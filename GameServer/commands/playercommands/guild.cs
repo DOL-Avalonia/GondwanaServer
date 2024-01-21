@@ -631,19 +631,19 @@ namespace DOL.GS.Commands
                             if (typed)
                             {
                                 /*
-								 * Guild Info for Clan Cotswold:
-								 * Realm Points: xxx Bouty Points: xxx Merit Points: xxx
-								 * Guild Level: xx
-								 * Dues: 0% Bank: 0 copper pieces
-								 * Current Merit Bonus: None
-								 * Banner available for purchase
-								 * Webpage: xxx
-								 * Contact Email:
-								 * Message: motd
-								 * Officer Message: xxx
-								 * Alliance Message: xxx
-								 * Claimed Keep: xxx
-								 */
+                                 * Guild Info for Clan Cotswold:
+                                 * Realm Points: xxx Bouty Points: xxx Merit Points: xxx
+                                 * Guild Level: xx
+                                 * Dues: 0% Bank: 0 copper pieces
+                                 * Current Merit Bonus: None
+                                 * Banner available for purchase
+                                 * Webpage: xxx
+                                 * Contact Email:
+                                 * Message: motd
+                                 * Officer Message: xxx
+                                 * Alliance Message: xxx
+                                 * Claimed Keep: xxx
+                                 */
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuild", client.Player.Guild.Name), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoRPBPMP", client.Player.Guild.RealmPoints, client.Player.Guild.BountyPoints, client.Player.Guild.MeritPoints), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuildLevel", client.Player.Guild.GuildLevel), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
@@ -2515,7 +2515,7 @@ namespace DOL.GS.Commands
                             }
                             client.Player.Guild.UpdateGuildWindow();
                             return;
-							 */
+                             */
                         }
                     #endregion
                     #region Type
