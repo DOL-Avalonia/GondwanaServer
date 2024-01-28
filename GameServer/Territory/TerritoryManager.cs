@@ -2,7 +2,6 @@
 using DOL.events.server;
 using DOL.Events;
 using DOL.GameEvents;
-using DOL.Geometry;
 using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.GS.PropertyCalc;
@@ -11,9 +10,11 @@ using DOL.Language;
 using DOL.MobGroups;
 using DOLDatabase.Tables;
 using log4net;
+using SQLitePCL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -109,7 +110,9 @@ namespace DOL.Territory
                                         log.Error($"Boss Id does not match from GroupId {territoryDb.GroupId} and Found Bossid from groupId (event search) {mobinfo.Mob.InternalID} , {territoryDb.BossMobId} identified in database");
                                         continue;
                                     }
-                                    Territory territory = new Territory(area, territoryDb.AreaId, territoryDb.RegionId, territoryDb.ZoneId, territoryDb.GroupId, mobinfo.Mob, territoryDb.IsBannerSummoned, guild: territoryDb.GuidldOwner, bonus: territoryDb.Bonus, id: territoryDb.ObjectId);
+                                    var coordinates = GetCoordinates(area);
+
+                                    Territory territory = new Territory(area, territoryDb.AreaId, new Vector3(coordinates.X, coordinates.Y, coordinates.Z), territoryDb.RegionId, territoryDb.ZoneId, territoryDb.GroupId, mobinfo.Mob, territoryDb.IsBannerSummoned, guild: territoryDb.GuidldOwner, bonus: territoryDb.Bonus, id: territoryDb.ObjectId);
 
                                     Instance.Territories.Add(territory);
 
@@ -448,7 +451,7 @@ namespace DOL.Territory
                 return false;
             }
 
-            var territory = new Territory(area, areaId, regionId, zone.ID, groupId, boss, false);
+            var territory = new Territory(area, areaId, new Vector3(coords.X, coords.Y, coords.Z), regionId, zone.ID, groupId, boss, false);
             this.Territories.Add(territory);
 
             try
@@ -476,6 +479,7 @@ namespace DOL.Territory
                     oldGuild.RemoveTerritory(territory.AreaId);
                 }
                 ClearEmblem(territory);
+                territory.ClearPortal();
             }
 
             guild.AddTerritory(territory.AreaId, saveChange);
@@ -548,32 +552,12 @@ namespace DOL.Territory
 
         public static AreaCoordinate GetCoordinates(IArea area)
         {
-            float x, y;
-
-            if (area is DOL.GS.Area.Circle circle)
+            return area switch
             {
-                x = circle.Position.X;
-                y = circle.Position.Y;
-            }
-            else if (area is Square sq)
-            {
-                x = sq.X;
-                y = sq.Y;
-            }
-            else if (area is Polygon poly)
-            {
-                x = poly.X;
-                y = poly.Y;
-            }
-            else
-            {
-                return null;
-            }
-
-            return new AreaCoordinate()
-            {
-                X = x,
-                Y = y
+                DOL.GS.Area.Circle circle => new AreaCoordinate() { X = circle.Position.X, Y = circle.Position.Y, Z = circle.Position.Z },
+                Square sq => new AreaCoordinate() { X = sq.Position.X, Y = sq.Position.Y, Z = sq.Position.Z },
+                Polygon poly => new AreaCoordinate() { X = poly.Position.X, Y = poly.Position.Y, Z = poly.Position.Z },
+                _ => null
             };
         }
 

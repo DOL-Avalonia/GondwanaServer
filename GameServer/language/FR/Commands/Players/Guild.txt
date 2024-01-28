@@ -238,6 +238,16 @@ Commands.Players.Guild.TerritoryPaid:           La somme de {0} a été retirée
 Commands.Players.Guild.TerritoryNoMoney:        Votre guilde n'a pas pu honorer ses dettes et vous avez perdu vos territoires conquis.  
 Commands.Players.Guild.TerritoryMeritPoints:   L'occupation de vos territoires vous rapporte {0} points de mérite.
 
+Commands.Players.Guild.TerritoryPortal.NoGuild:			Vous devez faire parti d'une guilde pour invoquer un portail de guilde.
+Commands.Players.Guild.TerritoryPortal.Denied:			Vous devez être au moins rang 4 pour invoquer un portail de guilde.
+Commands.Players.Guild.TerritoryPortal.ConfirmCost:		Invoquer un portail de guilde coûtera {0} points de mérite. Confirmer?
+Commands.Players.Guild.TerritoryPortal.Cooldown:		Vous ne pouvez pas invoquer un portail de guilde si tôt après en avoir invoqué un.
+Commands.Players.Guild.TerritoryPortal.NotEnoughMerit:	Votre guilde doit avoir {0} points de mérite pour invoquer un portail de guilde.
+Commands.Players.Guild.TerritoryPortal.NotInTerritory:	Vous ne pouvez pas invoquer un portail de guilde en dehors d'un territoire contrôlé par votre guilde.
+
+Commands.Players.Guild.TerritoryPortal.Called:		Vous avez été appelé(e) par votre guilde pour défendre {0}, allez-vous répondre à l'appel?
+Commands.Players.Guild.TerritoryPortal.Expired:		L'appel aux armes a éxpiré!
+Commands.Players.Guild.TerritoryPortal.Summoned:	Vous avez été téléporté(e) à {0}. Vous pouvez utiliser le portail au centre du territoire pour revenir à votre précédente position.
 
 # /Guilds a traduire:
 Commands.Players.Guild.Alliance.AlreadyOther:		La guilde a déjà une alliance

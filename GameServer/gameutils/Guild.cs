@@ -30,6 +30,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Territory;
 using DOL.GS.Finance;
+using System.Timers;
 
 namespace DOL.GS
 {
@@ -110,14 +111,14 @@ namespace DOL.GS
         protected readonly Dictionary<string, GamePlayer> m_onlineGuildPlayers = new Dictionary<string, GamePlayer>();
 
         /// <summary>
-		/// This holds all new recrue in the guild who can't leave during the server property timer
-		/// </summary>
-		private Dictionary<GamePlayer, DateTime> m_invite_Players = new Dictionary<GamePlayer, DateTime>();
+        /// This holds all new recrue in the guild who can't leave during the server property timer
+        /// </summary>
+        private Dictionary<GamePlayer, DateTime> m_invite_Players = new Dictionary<GamePlayer, DateTime>();
 
         /// <summary>
-		/// This holds all old members guild in the guild who can't enter during the server property timer
-		/// </summary>
-		private Dictionary<GamePlayer, DateTime> m_leave_Players = new Dictionary<GamePlayer, DateTime>();
+        /// This holds all old members guild in the guild who can't enter during the server property timer
+        /// </summary>
+        private Dictionary<GamePlayer, DateTime> m_leave_Players = new Dictionary<GamePlayer, DateTime>();
 
         /// <summary>
         /// Use this object to lock the guild member list
@@ -443,6 +444,12 @@ namespace DOL.GS
                     }
                 }
             }
+        }
+
+        public uint GuildPortalAvailableTick
+        {
+            get;
+            set;
         }
 
         public int Emblem
@@ -1013,11 +1020,11 @@ namespace DOL.GS
         }
 
         /// <summary>
-		/// Sends a message to all guild members with key to translate
-		/// <param name="msg">message string</param>
-		/// <param name="type">message type</param>
-		/// <param name="loc">message location</param>
-		public void SendMessageToGuildMembersKey(string msg, eChatType type, eChatLoc loc, params object[] args)
+        /// Sends a message to all guild members with key to translate
+        /// <param name="msg">message string</param>
+        /// <param name="type">message type</param>
+        /// <param name="loc">message location</param>
+        public void SendMessageToGuildMembersKey(string msg, eChatType type, eChatLoc loc, params object[] args)
         {
             lock (m_onlineGuildPlayers)
             {

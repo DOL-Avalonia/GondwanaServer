@@ -2521,6 +2521,18 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("guild", "guild_banner_merit_price", "The guild banner price in merit points", 5000)]
         public static int GUILD_BANNER_MERIT_PRICE;
 
+        [ServerProperty("guild", "guild_portal_merit_price", "The guild portal price in merit points", 5000)]
+        public static int GUILD_PORTAL_MERIT_PRICE;
+
+        [ServerProperty("guild", "guild_portal_cooldown", "The cooldown in minutes for guild portals, per guild", 120)]
+        public static int GUILD_PORTAL_COOLDOWN;
+
+        /// <summary>
+        /// Duration of a guild portal. Default 15 minutes
+        /// </summary>
+        [ServerProperty("guild", "guild_portal_duration", "The duration in seconds for guild portals", 15 * 60)]
+        public static int GUILD_PORTAL_DURATION;
+
         /// <summary>
         /// Do we allow guild members from other realms
         /// </summary>

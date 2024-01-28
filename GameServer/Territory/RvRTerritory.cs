@@ -3,6 +3,7 @@ using DOL.GS.Keeps;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,8 +12,8 @@ namespace DOL.Territory
     public class RvRTerritory
         : Territory
     {
-        public RvRTerritory(IArea area, string areaId, ushort regionId, ushort zoneId, GameNPC boss)
-            : base(area, areaId, regionId, zoneId, null, boss, false)
+        public RvRTerritory(IArea area, string areaId, Vector3 center, ushort regionId, ushort zoneId, GameNPC boss)
+            : base(area, areaId, center, regionId, zoneId, null, boss, false)
         {
             //add new area to region
             //only in memory
@@ -61,6 +62,7 @@ namespace DOL.Territory
             {
                 door.Reset((eRealm)6);
             }
+            ClearPortal();
         }
     }
 }

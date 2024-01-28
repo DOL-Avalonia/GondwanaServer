@@ -1,9 +1,15 @@
-﻿using DOL.GS;
+﻿using Discord;
+using DOL.GS;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
+using DOL.GS.Spells;
+using DOL.Language;
 using DOLDatabase.Tables;
 using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +22,11 @@ namespace DOL.Territory
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private string id;
 
-        public Territory(IArea area, string areaId, ushort regionId, ushort zoneId, string groupId, GameNPC boss, bool IsBannerSummoned, string guild = null, string bonus = null, string id = null)
+        public Territory(IArea area, string areaId, Vector3 center, ushort regionId, ushort zoneId, string groupId, GameNPC boss, bool IsBannerSummoned, string guild = null, string bonus = null, string id = null)
         {
             this.id = id;
             this.Area = area;
+            this.Center = center;
             this.RegionId = regionId;
             this.Name = ((AbstractArea)area).Description;
             this.ZoneId = zoneId;
@@ -87,6 +94,12 @@ namespace DOL.Territory
             get;
         }
 
+        public Vector3 Center
+        {
+            get;
+            init;
+        }
+
         public IEnumerable<GameNPC> Mobs
         {
             get;
@@ -109,6 +122,16 @@ namespace DOL.Territory
             get;
             set;
         }
+
+        public GuildPortalNPC Portal
+        {
+            get;
+            private set;
+        }
+
+        private RegionTimer m_portalTimer;
+
+        private readonly object m_portalLock = new();
 
         public AreaCoordinate Coordinates
         {
@@ -218,7 +241,7 @@ namespace DOL.Territory
 
         private ushort GetRadius()
         {
-            if (this.Area is Circle circle)
+            if (this.Area is Area.Circle circle)
             {
                 return (ushort)circle.Radius;
             }
@@ -247,6 +270,80 @@ namespace DOL.Territory
                 log.Error($"Territory initialisation failed, cannot determine radius from Area. Area ID: {Area.ID} not supported ");
                 return 0;
             }
+        }
+
+        public void SpawnPortalNpc(GamePlayer spawner)
+        {
+
+            Guild guild = spawner.Guild;
+            GuildPortalNPC portalNpc = GuildPortalNPC.Create(this, spawner);
+            portalNpc.AddToWorld();
+            RegionTimer timer = new RegionTimer(portalNpc);
+            timer.Callback = new RegionTimerCallback(PortalExpireCallback);
+            timer.Interval = Properties.GUILD_PORTAL_DURATION * 1000;
+            lock (m_portalLock)
+            {
+                if (Portal != null)
+                {
+                    DespawnPortalNpc();
+                }
+                Portal = portalNpc;
+                m_portalTimer = timer;
+                m_portalTimer.Start(m_portalTimer.Interval);
+            }
+            foreach (GamePlayer player in guild.GetListOfOnlineMembers())
+            {
+                player.Client.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Guild.TerritoryPortal.Called", this.Name), PlayerAcceptsSummon);
+            }
+        }
+
+        public void ClearPortal()
+        {
+            lock (m_portalLock)
+            {
+                if (Portal != null)
+                {
+                    DespawnPortalNpc();
+                }
+            }
+        }
+
+        private void PlayerAcceptsSummon(GamePlayer player, byte response)
+        {
+            if (response == 0)
+            {
+                return;
+            }
+            lock (m_portalLock)
+            {
+                if (Portal == null || Portal.OwningGuild != player.Guild)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Guild.TerritoryPortal.Expired"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+                else
+                {
+                    Portal.SummonPlayer(player);
+                }
+            }
+        }
+
+        private void DespawnPortalNpc()
+        {
+            m_portalTimer.Stop();
+            m_portalTimer = null;
+            Portal.RemoveFromWorld();
+            Portal.Delete();
+            Portal = null;
+        }
+
+        private int PortalExpireCallback(RegionTimer timer)
+        {
+            lock (m_portalLock)
+            {
+                DespawnPortalNpc();
+            }
+            timer.Stop();
+            return 0;
         }
 
         /// <summary>

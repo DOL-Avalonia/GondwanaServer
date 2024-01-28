@@ -368,7 +368,7 @@ namespace AmteScripts.Managers
 
                 var areaName = string.IsNullOrEmpty(lord.GuildName) ? initNpc.Name : lord.GuildName;
                 var area = new Area.Circle(areaName, lord.Position.X, lord.Position.Y, lord.Position.Z, RVR_RADIUS);
-                rvrTerritory = new RvRTerritory(area, area.Description, lord.CurrentRegionID, lord.CurrentZone.ID, lord);
+                rvrTerritory = new RvRTerritory(area, area.Description, area.Position, lord.CurrentRegionID, lord.CurrentZone.ID, lord);
             }
 
             return new RvRMap()
@@ -557,6 +557,7 @@ namespace AmteScripts.Managers
             {
                 ((LordRvR)m.Value.RvRTerritory.Boss).StopRvR();
                 TerritoryManager.ClearEmblem(m.Value.RvRTerritory, m.Value.RvRTerritory.Boss);
+                m.Value.RvRTerritory.ClearPortal();
                 AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(m.Value.RvRTerritory.RegionId, m.Value.RvRTerritory.Boss.Position, 100000);
                 keep.TempRealm = 0;
                 keep.Reset(0);

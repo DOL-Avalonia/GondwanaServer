@@ -35,58 +35,36 @@ namespace DOL.GS
         public class Square : AbstractArea
         {
             /// <summary>
-            /// The X coordinate of this Area
+            /// The center coordinate of this Area
             /// </summary>
-            protected int m_X;
-
-            /// <summary>
-            /// The Y coordinate of this Area 
-            /// </summary>
-            protected int m_Y;
+            public Vector3 Position { get; private set; }
 
             /// <summary>
             /// The width of this Area 
             /// </summary>
-            protected int m_Width;
+            protected float m_Width;
 
             /// <summary>
             /// The height of this Area 
             /// </summary>
-            protected int m_Height;
+            protected float m_Height;
 
             public Square()
                 : base()
             { }
 
-            public Square(string desc, int x, int y, int width, int height, bool isPvp) : base(desc)
+            public Square(string desc, float x, float y, float z, float width, float height, bool isPvp) : base(desc)
             {
-                m_X = x;
-                m_Y = y;
+                Position = new Vector3(x, y, z);
                 m_Height = height;
                 m_Width = width;
                 IsPvP = isPvp;
             }
 
             /// <summary>
-            /// Returns the X Coordinate of this Area
-            /// </summary>
-            public int X
-            {
-                get { return m_X; }
-            }
-
-            /// <summary>
-            /// Returns the Y Coordinate of this Area
-            /// </summary>
-            public int Y
-            {
-                get { return m_Y; }
-            }
-
-            /// <summary>
             /// Returns the Width of this Area
             /// </summary>
-            public int Width
+            public float Width
             {
                 get { return m_Width; }
             }
@@ -94,7 +72,7 @@ namespace DOL.GS
             /// <summary>
             /// Returns the Height of this Area
             /// </summary>
-            public int Height
+            public float Height
             {
                 get { return m_Height; }
             }
@@ -106,13 +84,13 @@ namespace DOL.GS
             /// <returns></returns>
             public override bool IsIntersectingZone(Zone zone)
             {
-                if (X + Width < zone.XOffset)
+                if (Position.X + Width < zone.XOffset)
                     return false;
-                if (X - Width >= zone.XOffset + 65536)
+                if (Position.X - Width >= zone.XOffset + 65536)
                     return false;
-                if (Y + Height < zone.YOffset)
+                if (Position.Y + Height < zone.YOffset)
                     return false;
-                if (Y - Height >= zone.YOffset + 65536)
+                if (Position.Y - Height >= zone.YOffset + 65536)
                     return false;
 
                 return true;
@@ -125,23 +103,23 @@ namespace DOL.GS
             /// <returns></returns>
             public override bool IsContaining(Vector3 p, bool checkZ)
             {
-                var m_xdiff = p.X - X;
+                var m_xdiff = p.X - Position.X;
                 if (m_xdiff < 0 || m_xdiff > Width)
                     return false;
 
-                var m_ydiff = p.Y - Y;
+                var m_ydiff = p.Y - Position.Y;
                 if (m_ydiff < 0 || m_ydiff > Height)
                     return false;
 
                 /*
-				//SH: Removed Z checks when one of the two Z values is zero(on ground)
-				if (Z != 0 && spotZ != 0)
-				{
-					long m_zdiff = (long) spotZ - Z;
-					if (m_zdiff> Radius)
-						return false;
-				}
-				*/
+                //SH: Removed Z checks when one of the two Z values is zero(on ground)
+                if (Z != 0 && spotZ != 0)
+                {
+                    long m_zdiff = (long) spotZ - Z;
+                    if (m_zdiff> Radius)
+                        return false;
+                }
+                */
 
                 return true;
             }
@@ -151,8 +129,7 @@ namespace DOL.GS
                 DbArea = area;
                 m_translationId = area.TranslationId;
                 m_Description = area.Description;
-                m_X = area.X;
-                m_Y = area.Y;
+                Position = new Vector3(area.X, area.Y, area.Z);
                 m_Width = area.Radius;
                 m_Height = area.Radius;
                 this.CanVol = area.AllowVol;
@@ -256,14 +233,9 @@ namespace DOL.GS
         public class Polygon : AbstractArea
         {
             /// <summary>
-            /// The X coordinate of this Area (center, not important)
+            /// The center coordinate of this Area
             /// </summary>
-            protected int m_X;
-
-            /// <summary>
-            /// The Y coordinate of this Area (center, not important)
-            /// </summary>
-            protected int m_Y;
+            public Vector3 Position { get; private set; }
 
             /// <summary>
             /// Returns the Height of this Area
@@ -293,30 +265,13 @@ namespace DOL.GS
             {
             }
 
-            public Polygon(string desc, int x, int y, int z, int radius, string points)
+            public Polygon(string desc, float x, float y, float z, int radius, string points)
                 : base(desc)
             {
                 m_Description = desc;
-                m_X = x;
-                m_Y = y;
+                Position = new Vector3(x, y, z);
                 m_Radius = radius;
                 StringPoints = points;
-            }
-
-            /// <summary>
-            /// Returns the X Coordinate of this Area (center, not important)
-            /// </summary>
-            public int X
-            {
-                get { return m_X; }
-            }
-
-            /// <summary>
-            /// Returns the Y Coordinate of this Area (center, not important)
-            /// </summary>
-            public int Y
-            {
-                get { return m_Y; }
             }
 
             /// <summary>
@@ -354,13 +309,13 @@ namespace DOL.GS
             public override bool IsIntersectingZone(Zone zone)
             {
                 // TODO if needed
-                if (X + Radius < zone.XOffset)
+                if (Position.X + Radius < zone.XOffset)
                     return false;
-                if (X - Radius >= zone.XOffset + 65536)
+                if (Position.X - Radius >= zone.XOffset + 65536)
                     return false;
-                if (Y + Radius < zone.YOffset)
+                if (Position.Y + Radius < zone.YOffset)
                     return false;
-                if (Y - Radius >= zone.YOffset + 65536)
+                if (Position.Y - Radius >= zone.YOffset + 65536)
                     return false;
 
                 return true;
@@ -395,8 +350,7 @@ namespace DOL.GS
                 DbArea = area;
                 m_translationId = area.TranslationId;
                 m_Description = area.Description;
-                m_X = area.X;
-                m_Y = area.Y;
+                Position = new Vector3(area.X, area.Y, area.Z);
                 m_Radius = area.Radius;
                 StringPoints = area.Points;
                 this.CanVol = area.AllowVol;

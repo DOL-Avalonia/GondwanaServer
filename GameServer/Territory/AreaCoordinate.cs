@@ -19,5 +19,11 @@ namespace DOL.Territory
             get;
             set;
         }
+
+        public float Z
+        {
+            get;
+            set;
+        }
     }
 }

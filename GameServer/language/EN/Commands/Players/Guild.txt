@@ -230,7 +230,16 @@ Commands.Players.Guild.Withdrawamount:			Your {0} tax is transfered to the guild
 Commands.Players.Guild.WithdrawInvalid:			This is not a valid amount.
 Commands.Players.Guild.WithdrawTooMuch:			You can no longer add money to the guild's bank.
 
+Commands.Players.Guild.TerritoryPortal.NoGuild:			You must be in a guild to summon a guild portal.
+Commands.Players.Guild.TerritoryPortal.Denied:			You must be rank 4 or lower in your guild to summon a guild portal.
+Commands.Players.Guild.TerritoryPortal.ConfirmCost:		Summoning a guild portal will cost {0} merit points. Confirm?
+Commands.Players.Guild.TerritoryPortal.Cooldown:		You cannot summon a guild portal so soon after summoning one.
+Commands.Players.Guild.TerritoryPortal.NotEnoughMerit:	Your guild must have {0} merit points to summon a guild portal.
+Commands.Players.Guild.TerritoryPortal.NotInTerritory:	You cannot summon a guild portal outside of a territory owned by your guild.
 
+Commands.Players.Guild.TerritoryPortal.Called:		You have been called by your guild to defend the territory {0}, will you answer the call?
+Commands.Players.Guild.TerritoryPortal.Expired:		The call to arms has expired!
+Commands.Players.Guild.TerritoryPortal.Summoned:	You have been teleported to defend {0}. You may use the portal to be teleported back to your previous location.
 
 Commands.Players.Guild.InviteNotThis:			You cannot invite a member of this realm to your guild.
 Commands.Players.Guild.Help.GuildTerritories:   '/gc territories' Displays the guild territories and their occupations.

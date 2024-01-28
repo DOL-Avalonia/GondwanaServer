@@ -1289,6 +1289,67 @@ namespace DOL.GS.Commands
                         break;
 
                     #endregion
+                    #region TerritoryPortal
+                    case "territoryportal":
+                        {
+                            GamePlayer player = client.Player;
+                            Guild guild = player.Guild;
+
+                            if (guild == null)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.NoGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            }
+                            if (TerritoryManager.Instance.DoesPlayerOwnsTerritory(player) && GameServer.ServerRules.IsInPvPArea(player))
+                            {
+                                var territory = TerritoryManager.Instance.GetCurrentTerritory(player.CurrentAreas);
+
+                                if (player.GuildRank.RankLevel > 4 && client.Account.PrivLevel == 1)
+                                {
+                                    client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.Denied"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    break;
+                                }
+
+                                if (client.Account.PrivLevel == 1 && guild.MeritPoints < (long)Properties.GUILD_PORTAL_MERIT_PRICE)
+                                {
+                                    client.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.NotEnoughMerit"), Properties.GUILD_BANNER_MERIT_PRICE), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+
+                                var availableTick = guild.GuildPortalAvailableTick;
+                                if (client.Account.PrivLevel == 1 && availableTick > GameServer.Instance.TickCount)
+                                {
+                                    client.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.Cooldown")), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+
+                                client.Out.SendCustomDialog(string.Format(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.ConfirmCost"), Properties.GUILD_PORTAL_MERIT_PRICE), (GamePlayer player, byte response) =>
+                                {
+                                    if (response == 1)
+                                    {
+                                        if (client.Account.PrivLevel == 1)
+                                        {
+                                            if (player.Guild.MeritPoints < (long)Properties.GUILD_PORTAL_MERIT_PRICE)
+                                            {
+                                                client.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.NotEnoughMerit"), Properties.GUILD_BANNER_MERIT_PRICE), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                                return;
+                                            }
+
+                                            player.Guild.RemoveMeritPoints(Properties.GUILD_PORTAL_MERIT_PRICE);
+                                            player.Guild.GuildPortalAvailableTick = GameServer.Instance.TickCount + (uint)(Properties.GUILD_PORTAL_COOLDOWN < 0 ? 0 : Properties.GUILD_PORTAL_COOLDOWN) * 1000;
+                                        }
+                                        territory.SpawnPortalNpc(player);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryPortal.NotInTerritory"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+                        break;
+
+                    #endregion
                     #region List
                     // --------------------------------------------------------------------------------
                     // LIST
@@ -1541,7 +1602,7 @@ namespace DOL.GS.Commands
                                     client.Out.SendMessage(
                                         LanguageMgr.GetTranslation(
                                             client.Account.Language,
-                                            "Commands.Players.Guild.NoPlayerWithName"),
+                                            "Commands.Players.Guild.NoPlayerWithName", playerName),
                                         eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 }
                                 else if (playerName == string.Empty)
@@ -1645,7 +1706,7 @@ namespace DOL.GS.Commands
                                 return;
                             }
                             //if (commandUserGuildRank != 0 && (newrank < commandUserGuildRank || newrank < 0)) // Do we have to authorize Self Retrograde for GuildMaster?
-                            if ((newrank < commandUserGuildRank) || (newrank < 0) && client.Account.PrivLevel == 1)
+                            if (((newrank < commandUserGuildRank) || (newrank < 0)) && client.Account.PrivLevel == 1)
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.PromoteHigherThanPlayer"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
