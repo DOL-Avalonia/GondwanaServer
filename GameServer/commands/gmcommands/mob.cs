@@ -1284,6 +1284,7 @@ namespace DOL.GS.Commands
             info.Add(" + Health: " + targetMob.Health + "/" + targetMob.MaxHealth);
             info.Add(" + Endurance: " + targetMob.Endurance + "/" + targetMob.MaxEndurance);
             info.Add(" + Mana: " + targetMob.Mana + "/" + targetMob.MaxMana);
+            info.Add(" + Tension: " + targetMob.Tension + "/" + targetMob.MaxTension);
             info.Add(" + IsRenaissance: " + targetMob.IsRenaissance);
             info.Add(" + EventId: " + targetMob.EventID);
             info.Add(" + GroupMobId: " + (targetMob?.CurrentGroupMob?.GroupId ?? "-"));

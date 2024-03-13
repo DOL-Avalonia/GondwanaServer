@@ -39,6 +39,7 @@ namespace DOL.GS.PlayerClass
             m_tertiaryStat = eStat.DEX;
             m_baseWeaponSkill = 440;
             m_eligibleRaces = DefaultEligibleRaces;
+            m_maxTensionFactor = 1.16f;
         }
 
         public override int WeaponSkillFactor(eObjectType type)

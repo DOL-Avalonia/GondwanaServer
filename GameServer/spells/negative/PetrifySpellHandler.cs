@@ -194,7 +194,7 @@ namespace DOL.GS.Spells
             if (args.AttackData.AttackResult == GameLiving.eAttackResult.HitUnstyled
                 || args.AttackData.AttackResult == GameLiving.eAttackResult.HitStyle)
                 absorbPercent = 50;
-            if (args.AttackData.AttackType == AttackData.eAttackType.Spell)
+            if (args.AttackData.AttackType is AttackData.eAttackType.Spell or AttackData.eAttackType.DoT)
                 absorbPercent = 75;
 
             int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));

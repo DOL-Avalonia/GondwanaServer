@@ -39,6 +39,7 @@ namespace DOL.GS.PlayerClass
             m_secondaryStat = eStat.DEX;
             m_tertiaryStat = eStat.QUI;
             m_eligibleRaces = DefaultEligibleRaces;
+            m_maxTensionFactor = 1.07f;
         }
 
         public override eClassType ClassType

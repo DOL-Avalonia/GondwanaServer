@@ -36,6 +36,7 @@ namespace DOL.GS.PlayerClass
             m_baseHP = 720;
             m_manaStat = eStat.EMP;
             m_eligibleRaces = DefaultEligibleRaces;
+            m_maxTensionFactor = 1.03f;
         }
 
         public override eClassType ClassType

@@ -52,6 +52,7 @@ using DOL.Language;
 using DOL.Territory;
 using DOL.GameEvents;
 using DOL.GS.GameEvents;
+using DOL.GS.Realm;
 using DOL.GS.Scripts;
 using log4net;
 
@@ -2913,6 +2914,68 @@ namespace DOL.GS
             }
         }
 
+        public const int BASE_MAX_TENSION = 25000;
+
+        /// <inheritdoc />
+        public override int Tension
+        {
+            get => DBCharacter != null ? DBCharacter.Tension : base.Tension;
+            set
+            {
+                if (base.Tension == value) // No change, ignore
+                {
+                    return;
+                }
+                base.Tension = value;
+                DBCharacter.Tension = base.Tension;
+            }
+        }
+
+        protected override void GainTension(GameLiving source)
+        {
+            if (MaxTension <= 0)
+            {
+                return;
+            }
+            int tension = 0;
+            int level_difference = source.Level - this.Level;
+
+            if (source is GamePlayer)
+            {
+                tension = level_difference switch
+                {
+                    <= -5 => 0,
+                    <= -2 => 20,
+                    <= 2 => 50,
+                    <= 6 => 100,
+                    <= 15 => 150,
+                    <= 30 => 200,
+                    > 30 => 250
+                };
+            }
+            else
+            {
+                tension = level_difference switch
+                {
+                    <= -5 => 0,
+                    <= -2 => 40,
+                    <= 2 => 100,
+                    <= 6 => 200,
+                    <= 15 => 300,
+                    <= 30 => 400,
+                    > 30 => 500
+                };
+            }
+
+            Tension += tension;
+        }
+
+        protected override void OnAdrenalineFull()
+        {
+            Out.SendMessage("Placeholder: Adrenaline full", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            m_tension = 0;
+        }
+
         /// <summary>
         /// Gets the concentration left
         /// </summary>
@@ -3032,6 +3095,16 @@ namespace DOL.GS
             m_characterClass.Init(this);
 
             DBCharacter.Class = m_characterClass.ID;
+
+            float maxTension = BASE_MAX_TENSION;
+            Race race = DOLDB<Race>.SelectObject(DB.Column(nameof(Database.Race.ID)).IsEqualTo(Race));
+            if (race != null)
+            {
+                maxTension *= race.MaxTensionFactor;
+            }
+            maxTension *= CharacterClass.MaxTensionFactor;
+            DBCharacter.MaxTension = (int)maxTension;
+            MaxTension = DBCharacter.MaxTension;
 
             if (Group != null)
             {
@@ -7196,7 +7269,8 @@ namespace DOL.GS
                             case eArmorSlot.FEET: hitLocName = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.Location.Foot"); break;
                         }
                         string modmessage = "";
-                        if (ad.Attacker is GamePlayer == false) // if attacked by player, don't show resists (?)
+
+                        if (ad.Attacker is not GamePlayer) // if attacked by player, don't show resists (?)
                         {
                             if (ad.Modifier > 0) modmessage = " (+" + ad.Modifier + ")";
                             if (ad.Modifier < 0) modmessage = " (" + ad.Modifier + ")";
@@ -7228,6 +7302,8 @@ namespace DOL.GS
 
 
                         #endregion
+
+                        // if (ad.CausesCombat)
 
                         // decrease condition of hitted armor piece
                         if (ad.ArmorHitLocation != eArmorSlot.NOTSET)

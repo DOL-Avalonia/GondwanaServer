@@ -38,6 +38,7 @@ namespace DOL.GS.PlayerClass
             m_tertiaryStat = eStat.DEX;
             m_manaStat = eStat.PIE;
             m_eligibleRaces = DefaultEligibleRaces;
+            m_maxTensionFactor = 1.04f;
         }
 
         public override bool HasAdvancedFromBaseClass()

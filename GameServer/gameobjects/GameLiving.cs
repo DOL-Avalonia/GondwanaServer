@@ -4338,6 +4338,11 @@ namespace DOL.GS
                     ad.Attacker.LastAttackTickPvP = CurrentRegion.Time;
                 }
             }
+
+            if (ad is { AttackResult: eAttackResult.HitStyle or eAttackResult.HitUnstyled, AttackType: not AttackData.eAttackType.DoT and not AttackData.eAttackType.Unknown })
+            {
+                GainTension(ad.Attacker);
+            }
         }
 
         /// <summary>
@@ -5624,8 +5629,7 @@ namespace DOL.GS
                 int maxmana = MaxMana;
                 m_mana = Math.Min(value, maxmana);
                 m_mana = Math.Max(m_mana, 0);
-                if (IsAlive && (m_mana < maxmana || (this is GamePlayer && ((GamePlayer)this).CharacterClass.ID == (int)eCharacterClass.Vampiir)
-                                || (this is GamePlayer && ((GamePlayer)this).CharacterClass.ID > 59 && ((GamePlayer)this).CharacterClass.ID < 63)))
+                if (IsAlive && (m_mana < maxmana || (this is GamePlayer { CharacterClass.ID: (int)eCharacterClass.Vampiir or (> 59 and < 63) })))
                 {
                     StartPowerRegeneration();
                 }
@@ -5686,6 +5690,79 @@ namespace DOL.GS
             get
             {
                 return (byte)(MaxEndurance <= 0 ? 0 : ((Endurance * 100) / MaxEndurance));
+            }
+        }
+
+        protected int m_tension = 0;
+
+        public virtual int Tension
+        {
+            get { return m_tension; }
+            set
+            {
+                int newTension = m_tension + value;
+                int maxtension = MaxTension;
+                if (newTension <= 0)
+                {
+                    m_tension = 0;
+                }
+                else if (newTension >= maxtension)
+                {
+                    m_tension = maxtension;
+                    OnAdrenalineFull();
+                }
+                else
+                {
+                    m_tension = newTension;
+                }
+            }
+        }
+
+        protected virtual void GainTension(GameLiving source)
+        {
+            if (MaxTension <= 0)
+            {
+                return;
+            }
+            int tension = 0;
+            int level_difference = source.Level - this.Level;
+
+            if (level_difference <= -5)
+            {
+                return;
+            }
+            tension = level_difference switch
+            {
+                <= -2 => 1,
+                <= 2 => 2,
+                <= 6 => 3,
+                <= 15 => 5,
+                > 15 => 8
+            };
+
+            Tension += tension;
+        }
+
+        protected virtual void OnAdrenalineFull()
+        {
+            // TODO
+            m_tension = 0;
+        }
+
+        public virtual int MaxTension
+        {
+            get;
+            set;
+        } = 0;
+
+        /// <summary>
+        /// Gets the Tension in percent 0..100
+        /// </summary>
+        public virtual byte TensionPercent
+        {
+            get
+            {
+                return (byte)(MaxTension <= 0 ? 0 : Tension * 100 / MaxTension);
             }
         }
 

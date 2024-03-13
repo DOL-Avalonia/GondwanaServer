@@ -37,6 +37,7 @@ namespace DOL.GS.Spells
         public override AttackData CalculateDamageToTarget(GameLiving target, double effectiveness)
         {
             AttackData ad = base.CalculateDamageToTarget(target, effectiveness);
+            ad.AttackType = AttackData.eAttackType.DoT;
             ad.CriticalDamage = 0;
             return ad;
         }

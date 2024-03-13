@@ -35,6 +35,7 @@ namespace DOL.GS.PlayerClass
             m_baseWeaponSkill = 360;
             m_baseHP = 720;
             m_eligibleRaces = DefaultEligibleRaces;
+            m_maxTensionFactor = 1.03f;
         }
 
         public override eClassType ClassType

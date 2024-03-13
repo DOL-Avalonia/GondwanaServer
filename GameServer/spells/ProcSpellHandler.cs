@@ -21,8 +21,10 @@ using System.Collections.Generic;
 using DOL.Database;
 using DOL.AI.Brain;
 using DOL.Events;
+using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
 using DOL.Language;
 
 using log4net;
@@ -241,12 +243,10 @@ namespace DOL.GS.Spells
         {
             AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
 
-            if (args == null || args.AttackData == null || args.AttackData.AttackType == AttackData.eAttackType.Spell)
+            if (args is not { AttackData: { AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle, AttackType: not AttackData.eAttackType.Spell and not AttackData.eAttackType.DoT } })
                 return;
 
             AttackData ad = args.AttackData;
-            if (ad.AttackResult != GameLiving.eAttackResult.HitUnstyled && ad.AttackResult != GameLiving.eAttackResult.HitStyle)
-                return;
 
             int baseChance = Spell.Frequency / 100;
 
@@ -316,12 +316,11 @@ namespace DOL.GS.Spells
         protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
             AttackedByEnemyEventArgs args = arguments as AttackedByEnemyEventArgs;
-            if (args == null || args.AttackData == null || args.AttackData.AttackType == AttackData.eAttackType.Spell)
+
+            if (args is not { AttackData: { AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle, AttackType: not AttackData.eAttackType.Spell and not AttackData.eAttackType.DoT } })
                 return;
 
             AttackData ad = args.AttackData;
-            if (ad.AttackResult != GameLiving.eAttackResult.HitUnstyled && ad.AttackResult != GameLiving.eAttackResult.HitStyle)
-                return;
 
             int baseChance = Spell.Frequency / 100;
 

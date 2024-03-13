@@ -91,6 +91,11 @@ namespace DOL.GS
         eStat ManaStat { get; }
 
         /// <summary>
+        /// Class Factor to multiply MaxTension by
+        /// </summary>
+        float MaxTensionFactor { get; }
+
+        /// <summary>
         /// Class Weapon Skill Base
         /// </summary>
         int WeaponSkillBase { get; }

@@ -266,6 +266,10 @@ namespace DOL.GS
             /// Attack is done with a spell
             /// </summary>
             Spell = 5,
+            /// <summary>
+            /// Attack is a damage-over-time effect
+            /// </summary>
+            DoT = 6
         }
 
         /// <summary>

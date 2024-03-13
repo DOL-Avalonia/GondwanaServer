@@ -99,6 +99,7 @@ namespace DOL.GS
         short Intelligence { get; }
         short Empathy { get; }
         short Charisma { get; }
+        int MaxTension { get; }
 
         /// <summary>
         /// Gets the template npc aggro values

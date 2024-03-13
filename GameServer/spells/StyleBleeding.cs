@@ -86,7 +86,7 @@ namespace DOL.GS.Spells
             AttackData ad = new AttackData();
             ad.Attacker = Caster;
             ad.Target = target;
-            ad.AttackType = AttackData.eAttackType.Spell;
+            ad.AttackType = AttackData.eAttackType.DoT;
             ad.Modifier = bleedValue * ad.Target.GetResist(Spell.DamageType) / -100;
             ad.Damage = bleedValue + ad.Modifier;
             ad.DamageType = Spell.DamageType;

@@ -51,6 +51,7 @@ namespace DOL.GS.Spells
         public override AttackData CalculateDamageToTarget(GameLiving target, double effectiveness)
         {
             AttackData ad = base.CalculateDamageToTarget(target, effectiveness);
+            ad.AttackType = AttackData.eAttackType.DoT;
             if (this.SpellLine.KeyName == GlobalSpellsLines.Mundane_Poisons)
             {
                 RealmAbilities.L3RAPropertyEnhancer ra = Caster.GetAbility<RealmAbilities.ViperAbility>();

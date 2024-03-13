@@ -31,7 +31,7 @@ namespace DOL.GS
     /// <summary>
     /// The Base class for all Character Classes in DOL
     /// </summary>
-	public class CharacterClassBase : ICharacterClass
+    public class CharacterClassBase : ICharacterClass
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -63,46 +63,46 @@ namespace DOL.GS
         /// <summary>
         /// multiplier for specialization points per level in 10th
         /// </summary>
-		protected int m_specializationMultiplier;
+        protected int m_specializationMultiplier;
 
         /// <summary>
         /// BaseHP for hp calculation
         /// </summary>
-		protected int m_baseHP;
+        protected int m_baseHP;
 
         /// <summary>
         /// Stat gained every level.
         ///	see eStat consts
         /// </summary>
-		protected eStat m_primaryStat;
+        protected eStat m_primaryStat;
 
         /// <summary>
         /// Stat gained every second level.
         /// see eStat consts
         /// </summary>
-		protected eStat m_secondaryStat;
+        protected eStat m_secondaryStat;
 
         /// <summary>
         /// Stat gained every third level.
         /// see eStat consts
         /// </summary>
-		protected eStat m_tertiaryStat;
+        protected eStat m_tertiaryStat;
 
         /// <summary>
         /// Stat that affects the power/mana pool.
         /// Do not set if they do not have a power pool/spells
         /// </summary>
-		protected eStat m_manaStat;
+        protected eStat m_manaStat;
 
         /// <summary>
         /// Weapon Skill Base value to influence weapon skill calc
         /// </summary>
-		protected int m_baseWeaponSkill;
+        protected int m_baseWeaponSkill;
 
         /// <summary>
         /// Weapon Skill Base value to influence ranged weapon skill calc
         /// </summary>
-		protected int m_baseWeaponSkillRanged;
+        protected int m_baseWeaponSkillRanged;
 
         /// <summary>
         /// How many chants can be run at once
@@ -120,7 +120,7 @@ namespace DOL.GS
 
         protected List<PlayerRace> m_eligibleRaces;
 
-        protected float m_maxTensionFactor = 0.0f;
+        protected float m_maxTensionFactor = 1.0f;
 
         protected struct ClassOverride
         {
@@ -325,6 +325,11 @@ namespace DOL.GS
             get { return m_manaStat; }
         }
 
+        public float MaxTensionFactor
+        {
+            get { return m_maxTensionFactor; }
+        }
+
         public int WeaponSkillBase
         {
             get { return m_baseWeaponSkill; }
@@ -343,7 +348,7 @@ namespace DOL.GS
         /// <summary>
         /// Maximum number of pulsing spells that can be active simultaneously
         /// </summary>
-		public ushort MaxPulsingSpells
+        public ushort MaxPulsingSpells
         {
             get { return m_maxPulsingSpells; }
         }
@@ -373,7 +378,7 @@ namespace DOL.GS
         /// can train in.  Added by Echostorm for RAs
         /// </summary>
         /// <returns></returns>
-		public IList<string> GetAutotrainableSkills()
+        public IList<string> GetAutotrainableSkills()
         {
             return m_autotrainableSkills;
         }

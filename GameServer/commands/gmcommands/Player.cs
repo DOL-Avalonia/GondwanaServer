@@ -2558,6 +2558,7 @@ namespace DOL.GS.Commands
                 }
             }
             text.Add("  - Current stats " + sTitle + " : " + sCurrent);
+            text.Add("  - Current tension: " + player.Tension + " / " + player.MaxTension);
 
             sCurrent = "";
             sTitle = "";

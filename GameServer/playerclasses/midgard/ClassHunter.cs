@@ -42,6 +42,7 @@ namespace DOL.GS.PlayerClass
             m_autotrainableSkills = DefaultAutoTrainableSkills;
             m_eligibleRaces = DefaultEligibleRaces;
             m_manaStat = eStat.EMP;
+            m_maxTensionFactor = 1.07f;
         }
 
         public override int WeaponSkillFactor(eObjectType type)

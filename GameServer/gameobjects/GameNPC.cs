@@ -2532,6 +2532,7 @@ namespace DOL.GS
             this.Flags = (eFlags)template.Flags;
             CanStealth = IsStealthed;
             this.MeleeDamageType = template.MeleeDamageType;
+            this.MaxTension = template.MaxTension;
             #endregion
 
             #region Inventory

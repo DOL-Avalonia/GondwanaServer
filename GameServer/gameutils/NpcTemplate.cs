@@ -69,6 +69,7 @@ namespace DOL.GS
         protected short m_intelligence;
         protected short m_empathy;
         protected short m_charisma;
+        private int m_maxTension;
         protected List<Style> m_styles;
         protected IList m_spells;
         protected IList m_spelllines;
@@ -122,6 +123,7 @@ namespace DOL.GS
             m_piety = data.Piety;
             m_charisma = data.Charisma;
             m_empathy = data.Empathy;
+            m_maxTension = data.MaxTension;
             WeaponDps = data.WeaponDps;
             WeaponSpd = data.WeaponSpd;
             ArmorFactor = data.ArmorFactor;
@@ -606,6 +608,12 @@ namespace DOL.GS
             set { m_charisma = value; }
         }
 
+        public int MaxTension
+        {
+            get { return m_maxTension; }
+            set { m_maxTension = value; }
+        }
+
         public virtual int WeaponDps { get; set; } = 0;
         public virtual int WeaponSpd { get; set; } = 30;
         public virtual int ArmorFactor { get; set; } = 0;
@@ -703,6 +711,7 @@ namespace DOL.GS
             tmp.Constitution = Constitution;
             tmp.Dexterity = Dexterity;
             tmp.Empathy = Empathy;
+            tmp.MaxTension = MaxTension;
             tmp.EquipmentTemplateID = EquipmentTemplateID;
             tmp.ItemsListTemplateID = ItemsListTemplateID;
             tmp.EvadeChance = EvadeChance;

@@ -67,6 +67,7 @@ namespace DOL.Database
         private short m_piety = 0;
         private short m_empathy = 0;
         private short m_charisma = 0;
+        private int m_maxTension = 0;
 
         private int m_weapondps = 0;
         private int m_weaponspd = 30;
@@ -511,6 +512,17 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_empathy = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MaxTension
+        {
+            get { return m_maxTension; }
+            set
+            {
+                Dirty = true;
+                m_maxTension = value;
             }
         }
 

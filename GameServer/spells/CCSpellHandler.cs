@@ -376,7 +376,7 @@ namespace DOL.GS.Spells
 
             bool remove = false;
 
-            if (attackArgs.AttackData.AttackType != AttackData.eAttackType.Spell)
+            if (attackArgs.AttackData is { AttackType: not AttackData.eAttackType.Spell and not AttackData.eAttackType.DoT })
             {
                 switch (attackArgs.AttackData.AttackResult)
                 {

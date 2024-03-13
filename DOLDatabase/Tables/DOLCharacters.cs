@@ -55,6 +55,8 @@ namespace DOL.Database
         private int m_mana;
         private int m_concentration;
         private int m_endurance;
+        private int m_maxtension;
+        private int m_tension;
         private long m_exp;
         private long m_bntyPts;
         private long m_realmPts;
@@ -587,6 +589,42 @@ namespace DOL.Database
             set
             {
                 m_concentration = value;
+                Dirty = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets max endurance
+        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public int MaxTension
+        {
+            get
+            {
+                return m_maxtension;
+            }
+            set
+            {
+                m_maxtension = value;
+                Dirty = true;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Gets/sets max endurance
+        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public int Tension
+        {
+            get
+            {
+                return m_tension;
+            }
+            set
+            {
+                m_tension = value;
                 Dirty = true;
             }
         }

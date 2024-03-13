@@ -45,7 +45,7 @@ namespace DOL.GS.Effects
         {
             AttackFinishedEventArgs afea = (AttackFinishedEventArgs)args;
 
-            if (m_owner != afea.AttackData.Attacker || afea.AttackData.AttackType == AttackData.eAttackType.Spell)
+            if (m_owner != afea.AttackData.Attacker || afea.AttackData.AttackType is AttackData.eAttackType.Spell or AttackData.eAttackType.DoT)
                 return;
             //only affect this onto players
             if (!(afea.AttackData.Target is GamePlayer))

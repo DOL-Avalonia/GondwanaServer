@@ -34,6 +34,7 @@ namespace DOL.GS.PlayerClass
             m_baseWeaponSkill = 320;
             m_baseHP = 720;
             m_manaStat = eStat.PIE;
+            m_maxTensionFactor = 1.02f;
         }
 
         public override eClassType ClassType

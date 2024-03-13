@@ -39,6 +39,7 @@ namespace DOL.GS.PlayerClass
             m_manaStat = eStat.INT;
             m_baseWeaponSkill = 240; // yes, lower that for other casters for some reason
             m_eligibleRaces = DefaultEligibleRaces;
+            m_maxTensionFactor = 1.02f;
         }
 
         public override bool HasAdvancedFromBaseClass()
