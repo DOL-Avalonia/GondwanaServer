@@ -959,6 +959,12 @@ namespace DOL.GS.ServerProperties
         public static double PVE_SPELL_DAMAGE = 1.0;
 
         /// <summary>
+        /// The tension players gain when hit by monsters
+        /// </summary>
+        [ServerProperty("rates", "pve_tension_rate", "The PvE Tension Gain Modifier - Edit this to change the amount of tension players gain when fighting mobs e.g 1.5 is 50% more 2.0 is twice (100%) 0.5 is half (50%)", 1.0)]
+        public static double PVE_TENSION_RATE = 1.0;
+
+        /// <summary>
         /// The percent per con difference (-1 = blue, 0 = yellow, 1 = OJ, 2 = red ...) subtracted to hitchance for spells in PVE.  0 is none, 5 is 5% per con, etc.  Default is 10%
         /// </summary>
         [ServerProperty("rates", "pve_spell_conhitpercent", "The percent per con (1 = OJ, 2 = red ...) subtracted to hitchance for spells in PVE  Must be >= 0.  0 is none, 5 is 5% per level, etc.  Default is 10%", (uint)10)]
@@ -977,6 +983,12 @@ namespace DOL.GS.ServerProperties
         public static double PVP_SPELL_DAMAGE;
 
         /// <summary>
+        /// The tension players gain when hit by players
+        /// </summary>
+        [ServerProperty("rates", "pvp_tension_rate", "The PvP Tension Gain Modifier - Edit this to change the amount of tension players gain when fighting players e.g 1.5 is 50% more 2.0 is twice (100%) 0.5 is half (50%)", 1.0)]
+        public static double PVP_TENSION_RATE = 1.0;
+
+        /// <summary>
         /// A multiplier to apply to the base miss rate in PVP combat
         /// </summary>
         [ServerProperty("rates", "pvp_base_miss_multiplier", "A multiplier to apply to the base miss rate in PVP combat - Edit this to change the rate of missed attacks in Player versus Player", 1.0)]
@@ -993,6 +1005,12 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("rates", "heal_pvp_damage_value_rp", "How many % of heal final value is obtained in rps?", 8)]
         public static int HEAL_PVP_DAMAGE_VALUE_RP;
+
+        /// <summary>
+        /// The tension mobs gain when hit
+        /// </summary>
+        [ServerProperty("rates", "mob_tension_rate", "The Mob Tension Gain Modifier - Edit this to change the amount of tension mobs gain when hit by mobs or players e.g 1.5 is 50% more 2.0 is twice (100%) 0.5 is half (50%)", 1.0)]
+        public static double MOB_TENSION_RATE = 1.0;
 
         /// <summary>
         /// The highest possible Block Rate against an Enemy (Hard Cap)

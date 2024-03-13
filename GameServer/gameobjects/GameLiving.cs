@@ -5724,14 +5724,14 @@ namespace DOL.GS
             {
                 return;
             }
-            int tension = 0;
             int level_difference = source.Level - this.Level;
 
             if (level_difference <= -5)
             {
                 return;
             }
-            tension = level_difference switch
+
+            int tension = level_difference switch
             {
                 <= -2 => 1,
                 <= 2 => 2,
@@ -5739,6 +5739,8 @@ namespace DOL.GS
                 <= 15 => 5,
                 > 15 => 8
             };
+
+            tension = (int)(Properties.MOB_TENSION_RATE * tension);
 
             Tension += tension;
         }

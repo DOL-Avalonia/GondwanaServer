@@ -2937,14 +2937,18 @@ namespace DOL.GS
             {
                 return;
             }
-            int tension = 0;
             int level_difference = source.Level - this.Level;
 
+            if (level_difference <= -5)
+            {
+                return;
+            }
+
+            int tension;
             if (source is GamePlayer)
             {
                 tension = level_difference switch
                 {
-                    <= -5 => 0,
                     <= -2 => 20,
                     <= 2 => 50,
                     <= 6 => 100,
@@ -2952,12 +2956,13 @@ namespace DOL.GS
                     <= 30 => 200,
                     > 30 => 250
                 };
+
+                tension = (int)(Properties.PVP_TENSION_RATE * tension);
             }
             else
             {
                 tension = level_difference switch
                 {
-                    <= -5 => 0,
                     <= -2 => 40,
                     <= 2 => 100,
                     <= 6 => 200,
@@ -2965,6 +2970,8 @@ namespace DOL.GS
                     <= 30 => 400,
                     > 30 => 500
                 };
+
+                tension = (int)(Properties.PVE_TENSION_RATE * tension);
             }
 
             Tension += tension;
@@ -7302,8 +7309,6 @@ namespace DOL.GS
 
 
                         #endregion
-
-                        // if (ad.CausesCombat)
 
                         // decrease condition of hitted armor piece
                         if (ad.ArmorHitLocation != eArmorSlot.NOTSET)
