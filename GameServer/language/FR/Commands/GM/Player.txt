@@ -1,0 +1,2 @@
+Commands.GM.Player.Tension.Show:			La tension de {0} est à {1} / {2}.
+Commands.GM.Player.Tension.Modified:		La tension de {0} est maintenant à {1} / {2}.

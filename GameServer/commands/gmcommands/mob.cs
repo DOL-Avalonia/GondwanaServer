@@ -35,6 +35,7 @@ using DOL.GS.Quests;
 using DOL.GS.Scripts;
 using DOL.GS.Styles;
 using DOL.GS.Utils;
+using DOL.Language;
 using DOL.MobGroups;
 using DOLDatabase.Tables;
 
@@ -115,6 +116,8 @@ namespace DOL.GS.Commands
          "'/mob path <PathID>' associate the mob to the specified path.",
          "'/mob house <HouseNumber>' set NPC's house number.",
          "'/mob <stat> <amount>' Set the mob's stats (str, con, dex, qui, int, emp, pie, cha).",
+         "'/mob tension <add|sub> <amount>' Show, add or substract to a mob's tension.",
+         "'/mob maxtension <amount>' Set a mob's max tension.",
          "'/mob tether <tether range>' set mob tether range (>0: check, <=0: no check).",
          "'/mob hood' toggle cloak hood visibility.",
          "'/mob cloak' toggle cloak visibility.",
@@ -153,11 +156,10 @@ namespace DOL.GS.Commands
 
             try
             {
-                GameNPC targetMob = null;
-                if (client.Player.TargetObject != null && client.Player.TargetObject is GameNPC)
-                    targetMob = (GameNPC)client.Player.TargetObject;
+                GameNPC targetMob = client.Player.TargetObject as GameNPC;
 
-                if (args[1] != "create"
+                if (targetMob == null
+                    && args[1] != "create"
                     && args[1] != "fastcreate"
                     && args[1] != "nrandcreate"
                     && args[1] != "nfastcreate"
@@ -171,9 +173,7 @@ namespace DOL.GS.Commands
                     && args[1] != "reload"
                     && args[1] != "findname"
                     && args[1] != "respawn"
-                     && args[1] != "reload"
-
-                    && targetMob == null)
+                     && args[1] != "reload" )
                 {
                     // it is not a mob
                     if (client.Player.TargetObject != null)
@@ -270,6 +270,8 @@ namespace DOL.GS.Commands
                     case "spd":
                     case "af":
                     case "abs": stat(client, targetMob, args); break;
+                    case "tension": tension(client, targetMob, args); break;
+                    case "maxtension": maxtension(client, targetMob, args); break;
                     case "tether": tether(client, targetMob, args); break;
                     case "hood": hood(client, targetMob, args); break;
                     case "cloak": cloak(client, targetMob, args); break;
@@ -2897,6 +2899,78 @@ namespace DOL.GS.Commands
                 DisplaySyntax(client, "<stat>");
                 return;
             }
+        }
+
+        private void tension(GameClient client, GameNPC targetMob, string[] args)
+        {
+            if (args.Length == 2)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Mob.Tension.Show", targetMob.Name, targetMob.Tension, targetMob.MaxTension), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (targetMob.MaxTension == 0)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Mob.Tension.Disabled"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            switch (args[2])
+            {
+                case "add":
+                    {
+                        if (args.Length < 4 || !Int32.TryParse(args[3], out int tensionMod))
+                        {
+                            DisplaySyntax(client);
+                            return;
+                        }
+                        targetMob.Tension += tensionMod; // Tension property clamps to [0, MaxTension]
+                        client.Player.SendTranslatedMessage("Commands.GM.Mob.Tension.Modified", eChatType.CT_System, eChatLoc.CL_SystemWindow, targetMob.Name, targetMob.Tension, targetMob.MaxTension);
+                    }
+                    break;
+
+                case "sub":
+                    {
+                        if (args.Length < 4 || !Int32.TryParse(args[3], out int tensionMod))
+                        {
+                            DisplaySyntax(client);
+                            return;
+                        }
+                        targetMob.Tension -= tensionMod; // Tension property clamps to [0, MaxTension]
+                        client.Player.SendTranslatedMessage("Commands.GM.Mob.Tension.Modified", eChatType.CT_System, eChatLoc.CL_SystemWindow, targetMob.Name, targetMob.Tension, targetMob.MaxTension);
+                    }
+                    break;
+
+                default:
+                    DisplaySyntax(client);
+                    return;
+            }
+        }
+
+        private void maxtension(GameClient client, GameNPC targetMob, string[] args)
+        {
+            if (args.Length == 2)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Mob.MaxTension.Show", targetMob.Name, targetMob.MaxTension), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (!Int32.TryParse(args[2], out int tensionMod))
+            {
+                DisplaySyntax(client);
+                return;
+            }
+
+            if (targetMob.NPCTemplate == null)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Mob.MaxTension.NoTemplate", targetMob.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            targetMob.NPCTemplate.MaxTension = tensionMod;
+            targetMob.MaxTension = tensionMod;
+            targetMob.NPCTemplate.SaveIntoDatabase();
+            client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Mob.MaxTension.Set", targetMob.Name, targetMob.MaxTension), eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
         private void tether(GameClient client, GameNPC targetMob, string[] args)

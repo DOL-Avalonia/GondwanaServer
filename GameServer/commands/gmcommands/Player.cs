@@ -46,6 +46,7 @@ namespace DOL.GS.Commands
         "/player inventory [wear|bag|vault|house|cons]",
         "/player <rps|bps|xp|xpa|clxp|mlxp> <amount>",
         "/player stat <typeofStat> <value>",
+        "/player tension <add|sub> <value> - shows, adds or subtracts a player's tension",
         "/player money <copp|silv|gold|plat|mith> <amount>",
         "/player respec <all|line|realm|dol|champion> <amount=1>",
         "/player model <reset|[change]> <modelid>",
@@ -1091,6 +1092,49 @@ namespace DOL.GS.Commands
                         {
                             DisplaySyntax(client);
                             return;
+                        }
+                    }
+                    break;
+
+                case "tension":
+                    {
+                        var player = (client.Player.TargetObject as GamePlayer) ?? client.Player;
+
+                        if (args.Length == 2)
+                        {
+                            client.Player.SendTranslatedMessage("Commands.GM.Player.Tension.Show", eChatType.CT_System, eChatLoc.CL_SystemWindow, player.Name, player.Tension, player.MaxTension);
+                            return;
+                        }
+
+                        switch (args[2])
+                        {
+                            case "add":
+                                {
+                                    if (args.Length < 4 || !Int32.TryParse(args[3], out int tensionMod))
+                                    {
+                                        DisplaySyntax(client);
+                                        return;
+                                    }
+                                    player.Tension += tensionMod; // Tension property clamps to [0, MaxTension]
+                                    client.Player.SendTranslatedMessage("Commands.GM.Player.Tension.Modified", eChatType.CT_System, eChatLoc.CL_SystemWindow, player.Name, player.Tension, player.MaxTension);
+                                }
+                                break;
+
+                            case "sub":
+                                {
+                                    if (args.Length < 4 || !Int32.TryParse(args[3], out int tensionMod))
+                                    {
+                                        DisplaySyntax(client);
+                                        return;
+                                    }
+                                    player.Tension -= tensionMod; // Tension property clamps to [0, MaxTension]
+                                    client.Player.SendTranslatedMessage("Commands.GM.Player.Tension.Modified", eChatType.CT_System, eChatLoc.CL_SystemWindow, player.Name, player.Tension, player.MaxTension);
+                                }
+                                break;
+
+                            default:
+                                DisplaySyntax(client);
+                                return;
                         }
                     }
                     break;

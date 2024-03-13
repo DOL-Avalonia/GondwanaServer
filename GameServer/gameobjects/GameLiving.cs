@@ -1353,112 +1353,112 @@ namespace DOL.GS
         /// </summary>
         public static readonly long[] XPForLiving =
         {
-			// noret: first 52 are from exp table, think mythic has changed some values
-			// cause they don't fit the formula; rest are calculated.
-			// with this formula group with 8 lv50 players should hit cap on lv67 mobs what looks about correct
-			// http://www.daocweave.com/daoc/general/experience_table.htm
-			5,					// xp for level 0
-			10,					// xp for level 1
-			20,					// xp for level 2
-			40,					// xp for level 3
-			80,					// xp for level 4
-			160,				// xp for level 5
-			320,				// xp for level 6
-			640,				// xp for level 7
-			1280,				// xp for level 8
-			2560,				// xp for level 9
-			5120,				// xp for level 10
-			7240,				// xp for level 11
-			10240,				// xp for level 12
-			14480,				// xp for level 13
-			20480,				// xp for level 14
-			28980,				// xp for level 15
-			40960,				// xp for level 16
-			57930,				// xp for level 17
-			81920,				// xp for level 18
-			115850,				// xp for level 19
-			163840,				// xp for level 20
-			206435,				// xp for level 21
-			231705,				// xp for level 22
-			327680,				// xp for level 23
-			412850,				// xp for level 24
-			520160,				// xp for level 25
-			655360,				// xp for level 26
-			825702,				// xp for level 27
-			1040319,			// xp for level 28
-			1310720,			// xp for level 29
-			1651404,			// xp for level 30
-			2080638,			// xp for level 31
-			2621440,			// xp for level 32
-			3302807,			// xp for level 33
-			4161277,			// xp for level 34
-			5242880,			// xp for level 35
-			6022488,			// xp for level 36
-			6918022,			// xp for level 37
-			7946720,			// xp for level 38
-			9128384,			// xp for level 39
-			10485760,			// xp for level 40
-			12044975,			// xp for level 41
-			13836043,			// xp for level 42
-			15893440,			// xp for level 43
-			18258769,			// xp for level 44
-			20971520,			// xp for level 45
-			24089951,			// xp for level 46
-			27672087,			// xp for level 47
-			31625241,			// xp for level 48; sshot505.tga
-			36513537,			// xp for level 49
-			41943040,			// xp for level 50
-			48179911,			// xp for level 51
-			52428800,			// xp for level 52
-			63573760,			// xp for level 53
-			73027074,			// xp for level 54
-			83886080,			// xp for level 55
-			96359802,			// xp for level 56
-			110688346,			// xp for level 57
-			127147521,			// xp for level 58
-			146054148,			// xp for level 59
-			167772160,			// xp for level 60
-			192719604,			// xp for level 61
-			221376692,			// xp for level 62
-			254295042,			// xp for level 63
-			292108296,			// xp for level 64
-			335544320,			// xp for level 65
-			385439208,			// xp for level 66
-			442753384,			// xp for level 67
-			508590084,			// xp for level 68
-			584216593,			// xp for level 69
-			671088640,			// xp for level 70
-			770878416,			// xp for level 71
-			885506769,			// xp for level 72
-			1017180169,			// xp for level 73
-			1168433187,			// xp for level 74
-			1342177280,			// xp for level 75
-			1541756833,			// xp for level 76
-			1771013538,			// xp for level 77
-			2034360338,			// xp for level 78
-			2336866374,			// xp for level 79
-			2684354560,			// xp for level 80
-			3083513667,			// xp for level 81
-			3542027077,			// xp for level 82
-			4068720676,			// xp for level 83
-			4673732748,			// xp for level 84
-			5368709120,			// xp for level 85
-			6167027334,			// xp for level 86
-			7084054154,			// xp for level 87
-			8137441353,			// xp for level 88
-			9347465497,			// xp for level 89
-			10737418240,		// xp for level 90
-			12334054669,		// xp for level 91
-			14168108308,		// xp for level 92
-			16274882707,		// xp for level 93
-			18694930994,		// xp for level 94
-			21474836480,		// xp for level 95
-			24668109338,		// xp for level 96
-			28336216617,		// xp for level 97
-			32549765415,		// xp for level 98
-			37389861988,		// xp for level 99
-			42949672960			// xp for level 100
-		};
+            // noret: first 52 are from exp table, think mythic has changed some values
+            // cause they don't fit the formula; rest are calculated.
+            // with this formula group with 8 lv50 players should hit cap on lv67 mobs what looks about correct
+            // http://www.daocweave.com/daoc/general/experience_table.htm
+            5,					// xp for level 0
+            10,					// xp for level 1
+            20,					// xp for level 2
+            40,					// xp for level 3
+            80,					// xp for level 4
+            160,				// xp for level 5
+            320,				// xp for level 6
+            640,				// xp for level 7
+            1280,				// xp for level 8
+            2560,				// xp for level 9
+            5120,				// xp for level 10
+            7240,				// xp for level 11
+            10240,				// xp for level 12
+            14480,				// xp for level 13
+            20480,				// xp for level 14
+            28980,				// xp for level 15
+            40960,				// xp for level 16
+            57930,				// xp for level 17
+            81920,				// xp for level 18
+            115850,				// xp for level 19
+            163840,				// xp for level 20
+            206435,				// xp for level 21
+            231705,				// xp for level 22
+            327680,				// xp for level 23
+            412850,				// xp for level 24
+            520160,				// xp for level 25
+            655360,				// xp for level 26
+            825702,				// xp for level 27
+            1040319,			// xp for level 28
+            1310720,			// xp for level 29
+            1651404,			// xp for level 30
+            2080638,			// xp for level 31
+            2621440,			// xp for level 32
+            3302807,			// xp for level 33
+            4161277,			// xp for level 34
+            5242880,			// xp for level 35
+            6022488,			// xp for level 36
+            6918022,			// xp for level 37
+            7946720,			// xp for level 38
+            9128384,			// xp for level 39
+            10485760,			// xp for level 40
+            12044975,			// xp for level 41
+            13836043,			// xp for level 42
+            15893440,			// xp for level 43
+            18258769,			// xp for level 44
+            20971520,			// xp for level 45
+            24089951,			// xp for level 46
+            27672087,			// xp for level 47
+            31625241,			// xp for level 48; sshot505.tga
+            36513537,			// xp for level 49
+            41943040,			// xp for level 50
+            48179911,			// xp for level 51
+            52428800,			// xp for level 52
+            63573760,			// xp for level 53
+            73027074,			// xp for level 54
+            83886080,			// xp for level 55
+            96359802,			// xp for level 56
+            110688346,			// xp for level 57
+            127147521,			// xp for level 58
+            146054148,			// xp for level 59
+            167772160,			// xp for level 60
+            192719604,			// xp for level 61
+            221376692,			// xp for level 62
+            254295042,			// xp for level 63
+            292108296,			// xp for level 64
+            335544320,			// xp for level 65
+            385439208,			// xp for level 66
+            442753384,			// xp for level 67
+            508590084,			// xp for level 68
+            584216593,			// xp for level 69
+            671088640,			// xp for level 70
+            770878416,			// xp for level 71
+            885506769,			// xp for level 72
+            1017180169,			// xp for level 73
+            1168433187,			// xp for level 74
+            1342177280,			// xp for level 75
+            1541756833,			// xp for level 76
+            1771013538,			// xp for level 77
+            2034360338,			// xp for level 78
+            2336866374,			// xp for level 79
+            2684354560,			// xp for level 80
+            3083513667,			// xp for level 81
+            3542027077,			// xp for level 82
+            4068720676,			// xp for level 83
+            4673732748,			// xp for level 84
+            5368709120,			// xp for level 85
+            6167027334,			// xp for level 86
+            7084054154,			// xp for level 87
+            8137441353,			// xp for level 88
+            9347465497,			// xp for level 89
+            10737418240,		// xp for level 90
+            12334054669,		// xp for level 91
+            14168108308,		// xp for level 92
+            16274882707,		// xp for level 93
+            18694930994,		// xp for level 94
+            21474836480,		// xp for level 95
+            24668109338,		// xp for level 96
+            28336216617,		// xp for level 97
+            32549765415,		// xp for level 98
+            37389861988,		// xp for level 99
+            42949672960			// xp for level 100
+        };
 
         /// <summary>
         /// Holds the level of target at which no exp is given
@@ -1466,57 +1466,57 @@ namespace DOL.GS
         public static readonly int[] NoXPForLevel =
         {
             -3,		//for level 0
-			-2,		//for level 1
-			-1,		//for level 2
-			0,		//for level 3
-			1,		//for level 4
-			2,		//for level 5
-			3,		//for level 6
-			4,		//for level 7
-			5,		//for level 8
-			6,		//for level 9
-			6,		//for level 10
-			6,		//for level 11
-			6,		//for level 12
-			7,		//for level 13
-			8,		//for level 14
-			9,		//for level 15
-			10,		//for level 16
-			11,		//for level 17
-			12,		//for level 18
-			13,		//for level 19
-			13,		//for level 20
-			13,		//for level 21
-			13,		//for level 22
-			14,		//for level 23
-			15,		//for level 24
-			16,		//for level 25
-			17,		//for level 26
-			18,		//for level 27
-			19,		//for level 28
-			20,		//for level 29
-			21,		//for level 30
-			22,		//for level 31
-			23,		//for level 32
-			24,		//for level 33
-			25,		//for level 34
-			25,		//for level 35
-			25,		//for level 36
-			25,		//for level 37
-			25,		//for level 38
-			25,		//for level 39
-			25,		//for level 40
-			26,		//for level 41
-			27,		//for level 42
-			28,		//for level 43
-			29,		//for level 44
-			30,		//for level 45
-			31,		//for level 46
-			32,		//for level 47
-			33,		//for level 48
-			34,		//for level 49
-			35,		//for level 50
-		};
+            -2,		//for level 1
+            -1,		//for level 2
+            0,		//for level 3
+            1,		//for level 4
+            2,		//for level 5
+            3,		//for level 6
+            4,		//for level 7
+            5,		//for level 8
+            6,		//for level 9
+            6,		//for level 10
+            6,		//for level 11
+            6,		//for level 12
+            7,		//for level 13
+            8,		//for level 14
+            9,		//for level 15
+            10,		//for level 16
+            11,		//for level 17
+            12,		//for level 18
+            13,		//for level 19
+            13,		//for level 20
+            13,		//for level 21
+            13,		//for level 22
+            14,		//for level 23
+            15,		//for level 24
+            16,		//for level 25
+            17,		//for level 26
+            18,		//for level 27
+            19,		//for level 28
+            20,		//for level 29
+            21,		//for level 30
+            22,		//for level 31
+            23,		//for level 32
+            24,		//for level 33
+            25,		//for level 34
+            25,		//for level 35
+            25,		//for level 36
+            25,		//for level 37
+            25,		//for level 38
+            25,		//for level 39
+            25,		//for level 40
+            26,		//for level 41
+            27,		//for level 42
+            28,		//for level 43
+            29,		//for level 44
+            30,		//for level 45
+            31,		//for level 46
+            32,		//for level 47
+            33,		//for level 48
+            34,		//for level 49
+            35,		//for level 50
+        };
 
         #endregion
 
@@ -3813,15 +3813,15 @@ namespace DOL.GS
             // Bladeturn
             // TODO: high level mob attackers penetrate bt, players are tested and do not penetrate (lv30 vs lv20)
             /*
-			 * http://www.camelotherald.com/more/31.shtml
-			 * - Bladeturns can now be penetrated by attacks from higher level monsters and
-			 * players. The chance of the bladeturn deflecting a higher level attack is
-			 * approximately the caster's level / the attacker's level.
-			 * Please be aware that everything in the game is
-			 * level/chance based - nothing works 100% of the time in all cases.
-			 * It was a bug that caused it to work 100% of the time - now it takes the
-			 * levels of the players involved into account.
-			 */
+             * http://www.camelotherald.com/more/31.shtml
+             * - Bladeturns can now be penetrated by attacks from higher level monsters and
+             * players. The chance of the bladeturn deflecting a higher level attack is
+             * approximately the caster's level / the attacker's level.
+             * Please be aware that everything in the game is
+             * level/chance based - nothing works 100% of the time in all cases.
+             * It was a bug that caused it to work 100% of the time - now it takes the
+             * levels of the players involved into account.
+             */
             // "The blow penetrated the magical barrier!"
             if (bladeturn != null)
             {
@@ -5157,7 +5157,7 @@ namespace DOL.GS
         /// </summary>
         protected static readonly eProperty[] m_damageTypeToResistBonusConversion = new eProperty[] {
             eProperty.Resist_Natural, //0,
-			eProperty.Resist_Crush,
+            eProperty.Resist_Crush,
             eProperty.Resist_Slash,
             eProperty.Resist_Thrust,
             0, 0, 0, 0, 0, 0,
@@ -5747,7 +5747,10 @@ namespace DOL.GS
 
         protected virtual void OnAdrenalineFull()
         {
-            // TODO
+            foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                player.Out.SendMessage("Placeholder: " + Name + " casts Adrenaline ability", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            }
             m_tension = 0;
         }
 

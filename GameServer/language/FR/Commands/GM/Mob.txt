@@ -1,0 +1,7 @@
+Commands.GM.Mob.Tension.Show:				La tension de {0} est à {1} / {2}.
+Commands.GM.Mob.Tension.Modified:			La tension de {0} est maintenant à {1} / {2}.
+Commands.GM.Mob.Tension.Disabled:			Vous ne pouvez pas régler la tension d'un mob pour lequel la tension maximale est 0.
+
+Commands.GM.Mob.MaxTension.Show:			La tension maximale de {0} est {1}.
+Commands.GM.Mob.MaxTension.NoTemplate:		Vous devez créer un npctemplate pour ce mob avant de faire cela.
+Commands.GM.Mob.MaxTension.Set:				La tension maximale de {0} est maintenant {1}.

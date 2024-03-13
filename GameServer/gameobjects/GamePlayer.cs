@@ -2977,12 +2977,6 @@ namespace DOL.GS
             Tension += tension;
         }
 
-        protected override void OnAdrenalineFull()
-        {
-            Out.SendMessage("Placeholder: Adrenaline full", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-            m_tension = 0;
-        }
-
         /// <summary>
         /// Gets the concentration left
         /// </summary>

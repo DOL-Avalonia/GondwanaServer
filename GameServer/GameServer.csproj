@@ -57,6 +57,8 @@
   <ItemGroup>
     <Content Include="language\EN\Commands\GM\AreaEffect.txt" />
     <Content Include="language\EN\Commands\GM\Coffre.txt" />
+    <Content Include="language\en\Commands\GM\Mob.txt" />
+    <Content Include="language\en\commands\gm\Player.txt" />
     <Content Include="language\EN\Commands\GM\TPPoint.txt" />
     <Content Include="language\EN\Commands\Players\Combine.txt" />
     <Content Include="language\EN\Commands\Players\Emotes.txt" />
@@ -73,6 +75,8 @@
     <Content Include="language\EN\spells\SpellReflectionHandler.txt" />
     <Content Include="language\FR\Commands\GM\AreaEffect.txt" />
     <Content Include="language\FR\Commands\GM\Coffre.txt" />
+    <Content Include="language\FR\Commands\GM\Mob.txt" />
+    <Content Include="language\FR\Commands\GM\Player.txt" />
     <Content Include="language\FR\Commands\GM\TPPoint.txt" />
     <Content Include="language\FR\GameObjects\CustomNPC\MoneyEventNPC.txt" />
     <Content Include="language\FR\GameUtils\Guild.txt" />
