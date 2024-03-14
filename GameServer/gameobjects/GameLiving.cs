@@ -5700,7 +5700,7 @@ namespace DOL.GS
             get { return m_tension; }
             set
             {
-                int newTension = m_tension + value;
+                int newTension = value;
                 int maxtension = MaxTension;
                 if (newTension <= 0)
                 {
