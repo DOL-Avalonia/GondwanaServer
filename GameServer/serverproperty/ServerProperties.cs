@@ -111,6 +111,12 @@ namespace DOL.GS.ServerProperties
         public static int MAX_REWARDQUEST_DESCRIPTION_LENGTH;
 
         /// <summary>
+        /// The tension players gain when hit by monsters
+        /// </summary>
+        [ServerProperty("system", "player_base_maxtension", "The Base Maximum Tension, before race & class multipliers, for the Adrenaline system.", 25000)]
+        public static int PLAYER_BASE_MAXTENSION = 25000;
+
+        /// <summary>
         /// If the server should only accept connections from staff
         /// </summary>
         [ServerProperty("system", "staff_login", "Staff Login Only - Edit this to set weather you wish staff to be the only ones allowed to Log in values True,False", false)]

@@ -2914,8 +2914,6 @@ namespace DOL.GS
             }
         }
 
-        public const int BASE_MAX_TENSION = 25000;
-
         /// <inheritdoc />
         public override int Tension
         {
@@ -3097,7 +3095,7 @@ namespace DOL.GS
 
             DBCharacter.Class = m_characterClass.ID;
 
-            float maxTension = BASE_MAX_TENSION;
+            float maxTension = Properties.PLAYER_BASE_MAXTENSION;
             Race race = DOLDB<Race>.SelectObject(DB.Column(nameof(Database.Race.ID)).IsEqualTo(Race));
             if (race != null)
             {
