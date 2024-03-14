@@ -34,7 +34,7 @@ namespace DOL.GS.Spells
             }
             AttackData ad = args.AttackData;
 
-            if (ad is { AttackType: AttackData.eAttackType.Spell, AttackResult: GameLiving.eAttackResult.HitUnstyled or  GameLiving.eAttackResult.HitStyle } )
+            if (ad is { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or  GameLiving.eAttackResult.HitStyle } )
             {
                 Spell spellToCast = ad.SpellHandler.Spell.Copy();
                 SpellLine line = ad.SpellHandler.SpellLine;
