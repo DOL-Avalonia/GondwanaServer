@@ -2766,27 +2766,6 @@ namespace DOL.GS.Spells
             {
                 OnDirectEffect(target, effectiveness);
             }
-
-            if (!HasPositiveEffect)
-            {
-                AttackData ad = new AttackData();
-                ad.Attacker = Caster;
-                ad.Target = target;
-                ad.AttackType = AttackData.eAttackType.Spell;
-                ad.SpellHandler = this;
-                ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-                ad.IsSpellResisted = false;
-
-                m_lastAttackData = ad;
-
-                // Treat non-damaging effects as attacks to trigger an immediate response and BAF
-                if (ad.Damage == 0 && ad.Target is GameNPC)
-                {
-                    IOldAggressiveBrain aggroBrain = ((GameNPC)ad.Target).Brain as IOldAggressiveBrain;
-                    if (aggroBrain != null)
-                        aggroBrain.AddToAggroList(Caster, 1);
-                }
-            }
         }
 
         /// <summary>
@@ -2974,6 +2953,26 @@ namespace DOL.GS.Spells
             finally
             {
                 target.EffectList.CommitChanges();
+            }
+
+            if (!HasPositiveEffect)
+            {
+                AttackData ad = new AttackData();
+                ad.Attacker = Caster;
+                ad.Target = target;
+                ad.AttackType = AttackData.eAttackType.Spell;
+                ad.SpellHandler = this;
+                ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
+                ad.IsSpellResisted = false;
+                target.OnAttackedByEnemy(ad);
+
+                m_lastAttackData = ad;
+
+                // Treat non-damaging effects as attacks to trigger an immediate response and BAF
+                if (ad.Damage == 0 && ad.Target is GameNPC { Brain: IOldAggressiveBrain aggroBrain })
+                {
+                    aggroBrain.AddToAggroList(Caster, 1);
+                }
             }
         }
 
@@ -4118,11 +4117,10 @@ namespace DOL.GS.Spells
             }
 
             ad.Attacker.DealDamage(ad);
-            if (ad.Damage == 0 && ad.Target is GameNPC)
+            // Treat non-damaging effects as attacks to trigger an immediate response and BAF
+            if (ad.Damage == 0 && ad.Target is GameNPC { Brain: IOldAggressiveBrain aggroBrain })
             {
-                IOldAggressiveBrain aggroBrain = ((GameNPC)ad.Target).Brain as IOldAggressiveBrain;
-                if (aggroBrain != null)
-                    aggroBrain.AddToAggroList(Caster, 1);
+                aggroBrain.AddToAggroList(Caster, 1);
             }
 
             m_lastAttackData = ad;
