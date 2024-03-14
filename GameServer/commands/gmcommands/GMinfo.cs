@@ -115,6 +115,7 @@ namespace DOL.GS.Commands
                     info.Add(" + Endu: " + target.Endurance + "/" + target.MaxEndurance);
                     info.Add(" + Mana: " + target.Mana + "/" + target.MaxMana);
                     info.Add(" + Conc: " + target.Concentration + "/" + target.MaxConcentration);
+                    info.Add(" + Tension: " + target.Tension + " / " + target.MaxTension);
 
                     IOldAggressiveBrain aggroBrain = target.Brain as IOldAggressiveBrain;
                     if (aggroBrain != null)
@@ -368,6 +369,7 @@ namespace DOL.GS.Commands
                     info.Add("- Maximum Health : " + target.MaxHealth);
                     info.Add("- Current AF : " + target.GetModified(eProperty.ArmorFactor));
                     info.Add("- Current ABS : " + target.GetModified(eProperty.ArmorAbsorption));
+                    info.Add("- Current tension: " + target.Tension + " / " + target.MaxTension);
 
                     for (eProperty stat = eProperty.Stat_First; stat <= eProperty.Stat_Last; stat++, cnt++)
                     {
