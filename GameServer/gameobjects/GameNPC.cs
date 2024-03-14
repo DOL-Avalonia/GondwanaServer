@@ -2454,6 +2454,7 @@ namespace DOL.GS
             this.EvadeChance = template.EvadeChance;
             this.BlockChance = template.BlockChance;
             this.LeftHandSwingChance = template.LeftHandSwingChance;
+            this.MaxTension = template.MaxTension;
 
             // We need level set before assigning spells to scale pet spells
             if (template.ReplaceMobValues)
@@ -2532,7 +2533,6 @@ namespace DOL.GS
             this.Flags = (eFlags)template.Flags;
             CanStealth = IsStealthed;
             this.MeleeDamageType = template.MeleeDamageType;
-            this.MaxTension = template.MaxTension;
             #endregion
 
             #region Inventory

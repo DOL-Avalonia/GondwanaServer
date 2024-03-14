@@ -687,7 +687,7 @@ namespace DOL.GS
 
         public virtual void SaveIntoDatabase()
         {
-            DBNpcTemplate tmp = GameServer.Database.FindObjectByKey<DBNpcTemplate>(TemplateId);
+            DBNpcTemplate tmp = GameServer.Database.SelectObject<DBNpcTemplate>(a => a.TemplateId == this.TemplateId);
             bool add = false;
 
             if (tmp == null)
@@ -702,56 +702,27 @@ namespace DOL.GS
                 tmp.TemplateId = TemplateId;
 
             tmp.TranslationId = TranslationId;
-            tmp.AggroLevel = AggroLevel;
-            tmp.AggroRange = AggroRange;
-            tmp.BlockChance = BlockChance;
-            tmp.BodyType = BodyType;
-            tmp.Charisma = Charisma;
+            tmp.Name = Name;
+            tmp.Suffix = Suffix;
             tmp.ClassType = ClassType;
-            tmp.Constitution = Constitution;
-            tmp.Dexterity = Dexterity;
-            tmp.Empathy = Empathy;
-            tmp.MaxTension = MaxTension;
-            tmp.EquipmentTemplateID = EquipmentTemplateID;
-            tmp.ItemsListTemplateID = ItemsListTemplateID;
-            tmp.EvadeChance = EvadeChance;
-            tmp.Flags = Flags;
             tmp.GuildName = GuildName;
             tmp.ExamineArticle = ExamineArticle;
             tmp.MessageArticle = MessageArticle;
-            tmp.Intelligence = Intelligence;
-            tmp.LeftHandSwingChance = LeftHandSwingChance;
-            tmp.Level = Level;
-            tmp.MaxDistance = MaxDistance;
-            tmp.MaxSpeed = MaxSpeed;
-            tmp.MeleeDamageType = (byte)MeleeDamageType;
             tmp.Model = Model;
-            tmp.Name = Name;
-            tmp.Suffix = Suffix;
-            tmp.ParryChance = ParryChance;
-            tmp.Piety = Piety;
-            tmp.Quickness = Quickness;
+            tmp.Gender = Gender;
             tmp.Size = Size;
-            tmp.Strength = Strength;
-            tmp.TetherRange = TetherRange;
+            tmp.Level = Level;
+            tmp.MaxSpeed = MaxSpeed;
+            tmp.EquipmentTemplateID = EquipmentTemplateID;
+            tmp.ItemsListTemplateID = ItemsListTemplateID;
+            tmp.Flags = Flags;
+            tmp.MeleeDamageType = (byte)MeleeDamageType;
+            tmp.ParryChance = ParryChance;
+            tmp.EvadeChance = EvadeChance;
+            tmp.BlockChance = BlockChance;
+            tmp.LeftHandSwingChance = LeftHandSwingChance;
 
-            if (m_abilities != null && m_abilities.Count > 0)
-            {
-                string serializedAbilities = "";
-
-                foreach (Ability npcAbility in m_abilities)
-                {
-                    if (npcAbility != null)
-                        if (serializedAbilities.Length > 0)
-                            serializedAbilities += ";";
-
-                    serializedAbilities += npcAbility.Name + "|" + npcAbility.Level;
-                }
-
-                tmp.Abilities = serializedAbilities;
-            }
-
-            if (m_spells != null && m_spells.Count > 0)
+            if (m_spells is { Count: > 0 })
             {
                 string serializedSpells = "";
 
@@ -766,8 +737,12 @@ namespace DOL.GS
 
                 tmp.Spells = serializedSpells;
             }
+            else
+            {
+                tmp.Spells = String.Empty;
+            }
 
-            if (m_styles != null && m_styles.Count > 0)
+            if (m_styles is { Count: > 0 })
             {
                 string serializedStyles = "";
 
@@ -782,6 +757,54 @@ namespace DOL.GS
 
                 tmp.Styles = serializedStyles;
             }
+            else
+            {
+                tmp.Styles = String.Empty;
+            }
+
+            tmp.Strength = Strength;
+            tmp.Constitution = Constitution;
+            tmp.Dexterity = Dexterity;
+            tmp.Quickness = Quickness;
+            tmp.Intelligence = Intelligence;
+            tmp.Piety = Piety;
+            tmp.Charisma = Charisma;
+            tmp.Empathy = Empathy;
+
+            if (m_abilities is { Count: > 0 })
+            {
+                string serializedAbilities = "";
+
+                foreach (Ability npcAbility in m_abilities)
+                {
+                    if (npcAbility != null)
+                        if (serializedAbilities.Length > 0)
+                            serializedAbilities += ";";
+
+                    serializedAbilities += npcAbility.Name + "|" + npcAbility.Level;
+                }
+
+                tmp.Abilities = serializedAbilities;
+            }
+            else
+            {
+                tmp.Abilities = String.Empty;
+            }
+
+            tmp.AggroLevel = AggroLevel;
+            tmp.AggroRange = AggroRange;
+            tmp.Race = Race;
+            tmp.BodyType = BodyType;
+            tmp.MaxDistance = MaxDistance;
+            tmp.TetherRange = TetherRange;
+            tmp.VisibleWeaponSlots = VisibleActiveWeaponSlot;
+            tmp.ReplaceMobValues = ReplaceMobValues;
+            // MISSING PackageID;
+            tmp.WeaponDps = WeaponDps;
+            tmp.WeaponSpd = WeaponSpd;
+            tmp.ArmorFactor = ArmorFactor;
+            tmp.ArmorAbsorb = ArmorAbsorb;
+            tmp.MaxTension = MaxTension;
 
             if (add)
                 GameServer.Database.AddObject(tmp);
