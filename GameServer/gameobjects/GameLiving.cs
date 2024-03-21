@@ -2847,6 +2847,9 @@ namespace DOL.GS
 
                 owner.TempProperties.setProperty(LAST_ATTACK_DATA, mainHandAD);
 
+                //Notify ourself about the attack
+                owner.Notify(GameLivingEvent.AttackFinished, owner, new AttackFinishedEventArgs(mainHandAD));
+
                 //Notify the target of our attack (sends damage messages, should be before damage)
                 // ...but certainly not if the attack never took place, like when the living
                 // is out of range!
@@ -2900,9 +2903,6 @@ namespace DOL.GS
                 //Send the proper attacking messages to ourself
                 owner.SendAttackingCombatMessages(mainHandAD);
 
-                //Notify ourself about the attack
-                owner.Notify(GameLivingEvent.AttackFinished, owner, new AttackFinishedEventArgs(mainHandAD));
-
                 // remove the left-hand AttackData from the previous attack
                 owner.TempProperties.removeProperty(LAST_ATTACK_DATA_LH);
 
@@ -2928,6 +2928,9 @@ namespace DOL.GS
                                 else
                                     leftHandAD = owner.MakeAttack(m_target, mainWeapon, null, leftHandEffectiveness, m_interruptDuration, true);
 
+                                //Notify ourself about the attack
+                                owner.Notify(GameLivingEvent.AttackFinished, owner, new AttackFinishedEventArgs(leftHandAD));
+
                                 //Notify the target of our attack (sends damage messages, should be before damage)
                                 if (leftHandAD.Target != null)
                                     leftHandAD.Target.OnAttackedByEnemy(leftHandAD);
@@ -2946,9 +2949,6 @@ namespace DOL.GS
 
                                 //Send messages about our left hand attack now
                                 owner.SendAttackingCombatMessages(leftHandAD);
-
-                                //Notify ourself about the attack
-                                owner.Notify(GameLivingEvent.AttackFinished, owner, new AttackFinishedEventArgs(leftHandAD));
                             }
                             break;
                     }
