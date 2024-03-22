@@ -233,7 +233,7 @@ namespace DOL.GS.Spells
                             {
                                 player.Out.SendMessage("The blow was absorbed by a magical barrier!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                             }
-                            ad.missChance = 100;
+                            ad.MissChance = 100;
                             ad.AttackResult = GameLiving.eAttackResult.Missed;
                             bladeturn.Cancel(false);
                         }

@@ -25,6 +25,7 @@ using DOL.GS.PacketHandler;
 using DOL.Language;
 using DOL.GS.Realm;
 using DOL.Database;
+using static DOL.Database.ArtifactBonus;
 
 namespace DOL.GS
 {
@@ -110,6 +111,17 @@ namespace DOL.GS
         protected ushort m_maxPulsingSpells;
 
         /// <summary>
+        /// ID of the spell cast when Adrenaline is full
+        /// </summary>
+        protected int m_adrenalineSpellID = 0;
+
+        public Spell AdrenalineSpell
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// The GamePlayer for this character
         /// </summary>
         public GamePlayer Player { get; private set; }
@@ -131,6 +143,7 @@ namespace DOL.GS
             public List<string> AutotrainableSkills;
             public List<PlayerRace> EligibleRaces;
             public float? MaxTensionFactor;
+            public int? AdrenalineSpellID;
         }
 
         protected static Dictionary<byte, ClassOverride> m_classOverride = new Dictionary<byte, ClassOverride>(0);
@@ -196,7 +209,8 @@ namespace DOL.GS
                     SpecializationMultiplier = dbClassOverride.SpecPointMultiplier,
                     BaseHP = dbClassOverride.BaseHP,
                     BaseWeaponSkill = dbClassOverride.BaseWeaponSkill,
-                    MaxTensionFactor = dbClassOverride.MaxTensionFactor
+                    MaxTensionFactor = dbClassOverride.MaxTensionFactor,
+                    AdrenalineSpellID = dbClassOverride.AdrenalineSpellID
                 };
 
                 classOverride.AutotrainableSkills = new(0);
@@ -241,6 +255,11 @@ namespace DOL.GS
                 {
                     m_maxTensionFactor = (float)cOverride.MaxTensionFactor;
                 }
+
+                if (cOverride.AdrenalineSpellID != null)
+                {
+                    m_adrenalineSpellID = (int)cOverride.AdrenalineSpellID;
+                }
             }
         }
 
@@ -251,6 +270,15 @@ namespace DOL.GS
                 log.WarnFormat("Character Class initializing Player when it was already initialized ! Old Player : {0} New Player : {1}", Player, player);
 
             Player = player;
+
+            if (m_adrenalineSpellID != 0)
+            {
+                AdrenalineSpell = SkillBase.GetSpellByID(m_adrenalineSpellID);
+                if (AdrenalineSpell == null)
+                {
+                    log.Error($"Class {ID} aka {Name} has invalid Adrenaline Spell ID {m_adrenalineSpellID}");
+                }
+            }
         }
 
         public List<PlayerRace> EligibleRaces => m_eligibleRaces;
@@ -351,6 +379,15 @@ namespace DOL.GS
         public ushort MaxPulsingSpells
         {
             get { return m_maxPulsingSpells; }
+        }
+
+        /// <inheritdoc />
+        public int AdrenalineSpellID
+        {
+            get
+            {
+                return m_adrenalineSpellID;
+            }
         }
 
         public string GetTitle(GamePlayer player, int level)

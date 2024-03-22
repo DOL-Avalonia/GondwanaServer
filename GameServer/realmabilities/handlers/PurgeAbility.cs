@@ -99,33 +99,6 @@ namespace DOL.GS.RealmAbilities
                 }
             }
 
-            lock (living.EffectList)
-            {
-                foreach (IGameEffect effect in living.EffectList)
-                {
-                    GameSpellEffect gsp = effect as GameSpellEffect;
-                    if (gsp == null)
-                        continue;
-                    if (gsp is GameSpellAndImmunityEffect && ((GameSpellAndImmunityEffect)gsp).ImmunityState)
-                        continue; // ignore immunity effects
-                    if (gsp.SpellHandler.HasPositiveEffect)//only enemy spells are affected
-                        continue;
-                    /*
-                    if (gsp.SpellHandler is RvRResurrectionIllness)
-                       continue;
-                     */
-                    //if (gsp.Spell.SpellType == "DesperateBowman")//Can't be purged
-                    //continue;
-                    effects.Add(gsp);
-                    removed = true;
-                }
-
-                foreach (IGameEffect effect in effects)
-                {
-                    effect.Cancel(false);
-                }
-            }
-
             if (player != null)
             {
                 foreach (GamePlayer rangePlayer in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))

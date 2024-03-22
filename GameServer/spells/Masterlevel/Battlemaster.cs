@@ -632,7 +632,7 @@ namespace DOL.GS.Spells
                 ad.Damage = (int)((double)ad.Damage * ServerProperties.Properties.PVP_MELEE_DAMAGE);
                 if (ad.Damage == 0)
                 {
-                    ad.missChance = 100;
+                    ad.MissChance = 100;
                     ad.AttackResult = DOL.GS.GameLiving.eAttackResult.Missed;
                 }
                 ad.CriticalDamage = player.GetMeleeCriticalDamage(ad, weapon);

@@ -395,6 +395,8 @@ namespace DOL.GS
         public const string Vol = "Vol";
         public const string Trading = "Trading";
 
+        public const string Adrenaline = "Adrenaline Ability";
+
         public static eObjectType AbilityToWeapon(string abilityKeyName)
         {
             eObjectType type = eObjectType.GenericItem;

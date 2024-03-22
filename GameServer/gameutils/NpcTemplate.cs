@@ -26,6 +26,7 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using DOL.GS.Profession;
+using static DOL.Database.ArtifactBonus;
 
 namespace DOL.GS
 {
@@ -82,6 +83,7 @@ namespace DOL.GS
         protected int m_tetherRange;
         protected bool m_replaceMobValues;
         protected byte m_visibleActiveWeaponSlot;
+        protected Spell m_adrenalineSpell;
 
         /// <summary>
         /// Constructs a new NpcTemplate
@@ -184,6 +186,27 @@ namespace DOL.GS
                 }
             }
 
+            if (data.AdrenalineSpellID != 0)
+            {
+                if (data.MaxTension == 0)
+                {
+                    log.Warn($"NPCTemplate {m_templateId} has Adrenaline spell {data.AdrenalineSpellID} but MaxTension is 0, it will never be called");
+                }
+                Spell sp = SkillBase.GetSpellByID(data.AdrenalineSpellID);
+                if (sp != null)
+                {
+                    m_adrenalineSpell = sp;
+                }
+                else
+                {
+                    log.Error($"NPCTemplate { m_templateId } has unknown Adrenaline spell { data.AdrenalineSpellID } ");
+                }
+            }
+            else if (data.MaxTension > 0) /* && data.AdrenalineSpellID == 0 */
+            {
+                log.Warn($"NPCTemplate {m_templateId} has Tension but no AdrenalineSpellID");
+            }
+
             m_flags = data.Flags;
 
             m_meleeDamageType = (eDamageType)data.MeleeDamageType;
@@ -244,6 +267,7 @@ namespace DOL.GS
             m_templateId = GetNextFreeTemplateId();
             m_tetherRange = mob.TetherRange;
             m_visibleActiveWeaponSlot = mob.VisibleActiveWeaponSlots;
+            m_adrenalineSpell = mob.NPCTemplate?.AdrenalineSpell;
 
             if (mob.Abilities != null && mob.Abilities.Count > 0)
             {
@@ -389,6 +413,14 @@ namespace DOL.GS
         {
             get { return m_classType; }
             set { m_classType = value; }
+        }
+
+        /// <inheritdoc />
+        public Spell AdrenalineSpell
+        {
+            get { return m_adrenalineSpell; }
+            set { AdrenalineSpell = value; }
+
         }
 
         /// <summary>
@@ -805,6 +837,7 @@ namespace DOL.GS
             tmp.ArmorFactor = ArmorFactor;
             tmp.ArmorAbsorb = ArmorAbsorb;
             tmp.MaxTension = MaxTension;
+            tmp.AdrenalineSpellID = AdrenalineSpell?.ID ?? 0;
 
             if (add)
                 GameServer.Database.AddObject(tmp);

@@ -44,6 +44,7 @@ using DOL.GS.ServerProperties;
 using static DOL.GS.ScriptMgr;
 using System.Threading.Tasks;
 using DOL.GameEvents;
+using System.Collections.Immutable;
 
 namespace DOL.GS
 {
@@ -1717,6 +1718,7 @@ namespace DOL.GS
                 return ad;
             }
 
+            this.Notify(GameLivingEvent.AttackStarted, this, new AttackStartedEventArgs(ad));
 
             //Calculate our attack result and attack damage
             ad.AttackResult = ad.Target.CalculateEnemyAttackResult(ad, weapon);
@@ -3319,7 +3321,7 @@ namespace DOL.GS
         /// <returns>The amount of critical damage.</returns>
         public virtual int GetMeleeCriticalDamage(AttackData attackData, InventoryItem weapon)
         {
-            if (Util.Chance(AttackCriticalChance(weapon)))
+            if (Util.Chance(AttackCriticalChance(weapon) + attackData.criticalChance))
             {
                 int maxCriticalDamage = (attackData.Target is GamePlayer)
                     ? attackData.Damage / 2
@@ -3387,7 +3389,7 @@ namespace DOL.GS
             GameSpellEffect brittleguard = null;
 
             AttackData lastAD = TempProperties.getProperty<AttackData>(LAST_ATTACK_DATA, null);
-            bool defenseDisabled = ad.Target.IsMezzed | ad.Target.IsStunned | ad.Target.IsSitting;
+            bool defenseDisabled = ad.Target.IsMezzed || ad.Target.IsStunned || ad.Target.IsSitting;
 
             // If berserk is on, no defensive skills may be used: evade, parry, ...
             // unfortunately this as to be check for every action itself to kepp oder of actions the same.
@@ -3465,6 +3467,8 @@ namespace DOL.GS
                 }
             }
 
+            this.Notify(GameLivingEvent.IncomingAttack, this, new IncomingAttackEventArgs(ad));
+
             bool stealthStyle = false;
             if (ad.Style != null && ad.Style.StealthRequirement && ad.Attacker is GamePlayer && StyleProcessor.CanUseStyle((GamePlayer)ad.Attacker, ad.Style, weapon))
             {
@@ -3511,7 +3515,7 @@ namespace DOL.GS
 
             if (phaseshift != null)
             {
-                ad.missChance = 100;
+                ad.MissChance = 100;
                 return eAttackResult.Missed;
             }
 
@@ -3525,7 +3529,7 @@ namespace DOL.GS
                 if (ad.Attacker is GamePlayer)
                     ((GamePlayer)ad.Attacker).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)ad.Attacker).Client.Account.Language, "GameLiving.CalculateEnemyAttackResult.StrikeIntercepted"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                 brittleguard.Cancel(false);
-                ad.missChance = 100;
+                ad.MissChance = 100;
                 return eAttackResult.Missed;
             }
 
@@ -3546,35 +3550,29 @@ namespace DOL.GS
 
             if (!defenseDisabled)
             {
-                double evadeChance = TryEvade(ad, lastAD, attackerConLevel, attackerCount);
-
-                if (Util.ChanceDouble(evadeChance))
+                ad.EvadeChance ??= TryEvade(ad, lastAD, attackerConLevel, attackerCount);
+                if (Util.ChanceDouble((double)ad.EvadeChance))
                 {
-                    ad.evadeChance = evadeChance;
                     return eAttackResult.Evaded;
                 }
 
                 if (ad.IsMeleeAttack)
                 {
-                    double parryChance = TryParry(ad, lastAD, attackerConLevel, attackerCount);
+                    ad.ParryChance ??= TryParry(ad, lastAD, attackerConLevel, attackerCount);
 
-                    if (Util.ChanceDouble(parryChance))
+                    if (Util.ChanceDouble((double)ad.ParryChance))
                     {
-                        ad.parryChance = parryChance;
                         return eAttackResult.Parried;
                     }
                 }
 
-                double blockChance = TryBlock(ad, lastAD, attackerConLevel, attackerCount, engage);
-
-                if (Util.ChanceDouble(blockChance))
+                ad.BlockChance ??= TryBlock(ad, lastAD, attackerConLevel, attackerCount, engage);
+                if (Util.ChanceDouble((double)ad.BlockChance))
                 {
                     // reactive effects on block moved to GamePlayer
-                    ad.blockChance = blockChance;
                     return eAttackResult.Blocked;
                 }
             }
-
 
             // Guard
             if (guard != null &&
@@ -3625,7 +3623,7 @@ namespace DOL.GS
                         if (Util.ChanceDouble(guardchance))
                         {
                             ad.Target = guard.GuardSource;
-                            ad.blockChance = guardchance;
+                            ad.BlockChance = guardchance;
                             return eAttackResult.Blocked;
                         }
                     }
@@ -3679,13 +3677,13 @@ namespace DOL.GS
                         if (Util.ChanceDouble(guardchance))
                         {
                             ad.Target = dashing.GuardSource;
-                            ad.blockChance = guardchance;
+                            ad.BlockChance = guardchance;
                             return eAttackResult.Blocked;
                         }
                         else if (Util.ChanceDouble(parrychance))
                         {
                             ad.Target = dashing.GuardSource;
-                            ad.parryChance = parrychance;
+                            ad.ParryChance = parrychance;
                             return eAttackResult.Parried;
                         }
                     }
@@ -3705,7 +3703,7 @@ namespace DOL.GS
                         if (Util.ChanceDouble(parrychance))
                         {
                             ad.Target = dashing.GuardSource;
-                            ad.parryChance = parrychance;
+                            ad.ParryChance = parrychance;
                             return eAttackResult.Parried;
                         }
                     }
@@ -3713,94 +3711,92 @@ namespace DOL.GS
             }
 
             // Missrate
-            int missrate = (ad.Attacker is GamePlayer) ? 20 : 25; //player vs player tests show 20% miss on any level
-            missrate -= ad.Attacker.GetModified(eProperty.ToHitBonus);
-            if (this is GamePlayer && ad.Attacker is GamePlayer)
+            if (ad.MissChance == null)
             {
-                missrate = (int)(missrate * ServerProperties.Properties.PVP_BASE_MISS_MULTIPLIER);
-            }
-            else
-            {
-                missrate = (int)(missrate * ServerProperties.Properties.PVE_BASE_MISS_MULTIPLIER);
-            }
-            // PVE group missrate
-            if (this is GameNPC && ad.Attacker is GamePlayer &&
-                ((GamePlayer)ad.Attacker).Group != null &&
-                (int)(0.90 * ((GamePlayer)ad.Attacker).Group.Leader.Level) >= ad.Attacker.Level &&
-                ad.Attacker.IsWithinRadius(((GamePlayer)ad.Attacker).Group.Leader, 3000))
-            {
-                missrate -= (int)(5 * ((GamePlayer)ad.Attacker).Group.Leader.GetConLevel(this));
-            }
-            else if (this is GameNPC || ad.Attacker is GameNPC) // if target is not player use level mod
-            {
-                missrate += (int)(5 * ad.Attacker.GetConLevel(this));
-            }
+                int missrate = (ad.Attacker is GamePlayer) ? 20 : 25; //player vs player tests show 20% miss on any level
+                missrate -= ad.Attacker.GetModified(eProperty.ToHitBonus);
+                if (this is GamePlayer && ad.Attacker is GamePlayer)
+                {
+                    missrate = (int)(missrate * ServerProperties.Properties.PVP_BASE_MISS_MULTIPLIER);
+                }
+                else
+                {
+                    missrate = (int)(missrate * ServerProperties.Properties.PVE_BASE_MISS_MULTIPLIER);
+                }
+                // PVE group missrate
+                if (this is GameNPC && ad.Attacker is GamePlayer &&
+                    ((GamePlayer)ad.Attacker).Group != null &&
+                    (int)(0.90 * ((GamePlayer)ad.Attacker).Group.Leader.Level) >= ad.Attacker.Level &&
+                    ad.Attacker.IsWithinRadius(((GamePlayer)ad.Attacker).Group.Leader, 3000))
+                {
+                    missrate -= (int)(5 * ((GamePlayer)ad.Attacker).Group.Leader.GetConLevel(this));
+                }
+                else if (this is GameNPC || ad.Attacker is GameNPC) // if target is not player use level mod
+                {
+                    missrate += (int)(5 * ad.Attacker.GetConLevel(this));
+                }
 
-            // experimental missrate adjustment for number of attackers
-            if ((this is GamePlayer && ad.Attacker is GamePlayer) == false)
-            {
-                missrate -= (Math.Max(0, Attackers.Count - 1) * ServerProperties.Properties.MISSRATE_REDUCTION_PER_ATTACKERS);
-            }
+                // experimental missrate adjustment for number of attackers
+                if ((this is GamePlayer && ad.Attacker is GamePlayer) == false)
+                {
+                    missrate -= (Math.Max(0, Attackers.Count - 1) * ServerProperties.Properties.MISSRATE_REDUCTION_PER_ATTACKERS);
+                }
 
-            // weapon/armor bonus
-            int armorBonus = 0;
-            if (ad.Target is GamePlayer)
-            {
-                ad.ArmorHitLocation = ((GamePlayer)ad.Target).CalculateArmorHitLocation(ad);
-                InventoryItem armor = null;
-                if (ad.Target.Inventory != null)
-                    armor = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
-                if (armor != null)
-                    armorBonus = armor.Bonus;
-            }
-            if (weapon != null)
-            {
-                armorBonus -= weapon.Bonus;
-            }
-            if (ad.Target is GamePlayer && ad.Attacker is GamePlayer)
-            {
-                missrate += armorBonus;
-            }
-            else
-            {
-                missrate += missrate * armorBonus / 100;
-            }
-            if (ad.Style != null)
-            {
-                missrate -= ad.Style.BonusToHit; // add style bonus
-            }
-            if (lastAD != null && lastAD.AttackResult == eAttackResult.HitStyle && lastAD.Style != null)
-            {
-                // add defence bonus from last executed style if any
-                missrate += lastAD.Style.BonusToDefense;
-            }
-            if (this is GamePlayer && ad.Attacker is GamePlayer && weapon != null)
-            {
-                missrate -= (int)((ad.Attacker.WeaponSpecLevel(weapon) - 1) * 0.1);
-            }
-            if (ad.Attacker.ActiveWeaponSlot == eActiveWeaponSlot.Distance)
-            {
-                InventoryItem ammo = RangeAttackAmmo;
-                if (ammo != null)
-                    switch ((ammo.SPD_ABS >> 4) & 0x3)
-                    {
-                        // http://rothwellhome.org/guides/archery.htm
-                        case 0: missrate += 15; break; // Rough
-                                                       //						case 1: missrate -= 0; break;
-                        case 2: missrate -= 15; break; // doesn't exist (?)
-                        case 3: missrate -= 25; break; // Footed
-                    }
-            }
-            if (this is GamePlayer && ((GamePlayer)this).IsSitting)
-            {
-                missrate >>= 1; //halved
-            }
+                // weapon/armor bonus
+                int armorBonus = 0;
+                if (ad.Target is GamePlayer)
+                {
+                    ad.ArmorHitLocation = ((GamePlayer)ad.Target).CalculateArmorHitLocation(ad);
+                    InventoryItem armor = null;
+                    if (ad.Target.Inventory != null)
+                        armor = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
+                    if (armor != null)
+                        armorBonus = armor.Bonus;
+                }
+                if (weapon != null)
+                {
+                    armorBonus -= weapon.Bonus;
+                }
+                if (ad.Target is GamePlayer && ad.Attacker is GamePlayer)
+                {
+                    missrate += armorBonus;
+                }
+                else
+                {
+                    missrate += missrate * armorBonus / 100;
+                }
+                if (ad.Style != null)
+                {
+                    missrate -= ad.Style.BonusToHit; // add style bonus
+                }
+                if (lastAD != null && lastAD.AttackResult == eAttackResult.HitStyle && lastAD.Style != null)
+                {
+                    // add defence bonus from last executed style if any
+                    missrate += lastAD.Style.BonusToDefense;
+                }
+                if (this is GamePlayer && ad.Attacker is GamePlayer && weapon != null)
+                {
+                    missrate -= (int)((ad.Attacker.WeaponSpecLevel(weapon) - 1) * 0.1);
+                }
+                if (ad.Attacker.ActiveWeaponSlot == eActiveWeaponSlot.Distance)
+                {
+                    InventoryItem ammo = RangeAttackAmmo;
+                    if (ammo != null)
+                        switch ((ammo.SPD_ABS >> 4) & 0x3)
+                        {
+                            // http://rothwellhome.org/guides/archery.htm
+                            case 0: missrate += 15; break; // Rough
+                                                           //						case 1: missrate -= 0; break;
+                            case 2: missrate -= 15; break; // doesn't exist (?)
+                            case 3: missrate -= 25; break; // Footed
+                        }
+                }
+                if (this is GamePlayer { IsSitting: true })
+                {
+                    missrate >>= 1; //halved
+                }
 
-            missrate = Math.Min(95, missrate); // cap the missrate
-            if (Util.Chance(missrate))
-            {
-                ad.missChance = missrate;
-                return eAttackResult.Missed;
+                ad.MissChance = ((double)Math.Min(95, missrate) / 100); // cap the missrate
             }
 
             if (ad.IsRandomFumble)
@@ -3848,7 +3844,7 @@ namespace DOL.GS
                     if (ad.Attacker is GamePlayer) ((GamePlayer)ad.Attacker).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)ad.Attacker).Client.Account.Language, "GameLiving.CalculateEnemyAttackResult.StrikeAbsorbed"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                     bladeturn.Cancel(false);
                     Stealth(false);
-                    ad.missChance = missChance;
+                    ad.MissChance = missChance;
                     return eAttackResult.Missed;
                 }
             }
@@ -5747,10 +5743,8 @@ namespace DOL.GS
 
         protected virtual void OnAdrenalineFull()
         {
-            foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-            {
-                player.Out.SendMessage("Placeholder: " + Name + " casts Adrenaline ability", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-            }
+            Ability ab = SkillBase.GetAbility(Abilities.Adrenaline);
+            (ab as AdrenalineAbilityHandler)?.Execute(this);
             m_tension = 0;
         }
 
@@ -5759,6 +5753,11 @@ namespace DOL.GS
             get;
             set;
         } = 0;
+
+        public virtual Spell AdrenalineSpell
+        {
+            get => null;
+        }
 
         /// <summary>
         /// Gets the Tension in percent 0..100

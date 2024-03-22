@@ -36,6 +36,7 @@ namespace DOL.GS.PlayerClass
             m_baseHP = 880;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.05f;
+            m_adrenalineSpellID = 28001;
         }
 
         public override eClassType ClassType

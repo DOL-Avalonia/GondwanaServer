@@ -66,6 +66,15 @@ namespace DOL.GS.Spells
         {
             // vampiir, they cannot be buffed except with resists/armor factor/ haste / power regen
             GamePlayer player = target as GamePlayer;
+            if (!HasPositiveEffect)
+            {
+                if (target.EffectList.GetOfType<AdrenalineSpellEffect>() != null)
+                {
+                    (m_caster as GamePlayer)?.SendTranslatedMessage("Adrenaline.Target.Immune", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow, m_caster.GetPersonalizedName(target));
+                    (target as GamePlayer)?.SendTranslatedMessage("Adrenaline.Self.Immune", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+            }
             if (player != null)
             {
                 if (HasPositiveEffect && player.CharacterClass.ID == (int)eCharacterClass.Vampiir && m_caster != player)

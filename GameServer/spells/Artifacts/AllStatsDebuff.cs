@@ -80,6 +80,13 @@ namespace DOL.GS.Spells.Atlantis
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
+            if (target.EffectList.GetOfType<AdrenalineSpellEffect>() != null)
+            {
+                (m_caster as GamePlayer)?.SendTranslatedMessage("Adrenaline.Target.Immune", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow, m_caster.GetPersonalizedName(target));
+                (target as GamePlayer)?.SendTranslatedMessage("Adrenaline.Self.Immune", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             base.ApplyEffectOnTarget(target, effectiveness);
             if (target.Realm == 0 || Caster.Realm == 0)
             {

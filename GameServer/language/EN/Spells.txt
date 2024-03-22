@@ -122,13 +122,19 @@ AblativeArmor.Attacker:	A barrier absorbs {0} damage of your attack!
 Amnesia.MessageToTarget:	Your mind goes blank and you forget what you were doing!
 
 # Petrify
-Petrify.Target.Absorbs:  The target is petrify and absorbs {0} damage!
-Petrify.Target.Resist:   {0} is petrify and can't be effected by this Spell!
-Petrify.Self.Message:	The target is petrify.
-Petrify.Self.Absorb:		You're petrify and absorb {0} damage!
-Petrify.Self.Unpetrify:		You're unpetrify.
+Petrify.Target.Absorbs:		The target is petrified and absorbs {0} damage!
+Petrify.Target.Resist:		{0} is petrified and can't be effected by this Spell!
+Petrify.Self.Message:		The target is petrified.
+Petrify.Self.Absorb:		You're petrified and absorb {0} damage!
+Petrify.Self.Unpetrify:		Your petrification fades.
 
 # Damnation
-Damnation.Self.Message:  The target is damned
-Damnation.Self.Message2: You're damned
-Damnation.Target.Resist:  {0} is damned and can't be effected by this Spell!
+Damnation.Self.Message:		The target is damned
+Damnation.Self.Message2:	You're damned
+Damnation.Target.Resist:	{0} is damned and can't be effected by this Spell!
+
+# Adrenaline
+Adrenaline.Target.Immune:		{0}'s battle fever renders them immune to this effect!
+Adrenaline.Target.Absorbs:		The target absorbs {0} damage from the attack!
+Adrenaline.Self.Immune:			Your battle fever makes you immune to the effect!
+Adrenaline.Self.Absorb:			You absorb {0} damage from the attack!

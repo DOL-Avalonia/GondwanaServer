@@ -76,6 +76,14 @@ namespace DOL.Events
         /// </summary>
         public static readonly GameLivingEvent Whisper = new GameLivingEvent("GameLiving.Whisper");
         /// <summary>
+        /// The IncomingAttack event is fired whenever the living is starting an attack
+        /// </summary>
+        public static readonly GameLivingEvent AttackStarted = new GameLivingEvent("GameLiving.AttackStarted");
+        /// <summary>
+        /// The IncomingAttack event is fired whenever the living is receiving an attack and calculating parry / evade / etc
+        /// </summary>
+        public static readonly GameLivingEvent IncomingAttack = new GameLivingEvent("GameLiving.IncomingAttack");
+        /// <summary>
         /// The Hit event is fired whenever the living is hit by gameliving
         /// </summary>
         public static readonly GameLivingEvent AttackedByEnemy = new GameLivingEvent("GameLiving.AttackedByEnemy");

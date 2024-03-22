@@ -182,7 +182,7 @@ namespace DOL.GS.Spells
 
                 if (Util.Chance(missrate))
                 {
-                    ad.missChance = missrate;
+                    ad.MissChance = missrate;
                     ad.AttackResult = GameLiving.eAttackResult.Missed;
                     m_handler.MessageToCaster("You miss!", eChatType.CT_YouHit);
                     m_handler.MessageToLiving(target, caster.GetName(0, false) + " missed!", eChatType.CT_Missed);

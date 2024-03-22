@@ -3882,6 +3882,11 @@ namespace DOL.GS
 
         protected GameObject m_targetLOSObject = null;
 
+        public override Spell AdrenalineSpell
+        {
+            get => NPCTemplate?.AdrenalineSpell ?? null;
+        }
+
         /// <summary>
         /// Starts a melee attack on a target
         /// </summary>

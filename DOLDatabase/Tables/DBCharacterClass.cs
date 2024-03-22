@@ -41,6 +41,7 @@ namespace DOL.Database
         private bool canUseLeftHandedWeapon;
         private byte maxPulsingSpells;
         private float? maxTensionFactor;
+        private int? m_adrenalineSpellID;
 
         [PrimaryKey]
         public byte ID
@@ -238,6 +239,17 @@ namespace DOL.Database
             {
                 Dirty = true;
                 maxTensionFactor = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int? AdrenalineSpellID
+        {
+            get => m_adrenalineSpellID;
+            set
+            {
+                Dirty = true;
+                m_adrenalineSpellID = value;
             }
         }
     }

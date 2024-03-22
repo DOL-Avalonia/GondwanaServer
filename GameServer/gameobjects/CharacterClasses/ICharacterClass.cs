@@ -132,6 +132,11 @@ namespace DOL.GS
         /// </summary>
         byte HealthPercentGroupWindow { get; }
 
+        /// <summary>
+        /// ID of the spell cast when adrenaline gauge is full
+        /// </summary>
+        Spell AdrenalineSpell { get; }
+
         string GetTitle(GamePlayer player, int level);
         void OnLevelUp(GamePlayer player, int previousLevel);
         void OnRealmLevelUp(GamePlayer player);

@@ -44,6 +44,7 @@ namespace DOL.GS.PlayerClass
             m_baseHP = 878;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.09f;
+            m_adrenalineSpellID = 28001;
         }
 
         public override int WeaponSkillFactor(eObjectType type)

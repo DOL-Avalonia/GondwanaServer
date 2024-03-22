@@ -83,6 +83,7 @@ namespace DOL.Database
         private byte m_visibleWeaponSlots = 0;
         private bool m_replaceMobValues = false;
         private string m_packageID = string.Empty;
+        private int m_adrenalineSpellID;
         #endregion Variables
 
         /// <summary>
@@ -689,6 +690,17 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_replaceMobValues = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int AdrenalineSpellID
+        {
+            get { return m_adrenalineSpellID; }
+            set
+            {
+                Dirty = true;
+                m_adrenalineSpellID = value;
             }
         }
 

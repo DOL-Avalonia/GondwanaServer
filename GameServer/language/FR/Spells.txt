@@ -123,9 +123,16 @@ Petrify.Target.Absorbs:  Votre cible est pétrifiée et absorbe {0} dommages.
 Petrify.Target.Resist:    {0} est pétrifiée et est insensible à ce sort.
 Petrify.Self.Message:	La cilbe est pétrifiée.
 Petrify.Self.Absorb:		Vous êtes pétrifié(e) et absorbez {0} dommages.
-Petrify.Self.Unpetrify:		Vous êtes libéré(e) de Petrify.
+Petrify.Self.Unpetrify:		Vous êtes libéré(e) de votre pétrification.
 
 # Damnation
 Damnation.Self.Message: Votre cible est damnée
 Damnation.Self.Message2: Tu ne le sais pas encore, mais tu es déjà mort !
 Damnation.Target.Resist:   {0} est damné et est insensible à ce sort.
+
+
+# Adrenaline
+Adrenaline.Target.Immune:		{0} est en fièvre de bataille et résiste entièrement le sort!
+Adrenaline.Target.Absorbs:		Votre cible absorbe {0} points de dégât de l'attaque!
+Adrenaline.Self.Immune:			Votre fièvre de bataille vous protège de ce sort!
+Adrenaline.Self.Absorb:			Vous absorbez {0} points de dégât du sort!

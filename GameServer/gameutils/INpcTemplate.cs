@@ -127,5 +127,10 @@ namespace DOL.GS
         /// What object ClassType should this template use?
         /// </summary>
         string ClassType { get; }
+
+        /// <summary>
+        /// What Spell to cast when adrenaline is full
+        /// </summary>
+        Spell AdrenalineSpell { get; }
     }
 }

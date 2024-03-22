@@ -2929,6 +2929,11 @@ namespace DOL.GS
             }
         }
 
+        public override Spell AdrenalineSpell
+        {
+            get => m_characterClass.AdrenalineSpell;
+        }
+
         protected override void GainTension(GameLiving source)
         {
             if (MaxTension <= 0)
@@ -7000,7 +7005,7 @@ namespace DOL.GS
                         //30% chance to miss
                         if (IsStrafing && ad.Target is GamePlayer && Util.Chance(30))
                         {
-                            ad.missChance = 30;
+                            ad.MissChance = 30;
                             ad.AttackResult = eAttackResult.Missed;
                             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.StrafMiss"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
                             break;
@@ -7165,7 +7170,7 @@ namespace DOL.GS
         /// <returns>The amount of critical damage</returns>
         public override int GetMeleeCriticalDamage(AttackData ad, InventoryItem weapon)
         {
-            if (Util.Chance(AttackCriticalChance(weapon)))
+            if (Util.Chance(AttackCriticalChance(weapon) + ad.criticalChance))
             {
                 // triple wield prevents critical hits
                 if (ad.Target.EffectList.GetOfType<TripleWieldEffect>() != null) return 0;
@@ -7242,10 +7247,10 @@ namespace DOL.GS
                         break;
                     if (ad.Attacker is GameNPC)
                         Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.Missed", ad.Attacker.GetName(0, true, Client.Account.Language, (ad.Attacker as GameNPC)))
-                        + (ad.missChance > 0 ? " (" + ad.missChance + "%)" : ""), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
+                        + (ad.MissChance > 0 ? " (" + (int)(ad.MissChance * 100) + "%)" : ""), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
                     else
                         Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.Missed", GetPersonalizedName(ad.Attacker))
-                        + (ad.missChance > 0 ? " (" + ad.missChance + "%)" : ""), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
+                        + (ad.MissChance > 0 ? " (" + (int)(ad.MissChance * 100) + "%)" : ""), eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
                     break;
                 case eAttackResult.HitStyle:
                 case eAttackResult.HitUnstyled:

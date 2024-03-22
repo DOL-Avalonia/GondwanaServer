@@ -32,6 +32,12 @@ namespace DOL.GS.Spells
                 MessageToCaster((Caster as GamePlayer).GetPersonalizedName(target) + " is immune to this effect!", eChatType.CT_SpellResisted);
                 return;
             }
+            if (target.EffectList.GetOfType<AdrenalineSpellEffect>() != null)
+            {
+                (m_caster as GamePlayer)?.SendTranslatedMessage("Adrenaline.Target.Immune", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow, m_caster.GetPersonalizedName(target));
+                (target as GamePlayer)?.SendTranslatedMessage("Adrenaline.Self.Immune", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                return;
+            }
             if (target.EffectList.GetOfType<ChargeEffect>() != null)
             {
                 MessageToCaster((Caster as GamePlayer).GetPersonalizedName(target) + " is moving to fast for this spell to have any effect!", eChatType.CT_SpellResisted);
