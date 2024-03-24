@@ -4345,7 +4345,7 @@ namespace DOL.GS
 
             if (ad is { AttackResult: eAttackResult.HitStyle or eAttackResult.HitUnstyled, AttackType: not AttackData.eAttackType.DoT and not AttackData.eAttackType.Unknown })
             {
-                GainTension(ad.Attacker);
+                GainTension(ad);
             }
         }
 
@@ -5722,13 +5722,14 @@ namespace DOL.GS
             }
         }
 
-        protected virtual void GainTension(GameLiving source)
+        protected virtual void GainTension(AttackData source)
         {
-            if (MaxTension <= 0)
+            if (source.Attacker == null || MaxTension <= 0)
             {
                 return;
             }
-            int level_difference = source.Level - this.Level;
+
+            int level_difference = source.Attacker.EffectiveLevel - this.EffectiveLevel;
 
             if (level_difference <= -5)
             {
@@ -5744,7 +5745,15 @@ namespace DOL.GS
                 > 15 => 8
             };
 
-            tension = (int)(Properties.MOB_TENSION_RATE * tension);
+            if (source is { AttackType: AttackData.eAttackType.Spell, Damage: 0, SpellHandler: not AbstractCCSpellHandler }) // Non-damaging spells that are not CCs are assumed to be stat debuffs
+            {
+                tension = (int)(Properties.MOB_TENSION_RATE / 4 * tension);
+            }
+            else
+            {
+                tension = (int)(Properties.MOB_TENSION_RATE * tension);
+            }
+
 
             Tension += tension;
         }
@@ -5752,7 +5761,7 @@ namespace DOL.GS
         protected virtual void OnAdrenalineFull()
         {
             Ability ab = SkillBase.GetAbility(Abilities.Adrenaline);
-            (ab as AdrenalineAbilityHandler)?.Execute(this);
+            ab.Execute(this);
             m_tension = 0;
         }
 

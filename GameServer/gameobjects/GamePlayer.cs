@@ -2929,14 +2929,14 @@ namespace DOL.GS
             }
         }
 
-        protected override void GainTension(GameLiving source)
+        protected override void GainTension(AttackData source)
         {
-            if (MaxTension <= 0)
+            if (source.Attacker == null || MaxTension <= 0)
             {
                 return;
             }
 
-            int level_difference = source.Level - this.Level;
+            int level_difference = source.Attacker.EffectiveLevel - this.EffectiveLevel;
 
             if (level_difference <= -5)
             {
@@ -2953,6 +2953,7 @@ namespace DOL.GS
             }
 
             int tension;
+            double rate;
             if (source is GamePlayer)
             {
                 tension = level_difference switch
@@ -2965,7 +2966,7 @@ namespace DOL.GS
                     > 30 => 250
                 };
 
-                tension = (int)(Properties.PVP_TENSION_RATE * tension);
+                rate = Properties.PVP_TENSION_RATE;
             }
             else
             {
@@ -2979,9 +2980,17 @@ namespace DOL.GS
                     > 30 => 500
                 };
 
-                tension = (int)(Properties.PVE_TENSION_RATE * tension);
+                rate = Properties.PVE_TENSION_RATE;
             }
 
+            if (source is { AttackType: AttackData.eAttackType.Spell, Damage: 0, SpellHandler: not AbstractCCSpellHandler }) // Non-damaging spells that are not CCs are assumed to be stat debuffs
+            {
+                tension = (int)(rate / 4 * tension);
+            }
+            else
+            {
+                tension = (int)(rate * tension);
+            }
             Tension += tension;
         }
 
