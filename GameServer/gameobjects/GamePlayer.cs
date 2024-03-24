@@ -14148,16 +14148,17 @@ namespace DOL.GS
 
             if (this.EffectList.GetOfType<AdrenalineStealthSpellEffect>() != null)
             {
-                if (!enemy.EffectList.GetOfType<AdrenalineStealthSpellEffect>() != null)
+                if (enemy.EffectList.GetOfType<AdrenalineStealthSpellEffect>() == null)
                 {
                     // Detector has increased stealth detection
-                    range *= 1.3;
+                    range = (int)(((double)range) * 1.3);
                 }
                 // else We have 30% increase and 30% decrease, do nothing
             }
             else if (enemy.EffectList.GetOfType<AdrenalineStealthSpellEffect>() != null)
             {
-                range *= 0.7;
+                // Enemy has increased stealth
+                range = (int)(((double)range) * 0.7);
             }
 
             //Hard cap is 1900
