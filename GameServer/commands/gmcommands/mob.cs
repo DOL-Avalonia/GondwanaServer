@@ -172,8 +172,7 @@ namespace DOL.GS.Commands
                     && args[1] != "select"
                     && args[1] != "reload"
                     && args[1] != "findname"
-                    && args[1] != "respawn"
-                     && args[1] != "reload" )
+                    && args[1] != "respawn" )
                 {
                     // it is not a mob
                     if (client.Player.TargetObject != null)

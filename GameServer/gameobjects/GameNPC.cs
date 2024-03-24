@@ -2170,6 +2170,7 @@ namespace DOL.GS
             m_Heading = (ushort)(dbMob.Heading & 0xFFF);
             m_maxSpeedBase = (short)dbMob.Speed;
             m_currentSpeed = 0;
+            m_tension = 0;
             CurrentRegionID = dbMob.Region;
             Realm = (eRealm)dbMob.Realm;
             Model = dbMob.Model;
