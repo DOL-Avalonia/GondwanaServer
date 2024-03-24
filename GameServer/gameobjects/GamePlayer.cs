@@ -14129,7 +14129,7 @@ namespace DOL.GS
             }
 
             // Apply Lookout effect
-            GameSpellEffect iSpymasterEffect2 = SpellHandler.FindEffectOnTarget((GameLiving)this, "Loockout");
+            GameSpellEffect iSpymasterEffect2 = SpellHandler.FindEffectOnTarget((GameLiving)this, "Lookout");
             if (iSpymasterEffect2 != null)
                 range += (int)iSpymasterEffect2.Spell.Value;
 
