@@ -19,6 +19,18 @@ namespace DOL.GS.Spells
         {
         }
     }
+    public class AdrenalineStealthSpellEffect : GameSpellEffect
+    {
+        /// <inheritdoc />
+        public AdrenalineStealthSpellEffect(ISpellHandler handler, int duration, int pulseFreq) : base(handler, duration, pulseFreq)
+        {
+        }
+
+        /// <inheritdoc />
+        public AdrenalineStealthSpellEffect(ISpellHandler handler, int duration, int pulseFreq, double effectiveness) : base(handler, duration, pulseFreq, effectiveness)
+        {
+        }
+    }
 
     public abstract class AdrenalineSpellHandler : SpellHandler
     {
@@ -156,6 +168,12 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         public StealthAdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
         {
+        }
+
+        /// <inheritdoc />
+        protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
+        {
+            return new AdrenalineStealthSpellEffect(this, CalculateEffectDuration(target, effectiveness), 0);
         }
 
         /// <inheritdoc />

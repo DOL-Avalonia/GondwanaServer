@@ -14146,16 +14146,16 @@ namespace DOL.GS
             if (iConvokerEffect != null)
                 range += (int)iConvokerEffect.Spell.Value;
 
-            if (this.EffectList.GetAllOfType<StealthAdrenalineSpellHandler>())
+            if (this.EffectList.GetOfType<AdrenalineStealthSpellEffect>() != null)
             {
-                if (!enemy.EffectList.GetAllOfType<StealthAdrenalineSpellHandler>())
+                if (!enemy.EffectList.GetOfType<AdrenalineStealthSpellEffect>() != null)
                 {
                     // Detector has increased stealth detection
                     range *= 1.3;
                 }
                 // else We have 30% increase and 30% decrease, do nothing
             }
-            else if (enemy.EffectList.GetAllOfType<StealthAdrenalineSpellHandler>())
+            else if (enemy.EffectList.GetOfType<AdrenalineStealthSpellEffect>() != null)
             {
                 range *= 0.7;
             }
