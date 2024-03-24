@@ -175,10 +175,10 @@ namespace DOL.GS.Trainer
         public const string HIBMAULARMOR_ID2 = "stoneskin_vest_hib";
         public const string HIBMAULARMOR_ID3 = "vest_of_five_paws_hib";
         public const string HIBMAULARMOR_ID4 = "vest_of_the_pugilist_hib";
-        public const string MENTAARMOR_ID1 = "robes_of_the_apprentice_hib";
-        public const string MENTAARMOR_ID2 = "adepts_robe_hib";
-        public const string MENTAARMOR_ID3 = "robe_of_the_thought_walker_hib";
-        public const string MENTAARMOR_ID4 = "robe_of_the_visionary_hib";
+        public const string MENTARMOR_ID1 = "robes_of_the_apprentice_hib";
+        public const string MENTARMOR_ID2 = "adepts_robe_hib";
+        public const string MENTARMOR_ID3 = "robe_of_the_thought_walker_hib";
+        public const string MENTARMOR_ID4 = "robe_of_the_visionary_hib";
         public const string NIGHARMOR_ID1 = "vest_of_the_huntsman_hib";
         public const string NIGHARMOR_ID2 = "nightwalkers_vest";
         public const string NIGHARMOR_ID3 = "darkshades_vest";
@@ -674,7 +674,7 @@ namespace DOL.GS.Trainer
                 messageKey = "NaturalistTrainer.Warden.Explain";
                 playerLastClassOffers[player] = "warden";
             }
-            if ((str == "ranger" && player.CharacterClass.ID == (int)eCharacterClass.Stalker)
+            if ((str == "ranger" && player.CharacterClass.ID == (int)eCharacterClass.Stalker))
             {
                 messageKey = "StalkerTrainer.Ranger.Explain";
                 playerLastClassOffers[player] = "ranger";
