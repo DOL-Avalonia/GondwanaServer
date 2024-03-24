@@ -282,6 +282,42 @@ namespace DOL.GS
             set;
         }
 
+        protected override void GainTension(AttackData source)
+        {
+            if (source.Attacker == null || MaxTension <= 0)
+            {
+                return;
+            }
+
+            int level_difference = source.Attacker.EffectiveLevel - this.EffectiveLevel;
+
+            if (level_difference <= -5)
+            {
+                return;
+            }
+
+            int tension = level_difference switch
+            {
+                <= -2 => 1,
+                <= 2 => 2,
+                <= 6 => 3,
+                <= 15 => 5,
+                > 15 => 8
+            };
+
+            if (source is { AttackType: AttackData.eAttackType.Spell, Damage: 0, SpellHandler: not AbstractCCSpellHandler }) // Non-damaging spells that are not CCs are assumed to be stat debuffs
+            {
+                tension = (int)(Properties.MOB_TENSION_RATE * (IsRenaissance ? 1.10f * tension : tension) / 4);
+            }
+            else
+            {
+                tension = (int)(Properties.MOB_TENSION_RATE * (IsRenaissance ? 1.10f * tension : tension));
+            }
+
+
+            Tension += tension;
+        }
+
         /// <summary>
         /// Gets or sets the heading of this NPC
         /// </summary>

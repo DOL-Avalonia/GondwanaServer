@@ -2952,8 +2952,8 @@ namespace DOL.GS
                 }
             }
 
-            int tension;
-            double rate;
+            float tension;
+            float server_rate;
             if (source is GamePlayer)
             {
                 tension = level_difference switch
@@ -2966,7 +2966,7 @@ namespace DOL.GS
                     > 30 => 250
                 };
 
-                rate = Properties.PVP_TENSION_RATE;
+                server_rate = (float)Properties.PVP_TENSION_RATE;
             }
             else
             {
@@ -2980,18 +2980,31 @@ namespace DOL.GS
                     > 30 => 500
                 };
 
-                rate = Properties.PVE_TENSION_RATE;
+                server_rate = (float)Properties.PVE_TENSION_RATE;
+            }
+
+            float rate = (1.00f + ((float)GetModified(eProperty.MythicalTension)) / 100) * (1.00f - CurrentRegion.TensionRate);
+
+            if (rate < 0.0f)
+            {
+                return;
+            }
+
+            if (IsRenaissance)
+            {
+                rate *= 0.10f;
             }
 
             if (source is { AttackType: AttackData.eAttackType.Spell, Damage: 0, SpellHandler: not AbstractCCSpellHandler }) // Non-damaging spells that are not CCs are assumed to be stat debuffs
             {
-                tension = (int)(rate / 4 * tension);
+                tension = (server_rate * rate * tension) / 4;
             }
             else
             {
-                tension = (int)(rate * tension);
+                tension = server_rate * rate * tension;
             }
-            Tension += tension;
+
+            Tension += (int)tension;
         }
 
         /// <summary>

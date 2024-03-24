@@ -79,6 +79,11 @@ namespace DOL.Database
         /// </summary>
         private bool m_isFrontier;
 
+        /// <summary>
+        /// The player tension rate in this region
+        /// </summary>
+        private float m_tensionRate;
+
         public DBRegions()
         {
             m_regionID = 0;
@@ -245,6 +250,20 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_isFrontier = value;
+            }
+        }
+
+        /// <summary>
+        /// The player tension rate in this region
+        /// </summary>
+        public float TensionRate
+        {
+            get
+            { return m_tensionRate; }
+            set
+            {
+                Dirty = true;
+                m_tensionRate = value;
             }
         }
     }

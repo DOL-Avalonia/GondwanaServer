@@ -365,7 +365,6 @@ namespace DOL.GS.Spells
             eff.Var2 = (int)(Spell.Value * e.Effectiveness);
             eff.SpellLine = SpellLine.KeyName;
             return eff;
-
         }
 
         public PropertyChangingSpell(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
@@ -397,6 +396,8 @@ namespace DOL.GS.Spells
             {eProperty.Resist_Spirit, "Spirit" },
             {eProperty.Resist_Energy, "Energy" },
             {eProperty.Resist_Natural, "Essence" },
+
+            {eProperty.MythicalTension, "Tension gains" },
         };
 
         protected string ConvertPropertyToText(eProperty propertyID)

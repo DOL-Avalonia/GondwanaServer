@@ -74,6 +74,15 @@ namespace DOL.GS
         /// Should this region be treated as part of the Frontier?
         /// </summary>
         public bool IsFrontier;
+        
+        /// <summary>
+        /// The player tension rate in this region
+        /// </summary>
+        public float TensionRate
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Compares 2 objects

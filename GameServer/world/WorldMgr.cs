@@ -385,6 +385,7 @@ namespace DOL.GS
                 data.WaterLevel = dbRegion.WaterLevel;
                 data.ClassType = dbRegion.ClassType;
                 data.IsFrontier = dbRegion.IsFrontier;
+                data.TensionRate = dbRegion.TensionRate;
 
                 hasFrontierRegion |= data.IsFrontier;
 
