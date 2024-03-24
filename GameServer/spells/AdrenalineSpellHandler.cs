@@ -158,7 +158,7 @@ namespace DOL.GS.Spells
         }
     }
 
-    [SpellHandler("AdrenalineRanged")]
+    [SpellHandler("AdrenalineStealth")]
     public class StealthAdrenalineSpellHandler : AdrenalineSpellHandler
     {
 
@@ -183,11 +183,12 @@ namespace DOL.GS.Spells
 
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 30;
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] += 20;
-            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 25);
+            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 2);
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
                 player.Out.SendUpdateWeaponAndArmorStats();
+                player.Out.SendUpdateMaxSpeed();
             }
             GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackStarted, OnOutgoingAttack);
             GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, OnIncomingHit);
@@ -205,6 +206,7 @@ namespace DOL.GS.Spells
             {
                 player.Out.SendCharStatsUpdate();
                 player.Out.SendUpdateWeaponAndArmorStats();
+                player.Out.SendUpdateMaxSpeed();
             }
             GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackStarted, OnOutgoingAttack);
             GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, OnIncomingHit);
