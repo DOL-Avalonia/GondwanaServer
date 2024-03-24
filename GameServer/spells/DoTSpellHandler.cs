@@ -214,6 +214,7 @@ namespace DOL.GS.Spells
             // no interrupts on DoT direct effect
             // calc damage
             AttackData ad = CalculateDamageToTarget(target, effectiveness);
+            ad.AttackType = AttackData.eAttackType.Spell; // First hit counts as a spell hit, not a dot
             SendDamageMessages(ad);
             DamageTarget(ad, false);
         }
