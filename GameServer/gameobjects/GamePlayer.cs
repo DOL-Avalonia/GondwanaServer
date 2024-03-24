@@ -14132,6 +14132,20 @@ namespace DOL.GS
             if (iConvokerEffect != null)
                 range += (int)iConvokerEffect.Spell.Value;
 
+            if (this.EffectList.GetAllOfType<StealthAdrenalineSpellHandler>())
+            {
+                if (!enemy.EffectList.GetAllOfType<StealthAdrenalineSpellHandler>())
+                {
+                    // Detector has increased stealth detection
+                    range *= 1.3;
+                }
+                // else We have 30% increase and 30% decrease, do nothing
+            }
+            else if (enemy.EffectList.GetAllOfType<StealthAdrenalineSpellHandler>())
+            {
+                range *= 0.7;
+            }
+
             //Hard cap is 1900
             if (range > 1900)
                 range = 1900;

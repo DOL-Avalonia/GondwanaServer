@@ -22,6 +22,9 @@ namespace DOL.GS.Spells
 
     public abstract class AdrenalineSpellHandler : SpellHandler
     {
+        public static readonly int RANGED_ADRENALINE_SPELL_ID = 28003;
+        public static readonly int MELEE_ADRENALINE_SPELL_ID = 28001;
+
         public AdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
 
         /// <inheritdoc />
@@ -55,8 +58,9 @@ namespace DOL.GS.Spells
     [SpellHandler("AdrenalineTank")]
     public class TankAdrenalineSpellHandler : AdrenalineSpellHandler
     {
+
         /// <inheritdoc />
-        public override string ShortDescription => "You are taken over by battle fever! Your attacks against weak enemies cannot miss and your defense and your melee power are greatly enhanced!";
+        public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense and your melee power are greatly enhanced!";
 
         /// <inheritdoc />
         public TankAdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
@@ -68,7 +72,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 25;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 40;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -83,7 +87,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectRemove(effect, overwrite);
 
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= 25;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= 40;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -103,7 +107,7 @@ namespace DOL.GS.Spells
                 return;
             }
 
-            if (ad.Style != null && ad.Target.EffectiveLevel > ad.Attacker.EffectiveLevel + 10)
+            if (ad.Style != null && ad.Target.EffectiveLevel < ad.Attacker.EffectiveLevel + 10)
             {
                 ad.FumbleChance = 0;
                 ad.MissChance = 0;
@@ -130,6 +134,99 @@ namespace DOL.GS.Spells
                 return;
             if (ad.AttackType is AttackData.eAttackType.Spell or AttackData.eAttackType.DoT)
                 absorbPercent = 0.25;
+
+            int damageAbsorbed = (int)(absorbPercent * (ad.Damage + ad.CriticalDamage));
+
+            ad.Damage -= damageAbsorbed;
+
+            if (ad.Target is GamePlayer player)
+                player.SendTranslatedMessage("Adrenaline.Self.Absorb", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, damageAbsorbed);
+            if (ad.Attacker is GamePlayer attacker)
+                attacker.SendTranslatedMessage("Adrenaline.Target.Absorbs", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, damageAbsorbed);
+        }
+    }
+
+    [SpellHandler("AdrenalineRanged")]
+    public class StealthAdrenalineSpellHandler : AdrenalineSpellHandler
+    {
+
+        /// <inheritdoc />
+        public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense and your melee power are greatly enhanced!";
+
+        /// <inheritdoc />
+        public StealthAdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
+        {
+        }
+
+        /// <inheritdoc />
+        public override void OnEffectStart(GameSpellEffect effect)
+        {
+            base.OnEffectStart(effect);
+
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 30;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] += 20;
+            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 25);
+            if (effect.Owner is GamePlayer player)
+            {
+                player.Out.SendCharStatsUpdate();
+                player.Out.SendUpdateWeaponAndArmorStats();
+            }
+            GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackStarted, OnOutgoingAttack);
+            GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, OnIncomingHit);
+        }
+
+        /// <inheritdoc />
+        public override void OnEffectRemove(GameSpellEffect effect, bool overwrite)
+        {
+            base.OnEffectRemove(effect, overwrite);
+
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= 30;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] -= 20;
+            effect.Owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
+            if (effect.Owner is GamePlayer player)
+            {
+                player.Out.SendCharStatsUpdate();
+                player.Out.SendUpdateWeaponAndArmorStats();
+            }
+            GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackStarted, OnOutgoingAttack);
+            GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, OnIncomingHit);
+        }
+
+        /// <inheritdoc />
+        public void OnOutgoingAttack(DOLEvent e, object sender, EventArgs args)
+        {
+            AttackData ad = (args as AttackStartedEventArgs)?.AttackData;
+
+            if (ad == null)
+            {
+                return;
+            }
+
+            if (ad.Style != null && ad.Target.EffectiveLevel < ad.Attacker.EffectiveLevel + 5)
+            {
+                ad.FumbleChance = 0;
+                ad.MissChance = 0;
+            }
+
+            if (ad.AttackType is AttackData.eAttackType.MeleeDualWield or AttackData.eAttackType.MeleeOneHand or AttackData.eAttackType.MeleeTwoHand or AttackData.eAttackType.Ranged)
+            {
+                ad.criticalChance += ad.Target is GamePlayer ? 15 : 25;
+            }
+        }
+
+        /// <inheritdoc />
+        public void OnIncomingHit(DOLEvent e, object sender, EventArgs args)
+        {
+            AttackData ad = (args as AttackedByEnemyEventArgs)?.AttackData;
+
+            if (ad is not { AttackResult: not GameLiving.eAttackResult.HitUnstyled and not GameLiving.eAttackResult.HitStyle })
+            {
+                return;
+            }
+
+            double absorbPercent = 0.40;
+            if (ad.AttackType is AttackData.eAttackType.Spell or AttackData.eAttackType.DoT)
+                absorbPercent = 0.20;
 
             int damageAbsorbed = (int)(absorbPercent * (ad.Damage + ad.CriticalDamage));
 
