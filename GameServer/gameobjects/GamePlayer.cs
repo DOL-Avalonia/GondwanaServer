@@ -14058,6 +14058,12 @@ namespace DOL.GS
             if (enemy.Client.Account.PrivLevel > 1)
                 return false;
 
+            //everyone can see your own group stealthed
+            if (enemy.Group != null && Group != null && enemy.Group == Group)
+            {
+                return this.IsWithinRadius(enemy, 2500);
+            }
+
             /*
              * http://www.critshot.com/forums/showthread.php?threadid=3142
              * The person doing the looking has a chance to find them based on their level, minus the stealthed person's stealth spec.
@@ -14149,11 +14155,6 @@ namespace DOL.GS
             //Hard cap is 1900
             if (range > 1900)
                 range = 1900;
-            //everyone can see your own group stealthed
-            else if (enemy.Group != null && Group != null && enemy.Group == Group)
-            {
-                range = 2500;
-            }
 
             // Fin
             // vampiir stealth range, uncomment when add eproperty stealthrange i suppose
