@@ -8092,10 +8092,18 @@ namespace DOL.GS
                 speed *= (1.0 - (qui - 60) * 0.002) * 0.01 * GetModified(eProperty.MeleeSpeed);
             }
 
+
             // apply speed cap
-            if (speed < 15)
+            if (IsInRvR)
             {
-                speed = 15;
+                if (speed < 15)
+                {
+                    speed = 15;
+                }
+            }
+            else if (speed < 9)
+            {
+                speed = 9;
             }
             return (int)(speed * 100);
         }
