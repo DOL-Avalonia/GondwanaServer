@@ -22,6 +22,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
 using DOL.GS.RealmAbilities;
 using DOL.GS.Spells;
+using System.Linq;
 
 namespace DOL.GS.PropertyCalc
 {
@@ -67,8 +68,8 @@ namespace DOL.GS.PropertyCalc
 
                 if (ServerProperties.Properties.ENABLE_PVE_SPEED)
                 {
-                    if (speed == 1 && !player.InCombat && !player.IsStealthed && !player.CurrentRegion.IsRvR)
-                        speed *= 1.25; // new run speed is 125% when no buff
+                    if (speed < 1.25 && speed > 1 && !player.InCombat && !player.IsStealthed && !player.CurrentRegion.IsRvR)
+                        speed = 1.25; // new run speed is 125% when no buff
                 }
 
                 if (player.IsOverencumbered && player.Client.Account.PrivLevel < 2 && ServerProperties.Properties.ENABLE_ENCUMBERANCE_SPEED_LOSS)
