@@ -85,6 +85,7 @@ namespace DOL.GS.Spells
     [SpellHandler("AdrenalineTank")]
     public class TankAdrenalineSpellHandler : AdrenalineSpellHandler
     {
+        public readonly int MELEESPEED_BONUS = 40;
 
         /// <inheritdoc />
         public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense and your melee power are greatly enhanced!";
@@ -99,7 +100,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 40;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += MELEESPEED_BONUS;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -114,7 +115,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectRemove(effect, overwrite);
 
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= 40;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= MELEESPEED_BONUS;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -149,9 +150,7 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         public void OnIncomingHit(DOLEvent e, object sender, EventArgs args)
         {
-            AttackData ad = (args as AttackedByEnemyEventArgs)?.AttackData;
-
-            if (ad == null)
+            if (args is not AttackedByEnemyEventArgs { AttackData: { AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle } ad })
             {
                 return;
             }
@@ -176,8 +175,10 @@ namespace DOL.GS.Spells
     [SpellHandler("AdrenalineMage")]
     public class MageAdrenalineSpellHandler : AdrenalineSpellHandler
     {
+        public static readonly int CASTSPEED_BONUS = 30;
+
         /// <inheritdoc />
-        public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense and your melee power are greatly enhanced!";
+        public override string ShortDescription => "You are taken over by battle fever! Your defense and chance to hit with spells and their casting speed are greatly enhanced, and you cannot be interrupted by attacks!";
 
         /// <inheritdoc />
         public MageAdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
@@ -195,7 +196,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] += 15;
+            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] += CASTSPEED_BONUS;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -209,7 +210,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectRemove(effect, overwrite);
 
-            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] -= 50;
+            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] -= CASTSPEED_BONUS;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -237,7 +238,7 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         public void OnIncomingHit(DOLEvent e, object sender, EventArgs args)
         {
-            if (args is not AttackedByEnemyEventArgs { AttackData: { AttackResult: not GameLiving.eAttackResult.HitUnstyled and not GameLiving.eAttackResult.HitStyle } ad })
+            if (args is not AttackedByEnemyEventArgs { AttackData: { AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle } ad })
             {
                 return;
             }
@@ -256,9 +257,12 @@ namespace DOL.GS.Spells
     [SpellHandler("AdrenalineStealth")]
     public class StealthAdrenalineSpellHandler : AdrenalineSpellHandler
     {
+        public readonly int MELEESPEED_BONUS = 30;
+        public readonly int RANGEDSPEED_BONUS = 20;
+        public readonly double MAXSPEED_BONUS = 1.25;
 
         /// <inheritdoc />
-        public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense and your melee power are greatly enhanced!";
+        public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense, stealth, melee and ranged power are greatly enhanced!";
 
         /// <inheritdoc />
         public StealthAdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
@@ -276,9 +280,9 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 30;
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] += 20;
-            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.25);
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += MELEESPEED_BONUS;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] += RANGEDSPEED_BONUS;
+            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, MAXSPEED_BONUS);
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -294,8 +298,8 @@ namespace DOL.GS.Spells
         {
             base.OnEffectRemove(effect, overwrite);
 
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= 30;
-            effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] -= 20;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] -= MELEESPEED_BONUS;
+            effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] -= RANGEDSPEED_BONUS;
             effect.Owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, this);
             if (effect.Owner is GamePlayer player)
             {
@@ -332,9 +336,7 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         public void OnIncomingHit(DOLEvent e, object sender, EventArgs args)
         {
-            AttackData ad = (args as AttackedByEnemyEventArgs)?.AttackData;
-
-            if (ad is not { AttackResult: not GameLiving.eAttackResult.HitUnstyled and not GameLiving.eAttackResult.HitStyle })
+            if (args is not AttackedByEnemyEventArgs { AttackData: { AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle } ad })
             {
                 return;
             }
