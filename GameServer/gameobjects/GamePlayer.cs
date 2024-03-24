@@ -2935,11 +2935,21 @@ namespace DOL.GS
             {
                 return;
             }
+
             int level_difference = source.Level - this.Level;
 
             if (level_difference <= -5)
             {
                 return;
+            }
+
+            lock (EffectList)
+            {
+                // Players under Resurrection sickness, Damnation or Reanimate Corpse cannot gain tension
+                if (EffectList.Any(e => e is GameSpellEffect { SpellHandler: AbstractIllnessSpellHandler or DamnationSpellHandler or SummonMonster }))
+                {
+                    return;
+                }
             }
 
             int tension;
