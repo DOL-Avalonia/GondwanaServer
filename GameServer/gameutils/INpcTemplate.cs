@@ -131,6 +131,6 @@ namespace DOL.GS
         /// <summary>
         /// What Spell to cast when adrenaline is full
         /// </summary>
-        Spell AdrenalineSpell { get; }
+        int AdrenalineSpellID { get; }
     }
 }

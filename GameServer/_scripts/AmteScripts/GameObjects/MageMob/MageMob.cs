@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
 using GameServerScripts.Amtescripts.Managers;
 
 
@@ -25,6 +26,7 @@ namespace DOL.GS.Scripts
                 return (int)(GetModified(eProperty.MaxMana) * 1.3);
             }
         }
+
         /// <summary>
         /// Interval for power regeneration tics
         /// </summary>

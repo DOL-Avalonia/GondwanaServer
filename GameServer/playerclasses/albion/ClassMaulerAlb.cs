@@ -42,7 +42,7 @@ namespace DOL.GS.PlayerClass
             m_manaStat = eStat.STR;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.12f;
-            m_adrenalineSpellID = AdrenalineSpellHandler.MELEE_ADRENALINE_SPELL_ID;
+            m_adrenalineSpellID = AdrenalineSpellHandler.TANK_ADRENALINE_SPELL_ID;
         }
 
         public override int WeaponSkillFactor(eObjectType type)

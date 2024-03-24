@@ -2284,8 +2284,8 @@ namespace DOL.GS
 
             LoadTemplate(NPCTemplate);
             /*
-                        if (Inventory != null)
-                            SwitchWeapon(ActiveWeaponSlot);
+                if (Inventory != null)
+                    SwitchWeapon(ActiveWeaponSlot);
             */
         }
 
@@ -2476,6 +2476,31 @@ namespace DOL.GS
                 {
                     foreach (Ability ab in template.Abilities)
                         m_abilities[ab.KeyName] = ab;
+                }
+            }
+
+            if (template.AdrenalineSpellID != 0)
+            {
+                if (template.MaxTension == 0)
+                {
+                    log.Warn($"NPCTemplate {template.TemplateId} has Adrenaline spell {template.AdrenalineSpellID} but MaxTension is 0, it will never be called");
+                }
+                Spell sp = SkillBase.GetSpellByID(template.AdrenalineSpellID);
+                if (sp != null)
+                {
+                    AdrenalineSpell = sp;
+                }
+                else
+                {
+                    log.Error($"NPCTemplate {template.TemplateId} has unknown Adrenaline spell {template.AdrenalineSpellID} ");
+                }
+            }
+            else if (template.MaxTension > 0) /* && data.AdrenalineSpellID == 0 */
+            {
+                AdrenalineSpell = this is MageMob ? SkillBase.GetSpellByID(AdrenalineSpellHandler.MAGE_ADRENALINE_SPELL_ID) : SkillBase.GetSpellByID(AdrenalineSpellHandler.TANK_ADRENALINE_SPELL_ID);
+                if (AdrenalineSpell == null)
+                {
+                    log.Error($"Could not load default adrenaline spell for NPCTemplate {template.TemplateId}");
                 }
             }
 
@@ -3881,11 +3906,6 @@ namespace DOL.GS
         protected object LOS_LOCK = new object();
 
         protected GameObject m_targetLOSObject = null;
-
-        public override Spell AdrenalineSpell
-        {
-            get => NPCTemplate?.AdrenalineSpell ?? null;
-        }
 
         /// <summary>
         /// Starts a melee attack on a target

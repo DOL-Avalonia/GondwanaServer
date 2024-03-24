@@ -2929,11 +2929,6 @@ namespace DOL.GS
             }
         }
 
-        public override Spell AdrenalineSpell
-        {
-            get => m_characterClass.AdrenalineSpell;
-        }
-
         protected override void GainTension(GameLiving source)
         {
             if (MaxTension <= 0)
@@ -3109,6 +3104,7 @@ namespace DOL.GS
             maxTension *= CharacterClass.MaxTensionFactor;
             DBCharacter.MaxTension = (int)maxTension;
             MaxTension = DBCharacter.MaxTension;
+            AdrenalineSpell = CharacterClass.AdrenalineSpell;
 
             if (Group != null)
             {

@@ -5764,7 +5764,8 @@ namespace DOL.GS
 
         public virtual Spell AdrenalineSpell
         {
-            get => null;
+            get;
+            protected set;
         }
 
         /// <summary>

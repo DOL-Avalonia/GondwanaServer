@@ -38,7 +38,7 @@ namespace DOL.GS.PlayerClass
             m_manaStat = eStat.INT;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.03f;
-            m_adrenalineSpellID = AdrenalineSpellHandler.MELEE_ADRENALINE_SPELL_ID;
+            m_adrenalineSpellID = AdrenalineSpellHandler.TANK_ADRENALINE_SPELL_ID;
         }
 
         public override eClassType ClassType

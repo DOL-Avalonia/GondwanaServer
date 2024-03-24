@@ -50,7 +50,7 @@ namespace DOL.GS.Spells
     {
         public static readonly int RANGED_ADRENALINE_SPELL_ID = 28003;
         public static readonly int MAGE_ADRENALINE_SPELL_ID = 28002;
-        public static readonly int MELEE_ADRENALINE_SPELL_ID = 28001;
+        public static readonly int TANK_ADRENALINE_SPELL_ID = 28001;
 
         public AdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
 
