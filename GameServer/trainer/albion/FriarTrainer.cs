@@ -34,7 +34,7 @@ namespace DOL.GS.Trainer
             get { return eCharacterClass.Friar; }
         }
 
-        public const string WEAPON_ID = "friar_item";
+        public const string WEAPON_ID = "friar_staff";
         public const string ARMOR_ID1 = "robes_of_the_novice_alb";
         public const string ARMOR_ID2 = "chaplains_robe";
         public const string ARMOR_ID3 = "fanatics_robes";

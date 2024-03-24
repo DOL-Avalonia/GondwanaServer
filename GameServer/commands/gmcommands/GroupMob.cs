@@ -123,6 +123,8 @@ namespace DOL.commands.gmcommands
                             spawner.NpcTemplate2 = -1;
                             spawner.NpcTemplate3 = -1;
                             spawner.NpcTemplate4 = -1;
+                            spawner.NpcTemplate5 = -1;
+                            spawner.NpcTemplate6 = -1;
                             spawner.PercentLifeAddsActivity = 0;
                             spawner.MasterGroupId = groupId;
                             spawner.AddsRespawnCount = 0;

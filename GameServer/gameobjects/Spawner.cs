@@ -33,6 +33,8 @@ namespace DOL.GS
         private int npcTemplate2;
         private int npcTemplate3;
         private int npcTemplate4;
+        private int npcTemplate5;
+        private int npcTemplate6;
         private int addsRespawnCountTotal;
         private int addsRespawnCurrentCount;
         private int addRespawnTimerSecs;
@@ -104,6 +106,8 @@ namespace DOL.GS
                     this.npcTemplate2 = db.NpcTemplate2;
                     this.npcTemplate3 = db.NpcTemplate3;
                     this.npcTemplate4 = db.NpcTemplate4;
+                    this.npcTemplate5 = db.NpcTemplate5;
+                    this.npcTemplate6 = db.NpcTemplate6;
 
                     if (db.MasterGroupId != null)
                     {
@@ -111,6 +115,8 @@ namespace DOL.GS
                         this.npcTemplate2 = -1;
                         this.npcTemplate3 = -1;
                         this.npcTemplate4 = -1;
+                        this.npcTemplate5 = -1;
+                        this.npcTemplate6 = -1;
                         this.isAddsGroupMasterGroup = true;
                         this.addsGroupmobId = db.MasterGroupId;
 
@@ -154,6 +160,8 @@ namespace DOL.GS
                     db.NpcTemplate2 = this.npcTemplate2;
                     db.NpcTemplate3 = this.npcTemplate3;
                     db.NpcTemplate4 = this.npcTemplate4;
+                    db.NpcTemplate5 = this.npcTemplate5;
+                    db.NpcTemplate6 = this.npcTemplate6;
                     db.AddRespawnTimerSecs = this.addRespawnTimerSecs;
                     db.MasterGroupId = this.isAddsGroupMasterGroup ? this.addsGroupmobId : null;
                     db.AddsRespawnCount = this.addsRespawnCountTotal;
@@ -207,78 +215,51 @@ namespace DOL.GS
 
         private void InstanciateMobs()
         {
-
-            GameNPC npc1 = null;
-            GameNPC npc2 = null;
-            GameNPC npc3 = null;
-            GameNPC npc4 = null;
-
-            var template1 = NpcTemplateMgr.GetTemplate(npcTemplate1);
-            var template2 = NpcTemplateMgr.GetTemplate(npcTemplate2);
-            var template3 = NpcTemplateMgr.GetTemplate(npcTemplate3);
-            var template4 = NpcTemplateMgr.GetTemplate(npcTemplate4);
-
-            foreach (var asm in ScriptMgr.GameServerScripts)
+            GameNPC[] npcs = new GameNPC[6];
+            NpcTemplate[] templates = new NpcTemplate[6]
             {
-                if (npc1 == null && template1 != null)
-                {
-                    try
-                    {
-                        npc1 = asm.CreateInstance(template1.ClassType, false) as GameNPC;
-                    }
-                    catch { }
-                }
+                NpcTemplateMgr.GetTemplate(npcTemplate1),
+                NpcTemplateMgr.GetTemplate(npcTemplate2),
+                NpcTemplateMgr.GetTemplate(npcTemplate3),
+                NpcTemplateMgr.GetTemplate(npcTemplate4),
+                NpcTemplateMgr.GetTemplate(npcTemplate5),
+                NpcTemplateMgr.GetTemplate(npcTemplate6)
+            };
 
-                if (npc2 == null && template2 != null)
-                {
-                    try
-                    {
-                        npc2 = asm.CreateInstance(template2.ClassType, false) as GameNPC;
-                    }
-                    catch { }
-                }
+            List<GameNPC> instantiatedNpcs = new List<GameNPC>();
 
-                if (npc3 == null && template3 != null)
+            for (int i = 0; i < templates.Length; i++)
+            {
+                if (templates[i] != null)
                 {
-                    try
-                    {
-                        npc3 = asm.CreateInstance(template3.ClassType, false) as GameNPC;
-                    }
-                    catch { }
-                }
+                    GameNPC npc = new GameNPC();
+                    npc.LoadTemplate(templates[i]);
+                    npc.Name = templates[i].Name;
 
-                if (npc4 == null && template4 != null)
-                {
-                    try
-                    {
-                        npc4 = asm.CreateInstance(template4.ClassType, false) as GameNPC;
-                    }
-                    catch { }
+                    SetCircularPosition(npc, i, templates.Length, WorldMgr.GIVE_ITEM_DISTANCE);
+                    instantiatedNpcs.Add(npc);
                 }
             }
-            bool isXOffset = false;
-            bool isPositiveOffset = true;
-            List<GameNPC> npcs = new List<GameNPC>();
 
-            isPositiveOffset = LoadNpcTemplateMob(npc1, template1, isXOffset, isPositiveOffset, npcs);
-            isPositiveOffset = LoadNpcTemplateMob(npc2, template2, isXOffset, isPositiveOffset, npcs);
-            isXOffset = true;
-            isPositiveOffset = LoadNpcTemplateMob(npc3, template3, isXOffset, isPositiveOffset, npcs);
-            LoadNpcTemplateMob(npc4, template4, isXOffset, isPositiveOffset, npcs);
-            this.AddToMobGroupToNPCTemplates(npcs);
+            AddToMobGroupToNPCTemplates(instantiatedNpcs);
         }
 
-        private bool LoadNpcTemplateMob(GameNPC npc, NpcTemplate template, bool isXOffset, bool isPositiveOffset, List<GameNPC> npcs)
+        private void SetCircularPosition(GameNPC npc, int index, int total, float distance)
         {
-            if (npc != null)
-            {
-                npc.LoadTemplate(template);
-                SetPositionAndLoad(npc, isXOffset, isPositiveOffset);
-                isPositiveOffset = !isPositiveOffset;
-                npcs.Add(npc);
-            }
+            double angle = (Math.PI * 2 * index) / total;
+            float xOffset = (float)Math.Cos(angle) * distance;
+            float yOffset = (float)Math.Sin(angle) * distance;
 
-            return isPositiveOffset;
+            npc.Position = new System.Numerics.Vector3(this.Position.X + xOffset, this.Position.Y + yOffset, this.Position.Z);
+            npc.Heading = this.Heading;
+            npc.RespawnInterval = -1;
+            npc.CurrentRegion = WorldMgr.GetRegion(this.CurrentRegionID);
+            npc.AddToWorld();
+            npc.OwnerID = this.InternalID;
+            if (this.Faction != null)
+            {
+                npc.Faction = FactionMgr.GetFactionByID(this.Faction.ID);
+            }
         }
 
         private void AddSpawnerToMobGroup()
@@ -314,25 +295,6 @@ namespace DOL.GS
                 await Task.Delay(500);
                 MobGroupManager.Instance.Groups[this.addsGroupmobId].SetGroupInfo(status, true, true);
             });
-        }
-
-        private void SetPositionAndLoad(GameNPC npc, bool isXOffset, bool isPositiveOffset)
-        {
-            npc.LoadedFromScript = true;
-
-            npc.Position = new System.Numerics.Vector3(this.Position.X + (isXOffset ? (isPositiveOffset ? WorldMgr.GIVE_ITEM_DISTANCE : WorldMgr.GIVE_ITEM_DISTANCE * -1) : 0),
-                                                this.Position.Y + (!isXOffset ? (isPositiveOffset ? WorldMgr.GIVE_ITEM_DISTANCE : WorldMgr.GIVE_ITEM_DISTANCE * -1) : 0),
-                                                this.Position.Z);
-            npc.Heading = this.Heading;
-            npc.RespawnInterval = -1;
-            npc.CurrentRegion = WorldMgr.GetRegion(this.CurrentRegionID);
-            npc.CurrentRegionID = this.CurrentRegionID;
-            var added = npc.AddToWorld();
-            npc.OwnerID = this.InternalID;
-            if (this.Faction != null)
-            {
-                npc.Faction = FactionMgr.GetFactionByID(this.Faction.ID);
-            }
         }
 
         public override void StartAttack(GameObject target)

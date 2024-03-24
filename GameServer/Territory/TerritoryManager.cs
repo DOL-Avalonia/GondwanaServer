@@ -308,6 +308,10 @@ namespace DOL.Territory
         {
             bool wasBannerSummoned = territory.IsBannerSummoned;
 
+            Guild guild = GuildMgr.GetGuildByName(territory.GuildOwner);
+            int guildLevel = (int)(guild != null ? guild.GuildLevel : 0);
+            int mobBannerResist = Properties.TERRITORYMOB_BANNER_RESIST + (guildLevel >= 15 ? 15 : 0);
+
             territory.IsBannerSummoned = false;
             foreach (var mob in territory.Mobs)
             {
@@ -315,13 +319,13 @@ namespace DOL.Territory
                 if (wasBannerSummoned)
                 {
                     // Unapply magic and physical resistance bonus
-                    Instance.ChangeMagicAndPhysicalResistance(mob, 30, true);
+                    Instance.ChangeMagicAndPhysicalResistance(mob, mobBannerResist, true);
                 }
             }
 
             if (wasBannerSummoned)
             {
-                Instance.ChangeMagicAndPhysicalResistance(territory.Boss, 30, true);
+                Instance.ChangeMagicAndPhysicalResistance(territory.Boss, mobBannerResist, true);
             }
             RestoreOriginalEmblem(territory.Boss);
 
@@ -517,18 +521,22 @@ namespace DOL.Territory
             territory.IsBannerSummoned = true;
             var cls = WorldMgr.GetAllPlayingClients().Where(c => c.Player.CurrentZone.ID.Equals(territory.ZoneId));
 
+
+            int guildLevel = (int)(guild != null ? guild.GuildLevel : 0);
+            int mobBannerResist = Properties.TERRITORYMOB_BANNER_RESIST + (guildLevel >= 15 ? 15 : 0);
+
             foreach (var mob in territory.Mobs)
             {
                 ApplyNewEmblem(guild.Name, mob);
 
                 // Apply magic and physical resistance bonus
-                ChangeMagicAndPhysicalResistance(mob, 30, false);
+                ChangeMagicAndPhysicalResistance(mob, mobBannerResist, false);
 
                 cls.Foreach(c => c.Out.SendLivingEquipmentUpdate(mob));
             }
 
             // Apply magic and physical resistance bonus
-            ChangeMagicAndPhysicalResistance(territory.Boss, 30, false);
+            ChangeMagicAndPhysicalResistance(territory.Boss, mobBannerResist, false);
             ApplyNewEmblem(guild.Name, territory.Boss);
 
             var firstMob = initSearchNPC ?? territory.Mobs.FirstOrDefault();

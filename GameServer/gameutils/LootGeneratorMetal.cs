@@ -119,8 +119,16 @@ namespace DOL.GS
         public override LootList GenerateLoot(GameNPC mob, GameObject killer)
         {
             LootList loot = base.GenerateLoot(mob, killer);
-            if (Util.Chance(60))
-                return loot;
+            if (mob.Level > 59)
+            {
+                if (Util.Chance(30))
+                    return loot;
+            }
+            else
+            {
+                if (Util.Chance(60))
+                    return loot;
+            }
 
             var metalBars = new LootList(1);
             foreach (var metalBar in _metal_bars)

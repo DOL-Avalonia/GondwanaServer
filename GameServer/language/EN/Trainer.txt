@@ -695,3 +695,25 @@ MageTrainer.Sorcerer.Refuse:		{0} says, "The path of the Sorcerer is not availab
 # /BaseclassMauler
 Baseclass.Mauler.Explain:		{0} says, "The Mauler is a class comprised of brawny and brutish martial artist elements along with unique powers and spells. This brawling class channels earthen elemental powers to perform its primal magic. These powers augment Mauler combat abilities and combat styles. The class does not have a normal power pool, however. It will gain power from taking damage in combat. Maulers can specialize in two forms of melee combat. Mauler Staff uses a weighted, primitive form of the quarterstaff. It is known for its raw power, rather than the finesse of other staff based skills. Fist wraps are rune inscribed pieces of cloth, or heavy weights attached to the fists to augment the Mauler's naturally powerful hand to hand combat. Their spell lines augment melee combat depending on the specialization. Aura manipulation augments the natural auras around the Mauler, enhancing their defense and health, as well as those around them. Magnetism uses the power of the earth to disrupt the actions of enemies in close quarters with the Mauler. Power strikes allows the Mauler to launch a barrage of attacks that will damage and debuff anyone who decides to face them in combat."
 Baseclass.Mauler.Refuse:		{0} says, "The path of the Mauler is not available to your race. Please choose another."
+
+
+## MasterTrainer
+MasterTrainer.Interact.Acolyte1:		{0} says, "Here are the training paths you can follow: [Cleric], [Heretic], or [Friar]."
+MasterTrainer.Interact.AlbionRogue1:	{0} says, "Here are the training paths you can follow: [Infiltrator], [Minstrel], or [Scout]."
+MasterTrainer.Interact.Disciple1:		{0} says, "Here are the training paths you can follow: [Necromancer]."
+MasterTrainer.Interact.Elementalist1:	{0} says, "Here are the training paths you can follow: [Theurgist] or [Wizard]."
+MasterTrainer.Interact.Fighter1:		{0} says, "Here are the training paths you can follow: [Armsman], [Paladin], [Mercenary], [Reaver] or [Mauler]"
+MasterTrainer.Interact.Mage1:			{0} says, "Here are the training paths you can follow: [Cabalist] or [Sorcerer]."
+MasterTrainer.Interact.Forester1:		{0} says, "Here are the training paths you can follow: [Animist] or [Valewalker]."
+MasterTrainer.Interact.Guardian1:		{0} says, "Here are the training paths you can follow: [Hero], [Champion], [Blademaster] or [Mauler]."
+MasterTrainer.Interact.Magician1:		{0} says, "Here are the training paths you can follow: [Eldritch], [Enchanter], [Mentalist] or [Bainshee]."
+MasterTrainer.Interact.Naturalist1:		{0} says, "Here are the training paths you can follow: [Bard], [Druid] or [Warden]."
+MasterTrainer.Interact.Stalker1:		{0} says, "Here are the training paths you can follow: [Ranger], [Nightshade], or [Vampiir]."
+MasterTrainer.Interact.MidgardRogue1:	{0} says, "Here are the training paths you can follow: [Hunter] or [Shadowblade]."
+MasterTrainer.Interact.Mystic1:			{0} says, "Here are the training paths you can follow: [Runemaster], [Spiritmaster], [Bonedancer] or [Warlock]."
+MasterTrainer.Interact.Viking1:			{0} says, "Here are the training paths you can follow: [Warrior], [Berserker], [Skald], [Thane], [Savage], [Valkyrie] or [Mauler]."
+MasterTrainer.Interact.Seer1:			{0} says, "Here are the training paths you can follow: [Shaman] or [Healer]."
+MasterTrainer.Interact.ChooseClass:		"Would you like to choose this path for your training? [Yes] - [No]"
+MasterTrainer.Interact.GiveWeapon1:		{0} says, "Here is a weapon to help you begin your journey through these lands."
+MasterTrainer.Interact.GiveWeapon2:		{0} says, "Here is a staff to help you begin your journey through these lands."
+MasterTrainer.Interact.GiveWeapon3:		{0} says, "Here is an instrument to help you begin your journey through these lands."

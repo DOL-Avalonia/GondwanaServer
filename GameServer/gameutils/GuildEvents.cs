@@ -333,7 +333,7 @@ namespace DOL.GS
                 {
                     TimeSpan bonusTime = DateTime.Now.Subtract(checkGuild.BonusStartTime);
 
-                    if (bonusTime.TotalHours > ServerProperties.Properties.GUILD_BUFF_DURATION_HOURS)
+                    if (bonusTime.TotalMinutes > ServerProperties.Properties.GUILD_BUFF_DURATION_MINUTES)
                     {
                         checkGuild.BonusType = Guild.eBonusType.None;
 

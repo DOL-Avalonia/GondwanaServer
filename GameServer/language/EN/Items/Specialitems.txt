@@ -1,9 +1,10 @@
 Items.Specialitems.Feuartificetext:        		    The fireworks will start in {0} seconds.
 
-
 Items.Specialitems.BeerAlreadyDrinking:				You're already drinking!
 Items.Specialitems.BeerDrinkDistance:				drinks
 
+Items.Specialitems.PlaceAssiseTooFar:				You are too far away to sit down.
+Items.Specialitems.PlaceAssiseTaken:				The spot is already taken.
 
 Items.Specialitems.GuarkRingListened:				Your request has been heard.
 Items.Specialitems.GuarkRingUsed:					You feel a powerful aura that immobilizes you.
@@ -22,9 +23,7 @@ Items.Specialitems.GuarkRingCannotUseHere:			You can't use this item here.
 Items.Specialitems.GuarkRingDoNotMove:				You must remain at the same place to use this item.
 Items.Specialitems.GuarkRingWaitBeforeUse:			You've been in combat recently, so you have to wait to be able to use this item again.
 
-
 Items.Specialitems.MiniPetNoCast:					You cannot cast this spell here!
-
 
 Items.Specialitems.FirecampNoSit:					Do not sit close to a bonfire to remove this effect.
 Items.Specialitems.FirecampHeatRegen:				The warmth of the bonfire allows you to recover your health faster.

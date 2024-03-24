@@ -2645,8 +2645,8 @@ namespace DOL.GS.ServerProperties
         /// <summary>
         /// Guild masterlevel XP Buff bonus amount
         /// </summary>
-        [ServerProperty("guild", "guild_buff_duration_hours", "Duration in hours for all guild buffs.", (ushort)5)]
-        public static ushort GUILD_BUFF_DURATION_HOURS;
+        [ServerProperty("guild", "guild_buff_duration_minutes", "Duration in minutes for all guild buffs.", (ushort)360)]
+        public static ushort GUILD_BUFF_DURATION_MINUTES;
 
         /// <summary>
         /// How much merit to reward guild when dragon is killed, if any.
@@ -2731,6 +2731,9 @@ namespace DOL.GS.ServerProperties
 
         [ServerProperty("territory", "daily_merit_points ", "Territory Daily Merit Points", 19)]
         public static int DAILY_MERIT_POINTS;
+
+        [ServerProperty("territory", "territorymob_banner_resist", "Base Mob resistance in territories when Guild banner is set", 30)]
+        public static int TERRITORYMOB_BANNER_RESIST;
 
         /// <summary>
         /// Crafting skill gain bonus in capital cities

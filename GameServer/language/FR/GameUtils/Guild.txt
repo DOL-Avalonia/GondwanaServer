@@ -1,7 +1,34 @@
-GameUtils.Guild.LevelUp:			{0} a atteint le niveau {1}!
-GameUtils.Guild.CommandAvailable:	La commande {0} est maintenant disponible.
-GameUtils.Guild.CommandsAvailable:	Les commandes {0} sont maintenant disponible.
-GameUtils.Guild.MaxDuesAvailable:	Les taxes de guilde peuvent maintenant être réglées à {0}%.
+GameUtils.Guild.LevelUp:		{0} a atteint le niveau {1}!
+GameUtils.Guild.CommandAvailable:	- La commande {0} est maintenant disponible.
+GameUtils.Guild.CommandsAvailable:	- Les commandes {0} sont maintenant disponible.
+GameUtils.Guild.MaxDuesAvailable:	- Les taxes de guilde peuvent maintenant être réglées jusqu'à {0}%.
+GameUtils.Guild.MoreTerritories01:	- Votre guilde peut capturer jusqu'à 2 territoires sans encourir le risque de surtaxe et peut accumuler des bonus pour un maximum de 2 territoires.
+GameUtils.Guild.MoreTerritories02:	- Votre guilde peut capturer jusqu'à 3 territoires sans encourir le risque de surtaxe et peut accumuler des bonus pour un maximum de 3 territoires.
+GameUtils.Guild.MoreTerritories03:	- Votre guilde peut capturer jusqu'à 4 territoires sans encourir le risque de surtaxe et peut accumuler des bonus pour un maximum de 4 territoires.
+GameUtils.Guild.MoreTerritories04:	- Votre guilde peut capturer jusqu'à 5 territoires sans encourir le risque de surtaxe et peut accumuler des bonus pour un maximum de 5 territoires.
+GameUtils.Guild.MoreTerritories05:	- Votre guilde peut capturer jusqu'à 6 territoires sans encourir le risque de surtaxe et peut accumuler des bonus pour un maximum de 6 territoires.
+GameUtils.Guild.MoreTerritories06:	- Votre guilde peut capturer jusqu'à 7 territoires sans encourir le risque de surtaxe et peut accumuler des bonus pour un maximum de 7 territoires.
+GameUtils.Guild.MoreDefenders01:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 2 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders02:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 3 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders03:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 5 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders04:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 7 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders05:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 9 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders06:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 12 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders07:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 15 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MoreDefenders08:	- Après avoir déposé votre bannière de guilde dans un territoire, votre guilde peut désormais acheter et déployer jusqu'à 20 défenseurs pour renforcer sa protection.
+GameUtils.Guild.MiscInfos01:		La commande /gc dues permet à votre guilde d'imposer à ses membres une taxe sur les gains provenant de la chasse de monstres, redirigeant ces fonds vers le compte bancaire de la guilde afin soutenir les efforts de guerre ou honorer les frais de location des territoires détenus.
+GameUtils.Guild.MiscInfos02:		La commande /gc territorybanner permet à votre guilde d'assimiler pleinement un territoire à votre cause, et expose davantage votre emblème aux adversaires. De plus, cette action réduit les frais de location du territoire de {0}% et augmente la résistance des gardes du territoire de {1}% au combat et contre les sorts. Parallèlement, la commande /gc buyterritorydefender permet à votre guilde d'acheter et de déployer un garde dans un territoire spécifié, renforçant ainsi sa défense.
+GameUtils.Guild.MiscInfos03:		Avec la commande /gc territoryportal, un membre de la guilde ayant au minimum le rang 4 et se trouvant dans un territoire possédé peut activer un portail de guilde et lancer un appel à tous les autres membres en ligne de la guilde, afin de demander des renforts en cas d'assaut sur le territoire. Le portail de guilde coûte 5000 points de Mérite et restera ouvert pendant {0} minutes.
+GameUtils.Guild.MiscInfos04:		La commande /gc combatzone permet à un membre de la guilde ayant au minimum le rang 2 de créer une "Arène de Guilde" à l'extérieur des villes où les joueurs peuvent se battre librement sans risquer la prison en perdant leur réputation. Le déploiement de cette zone de combat coûte 5000 points de Mérite et elle reste active pendant {0} minutes.
+GameUtils.Guild.MiscInfos05:		En utilisant la commande /gc jailrelease, un membre de la guilde de rang 3 ou supérieur peut libérer de prison un autre membre de la même guilde, cela en utilisant les fonds de la banque de guilde.
+GameUtils.Guild.MiscInfos06:		Les commandes /gc buybanner et /gc summon permettent à un membre de la guilde de convoquer et d'utiliser des bannières qui sont destinées à être des points de rassemblement sur le champ de bataille. Ces bannières, qui peuvent être achetées via la fenêtre de l'interface sociale, fournissent divers effets bénéfiques aux membres de la guilde et aux membres du groupe se trouvant à proximité.
+GameUtils.Guild.MiscInfos07:		- Tous les bonus des buffs de guilde sont désormais améliorés de 50%, cependant l'utilisation d'un buff de guilde coûte désormais 2000 points de Mérite de guilde au lieu de 1000.
+GameUtils.Guild.MiscInfos08:		- L'utilisation de /gc territorybanner a été améliorée pour fournir un bonus de 10% aux dégâts magiques et de mêlée pour tous les gardes du territoire, tout en augmentant également leur chance de coup critique de 5%.
+GameUtils.Guild.MiscInfos09:		- Les effets bénéfiques de la bannière de guilde sont désormais améliorés de 10% pour le porteur de la bannière ainsi que pour les joueurs environnants.
+GameUtils.Guild.MiscInfos10:		- L'utilisation de /gc territorybanner a été améliorée ; les gardes du territoire bénéficieront désormais d'un bonus d'absorption de dégâts supplémentaire de 15% contre les attaques magiques et les attaques en mêlée, en plus du bonus existant de {0}%.
+GameUtils.Guild.MiscInfos11:		- Tous les bonus des buffs de guilde sont désormais améliorés de 50%, cependant l'utilisation d'un buff de guilde coûte désormais 3000 points de Mérite de guilde au lieu des 1000 points d'origine.
+GameUtils.Guild.MiscInfos12:		- Les effets bénéfiques de la bannière de guilde sont désormais améliorés de 20% pour le porteur de la bannière ainsi que pour les joueurs environnants.
+GameUtils.Guild.MiscInfos13:		- L'utilisation de /gc territorybanner a été améliorée pour fournir un bonus de 15% aux dégâts magiques et de mêlée pour tous les gardes du territoire, tout en augmentant également leur chance de coup critique de 10%.
 
 GameUtils.Guild.Banner.BannerInGroup:			Quelqu'un dans votre groupe a déjà une bannière active!
 GameUtils.Guild.Banner.BannerNoGroup:			Vous avez quitté le groupe et votre bannière disparaît!

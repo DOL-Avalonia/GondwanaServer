@@ -1,9 +1,10 @@
 Items.Specialitems.Feuartificetext:					Le feu d'artifice va commencer dans {0} secondes.
 
-
 Items.Specialitems.BeerAlreadyDrinking:				Vous êtes déjà en train de boire !
 Items.Specialitems.BeerDrinkDistance:				boit
 
+Items.Specialitems.PlaceAssiseTooFar:				Vous êtes trop loin pour vous asseoir.
+Items.Specialitems.PlaceAssiseTaken:				La place est déjà prise.
 
 Items.Specialitems.GuarkRingListened:				Votre demande a été entendue.
 Items.Specialitems.GuarkRingUsed:					Vous ressentez une puissante magie qui vous immobilise.
@@ -22,9 +23,7 @@ Items.Specialitems.GuarkRingCannotUseHere:			Vous ne pouvez pas utiliser cet obj
 Items.Specialitems.GuarkRingDoNotMove:				Vous devez rester sur place pour utiliser cet objet.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Vous avez été en combat récemment, vous devez patienter pour utiliser cet objet.
 
-
 Items.Specialitems.MiniPetNoCast:					Vous ne pouvez pas lancer ce sort ici !
-
 
 Items.Specialitems.FirecampNoSit:					Ne restez pas assis près d'un feu de camp pour retirer cet effet.
 Items.Specialitems.FirecampHeatRegen:				La chaleur du feu de camp permet de vous reposer plus rapidement.

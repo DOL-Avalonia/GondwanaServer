@@ -272,7 +272,33 @@ namespace DOL.GS
 
         public long GetGuildDuesPercent()
         {
-            return Properties.GUILD_NEW_DUES_SYSTEM ? long.Min(m_DBguild.DuesPercent, GuildLevel * 5) : m_DBguild.DuesPercent;
+            long defaultValue = 0;
+            if (this.GuildLevel > 2 && this.GuildLevel < 13)
+            {
+                return Properties.GUILD_NEW_DUES_SYSTEM ? long.Min(m_DBguild.DuesPercent, (GuildLevel - 2) * 5) : m_DBguild.DuesPercent;
+            }
+            else if (this.GuildLevel == 2)
+            {
+                return Properties.GUILD_NEW_DUES_SYSTEM ? long.Min(m_DBguild.DuesPercent, GuildLevel) : m_DBguild.DuesPercent;
+            }
+            else if (this.GuildLevel >= 13)
+            {
+                int duesAvailable;
+                if (Properties.GUILD_DUES_MAX_VALUE <= 50)
+                {
+                    duesAvailable = 50;
+                }
+                else
+                {
+                    int maxDuesValue = (int)Properties.GUILD_DUES_MAX_VALUE;
+                    int additionalDues = (int)Math.Min((this.GuildLevel - 12) * 5, maxDuesValue - 50);
+                    duesAvailable = 50 + additionalDues;
+                    duesAvailable = Math.Min(duesAvailable, maxDuesValue);
+                }
+
+                return Properties.GUILD_NEW_DUES_SYSTEM ? long.Min(m_DBguild.DuesPercent, duesAvailable) : m_DBguild.DuesPercent;
+            }
+            return defaultValue;
         }
 
         public void SetGuildDues(bool dues)
@@ -389,22 +415,22 @@ namespace DOL.GS
 
             if (amount < 0)
             {
-                donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Commands.Players.Guild.DepositInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                 return;
             }
             else if ((donating.Guild.GetGuildBank() + amount) >= 1000000001)
             {
-                donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositFull"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Commands.Players.Guild.DepositFull"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                 return;
             }
 
             if (!donating.RemoveMoney(Currency.Copper.Mint(long.Parse(amount.ToString()))))
             {
-                donating.Out.SendMessage("You don't have this amount of money !", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Commands.Players.Guild.DepositNoMoney"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
             }
 
-            donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositAmount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+            donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Commands.Players.Guild.DepositAmount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 
             donating.Guild.UpdateGuildWindow();
             m_DBguild.Bank += amount;
@@ -417,16 +443,16 @@ namespace DOL.GS
         {
             if (amount < 0)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Player.Guild.WithdrawInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Guild.WithdrawInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                 return;
             }
             else if ((player.Guild.GetGuildBank() - amount) < 0)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Player.Guild.WithdrawTooMuch"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Guild.WithdrawTooMuch"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                 return;
             }
 
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Player.Guild.Withdrawamount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Guild.Withdrawamount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
             player.Guild.UpdateGuildWindow();
             m_DBguild.Bank -= amount;
 
@@ -645,23 +671,25 @@ namespace DOL.GS
                 {
                     string newCommands = (newLevel switch
                     {
-                        1 => "/gc dues & /gc buff",
-                        2 => null,
-                        3 => "/gc territorybanner",
+                        1 => "/gc buff",
+                        2 => "/gc dues",
+                        3 => "/gc territorybanner, /gc buyterritorydefender & /gc movedefender",
                         4 => "/gc territoryportal",
                         5 => "/gc combatzone",
                         6 => "/gc jailrelease",
-                        7 => "/gc buybanner, /gc summon, /gc edit buybanner & /gc edit summonbanner",
+                        7 => "/gc buybanner, /gc summon,  /gc unsummon, /gc edit buybanner & /gc edit summonbanner",
                         _ => null
                     })!;
+
                     foreach (GamePlayer player in GetListOfOnlineMembers())
                     {
                         string msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.LevelUp", Name, newLevel);
                         player.Out.SendMessage(msg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
                         player.Out.SendMessage(msg, eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                        player.Out.SendMessage(msg, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
                         if (newCommands != null)
                         {
-                            if (newLevel is 1 or 7)
+                            if (newLevel is 3 or 7)
                             {
                                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.CommandsAvailable", newCommands), eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
                             }
@@ -670,9 +698,96 @@ namespace DOL.GS
                                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.CommandAvailable", newCommands), eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
                             }
                         }
+
+                        string moreTerritories = newLevel switch
+                        {
+                            0 or 1 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreTerritories01"),
+                            3 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreTerritories02"),
+                            4 or 5 or 6 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreTerritories03"),
+                            7 or 8 or 9 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreTerritories04"),
+                            >= 10 and <= 13 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreTerritories05"),
+                            >= 14 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreTerritories06"),
+                            _ => null
+                        };
+                        string moreDefenders = newLevel switch
+                        {
+                            3 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders01"),
+                            4 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders02"),
+                            5 => null,
+                            6 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders03"),
+                            7 => null,
+                            8 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders04"),
+                            9 => null,
+                            10 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders05"),
+                            11 => null,
+                            12 => null,
+                            13 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders06"),
+                            14 => null,
+                            15 => null,
+                            16 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders07"),
+                            17 => null,
+                            18 => null,
+                            19 => null,
+                            20 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MoreDefenders08"),
+                            _ => null
+                        };
+                        string miscInfos = newLevel switch
+                        {
+                            2 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos01"),
+                            3 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos02", Properties.TERRITORY_BANNER_PERCENT_OFF, Properties.TERRITORYMOB_BANNER_RESIST),
+                            4 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos03", Properties.GUILD_PORTAL_DURATION / 60),
+                            5 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos04", Properties.GUILD_COMBAT_ZONE_DURATION / 60),
+                            6 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos05"),
+                            7 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos06"),
+                            8 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos07"),
+                            11 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos08"),
+                            13 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos09"),
+                            15 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos10", Properties.TERRITORYMOB_BANNER_RESIST),
+                            16 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos11"),
+                            18 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos12"),
+                            20 => LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MiscInfos13"),
+                            _ => null
+                        };
+
+                        if (!string.IsNullOrEmpty(miscInfos))
+                        {
+                            player.Out.SendMessage(miscInfos, eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                        }
+                        if (!string.IsNullOrEmpty(moreTerritories))
+                        {
+                            player.Out.SendMessage(moreTerritories, eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                        }
+                        if (!string.IsNullOrEmpty(moreDefenders))
+                        {
+                            player.Out.SendMessage(moreDefenders, eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                        }
                         if (Properties.GUILD_NEW_DUES_SYSTEM)
                         {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MaxDuesAvailable", newLevel * 5), eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                            if (newLevel > 2 && newLevel < 13)
+                            {
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MaxDuesAvailable", (newLevel - 2) * 5), eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                            }
+                            else if (newLevel == 2)
+                            {
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MaxDuesAvailable", newLevel), eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                            }
+                            else if (newLevel >= 13)
+                            {
+                                int duesAvailable;
+                                if (Properties.GUILD_DUES_MAX_VALUE <= 50)
+                                {
+                                    duesAvailable = 50;
+                                }
+                                else
+                                {
+                                    int maxDuesValue = (int)Properties.GUILD_DUES_MAX_VALUE;
+                                    int additionalDues = (int)Math.Min((newLevel - 12) * 5, maxDuesValue - 50);
+                                    duesAvailable = 50 + additionalDues;
+                                    duesAvailable = Math.Min(duesAvailable, maxDuesValue);
+                                }
+
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MaxDuesAvailable", duesAvailable), eChatType.CT_Guild, eChatLoc.CL_PopupWindow);
+                            }
                         }
                     }
 

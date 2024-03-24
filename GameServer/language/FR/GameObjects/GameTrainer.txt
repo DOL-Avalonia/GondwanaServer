@@ -9,7 +9,7 @@ GameTrainer.Interact.RegainPoints:		Vous obtenez {0} points de specialisations !
 GameTrainer.Interact.Respecialize:		{0} dit, "{1}, si vous le souhaitez, je peux annuler l'entraînement que vous avez suivi jusqu'à présent et vous donner la possibilité de vous entraîner à nouveau. Cela vous permettrait de [respécialiser] vos compétences. Si vous êtes intéressé, faites-le moi savoir."
 GameTrainer.PromotePlayer.Accepted:		Vous avez été accepté(e) par le {0} !
 GameTrainer.PromotePlayer.Says:			{0} dit, "{1}"
-GameTrainer.PromotePlayer.Upgraded:		vous avez été promu(e) à la classe de {0} !
+GameTrainer.PromotePlayer.Upgraded:		Vous avez été promu(e) à la classe de {0} !
 GameTrainer.ReceiveItem.RespecFull:		Un superbe {0}! J'ai recu une possibilité de re-spécialisation totale. Pour l'utiliser : /respec all.
 GameTrainer.ReceiveItem.RespecRealm:		Merci, j'ai reçu une possibilité de re-spécialisation de royaume. Pour l'utiliser : /respec realm.
 GameTrainer.ReceiveItem.RespecSingle:		Merci, j'ai reçu une possibilité de re-spécialisation simple. Pour l'utiliser : /respec <linename>

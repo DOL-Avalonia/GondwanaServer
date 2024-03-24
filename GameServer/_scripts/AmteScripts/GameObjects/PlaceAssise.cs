@@ -2,6 +2,7 @@ using System.Numerics;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.PacketHandler;
+using DOL.Language;
 
 namespace DOL.GS.Scripts
 {
@@ -37,14 +38,14 @@ namespace DOL.GS.Scripts
         {
             if (!IsWithinRadius(player, WorldMgr.INTERACT_DISTANCE))
             {
-                player.Out.SendMessage("Vous êtes trop loin pour vous asseoir.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.PlaceAssiseTooFar"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             if (GetFreeArrayLocation() == -1)
-                player.Out.SendMessage("La place est déjà prise.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.PlaceAssiseTaken"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             else
-                player.MountSteed(this, false);
+                player.MountSteed(this, true);
 
             return true;
         }

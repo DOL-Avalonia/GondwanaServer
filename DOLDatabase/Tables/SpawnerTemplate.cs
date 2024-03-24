@@ -17,6 +17,8 @@ namespace DOLDatabase.Tables
         private int m_npcTemplate2;
         private int m_npcTemplate3;
         private int m_npcTemplate4;
+        private int m_npcTemplate5;
+        private int m_npcTemplate6;
         private bool m_isAggroType;
         private int m_percentLifeAddsActivity;
         private string m_inactiveStatusId;
@@ -24,6 +26,7 @@ namespace DOLDatabase.Tables
         private int m_addsRespawnCount;
         private string m_masterGroupId;
         private int m_addRespawnTimerSecs;
+        private int m_percentageOfPlayerInRadius;
 
         [DataElement(AllowDbNull = false, Varchar = 255, Index = true)]
         public string MobID
@@ -60,11 +63,36 @@ namespace DOLDatabase.Tables
             set { Dirty = true; m_npcTemplate4 = value; }
         }
 
+        [DataElement(AllowDbNull = false)]
+        public int NpcTemplate5
+        {
+            get => m_npcTemplate5;
+            set { Dirty = true; m_npcTemplate5 = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int NpcTemplate6
+        {
+            get => m_npcTemplate6;
+            set { Dirty = true; m_npcTemplate6 = value; }
+        }
+
         [DataElement(AllowDbNull = true, Varchar = 255)]
         public string MasterGroupId
         {
             get => m_masterGroupId;
             set { Dirty = true; m_masterGroupId = value; }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int PercentageOfPlayerInRadius
+        {
+            get { return m_percentageOfPlayerInRadius; }
+            set
+            {
+                Dirty = true;
+                m_percentageOfPlayerInRadius = value;
+            }
         }
 
         [DataElement(AllowDbNull = true, Varchar = 255)]
