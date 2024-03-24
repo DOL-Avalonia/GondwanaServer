@@ -35,7 +35,9 @@ namespace DOL.GS.PropertyCalc
         public override int CalcValue(GameLiving living, eProperty property)
         {
             // 5% level 1, 0.1% level 50
-            return Math.Max(51 - living.Level, (10 * living.DebuffCategory[(int)property]) + (10 * living.AbilityBonus[(int)property]));
+            var debuffed = Math.Max(51 - living.Level, (10 * living.DebuffCategory[(int)property]) + (10 * living.AbilityBonus[(int)property]));
+            var buffed = Math.Min(0, debuffed - 10 * living.BuffBonusCategory4[(int)property]);
+            return buffed;
         }
     }
     [PropertyCalculator(eProperty.SpellFumbleChance)]
@@ -43,7 +45,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            return Math.Min(100, living.DebuffCategory[(int)property]);
+            return Math.Min(100, living.DebuffCategory[(int)property] - living.BuffBonusCategory4[(int)property]);
         }
     }
 }

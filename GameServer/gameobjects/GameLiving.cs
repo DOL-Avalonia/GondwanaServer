@@ -2188,6 +2188,14 @@ namespace DOL.GS
                 InterruptAction = 0;
                 return;
             }
+
+            if (EffectList.GetOfType<AdrenalineMageSpellEffect>() != null)
+            {
+                InterruptTime = 0;
+                InterruptAction = 0;
+                return;
+            }
+
             if (InterruptTime < CurrentRegion.Time + duration)
                 InterruptTime = CurrentRegion.Time + duration;
 

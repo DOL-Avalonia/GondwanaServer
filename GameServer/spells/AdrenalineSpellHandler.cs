@@ -31,10 +31,25 @@ namespace DOL.GS.Spells
         {
         }
     }
+    public class AdrenalineMageSpellEffect : GameSpellEffect
+    {
+        public static readonly int HIT_BONUS = 25;
+
+        /// <inheritdoc />
+        public AdrenalineMageSpellEffect(ISpellHandler handler, int duration, int pulseFreq) : base(handler, duration, pulseFreq)
+        {
+        }
+
+        /// <inheritdoc />
+        public AdrenalineMageSpellEffect(ISpellHandler handler, int duration, int pulseFreq, double effectiveness) : base(handler, duration, pulseFreq, effectiveness)
+        {
+        }
+    }
 
     public abstract class AdrenalineSpellHandler : SpellHandler
     {
         public static readonly int RANGED_ADRENALINE_SPELL_ID = 28003;
+        public static readonly int MAGE_ADRENALINE_SPELL_ID = 28002;
         public static readonly int MELEE_ADRENALINE_SPELL_ID = 28001;
 
         public AdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
@@ -158,6 +173,86 @@ namespace DOL.GS.Spells
         }
     }
 
+    [SpellHandler("AdrenalineMage")]
+    public class MageAdrenalineSpellHandler : AdrenalineSpellHandler
+    {
+        /// <inheritdoc />
+        public override string ShortDescription => "You are taken over by battle fever! Your styled attacks against evenly matched enemies cannot miss and your defense and your melee power are greatly enhanced!";
+
+        /// <inheritdoc />
+        public MageAdrenalineSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
+        {
+        }
+
+        /// <inheritdoc />
+        protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
+        {
+            return new AdrenalineMageSpellEffect(this, CalculateEffectDuration(target, effectiveness), 0);
+        }
+
+        /// <inheritdoc />
+        public override void OnEffectStart(GameSpellEffect effect)
+        {
+            base.OnEffectStart(effect);
+
+            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] += 15;
+            if (effect.Owner is GamePlayer player)
+            {
+                player.Out.SendCharStatsUpdate();
+            }
+            GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackStarted, OnOutgoingAttack);
+            GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, OnIncomingHit);
+        }
+
+        /// <inheritdoc />
+        public override void OnEffectRemove(GameSpellEffect effect, bool overwrite)
+        {
+            base.OnEffectRemove(effect, overwrite);
+
+            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] -= 50;
+            if (effect.Owner is GamePlayer player)
+            {
+                player.Out.SendCharStatsUpdate();
+            }
+            GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackStarted, OnOutgoingAttack);
+            GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, OnIncomingHit);
+        }
+
+        /// <inheritdoc />
+        public void OnOutgoingAttack(DOLEvent e, object sender, EventArgs args)
+        {
+            AttackData ad = (args as AttackStartedEventArgs)?.AttackData;
+
+            if (ad == null)
+            {
+                return;
+            }
+
+            if (ad.AttackType is AttackData.eAttackType.Spell or AttackData.eAttackType.DoT)
+            {
+                ad.criticalChance += ad.Target is GamePlayer ? 10 : 25;
+            }
+        }
+
+        /// <inheritdoc />
+        public void OnIncomingHit(DOLEvent e, object sender, EventArgs args)
+        {
+            if (args is not AttackedByEnemyEventArgs { AttackData: { AttackResult: not GameLiving.eAttackResult.HitUnstyled and not GameLiving.eAttackResult.HitStyle } ad })
+            {
+                return;
+            }
+
+            int damageAbsorbed = (int)(0.50 * (ad.Damage + ad.CriticalDamage));
+
+            ad.Damage -= damageAbsorbed;
+
+            if (ad.Target is GamePlayer player)
+                player.SendTranslatedMessage("Adrenaline.Self.Absorb", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, damageAbsorbed);
+            if (ad.Attacker is GamePlayer attacker)
+                attacker.SendTranslatedMessage("Adrenaline.Target.Absorbs", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, damageAbsorbed);
+        }
+    }
+
     [SpellHandler("AdrenalineStealth")]
     public class StealthAdrenalineSpellHandler : AdrenalineSpellHandler
     {
@@ -183,7 +278,7 @@ namespace DOL.GS.Spells
 
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.MeleeSpeed] += 30;
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.ArcherySpeed] += 20;
-            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 2);
+            effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, this, 1.25);
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();

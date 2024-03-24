@@ -17,6 +17,7 @@
  *
  */
 using DOL.GS.Realm;
+using DOL.GS.Spells;
 using System.Collections.Generic;
 
 namespace DOL.GS.PlayerClass
@@ -40,6 +41,7 @@ namespace DOL.GS.PlayerClass
             m_baseWeaponSkill = 360;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.09f;
+            m_adrenalineSpellID = AdrenalineSpellHandler.MAGE_ADRENALINE_SPELL_ID;
         }
 
         public override int WeaponSkillFactor(eObjectType type)

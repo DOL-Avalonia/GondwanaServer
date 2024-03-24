@@ -3809,6 +3809,12 @@ namespace DOL.GS.Spells
             {
                 missrate = (int)(missrate * ServerProperties.Properties.PVE_BASE_MISS_MULTIPLIER);
             }
+
+            if (caster.EffectList.GetOfType<AdrenalineMageSpellEffect>() != null)
+            {
+                missrate -= AdrenalineMageSpellEffect.HIT_BONUS;
+            }
+
             int hitchance = 100 - missrate + ((spellLevel - target.Level) / 2) + bonustohit;
 
             if (!(caster is GamePlayer && target is GamePlayer))

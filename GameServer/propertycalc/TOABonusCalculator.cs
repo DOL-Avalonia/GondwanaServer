@@ -102,9 +102,9 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            //hardcap at 10%
-            return Math.Min(10, living.ItemBonus[(int)property]
-                - living.DebuffCategory[(int)property]);
+            //hardcap at 10% for items
+            return living.BuffBonusCategory4[(int)property] + Math.Min(10, living.ItemBonus[(int)property]
+                                                                       - living.DebuffCategory[(int)property]);
         }
     }
 
@@ -115,7 +115,7 @@ namespace DOL.GS.PropertyCalc
         public override int CalcValue(GameLiving living, eProperty property)
         {
             //hardcap at 25%
-            return Math.Min(25, living.ItemBonus[(int)property]
+            return Math.Min(25, living.BuffBonusCategory4[(int)property] + living.ItemBonus[(int)property]
                 - living.DebuffCategory[(int)property]);
         }
     }

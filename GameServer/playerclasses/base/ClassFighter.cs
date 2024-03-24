@@ -38,7 +38,7 @@ namespace DOL.GS.PlayerClass
             m_baseHP = 880;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.05f;
-            m_adrenalineSpellID = TankAdrenalineSpellHandler.MELEE_ADRENALINE_SPELL_ID;
+            m_adrenalineSpellID = AdrenalineSpellHandler.MELEE_ADRENALINE_SPELL_ID;
         }
 
         public override eClassType ClassType

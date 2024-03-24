@@ -158,6 +158,11 @@ namespace DOL.GS.Spells
 
                 AttackData ad = m_handler.CalculateDamageToTarget(target, 0.5 - (caster.GetModified(eProperty.SpellDamage) * 0.01));
 
+                if (caster.EffectList.GetOfType<AdrenalineMageSpellEffect>() != null)
+                {
+                    missrate -= AdrenalineMageSpellEffect.HIT_BONUS;
+                }
+
                 if (Util.Chance(missrate))
                 {
                     ad.AttackResult = GameLiving.eAttackResult.Missed;

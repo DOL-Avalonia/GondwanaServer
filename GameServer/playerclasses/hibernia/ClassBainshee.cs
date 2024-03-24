@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using DOL.GS.Realm;
 using DOL.GS.Effects;
 using DOL.Events;
+using DOL.GS.Spells;
 
 namespace DOL.GS.PlayerClass
 {
@@ -44,6 +45,7 @@ namespace DOL.GS.PlayerClass
             m_manaStat = eStat.INT;
             m_eligibleRaces = DefaultEligibleRaces;
             m_maxTensionFactor = 1.07f;
+            m_adrenalineSpellID = AdrenalineSpellHandler.MAGE_ADRENALINE_SPELL_ID;
         }
 
         public override bool HasAdvancedFromBaseClass()
