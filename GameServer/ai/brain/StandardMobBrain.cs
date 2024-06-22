@@ -133,10 +133,6 @@ namespace DOL.AI.Brain
             }
             // If the NPC is Moving on path, it can detect closed doors and open them
             if (Body.IsMovingOnPath) DetectDoor();
-            //Instead - lets just let CheckSpells() make all the checks for us
-            //Check for just positive spells
-            if (CheckSpells(eCheckSpellType.Defensive))
-                return;
 
             // Note: Offensive spells are checked in GameNPC:SpellAction timer
 
@@ -172,6 +168,11 @@ namespace DOL.AI.Brain
                     return;
                 }
             }
+            
+            //Lets just let CheckSpells() make all the checks for us
+            //Check for just positive spells
+            if (CheckSpells(eCheckSpellType.Defensive))
+                return;
 
             if (AggroRange > 0)
             {
