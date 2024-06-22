@@ -140,8 +140,16 @@ namespace DOL.GS.Quests
                 player.RecoverReputation(Reputation);
 
             data.FinishQuest();
-            player.Out.SendNPCsQuestEffect(Npc, Npc.GetQuestIndicator(player));
+            SendNPCsQuestEffects(player);
             TaskManager.UpdateTaskProgress(player, "QuestsCompleted", 1);
+        }
+
+        public void SendNPCsQuestEffects(GamePlayer player)
+        {
+            foreach (var mob in player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().Where(npc => npc.IsRelatedToQuest(this)))
+            {
+                player.Out.SendNPCsQuestEffect(mob, mob.GetQuestIndicator(player));
+            }
         }
 
         private static void GiveItem(DataQuestJson quest, GamePlayer player, ItemTemplate itemTemplate)

@@ -5826,7 +5826,7 @@ namespace DOL.GS
                 Task.SaveIntoDatabase();
             }
             //refresh npc quests according to new level
-            foreach (GameNPC mob in WorldMgr.GetRegion(this.CurrentRegionID)?.Objects?.Where(o => o != null && o is GameNPC))
+            foreach (GameNPC mob in GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().Where(npc => npc.QuestIdListToGive.Any() || this.QuestList.SelectMany(q => q.Goals).OfType<DataQuestJsonGoal>().Any(g => g.hasInteraction && g.Target == npc)))
             {
                 this.Out.SendNPCsQuestEffect(mob, mob.GetQuestIndicator(this));
             }
@@ -15540,7 +15540,7 @@ namespace DOL.GS
                 if (CurrentRegionID != 0)
                 {
                     //refresh npc quests according to new reputation
-                    foreach (GameNPC mob in WorldMgr.GetRegion(CurrentRegionID)?.Objects?.Where(o => o is GameNPC))
+                    foreach (GameNPC mob in GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE, true))
                     {
                         Out.SendNPCsQuestEffect(mob, mob.GetQuestIndicator(this));
                     }

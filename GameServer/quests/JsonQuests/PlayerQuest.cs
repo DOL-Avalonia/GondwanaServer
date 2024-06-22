@@ -185,11 +185,6 @@ namespace DOL.GS.Quests
             GameServer.Database.DeleteObject(DbQuest);
 
             Owner.Out.SendQuestListUpdate();
-            foreach (GameNPC mob in Owner.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
-            {
-                Owner.Out.SendNPCsQuestEffect(mob, mob.GetQuestIndicator(Owner));
-            }
-            Owner.Out.SendMessage(LanguageMgr.GetTranslation(Owner.Client, "AbstractQuest.AbortQuest", Quest.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             if (Quest.RelatedMobGroups != null)
             {
                 foreach (MobGroup group in Quest.RelatedMobGroups)
@@ -197,6 +192,8 @@ namespace DOL.GS.Quests
                     UpdateGroupMob(group);
                 }
             }
+            Quest.SendNPCsQuestEffects(Owner);
+            Owner.Out.SendMessage(LanguageMgr.GetTranslation(Owner.Client, "AbstractQuest.AbortQuest", Quest.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
         public void UpdateGroupMob(MobGroup group)

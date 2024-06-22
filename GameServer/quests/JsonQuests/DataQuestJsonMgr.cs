@@ -166,10 +166,14 @@ public static class DataQuestJsonMgr
                 player.Out.SendCustomTextWindow(npc.Name + " dit", finalMsg);
             }
             dq.SaveIntoDatabase();
-            foreach (GameNPC mob in WorldMgr.GetRegion(player.CurrentRegionID)?.Objects?.Where(o => o != null && o is GameNPC))
+            if (quest.RelatedMobGroups != null)
             {
-                player.Out.SendNPCsQuestEffect(mob, mob.GetQuestIndicator(player));
+                foreach (MobGroup group in quest.RelatedMobGroups)
+                {
+                    dq.UpdateGroupMob(group);
+                }
             }
+            quest.SendNPCsQuestEffects(player);
             player.Out.SendQuestListUpdate();
         }
 
@@ -203,13 +207,6 @@ public static class DataQuestJsonMgr
             if (questEvent != null)
             {
                 System.Threading.Tasks.Task.Run(() => GameEventManager.Instance.ResetEvent(questEvent));
-            }
-        }
-        if (quest.RelatedMobGroups != null)
-        {
-            foreach (MobGroup group in quest.RelatedMobGroups)
-            {
-                dq.UpdateGroupMob(group);
             }
         }
     }

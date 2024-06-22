@@ -55,6 +55,7 @@ using Vector3 = System.Numerics.Vector3;
 using AmteScripts.Managers;
 using DOL.GS.Commands;
 using System.Reflection.Metadata;
+using static DOL.Database.ArtifactBonus;
 
 namespace DOL.GS
 {
@@ -2788,6 +2789,7 @@ namespace DOL.GS
 
             return false;
         }
+        
         /// <summary>
         /// Check if the npc can show a quest indicator to a player
         /// Checks both scripted and data quests
@@ -2822,6 +2824,21 @@ namespace DOL.GS
                         return true;
                 }
 
+            return false;
+        }
+
+        public bool IsRelatedToQuest(DataQuestJson quest)
+        {
+            if (quest.Goals.Select(p => p.Value).Any(g => g.hasInteraction && g.Target == this))
+                return true;
+            
+            lock (m_questIdListToGive)
+            {
+                if (m_questIdListToGive.Any(q => q == quest.Id || (DataQuestJsonMgr.GetQuest(q)?.QuestDependencyIDs.Contains(quest.Id)) == true))
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
