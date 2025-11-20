@@ -24,6 +24,9 @@ GameMerchant.OnPlayerInteract.Morphed:			En tant que {0}, grimper sur un cheval 
 GameMerchant.OnPlayerInteract.CantThisForm:		Vous ne pouvez pas monter à cheval sous cette forme !
 GameMerchant.OnPlayerInteract.Damned:			Ne t'approche pas, créature damnée !
 GameMerchant.OnPlayerInteract.EmbarkNotAllowed:	Je ne peux pas vous laisser embarquer pour le moment !
+GameMerchant.OnPlayerInteract.EmbarkMorphed:	En tant que {0}, embarquer sur ce navire risque d'être assez délicat !
+GameMerchant.OnPlayerInteract.EmbarkDamned:		Vous ne pouvez pas embarquer alors que vous êtes damné !
+GameMerchant.OnPlayerInteract.EmbarkThisForm:	Vous ne pouvez pas embarquer sous cette forme !
 
 # GameTerritoryMerchant
 GameMerchant.Interact.Territory.NotSameGuild:	Je n'ai rien à vous vendre !

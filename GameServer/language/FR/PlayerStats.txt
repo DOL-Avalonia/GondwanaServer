@@ -48,7 +48,7 @@ PlayerStatistic.TotalCraftPerformed:		Total des Objets fabriqués
 PlayerStatistic.Bonus.DemonslayerTitle:         +{0}% DPS en mêlée / +{1}% Dégâts des sorts / +{2}% Chance de coups critiques
 PlayerStatistic.Bonus.TraderTitle:              {0:0.##}% de réduction avec tous les marchands
 PlayerStatistic.Bonus.ThiefTitle:               +{0}% Chance de vol / -{1}% Temps de recharge de vol
-PlayerStatistic.Bonus.BountyhunterTitle:        +{0}% Résistance au vol / +{1}% Détection de furtivité
+PlayerStatistic.Bonus.BountyhunterTitle:        +{0}% Résistance au vol / +{1}% Détection de furtivité / {2:0.##}% de réduction avec tous les marchands
 PlayerStatistic.Bonus.WrathTitle:               +{0}% Augmentation de tension / -{1}% Perte de tension à la mort
 PlayerStatistic.Bonus.AdventurerTitle:          +{0}% Vitesse max de marche & de nage / +{1}% de portée des Sorts-Archerie
-PlayerStatistic.Bonus.DuelistTitle:				+{0}% Chance de coups critiques
+PlayerStatistic.Bonus.DuelistTitle:				+{0}% Chance de coups critiques / +{1} point(s) toutes compétences Mêlée & Deux armes

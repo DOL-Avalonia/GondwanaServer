@@ -48,7 +48,7 @@ PlayerStatistic.TotalCraftPerformed:		Total Item created
 PlayerStatistic.Bonus.DemonslayerTitle:         +{0}% DPS in melee / +{1}% spell dmg / +{2}% All critical hit chance
 PlayerStatistic.Bonus.TraderTitle:              {0:0.##}% discount with all merchants
 PlayerStatistic.Bonus.ThiefTitle:               +{0}% Robbery Chance / -{1}% Robbery Cooldown
-PlayerStatistic.Bonus.BountyhunterTitle:        +{0}% Robbery Resist / +{1}% Stealth Detection
+PlayerStatistic.Bonus.BountyhunterTitle:        +{0}% Robbery Resist / +{1}% Stealth Detection / {2:0.##}% discount with all merchants
 PlayerStatistic.Bonus.WrathTitle:               +{0}% Tension Increase / -{1}% Tension lost on death
 PlayerStatistic.Bonus.AdventurerTitle:          +{0}% Walking & swimming Max Speed / +{1}% Casting-Archery range
-PlayerStatistic.Bonus.DuelistTitle:				+{0}% All critical hit chance
+PlayerStatistic.Bonus.DuelistTitle:				+{0}% All critical hit chance / +{1} Melee & Dual Wield skill point(s)

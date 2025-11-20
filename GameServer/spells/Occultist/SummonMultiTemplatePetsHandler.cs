@@ -107,7 +107,10 @@ namespace DOL.GS.Spells
             var tpl = NpcTemplateMgr.GetTemplate(templateId);
             if (tpl == null)
             {
-                MessageTranslationToCaster("SpellHandler.Occultist.ArawnsLegion.NoTemplateFound", eChatType.CT_System, templateId);
+                if (Caster is GamePlayer player)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "SpellHandler.Occultist.ArawnsLegion.NoTemplateFound", templateId), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
                 return null;
             }
 
@@ -208,7 +211,10 @@ namespace DOL.GS.Spells
                 eff.Start(pet);
             }
 
-            MessageTranslationToCaster("SpellHandler.Occultist.ArawnsLegion.PetAnswer", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, pet.Name);
+            if (Caster is GamePlayer casterPlayer)
+            {
+                casterPlayer.Out.SendMessage(LanguageMgr.GetTranslation(casterPlayer.Client.Account.Language, "SpellHandler.Occultist.ArawnsLegion.PetAnswer", pet.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            }
 
             return pet;
         }

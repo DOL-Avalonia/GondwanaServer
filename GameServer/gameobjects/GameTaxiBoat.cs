@@ -22,7 +22,8 @@ using System.Reflection;
 
 using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
-
+using DOL.Language;
+using DOL.GS.Spells;
 using log4net;
 
 namespace DOL.GS
@@ -83,6 +84,47 @@ namespace DOL.GS
             {
                 return 1000;
             }
+        }
+
+        public override bool Interact(GamePlayer player)
+        {
+            if (player == null)
+                return false;
+
+            if (!IsWithinRadius(player, InteractDistance))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.TooFarFromBoat"), eChatType.CT_System, eChatLoc.CL_ChatWindow);
+                return false;
+            }
+
+            var morph = player.FindMorph(cancel: true);
+            if (morph != null)
+            {
+                switch (morph.SpellHandler)
+                {
+                    case WarlockSpeedDecreaseSpellHandler wsd:
+                        {
+                            int rm = wsd.Spell?.ResurrectMana ?? 0;
+                            string appearanceType = LanguageMgr.GetWarlockMorphAppearance(player.Client.Account.Language, rm);
+                            player.SendTranslatedMessage("GameMerchant.OnPlayerInteract.EmbarkMorphed", eChatType.CT_System, eChatLoc.CL_ChatWindow, appearanceType);
+                            return false;
+                        }
+
+                    case DamnationSpellHandler:
+                        {
+                            player.SendTranslatedMessage("GameMerchant.OnPlayerInteract.EmbarkDamned", eChatType.CT_System, eChatLoc.CL_ChatWindow);
+                            return false;
+                        }
+
+                    default: // Generic
+                        {
+                            player.SendTranslatedMessage("GameMerchant.OnPlayerInteract.EmbarkThisForm", eChatType.CT_System, eChatLoc.CL_ChatWindow);
+                            return false;
+                        }
+                }
+            }
+
+            return base.Interact(player);
         }
     }
 }

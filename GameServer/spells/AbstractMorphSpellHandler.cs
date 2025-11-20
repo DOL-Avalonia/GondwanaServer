@@ -31,6 +31,8 @@ namespace DOL.GS.Spells
             set;
         } = true;
 
+        public virtual bool IgnoreForRiding { get; } = false;
+
         /// <inheritdoc />
         public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {

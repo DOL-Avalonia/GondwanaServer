@@ -24,6 +24,9 @@ GameMerchant.OnPlayerInteract.Morphed:			Oh, as a {0}, you can't quite hop onto 
 GameMerchant.OnPlayerInteract.CantThisForm:		You can't ride a horse under this form!
 GameMerchant.OnPlayerInteract.Damned:			Stay away, you damned ghoul!
 GameMerchant.OnPlayerInteract.EmbarkNotAllowed:	I can't let you embark for now!
+GameMerchant.OnPlayerInteract.EmbarkMorphed:	Oh, as a {0}, you can't quite hop onto a boat just yet!
+GameMerchant.OnPlayerInteract.EmbarkDamned:		You can't embark while damned!
+GameMerchant.OnPlayerInteract.EmbarkThisForm:	You can't embark under this form!
 
 # GameTerritoryMerchant
 GameMerchant.Interact.Territory.NotSameGuild:		I have nothing to sell you !

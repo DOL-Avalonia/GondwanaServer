@@ -55,6 +55,21 @@ namespace DOL.GS.Spells
             _absorbPct = Math.Max(0, (int)Spell.AmnesiaChance);
         }
 
+        public override bool CheckBeginCast(GameLiving target, bool quiet)
+        {
+            if (Caster is GamePlayer player && player.IsRiding)
+            {
+                if (!quiet)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CannotCastRiding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+
+                return false;
+            }
+
+            return base.CheckBeginCast(target, quiet);
+        }
+
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             return new BringerOfDeathSpellEffect(this, CalculateEffectDuration(target, effectiveness), 0);

@@ -1249,14 +1249,23 @@ namespace DOL.GS.ServerRules
             #region Worth no experience
             if (!killedNPC.IsWorthReward)
             {
-                //"This monster has been charmed recently and is worth no experience."
-                string message = "ServerRules.AbstractServerRules.NoXPKill";
-                if (killedNPC.CurrentRegion == null || killedNPC.CurrentRegion.Time - GameNPC.CHARMED_NOEXP_TIMEOUT < killedNPC.TempProperties.getProperty<long>(GameNPC.CHARMED_TICK_PROP))
-                    message = "ServerRules.AbstractServerRules.NoXPKill";
-
                 foreach (var de in gainers)
+                {
                     if (de.Key is GamePlayer player)
+                    {
+                        string key = "ServerRules.AbstractServerRules.NoXPKill";
+
+                        if (killedNPC.CurrentRegion == null ||
+                            killedNPC.CurrentRegion.Time - GameNPC.CHARMED_NOEXP_TIMEOUT <
+                            killedNPC.TempProperties.getProperty<long>(GameNPC.CHARMED_TICK_PROP))
+                        {
+                            key = "ServerRules.AbstractServerRules.NoXPKill";
+                        }
+
+                        string message = LanguageMgr.GetTranslation(player.Client.Account.Language, key);
                         player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                }
 
                 return;
             }

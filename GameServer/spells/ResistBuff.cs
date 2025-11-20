@@ -42,7 +42,7 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         public override string GetDelveDescription(GameClient delveClient)
         {
-            return LanguageMgr.GetTranslation(delveClient, "SpellDescription.ResistBuff.MainDescription", LanguageMgr.GetDamageOfType(delveClient, (eDamageType)Property1), Spell.Value);
+            return LanguageMgr.GetTranslation(delveClient, "SpellDescription.ResistBuff.MainDescription", LanguageMgr.GetResistOfType(delveClient, (eResist)Property1), Spell.Value);
         }
     }
 

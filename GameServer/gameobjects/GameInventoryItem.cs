@@ -30,6 +30,7 @@ using DOL.GS.Geometry;
 using DOL.Bonus;
 using System.Linq;
 using Discord;
+using DOL.GS.PacketHandler.Client.v168;
 
 namespace DOL.GS
 {
@@ -580,6 +581,18 @@ namespace DOL.GS
             {
                 delve.Add(" ");
                 delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.EffectWhenSitting"));
+            }
+
+            if (this.ClassType.Contains("DOL.GS.AfkXpToken"))
+            {
+                delve.Add(" ");
+                delve.Add(" Remaining Use: " + (Condition / MaxCondition) * 100 + "%");
+            }
+
+            if (this.ClassType.Contains("DOL.GS.PvPTreasure"))
+            {
+                delve.Add(" ");
+                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DelveInfo.Value", (int)(Condition / 4.0)) + " " + LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.WriteBonusLine.Points"));
             }
 
             //Add admin info
@@ -2002,6 +2015,7 @@ namespace DOL.GS
                 || (bonusCat >= (int)eProperty.ResCapBonus_First && bonusCat <= (int)eProperty.ResCapBonus_Last)
                 || bonusCat == (int)eProperty.CraftingSkillGain
                 || bonusCat == (int)eProperty.SpellShieldChance
+                || bonusCat == (int)eProperty.WeaponSkill
                 || bonusCat == (int)eProperty.RobberyResist
                 || bonusCat == (int)eProperty.MythicalCoin
                 || (bonusCat >= 116 && bonusCat <= 119)

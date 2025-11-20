@@ -26,9 +26,12 @@ namespace DOL.GS.PlayerTitles
     public abstract class DuelistTitle : TaskTitle
     {
         public int CritBonus { get; init; }
+        public int MeleeWeaponSkillBonus { get; init; }
+
         protected DuelistTitle(int level)
         {
             CritBonus = level * 4;
+            MeleeWeaponSkillBonus = level * 1;
         }
 
         /// <inheritdoc />
@@ -39,8 +42,11 @@ namespace DOL.GS.PlayerTitles
             player.BaseBuffBonusCategory[eProperty.CriticalHealHitChance] += CritBonus;
             player.BaseBuffBonusCategory[eProperty.CriticalArcheryHitChance] += CritBonus;
             player.BaseBuffBonusCategory[eProperty.OffhandDamageAndChanceBonus] += CritBonus;
+            player.BaseBuffBonusCategory[eProperty.AllMeleeWeaponSkills] += MeleeWeaponSkillBonus;
+            player.BaseBuffBonusCategory[eProperty.AllDualWieldingSkills] += MeleeWeaponSkillBonus;
             base.OnTitleSelect(player);
             player.Out.SendCharStatsUpdate();
+            player.Out.SendUpdatePlayerSkills();
         }
 
         /// <inheritdoc />
@@ -51,14 +57,17 @@ namespace DOL.GS.PlayerTitles
             player.BaseBuffBonusCategory[eProperty.CriticalHealHitChance] -= CritBonus;
             player.BaseBuffBonusCategory[eProperty.CriticalArcheryHitChance] -= CritBonus;
             player.BaseBuffBonusCategory[eProperty.OffhandDamageAndChanceBonus] -= CritBonus;
+            player.BaseBuffBonusCategory[eProperty.AllMeleeWeaponSkills] -= MeleeWeaponSkillBonus;
+            player.BaseBuffBonusCategory[eProperty.AllDualWieldingSkills] -= MeleeWeaponSkillBonus;
             base.OnTitleDeselect(player);
             player.Out.SendCharStatsUpdate();
+            player.Out.SendUpdatePlayerSkills();
         }
 
         /// <inheritdoc />
         public override string GetStatsTranslation(string language)
         {
-            return LanguageMgr.GetTranslation(language, "PlayerStatistic.Bonus.DuelistTitle", CritBonus);
+            return LanguageMgr.GetTranslation(language, "PlayerStatistic.Bonus.DuelistTitle", CritBonus, MeleeWeaponSkillBonus);
         }
     }
 

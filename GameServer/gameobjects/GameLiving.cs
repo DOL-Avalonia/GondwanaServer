@@ -5928,7 +5928,7 @@ namespace DOL.GS
             GameSpellEffect preventingEffect = null;
             var cancelling = new List<GameSpellEffect>();
             var allMorphs = this
-                .FindEffectsOnTarget(e => !e.ImmunityState && e.SpellHandler is AbstractMorphSpellHandler)
+                .FindEffectsOnTarget(e => !e.ImmunityState && e.SpellHandler is AbstractMorphSpellHandler morph && !morph.IgnoreForRiding)
                 .ToList();
             foreach (var listEffect in allMorphs)
             {
@@ -6020,7 +6020,11 @@ namespace DOL.GS
         
         public void CancelMorphSpellEffects()
         {
-            CancelEffects<AbstractMorphSpellHandler>();
+            CancelEffects<AbstractMorphSpellHandler>(e =>
+            {
+                var morph = (AbstractMorphSpellHandler)e.SpellHandler;
+                return !morph.IgnoreForRiding;
+            });
         }
 
         #endregion

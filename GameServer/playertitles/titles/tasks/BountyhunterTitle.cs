@@ -26,13 +26,14 @@ namespace DOL.GS.PlayerTitles
     public abstract class BountyhunterTitle : TaskTitle
     {
         public int RobberyResistBonus { get; init; }
-        
         public int StealthDetectionBonus { get; init; }
-        
+        public double TradeFactor { get; init; }
+
         protected BountyhunterTitle(int level)
         {
             RobberyResistBonus = 5 * level;
             StealthDetectionBonus = 2 * level;
+            TradeFactor = -0.01 * level;
         }
 
         /// <inheritdoc />
@@ -40,6 +41,7 @@ namespace DOL.GS.PlayerTitles
         {
             player.BaseBuffBonusCategory[eProperty.RobberyResist] += RobberyResistBonus;
             player.BaseBuffBonusCategory[eProperty.StealthDetectionBonus] += StealthDetectionBonus;
+            player.NPCTradeFactor += TradeFactor;
             base.OnTitleSelect(player);
         }
 
@@ -48,13 +50,14 @@ namespace DOL.GS.PlayerTitles
         {
             player.BaseBuffBonusCategory[eProperty.RobberyResist] -= RobberyResistBonus;
             player.BaseBuffBonusCategory[eProperty.StealthDetectionBonus] -= StealthDetectionBonus;
+            player.NPCTradeFactor -= TradeFactor;
             base.OnTitleDeselect(player);
         }
 
         /// <inheritdoc />
         public override string GetStatsTranslation(string language)
         {
-            return LanguageMgr.GetTranslation(language, "PlayerStatistic.Bonus.BountyhunterTitle", RobberyResistBonus, StealthDetectionBonus);
+            return LanguageMgr.GetTranslation(language, "PlayerStatistic.Bonus.BountyhunterTitle", RobberyResistBonus, StealthDetectionBonus, TradeFactor * -100);
         }
     }
 

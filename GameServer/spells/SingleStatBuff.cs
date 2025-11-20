@@ -355,7 +355,15 @@ namespace DOL.GS.Spells
     {
         public override eProperty Property1 { get { return eProperty.Skill_Stealth; } }
 
-        protected override void SendUpdates(GameLiving target) { }
+        protected override void SendUpdates(GameLiving target)
+        {
+            base.SendUpdates(target);
+
+            if (target is GamePlayer player)
+            {
+                player.Out.SendUpdatePlayerSkills();
+            }
+        }
 
         public StealthSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
@@ -413,17 +421,21 @@ namespace DOL.GS.Spells
         public PaladinArmorFactorBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 
-    [Obsolete("This class will be removed. Please use FlexibleSkillBuff instead!")]
-    [SpellHandler("FelxibleSkillBuff")]
-    public class FelxibleSkillBuff : FlexibleSkillBuff
-    {
-        public FelxibleSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-    }
-
     [SpellHandler("FlexibleSkillBuff")]
     public class FlexibleSkillBuff : SingleStatBuff
     {
         public override eProperty Property1 { get { return eProperty.Skill_Flexible_Weapon; } }
+
+        protected override void SendUpdates(GameLiving target)
+        {
+            base.SendUpdates(target);
+
+            if (target is GamePlayer player)
+            {
+                player.Out.SendUpdatePlayerSkills();
+            }
+        }
+
         public FlexibleSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
         public override string GetDelveDescription(GameClient delveClient)

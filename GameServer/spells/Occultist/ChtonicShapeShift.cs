@@ -96,6 +96,17 @@ namespace DOL.GS.Spells
                     MessageToCaster(LanguageMgr.GetTranslation(m_caster as GamePlayer, "SpellHandler.Occultist.CastCondition4"), eChatType.CT_System);
                 return false;
             }
+
+            if (Caster is GamePlayer player && player.IsRiding)
+            {
+                if (!quiet)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CannotCastRiding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+
+                return false;
+            }
+
             return base.CheckBeginCast(target, quiet);
         }
 

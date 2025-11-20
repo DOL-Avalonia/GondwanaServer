@@ -258,6 +258,7 @@ SkillBase.RegisterPropertyNames.ArcaneSyphon:			Arcane Syphon
 SkillBase.RegisterPropertyNames.RealmPoints:			Bonus to Realm Points
 SkillBase.RegisterPropertyNames.BountyPoints:			Bonus to Bounty Points
 SkillBase.RegisterPropertyNames.ExperiencePoints:		Bonus to Experience Points
+SkillBase.RegisterPropertyNames.LivingEffectiveness:		Mythical Effectiveness Bonus
 
 SkillBase.RegisterPropertyNames.RobberyChanceBonus:         Bonus Robbery Chance
 SkillBase.RegisterPropertyNames.RobberyDelayReduction:      Robbery Cooldown Reduction
@@ -539,6 +540,7 @@ SkillBase.Property.ArcaneSyphon:			Arcane Syphon
 SkillBase.Property.RealmPoints:			Bonus to Realm Points
 SkillBase.Property.BountyPoints:			Bonus to Bounty Points
 SkillBase.Property.ExperiencePoints:		Bonus to Experience Points
+SkillBase.Property.LivingEffectiveness:		Bonus to Effectiveness
 
 SkillBase.Property.RobberyChanceBonus:         Bonus Robbery Chance
 SkillBase.Property.RobberyDelayReduction:      Robbery Cooldown Reduction

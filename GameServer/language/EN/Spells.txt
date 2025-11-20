@@ -196,6 +196,8 @@ SpellDescription.ParryChanceBuff.MainDescription:			Grants {0}% chance to parry 
 SpellDescription.WeaponSkillBuff.MainDescription:			Increases Weapon skill by {0}%.
 SpellDescription.StealthSkillBuff.MainDescription:			Increases Stealth skill by {0}%.
 SpellDescription.FlexibleSkillBuff.MainDescription:			Increases Flexible skill by {0}%.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Decreases Weapon skill by {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Decreases Stealth skill by {0}%.
 SpellDescription.ResiPierceBuff.MainDescription:			Grants you {0}% chance to penetrate magical resistances.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Increases the target's chance for a critical spell hit by {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Increases the target's chance for a critical melee hit by {0}%.
@@ -205,7 +207,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			The target deals {0}% less
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Increases the endurance the target uses in combat by {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Increases the target's chance to fumble by {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Decreases DPS by {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Decreases skills by {0}%.
+SpellDescription.SkillsDebuff.MainDescription:				Decreases all skills by {0}%.
 SpellDescription.Warlock.SecondarySpell:					This is a secondary spell.
 SpellDescription.Warlock.PrimarySpell:						This is a primary spell.
 SpellDescription.AllStatsDebuff.MainDescription:			Decreases all stats of the target by {0}.

@@ -9,6 +9,7 @@ SkillBase.RegisterPropertyNames.AllSkills:            Toutes compétences
 SkillBase.RegisterPropertyNames.ALLSpellLines:         Toutes Lignes de Sorts
 SkillBase.RegisterPropertyNames.Arboreal:             Voie Arboréale
 SkillBase.RegisterPropertyNames.ArborealFocus:         Focus : Voie Arboréale
+SkillBase.RegisterPropertyNames.Archery:				Archerie
 SkillBase.RegisterPropertyNames.ArcheryRange:         Portée d'Archerie
 SkillBase.RegisterPropertyNames.ArcherySpeed:         Vitesse de tir
 SkillBase.RegisterPropertyNames.ArrowRecovery:         Récupération de flèches
@@ -201,7 +202,7 @@ SkillBase.RegisterPropertyNames.Verdant:            Voie de la Verdure
 SkillBase.RegisterPropertyNames.VerdantFocus:         Focus : Voie de la Verdure
 SkillBase.RegisterPropertyNames.VoidMagic:            Voie du Vide
 SkillBase.RegisterPropertyNames.VoidMagicFocus:         Focus : Voie du Vide
-SkillBase.RegisterPropertyNames.WeaponSkill:         Bonus à l'attaque (Weaponskill)
+SkillBase.RegisterPropertyNames.WeaponSkill:         Bonus à l'Attaque (Weaponskill)
 SkillBase.RegisterPropertyNames.WindMagic:            Voie de l'Air
 SkillBase.RegisterPropertyNames.WindMagicFocus:         Focus : Voie de l'Air
 SkillBase.RegisterPropertyNames.Witchcraft:            Artifices
@@ -255,6 +256,7 @@ SkillBase.RegisterPropertyNames.ArcaneSyphon:			Arcane Syphon
 SkillBase.RegisterPropertyNames.RealmPoints:			Bonus Mythique Points de Royaume
 SkillBase.RegisterPropertyNames.BountyPoints:			Bonus Mythique Gains en Bounty Points
 SkillBase.RegisterPropertyNames.ExperiencePoints:		Bonus Mythique Experience
+SkillBase.RegisterPropertyNames.LivingEffectiveness:		Bonus Mythique d'Efficacité
 
 SkillBase.RegisterPropertyNames.RobberyChanceBonus:         Bonus Chance de Vol
 SkillBase.RegisterPropertyNames.RobberyDelayReduction:      Réduction de temps de recharge de Vol
@@ -288,6 +290,7 @@ SkillBase.Property.AllSkills:            toutes les compétences
 SkillBase.Property.ALLSpellLines:         toutes les Lignes de Sorts
 SkillBase.Property.Arboreal:             la compétence de Voie Arboréale
 SkillBase.Property.ArborealFocus:         la compétence de Focus : Voie Arboréale
+SkillBase.Property.Archery:				l'Archerie
 SkillBase.Property.ArcheryRange:         la Portée d'Archerie
 SkillBase.Property.ArcherySpeed:         la Vitesse de tir
 SkillBase.Property.ArrowRecovery:         la Récupération de flèches
@@ -480,7 +483,7 @@ SkillBase.Property.Verdant:            la compétence de Voie de la Verdure
 SkillBase.Property.VerdantFocus:         la compétence de Focus : Voie de la Verdure
 SkillBase.Property.VoidMagic:            la compétence de Voie du Vide
 SkillBase.Property.VoidMagicFocus:         la compétence de Focus : Voie du Vide
-SkillBase.Property.WeaponSkill:         la Bonus à l'attaque (Weaponskill)
+SkillBase.Property.WeaponSkill:         le Bonus à l'attaque (Weaponskill)
 SkillBase.Property.WindMagic:            la compétence de Voie de l'Air
 SkillBase.Property.WindMagicFocus:         la compétence de Focus : Voie de l'Air
 SkillBase.Property.Witchcraft:            la compétence d'Artifices
@@ -534,6 +537,7 @@ SkillBase.Property.ArcaneSyphon:			l'Arcane Syphon
 SkillBase.Property.RealmPoints:			le Bonus Mythique Points de Royaume
 SkillBase.Property.BountyPoints:			le Bonus Mythique Gains en Bounty Points
 SkillBase.Property.ExperiencePoints:		le Bonus Mythique Experience
+SkillBase.Property.LivingEffectiveness:		le Bonus d'Efficacité
 
 SkillBase.Property.RobberyChanceBonus:         le Bonus Chance de Vol
 SkillBase.Property.RobberyDelayReduction:      la Réduction de temps de recharge de Vol

@@ -627,6 +627,29 @@ namespace DOL.Language
             return translation;
         }
 
+        public static string GetResistOfType(string language, eResist resist)
+        {
+            string translationKey = resist switch
+            {
+                eResist.Natural => "Language.DamageType.Natural.Damage",
+                eResist.Crush => "Language.DamageType.Crush.Damage",
+                eResist.Slash => "Language.DamageType.Slash.Damage",
+                eResist.Thrust => "Language.DamageType.Thrust.Damage",
+                eResist.Body => "Language.DamageType.Body.Damage",
+                eResist.Cold => "Language.DamageType.Cold.Damage",
+                eResist.Energy => "Language.DamageType.Energy.Damage",
+                eResist.Heat => "Language.DamageType.Heat.Damage",
+                eResist.Matter => "Language.DamageType.Matter.Damage",
+                eResist.Spirit => "Language.DamageType.Spirit.Damage",
+                _ => "Language.DamageType.GM.Damage"
+            };
+            if (!TryGetTranslation(out string translation, language, translationKey))
+            {
+                return "(unknown)";
+            }
+            return translation;
+        }
+
         public static string GetCharmSpeciesOfType(string language, CharmSpellHandler.eCharmType charmType)
         {
             string translationKey = charmType switch
@@ -780,6 +803,16 @@ namespace DOL.Language
         public static string GetDamageOfType(GamePlayer player, eDamageType type)
         {
             return GetDamageOfType(player?.Client, type);
+        }
+
+        public static string GetResistOfType(GameClient client, eResist type)
+        {
+            return GetResistOfType(client?.Account?.Language ?? Properties.SERV_LANGUAGE, type);
+        }
+
+        public static string GetResistOfType(GamePlayer player, eResist type)
+        {
+            return GetResistOfType(player?.Client, type);
         }
 
         public static string GetProperty(string language, eProperty prop)

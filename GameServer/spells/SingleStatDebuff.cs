@@ -260,18 +260,73 @@ namespace DOL.GS.Spells
         }
     }
 
-    [SpellHandler("SkillsDebuff")]
-    public class SkillsDebuff : SingleStatDebuff
+    [SpellHandler("StealthSkillDebuff")]
+    public class StealthSkillDebuff : SingleStatDebuff
+    {
+        public override eProperty Property1 { get { return eProperty.Skill_Stealth; } }
+
+        protected override void SendUpdates(GameLiving target)
+        {
+            base.SendUpdates(target);
+
+            if (target is GamePlayer player)
+            {
+                player.Out.SendUpdatePlayerSkills();
+            }
+        }
+
+        public StealthSkillDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+
+        public override string GetDelveDescription(GameClient delveClient)
+        {
+            return LanguageMgr.GetTranslation(delveClient, "SpellDescription.StealthSkillDebuff.MainDescription", Spell.Value);
+        }
+    }
+
+    [SpellHandler("AllSkillsDebuff")]
+    public class AllSkillsDebuff : SingleStatDebuff
     {
         public override eProperty Property1 { get { return eProperty.AllSkills; } }
 
-        protected override void SendUpdates(GameLiving target) { }
+        protected override void SendUpdates(GameLiving target)
+        {
+            base.SendUpdates(target);
 
-        public SkillsDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+            if (target is GamePlayer player)
+            {
+                player.Out.SendUpdatePlayerSkills();
+            }
+        }
+
+        public AllSkillsDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
         public override string GetDelveDescription(GameClient delveClient)
         {
             return LanguageMgr.GetTranslation(delveClient, "SpellDescription.SkillsDebuff.MainDescription", Spell.Value);
+        }
+    }
+
+    [SpellHandler("WeaponSkillDebuff")]
+    public class WeaponSkillDebuff : SingleStatDebuff
+    {
+        public override eProperty Property1 { get { return eProperty.WeaponSkill; } }
+
+        protected override void SendUpdates(GameLiving target) { }
+
+        public WeaponSkillDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+
+        public override string GetDelveDescription(GameClient delveClient)
+        {
+            int recastSeconds = Spell.RecastDelay / 1000;
+            string description = LanguageMgr.GetTranslation(delveClient, "SpellDescription.WeaponSkillDebuff.MainDescription", Spell.Value);
+
+            if (Spell.RecastDelay > 0)
+            {
+                string thirdDesc = LanguageMgr.GetTranslation(delveClient, "SpellDescription.Disarm.MainDescription2", recastSeconds);
+                return description + "\n\n" + thirdDesc;
+            }
+
+            return description;
         }
     }
 

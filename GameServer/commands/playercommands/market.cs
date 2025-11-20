@@ -102,6 +102,21 @@ namespace DOL.GS.Commands
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployDamned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             break;
                         }
+                        if (client.Player.IsCrafting)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployCrafting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            break;
+                        }
+                        if (client.Player.IsClimbing)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployClimbing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            break;
+                        }
+                        if (client.Player.PlayerAfkMessage != null)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployAFK"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            break;
+                        }
                         if (SpellHandler.FindEffectOnTarget(client.Player, "Petrify") != null)
                         {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployPetrify"), eChatType.CT_System, eChatLoc.CL_SystemWindow);

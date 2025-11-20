@@ -348,6 +348,11 @@ namespace DOL.GS.Scripts
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingUsageCrafting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
+            if (player.IsClimbing)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingUsageClimbing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
             if (player.DuelTarget != null)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingUsageDuel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);

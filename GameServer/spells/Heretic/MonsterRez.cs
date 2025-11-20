@@ -122,6 +122,7 @@ namespace DOL.GS.Spells
     {
         private SpellLine m_monsterspellline = null;
         private GamePlayer m_owner = null;
+        public override bool IgnoreForRiding => true;
 
         public SpellLine MonsterSpellLine
         {

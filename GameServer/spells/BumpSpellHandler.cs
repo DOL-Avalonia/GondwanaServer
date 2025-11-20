@@ -2,6 +2,7 @@ using DOL.Database;
 using DOL.Events;
 using DOL.GameEvents;
 using DOL.gameobjects.CustomNPC;
+using DOL.AI.Brain;
 using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.Geometry;
@@ -392,6 +393,21 @@ namespace DOL.GS.Spells
             }
         }
 
+        public override bool CheckBeginCast(GameLiving target, bool quiet)
+        {
+            if (Caster is GamePlayer player && player.IsRiding)
+            {
+                if (!quiet)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CannotCastRiding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+
+                return false;
+            }
+
+            return base.CheckBeginCast(target, quiet);
+        }
+
         /// <inheritdoc />
         public override void OnEffectRemove(GameSpellEffect effect, bool overwrite)
         {
@@ -469,11 +485,25 @@ namespace DOL.GS.Spells
 
         public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            if (!target.IsAlive || target is ShadowNPC)
+            if (!target.IsAlive || target is ShadowNPC || target is IllusionBladePet || target is AstralPet || target is GameTaxiBoat || target is GameTaxi)
                 return false;
 
             if (IsSwimming(target) || IsPeaceful(target))
                 return false;
+
+            if (target is GameNPC npc)
+            {
+                if (npc is GameTrainingDummy || npc is GameDragon || npc.IsBoss)
+                {
+                    SendSpellResistAnimation(npc);
+                    return false;
+                }
+
+                if (npc.Brain is BomberBrain)
+                {
+                    return false;
+                }
+            }
 
             if (target.HasAbility(Abilities.StunImmunity) || target.HasAbility(Abilities.CCImmunity))
             {

@@ -1957,6 +1957,8 @@ namespace DOL.GS
 
                 case eProperty.LivingEffectiveLevel:
                     return "EffectiveLevel";
+                case eProperty.LivingEffectiveness:
+                    return "LivingEffectiveness";
 
 
                 //Added by Fooljam : Missing TOA/Catacomb bonusses names in item properties.

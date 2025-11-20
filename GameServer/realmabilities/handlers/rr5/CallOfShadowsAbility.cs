@@ -4,6 +4,7 @@ using DOL.GS.RealmAbilities;
 using DOL.GS.Spells;
 using DOL.Language;
 using System.Collections.Generic;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -48,6 +49,13 @@ namespace DOL.GS.RealmAbilities
                 return;
 
             _player = living as GamePlayer;
+
+            if (_player!.IsRiding)
+            {
+                _player.Out.SendMessage(LanguageMgr.GetTranslation(_player.Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CannotCastRiding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                return;
+            }
 
             BuildSpell();
 

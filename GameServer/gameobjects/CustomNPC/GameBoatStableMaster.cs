@@ -118,27 +118,15 @@ namespace DOL.GS
             {
                 GamePlayer player = (GamePlayer)source;
 
-                if (player.Reputation < 0)
-                {
-                    TurnTo(player, 5000);
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerInteract.Outlaw"), eChatType.CT_System, eChatLoc.CL_ChatWindow);
-                    return false;
-                }
-
-                if (player.IsDamned)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerInteract.Damned"), eChatType.CT_System, eChatLoc.CL_ChatWindow);
-                    return false;
-                }
-
-                if (SpellHandler.FindEffectOnTarget(player, "Petrify") != null || SpellHandler.FindEffectOnTarget(player, "WarlockSpeedDecrease") != null)
-                {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerInteract.EmbarkNotAllowed"), eChatType.CT_System, eChatLoc.CL_ChatWindow);
-                    return false;
-                }
-
                 if (item.Name.ToLower().StartsWith(LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameStableMaster.ReceiveItem.TicketTo")) && item.Item_Type == 40)
                 {
+                    if (player.Reputation < 0)
+                    {
+                        TurnTo(player, 5000);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerInteract.Outlaw"), eChatType.CT_System, eChatLoc.CL_ChatWindow);
+                        return false;
+                    }
+
                     foreach (GameNPC npc in GetNPCsInRadius(1500))
                     {
                         if (npc is GameTaxiBoat)

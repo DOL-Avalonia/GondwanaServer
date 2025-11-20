@@ -94,6 +94,7 @@ namespace DOL.GS.Spells
                 pet.EvadeChance = tpl.EvadeChance;
                 pet.BlockChance = tpl.BlockChance;
                 pet.LeftHandSwingChance = tpl.LeftHandSwingChance;
+                pet.Flags = (GameNPC.eFlags)tpl.Flags;
 
                 try
                 {

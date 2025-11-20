@@ -1,4 +1,6 @@
-﻿using DOL.gameobjects.CustomNPC;
+﻿using DOL.AI.Brain;
+using DOL.gameobjects.CustomNPC;
+using DOL.GS.Scripts;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 using System.Collections.Generic;
@@ -20,6 +22,41 @@ namespace DOL.GS.Spells
         {
             if (target is ShadowNPC)
                 return false;
+
+            if (target is GameNPC npc)
+            {
+                if (npc is AmteMob || npc is GameMobKamikaze || npc is SplitMob || npc is GamePet || npc is StaticMob)
+                {
+                    if (npc is TerritoryGuard || npc is TerritoryBoss || npc is IllusionBladePet || npc is AstralPet || npc.IsBoss)
+                    {
+                        SendSpellResistAnimation(npc);
+                        return false;
+                    }
+                }
+                else
+                {
+                    SendSpellResistAnimation(npc);
+                    return false;
+                }
+
+                if (npc.Brain is TurretBrain || npc.Brain is TurretFNFBrain || npc.Brain is MLBrain)
+                {
+                    SendSpellResistAnimation(npc);
+                    return false;
+                }
+
+                if (npc.Brain is BomberBrain)
+                {
+                    return false;
+                }
+
+                if (npc.Brain is IllusionPetBrain)
+                {
+                    if (npc.IsAlive)
+                        npc.Die(m_caster);
+                    return true;
+                }
+            }
 
             if (Spell.LifeDrainReturn <= 0)
             {
