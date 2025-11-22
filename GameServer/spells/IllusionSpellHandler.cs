@@ -298,7 +298,7 @@ namespace DOL.GS.Spells
             pet.AutoRespawn = false;
             pet.GuildName = target.GuildName;
             pet.Realm = target.Realm;
-            pet.Effectiveness = this.Spell.Damage / 100.0;
+            pet.BaseEffectiveness = this.Spell.Damage / 100.0;
             pet.CloneMaxHealth = Math.Max(1, (int)Math.Round(target.GetModified(eProperty.MaxHealth) * this.Spell.AmnesiaChance / 100.0));
             pet.Health = pet.CloneMaxHealth;
             pet.WeaponDps = (int)target.WeaponDamage(target.AttackWeapon);

@@ -295,10 +295,9 @@ namespace DOL.GS.Spells
         /// <param name="effect"></param>
         public override void OnEffectStart(GameSpellEffect effect)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            effect.Owner.BaseBuffBonusCategory[eProperty.LivingEffectiveness] -= (int)Spell.Value;
+            if (effect.Owner is GamePlayer player)
             {
-                player.Effectiveness += Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }
@@ -313,10 +312,9 @@ namespace DOL.GS.Spells
         /// <returns>immunity duration in milliseconds</returns>
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            effect.Owner.DebuffCategory[eProperty.LivingEffectiveness] += (int)Spell.Value;
+            if (effect.Owner is GamePlayer player)
             {
-                player.Effectiveness -= Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }

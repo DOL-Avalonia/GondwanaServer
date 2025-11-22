@@ -7005,18 +7005,24 @@ namespace DOL.GS
         #endregion
         #region Spell Cast
 
-        /// <summary>
-        /// Multiplier for melee and magic.
-        /// </summary>
-        public virtual double Effectiveness
+
+        public double BaseEffectiveness
         {
             get;
             set;
         } = 1.0;
 
+        /// <summary>
+        /// Multiplier for melee and magic.
+        /// </summary>
+        public virtual double Effectiveness
+        {
+            get => GetModified(eProperty.LivingEffectiveness) / 100.0;
+        }
+
         public virtual bool IsCasting
         {
-            get { return m_runningSpellHandler != null && m_runningSpellHandler.IsCasting; }
+            get { return m_runningSpellHandler is { IsCasting: true }; }
         }
 
         /// <summary>

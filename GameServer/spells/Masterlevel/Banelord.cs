@@ -513,10 +513,10 @@ namespace DOL.GS.Spells
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            base.OnEffectStart(effect);
+            effect.Owner.DebuffCategory[eProperty.LivingEffectiveness] += (int)Spell.Value;
+            if (effect.Owner is GamePlayer player)
             {
-                player.Effectiveness -= Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }
@@ -524,10 +524,10 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            GamePlayer player = effect.Owner as GamePlayer;
-            if (player != null)
+            base.OnEffectExpires(effect, noMessages);
+            effect.Owner.DebuffCategory[eProperty.LivingEffectiveness] -= (int)Spell.Value;
+            if (effect.Owner is GamePlayer player)
             {
-                player.Effectiveness += Spell.Value * 0.01;
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }

@@ -2,14 +2,15 @@
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
+using System.Numerics;
 
 namespace DOL.GS.Spells
 {
     [SpellHandler("Ascendance")]
     public class AscendanceSpellHandler : SpellHandler
     {
-        private const string ASC_BONUS_KEY = "Ascendance_EffectivenessBonus";
-
+        private int m_bonus;
+        
         public override bool HasPositiveEffect => true;
 
         public AscendanceSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -17,20 +18,13 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
+            
+            m_bonus = (int)Spell.Value;
+            effect.Owner.SpecBuffBonusCategory[eProperty.LivingEffectiveness] += m_bonus;
+
 
             if (effect.Owner is GamePlayer player)
             {
-                double bonus = Spell.Value * 0.01;
-                player.TempProperties.setProperty(ASC_BONUS_KEY, bonus);
-                player.Effectiveness += bonus;
-
-                var moc = player.EffectList.GetOfType<MasteryofConcentrationEffect>();
-                if (moc != null && Spell.AmnesiaChance <= 0)
-                {
-                    moc.Cancel(false);
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "SpellHandler.Cleric.Ascendance.CanceledMoC"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
 
@@ -40,15 +34,14 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
+            base.OnEffectExpires(effect, noMessages);
+            if (m_bonus != 0)
+            {
+                effect.Owner.SpecBuffBonusCategory[eProperty.LivingEffectiveness] -= m_bonus;
+            }
+
             if (effect.Owner is GamePlayer player)
             {
-                double bonus = player.TempProperties.getProperty<double>(ASC_BONUS_KEY);
-                if (bonus != 0)
-                {
-                    player.Effectiveness -= bonus;
-                    player.TempProperties.removeProperty(ASC_BONUS_KEY);
-                }
-
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
 
@@ -67,7 +60,6 @@ namespace DOL.GS.Spells
             int recastSeconds = Spell.RecastDelay / 1000;
 
             string description = LanguageMgr.GetTranslation(lang, "SpellDescription.Ascendance.MainDescription", (int)Spell.Value);
-
             if (Spell.AmnesiaChance == 0)
             {
                 string rest = LanguageMgr.GetTranslation(lang, "SpellDescription.Ascendance.Restrictions");

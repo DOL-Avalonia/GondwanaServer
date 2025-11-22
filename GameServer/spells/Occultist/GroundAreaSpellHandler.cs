@@ -107,7 +107,7 @@ namespace DOL.GS.Spells
             pet.Owner = Caster;
             pet.Level = Caster.Level;
             pet.Flags = GameNPC.eFlags.CANTTARGET;
-            pet.Effectiveness = Caster.Effectiveness;
+            pet.BaseEffectiveness = Caster.Effectiveness;
             pet.Spells = GetTurretSpells().ToList();
             return pet;
         }

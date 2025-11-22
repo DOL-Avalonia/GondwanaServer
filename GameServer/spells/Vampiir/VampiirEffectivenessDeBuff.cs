@@ -36,49 +36,33 @@ namespace DOL.GS.Spells
             m_caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target, force);
         }
-        
+
         /// <inheritdoc />
         public override bool HasPositiveEffect => false;
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
-
-            if (effect.Owner is GamePlayer)
-            {
                 base.OnEffectStart(effect);
-                GamePlayer player = effect.Owner as GamePlayer;
-                player!.TempProperties.setProperty("PreEffectivenessDebuff", player.Effectiveness);
+                GameLiving living = effect.Owner;
 
-
-                double effectiveness = player.Effectiveness;
-                double valueToAdd = (Spell.Value * effectiveness) / 100;
-                valueToAdd = effectiveness - valueToAdd;
-
-                if ((valueToAdd) > 0)
-                {
-                    player.Effectiveness = valueToAdd;
-                }
-                else
-                {
-                    player.Effectiveness = 0;
-                }
-
+                living.BuffBonusMultCategory1.Set((int)eProperty.LivingEffectiveness, this, 1.0 - (Spell.Value / 100.0));
 
                 MessageToLiving(effect.Owner, Spell.Message1, eChatType.CT_Spell);
-                foreach (GamePlayer player1 in effect.Owner.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+                if (effect.Owner is GamePlayer player)
                 {
-                    if (!(effect.Owner == player1))
+                    foreach (GamePlayer player1 in effect.Owner.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                     {
-                        player1.MessageFromArea(effect.Owner, Util.MakeSentence(Spell.Message2,
-                            player1.GetPersonalizedName(effect.Owner)), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        if (!(effect.Owner == player1))
+                        {
+                            player1.MessageFromArea(effect.Owner, Util.MakeSentence(Spell.Message2,
+                                                                                    player1.GetPersonalizedName(effect.Owner)), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        }
                     }
+
+                    // Added to fix?
+                    player.Out.SendUpdateWeaponAndArmorStats();
+                    player.Out.SendStatusUpdate();
                 }
-
-                // Added to fix?
-                player.Out.SendUpdateWeaponAndArmorStats();
-                player.Out.SendStatusUpdate();
-            }
-
         }
 
         /// <inheritdoc />
@@ -96,18 +80,16 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            if (effect.Owner is GamePlayer)
+            effect.Owner.BuffBonusMultCategory1.Remove((int)eProperty.LivingEffectiveness, this);
+            if (effect.Owner is GamePlayer player)
             {
-                GamePlayer player = effect.Owner as GamePlayer;
-                player!.Effectiveness = player.TempProperties.getProperty<double>("PreEffectivenessDebuff");
-                player.TempProperties.removeProperty("PreEffectivenessDebuff");
-                MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_Spell);
-                foreach (GamePlayer player1 in effect.Owner.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+                MessageToLiving(player, Spell.Message3, eChatType.CT_Spell);
+                foreach (GamePlayer player1 in player.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                 {
-                    if (!(effect.Owner == player1))
+                    if (!(player == player1))
                     {
-                        player1.MessageFromArea(effect.Owner, Util.MakeSentence(Spell.Message4,
-                            player1.GetPersonalizedName(effect.Owner)), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        player1.MessageFromArea(player, Util.MakeSentence(Spell.Message4,
+                                                                          player1.GetPersonalizedName(player)), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                     }
                 }
 

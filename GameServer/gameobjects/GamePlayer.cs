@@ -4583,22 +4583,6 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// effectiveness of the player (resurrection illness)
-        /// Effectiveness is used in physical/magic damage (exept dot), in weapon skill and max concentration formula
-        /// </summary>
-        protected double m_playereffectiveness = 1.0;
-
-        /// <summary>
-        /// get / set the player's effectiveness.
-        /// Effectiveness is used in physical/magic damage (exept dot), in weapon skill and max concentration
-        /// </summary>
-        public override double Effectiveness
-        {
-            get { return m_playereffectiveness; }
-            set { m_playereffectiveness = value; }
-        }
-
-        /// <summary>
         /// Creates new effects list for this living.
         /// </summary>
         /// <returns>New effects list instance</returns>

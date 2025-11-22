@@ -33,8 +33,8 @@ namespace DOL.GS.Spells
     [SpellHandler("WarlockSpeedDecrease")]
     public class WarlockSpeedDecreaseSpellHandler : AbstractMorphSpellHandler
     {
-        private const string WARLOCK_PRE_EFFECTIVENESS_KEY = "Warlock_PreEffectivenessDebuff";
-
+        private int m_effectivenessReduction;
+        
         /// <inheritdoc />
         private struct RealmTriplet
         {
@@ -148,7 +148,7 @@ namespace DOL.GS.Spells
 
             SendUpdates(effect.Owner);
 
-            string casterLanguage = (m_caster as GamePlayer)?.Client?.Account?.Language ?? "EN";
+            string casterLanguage = (m_caster as GamePlayer)?.Client?.Account?.Language ?? ServerProperties.Properties.SERV_LANGUAGE;
             GamePlayer ownerPlayer = effect.Owner as GamePlayer;
 
             if (ownerPlayer != null)
@@ -185,17 +185,9 @@ namespace DOL.GS.Spells
             if (Spell.LifeDrainReturn > 0 && effect.Owner is GamePlayer effPlayer)
             {
                 bool vampAlreadyActive = SpellHandler.FindEffectOnTarget(effPlayer, "VampiirEffectivenessDeBuff") != null;
-
-                object existingSave = effPlayer.TempProperties.getProperty<object>(WARLOCK_PRE_EFFECTIVENESS_KEY, null);
-
-                if (!vampAlreadyActive && existingSave == null)
+                if (!vampAlreadyActive)
                 {
-                    double prev = effPlayer.Effectiveness;
-                    effPlayer.TempProperties.setProperty(WARLOCK_PRE_EFFECTIVENESS_KEY, prev);
-
-                    double pct = Spell.LifeDrainReturn;
-                    double reduced = prev - (pct * prev) / 100.0;
-                    effPlayer.Effectiveness = reduced > 0 ? reduced : 0;
+                    effPlayer.BuffBonusMultCategory1.Set((int)eProperty.LivingEffectiveness, this, 1.0 - (Spell.LifeDrainReturn / 100.0));
 
                     effPlayer.Out.SendUpdateWeaponAndArmorStats();
                     effPlayer.Out.SendStatusUpdate();
@@ -273,22 +265,20 @@ namespace DOL.GS.Spells
             // --- Restore Effectiveness if we changed it here ---
             if (Spell.LifeDrainReturn > 0 && effect.Owner is GamePlayer effPlayer)
             {
-                object prevObj = effPlayer.TempProperties.getProperty<object>(WARLOCK_PRE_EFFECTIVENESS_KEY, null);
-                if (prevObj is double prev)
+                if (m_effectivenessReduction > 0)
                 {
-                    effPlayer.Effectiveness = prev;
-                    effPlayer.TempProperties.removeProperty(WARLOCK_PRE_EFFECTIVENESS_KEY);
+                    effect.Owner.BuffBonusMultCategory1.Remove((int)eProperty.LivingEffectiveness, this);
                     effPlayer.Out.SendUpdateWeaponAndArmorStats();
                     effPlayer.Out.SendStatusUpdate();
                 }
             }
 
             // Remove Silence/Disarm if applied
-            if ((Spell.AmnesiaChance == 1 || Spell.AmnesiaChance == 3) && effect.Owner is GamePlayer)
+            if (Spell.AmnesiaChance is 1 or 3 && effect.Owner is GamePlayer)
             {
                 effect.Owner.SilencedCount--;
             }
-            if (Spell.AmnesiaChance == 2 || Spell.AmnesiaChance == 3)
+            if (Spell.AmnesiaChance is 2 or 3)
             {
                 effect.Owner.DisarmedCount--;
             }
