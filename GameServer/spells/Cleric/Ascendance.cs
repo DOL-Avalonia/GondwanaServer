@@ -15,6 +15,35 @@ namespace DOL.GS.Spells
 
         public AscendanceSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
+        /// <inheritdoc />
+        protected override bool ExecuteSpell(GameLiving target, bool force = false)
+        {
+            if (m_spellTarget == null)
+                m_spellTarget = target;
+
+            if (m_spellTarget == null) return false;
+            
+            if (m_spellTarget is GamePlayer player)
+            {
+                player.EffectList.BeginChanges();
+                foreach (var ef in player.FindEffectsOnTarget())
+                {
+                    if (ef is MasteryofConcentrationEffect moc)
+                    {
+                        moc.Cancel(false);
+                        player.SendTranslatedMessage("SpellHandler.Cleric.Ascendance.CanceledMoC");
+                    }
+
+                    if (ef is GameSpellEffect { SpellHandler: AscendanceSpellHandler })
+                    {
+                        ef.Cancel(false);
+                    }
+                }
+                player.EffectList.CommitChanges();
+            }
+            return base.ExecuteSpell(target, force);
+        }
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
