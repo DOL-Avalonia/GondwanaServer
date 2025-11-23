@@ -166,12 +166,12 @@ namespace DOL.GS.Spells
     [SpellHandler("SecondaryMagicResistsBuff")]
     public class SecondaryMagicResistsBuff : AbstractResistBuff
     {
-        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.SpecBuff; } }
-        public override eBuffBonusCategory BonusCategory2 { get { return eBuffBonusCategory.SpecBuff; } }
-        public override eBuffBonusCategory BonusCategory3 { get { return eBuffBonusCategory.SpecBuff; } }
-        public override eBuffBonusCategory BonusCategory4 { get { return eBuffBonusCategory.SpecBuff; } }
-        public override eBuffBonusCategory BonusCategory5 { get { return eBuffBonusCategory.SpecBuff; } }
-        public override eBuffBonusCategory BonusCategory6 { get { return eBuffBonusCategory.SpecBuff; } }
+        public override eBuffBonusCategory BonusCategory1 { get { return eBuffBonusCategory.Other; } }
+        public override eBuffBonusCategory BonusCategory2 { get { return eBuffBonusCategory.Other; } }
+        public override eBuffBonusCategory BonusCategory3 { get { return eBuffBonusCategory.Other; } }
+        public override eBuffBonusCategory BonusCategory4 { get { return eBuffBonusCategory.Other; } }
+        public override eBuffBonusCategory BonusCategory5 { get { return eBuffBonusCategory.Other; } }
+        public override eBuffBonusCategory BonusCategory6 { get { return eBuffBonusCategory.Other; } }
 
         public override eProperty Property1 { get { return eProperty.Resist_Heat; } }
         public override eProperty Property2 { get { return eProperty.Resist_Cold; } }
