@@ -86,11 +86,25 @@ namespace DOL.GS.PacketHandler
                         if (skill is Specialization)
                         {
                             Specialization spec = (Specialization)skill;
-                            pak.WriteByte((byte)spec.Level);
+                            var baseLevel = spec.Level;
+                            var modifiedLevel = m_gameClient.Player.GetModifiedSpecLevel(spec.KeyName);
+                            var diff = modifiedLevel - baseLevel;
+                            if (diff < 0)
+                            {
+                                baseLevel = modifiedLevel;
+                                diff = 0;
+                            }
+                            else
+                            {
+                                // Don't overflow and show weird value, cap at 255
+                                diff = Math.Min(byte.MaxValue, diff);
+                            }
+                            baseLevel = Math.Min(byte.MaxValue, baseLevel);
+                            pak.WriteByte((byte)baseLevel);
                             pak.WriteShort((ushort)spec.InternalID); //new 1.112
                             pak.WriteByte((byte)spec.SkillType);
-                            pak.WriteShort(0);
-                            pak.WriteByte((byte)(m_gameClient.Player.GetModifiedSpecLevel(spec.KeyName) - spec.Level)); // bonus
+                            pak.WriteShort(0x8001);
+                            pak.WriteByte((byte)(diff)); // bonus
                             pak.WriteShort((ushort)spec.Icon);
                             pak.WritePascalString(spec.Name);
                         }

@@ -4080,6 +4080,7 @@ namespace DOL.GS
                 eProperty skillProp = SkillBase.SpecToSkill(keyName);
                 if (skillProp != eProperty.Undefined)
                     level += GetModified(skillProp);
+                level = Math.Max(1, level);
             }
 
             return level;
