@@ -311,8 +311,6 @@ namespace DOL.GS.Spells
     {
         public override eProperty Property1 { get { return eProperty.WeaponSkill; } }
 
-        protected override void SendUpdates(GameLiving target) { }
-
         public WeaponSkillDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
         public override string GetDelveDescription(GameClient delveClient)
