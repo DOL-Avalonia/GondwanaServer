@@ -21,7 +21,7 @@ namespace DOL.GS.PropertyCalc
 
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int chance = living.BaseBuffBonusCategory[(int)property] + living.BuffBonusCategory4[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
+            int chance = living.BaseBuffBonusCategory[(int)property] + living.OtherBuffBonus[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
 
             if (living is GamePet gamePet)
             {
@@ -59,7 +59,7 @@ namespace DOL.GS.PropertyCalc
 
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int chance = living.BaseBuffBonusCategory[(int)property] + living.BuffBonusCategory4[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
+            int chance = living.BaseBuffBonusCategory[(int)property] + living.OtherBuffBonus[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
 
             if (living is GamePlayer player)
             {
@@ -115,7 +115,7 @@ namespace DOL.GS.PropertyCalc
             }
 
             // base 10% chance of critical for all with melee weapons plus ra bonus
-            int chance = living.BaseBuffBonusCategory[(int)property] + living.BuffBonusCategory4[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
+            int chance = living.BaseBuffBonusCategory[(int)property] + living.OtherBuffBonus[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
 
             if (living is NecromancerPet necroPet)
             {
@@ -159,7 +159,7 @@ namespace DOL.GS.PropertyCalc
 
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int chance = living.BaseBuffBonusCategory[(int)property] + living.BuffBonusCategory4[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
+            int chance = living.BaseBuffBonusCategory[(int)property] + living.OtherBuffBonus[(int)property] + living.AbilityBonus[(int)property] + living.ItemBonus[(int)property];
 
             if (living is GamePlayer player)
             {

@@ -38,7 +38,7 @@ namespace DOL.GS.PropertyCalc
         public override int CalcValue(GameLiving living, eProperty property)
         {
             int itemBonus = living.ItemBonus[(int)property];
-            int buffBonus = living.BuffBonusCategory4[eProperty.MythicalSpellReflect];
+            int buffBonus = living.OtherBuffBonus[eProperty.MythicalSpellReflect];
             int debuff = living.DebuffCategory[eProperty.MythicalSpellReflect];
             int value = (buffBonus + Math.Min(100, itemBonus) - debuff) / 2;
             return Math.Max(0, value);

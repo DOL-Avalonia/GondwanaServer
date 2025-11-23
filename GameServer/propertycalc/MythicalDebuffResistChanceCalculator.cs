@@ -30,7 +30,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int value = living.BuffBonusCategory4[property];
+            int value = living.OtherBuffBonus[property];
 
             if (living is GamePlayer)
             {

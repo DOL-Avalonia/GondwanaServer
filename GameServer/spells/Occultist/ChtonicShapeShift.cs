@@ -115,7 +115,7 @@ namespace DOL.GS.Spells
             var owner = effect.Owner;
             int mult = apply ? 1 : -1;
             // Armor %
-            owner.BuffBonusCategory4[(int)eProperty.ArmorFactor] += mult * m_afBonusFlat;
+            owner.OtherBuffBonus[(int)eProperty.ArmorFactor] += mult * m_afBonusFlat;
             owner.BaseBuffBonusCategory[(int)eProperty.MaxHealth] += mult * m_hpBonus;
             owner.SpecBuffBonusCategory[(int)eProperty.WeaponSkill] += mult * m_wsBonus;
             owner.SpecBuffBonusCategory[(int)eProperty.ArmorAbsorption] += mult * m_absBonus;

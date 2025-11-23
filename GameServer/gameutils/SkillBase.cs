@@ -3225,7 +3225,7 @@ namespace DOL.GS
         /// <param name="race">Value must be greater than 0</param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static int GetRaceResist(int race, eResist type, GamePlayer player)
+        public static int GetRaceResist(int race, eResist type, GameLiving? living)
         {
             if (race == 0)
                 return 0;
@@ -3255,7 +3255,7 @@ namespace DOL.GS
                 log.WarnFormat("No resists defined for race:  {0}", race);
             }
 
-            if (player != null)
+            if (living is GamePlayer player)
             {
                 if (player.IsRenaissance && player.Race.Equals((short)race))
                 {

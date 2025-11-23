@@ -33,7 +33,7 @@ namespace DOL.GS.PropertyCalc
             int value = 100;
 
             value -= living.BaseBuffBonusCategory[eProperty.DeathExpLoss];
-            value -= living.BuffBonusCategory4[eProperty.DeathExpLoss];
+            value -= living.OtherBuffBonus[eProperty.DeathExpLoss];
             value -= Math.Min(25, living.ItemBonus[(int)property]);
             return Math.Max(0, value);
         }

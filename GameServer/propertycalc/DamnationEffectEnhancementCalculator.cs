@@ -29,7 +29,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int value = living.BuffBonusCategory4[eProperty.DamnationEffectEnhancement];
+            int value = living.OtherBuffBonus[eProperty.DamnationEffectEnhancement];
 
             if (living is GamePlayer)
             {

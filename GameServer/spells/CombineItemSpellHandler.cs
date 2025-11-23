@@ -903,7 +903,7 @@ namespace DOL.spells
         {
             double speedMultiplier = 1.0;
 
-            speedMultiplier *= (1.0 + player.BuffBonusCategory4[eProperty.CraftingSpeed] * 0.01);
+            speedMultiplier *= (1.0 + player.OtherBuffBonus[eProperty.CraftingSpeed] * 0.01);
             speedMultiplier *= (1.0 + player.ItemBonus[(int)eProperty.CraftingSpeed] * 0.01);
 
             if (player.Guild != null && player.Guild.BonusType == Guild.eBonusType.CraftingHaste)

@@ -70,52 +70,52 @@ namespace DOL.GS.Scripts
                 bool effect = false;
                 if (item.Bonus1Type > 0 && item.Bonus1 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus1Type] += item.Bonus1;
+                    player.OtherBuffBonus[item.Bonus1Type] += item.Bonus1;
                     effect = true;
                 }
                 if (item.Bonus2Type > 0 && item.Bonus2 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus2Type] += item.Bonus2;
+                    player.OtherBuffBonus[item.Bonus2Type] += item.Bonus2;
                     effect = true;
                 }
                 if (item.Bonus3Type > 0 && item.Bonus3 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus3Type] += item.Bonus3;
+                    player.OtherBuffBonus[item.Bonus3Type] += item.Bonus3;
                     effect = true;
                 }
                 if (item.Bonus4Type > 0 && item.Bonus4 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus4Type] += item.Bonus4;
+                    player.OtherBuffBonus[item.Bonus4Type] += item.Bonus4;
                     effect = true;
                 }
                 if (item.Bonus5Type > 0 && item.Bonus5 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus5Type] += item.Bonus5;
+                    player.OtherBuffBonus[item.Bonus5Type] += item.Bonus5;
                     effect = true;
                 }
                 if (item.Bonus6Type > 0 && item.Bonus6 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus6Type] += item.Bonus6;
+                    player.OtherBuffBonus[item.Bonus6Type] += item.Bonus6;
                     effect = true;
                 }
                 if (item.Bonus7Type > 0 && item.Bonus7 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus7Type] += item.Bonus7;
+                    player.OtherBuffBonus[item.Bonus7Type] += item.Bonus7;
                     effect = true;
                 }
                 if (item.Bonus8Type > 0 && item.Bonus8 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus8Type] += item.Bonus8;
+                    player.OtherBuffBonus[item.Bonus8Type] += item.Bonus8;
                     effect = true;
                 }
                 if (item.Bonus9Type > 0 && item.Bonus9 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus9Type] += item.Bonus9;
+                    player.OtherBuffBonus[item.Bonus9Type] += item.Bonus9;
                     effect = true;
                 }
                 if (item.Bonus10Type > 0 && item.Bonus10 != 0)
                 {
-                    player.BuffBonusCategory4[item.Bonus10Type] += item.Bonus10;
+                    player.OtherBuffBonus[item.Bonus10Type] += item.Bonus10;
                     effect = true;
                 }
                 if (item.ExtraBonusType > 0 && item.ExtraBonus != 0)
@@ -239,25 +239,25 @@ namespace DOL.GS.Scripts
             GameLiving gameLiving = (GameLiving)timer.Owner;
 
             if (item.Bonus1Type > 0 && item.Bonus1 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus1Type] -= item.Bonus1;
+                gameLiving.OtherBuffBonus[item.Bonus1Type] -= item.Bonus1;
             if (item.Bonus2Type > 0 && item.Bonus2 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus2Type] -= item.Bonus2;
+                gameLiving.OtherBuffBonus[item.Bonus2Type] -= item.Bonus2;
             if (item.Bonus3Type > 0 && item.Bonus3 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus3Type] -= item.Bonus3;
+                gameLiving.OtherBuffBonus[item.Bonus3Type] -= item.Bonus3;
             if (item.Bonus4Type > 0 && item.Bonus4 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus4Type] -= item.Bonus4;
+                gameLiving.OtherBuffBonus[item.Bonus4Type] -= item.Bonus4;
             if (item.Bonus5Type > 0 && item.Bonus5 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus5Type] -= item.Bonus5;
+                gameLiving.OtherBuffBonus[item.Bonus5Type] -= item.Bonus5;
             if (item.Bonus6Type > 0 && item.Bonus6 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus6Type] -= item.Bonus6;
+                gameLiving.OtherBuffBonus[item.Bonus6Type] -= item.Bonus6;
             if (item.Bonus7Type > 0 && item.Bonus7 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus7Type] -= item.Bonus7;
+                gameLiving.OtherBuffBonus[item.Bonus7Type] -= item.Bonus7;
             if (item.Bonus8Type > 0 && item.Bonus8 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus8Type] -= item.Bonus8;
+                gameLiving.OtherBuffBonus[item.Bonus8Type] -= item.Bonus8;
             if (item.Bonus9Type > 0 && item.Bonus9 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus9Type] -= item.Bonus9;
+                gameLiving.OtherBuffBonus[item.Bonus9Type] -= item.Bonus9;
             if (item.Bonus10Type > 0 && item.Bonus10 != 0)
-                gameLiving.BuffBonusCategory4[item.Bonus10Type] -= item.Bonus10;
+                gameLiving.OtherBuffBonus[item.Bonus10Type] -= item.Bonus10;
             if (item.ExtraBonusType > 0 && item.ExtraBonus != 0)
                 gameLiving.BuffBonusMultCategory1.Remove(item.ExtraBonusType, "chope");
 

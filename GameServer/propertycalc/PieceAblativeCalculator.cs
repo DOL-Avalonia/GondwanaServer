@@ -30,7 +30,7 @@ namespace DOL.GS.PropertyCalc
         public override int CalcValue(GameLiving living, eProperty property)
         {
             int itemBonus = living.ItemBonus[(int)property];
-            int buffBonus = living.BuffBonusCategory4[eProperty.PieceAblative];
+            int buffBonus = living.OtherBuffBonus[eProperty.PieceAblative];
             int debuff = living.DebuffCategory[eProperty.PieceAblative];
             int value = buffBonus + Math.Min(15, itemBonus) - debuff;
             return Math.Max(0, value);

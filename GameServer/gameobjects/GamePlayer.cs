@@ -7974,7 +7974,7 @@ namespace DOL.GS
                     eaf = eafcap;
                 eaf += (int)Math.Min(Level * 1.875, SpecBuffBonusCategory[(int)eProperty.ArmorFactor])
                     - DebuffCategory[(int)eProperty.ArmorFactor]
-                    + BuffBonusCategory4[(int)eProperty.ArmorFactor]
+                    + OtherBuffBonus[(int)eProperty.ArmorFactor]
                     + Math.Min(Level, ItemBonus[(int)eProperty.ArmorFactor]);
 
                 eaf = (int)(eaf * BuffBonusMultCategory1.Get((int)eProperty.ArmorFactor));
@@ -12047,7 +12047,7 @@ namespace DOL.GS
             {
                 int lootchance = 0;
 
-                lootchance += BuffBonusCategory4[eProperty.LootChance];
+                lootchance += OtherBuffBonus[eProperty.LootChance];
                 lootchance += ItemBonus[(int)eProperty.LootChance];
 
                 return Math.Max(0, lootchance);
@@ -15308,7 +15308,7 @@ namespace DOL.GS
             {
                 double gainMultiplier = 1.0;
 
-                gainMultiplier += BuffBonusCategory4[eProperty.CraftingSkillGain] * 0.01;
+                gainMultiplier += OtherBuffBonus[eProperty.CraftingSkillGain] * 0.01;
                 gainMultiplier += ItemBonus[(int)eProperty.CraftingSkillGain] * 0.01;
 
                 return gainMultiplier;
@@ -15448,7 +15448,7 @@ namespace DOL.GS
                 if (speed <= 0)
                     speed = 1.0;
 
-                speed *= (1.0 + BuffBonusCategory4[eProperty.CraftingSpeed] * .01);
+                speed *= (1.0 + OtherBuffBonus[eProperty.CraftingSpeed] * .01);
                 speed *= (1.0 + ItemBonus[(int)eProperty.CraftingSpeed] * .01);
 
                 if (Guild != null && Guild.BonusType == Guild.eBonusType.CraftingHaste)

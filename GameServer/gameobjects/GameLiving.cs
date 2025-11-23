@@ -5026,7 +5026,7 @@ namespace DOL.GS
         /// Property Buff bonus category
         /// what it means depends from the PropertyCalculator for a property element
         /// </summary>
-        public IPropertyIndexer BuffBonusCategory4
+        public IPropertyIndexer OtherBuffBonus
         {
             get { return m_buff4Bonus; }
         }

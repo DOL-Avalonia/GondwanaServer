@@ -31,7 +31,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int value = living.BaseBuffBonusCategory[eProperty.BladeturnReinforcement] + living.BuffBonusCategory4[eProperty.BladeturnReinforcement];
+            int value = living.BaseBuffBonusCategory[eProperty.BladeturnReinforcement] + living.OtherBuffBonus[eProperty.BladeturnReinforcement];
             if (living is GamePlayer)
             {
                 value += Math.Min(10, living.ItemBonus[(int)property]); // cap 10% from items? https://crowsofwinter.gamerlaunch.com/forums/viewtopic.php?t=11152031

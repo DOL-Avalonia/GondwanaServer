@@ -62,9 +62,9 @@ namespace DOL.GS.Scripts
                 Callback = PulseCallback
             };
             m_tickTimer.Start(5000);
-            m_owner.BuffBonusCategory4[(int)eProperty.HealthRegenerationRate] += m_owner.Level;
-            m_owner.BuffBonusCategory4[(int)eProperty.EnduranceRegenerationRate] += 5;
-            m_owner.BuffBonusCategory4[(int)eProperty.PowerRegenerationRate] += (m_owner.Level + 2) / 2;
+            m_owner.OtherBuffBonus[(int)eProperty.HealthRegenerationRate] += m_owner.Level;
+            m_owner.OtherBuffBonus[(int)eProperty.EnduranceRegenerationRate] += 5;
+            m_owner.OtherBuffBonus[(int)eProperty.PowerRegenerationRate] += (m_owner.Level + 2) / 2;
             m_owner.TempProperties.setProperty("regenItem_level", (int)m_owner.Level);
         }
 
@@ -85,9 +85,9 @@ namespace DOL.GS.Scripts
             }
             m_owner.EffectList.Remove(this);
             int level = m_owner.TempProperties.getProperty("regenItem_level", m_owner.Level);
-            m_owner.BuffBonusCategory4[(int)eProperty.HealthRegenerationRate] -= level;
-            m_owner.BuffBonusCategory4[(int)eProperty.EnduranceRegenerationRate] -= 5;
-            m_owner.BuffBonusCategory4[(int)eProperty.PowerRegenerationRate] -= (level + 2) / 2;
+            m_owner.OtherBuffBonus[(int)eProperty.HealthRegenerationRate] -= level;
+            m_owner.OtherBuffBonus[(int)eProperty.EnduranceRegenerationRate] -= 5;
+            m_owner.OtherBuffBonus[(int)eProperty.PowerRegenerationRate] -= (level + 2) / 2;
         }
 
         [GameServerStartedEvent]

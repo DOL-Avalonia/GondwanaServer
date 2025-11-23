@@ -112,7 +112,7 @@ namespace DOL.GS.Spells
 
             // Chtonic bonuses:
             var hpBonus = mult * _hpFlat;
-            target.BuffBonusCategory4[(int)eProperty.ArmorFactor] += mult * _afFlat;
+            target.OtherBuffBonus[(int)eProperty.ArmorFactor] += mult * _afFlat;
             target.BaseBuffBonusCategory[(int)eProperty.MaxHealth] += hpBonus;
             if (hpBonus != 0 && apply)
                 target.Health += hpBonus;

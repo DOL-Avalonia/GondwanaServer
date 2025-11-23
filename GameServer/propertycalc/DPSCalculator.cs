@@ -41,7 +41,7 @@ namespace DOL.GS.PropertyCalc
             int baseValue = living.BaseBuffBonusCategory[(int)property]
                 + living.SpecBuffBonusCategory[(int)property]
                 - living.DebuffCategory[(int)property]
-                + living.BuffBonusCategory4[(int)property];
+                + living.OtherBuffBonus[(int)property];
 
             int itemBonus = living.ItemBonus[(int)property];
             if (living is GamePlayer)

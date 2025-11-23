@@ -234,7 +234,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectStart(effect);
 
-            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] += CASTSPEED_BONUS;
+            effect.Owner.OtherBuffBonus[eProperty.CastingSpeed] += CASTSPEED_BONUS;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();
@@ -248,7 +248,7 @@ namespace DOL.GS.Spells
         {
             base.OnEffectRemove(effect, overwrite);
 
-            effect.Owner.BuffBonusCategory4[eProperty.CastingSpeed] -= CASTSPEED_BONUS;
+            effect.Owner.OtherBuffBonus[eProperty.CastingSpeed] -= CASTSPEED_BONUS;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendCharStatsUpdate();

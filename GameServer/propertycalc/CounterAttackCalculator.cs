@@ -30,7 +30,7 @@ namespace DOL.GS.PropertyCalc
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            int value = living.BuffBonusCategory4[eProperty.CounterAttack];
+            int value = living.OtherBuffBonus[eProperty.CounterAttack];
             if (living is GamePlayer)
             {
                 value += Math.Min(30, living.ItemBonus[(int)property]); // cap 30% from items

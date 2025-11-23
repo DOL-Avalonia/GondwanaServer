@@ -325,11 +325,12 @@ namespace DOL.GS.PacketHandler
                     case eProperty.Resist_Spirit:
                         var abMagicAbs = player.AbilityBonus[eProperty.MagicAbsorption];
                         var specMagicAbs = player.SpecBuffBonusCategory[eProperty.MagicAbsorption]
+                            - player.DebuffCategory[eProperty.MagicAbsorption]
                             - player.SpecDebuffCategory[eProperty.MagicAbsorption];
                         secondary[i] += abMagicAbs + specMagicAbs;
                         break;
                 }
-                secondary[i] = Math.Clamp(secondary[i], 0, 0xFF); // We send as unsigned byte, so cap it to 0 to not wrap around to high values
+                //secondary[i] = Math.Clamp(secondary[i], 0, 0xFF); // We send as unsigned byte, so cap it to 0 to not wrap around to high values
             }
 
 

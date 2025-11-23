@@ -48,7 +48,7 @@ namespace DOL.GS.PropertyCalc
                 // TrialsOfAtlantis af bonus
                 af += Math.Min(living.Level, living.ItemBonus[(int)property]);
                 // uncapped category
-                af += living.BuffBonusCategory4[(int)property];
+                af += living.OtherBuffBonus[(int)property];
 
                 return af;
             }
@@ -69,7 +69,7 @@ namespace DOL.GS.PropertyCalc
             {
                 return living.SpecBuffBonusCategory[(int)property]
                 - Math.Abs(living.DebuffCategory[(int)property])
-                + living.BuffBonusCategory4[(int)property];
+                + living.OtherBuffBonus[(int)property];
             }
         }
     }

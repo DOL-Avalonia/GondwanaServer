@@ -32,7 +32,7 @@ namespace DOL.GS.PropertyCalc
         {
             int value = 100;
             value -= living.BaseBuffBonusCategory[eProperty.SpellPowerCost];
-            value -= living.BuffBonusCategory4[eProperty.SpellPowerCost];
+            value -= living.OtherBuffBonus[eProperty.SpellPowerCost];
             if (living is GamePlayer)
             {
                 value -= Math.Min(25, living.ItemBonus[(int)property]); // cap 25% from items
