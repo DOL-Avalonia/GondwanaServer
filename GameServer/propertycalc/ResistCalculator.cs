@@ -152,6 +152,11 @@ namespace DOL.GS.PropertyCalc
             return Math.Min(living.ItemBonus[eProperty.ResCapBonus_First - eProperty.Resist_First + property], 5);
         }
 
+        public static int GetItemBonusCap(GameLiving living, eProperty property)
+        {
+            return living.Level / 2 + 1 + GetItemBonusCapIncrease(living, property);
+        }
+
         /// <summary>
         /// Cap for player cast resist buffs.
         /// </summary>
