@@ -37,6 +37,10 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         public override bool HasPositiveEffect => false;
 
+        private const int NUM_SKILLS = (int)eProperty.Skill_Last - (int)eProperty.Skill_First;
+
+        private int[] m_values = new int[NUM_SKILLS];
+
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
@@ -46,11 +50,12 @@ namespace DOL.GS.Spells
             {
                 GamePlayer player = effect.Owner as GamePlayer;
 
-                for (int i = (int)eProperty.Skill_First; i <= (int)eProperty.Skill_Last; i++)
+                for (int i = 0; i < NUM_SKILLS; i++)
                 {
                     if (player!.GetModifiedSpecLevel(SkillBase.GetPropertyName(player.Client, (eProperty)(i))) != 0)
                     {
-                        player.BaseBuffBonusCategory[i] = -player.GetModifiedSpecLevel(SkillBase.GetPropertyName(player.Client, (eProperty)(i)));
+                        m_values[i] = -player.GetModifiedSpecLevel(SkillBase.GetPropertyName(player.Client, (eProperty)(i)));
+                        player.BaseBuffBonusCategory[i + (int)eProperty.Skill_First] += m_values[i];
                     }
                     //					DOLConsole.WriteWarning("Spec " + SkillBase.GetPropertyName((eProperty)(i)) + " " + player.GetModifiedSpecLevel(SkillBase.GetPropertyName((eProperty)(i))));
                 }
@@ -89,9 +94,9 @@ namespace DOL.GS.Spells
             if (effect.Owner is GamePlayer)
             {
                 GamePlayer player = effect.Owner as GamePlayer;
-                for (int i = (int)eProperty.Skill_First; i <= (int)eProperty.Skill_Last; i++)
+                for (int i = 0; i < NUM_SKILLS; i++)
                 {
-                    player!.BaseBuffBonusCategory[i] = 0;
+                    player!.BaseBuffBonusCategory[i + (int)eProperty.Skill_First] -= m_values[i];
                 }
                 player!.PropertiesChanged();
                 player.Out.SendCharStatsUpdate();
