@@ -103,7 +103,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteByte((byte)baseLevel);
                             pak.WriteShort((ushort)spec.InternalID); //new 1.112
                             pak.WriteByte((byte)spec.SkillType);
-                            pak.WriteShort(0x8001);
+                            pak.WriteShort(0);
                             pak.WriteByte((byte)(diff)); // bonus
                             pak.WriteShort((ushort)spec.Icon);
                             pak.WritePascalString(spec.Name);
