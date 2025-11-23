@@ -58,7 +58,7 @@ namespace DOL.GS.PropertyCalc
         private double GetValue(IMultiplicativeProperties indexer, eProperty property)
         {
             double value = indexer.Get((int)property);
-
+            
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillMeleeWeapon))
                 value *= indexer.Get((int)eProperty.AllMeleeWeaponSkills);
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillMagical))

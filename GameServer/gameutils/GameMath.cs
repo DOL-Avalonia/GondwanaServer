@@ -121,17 +121,26 @@ namespace DOL
             return GetDistance2D(a.Coordinate, b.Coordinate);
         }
         
-        public static int GetDistance2DSquared(Coordinate a, Coordinate b)
+        public static float GetDistance2DSquared(Coordinate a, Coordinate b)
         {
-            int dX = b.X - a.X;
-            int dY = b.Y - a.Y;
+            float dX = b.X - a.X;
+            float dY = b.Y - a.Y;
             return dX * dX + dY * dY;
         }
         
-        public static int GetDistance2DSquared(GameObject a, GameObject b)
+        public static float GetDistance2DSquared(Position a, Position b)
+        {
+            if (a.RegionID != b.RegionID)
+                return float.MaxValue;
+            float dX = b.X - a.X;
+            float dY = b.Y - a.Y;
+            return dX * dX + dY * dY;
+        }
+        
+        public static float GetDistance2DSquared(GameObject a, GameObject b)
         {
             if (a.CurrentRegion != b.CurrentRegion)
-                return int.MaxValue;
+                return float.MaxValue;
             return GetDistance2DSquared(a.Coordinate, b.Coordinate);
         }
 
@@ -143,17 +152,19 @@ namespace DOL
                 return float.MaxValue;
             return GetDistance(a.Coordinate, b.Coordinate);
         }
-        public static int GetDistanceSquared(Coordinate a, Coordinate b)
+
+        public static float GetDistanceSquared(Coordinate a, Coordinate b)
         {
-            int dX = b.X - a.X;
-            int dY = b.Y - a.Y;
-            int dZ = b.Z - a.Z;
+            float dX = b.X - a.X;
+            float dY = b.Y - a.Y;
+            float dZ = b.Z - a.Z;
             return dX * dX + dY * dY + dZ * dZ;
         }
-        public static int GetDistanceSquared(GameObject a, GameObject b)
+
+        public static float GetDistanceSquared(GameObject a, GameObject b)
         {
             if (a.CurrentRegion != b.CurrentRegion)
-                return int.MaxValue;
+                return float.MaxValue;
             return GetDistanceSquared(a.Coordinate, b.Coordinate);
         }
 
@@ -181,6 +192,9 @@ namespace DOL
             => GetDistance2DSquared(source.Coordinate, target) <= distance * distance;
         
         public static bool IsWithinRadius2D(Coordinate source, Coordinate target, float distance)
+            => GetDistance2DSquared(source, target) <= distance * distance;
+        
+        public static bool IsWithinRadius2D(Position source, Position target, float distance)
             => GetDistance2DSquared(source, target) <= distance * distance;
     }
 }

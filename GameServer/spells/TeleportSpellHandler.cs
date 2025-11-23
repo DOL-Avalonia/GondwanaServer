@@ -4,6 +4,7 @@ using DOL.GS.Scripts;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 
 namespace DOL.GS.Spells
@@ -18,49 +19,58 @@ namespace DOL.GS.Spells
             zoneName = WorldMgr.GetRegion(tPPoint.Region).GetZone(tPPoint.Position.Coordinate).Description;
         }
 
+        /// <inheritdoc />
+        public override int CalculateSpellResistChance(GameLiving target)
+        {
+            if (target is GameNPC npc)
+            {
+                if (target is not (AmteMob or GameMobKamikaze or SplitMob or GamePet or StaticMob))
+                    return 100; // Resist always
+
+                if (npc.IsBoss)
+                    return 100;
+
+                if (target is TerritoryGuard or TerritoryBoss)
+                    return 100;
+
+                if (npc is IllusionBladePet or AstralPet or { Brain: TurretBrain or TurretFNFBrain or MLBrain })
+                    return 100;
+
+                if (npc.Brain is BomberBrain)
+                    return 100;
+            }
+            return 0;
+            //return base.CalculateSpellResistChance(target);
+        }
+
         public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
             if (target is ShadowNPC)
                 return false;
 
-            if (target is GameNPC npc)
+            var resistChance = CalculateSpellResistChance(target);
+            if (resistChance >= 100 || Util.Chance(resistChance))
             {
-                if (npc is AmteMob || npc is GameMobKamikaze || npc is SplitMob || npc is GamePet || npc is StaticMob)
-                {
-                    if (npc is TerritoryGuard || npc is TerritoryBoss || npc is IllusionBladePet || npc is AstralPet || npc.IsBoss)
-                    {
-                        SendSpellResistAnimation(npc);
-                        return false;
-                    }
-                }
-                else
-                {
-                    SendSpellResistAnimation(npc);
-                    return false;
-                }
-
-                if (npc.Brain is TurretBrain || npc.Brain is TurretFNFBrain || npc.Brain is MLBrain)
-                {
-                    SendSpellResistAnimation(npc);
-                    return false;
-                }
-
-                if (npc.Brain is BomberBrain)
-                {
-                    return false;
-                }
-
-                if (npc.Brain is IllusionPetBrain)
-                {
-                    if (npc.IsAlive)
-                        npc.Die(m_caster);
-                    return true;
-                }
+                SendSpellResistAnimation(target);
+                return true;
             }
 
+            return OnDirectEffect(target, effectiveness);
+        }
+
+        /// <inheritdoc />
+        public override bool OnDirectEffect(GameLiving target, double effectiveness)
+        {
             if (Spell.LifeDrainReturn <= 0)
             {
                 return false;
+            }
+
+            if (target is IllusionPet)
+            {
+                if (target.IsAlive)
+                    target.Die(m_caster);
+                return true;
             }
             
             TPPoint tPPoint = TeleportMgr.LoadTP((ushort)Spell.LifeDrainReturn);
@@ -80,6 +90,19 @@ namespace DOL.GS.Spells
                         break;
                 }
             }
+            
+            if (target is GamePet pet)
+            {
+                if (!GameMath.IsWithinRadius2D(tPPoint.Position, target.Position, ControlledNpcBrain.MAX_OWNER_FOLLOW_DIST))
+                {
+                    if (pet.Owner is GamePlayer playerOwner)
+                        playerOwner.CommandNpcRelease();
+                    else
+                        pet.RemoveFromWorld();
+                    return true;
+                }
+            }
+            
             target.TPPoint = tPPoint;
             target.MoveTo(tPPoint.Position.With(target.Orientation));
             return true;
