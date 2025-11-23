@@ -101,6 +101,13 @@ namespace DOL.GS.Spells
                         pet.RemoveFromWorld();
                     return true;
                 }
+                else
+                {
+                    // This is very important for necromancer pets to not turn off the shade effect
+                    target.TPPoint = tPPoint;
+                    pet.MoveWithoutRemovingFromWorld(tPPoint.Position.With(target.Orientation), true);
+                    return true;
+                }
             }
             
             target.TPPoint = tPPoint;
