@@ -97,9 +97,9 @@ namespace DOL.GS.Spells
             var mult = (sbyte)(apply ? 1 : -1);
 
             // Decrepit bonuses:
-            target.SpecBuffBonusCategory[(int)eProperty.SpellDamage] += mult * _spellDmgBonus;
-            target.SpecBuffBonusCategory[(int)eProperty.DotDamageBonus] += mult * _spellDmgBonus;
-            target.SpecBuffBonusCategory[(int)eProperty.ArmorAbsorption] += mult * _absBonus;
+            target.OtherBuffBonus[(int)eProperty.SpellDamage] += mult * _spellDmgBonus;
+            target.OtherBuffBonus[(int)eProperty.DotDamageBonus] += mult * _spellDmgBonus;
+            target.OtherBuffBonus[(int)eProperty.ArmorAbsorption] += mult * _absBonus;
 
             // Regen (multiplicative bucket)
             if (Math.Abs(_regenMult) > 0.0001f)
@@ -117,12 +117,12 @@ namespace DOL.GS.Spells
             if (hpBonus != 0 && apply)
                 target.Health += hpBonus;
             target.SpecBuffBonusCategory[(int)eProperty.WeaponSkill] += mult * _wsPct;
-            target.SpecBuffBonusCategory[(int)eProperty.Resist_Heat] += mult * _secResPct;
-            target.SpecBuffBonusCategory[(int)eProperty.Resist_Cold] += mult * _secResPct;
-            target.SpecBuffBonusCategory[(int)eProperty.Resist_Matter] += mult * _secResPct;
-            target.SpecBuffBonusCategory[(int)eProperty.Resist_Body] += mult * _secResPct;
-            target.SpecBuffBonusCategory[(int)eProperty.Resist_Spirit] += mult * _secResPct;
-            target.SpecBuffBonusCategory[(int)eProperty.Resist_Energy] += mult * _secResPct;
+            target.OtherBuffBonus[(int)eProperty.Resist_Heat] += mult * _secResPct;
+            target.OtherBuffBonus[(int)eProperty.Resist_Cold] += mult * _secResPct;
+            target.OtherBuffBonus[(int)eProperty.Resist_Matter] += mult * _secResPct;
+            target.OtherBuffBonus[(int)eProperty.Resist_Body] += mult * _secResPct;
+            target.OtherBuffBonus[(int)eProperty.Resist_Spirit] += mult * _secResPct;
+            target.OtherBuffBonus[(int)eProperty.Resist_Energy] += mult * _secResPct;
 
             // Spirit Bonus:
             target.BaseBuffBonusCategory[(int)eProperty.StealthDetectionBonus] += mult * _stealthDet;

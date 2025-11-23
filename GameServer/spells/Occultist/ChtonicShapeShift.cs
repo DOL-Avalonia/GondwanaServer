@@ -125,12 +125,12 @@ namespace DOL.GS.Spells
 
             if (m_resBonus != 0)
             {
-                owner.SpecBuffBonusCategory[(int)eProperty.Resist_Heat] += mult * m_resBonus;
-                owner.SpecBuffBonusCategory[(int)eProperty.Resist_Cold] += mult * m_resBonus;
-                owner.SpecBuffBonusCategory[(int)eProperty.Resist_Matter] += mult * m_resBonus;
-                owner.SpecBuffBonusCategory[(int)eProperty.Resist_Body] += mult * m_resBonus;
-                owner.SpecBuffBonusCategory[(int)eProperty.Resist_Spirit] += mult * m_resBonus;
-                owner.SpecBuffBonusCategory[(int)eProperty.Resist_Energy] += mult * m_resBonus;
+                owner.OtherBuffBonus[(int)eProperty.Resist_Heat] += mult * m_resBonus;
+                owner.OtherBuffBonus[(int)eProperty.Resist_Cold] += mult * m_resBonus;
+                owner.OtherBuffBonus[(int)eProperty.Resist_Matter] += mult * m_resBonus;
+                owner.OtherBuffBonus[(int)eProperty.Resist_Body] += mult * m_resBonus;
+                owner.OtherBuffBonus[(int)eProperty.Resist_Spirit] += mult * m_resBonus;
+                owner.OtherBuffBonus[(int)eProperty.Resist_Energy] += mult * m_resBonus;
             }
 
             if (owner is GamePlayer player)

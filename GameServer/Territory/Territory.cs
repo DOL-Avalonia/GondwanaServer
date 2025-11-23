@@ -519,24 +519,23 @@ namespace DOL.Territories
 
         private void ChangeMagicAndPhysicalResistance(GameNPC mob, int value)
         {
-            eProperty Property1 = eProperty.Resist_Heat;
-            eProperty Property2 = eProperty.Resist_Cold;
-            eProperty Property3 = eProperty.Resist_Matter;
-            eProperty Property4 = eProperty.Resist_Body;
-            eProperty Property5 = eProperty.Resist_Spirit;
-            eProperty Property6 = eProperty.Resist_Energy;
-            eProperty Property7 = eProperty.Resist_Crush;
-            eProperty Property8 = eProperty.Resist_Slash;
-            eProperty Property9 = eProperty.Resist_Thrust;
-            ApplyBonus(mob, Property1, value);
-            ApplyBonus(mob, Property2, value);
-            ApplyBonus(mob, Property3, value);
-            ApplyBonus(mob, Property4, value);
-            ApplyBonus(mob, Property5, value);
-            ApplyBonus(mob, Property6, value);
-            ApplyBonus(mob, Property7, value);
-            ApplyBonus(mob, Property8, value);
-            ApplyBonus(mob, Property9, value);
+            eProperty[] properties =
+            [
+                eProperty.Resist_Heat,
+                eProperty.Resist_Cold,
+                eProperty.Resist_Matter,
+                eProperty.Resist_Body,
+                eProperty.Resist_Spirit,
+                eProperty.Resist_Energy,
+                eProperty.Resist_Crush,
+                eProperty.Resist_Slash,
+                eProperty.Resist_Thrust
+            ];
+
+            foreach (var prop in properties)
+            {
+                ApplyBonus(mob, prop, value);
+            }
         }
 
         /// <summary>
