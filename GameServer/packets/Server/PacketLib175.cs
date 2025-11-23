@@ -302,6 +302,10 @@ namespace DOL.GS.PacketHandler
             var buffs = new int[updateResists.Length];
             var secondary = new int[updateResists.Length];
             var player = m_gameClient.Player;
+            var secMagicAbs = player.OtherBuffBonus[eProperty.MagicAbsorption];
+            var primMagicAbs = player.GetModifiedBase(eProperty.MagicAbsorption);
+            var itemMagicAbs = player.ItemBonus[eProperty.MagicAbsorption];
+            var buffMagicAbs = primMagicAbs - itemMagicAbs;
             
             foreach (var (stat, i) in updateResists.Select((stat, i) => (stat, i)))
             {
@@ -310,9 +314,7 @@ namespace DOL.GS.PacketHandler
                 racial[i] = SkillBase.GetRaceResist(player.Race, stat, player);
                 caps[i] = ResistCalculator.GetItemBonusCap(player, prop);
                 items[i] = player.ItemBonus[(int)prop];
-                secondary[i] = player.SpecBuffBonusCategory[(int)prop]
-                    + player.AbilityBonus[(int)prop]
-                    - player.SpecDebuffCategory[(int)prop];
+                secondary[i] = player.OtherBuffBonus[(int)prop];
                 buffs[i] = (total - (racial[i] + items[i]));
                 switch (prop)
                 {
@@ -323,11 +325,9 @@ namespace DOL.GS.PacketHandler
                     case eProperty.Resist_Matter:
                     case eProperty.Resist_Natural:
                     case eProperty.Resist_Spirit:
-                        var abMagicAbs = player.AbilityBonus[eProperty.MagicAbsorption];
-                        var specMagicAbs = player.SpecBuffBonusCategory[eProperty.MagicAbsorption]
-                            - player.DebuffCategory[eProperty.MagicAbsorption]
-                            - player.SpecDebuffCategory[eProperty.MagicAbsorption];
-                        secondary[i] += abMagicAbs + specMagicAbs;
+                        items[i] += itemMagicAbs;
+                        buffs[i] += buffMagicAbs;
+                        secondary[i] += secMagicAbs;
                         break;
                 }
                 //secondary[i] = Math.Clamp(secondary[i], 0, 0xFF); // We send as unsigned byte, so cap it to 0 to not wrap around to high values
