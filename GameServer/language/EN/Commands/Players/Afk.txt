@@ -1,4 +1,4 @@
-Commands.Players.Afk.Description:			Toggles your status to AFK. It is possible to display a message.
+Commands.Players.Afk.Description:			Toggles your status to AFK. It is possible to display a message. "/afk xp", "/afk combat" or "/afk attack" commands allows you to fight training dummies while keeping the "AFK" status activated.
 Commands.Players.Afk.Off:					You are no longer considered to be AFK.
 Commands.Players.Afk.On:					You are now considered as AFK.
 Commands.Players.Afk.Usage:					Usage : '/afk <text>'
@@ -17,3 +17,7 @@ Commands.Players.Afk.CannotWhileMezzed:		You can't be AFK while while you're mez
 Commands.Players.Afk.CannotWhileDamned:		You can't be AFK while while you're damned.
 Commands.Players.Afk.CannotWhileCrafting:	You can't be AFK while while you're crafting!
 Commands.Players.Afk.CannotWhilekMorphed:	You can't be AFK while you're under a "{0}" enchantment!
+Commands.Players.AfkAttack.On:				You are now AFK training.
+Commands.Players.AfkAttack.Off:				You interrupt your AFK training.
+Commands.Players.AfkAttack.NeedDummyTarget:	You have to select a training dummy!
+Commands.Players.AfkAttack.NeedDummyRange:	You are too far from your target to start your training!

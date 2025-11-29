@@ -20,6 +20,7 @@ using static DOL.GS.GameNPC;
 using static DOL.GS.Quests.DataQuestJsonGoal;
 using DOL.Territories;
 using DOL.Language;
+using System.Text.RegularExpressions;
 using System.Numerics;
 
 namespace DOL.GS.Scripts
@@ -40,10 +41,11 @@ namespace DOL.GS.Scripts
 
     public sealed class TextNPCPolicy
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private long _lastPhrase;
         private readonly GameNPC _body;
+        private readonly Dictionary<string, Dictionary<string, string>> _playerResponseKeyMappings = new Dictionary<string, Dictionary<string, string>>();
 
         public readonly Dictionary<string, DBEchangeur> EchangeurDB = new Dictionary<string, DBEchangeur>();
         public Dictionary<string, string> QuestTexts { get; private set; }
@@ -111,6 +113,125 @@ namespace DOL.GS.Scripts
             SaveIntoDatabase();
         }
 
+        private string TranslateNpcText(GamePlayer player, string originalText)
+        {
+            if (player == null || string.IsNullOrWhiteSpace(originalText))
+                return originalText;
+
+            if (!player.AutoTranslateEnabled || !GS.ServerProperties.Properties.AUTOTRANSLATE_ENABLE)
+                return originalText;
+
+            string serverLang = LanguageMgr.DefaultLanguage; // FR on your server
+            string playerLang = player.Client?.Account?.Language ?? serverLang;
+
+            if (string.Equals(serverLang, playerLang, StringComparison.OrdinalIgnoreCase))
+                return originalText;
+
+            // Prepare / reset mapping for this player.
+            if (!_playerResponseKeyMappings.TryGetValue(player.InternalID, out var keyMap))
+            {
+                keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                _playerResponseKeyMappings[player.InternalID] = keyMap;
+            }
+
+            var regex = new Regex(@"\[(.+?)\]", RegexOptions.Compiled);
+            int index = 0;
+
+            // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
+            const string placeholderPrefix = "§§";
+            const string placeholderSuffix = "§§";
+
+            var placeholderToBracket = new Dictionary<string, string>();
+
+            string placeholderText = regex.Replace(originalText, match =>
+            {
+                string originalKey = match.Groups[1].Value.Trim();
+
+                // §§0§§, §§1§§, etc.
+                string placeholder = $"{placeholderPrefix}{index++}{placeholderSuffix}";
+
+                bool isResponseKey =
+                    (Reponses != null && Reponses.ContainsKey(originalKey)) ||
+                    (QuestReponses != null && QuestReponses.ContainsKey(originalKey)) ||
+                    (StartEventResponses != null && StartEventResponses.ContainsKey(originalKey)) ||
+                    (StopEventResponses != null && StopEventResponses.ContainsKey(originalKey));
+
+                string translatedKey = originalKey;
+
+                if (isResponseKey)
+                {
+                    try
+                    {
+                        var singleTranslated = ExternalTranslator.Translate(originalKey, serverLang, playerLang);
+                        if (!string.IsNullOrWhiteSpace(singleTranslated))
+                            translatedKey = singleTranslated;
+                    }
+                    catch
+                    {
+                        translatedKey = originalKey;
+                    }
+
+                    // Save mapping translatedKey -> originalKey so whispers work.
+                    keyMap[translatedKey] = originalKey;
+                }
+
+                placeholderToBracket[placeholder] = "[" + translatedKey + "]";
+                return placeholder;
+            });
+
+            // 2) Translate the full text with placeholders so Google sees full context
+            string translatedFull;
+            try
+            {
+                translatedFull = ExternalTranslator.Translate(placeholderText, serverLang, playerLang);
+            }
+            catch
+            {
+                return originalText;
+            }
+
+            if (string.IsNullOrWhiteSpace(translatedFull))
+                return originalText;
+
+            // 3) Replace placeholders with the final [translatedKey] texts
+            foreach (var kvp in placeholderToBracket)
+            {
+                translatedFull = translatedFull.Replace(kvp.Key, kvp.Value);
+            }
+
+            if (translatedFull.Contains(placeholderPrefix))
+            {
+                return originalText;
+            }
+
+            return translatedFull;
+        }
+
+        private string ResolveResponseKey(GamePlayer player, string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                return key;
+
+            if ((Reponses != null && Reponses.ContainsKey(key)) ||
+                (QuestReponses != null && QuestReponses.ContainsKey(key)) ||
+                (StartEventResponses != null && StartEventResponses.ContainsKey(key)) ||
+                (StopEventResponses != null && StopEventResponses.ContainsKey(key)))
+            {
+                return key;
+            }
+
+            if (player == null)
+                return key;
+
+            if (_playerResponseKeyMappings.TryGetValue(player.InternalID, out var keyMap))
+            {
+                if (keyMap.TryGetValue(key, out var originalKey))
+                    return originalKey;
+            }
+
+            return key;
+        }
+
         public void TurnTo(GameLiving living)
         {
             _body.TurnTo(living, 10000);
@@ -129,17 +250,27 @@ namespace DOL.GS.Scripts
             //Message
             if (CheckQuestDialog(player) && QuestReponseKey != null)
             {
-                //get text from QuestTexts specific to current QuestReponseKey
-                string text = QuestTexts.ContainsKey(QuestReponses[QuestReponseKey]) ? QuestTexts[QuestReponses[QuestReponseKey]] : "";
+                string text = QuestTexts.ContainsKey(QuestReponses[QuestReponseKey])
+                    ? QuestTexts[QuestReponses[QuestReponseKey]]
+                    : "";
+
                 text = string.Format(text, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+
                 if (!string.IsNullOrEmpty(text))
+                {
+                    text = TranslateNpcText(player, text);
                     player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
             }
             else if (!string.IsNullOrEmpty(Interact_Text))
             {
                 string text = string.Format(Interact_Text, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+
                 if (!string.IsNullOrEmpty(text))
+                {
+                    text = TranslateNpcText(player, text);
                     player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
             }
 
             //Spell
@@ -172,18 +303,23 @@ namespace DOL.GS.Scripts
             if (!WillTalkTo(player))
                 return false;
 
+            string normalizedKey = ResolveResponseKey(player, str);
+
             //Message
-            if (Reponses != null && Reponses.ContainsKey(str))
+            if (Reponses != null && Reponses.ContainsKey(normalizedKey))
             {
-                string text = string.Format(Reponses[str], player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
-                if (text != "")
+                string text = string.Format(Reponses[normalizedKey], player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                if (!string.IsNullOrEmpty(text))
+                {
+                    text = TranslateNpcText(player, text);
                     player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
             }
 
             //Spell
-            if (SpellReponses?.TryGetValue(str, out var spellId) == true)
+            if (SpellReponses?.TryGetValue(normalizedKey, out var spellId) == true)
             {
-                if (SpellReponsesCast.TryGetValue(str, out bool castSpell) && castSpell)
+                if (SpellReponsesCast.TryGetValue(normalizedKey, out bool castSpell) && castSpell)
                 {
                     //cast spell on player
                     SpellLine spellLine = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
@@ -198,41 +334,46 @@ namespace DOL.GS.Scripts
                 else
                 {
                     foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                        plr.Out.SendSpellEffectAnimation(_body, player, SpellReponses[str], 0, false, 1);
+                        plr.Out.SendSpellEffectAnimation(_body, player, SpellReponses[normalizedKey], 0, false, 1);
                 }
             }
 
             //Quest
-            if (QuestReponses != null && QuestReponseKey != null && QuestReponseKey.LastIndexOf('-') != -1 && QuestReponses.ContainsKey(QuestReponseKey.Remove(QuestReponseKey.LastIndexOf('-')) + "-" + str))
+            if (QuestReponses != null && QuestReponseKey != null && QuestReponseKey.LastIndexOf('-') != -1)
             {
                 string questStr = QuestReponseKey.Remove(QuestReponseKey.LastIndexOf('-'));
-                HandleQuestInteraction(player, questStr + "-" + str);
-                //Trigger
-                if (ResponseTrigger != null && ResponseTrigger.Contains(questStr + "-" + str))
-                    _body.FireAllResponseTriggers(eAmbientTrigger.interact, player, questStr + "-" + str);
+                string compositeKey = questStr + "-" + normalizedKey;
+
+                if (QuestReponses.ContainsKey(compositeKey))
+                {
+                    HandleQuestInteraction(player, compositeKey);
+                    //Trigger
+                    if (ResponseTrigger != null && ResponseTrigger.Contains(compositeKey))
+                        _body.FireAllResponseTriggers(eAmbientTrigger.interact, player, compositeKey);
+                }
             }
-            else if (QuestReponses != null && QuestReponses.ContainsKey(str))
+            else if (QuestReponses != null && QuestReponses.ContainsKey(normalizedKey))
             {
-                HandleQuestInteraction(player, str);
+                HandleQuestInteraction(player, normalizedKey);
                 //Trigger
-                if (ResponseTrigger != null && ResponseTrigger.Contains(QuestReponses[str] + "-" + str))
-                    _body.FireAllResponseTriggers(eAmbientTrigger.interact, player, QuestReponses[str] + "-" + str);
+                if (ResponseTrigger != null && ResponseTrigger.Contains(QuestReponses[normalizedKey] + "-" + normalizedKey))
+                    _body.FireAllResponseTriggers(eAmbientTrigger.interact, player, QuestReponses[normalizedKey] + "-" + normalizedKey);
             }
 
             //Emote
-            if (EmoteReponses != null && EmoteReponses.ContainsKey(str))
+            if (EmoteReponses != null && EmoteReponses.ContainsKey(normalizedKey))
                 foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                    plr.Out.SendEmoteAnimation(_body, EmoteReponses[str]);
+                    plr.Out.SendEmoteAnimation(_body, EmoteReponses[normalizedKey]);
 
             //Trigger
-            if (ResponseTrigger != null && ResponseTrigger.Contains(str))
-                _body.FireAllResponseTriggers(eAmbientTrigger.interact, player, str);
+            if (ResponseTrigger != null && ResponseTrigger.Contains(normalizedKey))
+                _body.FireAllResponseTriggers(eAmbientTrigger.interact, player, normalizedKey);
 
             //Give Item
-            if (GiveItem != null && GiveItem.ContainsKey(str))
+            if (GiveItem != null && GiveItem.ContainsKey(normalizedKey))
             {
                 //Get item from db
-                ItemTemplate item = GameServer.Database.FindObjectByKey<ItemTemplate>(GiveItem[str]);
+                ItemTemplate item = GameServer.Database.FindObjectByKey<ItemTemplate>(GiveItem[normalizedKey]);
                 if (item != null)
                 {
                     InventoryItem playerItem = player.Inventory.GetFirstItemByName(item.Name, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
@@ -246,7 +387,7 @@ namespace DOL.GS.Scripts
 
             string eventId;
             //Stop Event
-            if (StopEventResponses != null && StopEventResponses.TryGetValue(str, out eventId))
+            if (StopEventResponses != null && StopEventResponses.TryGetValue(normalizedKey, out eventId))
             {
                 var ev = GameEventManager.Instance.GetEventByID(eventId);
 
@@ -262,7 +403,7 @@ namespace DOL.GS.Scripts
                 }
             }
             //Start Event
-            if (StartEventResponses != null && StartEventResponses.TryGetValue(str, out eventId))
+            if (StartEventResponses != null && StartEventResponses.TryGetValue(normalizedKey, out eventId))
             {
                 var ev = GameEventManager.Instance.GetEventByID(eventId);
 
@@ -316,7 +457,7 @@ namespace DOL.GS.Scripts
                         {
                             var jGoal = currentGoal as GenericDataQuestGoal;
                             var goalState = currentQuest.GoalStates.Find(gs => gs.GoalId == goalId);
-                            jGoal.Goal.AdvanceGoal(currentQuest, goalState);
+                            jGoal!.Goal.AdvanceGoal(currentQuest, goalState);
                         }
                     }
                 }
@@ -330,13 +471,13 @@ namespace DOL.GS.Scripts
                         if (currentGoal != null)
                         {
                             var jGoal = currentGoal as GenericDataQuestGoal;
-                            jGoal.Goal.ForceStartGoal(currentQuest);
+                            jGoal!.Goal.ForceStartGoal(currentQuest);
                         }
                     }
                 }
             }
         }
-        
+
         public bool CheckQuestDialog(GamePlayer player)
         {
             QuestReponseKey = null;
@@ -822,8 +963,14 @@ namespace DOL.GS.Scripts
             else if (text.StartsWith("yell:"))
                 _body.Yell(text.Substring(5));
             else if (text.StartsWith("em:"))
+            {
+                string baseMsg = _body.Name + " " + text.Substring(3);
                 foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.YELL_DISTANCE))
-                    plr.Out.SendMessage(_body.Name + " " + text.Substring(3), eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                {
+                    string localized = AutoTranslateManager.MaybeTranslateServerText(plr, baseMsg);
+                    plr.Out.SendMessage(localized, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                }
+            }
 
             //Emote
             if (emote != 0)

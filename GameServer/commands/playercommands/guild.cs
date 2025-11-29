@@ -1151,7 +1151,7 @@ namespace DOL.GS.Commands
                             }
                             else
                             {
-                                if (client.Player.Guild.MeritPoints > bannerPrice)
+                                if (client.Player.Guild!.MeritPoints > bannerPrice)
                                 {
                                     client.Out.SendCustomDialog(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.Banner.BuyPrice", bannerPrice), ConfirmBannerBuy);
                                     client.Player.TempProperties.setProperty(GUILD_BANNER_PRICE, bannerPrice);
@@ -1732,7 +1732,7 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.NoPrivileges"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            foreach (DBRank rank in client.Player.Guild.Ranks)
+                            foreach (DBRank rank in client.Player.Guild!.Ranks)
                             {
                                 client.Out.SendMessage("RANK: " + rank.RankLevel.ToString() + " NAME: " + rank.Title, eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage("AcHear: " + (rank.AcHear ? "y" : "n") + " AcSpeak: " + (rank.AcSpeak ? "y" : "n"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
@@ -1755,7 +1755,7 @@ namespace DOL.GS.Commands
                                 return;
                             }
                             client.Player.Guild?.UpdateGuildWindow();
-                            if (!client.Player.Guild.HasRank(client.Player, Guild.eRank.Leader))
+                            if (!client.Player.Guild!.HasRank(client.Player, Guild.eRank.Leader))
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.NoPrivileges"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
@@ -1776,7 +1776,7 @@ namespace DOL.GS.Commands
                                 return;
                             }
                             client.Player.Guild?.UpdateGuildWindow();
-                            if (!client.Player.Guild.HasRank(client.Player, Guild.eRank.Leader))
+                            if (!client.Player.Guild!.HasRank(client.Player, Guild.eRank.Leader))
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.NoPrivileges"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
@@ -4398,7 +4398,7 @@ namespace DOL.GS.Commands
                         return 0;
                     }
             } //switch
-            DBRank rank = client.Player.Guild.GetRankByID(number);
+            DBRank rank = client.Player.Guild!.GetRankByID(number);
             if (rank != null)
                 GameServer.Database.SaveObject(rank);
             return 1;

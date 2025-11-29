@@ -71,11 +71,11 @@ namespace DOL.GS.Commands
             foreach (GameClient playerClient in WorldMgr.GetAllClients())
             {
                 if (playerClient.Player == null) continue;
-                if ((playerClient.Player.Advisor &&
-                    playerClient.Player.Realm == client.Player.Realm) ||
-                    playerClient.Account.PrivLevel > 1)
-                    playerClient.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Advice.Advice", getRealmString(client.Player.Realm), client.Player.Name, msg), eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
-
+                if ((playerClient.Player.Advisor && playerClient.Player.Realm == client.Player.Realm) || playerClient.Account.PrivLevel > 1)
+                {
+                    string toSend = AutoTranslateManager.MaybeTranslate(client.Player, playerClient.Player, msg);
+                    playerClient.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Advice.Advice", getRealmString(client.Player.Realm), client.Player.Name, toSend), eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
+                }
             }
         }
 

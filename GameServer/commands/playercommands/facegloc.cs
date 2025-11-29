@@ -34,8 +34,8 @@ namespace DOL.GS.Commands
     [CmdAttribute(
         "&facegloc",
         ePrivLevel.Player,
-        "Commands.Players.Facgloc.Description",
-        "Commands.Players.Facgloc.Usage")]
+        "Commands.Players.Facegloc.Description",
+        "Commands.Players.Facegloc.Usage")]
     public class GLocFaceCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)

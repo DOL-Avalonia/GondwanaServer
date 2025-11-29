@@ -55,7 +55,7 @@ Commands.Players.Battlegroup.BattlegroupTreasurerIsYou:      You have been appoi
 Commands.Players.Battlegroup.BattlegroupTreasurerIs:         Your battle group treasurer has been set to {0}.
 
 
-Commands.Players.Battelgroup.CommandNotImplemented:			This command is not implemented.
+Commands.Players.Battlegroup.CommandNotImplemented:			This command is not implemented.
 Commands.Players.Battlechat.ChatName:						[BattleGroup Chat]
 Commands.Players.Battlechat.Description:					Battlegroup Chat Commands:
 Commands.Players.Battlechat.Usage:							Usage: '/bc <text>' # Send a message to your battlegroup.

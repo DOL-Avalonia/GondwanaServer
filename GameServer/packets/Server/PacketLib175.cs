@@ -33,7 +33,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.75 clients
@@ -311,9 +311,10 @@ namespace DOL.GS.PacketHandler
             {
                 var prop = (eProperty)stat;
                 var total = player.GetModifiedBase(prop);
+                var rawItemBonus = player.ItemBonus[(int)prop];
                 racial[i] = SkillBase.GetRaceResist(player.Race, stat, player);
                 caps[i] = ResistCalculator.GetItemBonusCap(player, prop);
-                items[i] = player.ItemBonus[(int)prop];
+                items[i] = Math.Min(rawItemBonus, caps[i]);
                 secondary[i] = player.OtherBuffBonus[(int)prop];
                 buffs[i] = (total - (racial[i] + items[i]));
                 switch (prop)

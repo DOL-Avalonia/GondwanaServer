@@ -1,19 +1,22 @@
-Commands.Players.Market.Description:	Spawns a Temporary Market.
-Commands.Players.Market.Usage:		Usage : '/market <command>'
-Commands.Players.Market.Usage.Open:		Usage : '/market open' # Opens the market
-Commands.Players.Market.Usage.Close:		Usage : '/market close' # Closes the market
-Commands.Players.Market.Usage.Name:		Usage : '/market name' # Renames the market
-Commands.Players.Market.No.Ability:		You don't have the required "Trading" ability to use this command
-Commands.Players.Market.No.SafeArea:		You have to be in a Safe Area or inside a City to set up your market.
-Commands.Players.Market.Confirm.Open:		Would you like do set up your market here?
-Commands.Players.Market.Confirm.Close:		Would you like to close your market now?
-Commands.Players.Market.Closed:		        You're too far! Your market has been closed.
-Commands.Players.Market.Cant.DeployHere:	You cannot set up your market in this zone!
-Commands.Players.Market.Already.Deployed:	Your market has already been deployed!
-Commands.Players.Market.Cant.DeployDungeon:	You cannot set up your market in dungeons!
-Commands.Players.Market.Cant.DeployJailed:	You cannot set up your market while imprisoned!
-Commands.Players.Market.Cant.DeployMounted:	You cannot set up your market while mounted on a horse!
-Commands.Players.Market.Cant.DeployCombat:	You cannot set up your market while in combat!
-Commands.Players.Market.Cant.DeployDamned:	You cannot set up your market while damned!
-Commands.Players.Market.Cant.DeployPetrify:	You cannot set up your market while petrified!
-Commands.Players.Market.Cant.DeployMorphed:	You cannot set up your market while under the "{0}" enchantment!
+Commands.Players.Market.Description:			Spawns a Temporary Market.
+Commands.Players.Market.Usage:					Usage : '/market <command>'
+Commands.Players.Market.Usage.Open:				Usage : '/market open' # Opens the market
+Commands.Players.Market.Usage.Close:			Usage : '/market close' # Closes the market
+Commands.Players.Market.Usage.Name:				Usage : '/market name' # Renames the market
+Commands.Players.Market.No.Ability:				You don't have the required "Trading" ability to use this command
+Commands.Players.Market.No.SafeArea:			You have to be in a Safe Area or inside a City to set up your market.
+Commands.Players.Market.Confirm.Open:			Would you like do set up your market here?
+Commands.Players.Market.Confirm.Close:			Would you like to close your market now?
+Commands.Players.Market.Closed:					You're too far! Your market has been closed.
+Commands.Players.Market.Cant.DeployHere:		You cannot set up your market in this zone!
+Commands.Players.Market.Already.Deployed:		Your market has already been deployed!
+Commands.Players.Market.Cant.DeployDungeon:		You cannot set up your market in dungeons!
+Commands.Players.Market.Cant.DeployJailed:		You cannot set up your market while imprisoned!
+Commands.Players.Market.Cant.DeployMounted:		You cannot set up your market while mounted on a horse!
+Commands.Players.Market.Cant.DeployCombat:		You cannot set up your market while in combat!
+Commands.Players.Market.Cant.DeployDamned:		You cannot set up your market while damned!
+Commands.Players.Market.Cant.DeployPetrify:		You cannot set up your market while petrified!
+Commands.Players.Market.Cant.DeployMorphed:		You cannot set up your market while under the "{0}" enchantment!
+Commands.Players.Market.Cant.DeployCrafting:	You cannot set up your market while you're crafting!
+Commands.Players.Market.Cant.DeployAFK:			You cannot set up your market while you're AFK!
+Commands.Players.Market.Cant.DeployClimbing:	You cannot set up your market while climbing!

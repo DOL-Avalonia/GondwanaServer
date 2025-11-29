@@ -55,9 +55,9 @@ Commands.Players.Battlegroup.BattlegroupTreasurerIsYou:      Vous avez été dé
 Commands.Players.Battlegroup.BattlegroupTreasurerIs:         Le trésorier de votre groupe de combat a été défini à {0}
 
 
-Commands.Players.Battelgroup.CommandNotImplemented:			Cette commande n'est pas implémentée.
+Commands.Players.Battlegroup.CommandNotImplemented:			Cette commande n'est pas implémentée.
 Commands.Players.Battlechat.ChatName:						[BattleGroup Chat]
-Commands.Players.Battlechat.Description:					Commande de discussion des groupes de combats.
+Commands.Players.Battlechat.Description:					Commande du canal de discussion des groupes de combats.
 Commands.Players.Battlechat.Usage:							Usage: '/bc <text>' # Envoie un message à votre groupe de combat.
 Commands.Players.Battlegroup.AlreadyInBattlegroup:			Vous êtes déjà dans un groupe de combat.
 Commands.Players.Battlegroup.BattlegroupCount:				Il y a actuellement {0} membres dans votre groupe de combat.
@@ -71,7 +71,7 @@ Commands.Players.Battlegroup.BattlegroupTreasurerIsYou:		Vous avez été désign
 Commands.Players.Battlegroup.BattlegroupTreasurerOff:		Le groupe de bataille n'a actuellement plus de trésorier.
 Commands.Players.Battlegroup.BattlegroupTreasurerOn:		Vous avez changé le trésorier du groupe de combat à : {0}.
 Commands.Players.Battlegroup.CurrentlyInBattleGroup:		Joueur participant à ce groupe de combat :
-Commands.Players.Battlegroup.Description:					Commands de gestion des groupes de combats.
+Commands.Players.Battlegroup.Description:					Commandes de gestion des groupes de combats.
 Commands.Players.Battlegroup.Help.Count:					'/bg count' # Compte le nombre de membres dans le groupe de combat.
 Commands.Players.Battlegroup.Help.Credit:					'/bg credit' # Liste les rencontres de type MasterLevel rencontrées par votre groupe de combat ces 10 dernières minutes.
 Commands.Players.Battlegroup.Help.GrantCredit:				'/bg grantcredit <masterlevel> <nom du joueur>' # Permet au chef du groupe de combat d'accorder des credits au pour les MasterLevel terminés.

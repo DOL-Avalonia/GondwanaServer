@@ -9,25 +9,18 @@ ServerRules.AmtenaelRules.PvpImmuneConnecting:						{0} est en train de se conne
 ServerRules.AmtenaelRules.PvpAttackerImmune:						Vous ne pouvez pas attaquer d'autres joueurs tant que votre invulnérabilité PvP est active !
 ServerRules.AmtenaelRules.PvpDefenderImmune:						{0} est temporairement immunisé(e) contre les attaques PvP !
 ServerRules.AmtenaelRules.TargetHostile:							Cette cible est hostile.
-ServerRules.AmtenaelRules.CannotAttackSelf:							Vous ne pouvez pas vous attaquer vous-même.
 ServerRules.AmtenaelRules.PveAttackerImmune:						Vous ne pouvez pas attaquer de monstres tant que votre invulnérabilité PvE est active !
-ServerRules.AmtenaelRules.CannotAttackShadowedNecro:				Vous ne pouvez pas attaquer un nécromancien sous forme d'Ombre !
 ServerRules.AmtenaelRules.AttackerIsPrisoner:						Vous ne pouvez pas attaquer lorsque vous êtes en prison.
 ServerRules.AmtenaelRules.DefenderIsPrisoner:						Vous ne pouvez pas attaquer un prisonnier.
-ServerRules.AmtenaelRules.SafeAreaAttackForbidden:					Vous ne pouvez pas attaquer quelqu'un dans une zone sécurisée !
-ServerRules.AmtenaelRules.CannotAttackGroupMember:					Vous ne pouvez pas attaquer un membre de votre groupe.
-ServerRules.AmtenaelRules.CannotAttackGuildMember:					Vous ne pouvez pas attaquer un membre de votre guilde.
-ServerRules.AmtenaelRules.CannotAttackBattlegroupMember:			Vous ne pouvez pas attaquer un membre de votre groupe de combat.
 ServerRules.AmtenaelRules.CannotAttackFriendlyNPC:					Vous ne pouvez pas attaquer un PNJ amical.
 ServerRules.AmtenaelRules.DebugRewardsEnabled:						Les récompenses sont activées car le serveur est en mode DEBUG.
-ServerRules.AmtenaelRules.ReceiveMoney:								Vous recevez {0}
 
 # /PvPServerRules
 ServerRules.PvPServerRules.InvTimerExpFlagON:						Votre timer d'invulnérabilité temporaire a expiré, mais votre indicateur "/safety" est toujours activé.
 ServerRules.PvPServerRules.InvTimerExp:								Votre timer d'invulnérabilité temporaire a expiré.
 ServerRules.PvPServerRules.AttackSelf:								Vous ne pouvez pas vous attaquer vous-même !
-ServerRules.PvPServerRules.AttackGroupMember:						Vous ne pouvez pas attaquer les membres de votre groupe.
-ServerRules.PvPServerRules.AttackGuildMember:						Vous ne pouvez pas attaquer les membres de votre guilde.
+ServerRules.PvPServerRules.AttackGroupMember:						Vous ne pouvez pas attaquer un membre de votre groupe.
+ServerRules.PvPServerRules.AttackGuildMember:						Vous ne pouvez pas attaquer un membre de votre guilde.
 ServerRules.PvPServerRules.AttackBattleGroupMember:					Vous ne pouvez pas attaquer un membre de votre groupe de combat.
 ServerRules.PvPServerRules.SafeZoneNoAttack:						Vous êtes dans une zone sécurisée : vous ne pouvez pas attaquer d'autres joueurs ici.
 ServerRules.PvPServerRules.SafetyFlagOnSelf:						Votre indicateur de sécurité PvP est activé.

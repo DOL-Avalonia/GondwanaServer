@@ -9,18 +9,11 @@ ServerRules.AmtenaelRules.PvpImmuneConnecting:						{0} is connecting; you can't
 ServerRules.AmtenaelRules.PvpAttackerImmune:						You can't attack players until your PvP invulnerability timer wears off!
 ServerRules.AmtenaelRules.PvpDefenderImmune:						{0} is temporarily immune to PvP attacks!
 ServerRules.AmtenaelRules.TargetHostile:							This target is hostile.
-ServerRules.AmtenaelRules.CannotAttackSelf:							You cannot attack yourself.
 ServerRules.AmtenaelRules.PveAttackerImmune:						You can't attack mobs until your PvE invulnerability timer wears off!
-ServerRules.AmtenaelRules.CannotAttackShadowedNecro:				You can't attack a shadowed necromancer!
 ServerRules.AmtenaelRules.AttackerIsPrisoner:						You cannot attack while you are in prison.
 ServerRules.AmtenaelRules.DefenderIsPrisoner:						You cannot attack a prisoner.
-ServerRules.AmtenaelRules.SafeAreaAttackForbidden:					You cannot attack someone in a safe area!
-ServerRules.AmtenaelRules.CannotAttackGroupMember:					You cannot attack a member of your group.
-ServerRules.AmtenaelRules.CannotAttackGuildMember:					You cannot attack a member of your guild.
-ServerRules.AmtenaelRules.CannotAttackBattlegroupMember:			You cannot attack a member of your battlegroup.
 ServerRules.AmtenaelRules.CannotAttackFriendlyNPC:					You cannot attack a friendly NPC.
 ServerRules.AmtenaelRules.DebugRewardsEnabled:						Rewards are enabled because the server is in DEBUG mode.
-ServerRules.AmtenaelRules.ReceiveMoney:								You receive {0}
 
 # /PvPServerRules
 ServerRules.PvPServerRules.InvTimerExpFlagON:						Your temporary invulnerability timer has expired, but your /safety flag is still on.
@@ -55,7 +48,7 @@ ServerRules.AbstractServerRules.PvpDefenderEntering:				{0} is entering the game
 ServerRules.AbstractServerRules.PvpAttackerImmune:					You can't attack players until your PvP invulnerability timer wears off!
 ServerRules.AbstractServerRules.PvpDefenderImmuneName:				{0} is temporarily immune to PvP attacks!
 ServerRules.AbstractServerRules.PvpAttackerImmuneAny:				You can't attack until your PvP invulnerability timer wears off!
-ServerRules.AbstractServerRules.SafeAreaAttackForbidden:			You can't attack someone in a safe area!
+ServerRules.AbstractServerRules.CantAttackInSafeArea:			You can't attack someone in a safe area!
 ServerRules.AbstractServerRules.CannotAttackShadowedNecro:			You can't attack a shadowed necromancer!
 ServerRules.AbstractServerRules.NpcNoXPCharmed:						This monster has been charmed recently and is worth no experience.
 ServerRules.AbstractServerRules.DebugRewardsEnabled:				Rewards are enabled because the server is in DEBUG mode.

@@ -46,14 +46,20 @@ namespace DOL.GS.Commands
             if (message == "")
                 return;
 
-            switch (args.GetValue(1).ToString().ToLower())
+            switch (args.GetValue(1)!.ToString()!.ToLower())
             {
                 #region Log
                 case "log":
                     {
-                        foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
-                            if (clients != null)
-                                clients.Out.SendMessage(LanguageMgr.GetTranslation(clients, "Commands.GM.Announce.LogAnnounce", message), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        {
+                            if (target == null || target.Player == null)
+                                continue;
+
+                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
+                            target.Out.SendMessage(LanguageMgr.GetTranslation(target, "Commands.GM.Announce.LogAnnounce", toSend), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+
                         break;
                     }
                 #endregion Log
@@ -63,36 +69,61 @@ namespace DOL.GS.Commands
                         var messages = new List<string>();
                         messages.Add(message);
 
-                        foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
-                            if (clients != null)
-                                clients.Player.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(clients, "Commands.GM.Announce.WindowAnnounce", client.Player.Name), messages);
+                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        {
+                            if (target == null || target.Player == null)
+                                continue;
+
+                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
+                            var msgs = new List<string> { toSend };
+
+                            target.Player.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(target, "Commands.GM.Announce.WindowAnnounce", client.Player.Name), msgs);
+                        }
+
                         break;
                     }
                 #endregion Window
                 #region Send
                 case "send":
                     {
-                        foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
-                            if (clients != null)
-                                clients.Out.SendMessage(LanguageMgr.GetTranslation(clients, "Commands.GM.Announce.SendAnnounce", message), eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        {
+                            if (target == null || target.Player == null)
+                                continue;
+
+                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
+                            target.Out.SendMessage(LanguageMgr.GetTranslation(target, "Commands.GM.Announce.SendAnnounce", toSend), eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                        }
+
                         break;
                     }
                 #endregion Send
                 #region Center
                 case "center":
                     {
-                        foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
-                            if (clients != null)
-                                clients.Out.SendMessage(message, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        {
+                            if (target == null || target.Player == null)
+                                continue;
+
+                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
+                            target.Out.SendMessage(toSend, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                        }
+
                         break;
                     }
                 #endregion Center
                 #region Confirm
                 case "confirm":
                     {
-                        foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
-                            if (clients != null)
-                                clients.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, LanguageMgr.GetTranslation(clients, "Commands.GM.Announce.ConfirmAnnounce", client.Player.Name, message));
+                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        {
+                            if (target == null || target.Player == null)
+                                continue;
+
+                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
+                            target.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, LanguageMgr.GetTranslation(target, "Commands.GM.Announce.ConfirmAnnounce", client.Player.Name, toSend));
+                        }
                         break;
                     }
                 #endregion Confirm

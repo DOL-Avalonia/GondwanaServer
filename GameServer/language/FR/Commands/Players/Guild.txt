@@ -1,4 +1,5 @@
-
+Commands.Players.Guild.Description:		Commandes de gestion des guildes.
+Commands.Players.Guild.Usage:			Usage: '/gc <texte>'
 Commands.Players.Guild.AccountRemoved:            {0} a été retiré par {1} de la guilde.
 Commands.Players.Guild.ActiveBuff:			    Votre guilde possède déjà un sort d'amélioration. Vous devez attendre que le sort expire pour le relancer. Temps restant : {0} heures, {1} minutes.
 Commands.Players.Guild.Alliance.AlreadyOther:      Cette guilde possède déjà une Alliance.

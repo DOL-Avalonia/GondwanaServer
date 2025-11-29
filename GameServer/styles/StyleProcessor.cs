@@ -42,7 +42,7 @@ namespace DOL.GS.Styles
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Returns wether this player can use a particular style
@@ -208,7 +208,7 @@ namespace DOL.GS.Styles
                 }
                 if (living.IsDisarmed)
                 {
-                    if (living is GamePlayer) (living as GamePlayer).Out.SendMessage("You are disarmed and cannot attack!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                    if (living is GamePlayer) (living as GamePlayer)!.Out.SendMessage("You are disarmed and cannot attack!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
                     return;
                 }
                 //Can't use styles with range weapon
@@ -453,7 +453,7 @@ namespace DOL.GS.Styles
                         if (absorb > 0)
                         {
                             player.Out.SendMessage("A barrier absorbs " + absorb + " damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                            if (living is GamePlayer) (living as GamePlayer).Out.SendMessage("A barrier absorbs " + absorb + " damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            if (living is GamePlayer) (living as GamePlayer)!.Out.SendMessage("A barrier absorbs " + absorb + " damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
                         }
                     }
 
@@ -631,13 +631,15 @@ namespace DOL.GS.Styles
 
         protected static bool CheckSpellRequirements(Style style, GameLiving attacker, GameObject target)
         {
-            if (style.SpellRequirement.Count > 0)
-            {
-                // Return false if none of the requirements are active
-                if (!attacker.FindEffectsOnTarget((e) => style.SpellRequirement.Contains(e.SpellHandler.Spell.SpellType)).Any())
-                    return false;
-            }
-            return true;
+            if (attacker is GameNPC)
+                return true;
+
+            var reqs = style.SpellRequirement;
+
+            if (reqs == null || reqs.Count == 0 || reqs.All(s => string.IsNullOrWhiteSpace(s)))
+                return true;
+
+            return attacker.FindEffectsOnTarget(e => reqs.Contains(e.SpellHandler.Spell.SpellType)).Any();
         }
 
         /// <summary>
@@ -674,7 +676,7 @@ namespace DOL.GS.Styles
             }
 
             // No negative effects can be applied on a keep door or via attacking a keep door
-            if ((target is GameKeepComponent || target is GameKeepDoor) && spellHandler.HasPositiveEffect == false)
+            if ((target is GameKeepComponent || target is GameKeepDoor) && spellHandler!.HasPositiveEffect == false)
             {
                 return null;
             }

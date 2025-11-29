@@ -216,7 +216,7 @@ namespace DOL.GS
                 if (dbClassOverride.ID < 0 || dbClassOverride.ID > byte.MaxValue
                     || !Enum.IsDefined(typeof(eCharacterClass), (byte)dbClassOverride.ID))
                 {
-                    log.Error($"LoadClassOverrideDictionary(): ClassID {dbClassOverride.ID} in table CharacterClass is out of range ({eCharacterClass.Unknown}-{eCharacterClass.ElementalKnightHib}");
+                    log.Error($"LoadClassOverrideDictionary(): ClassID {dbClassOverride.ID} in table CharacterClass is out of range ({eCharacterClass.Unknown}-{eCharacterClass.Psion}");
                     continue;
                 }
 

@@ -1,4 +1,5 @@
-
+Commands.Players.Guild.Description:		Guild management commands:
+Commands.Players.Guild.Usage:			Usage: '/gc <text>'
 Commands.Players.Guild.AccountRemoved:            {0} has been removed from the guild by {1}.
 Commands.Players.Guild.ActiveBuff:			    Your guild already has an upgrade buff. You must wait for the buff to expire to restart it. Remaining time: {0} hours, {1} minutes.
 Commands.Players.Guild.Alliance.AlreadyOther:      This guild already has an alliance.

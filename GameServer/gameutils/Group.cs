@@ -474,7 +474,15 @@ namespace DOL.GS
             if (from != null)
             {
                 foreach (GamePlayer player in GetPlayersInTheGroup())
-                    player.Out.SendMessage(string.Format("[Party] {0}: \"{1}\"", player.GetPersonalizedName(from), msg), type, loc);
+                {
+                    string finalMsg = msg;
+
+                    if (from is GamePlayer fromPlayer)
+                        finalMsg = AutoTranslateManager.MaybeTranslate(fromPlayer, player, msg);
+
+                    player.Out.SendMessage(string.Format("[Party] {0}: \"{1}\"", player.GetPersonalizedName(from), finalMsg), type, loc);
+                }
+
                 message = string.Format("[Party] {0}: \"{1}\"", from.GetName(0, true), msg);
                 return;
             }

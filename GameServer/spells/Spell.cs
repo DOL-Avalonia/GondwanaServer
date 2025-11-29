@@ -91,6 +91,9 @@ namespace DOL.GS
             set { m_paramCache = value; }
         }
 
+        protected double m_raceMultiplier = 1.0;
+        protected bool m_durationScaledByRace = false;
+
         #region member access properties
         #region warlocks
         public bool IsPrimary
@@ -445,6 +448,18 @@ namespace DOL.GS
                         return false;
                 }
             }
+        }
+
+        public double RaceMultiplier
+        {
+            get { return m_raceMultiplier; }
+            set { m_raceMultiplier = value; }
+        }
+
+        public bool DurationScaledByRace
+        {
+            get { return m_durationScaledByRace; }
+            set { m_durationScaledByRace = value; }
         }
 
         #endregion

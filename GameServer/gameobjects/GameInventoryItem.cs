@@ -585,8 +585,9 @@ namespace DOL.GS
 
             if (this.ClassType.Contains("DOL.GS.AfkXpToken"))
             {
+                var remaininguse = Condition * 100 / MaxCondition;
                 delve.Add(" ");
-                delve.Add(" Remaining Use: " + (Condition / MaxCondition) * 100 + "%");
+                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DelveInfo.RemainingUse", remaininguse) + "%");
             }
 
             if (this.ClassType.Contains("DOL.GS.PvPTreasure"))

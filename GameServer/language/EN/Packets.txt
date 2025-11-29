@@ -262,6 +262,11 @@ InviteToGroupHandler.InvitePrompt1:							{0} has invited you to join {1} group.
 InviteToGroupHandler.InvitePrompt2:							Do you wish to join?
 InviteToGroupHandler.InviteNotification:					{0} has invited you to join {1} group.
 
+# /PlayerGroundTargetHandler
+PlayerGroundTargetHandler.GroundTargetNotVisible:			Your ground target is not visible!
+PlayerGroundTargetHandler.BoatMoveOrder:					You usher your boat forward.
+PlayerGroundTargetHandler.NotEnoughPassengers:				The {0} does not yet have enough passengers to move!
+
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:					You can't enter melee combat mode with a fired weapon!
 

@@ -2,6 +2,7 @@
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
+using System;
 using System.Numerics;
 
 namespace DOL.GS.Spells
@@ -18,6 +19,11 @@ namespace DOL.GS.Spells
         /// <inheritdoc />
         protected override bool ExecuteSpell(GameLiving target, bool force = false)
         {
+            if (target == null && Spell != null && !string.IsNullOrEmpty(Spell.Target) && string.Equals(Spell.Target, "self", StringComparison.OrdinalIgnoreCase))
+            {
+                target = Caster;
+            }
+
             if (m_spellTarget == null)
                 m_spellTarget = target;
 

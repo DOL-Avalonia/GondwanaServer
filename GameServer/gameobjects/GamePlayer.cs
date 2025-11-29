@@ -85,12 +85,16 @@ namespace DOL.GS
         private RegionTimer _afkXpTickTimer;
 
         private bool _isAfkDelayElapsed;
+        private RegionTimer _afkAttackAnimTimer;
+        private bool _isAfkAttackMode;
 
         private bool stayStealth = false;
 
         private ShadowNPC shadowNPC;
 
         private TaskXPlayer taskXPlayer;
+
+        public static readonly string AUTOTRANSLATE_PROPERTY = "autotranslate_enabled";
 
         #region Client/Character/VariousFlags
 
@@ -201,6 +205,17 @@ namespace DOL.GS
         {
             get => _isAfkDelayElapsed;
             private set => _isAfkDelayElapsed = value;
+        }
+
+        public bool IsAfkAttackMode => _isAfkAttackMode;
+
+        /// <summary>
+        /// Does this player want incoming chat to be auto-translated?
+        /// </summary>
+        public bool AutoTranslateEnabled
+        {
+            get => TempProperties.getProperty(AUTOTRANSLATE_PROPERTY, false);
+            set => TempProperties.setProperty(AUTOTRANSLATE_PROPERTY, value);
         }
 
         /// <summary>
@@ -7452,11 +7467,46 @@ namespace DOL.GS
             return 0;
         }
 
+        /// <summary>
+        /// Check CounterAttackStyle.SpellRequirement for the player.
+        /// Returns true if requirements are met or empty, false otherwise.
+        /// </summary>
+        private bool CheckCounterAttackSpellRequirements()
+        {
+            if (CounterAttackStyle == null)
+                return true;
+
+            var requirements = CounterAttackStyle.SpellRequirement;
+
+            if (requirements == null || requirements.Count == 0 || requirements.All(t => string.IsNullOrWhiteSpace(t)))
+                return true;
+
+            foreach (var token in requirements)
+            {
+                var trimmed = token?.Trim();
+                if (string.IsNullOrEmpty(trimmed))
+                    continue;
+
+                if (SpellHandler.FindEffectOnTarget(this, trimmed) != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <inheritdoc />
         protected override void CounterAttack(GameLiving attacker)
         {
             if (!IsAlive || IsStunned || IsMezzed || IsDisarmed || IsFrozen || IsCrafting || IsClimbing || IsStrafing || (Steed != null))
                 return;
+
+            if (!CheckCounterAttackSpellRequirements())
+            {
+                Out.SendMessage(CounterAttackStyle.GetRequiredSpellMessage(Client), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
 
             if (CounterAttackStyle == null)
             {
@@ -10934,7 +10984,7 @@ namespace DOL.GS
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.PotionSpellNotFound", useItem.SpellID), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
-            
+
             var handler = new ItemchargeXRacesHandler();
             double raceMultiplier = handler.GetRaceMultiplier(this, useItem.Id_nb);
 
@@ -10945,12 +10995,20 @@ namespace DOL.GS
             }
 
             spell = (Spell)spell.Clone();
-            spell.Value *= effectiveMultiplier;
-            spell.Damage *= effectiveMultiplier;
 
-            if (handler.IsDurationMultiplied(useItem.Id_nb))
+            // Store meta on the spell so subspells can see it
+            spell.RaceMultiplier = effectiveMultiplier;
+            spell.DurationScaledByRace = handler.IsDurationMultiplied(useItem.Id_nb);
+
+            if (Math.Abs(effectiveMultiplier - 1.0) > 0.0001)
             {
-                spell.Duration = (int)(spell.Duration * effectiveMultiplier);
+                spell.Value *= effectiveMultiplier;
+                spell.Damage *= effectiveMultiplier;
+
+                if (spell.DurationScaledByRace && spell.Duration > 0)
+                {
+                    spell.Duration = (int)(spell.Duration * effectiveMultiplier);
+                }
             }
 
             bool isParchment = useItem.Id_nb.Contains("PARCH", StringComparison.InvariantCultureIgnoreCase);
@@ -11184,8 +11242,14 @@ namespace DOL.GS
                 type = eChatType.CT_Staff;
 
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SendReceive.Sends", GetPersonalizedName(source), str), type,
+            {
+                string displayed = str;
+                if (source != null)
+                    displayed = AutoTranslateManager.MaybeTranslate(source, this, str);
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SendReceive.Sends", GetPersonalizedName(source), displayed), type,
                                 eChatLoc.CL_ChatWindow);
+            }
             else
             {
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source)),
@@ -11198,12 +11262,12 @@ namespace DOL.GS
             {
                 if (afkmessage == "")
                 {
-                    source.Out.SendMessage(LanguageMgr.GetTranslation(source.Client.Account.Language, "GameObjects.GamePlayer.SendReceive.Afk", source.GetPersonalizedName(this)),
+                    source!.Out.SendMessage(LanguageMgr.GetTranslation(source.Client.Account.Language, "GameObjects.GamePlayer.SendReceive.Afk", source.GetPersonalizedName(this)),
                                            eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 else
                 {
-                    source.Out.SendMessage(
+                    source!.Out.SendMessage(
                         LanguageMgr.GetTranslation(source.Client.Account.Language, "GameObjects.GamePlayer.SendReceive.AfkMessage", source.GetPersonalizedName(this), afkmessage), eChatType.CT_Say,
                         eChatLoc.CL_ChatWindow);
                 }
@@ -11256,8 +11320,15 @@ namespace DOL.GS
             if (IsIgnoring(source))
                 return true;
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this) || Properties.ENABLE_DEBUG)
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SayReceive.Says", GetPersonalizedName(source), str),
+            {
+                string displayed = str;
+
+                if (source is GamePlayer sp)
+                    displayed = AutoTranslateManager.MaybeTranslate(sp, this, str);
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SayReceive.Says", GetPersonalizedName(source), displayed),
                                 eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            }
             else
                 Out.SendMessage(
                     LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SayReceive.FalseLanguage", GetPersonalizedName(source)),
@@ -11294,7 +11365,14 @@ namespace DOL.GS
             if (IsIgnoring(source))
                 return true;
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.YellReceive.Yells", GetPersonalizedName(source), str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                string displayed = str;
+
+                if (source is GamePlayer sp)
+                    displayed = AutoTranslateManager.MaybeTranslate(sp, this, str);
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.YellReceive.Yells", GetPersonalizedName(source), displayed), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            }
             else
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.YellReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
@@ -11329,7 +11407,14 @@ namespace DOL.GS
             if (IsIgnoring(source))
                 return true;
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.WhisperReceive.Whispers", GetPersonalizedName(source), str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                string displayed = str;
+
+                if (source is GamePlayer sp)
+                    displayed = AutoTranslateManager.MaybeTranslate(sp, this, str);
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.WhisperReceive.Whispers", GetPersonalizedName(source), displayed), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            }
             else
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.WhisperReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
@@ -15911,6 +15996,230 @@ namespace DOL.GS
 
         #region AFK and AFK XP methods
 
+        internal class AfkSpellImpactTimer : RegionAction
+        {
+            private readonly GamePlayer _caster;
+            private readonly GameLiving _target;
+            private readonly ushort _clientEffect;
+
+            public AfkSpellImpactTimer(GamePlayer caster, GameLiving target, ushort clientEffect)
+                : base(caster)
+            {
+                _caster = caster;
+                _target = target;
+                _clientEffect = clientEffect;
+            }
+
+            public override void OnTick()
+            {
+                if (_caster == null ||
+                    !_caster.IsAlive ||
+                    _caster.ObjectState != GameObject.eObjectState.Active)
+                    return;
+
+                GameLiving target = _target ?? _caster;
+
+                if (target.ObjectState != GameObject.eObjectState.Active)
+                    return;
+
+                foreach (GamePlayer vis in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                {
+                    if (vis == null)
+                        continue;
+
+                    vis.Out.SendSpellEffectAnimation(
+                        _caster,
+                        target,
+                        _clientEffect,
+                        0,      // bolt duration
+                        false,  // noSound
+                        1       // success
+                    );
+                }
+            }
+        }
+
+        // AFK dummy distances
+        private const int AfkMeleeDummyRadius = 100;
+        private const int AfkRangedDummyRadius = 700;
+
+        /// <summary>
+        /// Return true if this class should be treated as "caster / ranged"
+        /// for AFK dummy behavior (can use 100–700 range + fake spell).
+        /// Adjust this list as needed for your custom classes.
+        /// </summary>
+        private bool IsAfkRangedOrCasterClass()
+        {
+            switch ((eCharacterClass)CharacterClass.ID)
+            {
+                case eCharacterClass.Cabalist:
+                case eCharacterClass.Sorcerer:
+                case eCharacterClass.Wizard:
+                case eCharacterClass.Theurgist:
+                case eCharacterClass.Necromancer:
+                case eCharacterClass.Occultist:
+                case eCharacterClass.Heretic:
+                case eCharacterClass.Runemaster:
+                case eCharacterClass.Spiritmaster:
+                case eCharacterClass.Bonedancer:
+                case eCharacterClass.Shaman:
+                case eCharacterClass.Warlock:
+                case eCharacterClass.Animist:
+                case eCharacterClass.Bainshee:
+                case eCharacterClass.Eldritch:
+                case eCharacterClass.Enchanter:
+                case eCharacterClass.Mentalist:
+                case eCharacterClass.Druid:
+                case eCharacterClass.Bard:
+
+                // Ranged classes
+                case eCharacterClass.Scout:
+                case eCharacterClass.Ranger:
+                case eCharacterClass.Hunter:
+
+                // Custom magical
+                case eCharacterClass.Corsair:
+                case eCharacterClass.HelWarden:
+                case eCharacterClass.Geomancer:
+                case eCharacterClass.Alchemist:
+                case eCharacterClass.RedMage:
+                case eCharacterClass.ChaosMage:
+                case eCharacterClass.Psion:
+                case eCharacterClass.Reaper:
+                case eCharacterClass.BlueMage:
+                case eCharacterClass.ElementalKnight:
+                case eCharacterClass.PuppetMaster:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Global fallback list of visual spell effect IDs for fake AFK casting.
+        /// </summary>
+        private static readonly ushort[] AfkSpellEffects = {253, 255, 276, 477, 17, 301, 302, 362, 77, 916, 763, 677, 556, 3410, 12112, 967, 662, 5505, 5517, 4593, 4510, 4104, 4109, 12179, 12183, 7400, 7411, 2978, 2745};
+
+        // Sorcerer / Cabalist – purple / curse / DoT vibes
+        private static readonly ushort[] AfkFx_Sorcerer = { 662, 967, 756, 916 };
+        private static readonly ushort[] AfkFx_Cabalist = { 662, 763, 556 };
+        private static readonly ushort[] AfkFx_Necro_Occ = { 967, 611, 3410 };
+        // Wizard / Theurgist – nukes / elemental stuff
+        private static readonly ushort[] AfkFx_Wizard = { 301, 302, 362, 255 };
+        private static readonly ushort[] AfkFx_Theurgist = { 253, 276, 477 };
+        // Warlock – creepy chaos
+        private static readonly ushort[] AfkFx_Warlock = { 12179, 12183 };
+        // Spiritmaster – spirit / ghostly effects
+        private static readonly ushort[] AfkFx_Spiritmaster = { 4510, 4104 };
+        // Mentalist / Eldritch / Enchanter – mind / magic beams etc.
+        private static readonly ushort[] AfkFx_Menta_Eld_Ench = { 4593, 3410, 967 };
+        // Archers – “arrow shot” style effects
+        private static readonly ushort[] AfkFx_Archers = { 7400, 7411 };
+        // You can add more pools for your custom classes later:
+        private static readonly ushort[] AfkFx_RedMage = { 5505, 5517 };
+        private static readonly ushort[] AfkFx_ChaosMage = { 12112, 4109 };
+        private static readonly ushort[] AfkFx_Occultist = { 556, 662 };
+
+        /// <summary>
+        /// Returns the pool of client effects for this class.
+        /// If no specific pool is defined, falls back to the global AfkSpellEffects.
+        /// </summary>
+        private ushort[] GetAfkEffectPoolForClass()
+        {
+            switch ((eCharacterClass)CharacterClass.ID)
+            {
+                case eCharacterClass.Sorcerer:
+                    return AfkFx_Sorcerer;
+                case eCharacterClass.Cabalist:
+                    return AfkFx_Cabalist;
+                case eCharacterClass.Necromancer:
+                case eCharacterClass.Occultist:
+                    return AfkFx_Necro_Occ;
+
+                case eCharacterClass.Wizard:
+                    return AfkFx_Wizard;
+
+                case eCharacterClass.Theurgist:
+                    return AfkFx_Theurgist;
+
+                case eCharacterClass.Warlock:
+                    return AfkFx_Warlock;
+
+                case eCharacterClass.Spiritmaster:
+                    return AfkFx_Spiritmaster;
+
+                case eCharacterClass.Mentalist:
+                case eCharacterClass.Eldritch:
+                case eCharacterClass.Enchanter:
+                    return AfkFx_Menta_Eld_Ench;
+
+                case eCharacterClass.Scout:
+                case eCharacterClass.Ranger:
+                case eCharacterClass.Hunter:
+                    return AfkFx_Archers;
+
+                case eCharacterClass.RedMage:
+                    return AfkFx_RedMage;
+
+                case eCharacterClass.ChaosMage:
+                    return AfkFx_ChaosMage;
+
+                // Default: use the global pool
+                default:
+                    return AfkSpellEffects;
+            }
+        }
+
+        /// <summary>
+        /// Pick one ClientEffect ID from the pool associated to the class.
+        /// Returns 0 if nothing is available (no animation).
+        /// </summary>
+        private ushort GetAfkSpellEffectForClass()
+        {
+            var pool = GetAfkEffectPoolForClass();
+            if (pool == null || pool.Length == 0)
+                return 0;
+
+            int idx = Util.Random(pool.Length - 1);
+            return pool[idx];
+        }
+
+        private bool IsAfkDummyMeleeRange(GameTrainingDummy dummy)
+        {
+            return IsWithinRadius(dummy, AfkMeleeDummyRadius);
+        }
+
+        private bool IsAfkDummyRangedSpellRange(GameTrainingDummy dummy)
+        {
+            if (!IsAfkRangedOrCasterClass())
+                return false;
+
+            return !IsAfkDummyMeleeRange(dummy) && IsWithinRadius(dummy, AfkRangedDummyRadius);
+        }
+
+        /// <summary>
+        /// Returns true if dummy is in a valid AFK-attack range.
+        /// rangedMode = false => melee swing; true => fake spell cast.
+        /// </summary>
+        public bool IsAfkDummyInValidRange(GameTrainingDummy dummy, out bool rangedMode)
+        {
+            rangedMode = false;
+            if (dummy == null)
+                return false;
+
+            if (IsAfkDummyMeleeRange(dummy))
+                return true;
+
+            if (IsAfkDummyRangedSpellRange(dummy))
+            {
+                rangedMode = true;
+                return true;
+            }
+
+            return false;
+        }
+
         public bool IsAfkActive()
         {
             return PlayerAfkMessage != null || TempProperties.getProperty<string>(AFK_MESSAGE, null) != null;
@@ -15945,6 +16254,7 @@ namespace DOL.GS
 
             PlayerAfkMessage = null;
             TempProperties.removeProperty(AFK_MESSAGE);
+            StopAfkAttackMode(showMessage: false);
             StopAfkXp();
             ResetAFK(true);
 
@@ -15956,10 +16266,15 @@ namespace DOL.GS
 
         private bool IsFightingTrainingDummyInRange()
         {
-            var target = this.TargetObject as GameTrainingDummy;
-            if (target == null) return false;
-            if (!this.AttackState) return false;
-            return this.IsWithinRadius(target, WorldMgr.INTERACT_DISTANCE);
+            if (!_isAfkAttackMode)
+                return false;
+
+            var target = TargetObject as GameTrainingDummy;
+            if (target == null)
+                return false;
+
+            bool rangedMode;
+            return IsAfkDummyInValidRange(target, out rangedMode);
         }
 
         private AfkXpToken GetActiveAfkToken() => AfkXpToken.FindOn(this);
@@ -15968,10 +16283,19 @@ namespace DOL.GS
         {
             if (!_isAfkDelayElapsed) return;
             if (!IsAfkActive()) return;
-            if (!IsFightingTrainingDummyInRange()) { StopAfkXp(); return; }
+
+            if (!IsFightingTrainingDummyInRange())
+            {
+                StopAfkXp();
+                return;
+            }
 
             var token = GetActiveAfkToken();
-            if (token == null) { StopAfkXp(); return; }
+            if (token == null)
+            {
+                StopAfkXp();
+                return;
+            }
 
             // Start buffer timer if not running, else leave it alone.
             if (_afkXpBufferTimer == null)
@@ -16047,6 +16371,153 @@ namespace DOL.GS
             _afkXpTickTimer.Start(tickMs);
         }
 
+        /// <summary>
+        /// Start AFK attack mode: fake combat loop vs a training dummy.
+        /// </summary>
+        public void StartAfkAttackMode(GameTrainingDummy dummy)
+        {
+            if (dummy == null)
+                return;
+
+            if (_isAfkAttackMode && _afkAttackAnimTimer != null)
+            {
+                TargetObject = dummy;
+                return;
+            }
+
+            _isAfkAttackMode = true;
+            TargetObject = dummy;
+            TurnTo(dummy.Coordinate);
+
+            Out.SendMessage(LanguageMgr.GetTranslation(Client, "Commands.Players.AfkAttack.On"), eChatType.CT_Chat, eChatLoc.CL_SystemWindow);
+
+            _afkAttackAnimTimer?.Stop();
+            _afkAttackAnimTimer = new RegionTimer(this, _ =>
+            {
+                if (!_isAfkAttackMode)
+                    return 0;
+
+                var t = TargetObject as GameTrainingDummy;
+                bool rangedMode;
+                if (t == null || !IsAfkDummyInValidRange(t, out rangedMode) || !IsAfkActive())
+                {
+                    StopAfkAttackMode(showMessage: true);
+                    return 0;
+                }
+
+                if (rangedMode)
+                {
+                    PlayAfkSpellAnimation(this, t);
+                }
+                else
+                {
+                    PlayAfkAttackSwing(t);
+                }
+                MaybeStartAfkXp();
+                return 2000;
+            });
+
+            _afkAttackAnimTimer.Start(10);
+        }
+
+        /// <summary>
+        /// Stop AFK attack mode (does NOT clear AFK itself).
+        /// </summary>
+        public void StopAfkAttackMode(bool showMessage)
+        {
+            if (!_isAfkAttackMode && _afkAttackAnimTimer == null)
+                return;
+
+            _isAfkAttackMode = false;
+            _afkAttackAnimTimer?.Stop();
+            _afkAttackAnimTimer = null;
+
+            // Stopping attack mode = stop AFK XP too
+            StopAfkXp();
+
+            if (showMessage)
+            {
+                Out.SendMessage(
+                    LanguageMgr.GetTranslation(Client, "Commands.Players.AfkAttack.Off"),
+                    eChatType.CT_Chat, eChatLoc.CL_SystemWindow);
+            }
+        }
+
+        /// <summary>
+        /// Plays a fake spell cast + hit animation, with no checks, no mana cost,
+        /// and no real SpellHandler logic. Purely visual.
+        /// </summary>
+        private void PlayAfkSpellAnimation(GamePlayer player, GameLiving target)
+        {
+            if (player == null ||
+                !player.IsAlive ||
+                player.ObjectState != GameObject.eObjectState.Active)
+                return;
+
+            if (target == null ||
+                target.ObjectState != GameObject.eObjectState.Active)
+            {
+                target = player;
+            }
+
+            ushort clientEffect = GetAfkSpellEffectForClass();
+            if (clientEffect == 0)
+                return;
+
+            ushort fakeCastTime = (ushort)Util.Random(15, 20);
+
+            foreach (GamePlayer vis in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                if (vis == null)
+                    continue;
+
+                vis.Out.SendSpellCastAnimation(player, clientEffect, fakeCastTime);
+            }
+
+            new AfkSpellImpactTimer(player, target, clientEffect).Start(fakeCastTime * 100);
+        }
+
+        /// <summary>
+        /// Simple fake melee swing vs the AFK dummy.
+        /// No real combat, no damage, no big position updates – only animations.
+        /// </summary>
+        private void PlayAfkAttackSwing(GameTrainingDummy dummy)
+        {
+            if (dummy == null || !dummy.IsAlive)
+                return;
+
+            TurnTo(dummy.Coordinate);
+
+            ushort attackerWeapon = (ushort)(AttackWeapon?.Model ?? 0);
+            ushort defenderWeapon = 0;
+            byte attackAnim = (byte)Util.Random(0, 44);
+
+            // Choose a “result” byte with a bit of variety
+            //  - 0–69 : styled hit
+            //  - 70–84: unstyled hit
+            //  - 85–94: miss
+            //  - 95–100: evade
+            byte resultByte;
+            int roll = Util.Random(100);
+
+            if (roll < 70)
+                resultByte = 11; // HitStyle
+            else if (roll < 85)
+                resultByte = 10; // HitUnstyled
+            else if (roll < 95)
+                resultByte = 0;  // Missed
+            else
+                resultByte = 3;  // Evaded
+
+            AttackState = true;
+            foreach (GamePlayer viewer in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                if (viewer == null) continue;
+                viewer.Out.SendCombatAnimation(this, dummy, attackerWeapon, defenderWeapon, attackAnim, 0, resultByte, 100);
+            }
+            AttackState = false;
+        }
+
         private void StopAfkXp()
         {
             _afkXpTickTimer?.Stop(); _afkXpTickTimer = null;
@@ -16061,6 +16532,8 @@ namespace DOL.GS
             _afkKickoutTimer?.Stop(); _afkKickoutTimer = null;
             _afkXpBufferTimer?.Stop(); _afkXpBufferTimer = null;
             _afkXpTickTimer?.Stop(); _afkXpTickTimer = null;
+            _afkAttackAnimTimer?.Stop(); _afkAttackAnimTimer = null;
+            _isAfkAttackMode = false;
 
             StartAfkCooldown(30_000);
 

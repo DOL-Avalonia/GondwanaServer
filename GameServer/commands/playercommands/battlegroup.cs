@@ -24,9 +24,9 @@ using DOL.Language;
 
 namespace DOL.GS.Commands
 {
-    [CmdAttribute(
+    [Cmd(
         "&battlechat",
-        new string[] { "&bc" },
+        new string[] { "&bc" , "&bgchat" },
         ePrivLevel.Player,
         "Commands.Players.Battlechat.Description",
         "Commands.Players.Battlechat.Usage")]
@@ -54,40 +54,23 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + (args.Length - 1) * 8);
-            if ((bool)mybattlegroup.Members[client.Player] == true)
+            string rawText = string.Join(" ", args, 1, args.Length - 1);
+            bool isLeader = (bool)mybattlegroup.Members[client.Player];
+
+            foreach (GamePlayer ply in mybattlegroup.Members.Keys)
             {
-                text.Append(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlechat.ChatName"));
+                string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+
+                StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + toSend.Length);
+                text.Append(LanguageMgr.GetTranslation(ply.Client.Account.Language, "Commands.Players.Battlechat.ChatName"));
                 text.Append(": \"");
-                text.Append(args[1]);
-                for (int i = 2; i < args.Length; i++)
-                {
-                    text.Append(" ");
-                    text.Append(args[i]);
-                }
+                text.Append(toSend);
                 text.Append("\"");
+
                 string message = text.ToString();
-                foreach (GamePlayer ply in mybattlegroup.Members.Keys)
-                {
-                    ply.Out.SendMessage(" " + ply.GetPersonalizedName(client.Player) + message, eChatType.CT_BattleGroupLeader, eChatLoc.CL_ChatWindow);
-                }
-            }
-            else
-            {
-                text.Append(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlechat.ChatName"));
-                text.Append(": \"");
-                text.Append(args[1]);
-                for (int i = 2; i < args.Length; i++)
-                {
-                    text.Append(" ");
-                    text.Append(args[i]);
-                }
-                text.Append("\"");
-                string message = text.ToString();
-                foreach (GamePlayer ply in mybattlegroup.Members.Keys)
-                {
-                    ply.Out.SendMessage(" " + ply.GetPersonalizedName(client.Player) + message, eChatType.CT_BattleGroup, eChatLoc.CL_ChatWindow);
-                }
+                eChatType type = isLeader ? eChatType.CT_BattleGroupLeader : eChatType.CT_BattleGroup;
+
+                ply.Out.SendMessage(" " + ply.GetPersonalizedName(client.Player) + message, type, eChatLoc.CL_ChatWindow);
             }
         }
     }
@@ -96,8 +79,8 @@ namespace DOL.GS.Commands
         "&battlegroup",
         new string[] { "&bg" },
         ePrivLevel.Player,
-        "Commands.Players.Battlegroup.BG.Description",
-        "Commands.Players.Battlegroup.BG.Usage")]
+        "Commands.Players.Battlegroup.Description",
+        "Commands.Players.Battlegroup.Usage")]
     public class BattleGroupSetupCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -646,7 +629,7 @@ namespace DOL.GS.Commands
                         GameClient treasclient = WorldMgr.GetClientByPlayerName(treasname, false, false);
                         if (treasclient == null)
                         {
-                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlegroup.NoPlayer", client.Player.GetPersonalizedName(treasclient.Player)), eChatType.CT_BattleGroup, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlegroup.NoPlayer", client.Player.GetPersonalizedName(treasclient!.Player)), eChatType.CT_BattleGroup, eChatLoc.CL_SystemWindow);
                             return;
                         }
                         mybattlegroup.SetBGTreasurer(treasclient.Player);

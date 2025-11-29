@@ -14,11 +14,12 @@ DelveInfo.HealthCost:           Coût en vie : {0}
 DelveInfo.Radius:               Rayon d'effet : {0}
 DelveInfo.Range:                Portée : {0}
 DelveInfo.RangeModified:	Portée : {0} {1}
-DelveInfo.RecastTime:           Délai de réutilisation: 
+DelveInfo.RecastTime:           Délai de réutilisation : 
 DelveInfo.Target:               Cible : {0}
 DelveInfo.Value:                Valeur : {0}
 DelveInfo.ValueNegative:        Valeur : -{0}
 DelveInfo.Destination:			Destination : {0}
+DelveInfo.RemainingUse:			Usage restant : {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Inflige {0} {1} à la cible.
@@ -194,10 +195,10 @@ SpellDescription.MesmerizeDurationBuff.MainDescription:		Réduit l'efficacité d
 SpellDescription.EvadeChanceBuff.MainDescription:			Octroie {0}% de chance d'esquiver les attaques.
 SpellDescription.ParryChanceBuff.MainDescription:			Octroie {0}% de chance de parer les attaques.
 SpellDescription.WeaponSkillBuff.MainDescription:			Augmente la compétence en Armes (Weaponskill) de {0}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Augmente la compétence de Furtivité de {0}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Augmente la compétence Flexible de {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Augmente la compétence de Furtivité de {0} pts.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Augmente la compétence Flexible de {0} pts.
 SpellDescription.WeaponSkillDebuff.MainDescription:			Réduit la compétence en Armes (Weaponskill) de {0}%.
-SpellDescription.StealthSkillDebuff.MainDescription:		Réduit la compétence de Furtivité de {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Réduit la compétence de Furtivité de {0} pts.
 SpellDescription.ResiPierceBuff.MainDescription:			Vous accorde {0}% de chance de pénétrer les résistances magiques.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Augmente les chances de critique des sorts de la cible de {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Augmente la chance de coup critique en mêlée de la cible de {0}%.
@@ -207,7 +208,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			La cible inflige {0}% de d
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Augmente de {0}% l'endurance consommée par la cible en combat.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Augmente la probabilité que la cible échoue lamentablement de {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Réduit le DPS de {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Réduit toutes les compétences de {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Réduit toutes les compétences de {0} pts.
 SpellDescription.Warlock.SecondarySpell:					Ceci est un sort secondaire.
 SpellDescription.Warlock.PrimarySpell:						Ceci est un sort primaire.
 SpellDescription.AllStatsDebuff.MainDescription:			Réduit toutes les stats de la cible de {0}.

@@ -34,6 +34,12 @@ namespace DOL.GS.ServerRules
         /// </summary>
         protected GamePlayer.InvulnerabilityExpiredCallback m_pveinvExpiredCallback;
 
+        private static string Lang(GameLiving viewer, string key, params object[] args)
+        {
+            var lang = (viewer as GamePlayer)?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+            return LanguageMgr.GetTranslation(lang, key, args);
+        }
+
         /// <summary>
         /// This is called when server rules are reloaded for example when reloading server properties
         /// </summary>
@@ -80,7 +86,7 @@ namespace DOL.GS.ServerRules
                 if (playerDefender.Client.ClientState == GameClient.eClientState.WorldEnter)
                 {
                     if (!quiet)
-                        MessageToLiving(attacker, playerDefender.Name + " est en train de se connecter, vous ne pouvez pas l'attaquer pour le moment.");
+                        MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.PlayerIsConnecting", playerDefender.Name));
                     return false;
                 }
 
@@ -90,7 +96,7 @@ namespace DOL.GS.ServerRules
                     if (playerAttacker.IsInvulnerableToAttack)
                     {
                         if (quiet == false)
-                            MessageToLiving(attacker, "You can't attack players until your PvP invulnerability timer wears off!");
+                            MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.PvpInvTimerWearsOff"));
                         return false;
                     }
 
@@ -98,7 +104,7 @@ namespace DOL.GS.ServerRules
                     if (playerDefender.IsInvulnerableToAttack)
                     {
                         if (quiet == false)
-                            MessageToLiving(attacker, playerAttacker.GetPersonalizedName(playerDefender) + " is temporarily immune to PvP attacks!");
+                            MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.PvpDefenderImmune", playerAttacker.GetPersonalizedName(playerDefender)));
                         return false;
                     }
                 }
@@ -210,13 +216,13 @@ namespace DOL.GS.ServerRules
                     {
                         if (!MobGroups.MobGroup.IsQuestFriendly(srcNpc, tarPlayer))
                         {
-                            if (!quiet) MessageToLiving(source, "Cette cible est hostile.");
+                            if (!quiet) MessageToLiving(source, Lang(source, "ServerRules.AmtenaelRules.TargetHostile"));
                             return false;
                         }
                     }
                     else
                     {
-                        if (!quiet) MessageToLiving(source, "Cette cible est hostile.");
+                        if (!quiet) MessageToLiving(source, Lang(source, "ServerRules.AmtenaelRules.TargetHostile"));
                         return false;
                     }
                 }
@@ -236,13 +242,13 @@ namespace DOL.GS.ServerRules
                     {
                         if (srcPlayer.Guild != tarPlayer.Guild)
                         {
-                            if (!quiet) MessageToLiving(source, "Cette cible est hostile.");
+                            if (!quiet) MessageToLiving(source, Lang(source, "ServerRules.AmtenaelRules.TargetHostile"));
                             return false;
                         }
                     }
                     else
                     {
-                        if (!quiet) MessageToLiving(source, "Cette cible est hostile.");
+                        if (!quiet) MessageToLiving(source, Lang(source, "ServerRules.AmtenaelRules.TargetHostile"));
                         return false;
                     }
                 }
@@ -294,7 +300,7 @@ namespace DOL.GS.ServerRules
 
             if (attackerController == defenderController)
             {
-                if (quiet == false) MessageToLiving(attacker, "Vous ne pouvez pas vous attaquer vous-même.");
+                if (quiet == false) MessageToLiving(attacker, Lang(attacker, "ServerRules.NormalServerRules.AttackSelf"));
                 return false;
             }
 
@@ -376,7 +382,7 @@ namespace DOL.GS.ServerRules
                 // PVE Timer
                 if (attackerControllerPlayer.IsInvulnerableToPVEAttack)
                 {
-                    if (quiet == false) MessageToLiving(attacker, "You can't attack mobs until your PvE invulnerability timer wears off!");
+                    if (quiet == false) MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.PveAttackerImmune"));
                     return false;
                 }
             }
@@ -412,21 +418,21 @@ namespace DOL.GS.ServerRules
             // Checking for shadowed necromancer, can't be attacked.
             if (defender.ControlledBrain is { Body: NecromancerPet })
             {
-                if (quiet == false) MessageToLiving(attacker, "You can't attack a shadowed necromancer!");
+                if (quiet == false) MessageToLiving(attacker, Lang(attacker, "ServerRules.AbstractServerRules.CannotAttackShadowedNecro"));
                 return false;
             }
 
             if (attackerControllerPlayer != null && JailMgr.IsPrisoner(attackerControllerPlayer))
             {
                 if (quiet == false)
-                    MessageToLiving(attacker, "Vous ne pouvez pas attaquer lorsque vous êtes en prison.");
+                    MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.AttackerIsPrisoner"));
                 return false;
             }
 
             if (defenderControllerPlayer != null && JailMgr.IsPrisoner(defenderControllerPlayer))
             {
                 if (quiet == false)
-                    MessageToLiving(attacker, "Vous ne pouvez pas attaquer un prisonnier.");
+                    MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.DefenderIsPrisoner"));
                 return false;
             }
 
@@ -444,14 +450,14 @@ namespace DOL.GS.ServerRules
                     attackerControllerPlayer.CurrentAreas.Cast<AbstractArea>().Any(area => area.IsSafeArea))
                 {
                     if (quiet == false)
-                        MessageToLiving(attacker, "Vous ne pouvez pas attaquer quelqu'un dans une zone safe !");
+                        MessageToLiving(attacker, Lang(attacker, "ServerRules.AbstractServerRules.CantAttackInSafeArea"));
                     return false;
                 }
 
                 //check group
                 if (attackerControllerPlayer.Group != null && attackerControllerPlayer.Group.IsInTheGroup(defenderControllerPlayer))
                 {
-                    if (!quiet) MessageToLiving(attackerControllerPlayer, "Vous ne pouvez pas attaquer un membre de votre groupe.");
+                    if (!quiet) MessageToLiving(attackerControllerPlayer, Lang(attackerControllerPlayer, "ServerRules.PvPServerRules.AttackGroupMember"));
                     return false;
                 }
 
@@ -460,7 +466,7 @@ namespace DOL.GS.ServerRules
                     //check guild
                     if (attackerControllerPlayer.Guild != null && attackerControllerPlayer.Guild == defenderControllerPlayer.Guild)
                     {
-                        if (!quiet) MessageToLiving(attackerControllerPlayer, "Vous ne pouvez pas attaquer un membre de votre guilde.");
+                        if (!quiet) MessageToLiving(attackerControllerPlayer, Lang(attackerControllerPlayer, "ServerRules.PvPServerRules.AttackGuildMember"));
                         return false;
                     }
 
@@ -468,7 +474,7 @@ namespace DOL.GS.ServerRules
                     var mybattlegroup = attackerControllerPlayer.TempProperties.getProperty<BattleGroup>(BattleGroup.BATTLEGROUP_PROPERTY, null);
                     if (mybattlegroup != null && mybattlegroup.IsInTheBattleGroup(defenderControllerPlayer))
                     {
-                        if (!quiet) MessageToLiving(attackerControllerPlayer, "Vous ne pouvez pas attaquer un membre de votre groupe de combat.");
+                        if (!quiet) MessageToLiving(attackerControllerPlayer, Lang(attackerControllerPlayer, "ServerRules.PvPServerRules.AttackBattleGroupMember"));
                         return false;
                     }
                 }
@@ -505,7 +511,7 @@ namespace DOL.GS.ServerRules
             // "friendly" NPCs can't be attacked by "friendly" players
             if (defenderController is GameNPC { Realm: not 0 } and not GameKeepGuard and not GameFont && attackerRealm != 0)
             {
-                if (quiet == false) MessageToLiving(attacker, "Vous ne pouvez pas attaquer un PNJ amical.");
+                if (quiet == false) MessageToLiving(attacker, Lang(attacker, "ServerRules.AmtenaelRules.CannotAttackFriendlyNPC"));
                 return false;
             }
 
@@ -884,7 +890,7 @@ namespace DOL.GS.ServerRules
                     if (gainerPlayer.Client.Account.PrivLevel > 1)
                     {
                         if (Properties.ENABLE_DEBUG)
-                            gainerPlayer.SendMessage("Rewards are enabled because the server is in DEBUG mode.");
+                            gainerPlayer.SendMessage(Lang(gainerPlayer, "ServerRules.AmtenaelRules.DebugRewardsEnabled"));
                         else
                             dealNoXP = true;
                         break;
@@ -1090,7 +1096,7 @@ namespace DOL.GS.ServerRules
                     }
                     //long money = (long)(Money.GetMoney(0, 0, 17, 85, 0) * damagePercent * killedPlayer.Level / 50);
                     player.AddMoney(Currency.Copper.Mint(money));
-                    player.SendSystemMessage(string.Format("You receive {0}", Money.GetString(money)));
+                    player.SendSystemMessage(string.Format(Lang(player, "ServerRules.AbstractServerRules.ReceiveMoney"), Money.GetString(money)));
                     InventoryLogging.LogInventoryAction(killer, player, eInventoryActionType.Other, money);
                 }
 

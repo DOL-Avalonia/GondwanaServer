@@ -1,7 +1,7 @@
 # /GameTrainer
 GameTrainer.AddGift.NotEnoughSpace:					Vous n'avez plus de place dans votre inventaire pour recevoir votre cadeau. Faites de la place !
 GameTrainer.CheckAbilityToUseItem.Text1:			Vous ne pouvez plus utiliser l'objet {0}.
-GameTrainer.GetExamineMessages.RightClick:			[Cliquez-droit pour afficher une fenêtre d'entrainement]
+GameTrainer.GetExamineMessages.RightClick:			[Cliquez-droit pour afficher une fenêtre d'entraînement]
 GameTrainer.GetExamineMessages.YouExamine:			Vous observez {0}. {1} est {2} et instruit les membres de la classe {3}.
 GameTrainer.GetExamineMessages.YouExamine.Master:	Vous observez {0}. {1} est {2} et instruit les membres de toutes les classes.
 GameTrainer.GetExamineMessages.YouTarget:			Vous ciblez [{0}].

@@ -1,0 +1,6 @@
+Commands.Players.Autotranslate.Description:	Active/désactive la traduction automatique en temps réel des dialogues PNJ, quêtes et messages.
+Commands.Players.Autotranslate.Usage:		Utilisation : /autotranslate [on|off] – ou simplement /autotranslate ou /at pour basculer.
+Commands.Players.Autotranslate.Enabled:		La traduction automatique activée sur ce serveur.
+Commands.Players.Autotranslate.Disabled:	La traduction automatique désactivée sur ce serveur.
+Commands.Players.Autotranslate.NowOn:		Traduction automatique activée !
+Commands.Players.Autotranslate.NowOff:		Traduction automatique désactivée !

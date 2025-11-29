@@ -150,16 +150,10 @@ namespace DOL.GS.Scripts
             if (!base.CanHoldItem(item))
                 return false;
 
-            if (item.Item_Type != 40)
-                return false;
+            bool isStandardIngredientPackage = item.PackageID is "craft_ingredient" or "Bountyrecipe" or "combine_ingredient" or "loot_ingredient";
+            bool isCraftRealmUpdateAllowed = item.PackageID == "craft_realm_update" && (item.Item_Type == 24 || item.Item_Type == 40);
 
-            if (item.Object_Type is not ( 0 or 41 ))
-                return false;
-
-            if (item.PackageID is not ("craft_realm_update" or "craft_ingredient"))
-                return false;
-
-            return true;
+            return isStandardIngredientPackage || isCraftRealmUpdateAllowed;
         }
     }
 

@@ -61,8 +61,21 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            string message = "[Guild] " + client.Player.Name + ": \"" + string.Join(" ", args, 1, args.Length - 1) + "\"";
-            client.Player.Guild.SendMessageToGuildMembers(message, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+            if (args.Length < 2)
+                return;
+
+            string rawText = string.Join(" ", args, 1, args.Length - 1);
+
+            foreach (GamePlayer ply in client.Player.Guild.GetListOfOnlineMembers())
+            {
+                if (ply == null)
+                    continue;
+
+                string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+                string message = "[Guild] " + client.Player.Name + ": \"" + toSend + "\"";
+
+                ply.Out.SendMessage(message, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+            }
         }
     }
 
@@ -108,13 +121,19 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            string message = "[Officers] " + client.Player.Name + ": \"" + string.Join(" ", args, 1, args.Length - 1) + "\"";
+            if (args.Length < 2)
+                return;
+
+            string rawText = string.Join(" ", args, 1, args.Length - 1);
+
             foreach (GamePlayer ply in client.Player.Guild.GetListOfOnlineMembers())
             {
                 if (!client.Player.Guild.HasRank(ply, Guild.eRank.OcHear))
-                {
                     continue;
-                }
+
+                string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+                string message = "[Officers] " + client.Player.Name + ": \"" + toSend + "\"";
+
                 ply.Out.SendMessage(message, eChatType.CT_Officer, eChatLoc.CL_ChatWindow);
             }
         }
@@ -170,15 +189,21 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            string message = "[Alliance] " + client.Player.Name + ": \"" + string.Join(" ", args, 1, args.Length - 1) + "\"";
+            if (args.Length < 2)
+                return;
+
+            string rawText = string.Join(" ", args, 1, args.Length - 1);
+
             foreach (Guild gui in client.Player.Guild.alliance.Guilds)
             {
                 foreach (GamePlayer ply in gui.GetListOfOnlineMembers())
                 {
                     if (!gui.HasRank(ply, Guild.eRank.AcHear))
-                    {
                         continue;
-                    }
+
+                    string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+                    string message = "[Alliance] " + client.Player.Name + ": \"" + toSend + "\"";
+
                     ply.Out.SendMessage(message, eChatType.CT_Alliance, eChatLoc.CL_ChatWindow);
                 }
             }

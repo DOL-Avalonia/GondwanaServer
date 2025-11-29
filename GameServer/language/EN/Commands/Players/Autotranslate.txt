@@ -1,0 +1,6 @@
+Commands.Players.Autotranslate.Description:	Toggles automatic real-time translation of NPC dialogue, quests and player chat.
+Commands.Players.Autotranslate.Usage:		Usage: /autotranslate [on|off] – or simply /autotranslate or /at to toggle.
+Commands.Players.Autotranslate.Enabled:		Real-time translation is enabled on this server.
+Commands.Players.Autotranslate.Disabled:	Real-time translation is disabled on this server.
+Commands.Players.Autotranslate.NowOn:		Real-time translation turned ON!
+Commands.Players.Autotranslate.NowOff:		Real-time translation turned OFF!

@@ -79,30 +79,26 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            string EmoteStr = string.Join(" ", args, 1, args.Length - 1);
-            string ownRealm = LanguageMgr.GetTranslation(
-                client.Account.Language,
-                "Commands.Players.Emote.Act",
-                client.Player.Name,
-                EmoteStr
-            );
-
-            string diffRealm = LanguageMgr.GetTranslation(
-                client.Account.Language,
-                "Commands.Players.Emote.Strange",
-                client.Player.Name
-            );
+            string emoteStrRaw = string.Join(" ", args, 1, args.Length - 1);
 
             foreach (GamePlayer player in client.Player.GetPlayersInRadius(WorldMgr.SAY_DISTANCE))
             {
+                if (player == null)
+                    continue;
+
+                if (player.IsIgnoring(client.Player as GameLiving))
+                    continue;
+
                 if (GameServer.ServerRules.IsAllowedToUnderstand(client.Player, player))
                 {
+                    string toSend = AutoTranslateManager.MaybeTranslate(client.Player, player, emoteStrRaw);
+                    string ownRealm = LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Emote.Act", client.Player.Name, toSend);
                     player.Out.SendMessage(ownRealm, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
                 }
                 else
                 {
-                    if (!player.IsIgnoring(client.Player as GameLiving))
-                        player.Out.SendMessage(diffRealm, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                    string diffRealm = LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Emote.Strange", client.Player.Name);
+                    player.Out.SendMessage(diffRealm, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
                 }
             }
         }

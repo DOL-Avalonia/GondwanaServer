@@ -53,19 +53,22 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + (args.Length - 1) * 8);
-            text.Append(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Chatgroup.Chat"));
-            text.Append(": \"");
-            text.Append(args[1]);
-            for (int i = 2; i < args.Length; i++)
-            {
-                text.Append(" ");
-                text.Append(args[i]);
-            }
-            text.Append("\"");
-            string message = text.ToString();
+            string rawText = string.Join(" ", args, 1, args.Length - 1);
+
             foreach (GamePlayer ply in mychatgroup.Members.Keys)
             {
+                string toSend = rawText;
+
+                toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+
+                StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + toSend.Length);
+                text.Append(LanguageMgr.GetTranslation(ply.Client.Account.Language, "Commands.Players.Chatgroup.Chat"));
+                text.Append(": \"");
+                text.Append(toSend);
+                text.Append("\"");
+
+                string message = text.ToString();
+
                 ply.Out.SendMessage(" " + ply.GetPersonalizedName(client.Player) + message, eChatType.CT_Chat, eChatLoc.CL_ChatWindow);
             }
         }

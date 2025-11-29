@@ -2864,6 +2864,38 @@ namespace DOL.GS.Spells
         }
 
         /// <summary>
+        /// Clone a subspell and apply the parent's race multiplier (if any).
+        /// This scales Value/Damage and, optionally, Duration, and propagates
+        /// the race meta down the chain.
+        /// </summary>
+        protected virtual Spell GetSubSpellWithRaceMultiplier(Spell parentSpell, Spell subSpell)
+        {
+            if (parentSpell == null || subSpell == null)
+                return subSpell;
+
+            if (Math.Abs(parentSpell.RaceMultiplier - 1.0) < 0.0001)
+                return subSpell;
+
+            // Clone DB subspell so we don't mutate the global instance
+            Spell cloned = (Spell)subSpell.Clone();
+
+            double m = parentSpell.RaceMultiplier;
+
+            cloned.RaceMultiplier = m;
+            cloned.DurationScaledByRace = parentSpell.DurationScaledByRace;
+
+            cloned.Value *= m;
+            cloned.Damage *= m;
+
+            if (parentSpell.DurationScaledByRace && cloned.Duration > 0)
+            {
+                cloned.Duration = (int)(cloned.Duration * m);
+            }
+
+            return cloned;
+        }
+
+        /// <summary>
         /// Cast all subspell recursively
         /// </summary>
         /// <param name="target"></param>
@@ -2871,16 +2903,31 @@ namespace DOL.GS.Spells
         {
             if (target is null)
                 target = Caster;
-            
-            List<int> subSpellList = new List<int>();
-            if (m_spell.SubSpellID > 0)
-                subSpellList.Add(m_spell.SubSpellID);
 
             bool success = false;
-            foreach (int spellID in subSpellList.Union(m_spell.MultipleSubSpells))
+
+            // Build the linear chain from SubSpellID: m_spell -> sub1 -> sub2 -> ...
+            List<int> subSpellList = new List<int>();
+            Spell parent = m_spell;
+
+            while (parent != null && parent.SubSpellID > 0)
             {
-                Spell spell = SkillBase.GetSpellByID(spellID);
-                if (spell == null)
+                subSpellList.Add(parent.SubSpellID);
+
+                Spell next = SkillBase.GetSpellByID(parent.SubSpellID);
+                if (next == null)
+                    break;
+
+                parent = next;
+            }
+
+            // Merge with MultipleSubSpells (parallel) and avoid duplicates
+            IEnumerable<int> allSubSpellIDs = subSpellList.Union(m_spell.MultipleSubSpells);
+
+            foreach (int spellID in allSubSpellIDs)
+            {
+                Spell dbSub = SkillBase.GetSpellByID(spellID);
+                if (dbSub == null)
                 {
                     log.ErrorFormat(
                         "Spell {0} has subspell {1} which does not exist. Check DB and/or reload spells",
@@ -2889,15 +2936,23 @@ namespace DOL.GS.Spells
                     continue;
                 }
 
+                Spell effectiveSub = GetSubSpellWithRaceMultiplier(m_spell, dbSub);
+
                 //we need subspell ID to be 0, we don't want spells linking off the subspell
                 //TODO (Mishura): this comment ^ appears to be leftover from code that was removed
-                
+
                 // We have to scale pet subspells when cast
                 if (Caster is GamePet pet && !(Caster is NecromancerPet))
-                    pet.ScalePetSpell(spell);
+                    pet.ScalePetSpell(effectiveSub);
 
-                ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(m_caster, spell, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
+                // Keep using Reserved_Spells line like original code
+                ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(m_caster, effectiveSub, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
+
+                if (spellhandler == null)
+                    continue;
+
                 spellhandler.Parent = this;
+
                 if (m_spell.SubSpellDelay > 0)
                 {
                     success = true;
@@ -2908,6 +2963,7 @@ namespace DOL.GS.Spells
                     success = success || spellhandler.StartSpell(target);
                 }
             }
+
             return success;
         }
 

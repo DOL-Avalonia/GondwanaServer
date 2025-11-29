@@ -62,7 +62,7 @@ namespace DOL.GS
     /// This class is the baseclass for all Non Player Characters like
     /// Monsters, Merchants, Guards, Steeds ...
     /// </summary>
-    public class GameNPC : GameLiving, ITranslatableObject
+    public partial class GameNPC : GameLiving, ITranslatableObject
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
@@ -106,6 +106,34 @@ namespace DOL.GS
             Say("[DEBUG] " + str);
             log.Debug($"[pathing {Name}] {str}");
         }
+        #endregion
+
+        #region TextNPC hooks
+
+        /// <summary>
+        /// Allows TextNPC to modify or replace ambient text (MobXAmbientBehaviour)
+        /// before it is sent (Say/Yell/Broadcast/Popup).
+        /// If handled is set to true, GameNPC will not send anything itself.
+        /// </summary>
+        /// <param name="trigger">Ambient trigger (spawning, interact, etc.)</param>
+        /// <param name="player">Player concerned (may be null)</param>
+        /// <param name="behaviour">MobXAmbientBehaviour row selected</param>
+        /// <param name="text">Current text (placeholders already replaced)</param>
+        /// <param name="handled">Set to true if TextNPC already sent the text</param>
+        partial void BeforeAmbientText(eAmbientTrigger trigger, GamePlayer player, MobXAmbientBehaviour behaviour, ref string text, ref bool handled);
+
+        /// <summary>
+        /// Allows TextNPC to modify or replace a SayTo message
+        /// (NPC -> one player) before sending.
+        /// If handled is set to true, GameNPC will NOT send its own message.
+        /// </summary>
+        partial void BeforeSayTo(GamePlayer target, ref eChatLoc loc, ref string message, ref bool handled);
+
+        /// <summary>
+        /// Allows TextNPC to handle whispers to the NPC.
+        /// If handled is set to true, GameNPC will not run its default whisper logic.
+        /// </summary>
+        partial void BeforeWhisperReceive(GamePlayer player, string text, ref bool handled);
         #endregion
 
         #region Formations/Spacing
@@ -4023,6 +4051,11 @@ namespace DOL.GS
 
             GamePlayer player = (GamePlayer)source;
 
+            bool textNpcHandled = false;
+            BeforeWhisperReceive(player, text, ref textNpcHandled);
+            if (textNpcHandled)
+                return true;
+
             //TODO: Guards in rvr areas doesn't need check
             if (text == "task")
             {
@@ -4066,6 +4099,11 @@ namespace DOL.GS
         public virtual void SayTo(GamePlayer target, eChatLoc loc, string message, bool announce = true)
         {
             if (target == null)
+                return;
+
+            bool textNpcHandled = false;
+            BeforeSayTo(target, ref loc, ref message, ref textNpcHandled);
+            if (textNpcHandled)
                 return;
 
             TurnTo(target);
@@ -6694,6 +6732,11 @@ namespace DOL.GS
                 text = text.Replace("{class}", (living as GamePlayer)!.CharacterClass.Name).Replace("{race}", (living as GamePlayer)!.RaceName);
             if (living is GameNPC)
                 text = text.Replace("{class}", "NPC").Replace("{race}", "NPC");
+
+            bool textNpcHandled = false;
+            BeforeAmbientText(trigger, living as GamePlayer, chosen, ref text, ref textNpcHandled);
+            if (textNpcHandled)
+                return;
 
             if (trigger == eAmbientTrigger.interact)
             {

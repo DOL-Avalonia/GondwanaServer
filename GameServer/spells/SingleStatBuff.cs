@@ -331,7 +331,15 @@ namespace DOL.GS.Spells
     {
         public override eProperty Property1 { get { return eProperty.WeaponSkill; } }
 
-        protected override void SendUpdates(GameLiving target) { }
+        protected override void SendUpdates(GameLiving target)
+        {
+            base.SendUpdates(target);
+
+            if (target is GamePlayer player)
+            {
+                player.Out.SendUpdatePlayerSkills();
+            }
+        }
 
         public WeaponSkillBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 

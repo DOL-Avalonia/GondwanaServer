@@ -302,7 +302,7 @@ namespace DOL.GS.Spells
 
         public override string GetDelveDescription(GameClient delveClient)
         {
-            return LanguageMgr.GetTranslation(delveClient, "SpellDescription.SkillsDebuff.MainDescription", Spell.Value);
+            return LanguageMgr.GetTranslation(delveClient, "SpellDescription.AllSkillsDebuff.MainDescription", Spell.Value);
         }
     }
 

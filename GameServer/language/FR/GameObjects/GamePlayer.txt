@@ -77,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:	Vous avez déjà choisi vo
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Vous jouez déja un morceau.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Vous ne pouvez pas incanter lorsque vous êtes hypnotisé·e.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Vous ne pouvez pas incanter lorsque vous êtes étourdi·e.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Vous ne pouvez pas lancer ce sort lorsque vous êtes sur une monture !
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords:		Vous échouez votre incantation et vous ne parvenez pas à lancer votre sort !
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:			Vous ne pouvez pas lancer ce sort directement !
 GameObjects.GamePlayer.CastSpell.FollowSpell:			    Vous avez préparé un {0} en guise de suivi !

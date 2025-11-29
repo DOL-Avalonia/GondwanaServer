@@ -1,4 +1,4 @@
-Commands.Players.Afk.Description:			Bascule votre statut en AFK. Il est possible d'y ajouter un message.
+Commands.Players.Afk.Description:			Bascule votre statut en AFK. Il est possible d'y ajouter un message. Les commandes "/afk xp", "/afk combat" ou "/afk attack" vous permettent aussi de combattre des pantins d'entraînement tout en conservant le statut "AFK"
 Commands.Players.Afk.Off:					Vous n'êtes plus considéré·e comme étant AFK.
 Commands.Players.Afk.On:					Vous êtes maintenant considéré·e comme étant AFK.
 Commands.Players.Afk.Usage:					Usage : '/afk <text>'
@@ -17,3 +17,7 @@ Commands.Players.Afk.CannotWhileMezzed:		Vous ne pouvez pas utiliser le mode AFK
 Commands.Players.Afk.CannotWhileDamned:		Vous ne pouvez pas utiliser le mode AFK en étant damné.
 Commands.Players.Afk.CannotWhileCrafting:	Vous ne pouvez pas utiliser le mode AFK alors que fabriquez un objet !
 Commands.Players.Afk.CannotWhilekMorphed:	Vous ne pouvez pas utiliser le mode AFK en étant sous l'effet d'un enchantement "{0}"!
+Commands.Players.AfkAttack.On:				Vous démarrez votre entraînement (AFK) !
+Commands.Players.AfkAttack.Off:				Vous cessez de vous entraîner.
+Commands.Players.AfkAttack.NeedDummyTarget:	Vous devez séléctionner un pantin d'entraînement !
+Commands.Players.AfkAttack.NeedDummyRange:	Vous êtes trop éloigné de votre cible pour démarrer votre entraînement !

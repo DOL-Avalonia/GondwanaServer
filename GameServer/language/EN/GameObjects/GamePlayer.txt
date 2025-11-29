@@ -76,7 +76,8 @@ GameObjects.GamePlayer.CastSpell.AlreadyCastNoQueue:		You are already casting a 
 GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:		You have already chosen your spells for this chamber.
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:			You are already playing a song!		
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:			You can't cast while mesmerized!		
-GameObjects.GamePlayer.CastSpell.CantCastStunned:			You can't cast while stunned!		
+GameObjects.GamePlayer.CastSpell.CantCastStunned:			You can't cast while stunned!
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:			You can't cast this spell while riding!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords:		You are fumbling for your words, and cannot cast!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:			You cannot cast this spell directly!
 GameObjects.GamePlayer.CastSpell.FollowSpell:			    You ready a {0} as a follow up!

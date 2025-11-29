@@ -83,7 +83,11 @@ namespace DOL.GS.Commands
             if ((eBroadcastType) Properties.BROADCAST_TYPE == eBroadcastType.Server)
             {
                 foreach (GamePlayer p in GetTargets(player))
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", player.Name, message), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                {
+                    string finalMsg = AutoTranslateManager.MaybeTranslate(player, p, message);
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", player.Name, finalMsg), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                }
+
                 DiscordBot.Instance?.SendMessageBroadcast(player, message);
                 return;
             }
@@ -92,7 +96,8 @@ namespace DOL.GS.Commands
             {
                 if (GameServer.ServerRules.IsAllowedToUnderstand(p, player))
                 {
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", p.GetPersonalizedName(player), message), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    string finalMsg = AutoTranslateManager.MaybeTranslate(player, p, message);
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", p.GetPersonalizedName(player), finalMsg), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                 }
             }
 
@@ -101,7 +106,7 @@ namespace DOL.GS.Commands
         private List<GamePlayer> GetTargets(GamePlayer player)
         {
             List<GamePlayer> list = new();
-            eBroadcastType type = (eBroadcastType)ServerProperties.Properties.BROADCAST_TYPE;
+            eBroadcastType type = (eBroadcastType)Properties.BROADCAST_TYPE;
             switch (type)
             {
                 case eBroadcastType.Area:

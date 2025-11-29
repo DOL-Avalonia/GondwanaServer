@@ -1,4 +1,5 @@
 Commands.Players.Language.AvailableLanguages:	Language disponible : {0}
+Commands.Players.Language.LanguageNotSupported:	Cette langue n'est pas disponible.
 Commands.Players.Language.Current:				La langue d'affichage est actuellement : {0}.
 Commands.Players.Language.Description:			Change votre langue.
 Commands.Players.Language.NoChange:				Ce serveur ne supporte pas le changement de langue.

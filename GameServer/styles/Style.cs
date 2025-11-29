@@ -153,7 +153,18 @@ namespace DOL.GS.Styles
             {
                 log.Error($"Style {style.Name} (ID {style.ID}) has invalid positional requirement {OpeningRequirementValue}. It will probably crash the client");
             }
-            spellRequirement = new List<string>(style.SpellRequirement.Split('|'));
+            if (string.IsNullOrWhiteSpace(style.SpellRequirement))
+            {
+                spellRequirement = new List<string>();
+            }
+            else
+            {
+                spellRequirement = style.SpellRequirement
+                    .Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .Where(s => s.Length > 0)
+                    .ToList();
+            }
         }
 
         public int ClassID

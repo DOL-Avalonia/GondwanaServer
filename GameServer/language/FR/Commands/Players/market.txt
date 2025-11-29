@@ -1,19 +1,22 @@
-Commands.Players.Market.Description:	Générez un marché temporaire.
-Commands.Players.Market.Usage:		Usage : '/market <commande>'
-Commands.Players.Market.Usage.Open:		Usage : '/market open' # Déploie le marché
-Commands.Players.Market.Usage.Close:		Usage : '/market close' # Ferme le marché
-Commands.Players.Market.Usage.Name:		Usage : '/market name' # Renomme le marché
-Commands.Players.Market.No.Ability:		Vous n'avez pas la capacité "Trading" requise pour effectuer cette commande
-Commands.Players.Market.No.SafeArea:		Vous devez être dans une zone sécurisée ou dans une ville pour pouvoir commercer
-Commands.Players.Market.Confirm.Open:		Déployez votre marché ici ?
-Commands.Players.Market.Confirm.Close:		Voulez-vous vraiment remballer boutique maintenant ?
-Commands.Players.Market.Closed:		        Vous êtes trop loin! Votre marché a été fermé.
-Commands.Players.Market.Cant.DeployHere:	Vous ne pouvez pas déployer votre marché dans cette zone !
-Commands.Players.Market.Already.Deployed:	Votre marché est déjà en place !
-Commands.Players.Market.Cant.DeployDungeon:	Vous ne pouvez pas installer votre marché dans les donjons !
-Commands.Players.Market.Cant.DeployJailed:	Vous ne pouvez pas installer votre marché pendant que vous êtes en prison !
-Commands.Players.Market.Cant.DeployMounted:	Vous ne pouvez pas établir votre marché tout en étant à cheval !
-Commands.Players.Market.Cant.DeployCombat:	Vous ne pouvez pas établir votre marché en combat !
-Commands.Players.Market.Cant.DeployDamned:	Vous ne pouvez pas établir votre marché tant que vous êtes sous une malédiction !
-Commands.Players.Market.Cant.DeployPetrify:	Vous ne pouvez pas déployer votre marché en étant pétrifié !
-Commands.Players.Market.Cant.DeployMorphed:	Vous ne pouvez pas déployer votre marché sous l'enchantement "{0}" !
+Commands.Players.Market.Description:			Générez un marché temporaire.
+Commands.Players.Market.Usage:					Usage : '/market <commande>'
+Commands.Players.Market.Usage.Open:				Usage : '/market open' # Déploie le marché
+Commands.Players.Market.Usage.Close:			Usage : '/market close' # Ferme le marché
+Commands.Players.Market.Usage.Name:				Usage : '/market name' # Renomme le marché
+Commands.Players.Market.No.Ability:				Vous n'avez pas la capacité "Trading" requise pour effectuer cette commande
+Commands.Players.Market.No.SafeArea:			Vous devez être dans une zone sécurisée ou dans une ville pour pouvoir commercer
+Commands.Players.Market.Confirm.Open:			Déployez votre marché ici ?
+Commands.Players.Market.Confirm.Close:			Voulez-vous vraiment remballer boutique maintenant ?
+Commands.Players.Market.Closed:					Vous êtes trop loin! Votre marché a été fermé.
+Commands.Players.Market.Cant.DeployHere:		Vous ne pouvez pas déployer votre marché dans cette zone !
+Commands.Players.Market.Already.Deployed:		Votre marché est déjà en place !
+Commands.Players.Market.Cant.DeployDungeon:		Vous ne pouvez pas installer votre marché dans les donjons !
+Commands.Players.Market.Cant.DeployJailed:		Vous ne pouvez pas installer votre marché pendant que vous êtes en prison !
+Commands.Players.Market.Cant.DeployMounted:		Vous ne pouvez pas établir votre marché tout en étant à cheval !
+Commands.Players.Market.Cant.DeployCombat:		Vous ne pouvez pas établir votre marché en combat !
+Commands.Players.Market.Cant.DeployDamned:		Vous ne pouvez pas établir votre marché tant que vous êtes sous une malédiction !
+Commands.Players.Market.Cant.DeployPetrify:		Vous ne pouvez pas déployer votre marché en étant pétrifié !
+Commands.Players.Market.Cant.DeployMorphed:		Vous ne pouvez pas déployer votre marché sous l'enchantement "{0}" !
+Commands.Players.Market.Cant.DeployCrafting:	Vous ne pouvez pas déployer votre marché alors que fabriquez un objet !
+Commands.Players.Market.Cant.DeployAFK:			Vous ne pouvez pas déployer votre marché en étant AFK !
+Commands.Players.Market.Cant.DeployClimbing:	Vous ne pouvez pas déployer votre marché alors que vous grimpez !

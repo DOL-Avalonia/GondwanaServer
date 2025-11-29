@@ -18,7 +18,7 @@ namespace DOL.GS.Quests;
 
 public static class DataQuestJsonMgr
 {
-    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
     public static Dictionary<ushort, DataQuestJson> Quests = new();
 
@@ -160,8 +160,9 @@ public static class DataQuestJsonMgr
             if (!string.IsNullOrWhiteSpace(dq.Quest.AcceptText))
             {
                 var formatMsg = dq.Quest.AcceptText.Replace(@"\n", "\n");
-
-                var finalMsg = Util.SplitCSV(BehaviourUtils.GetPersonalizedMessage(formatMsg, player), true);
+                formatMsg = BehaviourUtils.GetPersonalizedMessage(formatMsg, player);
+                formatMsg = AutoTranslateManager.MaybeTranslateServerText(player, formatMsg);
+                var finalMsg = Util.SplitCSV(formatMsg, true);
 
                 player.Out.SendCustomTextWindow(npc.Name + " dit", finalMsg);
             }

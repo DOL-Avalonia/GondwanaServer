@@ -214,18 +214,6 @@ namespace DOL.GS.ServerProperties
         public static string DISABLED_EXPANSIONS = "";
 
         /// <summary>
-        /// Server Language
-        /// </summary>
-        [ServerProperty("system", "server_language", "Language of your server. It can be EN, FR or DE.", "EN")]
-        public static string SERV_LANGUAGE;
-
-        /// <summary>
-        /// allow_change_language
-        /// </summary>
-        [ServerProperty("system", "allow_change_language", "Should we allow clients to change their language ?", false)]
-        public static bool ALLOW_CHANGE_LANGUAGE;
-
-        /// <summary>
         /// Allow player to change their character face after creation through customizing ?
         /// </summary>
         [ServerProperty("system", "allow_customize_face_after_creation", "Allow player to change their character face after creation through customizing ?", true)]
@@ -260,12 +248,6 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("system", "ban_hackers", "Should we ban hackers, if set to true, bans will be done, if set to false, kicks will be done", false)]
         public static bool BAN_HACKERS;
-
-        /// <summary>
-        /// Is the database translated
-        /// </summary>
-        [ServerProperty("system", "db_language", "What language is the DB", "EN")]
-        public static string DB_LANGUAGE;
 
         [ServerProperty("system", "statprint_frequency", "How often (milliseconds) should statistics be printed on the server console.", 30000)]
         public static int STATPRINT_FREQUENCY;
@@ -365,6 +347,53 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("system", "new_player_stats", "Enable new player stats. If true, shows new statistics based on Tasks; otherwise, shows old statistics.", true)]
         public static bool SHOW_NEW_PLAYER_STATS;
+        #endregion
+
+        #region LANGUAGE
+        /// <summary>
+        /// Server Language
+        /// </summary>
+        [ServerProperty("system", "server_language", "Language of your server. It can be EN, FR or DE.", "EN")]
+        public static string SERV_LANGUAGE;
+
+        /// <summary>
+        /// allow_change_language
+        /// </summary>
+        [ServerProperty("system", "allow_change_language", "Should we allow clients to change their language ?", false)]
+        public static bool ALLOW_CHANGE_LANGUAGE;
+
+        /// <summary>
+        /// Is the database translated
+        /// </summary>
+        [ServerProperty("system", "db_language", "What language is the DB", "EN")]
+        public static string DB_LANGUAGE;
+
+        /// <summary>
+        /// Enable external auto-translation of player chat.
+        /// If false, AutoTranslateManager will always return the original text.
+        /// </summary>
+        [ServerProperty("autotranslate", "autotranslate_enable", "Enable external auto-translation of player chat messages.", true)]
+        public static bool AUTOTRANSLATE_ENABLE;
+
+        /// <summary>
+        /// Translation provider to use. Currently only 'google' is implemented.
+        /// </summary>
+        [ServerProperty("autotranslate", "autotranslate_provider", "Translation provider: 'google' (default) or 'none'.", "google")]
+        public static string AUTOTRANSLATE_PROVIDER;
+
+        /// <summary>
+        /// Google Translate API key.
+        /// Create it in Google Cloud console and restrict it to the server IP or domain.
+        /// </summary>
+        [ServerProperty("autotranslate", "google_api_key", "API key for Google Cloud Translation API v2.", "")]
+        public static string AUTOTRANSLATE_GOOGLE_API_KEY;
+
+        /// <summary>
+        /// Google Translate endpoint.
+        /// Normally you don't need to change this.
+        /// </summary>
+        [ServerProperty("autotranslate", "google_endpoint", "Google Cloud Translation v2 endpoint.", "https://translation.googleapis.com/language/translate/v2")]
+        public static string AUTOTRANSLATE_GOOGLE_ENDPOINT;
         #endregion
 
         #region LOGGING
