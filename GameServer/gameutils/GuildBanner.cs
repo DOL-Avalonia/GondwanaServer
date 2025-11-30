@@ -251,8 +251,11 @@ namespace DOL.GS
             {
                 if (CarryingPlayer.Group == null)
                 {
-                    if (!Properties.GUILD_BANNER_ALLOW_SOLO)
+                    if (!Properties.GUILD_BANNER_ALLOW_SOLO  && CarryingPlayer.Client.Account.PrivLevel <= 1)
+                    {
+                        CarryingPlayer = null;
                         return 9000;
+                    }
                 }
                 else
                 {

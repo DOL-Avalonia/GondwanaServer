@@ -213,17 +213,17 @@ namespace DOL.GS.Effects
         #endregion
 
         #region effect
-        public override void Start(GameLiving m_owner)
+        public override void Start(GameLiving owner)
         {
             int effValue = (int)(Math.Round(Value));
-            base.Start(m_owner);
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Body] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Cold] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Energy] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Heat] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Matter] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Spirit] += effValue;
-            SendUpdates(m_owner);
+            base.Start(owner);
+            owner.OtherBuffBonus[(int)eProperty.Resist_Body] += effValue;
+            owner.OtherBuffBonus[(int)eProperty.Resist_Cold] += effValue;
+            owner.OtherBuffBonus[(int)eProperty.Resist_Energy] += effValue;
+            owner.OtherBuffBonus[(int)eProperty.Resist_Heat] += effValue;
+            owner.OtherBuffBonus[(int)eProperty.Resist_Matter] += effValue;
+            owner.OtherBuffBonus[(int)eProperty.Resist_Spirit] += effValue;
+            SendUpdates(owner);
         }
 
         public override void Stop()
