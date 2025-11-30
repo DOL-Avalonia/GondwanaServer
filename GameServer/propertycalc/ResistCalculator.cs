@@ -2,6 +2,7 @@ using System;
 
 namespace DOL.GS.PropertyCalc
 {
+    [PropertyCalculator(eProperty.MagicAbsorption)]
     [PropertyCalculator(eProperty.Resist_Natural)]
     [PropertyCalculator(eProperty.Resist_First, eProperty.Resist_Last)]
     public class ResistCalculator : PropertyCalculator
@@ -23,7 +24,7 @@ namespace DOL.GS.PropertyCalc
             // Necromancer pets receive resistances from Avoidance of Magic and other active RAs.
             GameLiving livingToCheck;
 
-            if (living is NecromancerPet necroPet && necroPet.Owner is GamePlayer playerOwner)
+            if (living is NecromancerPet { Owner: GamePlayer playerOwner })
                 livingToCheck = playerOwner;
             else
                 livingToCheck = living;
@@ -35,7 +36,7 @@ namespace DOL.GS.PropertyCalc
             if (!forCrowdControlDuration)
                 abilityBonus += livingToCheck.OtherBuffBonus[property];
 
-            int racialBonus = SkillBase.GetRaceResist(living.Race, (eResist) property, living);
+            int racialBonus = 0;
             int buffBonus = CalcValueFromBuffs(living, property);
 
             switch (property)
@@ -56,15 +57,21 @@ namespace DOL.GS.PropertyCalc
                     break;
                 }
             }
-            
-            // Treat NPC resists from constitution buffs as another layer of resists for now.
-            if (living is GameNPC)
+
+            if (property is not eProperty.MagicAbsorption)
             {
-                double constitutionPerMagicAbsorptionPercent = 8;
-                var constitutionBuffBonus = living.BaseBuffBonusCategory[eProperty.Constitution] + living.SpecBuffBonusCategory[eProperty.Constitution];
-                var constitutionDebuffMalus = Math.Abs(living.DebuffCategory[eProperty.Constitution] + living.SpecDebuffCategory[eProperty.Constitution]);
-                var magicAbsorptionFromConstitution = (int)((constitutionBuffBonus - constitutionDebuffMalus) / constitutionPerMagicAbsorptionPercent);
-                buffBonus += magicAbsorptionFromConstitution;
+                racialBonus = SkillBase.GetRaceResist(living.Race, (eResist)property, living);
+
+                // Treat NPC resists from constitution buffs as another layer of resists for now.
+                if (living is GameNPC)
+                {
+                    double constitutionPerMagicAbsorptionPercent = 8;
+                    var constitutionBuffBonus = living.BaseBuffBonusCategory[eProperty.Constitution] + living.SpecBuffBonusCategory[eProperty.Constitution];
+                    var constitutionDebuffMalus = Math.Abs(living.DebuffCategory[eProperty.Constitution] + living.SpecDebuffCategory[eProperty.Constitution]);
+                    var magicAbsorptionFromConstitution = (int)((constitutionBuffBonus - constitutionDebuffMalus) / constitutionPerMagicAbsorptionPercent);
+                    buffBonus += magicAbsorptionFromConstitution;
+                }
+                
             }
 
             int result = itemBonus + buffBonus; // Primary resists.
@@ -82,7 +89,7 @@ namespace DOL.GS.PropertyCalc
         {
             GameLiving livingToCheck;
 
-            if (living is NecromancerPet necroPet && necroPet.Owner is GamePlayer playerOwner)
+            if (living is NecromancerPet { Owner: GamePlayer playerOwner })
                 livingToCheck = playerOwner;
             else
                 livingToCheck = living;
@@ -131,7 +138,7 @@ namespace DOL.GS.PropertyCalc
             // Necromancer pets receive resistances from their owner's items.
             GameLiving livingToCheck;
 
-            if (living is NecromancerPet necroPet && necroPet.Owner is GamePlayer playerOwner)
+            if (living is NecromancerPet { Owner: GamePlayer playerOwner })
                 livingToCheck = playerOwner;
             else
                 livingToCheck = living;
@@ -140,12 +147,17 @@ namespace DOL.GS.PropertyCalc
                 return 0;
 
             int itemBonus = livingToCheck.ItemBonus[property];
-
+            
             // Item bonus cap and cap increase from Mythirians.
             int itemBonusCap = livingToCheck.Level / 2 + 1;
-            int itemBonusCapIncrease = GetItemBonusCapIncrease(livingToCheck, property);
 
-            return Math.Min(itemBonus, itemBonusCap + itemBonusCapIncrease);
+            if (property is not eProperty.MagicAbsorption)
+            {
+                int itemBonusCapIncrease = GetItemBonusCapIncrease(livingToCheck, property);
+                itemBonusCap += itemBonusCapIncrease;
+            }
+
+            return Math.Min(itemBonus, itemBonusCap);
         }
 
         /// <summary>
