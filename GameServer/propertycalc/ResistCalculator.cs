@@ -90,6 +90,13 @@ namespace DOL.GS.PropertyCalc
             int buff = living.BaseBuffBonusCategory[property] + living.SpecBuffBonusCategory[property];
             buff = livingToCheck is GameNPC ? buff : Math.Min(buff, BuffBonusCap);
             int debuff = Math.Abs(living.DebuffCategory[property]) + Math.Abs(living.SpecDebuffCategory[property]);
+            int territoryBonus = 0;
+
+            if (living is GamePlayer player)
+            {
+                if (player.Guild != null)
+                    territoryBonus += player.Guild.GetResistFromTerritories((eResist)property);
+            }
 
             switch (property)
             {
@@ -108,6 +115,7 @@ namespace DOL.GS.PropertyCalc
             }
 
             buff -= Math.Abs(debuff);
+            buff += territoryBonus;
 
             if (buff < 0 && living is GamePlayer)
                 buff /= 2;
