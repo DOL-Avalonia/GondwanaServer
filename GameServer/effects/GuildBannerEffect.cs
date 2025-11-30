@@ -217,24 +217,24 @@ namespace DOL.GS.Effects
         {
             int effValue = (int)(Math.Round(Value));
             base.Start(owner);
-            owner.OtherBuffBonus[(int)eProperty.Resist_Body] += effValue;
-            owner.OtherBuffBonus[(int)eProperty.Resist_Cold] += effValue;
-            owner.OtherBuffBonus[(int)eProperty.Resist_Energy] += effValue;
-            owner.OtherBuffBonus[(int)eProperty.Resist_Heat] += effValue;
-            owner.OtherBuffBonus[(int)eProperty.Resist_Matter] += effValue;
-            owner.OtherBuffBonus[(int)eProperty.Resist_Spirit] += effValue;
+            owner.BaseBuffBonusCategory[(int)eProperty.Resist_Body] += effValue;
+            owner.BaseBuffBonusCategory[(int)eProperty.Resist_Cold] += effValue;
+            owner.BaseBuffBonusCategory[(int)eProperty.Resist_Energy] += effValue;
+            owner.BaseBuffBonusCategory[(int)eProperty.Resist_Heat] += effValue;
+            owner.BaseBuffBonusCategory[(int)eProperty.Resist_Matter] += effValue;
+            owner.BaseBuffBonusCategory[(int)eProperty.Resist_Spirit] += effValue;
             SendUpdates(owner);
         }
 
         public override void Stop()
         {
             int effValue = (int)(Math.Round(Value));
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Body] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Cold] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Energy] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Heat] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Matter] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Spirit] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Body] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Cold] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Energy] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Heat] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Matter] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Spirit] -= effValue;
             base.Stop();
             SendUpdates(m_owner);
         }
@@ -285,18 +285,18 @@ namespace DOL.GS.Effects
         {
             base.Start(target);
             int effValue = (int)(Math.Round(Value));
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Crush] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Slash] += effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Thrust] += effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Crush] += effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Slash] += effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Thrust] += effValue;
             SendUpdates(m_owner);
         }
 
         public override void Stop()
         {
             int effValue = (int)(Math.Round(Value));
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Crush] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Slash] -= effValue;
-            m_owner.OtherBuffBonus[(int)eProperty.Resist_Thrust] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Crush] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Slash] -= effValue;
+            m_owner.BaseBuffBonusCategory[(int)eProperty.Resist_Thrust] -= effValue;
             base.Stop();
             SendUpdates(m_owner);
         }
