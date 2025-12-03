@@ -8,6 +8,8 @@ using DOL.Database;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using log4net;
+using DOL.AI.Brain;
+using DOL.GS.Spells;
 
 namespace DOL.GS
 {
@@ -38,7 +40,25 @@ namespace DOL.GS
             Spell sp = ResolveAdrenalineSpell(player);
             if (sp == null) return;
 
+            // Cast adrenaline on the player first (Mage adrenaline for Necromancer).
             player.CastSpell(sp, SpellLine);
+
+            // If this is a Necromancer in shade form with an active pet,
+            // also apply the tank adrenaline to the pet.
+            if (player.CharacterClass is CharacterClassNecromancer &&
+                player.IsShade &&
+                player.ControlledBrain is IControlledBrain controlledBrain &&
+                controlledBrain.Body is GameLiving pet &&
+                pet != null)
+            {
+                Spell petAdrenaline = SkillBase.GetSpellByID(AdrenalineSpellHandler.TANK_ADRENALINE_SPELL_ID);
+                SpellLine adrenalineLine = SpellLine ?? SkillBase.GetSpellLine("Adrenaline");
+
+                if (petAdrenaline != null && adrenalineLine != null)
+                {
+                    pet.CastSpell(petAdrenaline, adrenalineLine);
+                }
+            }
         }
 
         private static Spell ResolveAdrenalineSpell(GamePlayer player)

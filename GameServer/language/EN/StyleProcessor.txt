@@ -22,5 +22,8 @@ StyleProcessor.TryToUseStyle.PerformStyleBefore:	You must perform the {0} style 
 StyleProcessor.TryToUseStyle.PreparePerform:		You prepare to perform a {0}!
 StyleProcessor.TryToUseStyle.StyleRequires:		This style requires a {0} weapon!
 
-StyleProcessor.TryToUseStyle.RequiredSpell:                        You do not satify all conditions to perform this style!
-StyleProcessor.TryToUseStyle.RequiredSpell.ChtonicShapeShift:      You must be in chtonic form to perform this style!
+StyleProcessor.TryToUseStyle.RequiredSpell:			You do not satify all conditions to perform this style!
+StyleProcessor.TryToUseStyle.RequiredSpell.ChtonicShapeShift:	You must be in chtonic form to perform this style!
+StyleProcessor.TryToUseStyle.Disarmed:				You are disarmed and cannot attack!
+StyleProcessor.ExecuteStyle.BarrierAbsorbs:			A barrier absorbs {0} damage!
+StyleProcessor.CreateMagicEffect.NotImplemented:		{0} not implemented yet ({1})

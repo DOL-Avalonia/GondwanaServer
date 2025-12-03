@@ -11,6 +11,7 @@ using System.Reflection;
 using DOL.Language;
 using DOL.GS.Finance;
 using DOL.MobGroups;
+using DOL.GS.Behaviour;
 
 namespace DOL.GS.Quests
 {
@@ -19,7 +20,7 @@ namespace DOL.GS.Quests
     /// </summary>
     public class DataQuestJson
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private DBDataQuestJson _db;
 
@@ -71,6 +72,42 @@ namespace DOL.GS.Quests
         public DataQuestJson()
         {
         }
+
+        /// <summary>
+        /// Translate a quest-level text (server base language -> player language),
+        /// optionally personalizing placeholders like &lt;race&gt;, &lt;class&gt;.
+        /// Returns original text if auto-translate is disabled.
+        /// </summary>
+        private string TranslateQuestText(GamePlayer player, string template, bool personalize)
+        {
+            if (player == null || string.IsNullOrWhiteSpace(template))
+                return template ?? string.Empty;
+
+            string text = template;
+
+            if (personalize)
+                text = BehaviourUtils.GetPersonalizedMessage(text, player);
+
+            return AutoTranslateManager.MaybeTranslateServerText(player, text);
+        }
+
+        public string GetNameForPlayer(GamePlayer player)
+            => TranslateQuestText(player, Name, personalize: false);
+
+        public string GetDescriptionForPlayer(GamePlayer player)
+            => TranslateQuestText(player, Description, personalize: false);
+
+        public string GetSummaryForPlayer(GamePlayer player)
+            => TranslateQuestText(player, Summary, personalize: true);
+
+        public string GetStoryForPlayer(GamePlayer player)
+            => TranslateQuestText(player, Story, personalize: true);
+
+        public string GetConclusionForPlayer(GamePlayer player)
+            => TranslateQuestText(player, Conclusion, personalize: true);
+
+        public string GetAcceptTextForPlayer(GamePlayer player)
+            => TranslateQuestText(player, AcceptText, personalize: true);
 
         public void Notify(PlayerQuest questData, DOLEvent e, object sender, EventArgs args)
         {
@@ -183,7 +220,7 @@ namespace DOL.GS.Quests
 
         public void OnQuestAssigned(GamePlayer player)
         {
-            player.Out.SendMessage(String.Format(LanguageMgr.GetTranslation(player.Client.Account.Language, "AbstractQuest.OnQuestAssigned.GetQuest", Name)), eChatType.CT_System, eChatLoc.CL_ChatWindow);
+            player.Out.SendMessage(String.Format(LanguageMgr.GetTranslation(player.Client.Account.Language, "AbstractQuest.OnQuestAssigned.GetQuest", GetNameForPlayer(player))), eChatType.CT_System, eChatLoc.CL_ChatWindow);
         }
 
         public virtual void SaveIntoDatabase()

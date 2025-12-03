@@ -61,6 +61,7 @@ GameObjects.GamePlayer.Attack.YouAttack:            Atacas a
 GameObjects.GamePlayer.Attack.YouShot:              Disparas a
 GameObjects.GamePlayer.Attack.CounterAttackSuccess: Usas {0} para contraatacar.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:   No puedes usar el estilo de contraataque con el arma actual.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	¡No puedes contraatacar con un arma a distancia!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:       No se encontró un estilo de contraataque para tu clase.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:       ¡{0} realiza una contraofensiva!
 
@@ -76,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:   Ya has elegido tus hechi
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Ya estás tocando una melodía.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        No puedes lanzar hechizos mientras estás hipnotizado.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       No puedes lanzar hechizos mientras estás aturdido.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		¡No puedes lanzar este hechizo mientras montas!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: ¡Tu invocación falla y no puedes lanzar tu hechizo!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     ¡No puedes lanzar este hechizo directamente!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           ¡Has preparado un {0} como hechizo de seguimiento!

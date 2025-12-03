@@ -1,0 +1,4 @@
+GameUtils.Chatgroup.JoinSelf:		Vous rejoignez le groupe de discussion.
+GameUtils.Chatgroup.MemberJoined:	{0} a rejoint le groupe de discussion.
+GameUtils.Chatgroup.LeaveSelf:		Vous quittez le groupe de discussion.
+GameUtils.Chatgroup.MemberLeft:		{0} a quitté le groupe de discussion.

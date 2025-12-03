@@ -19,5 +19,7 @@ Commands.Players.Afk.CannotWhileCrafting:	Vous ne pouvez pas utiliser le mode AF
 Commands.Players.Afk.CannotWhilekMorphed:	Vous ne pouvez pas utiliser le mode AFK en étant sous l'effet d'un enchantement "{0}"!
 Commands.Players.AfkAttack.On:				Vous démarrez votre entraînement (AFK) !
 Commands.Players.AfkAttack.Off:				Vous cessez de vous entraîner.
-Commands.Players.AfkAttack.NeedDummyTarget:	Vous devez séléctionner un pantin d'entraînement !
+Commands.Players.AfkAttack.NeedDummyTarget:	Vous devez sélectionner un pantin d'entraînement !
 Commands.Players.AfkAttack.NeedDummyRange:	Vous êtes trop éloigné de votre cible pour démarrer votre entraînement !
+Commands.Players.AfkAttack.NeedMeleeWeapon:	Vous devez être équipé d'une arme de corps-à-corps pour commencer l'entraînement.
+Commands.Players.AfkAttack.NeedRangedWeapon:	Vous devez vous équiper d'un arc pour commencer l'entraînement d'archerie.

@@ -245,6 +245,11 @@ InviteToGroupHandler.InvitePrompt1:				{0} ti ha invitato a unirti al suo gruppo
 InviteToGroupHandler.InvitePrompt2:				Accetti?
 InviteToGroupHandler.InviteNotification:			{0} ti ha invitato a unirti al suo gruppo.
 
+# /PlayerGroundTargetHandler
+PlayerGroundTargetHandler.GroundTargetNotVisible:		Il tuo bersaglio a terra non è visibile!
+PlayerGroundTargetHandler.BoatMoveOrder:				Fai avanzare la tua barca.
+PlayerGroundTargetHandler.NotEnoughPassengers:			{0} non ha ancora abbastanza passeggeri per muoversi!
+
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:		Non puoi combattere in mischia con un'arma da fuoco equipaggiata!
 

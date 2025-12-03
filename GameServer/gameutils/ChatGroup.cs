@@ -19,6 +19,7 @@
 using System.Collections;
 using System.Collections.Specialized;
 using DOL.GS.PacketHandler;
+using DOL.Language;
 namespace DOL.GS
 {
     public class ChatGroup
@@ -73,10 +74,10 @@ namespace DOL.GS
                 if (m_chatgroupMembers.Contains(player))
                     return false;
                 player.TempProperties.setProperty(CHATGROUP_PROPERTY, this);
-                player.Out.SendMessage("You join the chat group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Chatgroup.JoinSelf"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 foreach (GamePlayer member in Members.Keys)
                 {
-                    member.Out.SendMessage(member.GetPersonalizedName(player) + " has joined the chat group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "GameUtils.Chatgroup.MemberJoined", member.GetPersonalizedName(player)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 m_chatgroupMembers.Add(player, leader);
             }
@@ -97,10 +98,10 @@ namespace DOL.GS
                     return false;
                 m_chatgroupMembers.Remove(player);
                 player.TempProperties.removeProperty(CHATGROUP_PROPERTY);
-                player.Out.SendMessage("You leave the chat group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Chatgroup.LeaveSelf"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 foreach (GamePlayer member in Members.Keys)
                 {
-                    member.Out.SendMessage(member.GetPersonalizedName(player) + " has left the chat group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "GameUtils.Chatgroup.MemberLeft", member.GetPersonalizedName(player)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 if (m_chatgroupMembers.Count == 1)
                 {

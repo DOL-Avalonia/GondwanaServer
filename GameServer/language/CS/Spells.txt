@@ -18,6 +18,7 @@ DelveInfo.Target:               Cíl: {0}
 DelveInfo.Value:                Hodnota: {0}
 DelveInfo.ValueNegative:        Hodnota: -{0}
 DelveInfo.Destination:		    Cíl cesty: {0}
+DelveInfo.RemainingUse:			Zbývající použití: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Uděluje {0} {1} cíli.
@@ -192,9 +193,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Uděluješ o {0}% více poš
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Snižuje účinnost hypnózních kouzel o {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Dává {0}% šanci uhnout.
 SpellDescription.ParryChanceBuff.MainDescription:			Dává {0}% šanci vykrýt.
-SpellDescription.WeaponSkillBuff.MainDescription:			Zvyšuje dovednost s {0} o {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Zvyšuje dovednost Nenápadnost {0} o {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Zvyšuje dovednost Flexibilní {0} o {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Zvyšuje dovednost se zbraněmi o {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Zvyšuje dovednost Skrývání o {0} bodů.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Zvyšuje dovednost Flexible o {0} bodů.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Snižuje dovednost se zbraněmi o {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Snižuje dovednost Skrývání o {0} bodů.
 SpellDescription.ResiPierceBuff.MainDescription:			Dává {0}% šanci prorazit magické odolnosti.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Zvyšuje šanci na kritický zásah kouzly o {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Zvyšuje šanci na kritický zásah na blízko o {0}%.
@@ -204,7 +207,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			Cíl uděluje o {0}% mén�
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Zvyšuje spotřebu výdrže cíle v boji o {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Zvyšuje šanci cíle na chybu (fumble) o {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Snižuje DPS o {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Snižuje dovednosti o {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Snižuje všechny dovednosti o {0} bodů.
 SpellDescription.Warlock.SecondarySpell:					Toto je sekundární kouzlo.
 SpellDescription.Warlock.PrimarySpell:						Toto je primární kouzlo.
 SpellDescription.AllStatsDebuff.MainDescription:			Snižuje všechny atributy cíle o {0}.

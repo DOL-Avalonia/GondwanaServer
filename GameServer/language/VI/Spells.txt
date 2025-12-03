@@ -18,6 +18,7 @@ DelveInfo.Target:               Mục tiêu: {0}
 DelveInfo.Value:                Giá trị: {0}
 DelveInfo.ValueNegative:        Giá trị: -{0}
 DelveInfo.Destination:		    Đích đến: {0}
+DelveInfo.RemainingUse:			Lần dùng còn lại: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Gây {0} {1} lên mục tiêu.
@@ -192,9 +193,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Gây thêm {0}% sát thươn
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Giảm hiệu quả phép thôi miên {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Cho {0}% cơ hội né.
 SpellDescription.ParryChanceBuff.MainDescription:			Cho {0}% cơ hội đỡ.
-SpellDescription.WeaponSkillBuff.MainDescription:			Tăng kỹ năng {0} {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Tăng kỹ năng Ẩn nấp {0} {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Tăng kỹ năng Vũ khí mềm dẻo {0} {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Tăng kỹ năng Vũ khí thêm {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Tăng kỹ năng Tàng hình thêm {0} điểm.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Tăng kỹ năng Flexible thêm {0} điểm.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Giảm kỹ năng Vũ khí đi {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Giảm kỹ năng Tàng hình đi {0} điểm.
 SpellDescription.ResiPierceBuff.MainDescription:			Cho {0}% cơ hội xuyên kháng phép.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Tăng cơ hội chí mạng phép {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Tăng cơ hội chí mạng cận {0}%.
@@ -204,7 +207,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			Mục tiêu gây ít sát 
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Tăng tiêu hao thể lực trong chiến đấu của mục tiêu {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Tăng cơ hội “trượt tay” của mục tiêu {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Giảm DPS {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Giảm kỹ năng {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Giảm tất cả kỹ năng đi {0} điểm.
 SpellDescription.Warlock.SecondarySpell:					Đây là phép phụ.
 SpellDescription.Warlock.PrimarySpell:						Đây là phép chính.
 SpellDescription.AllStatsDebuff.MainDescription:			Giảm mọi thuộc tính của mục tiêu {0}.

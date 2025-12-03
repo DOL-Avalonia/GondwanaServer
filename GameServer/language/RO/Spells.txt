@@ -17,7 +17,7 @@ DelveInfo.RecastTime:           Reîncărcare:
 DelveInfo.Target:               Țintă: {0}
 DelveInfo.Value:                Valoare: {0}
 DelveInfo.ValueNegative:        Valoare: -{0}
-DelveInfo.Destination:		    Destinație: {0}
+DelveInfo.RemainingUse:			Utilizări rămase: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Provoacă {0} {1} țintei.
@@ -192,9 +192,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Provoci cu {0}% mai multe da
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Reduce eficiența vrăjilor de hipnoză cu {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Acordă {0}% șansă de eschivă.
 SpellDescription.ParryChanceBuff.MainDescription:			Acordă {0}% șansă de parare.
-SpellDescription.WeaponSkillBuff.MainDescription:			Creste abilitatea cu {0} cu {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Creste abilitatea de Furtivitate {0} cu {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Creste abilitatea Flexibil {0} cu {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Crește abilitatea cu armele cu {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Crește abilitatea Furtivitate cu {0} puncte.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Crește abilitatea Flexible cu {0} puncte.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Reduce abilitatea cu armele cu {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Reduce abilitatea Furtivitate cu {0} puncte.
 SpellDescription.ResiPierceBuff.MainDescription:			Acordă {0}% șansă de penetrare a rezistențelor magice.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Creste șansa de critic la vrăji cu {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Creste șansa de critic în melee cu {0}%.
@@ -204,7 +206,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			Ținta provoacă cu {0}% m
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Creste consumul de anduranță al țintei în luptă cu {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Creste șansa țintei de stângație (fumble) cu {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Reduce DPS cu {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Reduce abilitățile cu {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Reduce toate abilitățile cu {0} puncte.
 SpellDescription.Warlock.SecondarySpell:					Aceasta este o vrajă secundară.
 SpellDescription.Warlock.PrimarySpell:						Aceasta este o vrajă primară.
 SpellDescription.AllStatsDebuff.MainDescription:			Reduce toate atributele țintei cu {0}.

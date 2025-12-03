@@ -62,6 +62,7 @@ GameObjects.GamePlayer.Attack.YouAttack:	Ihr greift an,
 GameObjects.GamePlayer.Attack.YouShot:	Ihr schießt
 GameObjects.GamePlayer.Attack.CounterAttackSuccess:	Du setzt {0} zur Gegenattacke ein.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:	Gegenangriff‑Stil kann mit der aktuellen Waffe nicht verwendet werden.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Ihr könnt mit einer Fernkampfwaffe keinen Gegenangriff ausführen!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:	Kein Gegenangriff‑Stil für deine Klasse gefunden.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:	{0} führt eine Gegenattacke aus!
 
@@ -77,6 +78,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:	Ihr habt bereits Zauberspr
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:	Ihr spielt bereits ein Lied!
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:	Ihr könnt nichts machen, wenn Ihr hypnotisiert seid!
 GameObjects.GamePlayer.CastSpell.CantCastStunned:	Ihr könnt nichts machen, wenn Ihr betäubt seid!
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:	Ihr könnt diesen Zauber nicht wirken, während Ihr reitet!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords:	Ihr könnt nicht zaubern, da Ihr die Worte nur noch stammelt!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:	Ihr könnt diesen Zauberspruch nicht direkt anwenden!
 GameObjects.GamePlayer.CastSpell.FollowSpell:	Ihr bereitet {0} als Folgespruch vor!

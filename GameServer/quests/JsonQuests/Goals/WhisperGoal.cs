@@ -49,10 +49,13 @@ namespace DOL.GS.Quests
 
                 if (e == GameLivingEvent.Whisper && interact.Target.Name == Target.Name && interact.Target.CurrentRegion == Target.CurrentRegion && interact.Text == m_whisperText)
                 {
-                    if (AdvanceGoal(quest, goal));
+                    if (AdvanceGoal(quest, goal))
                     {
                         if (!string.IsNullOrWhiteSpace(m_text))
-                            ChatUtil.SendPopup(player, BehaviourUtils.GetPersonalizedMessage(m_text, player));
+                        {
+                            string msg = TranslateGoalText(player, m_text);
+                            ChatUtil.SendPopup(player, msg);
+                        }
                     }
                 }
             }

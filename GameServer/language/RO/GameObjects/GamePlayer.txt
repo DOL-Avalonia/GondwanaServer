@@ -61,6 +61,7 @@ GameObjects.GamePlayer.Attack.YouAttack:            Ataci
 GameObjects.GamePlayer.Attack.YouShot:              Tragi asupra
 GameObjects.GamePlayer.Attack.CounterAttackSuccess: Folosești {0} pentru a contraataca.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:   Nu poți folosi stilul de contraatac cu arma curentă.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Nu poți contraataca cu o armă la distanță!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:       Nu s-a găsit niciun stil de contraatac pentru clasa ta.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:       {0} lansează un contraatac!
 
@@ -76,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:   Ți-ai ales deja vrăjil
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Deja cânți o melodie.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Nu poți lansa vrăji cât timp ești hipnotizat.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Nu poți lansa vrăji cât timp ești uluit.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Nu poți lansa această vrajă în timp ce călărești!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Incantația ta eșuează; nu poți lansa vraja!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Nu poți lansa această vrajă direct!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Ai pregătit un {0} ca vrajă de urmărire!

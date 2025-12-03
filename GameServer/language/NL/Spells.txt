@@ -18,6 +18,7 @@ DelveInfo.Target:               Doelwit: {0}
 DelveInfo.Value:                Waarde: {0}
 DelveInfo.ValueNegative:        Waarde: -{0}
 DelveInfo.Destination:		    Bestemming: {0}
+DelveInfo.RemainingUse:			Resterend gebruik: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Brengt {0} {1} toe aan het doelwit.
@@ -192,9 +193,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Je doet {0}% meer melee‑sc
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Verlaagt de effectiviteit van hypnose‑spreuken met {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Verleent {0}% kans om te ontwijken.
 SpellDescription.ParryChanceBuff.MainDescription:			Verleent {0}% kans om te pareren.
-SpellDescription.WeaponSkillBuff.MainDescription:			Verhoogt vaardigheid met {0} met {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Verhoogt Stealth‑vaardigheid {0} met {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Verhoogt Flexibel‑vaardigheid {0} met {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Verhoogt de wapenvaardigheid met {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Verhoogt de vaardigheid Sluipen met {0} punten.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Verhoogt de vaardigheid Flexible met {0} punten.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Verlaagt de wapenvaardigheid met {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Verlaagt de vaardigheid Sluipen met {0} punten.
 SpellDescription.ResiPierceBuff.MainDescription:			Verleent {0}% kans om magische weerstanden te doorboren.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Verhoogt crit‑kans van spreuken met {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Verhoogt crit‑kans in melee met {0}%.
@@ -204,7 +207,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			Het doelwit doet {0}% mind
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Verhoogt uithoudingsverbruik in gevecht van het doelwit met {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Verhoogt de kans op uitglijden/fumble van het doelwit met {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Verlaagt DPS met {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Verlaagt vaardigheden met {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Verlaagt alle vaardigheden met {0} punten.
 SpellDescription.Warlock.SecondarySpell:					Dit is een secundaire spreuk.
 SpellDescription.Warlock.PrimarySpell:						Dit is een primaire spreuk.
 SpellDescription.AllStatsDebuff.MainDescription:			Verlaagt alle attributen van het doelwit met {0}.

@@ -94,6 +94,8 @@ namespace DOL.GS
 
         private TaskXPlayer taskXPlayer;
 
+        private List<Style> _counterAttackStyles = new();
+
         public static readonly string AUTOTRANSLATE_PROPERTY = "autotranslate_enabled";
 
         #region Client/Character/VariousFlags
@@ -2997,32 +2999,38 @@ namespace DOL.GS
             }
         }
 
-        protected override void GainTension(AttackData ad)
+        /// <summary>
+        /// Core tension gain logic used for both direct hits and special cases
+        /// (e.g. Necromancer pet channeling).
+        /// </summary>
+        private int ComputeTensionGain(AttackData ad, bool ignoreArmorMultiplier, GameLiving extraTensionBuffSource)
         {
-            if (ad.Attacker == null || MaxTension <= 0)
-            {
-                return;
-            }
+            if (ad == null)
+                return 0;
 
-            if (ad.Attacker is GamePlayer attackerPlayer && IsPlayerGreyCon(attackerPlayer))
-            {
-                return;
-            }
+            GameLiving attacker = ad.Attacker as GameLiving;
+
+            if (attacker == null || MaxTension <= 0)
+                return 0;
+
+            // Grey con player attackers do not give tension.
+            if (attacker is GamePlayer attackerPlayer && IsPlayerGreyCon(attackerPlayer))
+                return 0;
 
             lock (EffectList)
             {
-                // Players under Resurrection sickness, Damnation or Reanimate Corpse cannot gain tension
+                // Players under Resurrection sickness, Damnation or Reanimate Corpse cannot gain tension.
                 if (EffectList.Any(e => e is GameSpellEffect { SpellHandler: AbstractIllnessSpellHandler or DamnationSpellHandler or SummonMonster }))
                 {
-                    return;
+                    return 0;
                 }
             }
 
-            int conLevel = (int)GetConLevel(ad.Attacker as GameLiving);
+            int conLevel = (int)GetConLevel(attacker);
             float tension;
             float server_rate;
 
-            if (ad.Attacker is GamePlayer)
+            if (attacker is GamePlayer)
             {
                 tension = conLevel switch
                 {
@@ -3053,33 +3061,92 @@ namespace DOL.GS
                 server_rate = (float)Properties.PVE_TENSION_RATE;
             }
 
-            float rate = (1.00f + ((float)GetModified(eProperty.MythicalTension)) / 100);
+            if (tension <= 0)
+                return 0;
 
-            if (rate < 0.0f)
-            {
-                return;
-            }
+            // Tension bonuses:
+            // - Player items / buffs on MythicalTension.
+            // - PLUS pet's MythicalTension (for tension buffs placed on the pet).
+            int selfTensionBonus = GetModified(eProperty.MythicalTension);
+            int extraTensionBonus = extraTensionBuffSource != null
+                ? extraTensionBuffSource.GetModified(eProperty.MythicalTension)
+                : 0;
+
+            float rate = 1.00f + (selfTensionBonus + extraTensionBonus) / 100.0f;
+
+            if (rate <= 0.0f)
+                return 0;
 
             if (IsRenaissance)
-            {
                 rate *= 1.10f;
-            }
 
             double guildBuffMultiplier = Guild?.GetBonusMultiplier(Guild.eBonusType.Tension) ?? 1.0;
 
-            eArmorSlot hitLocation = ad.ArmorHitLocation;
-            float armorMultiplier = hitLocation switch
+            float armorMultiplier = 1.0f;
+            if (!ignoreArmorMultiplier)
             {
-                eArmorSlot.TORSO => 0.9f,
-                eArmorSlot.LEGS => 0.8f,
-                eArmorSlot.ARMS => 0.6f,
-                eArmorSlot.HEAD => 0.7f,
-                eArmorSlot.HAND => 0.4f,
-                eArmorSlot.FEET => 0.5f,
-                _ => 1.0f
-            };
+                eArmorSlot hitLocation = ad.ArmorHitLocation;
+                armorMultiplier = hitLocation switch
+                {
+                    eArmorSlot.TORSO => 0.9f,
+                    eArmorSlot.LEGS => 0.8f,
+                    eArmorSlot.ARMS => 0.6f,
+                    eArmorSlot.HEAD => 0.7f,
+                    eArmorSlot.HAND => 0.4f,
+                    eArmorSlot.FEET => 0.5f,
+                    _ => 1.0f
+                };
+            }
 
-            Tension += (int)Math.Round(server_rate * tension * armorMultiplier * ad.TensionRate * rate * CurrentZone.TensionRate * guildBuffMultiplier);
+            int tensionGain = (int)Math.Round(server_rate * tension * armorMultiplier * ad.TensionRate * rate * CurrentZone.TensionRate * guildBuffMultiplier);
+
+            if (tensionGain <= 0)
+                return 0;
+
+            return tensionGain;
+        }
+
+        /// <summary>
+        /// Normal tension gain when the player themself is hit.
+        /// </summary>
+        protected override void GainTension(AttackData ad)
+        {
+            AddTensionFromHit(ad, ignoreArmorMultiplier: false, tensionScale: 1.0f, extraTensionBuffSource: null);
+        }
+
+        /// <summary>
+        /// Core tension gain logic used for both direct hits and special cases
+        /// (e.g. Necromancer pet channeling).
+        /// </summary>
+        private void AddTensionFromHit(AttackData ad, bool ignoreArmorMultiplier, float tensionScale, GameLiving extraTensionBuffSource)
+        {
+            if (ad == null)
+                return;
+
+            int baseGain = ComputeTensionGain(ad, ignoreArmorMultiplier, extraTensionBuffSource);
+            if (baseGain <= 0)
+                return;
+
+            int scaled = (int)Math.Round(baseGain * tensionScale);
+            if (scaled <= 0)
+                return;
+
+            Tension += scaled;
+        }
+
+        /// <summary>
+        /// Tension gain when a controlled pet (e.g. Necromancer shade pet) is being hit.
+        /// Uses the owner's con vs the attacker, ignores armor location,
+        /// and includes MythicalTension buffs from the pet.
+        /// </summary>
+        internal void GainTensionFromPetHit(GameLiving pet, AttackData ad, float tensionScale)
+        {
+            if (pet == null || ad == null)
+                return;
+
+            int baseGain = ComputeTensionGain(ad, ignoreArmorMultiplier: true, extraTensionBuffSource: pet);
+            int scaled = (int)Math.Round(baseGain * tensionScale);
+            if (scaled > 0) Tension += scaled;
         }
 
         /// <summary>
@@ -3165,13 +3232,20 @@ namespace DOL.GS
             MaxTension = DBCharacter.MaxTension;
             AdrenalineSpell = CharacterClass.AdrenalineSpell;
 
-            CounterAttackStyle = SkillBase.GetStyleList("CounterAttack", m_characterClass.ID).FirstOrDefault();
-            if (CounterAttackStyle == null)
+            _counterAttackStyles = SkillBase.GetStyleList("CounterAttack", m_characterClass.ID)?.ToList() ?? new List<Style>();
+
+            if (_counterAttackStyles.Count == 0)
             {
                 var whereClause = DB.Column("SpecKeyName").IsEqualTo("CounterAttack").And(DB.Column("ClassId").IsEqualTo(m_characterClass.ID));
-                var dbStyle = GameServer.Database.SelectObject<DBStyle>(whereClause);
-                CounterAttackStyle = dbStyle == null ? null : new Style(dbStyle);
+                var dbStyles = GameServer.Database.SelectObjects<DBStyle>(whereClause);
+
+                foreach (var dbStyle in dbStyles)
+                {
+                    _counterAttackStyles.Add(new Style(dbStyle));
+                }
             }
+
+            CounterAttackStyle = _counterAttackStyles.FirstOrDefault();
 
             if (Group != null)
             {
@@ -6430,7 +6504,7 @@ namespace DOL.GS
         public override void SwitchWeapon(eActiveWeaponSlot slot)
         {
             //When switching weapons, attackmode is removed!
-            if (AttackState)
+            if (AttackState && !_isAfkAttackMode)
                 StopAttack();
 
             if (CurrentSpellHandler != null)
@@ -6562,6 +6636,11 @@ namespace DOL.GS
         /// <param name="attackTarget">the target to attack</param>
         public override void StartAttack(GameObject attackTarget)
         {
+            if (_isAfkAttackMode && !(attackTarget is GameTrainingDummy))
+            {
+                StopAfkAttackMode(showMessage: false);
+            }
+
             if (CharacterClass.StartAttack(attackTarget) == false)
             {
                 return;
@@ -6786,6 +6865,12 @@ namespace DOL.GS
         {
             NextCombatStyle = null;
             NextCombatBackupStyle = null;
+
+            if (_isAfkAttackMode)
+            {
+                StopAfkAttackMode(showMessage: false);
+            }
+
             base.StopAttack(forced);
             StopAfkXp();
             if (IsAlive)
@@ -7496,46 +7581,279 @@ namespace DOL.GS
             return false;
         }
 
+        /// <summary>
+        /// Returns true if the given weapon type is allowed to be used from the given slot
+        /// for melee counterattacks (according to your slot rules).
+        /// </summary>
+        private static bool IsWeaponAllowedInSlot(InventoryItem weapon, eInventorySlot slot)
+        {
+            if (weapon == null)
+                return false;
+
+            var type = (eObjectType)weapon.Object_Type;
+
+            switch (slot)
+            {
+                case eInventorySlot.TwoHandWeapon:
+                    if (type == eObjectType.FistWraps ||
+                        type == eObjectType.HandToHand ||
+                        type == eObjectType.LeftAxe)
+                        return false;
+
+                    return GlobalConstants.IsMeleeWeaponForAfk(type);
+
+                case eInventorySlot.RightHandWeapon:
+                case eInventorySlot.LeftHandWeapon:
+                    if (type == eObjectType.TwoHandedWeapon ||
+                        type == eObjectType.PolearmWeapon ||
+                        type == eObjectType.Staff ||
+                        type == eObjectType.LargeWeapons ||
+                        type == eObjectType.CelticSpear ||
+                        type == eObjectType.Scythe ||
+                        type == eObjectType.MaulerStaff)
+                        return false;
+
+                    return GlobalConstants.IsMeleeWeaponForAfk(type);
+
+                default:
+                    return GlobalConstants.IsMeleeWeaponForAfk(type);
+            }
+        }
+
+        /// <summary>
+        /// Find the best melee weapon to use for a counterattack.
+        /// Only checks RightHandWeapon and TwoHandWeapon, in that order of priority.
+        /// Returns null if no usable melee weapon is found.
+        /// </summary>
+        private InventoryItem FindCounterAttackMeleeWeapon(out eActiveWeaponSlot desiredSlot)
+        {
+            desiredSlot = ActiveWeaponSlot;
+
+            if (Inventory == null)
+                return null;
+
+            var twoHand = Inventory.GetItem(eInventorySlot.TwoHandWeapon);
+            if (twoHand != null &&
+                IsWeaponAllowedInSlot(twoHand, eInventorySlot.TwoHandWeapon) && HasAbilityToUseItem(twoHand.Template))
+            {
+                desiredSlot = eActiveWeaponSlot.TwoHanded;
+                return twoHand;
+            }
+
+            var rightHand = Inventory.GetItem(eInventorySlot.RightHandWeapon);
+            if (rightHand != null && IsWeaponAllowedInSlot(rightHand, eInventorySlot.RightHandWeapon) && HasAbilityToUseItem(rightHand.Template))
+            {
+                desiredSlot = eActiveWeaponSlot.Standard;
+                return rightHand;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns true if this style's WeaponTypeRequirement is compatible
+        /// with the given weapon's Object_Type.
+        /// - 1000 (DualWield) and 1001 (AnyWeapon) are treated as wildcards here.
+        /// - Normal values map directly to eObjectType.
+        /// - You can extend the switch to add "families" (Crush = 2, 12, 20) etc.
+        /// </summary>
+        private static bool MatchesWeaponTypeRequirement(Style style, InventoryItem weapon)
+        {
+            if (style == null || weapon == null)
+                return false;
+
+            int req = style.WeaponTypeRequirement;
+
+            if (req == Style.SpecialWeaponType.AnyWeapon || req == Style.SpecialWeaponType.DualWield)
+                return true;
+
+            var weaponType = (eObjectType)weapon.Object_Type;
+            var requirementType = (eObjectType)req;
+
+            switch (requirementType)
+            {
+                case eObjectType.CrushingWeapon:
+                    return weaponType == eObjectType.CrushingWeapon || weaponType == eObjectType.Hammer || weaponType == eObjectType.Blunt;
+
+
+                default:
+                    return weaponType == requirementType;
+            }
+        }
+
+        /// <summary>
+        /// Select the most appropriate CounterAttack style for the currently used weapon.
+        /// - Tries to match WeaponTypeRequirement with the weapon's Object_Type.
+        /// - If no specific type matches, falls back to AnyWeapon / DualWield styles if present.
+        /// - Returns null if no suitable style exists.
+        /// </summary>
+        private Style FindCounterAttackStyleForWeapon(InventoryItem weapon)
+        {
+            if (weapon == null)
+                return null;
+
+            if (_counterAttackStyles == null || _counterAttackStyles.Count == 0)
+                return null;
+
+            Style anyWeaponStyle = null;
+            Style dualWieldStyle = null;
+
+            foreach (var style in _counterAttackStyles)
+            {
+                if (style == null)
+                    continue;
+
+                if (style.WeaponTypeRequirement == Style.SpecialWeaponType.AnyWeapon)
+                {
+                    anyWeaponStyle ??= style;
+                    continue;
+                }
+
+                if (style.WeaponTypeRequirement == Style.SpecialWeaponType.DualWield)
+                {
+                    dualWieldStyle ??= style;
+                    continue;
+                }
+
+                if (MatchesWeaponTypeRequirement(style, weapon))
+                    return style;
+            }
+
+            if (anyWeaponStyle != null)
+                return anyWeaponStyle;
+
+            if (dualWieldStyle != null)
+                return dualWieldStyle;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Ensure we have a valid melee weapon for a real counterattack.
+        /// - If current AttackWeapon is already a valid melee weapon: keep it.
+        /// - If a ranged bow is equipped as active weapon, try to switch to a melee weapon
+        ///   in RightHand or TwoHand.
+        /// - If no valid melee weapon is found:
+        ///     * If we were using a ranged bow, send "you can't counterattack with a distance weapon"
+        ///     * Otherwise send the generic CounterAttackInvalidWeap.
+        /// Returns true if a usable weapon is prepared and assigned to 'weapon'.
+        /// </summary>
+        private bool TryPrepareCounterAttackWeapon(out InventoryItem weapon)
+        {
+            weapon = AttackWeapon;
+
+            if (weapon != null && !GlobalConstants.IsRangedBowForAfk((eObjectType)weapon.Object_Type))
+            {
+                return true;
+            }
+
+            bool wasRangedBow = false;
+
+            // Check if the currently active weapon is a ranged bow (distance slot / bow types)
+            var distanceWeapon = Inventory?.GetItem(eInventorySlot.DistanceWeapon);
+
+            if (distanceWeapon != null &&
+                GlobalConstants.IsRangedBowForAfk((eObjectType)distanceWeapon.Object_Type) &&
+                (ActiveWeaponSlot == eActiveWeaponSlot.Distance || weapon == distanceWeapon))
+            {
+                wasRangedBow = true;
+            }
+
+            if (weapon != null &&
+                GlobalConstants.IsRangedBowForAfk((eObjectType)weapon.Object_Type))
+            {
+                wasRangedBow = true;
+            }
+
+            eActiveWeaponSlot desiredSlot;
+            InventoryItem melee = FindCounterAttackMeleeWeapon(out desiredSlot);
+
+            if (melee == null)
+            {
+                if (wasRangedBow)
+                {
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+                else
+                {
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+
+                weapon = null;
+                return false;
+            }
+
+            if (ActiveWeaponSlot != desiredSlot)
+            {
+                SwitchWeapon(desiredSlot);
+            }
+
+            weapon = AttackWeapon ?? melee;
+            return true;
+        }
+
         /// <inheritdoc />
         protected override void CounterAttack(GameLiving attacker)
         {
             if (!IsAlive || IsStunned || IsMezzed || IsDisarmed || IsFrozen || IsCrafting || IsClimbing || IsStrafing || (Steed != null))
                 return;
 
+            // 1) Make sure we have a usable melee weapon (handles ranged → melee switch and no-weapon cases)
+            if (!TryPrepareCounterAttackWeapon(out InventoryItem weapon) || weapon == null)
+            {
+                return;
+            }
+
+            // 2) Select the appropriate CounterAttack style for this weapon
+            Style selectedStyle = FindCounterAttackStyleForWeapon(weapon);
+
+            if ((_counterAttackStyles == null || _counterAttackStyles.Count == 0) && selectedStyle == null)
+            {
+                Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackNoStyle"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (selectedStyle == null)
+            {
+                Out.SendMessage(
+                    LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            CounterAttackStyle = selectedStyle;
+
+            // 3) Check spell requirements specific to this counterattack style
             if (!CheckCounterAttackSpellRequirements())
             {
                 Out.SendMessage(CounterAttackStyle.GetRequiredSpellMessage(Client), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
-            if (CounterAttackStyle == null)
-            {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackNoStyle"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return;
-            }
-                
-            InventoryItem weapon = AttackWeapon;
-                
+            // 4) Final sanity check via StyleProcessor (should succeed if WeaponTypeRequirement is correct)
             if (!StyleProcessor.CanUseStyle(this, attacker, CounterAttackStyle, weapon))
             {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Out.SendMessage(
+                    LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
-            if (!AttackState && StyleProcessor.CanUseStyle(this, attacker, CounterAttackStyle, weapon) && CounterAttackStyle != null)
+            // 5) Normal attack flow
+            if (!AttackState)
             {
                 StartAttack(attacker);
             }
 
             TurnTo(attacker.Coordinate);
             Out.SendPlayerPositionAndObjectID();
+
             new WeaponOnTargetAction(this, attacker, weapon, null, 1.0, 0, CounterAttackStyle).OnTick();
 
             if (attacker is GamePlayer targetPlayer)
             {
                 targetPlayer.Out.SendMessage(LanguageMgr.GetTranslation(targetPlayer.Client, "GameObjects.GamePlayer.Attack.CounterAttackByEnemy", GetPersonalizedName(attacker)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
-            Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackSuccess", CounterAttackStyle!.Name), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+
+            Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.Attack.CounterAttackSuccess", CounterAttackStyle.Name), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
         }
 
         /// <summary>
@@ -16012,9 +16330,7 @@ namespace DOL.GS
 
             public override void OnTick()
             {
-                if (_caster == null ||
-                    !_caster.IsAlive ||
-                    _caster.ObjectState != GameObject.eObjectState.Active)
+                if (_caster == null || !_caster.IsAlive || _caster.ObjectState != GameObject.eObjectState.Active)
                     return;
 
                 GameLiving target = _target ?? _caster;
@@ -16027,14 +16343,7 @@ namespace DOL.GS
                     if (vis == null)
                         continue;
 
-                    vis.Out.SendSpellEffectAnimation(
-                        _caster,
-                        target,
-                        _clientEffect,
-                        0,      // bolt duration
-                        false,  // noSound
-                        1       // success
-                    );
+                    vis.Out.SendSpellEffectAnimation(_caster, target, _clientEffect, 1, false, 1);
                 }
             }
         }
@@ -16048,7 +16357,7 @@ namespace DOL.GS
         /// for AFK dummy behavior (can use 100–700 range + fake spell).
         /// Adjust this list as needed for your custom classes.
         /// </summary>
-        private bool IsAfkRangedOrCasterClass()
+        public bool IsAfkRangedOrCasterClass()
         {
             switch ((eCharacterClass)CharacterClass.ID)
             {
@@ -16094,6 +16403,113 @@ namespace DOL.GS
                 default:
                     return false;
             }
+        }
+
+        public bool IsAfkArcherClass()
+        {
+            switch ((eCharacterClass)CharacterClass.ID)
+            {
+                case eCharacterClass.Scout:
+                case eCharacterClass.Ranger:
+                case eCharacterClass.Hunter:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsMeleeWeaponItemForAfk(InventoryItem item)
+        {
+            if (item == null)
+                return false;
+
+            return GlobalConstants.IsMeleeWeaponForAfk((eObjectType)item.Object_Type);
+        }
+
+        private static bool IsRangedBowItemForAfk(InventoryItem item)
+        {
+            if (item == null)
+                return false;
+
+            return GlobalConstants.IsRangedBowForAfk((eObjectType)item.Object_Type);
+        }
+
+        /// <summary>
+        /// Returns true if the player has a melee weapon equipped that is valid for AFK use.
+        /// Archers: only RightHandWeapon counts.
+        /// Others: RightHand / TwoHand / LeftHand are accepted.
+        /// </summary>
+        public bool HasValidMeleeWeaponForAfk()
+        {
+            if (Inventory == null)
+                return false;
+
+            if (IsAfkArcherClass())
+            {
+                return HasEquippedMeleeInSlot(eInventorySlot.RightHandWeapon);
+            }
+
+            return HasEquippedMeleeInSlot(eInventorySlot.RightHandWeapon) || HasEquippedMeleeInSlot(eInventorySlot.TwoHandWeapon) || HasEquippedMeleeInSlot(eInventorySlot.LeftHandWeapon);
+        }
+
+        /// <summary>
+        /// Returns true if the player has a proper bow equipped in the DistanceWeapon slot.
+        /// (Longbow / Crossbow / CompositeBow / RecurvedBow only)
+        /// </summary>
+        public bool HasValidRangedBowForAfk()
+        {
+            var bow = Inventory?.GetItem(eInventorySlot.DistanceWeapon);
+            return IsRangedBowItemForAfk(bow);
+        }
+
+        /// <summary>
+        /// Helper: is there a usable melee weapon in this equip slot?
+        /// </summary>
+        private bool HasEquippedMeleeInSlot(eInventorySlot slot)
+        {
+            var item = Inventory.GetItem(slot);
+            if (item == null)
+                return false;
+
+            if (!GlobalConstants.IsMeleeWeaponForAfk((eObjectType)item.Object_Type))
+                return false;
+
+            return HasAbilityToUseItem(item.Template);
+        }
+
+        /// <summary>
+        /// Choose the best melee weapon to display for AFK swings, based on class.
+        /// Archers: only RightHand.
+        /// Others: prefer TwoHand, then RightHand, then LeftHand.
+        /// </summary>
+        private InventoryItem GetBestMeleeWeaponForAfk()
+        {
+            if (Inventory == null)
+                return null;
+
+            if (IsAfkArcherClass())
+            {
+                var rh = Inventory.GetItem(eInventorySlot.RightHandWeapon);
+                if (rh != null && IsMeleeWeaponItemForAfk(rh) && HasAbilityToUseItem(rh.Template))
+                    return rh;
+
+                return null;
+            }
+
+            var twoH = Inventory.GetItem(eInventorySlot.TwoHandWeapon);
+            if (twoH != null && IsMeleeWeaponItemForAfk(twoH) && HasAbilityToUseItem(twoH.Template))
+                return twoH;
+
+            var rh2 = Inventory.GetItem(eInventorySlot.RightHandWeapon);
+            if (rh2 != null && IsMeleeWeaponItemForAfk(rh2) && HasAbilityToUseItem(rh2.Template))
+                return rh2;
+
+            var lh = Inventory.GetItem(eInventorySlot.LeftHandWeapon);
+            if (lh != null && IsMeleeWeaponItemForAfk(lh) && HasAbilityToUseItem(lh.Template))
+                return lh;
+
+            return null;
         }
 
         /// <summary>
@@ -16372,6 +16788,20 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Helper to flip the visual "attack mode" (weapon drawn) for AFK combat
+        /// without starting the real combat engine.
+        /// </summary>
+        private void SetAfkAttackVisualState(bool inCombat)
+        {
+            AttackState = inCombat;
+
+            if (IsAlive)
+            {
+                Out.SendAttackMode(AttackState);
+            }
+        }
+
+        /// <summary>
         /// Start AFK attack mode: fake combat loop vs a training dummy.
         /// </summary>
         public void StartAfkAttackMode(GameTrainingDummy dummy)
@@ -16391,6 +16821,7 @@ namespace DOL.GS
 
             Out.SendMessage(LanguageMgr.GetTranslation(Client, "Commands.Players.AfkAttack.On"), eChatType.CT_Chat, eChatLoc.CL_SystemWindow);
 
+            SetAfkAttackVisualState(true);
             _afkAttackAnimTimer?.Stop();
             _afkAttackAnimTimer = new RegionTimer(this, _ =>
             {
@@ -16405,16 +16836,87 @@ namespace DOL.GS
                     return 0;
                 }
 
-                if (rangedMode)
+                bool dummyInMelee = IsAfkDummyMeleeRange(t);
+                bool dummyInRangedSpell = IsAfkDummyRangedSpellRange(t);
+
+                if (!dummyInMelee && !dummyInRangedSpell)
                 {
-                    PlayAfkSpellAnimation(this, t);
+                    StopAfkAttackMode(showMessage: true);
+                    return 0;
+                }
+
+                bool isArcher = IsAfkArcherClass();
+                bool isRangedCaster = IsAfkRangedOrCasterClass();
+                bool isPureMelee = !isArcher && !isRangedCaster;
+                int nextDelayMs = 1500;
+
+                if (isArcher)
+                {
+                    if (dummyInMelee)
+                    {
+                        if (!HasValidMeleeWeaponForAfk())
+                        {
+                            StopAfkAttackMode(showMessage: true);
+                            return 0;
+                        }
+
+                        if (ActiveWeaponSlot != eActiveWeaponSlot.Standard)
+                        {
+                            SwitchWeapon(eActiveWeaponSlot.Standard);
+                        }
+                        PlayAfkAttackSwing(t);
+                        nextDelayMs = 1500;
+                    }
+                    else
+                    {
+                        if (!HasValidRangedBowForAfk())
+                        {
+                            StopAfkAttackMode(showMessage: true);
+                            return 0;
+                        }
+
+                        if (ActiveWeaponSlot != eActiveWeaponSlot.Distance)
+                        {
+                            SwitchWeapon(eActiveWeaponSlot.Distance);
+                        }
+
+                        int spellMs = PlayAfkSpellAnimation(this, t);
+                        nextDelayMs = spellMs > 0 ? spellMs + 500 : 2000;
+                    }
+                }
+                else if (isRangedCaster)
+                {
+                    if (dummyInMelee && HasValidMeleeWeaponForAfk())
+                    {
+                        PlayAfkAttackSwing(t);
+                        nextDelayMs = 1500;
+                    }
+                    else
+                    {
+                        int spellMs = PlayAfkSpellAnimation(this, t);
+                        nextDelayMs = spellMs > 0 ? spellMs + 400 : 2200;
+                    }
                 }
                 else
                 {
+                    if (!dummyInMelee || !HasValidMeleeWeaponForAfk())
+                    {
+                        StopAfkAttackMode(showMessage: true);
+                        return 0;
+                    }
+
+                    if (ActiveWeaponSlot != eActiveWeaponSlot.Standard)
+                    {
+                        SwitchWeapon(eActiveWeaponSlot.Standard);
+                    }
+
                     PlayAfkAttackSwing(t);
+                    nextDelayMs = 1500;
                 }
+
                 MaybeStartAfkXp();
-                return 2000;
+                nextDelayMs = Math.Max(1000, Math.Min(nextDelayMs, 8000));
+                return nextDelayMs;
             });
 
             _afkAttackAnimTimer.Start(10);
@@ -16434,6 +16936,7 @@ namespace DOL.GS
 
             // Stopping attack mode = stop AFK XP too
             StopAfkXp();
+            SetAfkAttackVisualState(false);
 
             if (showMessage)
             {
@@ -16444,37 +16947,76 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Returns a fake cast time in "ticks" (1 tick = 100 ms) for AFK visuals.
+        /// For archers we base it on their attack speed with the bow,
+        /// for casters it's around 1.6–2.2 seconds.
+        /// </summary>
+        private ushort GetAfkFakeCastTimeTicks()
+        {
+            if (!IsAfkArcherClass())
+            {
+                int baseMs = Util.Random(2000, 2800);
+                return (ushort)(baseMs / 100);
+            }
+
+            InventoryItem bow = AttackWeapon as InventoryItem;
+
+            if (bow == null && Inventory != null)
+            {
+                bow = Inventory.GetItem(eInventorySlot.DistanceWeapon);
+            }
+
+            int attackSpeedMs;
+
+            if (bow != null)
+            {
+                attackSpeedMs = AttackSpeed(bow);
+            }
+            else
+            {
+                attackSpeedMs = 3000;
+            }
+
+            attackSpeedMs = (int)(attackSpeedMs * 1.25);
+            attackSpeedMs = Math.Max(3000, Math.Min(attackSpeedMs, 3400));
+            return (ushort)(attackSpeedMs / 100);
+        }
+
+        /// <summary>
         /// Plays a fake spell cast + hit animation, with no checks, no mana cost,
         /// and no real SpellHandler logic. Purely visual.
         /// </summary>
-        private void PlayAfkSpellAnimation(GamePlayer player, GameLiving target)
+        private int PlayAfkSpellAnimation(GamePlayer player, GameLiving target)
         {
-            if (player == null ||
-                !player.IsAlive ||
-                player.ObjectState != GameObject.eObjectState.Active)
-                return;
+            if (player == null || !player.IsAlive || player.ObjectState != GameObject.eObjectState.Active)
+                return 0;
 
-            if (target == null ||
-                target.ObjectState != GameObject.eObjectState.Active)
+            if (target == null || target.ObjectState != GameObject.eObjectState.Active)
             {
                 target = player;
             }
 
             ushort clientEffect = GetAfkSpellEffectForClass();
             if (clientEffect == 0)
-                return;
+                return 0;
 
-            ushort fakeCastTime = (ushort)Util.Random(15, 20);
+            ushort fakeCastTimeTicks = GetAfkFakeCastTimeTicks();
+            if (fakeCastTimeTicks == 0)
+                fakeCastTimeTicks = 20; // safety: 2s
 
             foreach (GamePlayer vis in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 if (vis == null)
                     continue;
 
-                vis.Out.SendSpellCastAnimation(player, clientEffect, fakeCastTime);
+                vis.Out.SendSpellCastAnimation(player, clientEffect, fakeCastTimeTicks);
             }
 
-            new AfkSpellImpactTimer(player, target, clientEffect).Start(fakeCastTime * 100);
+            int durationMs = fakeCastTimeTicks * 100;
+
+            new AfkSpellImpactTimer(player, target, clientEffect).Start(durationMs);
+
+            return durationMs;
         }
 
         /// <summary>
@@ -16487,8 +17029,9 @@ namespace DOL.GS
                 return;
 
             TurnTo(dummy.Coordinate);
+            InventoryItem displayWeapon = GetBestMeleeWeaponForAfk();
 
-            ushort attackerWeapon = (ushort)(AttackWeapon?.Model ?? 0);
+            ushort attackerWeapon = (ushort)(displayWeapon?.Model ?? AttackWeapon?.Model ?? 0);
             ushort defenderWeapon = 0;
             byte attackAnim = (byte)Util.Random(0, 44);
 
@@ -16509,13 +17052,13 @@ namespace DOL.GS
             else
                 resultByte = 3;  // Evaded
 
-            AttackState = true;
             foreach (GamePlayer viewer in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                if (viewer == null) continue;
+                if (viewer == null)
+                    continue;
+
                 viewer.Out.SendCombatAnimation(this, dummy, attackerWeapon, defenderWeapon, attackAnim, 0, resultByte, 100);
             }
-            AttackState = false;
         }
 
         private void StopAfkXp()

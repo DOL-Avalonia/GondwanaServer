@@ -356,7 +356,7 @@ namespace DOL.GS.Quests
         }
 
         public virtual IQuestGoal ToQuestGoal(PlayerQuest questData, PlayerGoalState goalData)
-            => new GenericDataQuestGoal(this, goalData?.Progress ?? 0, goalData?.State ?? eQuestGoalStatus.NotStarted);
+            => new GenericDataQuestGoal(this, questData, goalData?.Progress ?? 0, goalData?.State ?? eQuestGoalStatus.NotStarted);
 
         /// <summary>
         /// Returns the object to be saved as JSON given back as third argument in the constructor for loading
@@ -399,7 +399,8 @@ namespace DOL.GS.Quests
 
         public class GenericDataQuestGoal : IQuestGoal
         {
-            public string Description => Goal.Description;
+            private readonly string _description;
+            public string Description => _description ?? Goal.Description ?? string.Empty;
             public eQuestGoalType Type => Goal.Type;
             public int Progress { get; set; }
             public int ProgressTotal => Goal.ProgressTotal;
@@ -410,11 +411,14 @@ namespace DOL.GS.Quests
 
             public DataQuestJsonGoal Goal { get; init; }
 
-            public GenericDataQuestGoal(DataQuestJsonGoal goal, int progress, eQuestGoalStatus status)
+            public GenericDataQuestGoal(DataQuestJsonGoal goal, PlayerQuest questData, int progress, eQuestGoalStatus status)
             {
+                Goal = goal;
                 Progress = progress;
                 Status = status;
-                Goal = goal;
+
+                var player = questData?.Owner;
+                _description = goal.TranslateGoalText(player, goal.Description) ?? goal.Description ?? string.Empty;
             }
         }
     }

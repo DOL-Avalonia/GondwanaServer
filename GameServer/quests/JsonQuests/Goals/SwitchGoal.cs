@@ -69,7 +69,8 @@ namespace DOL.GS.Quests
                     {
                         if (AdvanceGoal(quest, goal))
                         {
-                            quest.Owner.Out.SendMessage(switchActivatedMessage, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            string msg = TranslateGoalText(quest.Owner, switchActivatedMessage);
+                            quest.Owner.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         }
                     }
                 }

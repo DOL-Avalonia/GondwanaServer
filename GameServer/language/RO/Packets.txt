@@ -245,6 +245,11 @@ InviteToGroupHandler.InvitePrompt1:				{0} v-a invitat să vă alăturați grupu
 InviteToGroupHandler.InvitePrompt2:				Acceptați?
 InviteToGroupHandler.InviteNotification:			{0} v-a invitat să vă alăturați grupului său.
 
+# /PlayerGroundTargetHandler
+PlayerGroundTargetHandler.GroundTargetNotVisible:		Ținta ta de sol nu este vizibilă!
+PlayerGroundTargetHandler.BoatMoveOrder:				Îți îndemni barca înainte.
+PlayerGroundTargetHandler.NotEnoughPassengers:			{0} nu are încă suficienți pasageri pentru a se deplasa!
+
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:		Nu puteți lupta corp la corp cu o armă de foc activată!
 

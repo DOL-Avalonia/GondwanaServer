@@ -245,6 +245,11 @@ InviteToGroupHandler.InvitePrompt1:				{0} tě pozval(a), abys se připojil(a) k
 InviteToGroupHandler.InvitePrompt2:				Přijmout?
 InviteToGroupHandler.InviteNotification:			{0} tě pozval(a), abys se připojil(a) k jeho/její skupině.
 
+# /PlayerGroundTargetHandler
+PlayerGroundTargetHandler.GroundTargetNotVisible:		Tvůj pozemní cíl není viditelný!
+PlayerGroundTargetHandler.BoatMoveOrder:				Popoženeš svou loď vpřed.
+PlayerGroundTargetHandler.NotEnoughPassengers:			{0} ještě nemá dostatek pasažérů k pohybu!
+
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:		Nemůžeš bojovat na blízko s vybavenou střelnou zbraní!
 

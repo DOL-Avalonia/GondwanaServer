@@ -62,6 +62,7 @@ GameObjects.GamePlayer.Attack.YouAttack:	    Vous attaquez
 GameObjects.GamePlayer.Attack.YouShot:		    Vous tirez sur
 GameObjects.GamePlayer.Attack.CounterAttackSuccess:		Vous utilisez {0} pour contre-attaquer.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:	Impossible d'utiliser le style de contre-attaque avec l'arme actuelle.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Vous ne pouvez pas contre-attaquer avec une arme à distance !
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:		Aucun style de contre-attaque trouvé pour votre classe.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:		{0} effectue une contre-attaque !
 

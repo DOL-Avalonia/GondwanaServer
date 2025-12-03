@@ -21,3 +21,5 @@ Commands.Players.AfkAttack.On:				You are now AFK training.
 Commands.Players.AfkAttack.Off:				You interrupt your AFK training.
 Commands.Players.AfkAttack.NeedDummyTarget:	You have to select a training dummy!
 Commands.Players.AfkAttack.NeedDummyRange:	You are too far from your target to start your training!
+Commands.Players.AfkAttack.NeedMeleeWeapon:	You must have valid melee weapon to start your training.
+Commands.Players.AfkAttack.NeedRangedWeapon:	You must equip a bow in your ranged slot to start your training as an archer.

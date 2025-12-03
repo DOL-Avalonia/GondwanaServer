@@ -80,7 +80,7 @@ namespace DOL.GS.Quests
                         {
                             player.Inventory.RemoveCountFromStack(usedItem, 1);
                         }
-                        player.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, BehaviourUtils.GetPersonalizedMessage(m_text, player));
+                        string msg = TranslateGoalText(player, m_text); player.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
                     }
                     
                 }

@@ -208,7 +208,8 @@ namespace DOL.GS.Styles
                 }
                 if (living.IsDisarmed)
                 {
-                    if (living is GamePlayer) (living as GamePlayer)!.Out.SendMessage("You are disarmed and cannot attack!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                    if (living is GamePlayer gp)
+                        gp.Out.SendMessage(LanguageMgr.GetTranslation(gp.Client.Account.Language, "StyleProcessor.TryToUseStyle.Disarmed"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
                     return;
                 }
                 //Can't use styles with range weapon
@@ -452,8 +453,13 @@ namespace DOL.GS.Styles
                     {
                         if (absorb > 0)
                         {
-                            player.Out.SendMessage("A barrier absorbs " + absorb + " damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                            if (living is GamePlayer) (living as GamePlayer)!.Out.SendMessage("A barrier absorbs " + absorb + " damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            var msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "StyleProcessor.ExecuteStyle.BarrierAbsorbs", absorb);
+                            player.Out.SendMessage(msg, eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            if (living is GamePlayer lp)
+                            {
+                                var msg2 = LanguageMgr.GetTranslation(lp.Client.Account.Language, "StyleProcessor.ExecuteStyle.BarrierAbsorbs", absorb);
+                                lp.Out.SendMessage(msg2, eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            }
                         }
                     }
 
@@ -670,9 +676,9 @@ namespace DOL.GS.Styles
             }
 
             ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(caster, styleSpell, styleLine);
-            if (spellHandler == null && styleSpell != null && caster is GamePlayer)
+            if (spellHandler == null && styleSpell != null && caster is GamePlayer gpNI)
             {
-                ((GamePlayer)caster).Out.SendMessage(styleSpell.Name + " not implemented yet (" + styleSpell.SpellType + ")", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                gpNI.Out.SendMessage(LanguageMgr.GetTranslation(gpNI.Client.Account.Language, "StyleProcessor.CreateMagicEffect.NotImplemented", styleSpell.Name, styleSpell.SpellType), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
             // No negative effects can be applied on a keep door or via attacking a keep door

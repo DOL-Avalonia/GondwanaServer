@@ -59,7 +59,8 @@ namespace DOL.GS.Quests
                 return;
             if (e == AreaEvent.PlayerEnter)
             {
-                quest.Owner.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, BehaviourUtils.GetPersonalizedMessage(m_text, quest.Owner));
+                string msg = TranslateGoalText(quest.Owner, m_text);
+                quest.Owner.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
                 OnPlayerEnterArea(quest, goal);
             }
             if (e == AreaEvent.PlayerLeave)

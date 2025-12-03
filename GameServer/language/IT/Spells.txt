@@ -18,6 +18,7 @@ DelveInfo.Target:               Bersaglio: {0}
 DelveInfo.Value:                Valore: {0}
 DelveInfo.ValueNegative:        Valore: -{0}
 DelveInfo.Destination:		    Destinazione: {0}
+DelveInfo.RemainingUse:			Uso rimanente: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Infligge {0} {1} al bersaglio.
@@ -192,9 +193,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Infliggi il {0}% di danno in
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Riduce l'efficacia delle magie di ipnosi del {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Conferisce il {0}% di probabilità di schivare.
 SpellDescription.ParryChanceBuff.MainDescription:			Conferisce il {0}% di probabilità di parare.
-SpellDescription.WeaponSkillBuff.MainDescription:			Aumenta la perizia con {0} del {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Aumenta l'abilità Furtività {0} del {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Aumenta l'abilità Flessibile {0} del {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Aumenta l'abilità Armi del {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Aumenta l'abilità Furtività di {0} punti.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Aumenta l'abilità Flexible di {0} punti.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Riduce l'abilità Armi del {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Riduce l'abilità Furtività di {0} punti.
 SpellDescription.ResiPierceBuff.MainDescription:			Conferisce il {0}% di probabilità di penetrare le resistenze magiche.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Aumenta la probabilità di critico delle magie del {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Aumenta la probabilità di critico in mischia del {0}%.
@@ -204,7 +207,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			Il bersaglio infligge il {
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Aumenta del {0}% il vigore consumato in combattimento dal bersaglio.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Aumenta la probabilità di inciampo del bersaglio del {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Riduce il DPS del {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Riduce le abilità del {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Riduce tutte le abilità di {0} punti.
 SpellDescription.Warlock.SecondarySpell:					Questa è una magia secondaria.
 SpellDescription.Warlock.PrimarySpell:						Questa è una magia primaria.
 SpellDescription.AllStatsDebuff.MainDescription:			Riduce tutti gli attributi del bersaglio di {0}.

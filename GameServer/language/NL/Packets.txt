@@ -245,6 +245,11 @@ InviteToGroupHandler.InvitePrompt1:				{0} heeft je uitgenodigd om zich bij zijn
 InviteToGroupHandler.InvitePrompt2:				Accepteren?
 InviteToGroupHandler.InviteNotification:			{0} heeft je uitgenodigd om zich bij zijn/haar groep aan te sluiten.
 
+# /PlayerGroundTargetHandler
+PlayerGroundTargetHandler.GroundTargetNotVisible:		Je gronddoel is niet zichtbaar!
+PlayerGroundTargetHandler.BoatMoveOrder:				Je laat je boot vooruit varen.
+PlayerGroundTargetHandler.NotEnoughPassengers:			De {0} heeft nog niet genoeg passagiers om te bewegen!
+
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:		Je kunt niet in mêlee vechten met een vuurwapen uitgerust!
 

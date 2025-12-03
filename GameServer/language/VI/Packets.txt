@@ -245,6 +245,11 @@ InviteToGroupHandler.InvitePrompt1:				{0} đã mời bạn tham gia nhóm của
 InviteToGroupHandler.InvitePrompt2:				Chấp nhận?
 InviteToGroupHandler.InviteNotification:			{0} đã mời bạn tham gia nhóm của họ.
 
+# /PlayerGroundTargetHandler
+PlayerGroundTargetHandler.GroundTargetNotVisible:		Mục tiêu mặt đất của bạn không thể nhìn thấy!
+PlayerGroundTargetHandler.BoatMoveOrder:				Bạn thúc thuyền tiến lên.
+PlayerGroundTargetHandler.NotEnoughPassengers:			{0} vẫn chưa có đủ hành khách để di chuyển!
+
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:		Bạn không thể chiến đấu cận chiến khi đang trang bị súng!
 

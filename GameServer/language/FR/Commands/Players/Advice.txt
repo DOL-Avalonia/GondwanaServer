@@ -1,6 +1,6 @@
 # /advice
 Commands.Players.Advice.Advice:			[CONSEIL {0}] {1}: "{2}"
-Commands.Players.Advice.Advice.AdvicersOn:	Il y a {0} conseiller·s en ligne !
+Commands.Players.Advice.AdvicersOn:		Il y a {0} conseiller·s en ligne !
 Commands.Players.Advice.Description1:	Les conseillers répondent par `/send`
 Commands.Players.Advice.Description:	Demande un conseil à un conseiller.
 Commands.Players.Advice.Message:		/advice <Message>

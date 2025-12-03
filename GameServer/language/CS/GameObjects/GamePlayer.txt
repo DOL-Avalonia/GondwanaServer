@@ -61,6 +61,7 @@ GameObjects.GamePlayer.Attack.YouAttack:            Útočíš na
 GameObjects.GamePlayer.Attack.YouShot:              Střílíš na
 GameObjects.GamePlayer.Attack.CounterAttackSuccess: Používáš {0} k protiútoku.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:   Styl protiútoku nelze s aktuální zbraní použít.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Nemůžeš protiútok provést s dálkovou zbraní!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:       Pro tvou třídu nebyl nalezen žádný styl protiútoku.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:       {0} provádí protiútok!
 
@@ -76,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:   Pro tuto komoru už má�
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Už hraješ skladbu.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Nemůžeš kouzlit, když jsi zhypnotizován/a.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Nemůžeš kouzlit, když jsi omráčen/a.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Nemůžeš sesílat toto kouzlo při jízdě!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Tvé zaklínání selhává; kouzlo nemůžeš seslat!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Toto kouzlo nemůžeš seslat přímo!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Připravil/a jsi {0} jako navazující kouzlo!

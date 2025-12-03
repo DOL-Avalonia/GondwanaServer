@@ -1,0 +1,12 @@
+# NecromancerPet
+
+GameObjects.NecromancerPet.ToggleTauntOff:		{0} semble moins agressif qu'auparavant.
+GameObjects.NecromancerPet.ToggleTauntOn:		{0} adopte une posture agressive.
+GameObjects.NecromancerPet.InterruptedByAttacker:	Votre familier a été attaqué par {0} et son sort a été interrompu !
+GameObjects.NecromancerPet.InterruptedBySelf:		Votre familier a attaqué et a interrompu son propre sort !
+GameObjects.NecromancerPet.ArawnTaunt:			En tant que l'un des nombreux serviteurs cadavériques d’Arawn, je peux [taunt] vos ennemis afin qu'ils se concentrent sur moi plutôt que sur vous.
+GameObjects.NecromancerPet.ArawnEmpower:		Vous pouvez aussi m'[empower] d'un simple mot.
+GameObjects.NecromancerPet.GreaterExtra:		Je peux également infliger [poison] ou [disease] à vos ennemis.
+GameObjects.NecromancerPet.AbominationIntro:		En tant que l'un des guerriers choisis d'Arawn, je dispose d’un puissant arsenal de [weapons] à votre service. Si vous le souhaitez, je peux [taunt] vos ennemis pour qu'ils se concentrent sur moi. {0}
+GameObjects.NecromancerPet.WeaponsQuestion:		Quelle arme m'ordonnez-vous d'employer ? Une [fiery sword], [icy sword], [poisonous sword] ou une [flaming mace], [frozen mace], [venomous mace] ?
+GameObjects.NecromancerPet.AsYouCommand:		À vos ordres.

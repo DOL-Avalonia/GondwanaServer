@@ -38,7 +38,11 @@ namespace DOL.GS.Quests
             {
                 questData.AbortQuest();
                 if (!string.IsNullOrWhiteSpace(m_text))
-                    ChatUtil.SendPopup(questData.Owner, BehaviourUtils.GetPersonalizedMessage(m_text, questData.Owner));
+                {
+                    string msg = TranslateGoalText(questData.Owner, m_text);
+                    ChatUtil.SendPopup(questData.Owner, msg);
+                }
+
                 return 0;
             }).Start(1);
             return state;

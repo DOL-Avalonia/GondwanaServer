@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -13,10 +13,38 @@ namespace DOL.GS
     /// <summary>
     /// Place where you plug your real external translation provider (Google, DeepL, etc.).
     /// This implementation uses Google Cloud Translation API v2.
+    /// 
+    /// IMPORTANT:
+    /// - This is often called on the RegionTime thread (RegionTime1) via AutoTranslateManager.
+    /// - Any slow network I/O here will freeze the region.
+    /// - We therefore use:
+    ///     * short HTTP timeouts
+    ///     * a circuit-breaker (temporary disable) when Google is unreachable
     /// </summary>
     public static class ExternalTranslator
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(ExternalTranslator));
+
+        /// <summary>
+        /// If true, we temporarily skip all calls to Google and just return original text.
+        /// </summary>
+        private static volatile bool _temporarilyDisabled = false;
+
+        /// <summary>
+        /// When _temporarilyDisabled is true, we skip Google calls until this UTC time.
+        /// </summary>
+        private static DateTime _disabledUntilUtc = DateTime.MinValue;
+
+        /// <summary>
+        /// How long we stay in "offline/backoff" mode after a failure, in milliseconds.
+        /// </summary>
+        private const int OfflineBackoffMs = 15_000;
+
+        /// <summary>
+        /// Max time we allow for an HTTP request (connect + send + receive), in milliseconds.
+        /// Keep it small so RegionTime doesn't freeze.
+        /// </summary>
+        private const int HttpTimeoutMs = 2_000;
 
         #region Google DTOs
 
@@ -47,11 +75,12 @@ namespace DOL.GS
         #endregion
 
         /// <summary>
-        /// Main public entry. Synchronous, as chat send is synchronous.
+        /// Main public entry. Synchronous.
         /// Returns original text if:
         ///  - feature disabled,
         ///  - provider not 'google',
         ///  - missing/invalid API key,
+        ///  - circuit breaker currently in offline mode,
         ///  - any error during HTTP or JSON.
         /// </summary>
         public static string Translate(string text, string fromLanguage, string toLanguage)
@@ -79,6 +108,15 @@ namespace DOL.GS
             if (string.IsNullOrWhiteSpace(endpoint))
                 endpoint = "https://translation.googleapis.com/language/translate/v2";
 
+            // If we are currently in "offline" backoff mode, don't even try to talk to Google.
+            var now = DateTime.UtcNow;
+            if (_temporarilyDisabled && now < _disabledUntilUtc)
+            {
+                if (log.IsDebugEnabled)
+                    log.Debug($"ExternalTranslator: temporarily disabled until {_disabledUntilUtc:o}, returning original text.");
+                return text;
+            }
+
             string source = NormalizeLanguageCode(fromLanguage);
             string target = NormalizeLanguageCode(toLanguage);
 
@@ -88,12 +126,24 @@ namespace DOL.GS
 
             try
             {
-                return GoogleTranslateSync(endpoint, apiKey, text, source, target) ?? text;
+                var result = GoogleTranslateSync(endpoint, apiKey, text, source, target);
+
+                // If null → we had some problem, keep original text.
+                if (string.IsNullOrWhiteSpace(result))
+                    return text;
+
+                // Successful call: re-enable if we were previously disabled.
+                _temporarilyDisabled = false;
+                _disabledUntilUtc = DateTime.MinValue;
+
+                return result;
             }
             catch (Exception ex)
             {
+                TripOfflineBreaker(ex.Message);
+
                 if (log.IsWarnEnabled)
-                    log.Warn($"ExternalTranslator: GoogleTranslateSync failed ({source}->{target}): {ex.Message}", ex);
+                    log.Warn($"ExternalTranslator: Exception in Translate ({source}->{target}): {ex.Message}", ex);
 
                 return text;
             }
@@ -149,6 +199,10 @@ namespace DOL.GS
                 var request = (HttpWebRequest)WebRequest.Create(url);
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded; charset=utf-8";
+
+                // SHORT TIMEOUTS so RegionTime1 doesn't freeze forever.
+                request.Timeout = HttpTimeoutMs;
+                request.ReadWriteTimeout = HttpTimeoutMs;
 
                 byte[] dataBytes = Encoding.UTF8.GetBytes(postData);
                 request.ContentLength = dataBytes.Length;
@@ -206,6 +260,8 @@ namespace DOL.GS
                 if (log.IsWarnEnabled)
                     log.Warn($"ExternalTranslator: WebException ({source}->{target}): {webEx.Message}. Body: {body}");
 
+                TripOfflineBreaker(webEx.Message);
+
                 return null;
             }
             catch (Exception ex)
@@ -213,8 +269,24 @@ namespace DOL.GS
                 if (log.IsWarnEnabled)
                     log.Warn($"ExternalTranslator: Exception ({source}->{target}): {ex.Message}", ex);
 
+                TripOfflineBreaker(ex.Message);
+
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Put the translator into "offline/backoff" mode for some time.
+        /// During that time, Translate() will immediately return original text,
+        /// so NPC JSON quests behave exactly as if AutoTranslate was disabled.
+        /// </summary>
+        private static void TripOfflineBreaker(string reason)
+        {
+            _temporarilyDisabled = true;
+            _disabledUntilUtc = DateTime.UtcNow.AddMilliseconds(OfflineBackoffMs);
+
+            if (log.IsWarnEnabled)
+                log.Warn($"ExternalTranslator: entering offline/backoff mode for {OfflineBackoffMs}ms. Reason: {reason}");
         }
     }
 }

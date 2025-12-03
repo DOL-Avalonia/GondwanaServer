@@ -1,4 +1,4 @@
-/*
+﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
  * This program is free software; you can redistribute it and/or
@@ -191,6 +191,31 @@ namespace DOL.GS.Commands
                     LanguageMgr.GetTranslation(client, "Commands.Players.AfkAttack.NeedDummyRange"),
                     eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
+            }
+
+            bool isArcher = p.IsAfkArcherClass();
+            bool isRangedCaster = p.IsAfkRangedOrCasterClass();
+            bool isPureMelee = !isArcher && !isRangedCaster;
+
+            if (rangedMode)
+            {
+                if (isArcher && !p.HasValidRangedBowForAfk())
+                {
+                    client.Out.SendMessage(
+                        LanguageMgr.GetTranslation(client, "Commands.Players.AfkAttack.NeedRangedWeapon"),
+                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+            }
+            else
+            {
+                if ((isArcher || isPureMelee) && !p.HasValidMeleeWeaponForAfk())
+                {
+                    client.Out.SendMessage(
+                        LanguageMgr.GetTranslation(client, "Commands.Players.AfkAttack.NeedMeleeWeapon"),
+                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
             }
 
             if (!p.IsAfkActive())

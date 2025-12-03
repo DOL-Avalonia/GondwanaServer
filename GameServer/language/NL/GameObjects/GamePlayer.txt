@@ -61,6 +61,7 @@ GameObjects.GamePlayer.Attack.YouAttack:            Je valt aan
 GameObjects.GamePlayer.Attack.YouShot:              Je schiet op
 GameObjects.GamePlayer.Attack.CounterAttackSuccess: Je gebruikt {0} om te tegenaanvallen.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:   Tegenaanval-stijl kan niet met het huidige wapen worden gebruikt.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Je kunt niet terugslaan met een afstandswapen!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:       Geen tegenaanval-stijl voor je klasse gevonden.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:       {0} voert een tegenaanval uit!
 
@@ -76,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:   Je hebt je spreuken voor
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Je speelt al een melodie.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Je kunt geen spreuken uitspreken terwijl je gehypnotiseerd bent.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Je kunt geen spreuken uitspreken terwijl je bedwelmd bent.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Je kunt deze spreuk niet uitspreken terwijl je rijdt!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Je bezwering mislukt; je kunt je spreuk niet uitspreken!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Je kunt deze spreuk niet rechtstreeks uitspreken!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Je hebt een {0} als vervolgspreuk voorbereid!

@@ -1932,6 +1932,52 @@ namespace DOL.GS
 
         }
 
+        public static bool IsMeleeWeaponForAfk(eObjectType objectType)
+        {
+            switch (objectType)
+            {
+                case eObjectType.CrushingWeapon:
+                case eObjectType.SlashingWeapon:
+                case eObjectType.ThrustWeapon:
+                case eObjectType.TwoHandedWeapon:
+                case eObjectType.PolearmWeapon:
+                case eObjectType.Staff:
+                case eObjectType.Sword:
+                case eObjectType.Hammer:
+                case eObjectType.Axe:
+                case eObjectType.Spear:
+                case eObjectType.LeftAxe:
+                case eObjectType.HandToHand:
+                case eObjectType.Blades:
+                case eObjectType.Blunt:
+                case eObjectType.Piercing:
+                case eObjectType.LargeWeapons:
+                case eObjectType.CelticSpear:
+                case eObjectType.Scythe:
+                case eObjectType.FistWraps:
+                case eObjectType.MaulerStaff:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsRangedBowForAfk(eObjectType objectType)
+        {
+            switch (objectType)
+            {
+                case eObjectType.Longbow:
+                case eObjectType.Crossbow:
+                case eObjectType.CompositeBow:
+                case eObjectType.RecurvedBow:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         public static byte GetSpecToInternalIndex(string name)
         {
             switch (name)

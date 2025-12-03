@@ -61,6 +61,7 @@ GameObjects.GamePlayer.Attack.YouAttack:            Bạn tấn công
 GameObjects.GamePlayer.Attack.YouShot:              Bạn bắn vào
 GameObjects.GamePlayer.Attack.CounterAttackSuccess: Bạn dùng {0} để phản công.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:   Không thể dùng kiểu phản công với vũ khí hiện tại.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Bạn không thể phản công bằng vũ khí tầm xa!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:       Không tìm thấy kiểu phản công cho lớp của bạn.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:       {0} thực hiện phản công!
 
@@ -76,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:   Bạn đã chọn phép 
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Bạn đã chơi một giai điệu.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Bạn không thể niệm khi đang bị thôi miên.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Bạn không thể niệm khi đang bị choáng.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Bạn không thể niệm phép khi đang cưỡi!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Thần chú của bạn thất bại; bạn không thể niệm phép!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Bạn không thể niệm trực tiếp phép này!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Bạn đã chuẩn bị {0} làm phép tiếp nối!

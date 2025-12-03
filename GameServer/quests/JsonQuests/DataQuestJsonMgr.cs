@@ -159,10 +159,12 @@ public static class DataQuestJsonMgr
         {
             if (!string.IsNullOrWhiteSpace(dq.Quest.AcceptText))
             {
-                var formatMsg = dq.Quest.AcceptText.Replace(@"\n", "\n");
-                formatMsg = BehaviourUtils.GetPersonalizedMessage(formatMsg, player);
-                formatMsg = AutoTranslateManager.MaybeTranslateServerText(player, formatMsg);
-                var finalMsg = Util.SplitCSV(formatMsg, true);
+                var raw = dq.Quest.AcceptText.Replace(@"\n", "\n");
+                var text = dq.Quest.GetAcceptTextForPlayer(player);
+                if (!string.IsNullOrEmpty(text))
+                    text = text.Replace(@"\n", "\n");
+
+                var finalMsg = Util.SplitCSV(text, true);
 
                 player.Out.SendCustomTextWindow(npc.Name + " dit", finalMsg);
             }

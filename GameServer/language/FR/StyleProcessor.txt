@@ -22,8 +22,11 @@ StyleProcessor.TryToUseStyle.PerformStyleBefore:   Vous devez exécuter votre {0
 StyleProcessor.TryToUseStyle.PreparePerform:      Vous vous préparez à exécuter {0} !
 StyleProcessor.TryToUseStyle.StyleRequires:      Cette attaque requiert un(e) {0} !
  
-StyleProcessor.TryToUseStyle.RequiredSpell:                        Vous n'avez pas les conditions nécessaires pour éxecuter ce style !
-StyleProcessor.TryToUseStyle.RequiredSpell.ChtonicShapeShift:      Vous devez être en forme chtonique pour éxecuter ce style !
+StyleProcessor.TryToUseStyle.RequiredSpell:			Vous n'avez pas les conditions nécessaires pour éxecuter ce style !
+StyleProcessor.TryToUseStyle.RequiredSpell.ChtonicShapeShift:	Vous devez être en forme chtonique pour éxecuter ce style !
+StyleProcessor.TryToUseStyle.Disarmed:				Vous êtes désarmé et ne pouvez pas attaquer !
+StyleProcessor.ExecuteStyle.BarrierAbsorbs:			Une barrière absorbe {0} points de dégâts !
+StyleProcessor.CreateMagicEffect.NotImplemented:		{0} n'est pas encore implémenté ({1})
 
 
 

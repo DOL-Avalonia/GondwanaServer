@@ -25,6 +25,7 @@ using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.GS.Spells;
 using DOL.GS.Styles;
+using DOL.Language;
 
 namespace DOL.GS
 {
@@ -34,7 +35,7 @@ namespace DOL.GS
     /// <author>Aredhel</author>
     public class NecromancerPet : GamePet
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// gets the DamageRvR Memory of this NecromancerPet
@@ -220,6 +221,24 @@ namespace DOL.GS
 
                         return conBonus + hitsBonus;
                     }
+                case eProperty.CounterAttack:
+                    {
+                        int val = OtherBuffBonus[eProperty.CounterAttack];
+                        val -= DebuffCategory[eProperty.CounterAttack];
+
+                        if (Brain is IControlledBrain cb && cb.Owner is GamePlayer gp)
+                        {
+                            bool isNecro = gp.CharacterClass is CharacterClassNecromancer;
+
+                            if (isNecro && gp.IsShade)
+                            {
+                                int ownerItem = Math.Min(30, gp.ItemBonus[(int)eProperty.CounterAttack]);
+                                val += ownerItem;
+                            }
+                        }
+
+                        return Math.Max(0, val);
+                    }
             }
 
             return base.GetModified(property);
@@ -254,8 +273,8 @@ namespace DOL.GS
                 {
                     // Update pet health in group window.
 
-                    GamePlayer owner = ((Brain as IControlledBrain).Owner) as GamePlayer;
-                    if (owner.Group != null)
+                    GamePlayer owner = ((Brain as IControlledBrain)!.Owner) as GamePlayer;
+                    if (owner!.Group != null)
                         owner.Group.UpdateMember(owner, false, false);
                 }
             }
@@ -346,7 +365,7 @@ namespace DOL.GS
         private void ToggleTauntMode()
         {
             TauntEffect tauntEffect = EffectList.GetOfType<TauntEffect>();
-            GamePlayer owner = (Brain as IControlledBrain).Owner as GamePlayer;
+            GamePlayer owner = (Brain as IControlledBrain)!.Owner as GamePlayer;
 
             if (tauntEffect != null)
             {
@@ -354,16 +373,14 @@ namespace DOL.GS
 
                 tauntEffect.Stop();
                 if (owner != null)
-                    owner.Out.SendMessage(String.Format("{0} seems to be less aggressive than before.",
-                                                        GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    owner.Out.SendMessage(LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.ToggleTauntOff", GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
             else
             {
                 // It's off, so let's turn it on.
 
                 if (owner != null)
-                    owner.Out.SendMessage(String.Format("{0} enters an aggressive stance.",
-                                                        GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    owner.Out.SendMessage(LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.ToggleTauntOn", GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 new TauntEffect().Start(this);
             }
@@ -384,7 +401,9 @@ namespace DOL.GS
                 if (Brain is NecromancerPetBrain necroBrain && IsCasting)
                 {
                     StopCurrentSpellcast();
-                    necroBrain.MessageToOwner("Your pet was attacked by " + ad.Attacker.Name + " and their spell was interrupted!", eChatType.CT_SpellResisted);
+                    var _owner = (Brain as IControlledBrain)?.Owner as GamePlayer;
+                    var _lang = _owner?.Client?.Account?.Language ?? "EN";
+                    necroBrain.MessageToOwner(LanguageMgr.GetTranslation(_lang, "GameObjects.NecromancerPet.InterruptedByAttacker", ad.Attacker.Name), eChatType.CT_SpellResisted);
 
                     if (necroBrain.SpellsQueued)
                         necroBrain.ClearSpellQueue();
@@ -392,6 +411,43 @@ namespace DOL.GS
             }
 
             base.OnAttackedByEnemy(ad);
+        }
+
+        /// <summary>
+        /// When the necromancer pet actually takes damage, channel tension
+        /// to the necromancer (while in shade), based on damage type.
+        /// </summary>
+        public override void TakeDamage(AttackData ad)
+        {
+            base.TakeDamage(ad);
+
+            if (ad == null)
+                return;
+
+            if (!(Brain is IControlledBrain controlledBrain))
+                return;
+
+            if (!(controlledBrain.Owner is GamePlayer owner))
+                return;
+
+            if (!(owner.CharacterClass is CharacterClassNecromancer))
+                return;
+
+            if (!owner.IsShade)
+                return;
+
+            float channelScale = 0.45f; // Default: pet hit by melee / physical attacks.
+
+            if (ad.AttackType == AttackData.eAttackType.Spell) // Pet hit by magic.
+            {
+                channelScale = 0.70f;
+            }
+            else if (ad.AttackType == AttackData.eAttackType.DoT) // Pet hit by DoT.
+            {
+                channelScale = 0.10f;
+            }
+
+            owner.GainTensionFromPetHit(this, ad, channelScale);
         }
 
         public override double WeaponDamage(InventoryItem weapon)
@@ -409,7 +465,7 @@ namespace DOL.GS
                 if (Brain is NecromancerPetBrain necroBrain && IsCasting)
                 {
                     StopCurrentSpellcast();
-                    necroBrain.MessageToOwner("Your pet attacked and interrupted their spell!", eChatType.CT_SpellResisted);
+                    necroBrain.MessageToOwner(LanguageMgr.GetTranslation(((Brain as IControlledBrain)!.Owner as GamePlayer)!.Client.Account.Language, "GameObjects.NecromancerPet.InterruptedBySelf"), eChatType.CT_SpellResisted);
 
                     if (necroBrain.SpellsQueued)
                         necroBrain.ClearSpellQueue();
@@ -474,7 +530,7 @@ namespace DOL.GS
         {
             if (SpellTimer != null)
             {
-                if (this == null || this.ObjectState != eObjectState.Active || !this.IsAlive || this.TargetObject == null || (this.TargetObject is GameLiving && this.TargetObject.ObjectState != eObjectState.Active || !(this.TargetObject as GameLiving).IsAlive))
+                if (this == null || this.ObjectState != eObjectState.Active || !this.IsAlive || this.TargetObject == null || (this.TargetObject is GameLiving && this.TargetObject.ObjectState != eObjectState.Active || !(this.TargetObject as GameLiving)!.IsAlive))
                     SpellTimer.Stop();
                 else
                     SpellTimer.Start(1);
@@ -499,7 +555,7 @@ namespace DOL.GS
         {
             base.ModifyAttack(attackData);
 
-            if ((Owner as GamePlayer).Client.Account.PrivLevel > (int)ePrivLevel.Player)
+            if ((Owner as GamePlayer)!.Client.Account.PrivLevel > (int)ePrivLevel.Player)
             {
                 attackData.Damage = 0;
                 attackData.CriticalDamage = 0;
@@ -602,15 +658,15 @@ namespace DOL.GS
         /// <returns>True if whisper was handled, false otherwise.</returns>
         public override bool WhisperReceive(GameLiving source, string text)
         {
-            GamePlayer owner = ((Brain as IControlledBrain).Owner) as GamePlayer;
+            GamePlayer owner = ((Brain as IControlledBrain)!.Owner) as GamePlayer;
             if (source == null || source != owner) return false;
 
             switch (text.ToLower())
             {
                 case "arawn":
                     {
-                        String taunt = "As one of the many cadaverous servants of Arawn, I am able to [taunt] your enemies so that they will focus on me instead of you.";
-                        String empower = "You may also [empower] me with just a word.";
+                        String taunt = LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.ArawnTaunt");
+                        String empower = LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.ArawnEmpower");
                         switch (Name.ToLower())
                         {
                             case "minor zombie servant":
@@ -621,12 +677,10 @@ namespace DOL.GS
                                 SayTo(owner, taunt);
                                 return true;
                             case "greater necroservant":
-                                SayTo(owner, taunt + " I can also inflict [poison] or [disease] on your enemies. "
-                                      + empower);
+                                SayTo(owner, taunt + LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.GreaterExtra") + " " + empower);
                                 return true;
                             case "abomination":
-                                SayTo(owner, "As one of the chosen warriors of Arawn, I have a mighty arsenal of [weapons] at your disposal. If you wish it, I am able to [taunt] your enemies so that they will focus on me instead of you. "
-                                      + empower);
+                                SayTo(owner, LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.AbominationIntro", empower));
                                 return true;
                             default:
                                 return false;
@@ -638,11 +692,11 @@ namespace DOL.GS
                         (item = Inventory.GetItem(eInventorySlot.RightHandWeapon)) != null)
                     {
                         item.ProcSpellID = (int)Procs.Disease;
-                        SayTo(owner, eChatLoc.CL_SystemWindow, "As you command.");
+                        SayTo(owner, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.AsYouCommand"));
                     }
                     return true;
                 case "empower":
-                    SayTo(owner, eChatLoc.CL_SystemWindow, "As you command.");
+                    SayTo(owner, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.AsYouCommand"));
                     Empower();
                     return true;
                 case "poison":
@@ -650,7 +704,7 @@ namespace DOL.GS
                         (item = Inventory.GetItem(eInventorySlot.RightHandWeapon)) != null)
                     {
                         item.ProcSpellID = (int)Procs.Poison;
-                        SayTo(owner, eChatLoc.CL_SystemWindow, "As you command.");
+                        SayTo(owner, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.AsYouCommand"));
                     }
                     return true;
                 case "taunt":
@@ -661,7 +715,7 @@ namespace DOL.GS
                         if (Name != "abomination")
                             return false;
 
-                        SayTo(owner, "What weapon do you command me to wield? A [fiery sword], [icy sword], [poisonous sword] or a [flaming mace], [frozen mace], [venomous mace]?");
+                        SayTo(owner, LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.WeaponsQuestion"));
                         return true;
                     }
                 case "fiery sword":
@@ -676,7 +730,7 @@ namespace DOL.GS
 
                         String templateID = String.Format("{0}_{1}", Name, text.Replace(" ", "_"));
                         if (LoadEquipmentTemplate(templateID))
-                            SayTo(owner, eChatLoc.CL_SystemWindow, "As you command.");
+                            SayTo(owner, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(owner.Client.Account.Language, "GameObjects.NecromancerPet.AsYouCommand"));
                         return true;
                     }
                 default: return false;
@@ -747,7 +801,7 @@ namespace DOL.GS
         /// </summary>
         public void CutTether()
         {
-            GamePlayer owner = ((Brain as IControlledBrain).Owner) as GamePlayer;
+            GamePlayer owner = ((Brain as IControlledBrain)!.Owner) as GamePlayer;
             if (owner == null)
                 return;
             Brain.Stop();

@@ -18,6 +18,7 @@ DelveInfo.Target:               Objetivo: {0}
 DelveInfo.Value:                Valor: {0}
 DelveInfo.ValueNegative:        Valor: -{0}
 DelveInfo.Destination:		    Destino: {0}
+DelveInfo.RemainingUse:			Usos restantes: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Inflige {0} de {1} al objetivo.
@@ -192,9 +193,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Infliges un {0}% más de da�
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Reduce la eficacia de los hechizos de hipnosis un {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Otorga un {0}% de probabilidad de esquivar.
 SpellDescription.ParryChanceBuff.MainDescription:			Otorga un {0}% de probabilidad de parar.
-SpellDescription.WeaponSkillBuff.MainDescription:			Aumenta la pericia con {0} un {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Aumenta la habilidad de Sigilo {0} un {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Aumenta la habilidad Flexible {0} un {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Aumenta la habilidad de Armas en {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Aumenta la habilidad de Sigilo en {0} puntos.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Aumenta la habilidad Flexible en {0} puntos.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Disminuye la habilidad de Armas en {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Disminuye la habilidad de Sigilo en {0} puntos.
 SpellDescription.ResiPierceBuff.MainDescription:			Otorga un {0}% de probabilidad de atravesar resistencias mágicas.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Aumenta la probabilidad de crítico de hechizos un {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Aumenta la probabilidad de crítico en cuerpo a cuerpo un {0}%.
@@ -204,7 +207,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			El objetivo inflige un {0}
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Aumenta el aguante consumido en combate por el objetivo un {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Aumenta la probabilidad de fallo del objetivo un {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Reduce el DPS un {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Reduce habilidades un {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Disminuye todas las habilidades en {0} puntos.
 SpellDescription.Warlock.SecondarySpell:					Este es un hechizo secundario.
 SpellDescription.Warlock.PrimarySpell:						Este es un hechizo primario.
 SpellDescription.AllStatsDebuff.MainDescription:			Reduce todos los atributos del objetivo en {0}.

@@ -32,7 +32,7 @@ namespace DOL.GS.Quests
     /// </summary>
     public class PlayerQuest : IQuestPlayerData
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         
         private ushort m_questId;
         public ushort QuestId => m_questId;
@@ -73,7 +73,7 @@ namespace DOL.GS.Quests
             Owner = owner;
             DbQuest = dbquest;
             var json = JsonConvert.DeserializeObject<JsonState>(dbquest.CustomPropertiesString);
-            m_questId = json.QuestId;
+            m_questId = json!.QuestId;
             if (!DataQuestJsonMgr.Quests.ContainsKey(m_questId))
                 DataQuestJsonMgr.Quests.Add(m_questId, new DataQuestJson { Name = "ERROR" });
             
@@ -134,7 +134,13 @@ namespace DOL.GS.Quests
         public void FinishQuest()
         {
             DbQuest.Step = (int)eQuestStatus.Done;
-            Owner.Out.SendMessage(String.Format(LanguageMgr.GetTranslation(Owner.Client, "AbstractQuest.FinishQuest.Completed", Quest.Name)), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+            string questName = Quest.Name;
+            if (Quest is DataQuestJson dqQuest)
+                questName = dqQuest.GetNameForPlayer(Owner) ?? Quest.Name;
+
+            string completedMsg = string.Format(LanguageMgr.GetTranslation(Owner.Client, "AbstractQuest.FinishQuest.Completed", questName));
+
+            Owner.Out.SendMessage(completedMsg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
 
             // move quest from active list to finished list...
             Owner.AddFinishedQuest(this);

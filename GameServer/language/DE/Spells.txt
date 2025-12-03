@@ -17,6 +17,7 @@ DelveInfo.Target:					Ziel: {0}
 DelveInfo.Value:					Wert: {0}
 DelveInfo.ValueNegative:				Wert: -{0}
 DelveInfo.Destination:					Zielort: {0}
+DelveInfo.RemainingUse:					Verbleibende Verwendung: {0}
 
 # Spell ShortDescriptions
 SpellDescription.DirectDamage.MainDescription:		Fügt dem Ziel {0} {1} zu.
@@ -191,9 +192,11 @@ SpellDescription.MeleeDamageBuff.MainDescription:			Ihr verursacht {0}% mehr Nah
 SpellDescription.MesmerizeDurationBuff.MainDescription:		Verringert die Wirksamkeit von Hypnose‑Zaubern um {0}%.
 SpellDescription.EvadeChanceBuff.MainDescription:			Gewährt {0}% Chance, Angriffen auszuweichen.
 SpellDescription.ParryChanceBuff.MainDescription:			Gewährt {0}% Chance, Angriffe zu parieren.
-SpellDescription.WeaponSkillBuff.MainDescription:			Erhöht die Waffenkunde {0} um {1}%.
-SpellDescription.StealthSkillBuff.MainDescription:			Erhöht die Schleichen‑Fertigkeit {0} um {1}%.
-SpellDescription.FlexibleSkillBuff.MainDescription:			Erhöht die Flexible‑Fertigkeit {0} um {1}%.
+SpellDescription.WeaponSkillBuff.MainDescription:			Erhöht die Waffenfertigkeit um {0}%.
+SpellDescription.StealthSkillBuff.MainDescription:			Erhöht die Fertigkeit Schleichen um {0} Punkte.
+SpellDescription.FlexibleSkillBuff.MainDescription:			Erhöht die Fertigkeit Flexible um {0} Punkte.
+SpellDescription.WeaponSkillDebuff.MainDescription:			Verringert die Waffenfertigkeit um {0}%.
+SpellDescription.StealthSkillDebuff.MainDescription:		Verringert die Fertigkeit Schleichen um {0} Punkte.
 SpellDescription.ResiPierceBuff.MainDescription:			Gewährt {0}% Chance, magische Resistenzen zu durchdringen.
 SpellDescription.CriticalMagicalBuff.MainDescription:		Erhöht die Krit‑Chance der Zauber des Ziels um {0}%.
 SpellDescription.CriticalMeleeBuff.MainDescription:			Erhöht die Krit‑Chance des Ziels im Nahkampf um {0}%.
@@ -203,7 +206,7 @@ SpellDescription.MeleeDamageDebuff.MainDescription:			Das Ziel verursacht {0}% w
 SpellDescription.FatigueConsumptionDebuff.MainDescription:	Erhöht die vom Ziel im Kampf verbrauchte Ausdauer um {0}%.
 SpellDescription.FumbleChanceDebuff.MainDescription:		Erhöht die Wahrscheinlichkeit eines Patzers des Ziels um {0}%.
 SpellDescription.DPSDebuff.MainDescription:					Verringert den DPS um {0}%.
-SpellDescription.SkillsDebuff.MainDescription:				Verringert die Fertigkeiten um {0}%.
+SpellDescription.AllSkillsDebuff.MainDescription:			Verringert alle Fertigkeiten um {0} Punkte.
 SpellDescription.Warlock.SecondarySpell:					Dies ist ein Sekundärzauber.
 SpellDescription.Warlock.PrimarySpell:						Dies ist ein Primärzauber.
 SpellDescription.AllStatsDebuff.MainDescription:			Verringert alle Attribute des Ziels um {0}.

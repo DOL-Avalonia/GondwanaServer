@@ -1521,8 +1521,14 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(0x00);
                 pak.WriteByte(0x01); // yes/no response
                 pak.WriteByte(0x01); // autowrap message
-                if (inviteMessage.Length > 0)
+                if (!string.IsNullOrEmpty(inviteMessage))
+                {
+                    var player = m_gameClient.Player;
+                    if (player != null)
+                        inviteMessage = AutoTranslateManager.MaybeTranslate(null, player, inviteMessage);
+
                     pak.WriteString(inviteMessage, inviteMessage.Length);
+                }
                 pak.WriteByte(0x00);
                 SendTCP(pak);
             }
@@ -1542,8 +1548,14 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(0x00);
                 pak.WriteByte(0x01); // yes/no response
                 pak.WriteByte(0x01); // autowrap message
-                if (abortMessage.Length > 0)
+                if (!string.IsNullOrEmpty(abortMessage))
+                {
+                    var player = m_gameClient.Player;
+                    if (player != null)
+                        abortMessage = AutoTranslateManager.MaybeTranslate(null, player, abortMessage);
+
                     pak.WriteString(abortMessage, abortMessage.Length);
+                }
                 pak.WriteByte(0x00);
                 SendTCP(pak);
             }
@@ -4070,25 +4082,50 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    string name = quest.Quest.Name;
-                    string desc = quest.Quest.Description;
+                    if (quest.Quest == null)
+                    {
+                        pak.WriteByte(0);
+                        pak.WriteByte(0);
+                        pak.WriteByte(0);
+                        SendTCP(pak);
+                        return;
+                    }
+
+                    GamePlayer receiver = m_gameClient.Player;
+
+                    string name = quest.Quest.Name ?? string.Empty;
+                    string desc = quest.Quest.Description ?? string.Empty;
+
+                    // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
+                    // We treat quest texts as "server texts", so sender = null
+                    if (receiver != null)
+                    {
+                        name = AutoTranslateManager.MaybeTranslate(null, receiver, name);
+                        desc = AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+                    }
+
+                    // Make sure we don't exceed packet limits after translation
                     if (name.Length > byte.MaxValue)
                     {
                         if (log.IsWarnEnabled)
                             log.Warn($"quest name is too long for 1.68+ clients ({name.Length}) '{name}'");
                         name = name.Substring(0, byte.MaxValue);
                     }
+
                     if (desc.Length > byte.MaxValue)
                     {
                         if (log.IsWarnEnabled)
                             log.Warn($"quest description is too long for 1.68+ clients ({desc.Length}) '{desc}'");
                         desc = desc.Substring(0, byte.MaxValue);
                     }
+
                     pak.WriteByte((byte)name.Length);
                     pak.WriteByte((byte)desc.Length);
-                    pak.WriteByte(0);
-                    pak.WriteStringBytes(name); //Write Quest Name without trailing 0
-                    pak.WriteStringBytes(desc); //Write Quest Description without trailing 0
+                    pak.WriteByte(0); // unknown / reserved
+
+                    // Write Quest Name and Description without trailing 0
+                    pak.WriteStringBytes(name);
+                    pak.WriteStringBytes(desc);
                 }
 
                 SendTCP(pak);

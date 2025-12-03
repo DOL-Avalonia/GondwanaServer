@@ -61,6 +61,7 @@ GameObjects.GamePlayer.Attack.YouAttack:            Attacchi
 GameObjects.GamePlayer.Attack.YouShot:              Spari a
 GameObjects.GamePlayer.Attack.CounterAttackSuccess: Usi {0} per contrattaccare.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:   Non puoi usare lo stile di contrattacco con l'arma attuale.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	Non puoi contrattaccare con un’arma a distanza!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:       Nessuno stile di contrattacco trovato per la tua classe.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:       {0} esegue un contrattacco!
 
@@ -76,6 +77,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:   Hai già scelto i tuoi i
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Stai già suonando una melodia.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Non puoi lanciare incantesimi mentre sei ipnotizzato.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Non puoi lanciare incantesimi mentre sei stordito.
+GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Non puoi lanciare questo incantesimo mentre sei a cavallo!
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: La tua invocazione fallisce e non puoi lanciare il tuo incantesimo!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Non puoi lanciare direttamente questo incantesimo!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Hai preparato un {0} come incantesimo di seguito!

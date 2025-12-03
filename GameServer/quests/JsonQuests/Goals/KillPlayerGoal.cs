@@ -55,17 +55,27 @@ namespace DOL.GS.Quests
 
         protected override void NotifyActive(PlayerQuest quest, PlayerGoalState goal, DOLEvent e, object sender, EventArgs args)
         {
-            // Enemy of player with quest was killed, check quests and steps
-            if (e == GameLivingEvent.EnemyKilled && args is EnemyKilledEventArgs killedArgs)
-            {
-                var killed = killedArgs.Target;
-                if (killed == null || (m_region != null && m_region != killed.CurrentRegion)
-                    || !(killed is GamePlayer)
-                    || (hasArea && !m_area.IsContaining(killed.Coordinate, false)))
-                    return;
-                AdvanceGoal(quest, goal);
-            }
+            if (e != GameLivingEvent.EnemyKilled || args is not EnemyKilledEventArgs killedArgs)
+                return;
+
+            var killed = killedArgs.Target;
+
+            var killer = quest.Owner as GamePlayer;
+            if (killer == null)
+                return;
+
+            if (killed == null
+                || !(killed is GamePlayer killedPlayer)
+                || (m_region != null && m_region != killed.CurrentRegion)
+                || (hasArea && !m_area.IsContaining(killed.Coordinate, false)))
+                return;
+
+            if (killer.IsPlayerGreyCon(killedPlayer))
+                return;
+
+            AdvanceGoal(quest, goal);
         }
+
         public override void Unload()
         {
             WorldMgr.GetRegion(m_areaRegion)?.RemoveArea(m_area);

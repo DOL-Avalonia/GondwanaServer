@@ -49,7 +49,10 @@ namespace DOL.GS.Quests
                     if (AdvanceGoal(quest, goal))
                     {
                         if (!string.IsNullOrWhiteSpace(m_text))
-                            ChatUtil.SendPopup(player, BehaviourUtils.GetPersonalizedMessage(m_text, player));
+                        {
+                            string msg = TranslateGoalText(player, m_text);
+                            ChatUtil.SendPopup(player, msg);
+                        }
                     }
                 }
             }

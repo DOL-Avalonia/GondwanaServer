@@ -79,7 +79,10 @@ namespace DOL.GS.Quests
 
             goal.Progress += itemsCountToRemove - 1;
             if (!string.IsNullOrWhiteSpace(m_text))
-                ChatUtil.SendPopup(player, BehaviourUtils.GetPersonalizedMessage(m_text, player));
+            {
+                string msg = TranslateGoalText(player, m_text);
+                ChatUtil.SendPopup(player, msg);
+            }
             AdvanceGoal(quest, goal, true);
         }
 

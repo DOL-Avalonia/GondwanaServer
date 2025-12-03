@@ -62,6 +62,7 @@ GameObjects.GamePlayer.Attack.YouAttack:				You attack
 GameObjects.GamePlayer.Attack.YouShot:					You shot
 GameObjects.GamePlayer.Attack.CounterAttackSuccess:		You use {0} to counterattack.
 GameObjects.GamePlayer.Attack.CounterAttackInvalidWeap:	Cannot use the counterattack style with the current weapon.
+GameObjects.GamePlayer.Attack.CounterAttackNoRangedWeapon:	You can't counterattack with a ranged weapon!
 GameObjects.GamePlayer.Attack.CounterAttackNoStyle:		No counterattack style found for your class.
 GameObjects.GamePlayer.Attack.CounterAttackByEnemy:		{0} performs a counterattack!
 
