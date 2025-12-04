@@ -5905,6 +5905,8 @@ namespace DOL.GS
                     else
                     {
                         //update the mob colours
+                        RefreshUsableSkills(true);
+                        UpdateAbilities();
                         Out.SendLevelUpSound();
                     }
                 }
@@ -6159,6 +6161,7 @@ namespace DOL.GS
             RemoveAllStyles();
             RemoveAllSpecs();
             RemoveAllSpellLines();
+            RemoveAllAbilities();
 
             foreach (byte resist in Enum.GetValues(typeof(eResist)))
             {

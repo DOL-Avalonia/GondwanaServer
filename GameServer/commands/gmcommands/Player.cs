@@ -250,6 +250,12 @@ namespace DOL.GS.Commands
 
                             if (newLevel < player.Level || args[1] == "reset")
                             {
+                                //remove all their tricks and abilities!
+                                player.RemoveAllSpecs();
+                                player.RemoveAllSpellLines();
+                                player.RemoveAllStyles();
+                                player.RemoveAllAbilities();
+
                                 player.Reset();
                             }
 
