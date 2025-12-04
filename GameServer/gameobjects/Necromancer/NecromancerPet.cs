@@ -551,18 +551,6 @@ namespace DOL.GS
             return true;
         }
 
-        public override void ModifyAttack(AttackData attackData)
-        {
-            base.ModifyAttack(attackData);
-
-            if ((Owner as GamePlayer)!.Client.Account.PrivLevel > (int)ePrivLevel.Player)
-            {
-                attackData.Damage = 0;
-                attackData.CriticalDamage = 0;
-            }
-        }
-
-
         /// <summary>
         /// Insta cast baseline buffs (STR+DEX) on the pet.
         /// </summary>
