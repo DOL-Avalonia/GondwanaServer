@@ -232,8 +232,9 @@ namespace DOL.Database.Handlers
                             var column = reader.GetString(1);
                             var colType = reader.GetString(2);
                             var allowNull = !reader.GetBoolean(3);
+                            var def = reader.IsDBNull(4) ? null : reader.GetString(4);
                             var primary = reader.GetInt64(5) > 0;
-                            currentTableColumns.Add(new TableRowBindind(column, colType, allowNull, primary));
+                            currentTableColumns.Add(new TableRowBindind(column, colType, allowNull, primary, def));
                             if (log.IsDebugEnabled)
                                 log.DebugFormat("CheckOrCreateTable: Found Column {0} in existing table {1}", column, table.TableName);
                         }

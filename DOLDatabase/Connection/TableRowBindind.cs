@@ -42,6 +42,7 @@ namespace DOL.Database.Connection
         /// Column Allow Null
         /// </summary>
         public bool Primary { get; private set; }
+        public string? DefaultValue { get; private set; }
 
         /// <summary>
         /// Create new instance of <see cref="TableRowBindind"/>
@@ -50,12 +51,14 @@ namespace DOL.Database.Connection
         /// <param name="ColumnType">Row Column Type</param>
         /// <param name="AllowDbNull">Row DB Null</param>
         /// <param name="Primary">Row Primary</param>
-        public TableRowBindind(string ColumnName, string ColumnType, bool AllowDbNull, bool Primary)
+        public TableRowBindind(string ColumnName, string ColumnType, bool AllowDbNull, bool Primary, string? DefaultValue)
         {
             this.ColumnName = ColumnName;
             this.ColumnType = ColumnType;
             this.AllowDbNull = AllowDbNull;
             this.Primary = Primary;
+            this.DefaultValue = DefaultValue;
+
         }
     }
 }

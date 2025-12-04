@@ -171,6 +171,9 @@ namespace DOL.Database
                     if (bind.DataElement.Varchar > 0)
                         column.ExtendedProperties.Add("VARCHAR", bind.DataElement.Varchar);
                 }
+                
+                if (bind.DefaultValue != null)
+                    column.DefaultValue = bind.DefaultValue.Value ?? DBNull.Value;
             }
 
             // Set Indexes when all columns are set

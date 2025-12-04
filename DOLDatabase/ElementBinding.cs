@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Linq;
 
 using DOL.Database.Attributes;
+using System.ComponentModel;
 
 namespace DOL.Database
 {
@@ -50,6 +51,10 @@ namespace DOL.Database
         /// Get DataElement Attribute
         /// </summary>
         public DataElement DataElement { get; private set; }
+        /// <summary>
+        /// Get DefaultValue Attribute
+        /// </summary>
+        public DefaultValueAttribute DefaultValue { get; private set; }
         /// <summary>
         /// Get Relation Attribute
         /// </summary>
@@ -111,6 +116,7 @@ namespace DOL.Database
 
             ColumnName = Member.Name;
             DataElement = Member.GetCustomAttributes<DataElement>().FirstOrDefault();
+            DefaultValue = Member.GetCustomAttributes<DefaultValueAttribute>().FirstOrDefault();
             Relation = Member.GetCustomAttributes<Relation>().FirstOrDefault();
             PrimaryKey = Member.GetCustomAttributes<PrimaryKey>().FirstOrDefault();
             ReadOnly = Member.GetCustomAttributes<ReadOnly>().FirstOrDefault();
