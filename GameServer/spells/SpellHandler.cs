@@ -1225,7 +1225,7 @@ namespace DOL.GS.Spells
             
             //Ryan: don't want mobs to have reductions in mana
             //Mishura: sure, but why is this tied to checking the power for casting?
-            if (m_caster is not GamePlayer && !CheckHasPower(selectedTarget, quiet))
+            if (m_caster is GamePlayer && !CheckHasPower(selectedTarget, quiet))
             {
                 return false;
             }
