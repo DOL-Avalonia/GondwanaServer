@@ -37,11 +37,14 @@ namespace DOL.GS.Spells
         protected readonly ListDictionary m_resTimersByLiving = new ListDictionary();
 
         // constructor
-        public ResurrectSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+        public ResurrectSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
+        {
+            m_powerTypeOverride = Spell.ePowerType.Mana;
+        }
 
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= CalculatePowerCost(target);
+            ConsumePower(target);
             base.FinishSpellCast(target, force);
         }
 
@@ -276,6 +279,7 @@ namespace DOL.GS.Spells
                 return false;
 
             //Lifeflight, the base call to Checkbegincast uses its own power check, which is bad for rez spells
+            //TODO(Mishura): Is this still needed?
             //so I added another check here.
             if (m_caster.Mana < CalculatePowerCost(target))
             {

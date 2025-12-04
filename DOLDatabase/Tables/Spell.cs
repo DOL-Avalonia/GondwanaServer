@@ -18,6 +18,7 @@
  */
 using System;
 using DOL.Database.Attributes;
+using System.ComponentModel;
 
 namespace DOL.Database
 {
@@ -70,6 +71,7 @@ namespace DOL.Database
         protected int m_sharedtimergroup;
         protected string m_packageID = string.Empty;
         protected ushort m_hardTargetCap = 0;
+        protected string m_powerType = "Mana";
 
         // warlock
         protected bool m_isprimary;
@@ -702,6 +704,18 @@ namespace DOL.Database
             set
             {
                 this.m_tooltipId = value;
+                this.Dirty = true;
+            }
+        }
+
+        [DefaultValue("Mana")]
+        [DataElement(AllowDbNull = false, Varchar = 255)]
+        public string PowerType
+        {
+            get => this.m_powerType;
+            set
+            {
+                this.m_powerType = value;
                 this.Dirty = true;
             }
         }

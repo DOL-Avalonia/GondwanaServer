@@ -5,6 +5,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.PlayerClass;
 using DOL.Language;
 using System;
+using System.Diagnostics;
 
 namespace DOL.GS.Spells
 {
@@ -54,21 +55,40 @@ namespace DOL.GS.Spells
                 line = bomber.SpellLine;
             }
 
-            int cost;
+            int power;
             GamePlayer player = ad.Target as GamePlayer;
+            spellToCast.PowerType = Spell.ePowerType.Mana; // Force spells to use mana at this point
             if (player is { CharacterClass: ClassSavage })
             {
-                cost = ((spellToCast.Power * Spell.AmnesiaChance / 100) / 2) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
-                spellToCast.CostPower = false;
+                power = ((spellToCast.Power * Spell.AmnesiaChance / 100) / 2) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
+                spellToCast.PowerType = Spell.ePowerType.None;
             }
             else
             {
-                cost = (spellToCast.Power * Spell.AmnesiaChance / 100) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
-                spellToCast.CostPower = true;
-                if (ad.Target.Mana < cost)
-                    return;
+                power = (spellToCast.Power * Spell.AmnesiaChance / 100) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
             }
-            spellToCast.Power = cost;
+            
+            switch (Spell.PowerType)
+            {
+                case Spell.ePowerType.None:
+                    power = 0;
+                    break;
+                
+                case Spell.ePowerType.Mana:
+                    if (ad.Target.Mana < power)
+                        return;
+                    break;
+
+                case Spell.ePowerType.Endurance:
+                    if (ad.Target.Endurance < power)
+                        return;
+                    break;
+
+                default:
+                    throw new NotImplementedException($"Unimplemented power type {Spell.PowerType} when reflecting Spell {Spell.Name} ({Spell.ID})");
+            }
+            
+            spellToCast.Power = power;
 
             double absorbPercent = Spell.LifeDrainReturn;
             int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));

@@ -30,7 +30,6 @@ namespace DOL.GS.Spells
 {
     public abstract class AbstractSavageBuff : PropertyChangingSpell
     {
-        public override string CostType => "Health";
         public override eBuffBonusCategory BonusCategory1 => eBuffBonusCategory.BaseBuff;
 
         public override void OnEffectStart(GameSpellEffect effect)
@@ -104,7 +103,10 @@ namespace DOL.GS.Spells
             return 0;
         }
 
-        public AbstractSavageBuff(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
+        public AbstractSavageBuff(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
+        {
+            PowerType = Spell.ePowerType.Health;
+        }
     }
 
     public abstract class AbstractSavageStatBuff : AbstractSavageBuff

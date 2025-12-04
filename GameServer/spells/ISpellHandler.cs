@@ -240,7 +240,7 @@ namespace DOL.GS.Spells
         /// </summary>
         SpellLine SpellLine { get; }
 
-        string CostType { get; }
+        Spell.ePowerType PowerType { get; }
 
         /// <summary>
         /// The DelveInfo

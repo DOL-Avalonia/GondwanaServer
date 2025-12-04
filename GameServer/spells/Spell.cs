@@ -16,15 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using DOL.AI.Brain;
+using DOL.Database;
+using DOL.Language;
+using log4net;
+using MySqlConnector.Logging;
 using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-
-using DOL.Database;
-using DOL.AI.Brain;
-using DOL.Language;
-using MySqlConnector.Logging;
+using System.Text;
 
 namespace DOL.GS
 {
@@ -33,6 +33,19 @@ namespace DOL.GS
     /// </summary>
     public class Spell : Skill, ICustomParamsValuable
     {
+        private static readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        
+        public enum ePowerType
+        {
+            None, // Power is ignored
+            
+            Mana,
+            
+            Endurance,
+            
+            Health
+        }
+
         protected readonly string m_description = "";
         protected readonly string m_target = "";
         protected readonly string m_spelltype = "-";
@@ -48,6 +61,7 @@ namespace DOL.GS
         protected readonly int m_pulse_power = 0;
         protected int m_power = 0;
         protected int m_casttime = 0;
+        protected ePowerType m_powerType = ePowerType.Mana;
         protected readonly int m_recastdelay = 0;
         protected readonly int m_reshealth = 0;
         protected readonly int m_resmana = 0;
@@ -76,7 +90,6 @@ namespace DOL.GS
         protected readonly bool m_isprimary = false;
         protected readonly bool m_issecondary = false;
         protected bool m_inchamber = false;
-        protected bool m_costpower = true;
         protected readonly bool m_allowbolt = false;
         protected int m_overriderange = 0;
         protected bool m_isShearable = false;
@@ -110,12 +123,6 @@ namespace DOL.GS
         {
             get { return m_inchamber; }
             set { m_inchamber = value; }
-        }
-
-        public bool CostPower
-        {
-            get { return m_costpower; }
-            set { m_costpower = value; }
         }
 
         public bool AllowBolt
@@ -173,14 +180,17 @@ namespace DOL.GS
             }
         }
 
+        public ePowerType PowerType
+        {
+            get { return m_powerType; }
+            set { m_powerType = value; }
+        }
+
         public int Power
         {
             get
             {
-                if (!m_costpower)
-                    return 0;
-                else
-                    return m_power;
+                return m_powerType is ePowerType.None ? 0 : m_power;
             }
             set
             {
@@ -531,6 +541,16 @@ namespace DOL.GS
             m_minotaurspell = minotaur;
             // Params
             this.InitFromCollection<DBSpellXCustomValues>(dbspell.CustomValues, param => param.KeyName, param => param.Value);
+
+            if (string.IsNullOrEmpty(dbspell.PowerType))
+                m_powerType = ePowerType.None;
+            else
+            {
+                if (ePowerType.TryParse(dbspell.PowerType, true, out ePowerType type))
+                    m_powerType = type;
+                else
+                    log!.Error($"Spell {Name} ({ID}) has invalid PowerType '{dbspell.PowerType}' in database.");
+            }
         }
 
         /// <summary>
@@ -557,6 +577,7 @@ namespace DOL.GS
             m_pulse = spell.Pulse;
             m_pulse_power = spell.PulsePower;
             m_power = spell.Power;
+            m_powerType = spell.PowerType;
             m_casttime = spell.CastTime;
             m_recastdelay = spell.RecastDelay;
             m_reshealth = spell.ResurrectHealth;
@@ -743,17 +764,6 @@ namespace DOL.GS
             get
             {
                 return Concentration > 0;
-            }
-        }
-
-        /// <summary>
-        /// Whether this spell has power usage.
-        /// </summary>
-        public bool UsePower
-        {
-            get
-            {
-                return Power != 0;
             }
         }
 

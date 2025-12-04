@@ -39,8 +39,6 @@ namespace DOL.GS.Spells
             Rapid = 4
         }
 
-        public override string CostType => "Endurance";
-
         public override bool UnstealthCasterOnStart
         {
             get { return false; }
@@ -334,6 +332,12 @@ namespace DOL.GS.Spells
 
         public override int CalculatePowerCost(GameLiving target) { return 0; }
 
+        /// <inheritdoc />
+        public override bool CheckHasPower(GameLiving selectedTarget, bool quiet)
+        {
+            return true;
+        }
+
         public override int CalculateEnduranceCost()
         {
             #region [Freya] Nidel: Arcane Syphon chance
@@ -421,7 +425,10 @@ namespace DOL.GS.Spells
             return ServerProperties.Properties.ENABLE_SUB_SPELL_ALL_CLASS ? base.CastSubSpells(target) : false;
         }
 
-        public Archery(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+        public Archery(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
+        {
+            PowerType = Spell.ePowerType.Endurance;
+        }
 
         public override string GetDelveDescription(GameClient delveClient)
         {

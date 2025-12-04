@@ -29,12 +29,22 @@ namespace DOL.GS.Spells
     {
         public EnduranceHealSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
+        private bool m_healed = false;
+
+        /// <inheritdoc />
+        public override int CalculatePowerCost(GameLiving target)
+        {
+            // group heals seem to use full power even if no heals
+            if (!m_healed && Spell.Target.Equals("realm", StringComparison.OrdinalIgnoreCase))
+                return base.CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
+            else
+                return base.CalculatePowerCost(target);
+        }
+
         protected override bool ExecuteSpell(GameLiving target, bool force)
         {
             var targets = SelectTargets(target, force);
             if (targets.Count <= 0) return false;
-
-            bool healed = false;
 
             int spellValue = (int)Math.Round(Spell.Value);
 
@@ -44,19 +54,15 @@ namespace DOL.GS.Spells
                     // Restore a percentage of the target's endurance
                     spellValue = (int)Math.Round(Spell.Value * -0.01) * target.MaxEndurance;
 
-                healed |= HealTarget(healTarget, spellValue);
+                m_healed |= HealTarget(healTarget, spellValue);
             }
 
-            // group heals seem to use full power even if no heals
-            if (!healed && Spell.Target == "realm")
-                RemoveFromStat(CalculatePowerCost(target) >> 1); // only 1/2 power if no heal
-            else
-                RemoveFromStat(CalculatePowerCost(target));
+            ConsumePower(target);
 
             // send animation for non pulsing spells only
             if (Spell.Pulse == 0)
             {
-                if (healed)
+                if (m_healed)
                 {
                     // send animation on all targets if healed
                     foreach (GameLiving healTarget in targets)
@@ -69,14 +75,9 @@ namespace DOL.GS.Spells
                 }
             }
 
-            if (!healed && Spell.CastTime == 0) m_startReuseTimer = false;
+            if (!m_healed && Spell.CastTime == 0) m_startReuseTimer = false;
 
             return true;
-        }
-
-        protected virtual void RemoveFromStat(int value)
-        {
-            m_caster.Mana -= value;
         }
 
         public virtual bool HealTarget(GameLiving target, int amount)

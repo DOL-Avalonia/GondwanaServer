@@ -44,6 +44,8 @@ using DOL.Territories;
 using static Grpc.Core.Metadata;
 using System.Collections;
 using DOL.GS.PlayerClass;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DOL.GS.Spells
 {
@@ -305,6 +307,10 @@ namespace DOL.GS.Spells
         /// The spell line the spell belongs to
         /// </summary>
         protected SpellLine m_spellLine;
+        /// <summary>
+        /// The power type that will be used for the cast, if null defer to Spell.PowerType
+        /// </summary>
+        protected Spell.ePowerType? m_powerTypeOverride;
         /// <summary>
         /// The caster of the spell
         /// </summary>
@@ -915,6 +921,46 @@ namespace DOL.GS.Spells
             return CheckBeginCast(selectedTarget, false);
         }
 
+        public virtual bool CheckHasPower(GameLiving selectedTarget, bool quiet)
+        {
+            if (Spell.Power == 0)
+                return true;
+
+            var cost = CalculatePowerCost(selectedTarget);
+            switch (PowerType)
+            {
+                case Spell.ePowerType.None:
+                    // Should be handled by `Spell.Power == 0` but anyway
+                    return true;
+                    
+                case Spell.ePowerType.Endurance:
+                    if (m_caster.Endurance >= cost)
+                        return true;
+                    break;
+
+                case Spell.ePowerType.Mana:
+                    if (m_caster.Mana >= cost)
+                        return true;
+                    else
+                    {
+                        if (!quiet)
+                            MessageTranslationToCaster("SpellHandler.NoMoreMana", eChatType.CT_SpellResisted);
+                        return false;
+                    }
+                    break;
+                    
+                case Spell.ePowerType.Health:
+                    if (m_caster.Health >= cost)
+                        return true;
+                    break;
+            }
+
+            // Failed
+            if (!quiet)
+                MessageTranslationToCaster("SpellHandler.NotEnoughPower", eChatType.CT_SpellResisted);
+            return false;
+        }
+
         /// <summary>
         /// All checks before any casting begins
         /// </summary>
@@ -1176,11 +1222,11 @@ namespace DOL.GS.Spells
                     return false;
                 }
             }
-
+            
             //Ryan: don't want mobs to have reductions in mana
-            if (Spell.Power != 0 && m_caster is GamePlayer && (m_caster as GamePlayer)!.CharacterClass.ID != (int)eCharacterClass.Savage && m_caster.Mana < CalculatePowerCost(selectedTarget) && Spell.SpellType != "Archery")
+            //Mishura: sure, but why is this tied to checking the power for casting?
+            if (m_caster is not GamePlayer && !CheckHasPower(selectedTarget, quiet))
             {
-                if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((m_caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -1436,14 +1482,8 @@ namespace DOL.GS.Spells
                 }
             }
 
-            if (m_caster.Mana <= 0 && Spell.Power != 0 && Spell.SpellType != "Archery")
+            if (!CheckHasPower(target, false))
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoMoreMana"), eChatType.CT_SpellResisted);
-                return false;
-            }
-            if (Spell.Power != 0 && m_caster.Mana < CalculatePowerCost(target) && Spell.SpellType != "Archery")
-            {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -1635,14 +1675,8 @@ namespace DOL.GS.Spells
                 }
             }
 
-            if (m_caster.Mana <= 0 && Spell.Power != 0 && Spell.SpellType != "Archery")
+            if (!CheckHasPower(target, quiet))
             {
-                if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoMoreMana"), eChatType.CT_SpellResisted);
-                return false;
-            }
-            if (Spell.Power != 0 && m_caster.Mana < CalculatePowerCost(target) && Spell.SpellType != "Archery")
-            {
-                if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -1818,14 +1852,8 @@ namespace DOL.GS.Spells
                 }
             }
 
-            if (m_caster.Mana <= 0 && Spell.Power != 0 && Spell.SpellType != "Archery")
+            if (!CheckHasPower(target, quiet))
             {
-                if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoMoreMana"), eChatType.CT_SpellResisted);
-                return false;
-            }
-            if (Spell.Power != 0 && m_caster.Mana < CalculatePowerCost(target) && Spell.SpellType != "Archery")
-            {
-                if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
             }
 
@@ -1847,6 +1875,44 @@ namespace DOL.GS.Spells
 
         #endregion
 
+        protected virtual int? ConsumePower(GameLiving target)
+        {
+            if (Caster is null)
+                return null;
+            
+            if (Spell.PowerType is Spell.ePowerType.None)
+                return 0; // Ok, bypass power costs
+            
+            var cost = CalculatePowerCost(target);
+            switch (Spell.PowerType)
+            {
+                case Spell.ePowerType.None:
+                    throw new UnreachableException("This should be checked before");
+                
+                case Spell.ePowerType.Endurance:
+                    if (Caster.Endurance < cost)
+                        return null;
+
+                    Caster.Endurance -= cost;
+                    return cost;
+                
+                case Spell.ePowerType.Mana:
+                    if (Caster.Mana < cost)
+                        return null;
+
+                    Caster.Mana -= cost;
+                    return cost;
+                
+                case Spell.ePowerType.Health:
+                    if (Caster.Health < cost)
+                        return null;
+
+                    Caster.Health -= cost;
+                    return cost;
+            }
+            throw new UnreachableException($"Unhandled Spell.PowerType { Spell.PowerType } in spell \"{ Spell.Name }\" ({ Spell.ID })");
+        }
+
         /// <summary>
         /// Calculates the power to cast the spell
         /// </summary>
@@ -1854,6 +1920,9 @@ namespace DOL.GS.Spells
         /// <returns></returns>
         public virtual int CalculatePowerCost(GameLiving target)
         {
+            if (Spell.PowerType is Spell.ePowerType.None)
+                return 0;
+            
             // warlock
             GameSpellEffect effect = SpellHandler.FindEffectOnTarget(m_caster, "Powerless");
             if (effect != null && !m_spell.IsPrimary)
@@ -1886,14 +1955,23 @@ namespace DOL.GS.Spells
             // percent of maxPower if less than zero
             if (basepower < 0)
             {
-                if (Caster is GamePlayer && ((GamePlayer)Caster).CharacterClass.ManaStat != eStat.UNDEFINED)
+                switch (Spell.PowerType)
                 {
-                    GamePlayer player = Caster as GamePlayer;
-                    basepower = player!.CalculateMaxMana(player.Level, player.GetBaseStat(player.CharacterClass.ManaStat)) * basepower * -0.01;
-                }
-                else
-                {
-                    basepower = Caster.MaxMana * basepower * -0.01;
+                    case Spell.ePowerType.Mana:
+                        if (Caster is GamePlayer { CharacterClass.ManaStat: not eStat.UNDEFINED })
+                        {
+                            GamePlayer player = Caster as GamePlayer;
+                            basepower = player!.CalculateMaxMana(player.Level, player.GetBaseStat(player.CharacterClass.ManaStat)) * basepower * -0.01;
+                        }
+                        else
+                        {
+                            basepower = Caster.MaxMana * basepower * -0.01;
+                        }
+                        break;
+
+                    case Spell.ePowerType.Endurance:
+                        basepower = Caster.MaxEndurance * basepower * -0.01;
+                        break;
                 }
             }
 
@@ -1911,10 +1989,10 @@ namespace DOL.GS.Spells
                     focusBonus = 0;
                 power -= basepower * focusBonus; //<== So i can finally use 'basepower' for both calculations: % and absolut
             }
-            else if (Caster is GamePlayer { CharacterClass.ClassType: eClassType.Hybrid })
+            else if (Caster is GamePlayer { CharacterClass.ClassType: eClassType.Hybrid } hybridCaster)
             {
                 double specBonus = 0;
-                if (Spell.Level != 0) specBonus = (((GamePlayer)Caster).GetBaseSpecLevel(SpellLine.Spec) * 0.4 / Spell.Level);
+                if (Spell.Level != 0) specBonus = (hybridCaster.GetBaseSpecLevel(SpellLine.Spec) * 0.4 / Spell.Level);
 
                 if (specBonus > 0.4)
                     specBonus = 0.4;
@@ -1931,6 +2009,7 @@ namespace DOL.GS.Spells
             // doubled power usage if quickcasting
             if (Caster.EffectList.GetOfType<QuickCastEffect>() != null && Spell.CastTime > 0)
                 power *= 2;
+
             return (int)power;
         }
 
@@ -3925,7 +4004,11 @@ namespace DOL.GS.Spells
 
         public Spell Spell => m_spell;
         public SpellLine SpellLine => m_spellLine;
-        public virtual string CostType => "Power";
+        public Spell.ePowerType PowerType
+        {
+            get => m_powerTypeOverride ?? Spell.PowerType;
+            set => m_powerTypeOverride = value;
+        }
         public GameLiving Caster => m_caster;
         public bool IsCasting
             => m_castTimer != null && m_castTimer.IsAlive;

@@ -40,7 +40,7 @@ namespace DOL.GS.Spells
         {
             if (!m_castFailed)
             {
-                m_caster.Mana -= CalculatePowerCost(target);
+                ConsumePower(target);
             }
 
             base.FinishSpellCast(target, force);
