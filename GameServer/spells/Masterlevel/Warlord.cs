@@ -55,7 +55,7 @@ namespace DOL.GS.Spells
                     }
                     break;
             }
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
 
@@ -279,7 +279,7 @@ namespace DOL.GS.Spells
         /// </summary>
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
 

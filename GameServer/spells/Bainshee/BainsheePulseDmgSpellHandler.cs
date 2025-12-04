@@ -48,7 +48,7 @@ namespace DOL.GS.Spells
                 GameEventMgr.AddHandler(Caster, GamePlayerEvent.Moving, new DOLEventHandler(EventAction));
                 GameEventMgr.AddHandler(Caster, GamePlayerEvent.Dying, new DOLEventHandler(EventAction));
             }
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
 

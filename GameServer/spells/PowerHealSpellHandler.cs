@@ -67,9 +67,9 @@ namespace DOL.GS.Spells
 
             // group heals seem to use full power even if no heals
             if (!healed && Spell.Target == "realm")
-                m_caster.Mana -= PowerCost(target) >> 1; // only 1/2 power if no heal
+                m_caster.Mana -= CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
             else
-                m_caster.Mana -= PowerCost(target);
+                m_caster.Mana -= CalculatePowerCost(target);
 
             // send animation for non pulsing spells only
             if (Spell.Pulse == 0)

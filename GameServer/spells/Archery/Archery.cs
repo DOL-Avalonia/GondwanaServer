@@ -332,7 +332,7 @@ namespace DOL.GS.Spells
             return ticks;
         }
 
-        public override int PowerCost(GameLiving target) { return 0; }
+        public override int CalculatePowerCost(GameLiving target) { return 0; }
 
         public override int CalculateEnduranceCost()
         {

@@ -30,12 +30,12 @@ namespace DOL.GS.Spells
             bool consume = anyHealed;
             if (!anyHealed && Spell.Target.Equals("Realm", StringComparison.OrdinalIgnoreCase))
             {
-                Caster.Mana -= (PowerCost(baseTarget) >> 1);
+                Caster.Mana -= (CalculatePowerCost(baseTarget) >> 1);
                 consume = true; // For AOEs, mark the spell as success even if nobody was healed, so item charges can be consumed similar to mana
             }
             else
             {
-                Caster.Mana -= PowerCost(baseTarget);
+                Caster.Mana -= CalculatePowerCost(baseTarget);
             }
 
             if (Spell.Pulse == 0)

@@ -48,7 +48,7 @@ namespace DOL.GS.Spells
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
             m_currentTarget = target;
-            Caster.Mana -= (PowerCost(target) + Spell.PulsePower);
+            Caster.Mana -= (CalculatePowerCost(target) + Spell.PulsePower);
             base.FinishSpellCast(target, force);
             OnDirectEffect(target, CurrentEffectiveness);
         }

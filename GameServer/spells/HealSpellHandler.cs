@@ -159,14 +159,14 @@ namespace DOL.GS.Spells
             if (healed)
             {
                 Status = eStatus.Success; // Consume item charges
-                m_caster.Mana -= PowerCost(target);
+                m_caster.Mana -= CalculatePowerCost(target);
             }
             else
             {
                 if (Spell.Target.ToLower() == "realm")
                 {
                     Status = eStatus.Success; // Consume item charges
-                    m_caster.Mana -= PowerCost(target) >> 1; // only 1/2 power if no heal
+                    m_caster.Mana -= CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
                 }
                 else
                 {

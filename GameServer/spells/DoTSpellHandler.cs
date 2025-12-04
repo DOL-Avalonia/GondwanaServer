@@ -30,7 +30,7 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
 

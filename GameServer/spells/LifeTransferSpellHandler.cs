@@ -170,11 +170,11 @@ namespace DOL.GS.Spells
 
             if (!healed && Spell.Target == "realm")
             {
-                m_caster.Mana -= PowerCost(target) >> 1;    // only 1/2 power if no heal
+                m_caster.Mana -= CalculatePowerCost(target) >> 1;    // only 1/2 power if no heal
             }
             else
             {
-                m_caster.Mana -= PowerCost(target);
+                m_caster.Mana -= CalculatePowerCost(target);
 
                 if ((totalHealedAmount >> 1) >= Caster.Health)
                 {

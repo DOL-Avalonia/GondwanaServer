@@ -59,7 +59,7 @@ namespace DOL.GS.Spells
 
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             //For Banelord ML 8, it drains Life from the Caster
             if (Spell.Damage > 0)
             {
@@ -163,7 +163,7 @@ namespace DOL.GS.Spells
         }
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
         public override int CalculateSpellResistChance(GameLiving target)
@@ -343,7 +343,7 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
 
@@ -507,7 +507,7 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            m_caster.Mana -= CalculatePowerCost(target);
             base.FinishSpellCast(target, force);
         }
 

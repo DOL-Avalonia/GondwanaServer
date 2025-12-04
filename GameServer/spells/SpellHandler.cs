@@ -1178,7 +1178,7 @@ namespace DOL.GS.Spells
             }
 
             //Ryan: don't want mobs to have reductions in mana
-            if (Spell.Power != 0 && m_caster is GamePlayer && (m_caster as GamePlayer)!.CharacterClass.ID != (int)eCharacterClass.Savage && m_caster.Mana < PowerCost(selectedTarget) && Spell.SpellType != "Archery")
+            if (Spell.Power != 0 && m_caster is GamePlayer && (m_caster as GamePlayer)!.CharacterClass.ID != (int)eCharacterClass.Savage && m_caster.Mana < CalculatePowerCost(selectedTarget) && Spell.SpellType != "Archery")
             {
                 if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((m_caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
@@ -1441,7 +1441,7 @@ namespace DOL.GS.Spells
                 MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoMoreMana"), eChatType.CT_SpellResisted);
                 return false;
             }
-            if (Spell.Power != 0 && m_caster.Mana < PowerCost(target) && Spell.SpellType != "Archery")
+            if (Spell.Power != 0 && m_caster.Mana < CalculatePowerCost(target) && Spell.SpellType != "Archery")
             {
                 MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
@@ -1640,7 +1640,7 @@ namespace DOL.GS.Spells
                 if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoMoreMana"), eChatType.CT_SpellResisted);
                 return false;
             }
-            if (Spell.Power != 0 && m_caster.Mana < PowerCost(target) && Spell.SpellType != "Archery")
+            if (Spell.Power != 0 && m_caster.Mana < CalculatePowerCost(target) && Spell.SpellType != "Archery")
             {
                 if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
@@ -1823,7 +1823,7 @@ namespace DOL.GS.Spells
                 if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoMoreMana"), eChatType.CT_SpellResisted);
                 return false;
             }
-            if (Spell.Power != 0 && m_caster.Mana < PowerCost(target) && Spell.SpellType != "Archery")
+            if (Spell.Power != 0 && m_caster.Mana < CalculatePowerCost(target) && Spell.SpellType != "Archery")
             {
                 if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;
@@ -1852,7 +1852,7 @@ namespace DOL.GS.Spells
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public virtual int PowerCost(GameLiving target)
+        public virtual int CalculatePowerCost(GameLiving target)
         {
             // warlock
             GameSpellEffect effect = SpellHandler.FindEffectOnTarget(m_caster, "Powerless");
@@ -1911,7 +1911,7 @@ namespace DOL.GS.Spells
                     focusBonus = 0;
                 power -= basepower * focusBonus; //<== So i can finally use 'basepower' for both calculations: % and absolut
             }
-            else if (Caster is GamePlayer && ((GamePlayer)Caster).CharacterClass.ClassType == eClassType.Hybrid)
+            else if (Caster is GamePlayer { CharacterClass.ClassType: eClassType.Hybrid })
             {
                 double specBonus = 0;
                 if (Spell.Level != 0) specBonus = (((GamePlayer)Caster).GetBaseSpecLevel(SpellLine.Spec) * 0.4 / Spell.Level);
