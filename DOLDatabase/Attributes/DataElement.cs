@@ -72,5 +72,12 @@ namespace DOL.Database.Attributes
         /// Varchar = 0 will force creation of TEXT datatype
         /// </summary>
         public byte Varchar { get; set; }
+        
+        /// <summary>
+        /// Default value when a row is created.
+        /// This is ONLY about the column info, it does not affect the default value when creating an object via new
+        /// <TODO>Maybe this can be fixed in the future</TODO>
+        /// </summary>
+        public object? DefaultDBValue { get; set; }
     }
 }

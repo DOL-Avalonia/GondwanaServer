@@ -743,7 +743,6 @@ namespace DOL.Database
         /// <param name="SQLCommand">Raw Command</param>
         protected int ExecuteNonQueryImpl(string SQLCommand)
         {
-            log.Info(SQLCommand);
             return ExecuteNonQueryImpl(SQLCommand, new[] { Array.Empty<QueryParameter>() }).First();
         }
 

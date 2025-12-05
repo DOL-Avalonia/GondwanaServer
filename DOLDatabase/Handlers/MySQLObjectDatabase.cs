@@ -151,7 +151,7 @@ namespace DOL.Database.Handlers
                 typeof(ushort), typeof(ulong), typeof(uint), typeof(double)
             };
             
-            if (bind.DefaultValue == null) // No default value specified, insert our defaults
+            if (bind.DataElement.DefaultDBValue is null) // No default value specified, insert our defaults
             {
                 if (bind.ValueType == typeof(DateTime))
                 {
@@ -165,7 +165,7 @@ namespace DOL.Database.Handlers
             }
             else
             {
-                return bind.DefaultValue.Value?.ToString();
+                return bind.DataElement.DefaultDBValue?.ToString();
             }
         }
 
@@ -453,7 +453,6 @@ namespace DOL.Database.Handlers
 
                             // Alter Table
                             cmd.CommandText = string.Format("ALTER TABLE `{0}` {1}", table.TableName, string.Join(", \n", columnDefs));
-                            log.Info(cmd.CommandText);
                             cmd.ExecuteNonQuery();
 
                             tran.Commit();

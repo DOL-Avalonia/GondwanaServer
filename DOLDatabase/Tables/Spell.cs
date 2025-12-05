@@ -708,8 +708,7 @@ namespace DOL.Database
             }
         }
 
-        [DefaultValue("Mana")]
-        [DataElement(AllowDbNull = false, Varchar = 255)]
+        [DataElement(AllowDbNull = false, Varchar = 255, DefaultDBValue = "Mana")]
         public string PowerType
         {
             get => this.m_powerType;
