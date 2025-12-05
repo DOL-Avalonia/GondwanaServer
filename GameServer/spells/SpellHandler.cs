@@ -1880,11 +1880,11 @@ namespace DOL.GS.Spells
             if (Caster is null)
                 return null;
             
-            if (Spell.PowerType is Spell.ePowerType.None)
+            if (PowerType is Spell.ePowerType.None)
                 return 0; // Ok, bypass power costs
             
             var cost = CalculatePowerCost(target);
-            switch (Spell.PowerType)
+            switch (PowerType)
             {
                 case Spell.ePowerType.None:
                     throw new UnreachableException("This should be checked before");
