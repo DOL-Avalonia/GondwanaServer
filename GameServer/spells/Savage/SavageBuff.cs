@@ -37,6 +37,18 @@ namespace DOL.GS.Spells
             base.OnEffectStart(effect);
             SendUpdates(effect.Owner);
         }
+
+        /// <inheritdoc />
+        public override int CalculatePowerCost(GameLiving target)
+        {
+            int cost = 0;
+            if (m_spell.Power < 0)
+                cost = (int)(m_caster.MaxHealth * Math.Abs(m_spell.Power) * 0.01);
+            else
+                cost = m_spell.Power;
+            return cost;
+        }
+
         public override IList<string> DelveInfo
         {
             get
@@ -83,24 +95,6 @@ namespace DOL.GS.Spells
 
                 return list;
             }
-        }
-
-        public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
-        {
-            base.OnEffectExpires(effect, noMessages);
-
-            if (m_spell.Power != 0)
-            {
-                int cost = 0;
-                if (m_spell.Power < 0)
-                    cost = (int)(m_caster.MaxHealth * Math.Abs(m_spell.Power) * 0.01);
-                else
-                    cost = m_spell.Power;
-                if (effect.Owner.Health > cost)
-                    effect.Owner.ChangeHealth(effect.Owner, GameLiving.eHealthChangeType.Spell, -cost);
-            }
-            SendUpdates(effect.Owner);
-            return 0;
         }
 
         public AbstractSavageBuff(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
