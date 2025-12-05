@@ -58,6 +58,10 @@ namespace DOL.GS.PlayerClass
             get { return eClassType.ListCaster; }
         }
 
+        /// <inheritdoc />
+        /// Override this, because our mana stat is undefined so this would normally be endurance, but we are a mana user
+        public override Spell.ePowerType PowerType => Spell.ePowerType.Mana;
+
         public override bool HasAdvancedFromBaseClass()
         {
             return true;

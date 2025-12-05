@@ -25,6 +25,7 @@ using DOL.GS.PacketHandler;
 using DOL.Language;
 using DOL.GS.Realm;
 using DOL.Database;
+using DOL.GS.PlayerClass;
 using static DOL.Database.ArtifactBonus;
 
 namespace DOL.GS
@@ -406,6 +407,9 @@ namespace DOL.GS
                 return m_adrenalineSpellID;
             }
         }
+
+        /// <inheritdoc />
+        public virtual Spell.ePowerType PowerType => ManaStat is eStat.UNDEFINED ? Spell.ePowerType.Endurance : Spell.ePowerType.Mana;
 
         public string GetTitle(GamePlayer player, int level)
         {

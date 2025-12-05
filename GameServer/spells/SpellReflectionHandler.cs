@@ -6,6 +6,7 @@ using DOL.GS.PlayerClass;
 using DOL.Language;
 using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace DOL.GS.Spells
 {
@@ -47,6 +48,8 @@ namespace DOL.GS.Spells
             if (ad is not { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
                 return;
 
+            var attacker = ad.Attacker;
+            var defender = ad.Target;
             Spell spellToCast = ad.SpellHandler.Spell.Copy();
             SpellLine line = ad.SpellHandler.SpellLine;
             if (ad.SpellHandler.Parent is BomberSpellHandler bomber)
@@ -56,19 +59,20 @@ namespace DOL.GS.Spells
             }
 
             int power;
-            GamePlayer player = ad.Target as GamePlayer;
+            double powerCalc;
+            double levelRatio = (double)defender.Level / attacker.Level;
+            GamePlayer? defenderPlayer = defender as GamePlayer;
             spellToCast.PowerType = Spell.ePowerType.Mana; // Force spells to use mana at this point
-            if (player is { CharacterClass: ClassSavage })
+            powerCalc = spellToCast.Power * Spell.AmnesiaChance / 100.0;
+            powerCalc /= Math.Max(1.0, levelRatio);
+            if (defenderPlayer.CharacterClass.PowerType is Spell.ePowerType.Endurance)
             {
-                power = ((spellToCast.Power * Spell.AmnesiaChance / 100) / 2) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
-                spellToCast.PowerType = Spell.ePowerType.None;
+                spellToCast.PowerType = Spell.ePowerType.Endurance;
+                powerCalc *= 1.5; // +50% usage of endurance compared to mana
             }
-            else
-            {
-                power = (spellToCast.Power * Spell.AmnesiaChance / 100) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
-            }
+            power = (int)Math.Round(powerCalc);
             
-            switch (Spell.PowerType)
+            switch (spellToCast.PowerType)
             {
                 case Spell.ePowerType.None:
                     power = 0;
@@ -97,11 +101,11 @@ namespace DOL.GS.Spells
 
             if (damageAbsorbed > 0)
             {
-                if (player != null)
-                    MessageToLiving(player, LanguageMgr.GetTranslation(player.Client, "SpellReflection.Self.Absorb", damageAbsorbed), eChatType.CT_Spell);
+                if (defenderPlayer != null)
+                    MessageToLiving(defenderPlayer, LanguageMgr.GetTranslation(defenderPlayer.Client, "SpellReflection.Self.Absorb", damageAbsorbed), eChatType.CT_Spell);
 
-                if (ad.Attacker is GamePlayer attacker)
-                    MessageToLiving(attacker, LanguageMgr.GetTranslation(attacker.Client, "SpellReflection.Target.Absorbs", damageAbsorbed), eChatType.CT_Spell);
+                if (ad.Attacker is GamePlayer playerAttacker)
+                    MessageToLiving(playerAttacker, LanguageMgr.GetTranslation(playerAttacker.Client, "SpellReflection.Target.Absorbs", damageAbsorbed), eChatType.CT_Spell);
             }
 
             spellToCast.Damage = spellToCast.Damage * Spell.AmnesiaChance / 100;
