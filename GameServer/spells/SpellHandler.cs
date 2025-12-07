@@ -1909,8 +1909,10 @@ namespace DOL.GS.Spells
 
                     Caster.Health -= cost;
                     return cost;
+                
+                default:
+                    throw new NotImplementedException($"Unhandled Spell.PowerType { Spell.PowerType } in spell \"{ Spell.Name }\" ({ Spell.ID })");
             }
-            throw new UnreachableException($"Unhandled Spell.PowerType { Spell.PowerType } in spell \"{ Spell.Name }\" ({ Spell.ID })");
         }
 
         /// <summary>
