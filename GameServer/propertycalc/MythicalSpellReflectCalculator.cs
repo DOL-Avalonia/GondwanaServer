@@ -58,7 +58,7 @@ namespace DOL.GS.PropertyCalc
                 return;
 
             AttackData ad = args.AttackData;
-            if (ad is not { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
+            if (ad is not { AttackType: AttackData.eAttackType.Spell, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
                 return;
 
             int chanceToReflect = defender.GetModified(eProperty.MythicalSpellReflect);
@@ -127,15 +127,15 @@ namespace DOL.GS.PropertyCalc
                 pl.Out.SendSpellEffectAnimation(defender, defender, clientEffect, 0, false, 1);
             }
 
+            const string MYTH_REFLECT_ABSORB_FLAG = "MYTH_REFLECT_ABSORB_PCT_THIS_HIT";
+            defender.TempProperties.setProperty(MYTH_REFLECT_ABSORB_FLAG, 30);
+            defender.TempProperties.setProperty("MYTH_REFLECT_ABSORB_TICK", defender.CurrentRegion.Time);
+
             ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(defender, spellToCast, line);
             if (spellHandler is BomberSpellHandler bomberSpell)
             {
                 bomberSpell.ReduceSubSpellDamage = 30;
             }
-
-            const string MYTH_REFLECT_ABSORB_FLAG = "MYTH_REFLECT_ABSORB_PCT_THIS_HIT";
-            defender.TempProperties.setProperty(MYTH_REFLECT_ABSORB_FLAG, 30);
-            defender.TempProperties.setProperty("MYTH_REFLECT_ABSORB_TICK", defender.CurrentRegion.Time);
 
             spellHandler.StartSpell(ad.Attacker, false);
         }

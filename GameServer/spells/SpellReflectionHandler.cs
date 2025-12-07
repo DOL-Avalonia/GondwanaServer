@@ -45,7 +45,7 @@ namespace DOL.GS.Spells
             }
             
             AttackData ad = args.AttackData;
-            if (ad is not { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
+            if (ad is not { AttackType: AttackData.eAttackType.Spell, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
                 return;
 
             var attacker = ad.Attacker;
