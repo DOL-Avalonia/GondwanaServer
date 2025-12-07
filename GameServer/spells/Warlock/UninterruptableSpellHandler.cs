@@ -64,7 +64,7 @@ namespace DOL.GS.Spells
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override int PowerCost(GameLiving target)
+        public override int CalculatePowerCost(GameLiving target)
         {
             double basepower = m_spell.Power; //<== defined a basevar first then modified this base-var to tell %-costs from absolut-costs
 

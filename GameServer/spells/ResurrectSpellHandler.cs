@@ -37,11 +37,14 @@ namespace DOL.GS.Spells
         protected readonly ListDictionary m_resTimersByLiving = new ListDictionary();
 
         // constructor
-        public ResurrectSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+        public ResurrectSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
+        {
+            m_powerTypeOverride = Spell.ePowerType.Mana;
+        }
 
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            ConsumePower(target);
             base.FinishSpellCast(target, force);
         }
 
@@ -102,7 +105,7 @@ namespace DOL.GS.Spells
         /// </summary>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override int PowerCost(GameLiving target)
+        public override int CalculatePowerCost(GameLiving target)
         {
             float factor = Math.Max(0.1f, 0.5f + (target.Level - m_caster.Level) / (float)m_caster.Level);
 
@@ -163,7 +166,7 @@ namespace DOL.GS.Spells
                     {
                         player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "SpellHandler.ResurrectSpellHandler.ResurrectDeclined"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         //refund mana
-                        m_caster.Mana += PowerCost(player);
+                        m_caster.Mana += CalculatePowerCost(player);
                     }
                 }
             }
@@ -276,8 +279,9 @@ namespace DOL.GS.Spells
                 return false;
 
             //Lifeflight, the base call to Checkbegincast uses its own power check, which is bad for rez spells
+            //TODO(Mishura): Is this still needed?
             //so I added another check here.
-            if (m_caster.Mana < PowerCost(target))
+            if (m_caster.Mana < CalculatePowerCost(target))
             {
                 MessageToCaster(LanguageMgr.GetTranslation((m_caster as GamePlayer)?.Client, "SpellHandler.NotEnoughPower"), eChatType.CT_SpellResisted);
                 return false;

@@ -14,33 +14,40 @@ namespace DOL.GS.Spells
         public OmniHealSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line) { }
 
+        private bool m_healed = false;
+
+        /// <inheritdoc />
+        public override int CalculatePowerCost(GameLiving target)
+        {
+            // group heals seem to use full power even if no heals
+            if (!m_healed && Spell.Target.Equals("realm", StringComparison.OrdinalIgnoreCase))
+                return base.CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
+            else
+                return base.CalculatePowerCost(target);
+        }
+
         protected override bool ExecuteSpell(GameLiving baseTarget, bool force = false)
         {
             IList<GameLiving> targets = SelectTargets(baseTarget, force);
             if (targets == null || targets.Count == 0)
                 return false;
 
-            bool anyHealed = false;
             foreach (GameLiving living in targets)
             {
                 if (OnDirectEffect(living, 1.0))
-                    anyHealed = true;
+                    m_healed = true;
             }
 
-            bool consume = anyHealed;
-            if (!anyHealed && Spell.Target.Equals("Realm", StringComparison.OrdinalIgnoreCase))
+            bool consume = m_healed;
+            ConsumePower(baseTarget);
+            if (!m_healed && Spell.Target.Equals("realm", StringComparison.OrdinalIgnoreCase))
             {
-                Caster.Mana -= (PowerCost(baseTarget) >> 1);
                 consume = true; // For AOEs, mark the spell as success even if nobody was healed, so item charges can be consumed similar to mana
-            }
-            else
-            {
-                Caster.Mana -= PowerCost(baseTarget);
             }
 
             if (Spell.Pulse == 0)
             {
-                if (anyHealed)
+                if (m_healed)
                 {
                     foreach (GameLiving living in targets)
                         SendEffectAnimation(living, 0, false, 1);

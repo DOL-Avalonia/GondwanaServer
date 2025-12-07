@@ -506,7 +506,7 @@ namespace DOL.GS
             ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(this, spell, line);
             if (spellhandler != null)
             {
-                int power = spellhandler.PowerCost(Owner);
+                int power = spellhandler.CalculatePowerCost(Owner);
 
                 if (Owner.Mana < power)
                 {

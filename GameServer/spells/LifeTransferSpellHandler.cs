@@ -38,6 +38,18 @@ namespace DOL.GS.Spells
         // constructor
         public LifeTransferSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
+        private bool m_healed = false;
+
+        /// <inheritdoc />
+        public override int CalculatePowerCost(GameLiving target)
+        {
+            // group heals seem to use full power even if no heals
+            if (!m_healed && Spell.Target.ToLower() is "realm")
+                return base.CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
+            else
+                return base.CalculatePowerCost(target);
+        }
+
         /// <summary>
         /// Execute lifetransfer spell
         /// </summary>
@@ -46,7 +58,6 @@ namespace DOL.GS.Spells
             var targets = SelectTargets(target, force);
             if (targets.Count <= 0) return false;
 
-            bool healed = false;
             double spellValue = m_spell.Value;
 
             int baseTransferHeal = (int)(Caster.MaxHealth / 100 * Math.Abs(spellValue));
@@ -152,7 +163,7 @@ namespace DOL.GS.Spells
                     {
                         transferHeal = (transferHeal * Math.Abs(harmvalue)) / 100;
                         MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "Spell.LifeTransfer.TargetDamnedReducedHeal"), eChatType.CT_SpellResisted);
-                        healed |= HealTarget(healTarget, transferHeal);
+                        m_healed |= HealTarget(healTarget, transferHeal);
                         totalHealedAmount += transferHeal;
                     }
                     else
@@ -163,19 +174,15 @@ namespace DOL.GS.Spells
                 }
                 else
                 {
-                    healed |= HealTarget(healTarget, transferHeal);
+                    m_healed |= HealTarget(healTarget, transferHeal);
                     totalHealedAmount += transferHeal;
                 }
             }
+            
+            ConsumePower(target);
 
-            if (!healed && Spell.Target == "realm")
+            if (m_healed || Spell.Target != "realm")
             {
-                m_caster.Mana -= PowerCost(target) >> 1;    // only 1/2 power if no heal
-            }
-            else
-            {
-                m_caster.Mana -= PowerCost(target);
-
                 if ((totalHealedAmount >> 1) >= Caster.Health)
                 {
                     totalHealedAmount = ((Caster.Health - 1) << 1);
@@ -187,7 +194,7 @@ namespace DOL.GS.Spells
             // Send animation for non pulsing spells only
             if (Spell.Pulse == 0)
             {
-                if (healed)
+                if (m_healed)
                 {
                     // Send animation on all targets if healed
                     foreach (GameLiving healTarget in targets)

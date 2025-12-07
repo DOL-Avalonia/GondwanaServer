@@ -136,6 +136,11 @@ namespace DOL.GS
         /// ID of the spell cast when adrenaline gauge is full
         /// </summary>
         Spell AdrenalineSpell { get; }
+        
+        /// <summary>
+        /// What is the main power type this class uses?
+        /// </summary>
+        Spell.ePowerType PowerType { get; }
 
         string GetTitle(GamePlayer player, int level);
         void OnLevelUp(GamePlayer player, int previousLevel);

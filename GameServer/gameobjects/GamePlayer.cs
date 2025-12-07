@@ -10099,7 +10099,7 @@ namespace DOL.GS
                                     if (m_runningSpellHandler is PowerlessSpellHandler)
                                     {
                                         cloneSpell = spell.Copy();
-                                        cloneSpell.CostPower = false;
+                                        cloneSpell.PowerType = Spell.ePowerType.None;
                                         m_nextSpell = cloneSpell;
                                         m_nextSpellLine = line;
                                         casted = true;
@@ -10107,7 +10107,7 @@ namespace DOL.GS
                                     else if (m_runningSpellHandler is RangeSpellHandler)
                                     {
                                         cloneSpell = spell.Copy();
-                                        cloneSpell.CostPower = false;
+                                        cloneSpell.PowerType = Spell.ePowerType.None;
                                         cloneSpell.OverrideRange = m_runningSpellHandler.Spell.Range;
                                         m_nextSpell = cloneSpell;
                                         m_nextSpellLine = line;
@@ -10116,7 +10116,7 @@ namespace DOL.GS
                                     else if (m_runningSpellHandler is UninterruptableSpellHandler)
                                     {
                                         cloneSpell = spell.Copy();
-                                        cloneSpell.CostPower = false;
+                                        cloneSpell.PowerType = Spell.ePowerType.None;
                                         m_nextSpell = cloneSpell;
                                         m_nextSpellLine = line;
                                         casted = true;
@@ -10145,7 +10145,7 @@ namespace DOL.GS
                                 {
                                     Spell cloneSpell = spell.Copy();
                                     cloneSpell.InChamber = true;
-                                    cloneSpell.CostPower = false;
+                                    cloneSpell.PowerType = Spell.ePowerType.None;
                                     chamber.PrimarySpell = cloneSpell;
                                     chamber.PrimarySpellLine = line;
                                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.SpellInChamber", spell.Name, ((ChamberSpellHandler)m_runningSpellHandler).Spell.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -10163,7 +10163,7 @@ namespace DOL.GS
                                     if (chamber.SecondarySpell == null)
                                     {
                                         Spell cloneSpell = spell.Copy();
-                                        cloneSpell.CostPower = false;
+                                        cloneSpell.PowerType = Spell.ePowerType.None;
                                         cloneSpell.InChamber = true;
                                         cloneSpell.OverrideRange = chamber.PrimarySpell.Range;
                                         chamber.SecondarySpell = cloneSpell;
@@ -10259,7 +10259,7 @@ namespace DOL.GS
                             if (effect.SpellHandler is PowerlessSpellHandler)
                             {
                                 cloneSpell = spell.Copy();
-                                cloneSpell.CostPower = false;
+                                cloneSpell.PowerType = Spell.ePowerType.None;
                                 spellhandler = ScriptMgr.CreateSpellHandler(this, cloneSpell, line);
                                 casted = spellhandler.CastSpell(useItem);
                                 effect.Cancel(false);
@@ -10267,7 +10267,7 @@ namespace DOL.GS
                             else if (effect.SpellHandler is RangeSpellHandler)
                             {
                                 cloneSpell = spell.Copy();
-                                cloneSpell.CostPower = false;
+                                cloneSpell.PowerType = Spell.ePowerType.None;
                                 cloneSpell.OverrideRange = effect.Spell.Range;
                                 spellhandler = ScriptMgr.CreateSpellHandler(this, cloneSpell, line);
                                 casted = spellhandler.CastSpell(useItem);
@@ -10276,7 +10276,7 @@ namespace DOL.GS
                             else if (effect.SpellHandler is UninterruptableSpellHandler)
                             {
                                 cloneSpell = spell.Copy();
-                                cloneSpell.CostPower = false;
+                                cloneSpell.PowerType = Spell.ePowerType.None;
                                 spellhandler = ScriptMgr.CreateSpellHandler(this, cloneSpell, line);
                                 casted = spellhandler.CastSpell(useItem);
                                 effect.Cancel(false);

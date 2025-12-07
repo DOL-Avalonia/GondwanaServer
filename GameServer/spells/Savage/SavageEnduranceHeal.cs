@@ -26,15 +26,12 @@ namespace DOL.GS.Spells
     [SpellHandler("SavageEnduranceHeal")]
     public class SavageEnduranceHeal : EnduranceHealSpellHandler
     {
-        public override string CostType => "Health";
-        public SavageEnduranceHeal(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-
-        protected override void RemoveFromStat(int value)
+        public SavageEnduranceHeal(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
         {
-            m_caster.Health -= value;
+            m_powerTypeOverride = Spell.ePowerType.Health;
         }
 
-        public override int PowerCost(GameLiving target)
+        public override int CalculatePowerCost(GameLiving target)
         {
             int cost = 0;
             if (m_spell.Power < 0)
@@ -44,15 +41,17 @@ namespace DOL.GS.Spells
             return cost;
         }
 
-        public override bool CheckBeginCast(GameLiving selectedTarget, bool quiet)
+        /// <inheritdoc />
+        public override bool CheckHasPower(GameLiving selectedTarget, bool quiet)
         {
-            int cost = PowerCost(Caster);
+            int cost = CalculatePowerCost(Caster);
             if (Caster.Health < cost)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)!.Client, "SavageEnduranceHeal.CheckBeginCast.InsuffiscientHealth"), eChatType.CT_SpellResisted);
+                if (!quiet)
+                    MessageTranslationToCaster("SavageEnduranceHeal.CheckBeginCast.InsuffiscientHealth", eChatType.CT_SpellResisted);
                 return false;
             }
-            return base.CheckBeginCast(Caster);
+            return true;
         }
 
         public override string GetDelveDescription(GameClient delveClient)

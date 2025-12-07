@@ -223,7 +223,7 @@ namespace DOL.GS.Spells
         /// </summary>
         /// <param name="caster"></param>
         /// <returns></returns>
-        int PowerCost(GameLiving caster);
+        int CalculatePowerCost(GameLiving caster);
 
         /// <summary>
         /// The ability casting the spell
@@ -240,7 +240,7 @@ namespace DOL.GS.Spells
         /// </summary>
         SpellLine SpellLine { get; }
 
-        string CostType { get; }
+        Spell.ePowerType PowerType { get; }
 
         /// <summary>
         /// The DelveInfo

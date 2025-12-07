@@ -140,6 +140,35 @@ namespace DOL.Database.Handlers
             return type;
         }
 
+        protected virtual string GetColumnDefault(ElementBinding bind, DataTableHandler table)
+        {
+            if (bind.PrimaryKey != null)
+                return null;
+            
+            Type[] numberTypes =
+            {
+                typeof(int), typeof(byte), typeof(bool), typeof(long), typeof(short),
+                typeof(ushort), typeof(ulong), typeof(uint), typeof(double)
+            };
+            
+            if (bind.DataElement.DefaultDBValue is null) // No default value specified, insert our defaults
+            {
+                if (bind.ValueType == typeof(DateTime))
+                {
+                    return "2000-01-01 00:00:00";
+                }
+                if (numberTypes.Contains(bind.ValueType))
+                {
+                    return "0";
+                }
+                return null;
+            }
+            else
+            {
+                return bind.DataElement.DefaultDBValue?.ToString();
+            }
+        }
+
         /// <summary>
         /// Get Database Column Definition for ElementBinding
         /// </summary>
@@ -149,36 +178,35 @@ namespace DOL.Database.Handlers
         protected virtual string GetColumnDefinition(ElementBinding bind, DataTableHandler table)
         {
             string type = GetDatabaseType(bind, table);
-            string defaultDef = null;
-            Type[] numberTypes =
-            {
-                typeof(int), typeof(byte), typeof(bool), typeof(long), typeof(short),
-                typeof(ushort), typeof(ulong), typeof(uint), typeof(double)
-            };
+            string attributes = string.Empty;
 
             // Check for Default Value depending on Constraints and Type
-            if (bind.PrimaryKey != null && bind.PrimaryKey.AutoIncrement)
+            bool allowNull = true;
+            if (bind.DataElement is { AllowDbNull: false } || bind.PrimaryKey != null)
             {
-                defaultDef = "NOT NULL AUTO_INCREMENT";
+                attributes += "NOT NULL ";
+                allowNull = false;
             }
-            else if (bind.DataElement != null && bind.DataElement.AllowDbNull)
+            
+            if (bind.PrimaryKey != null)
             {
-                defaultDef = "DEFAULT NULL";
-            }
-            else if (bind.ValueType == typeof(DateTime))
-            {
-                defaultDef = "NOT NULL DEFAULT '2000-01-01 00:00:00'";
-            }
-            else if (numberTypes.Contains(bind.ValueType))
-            {
-                defaultDef = "NOT NULL DEFAULT 0";
+                if (bind.PrimaryKey.AutoIncrement)
+                    attributes += "AUTO_INCREMENT ";
             }
             else
             {
-                defaultDef = "NOT NULL";
+                string def = GetColumnDefault(bind, table);
+                if (!string.IsNullOrEmpty(def))
+                {
+                    attributes += "DEFAULT '" + def + "' ";
+                }
+                else if (allowNull)
+                {
+                    attributes += "DEFAULT NULL ";
+                }
             }
 
-            return string.Format("`{0}` {1} {2}", bind.ColumnName, type, defaultDef);
+            return string.Format("`{0}` {1} {2}", bind.ColumnName, type, attributes);
         }
         #endregion
 
@@ -202,7 +230,8 @@ namespace DOL.Database.Handlers
                             var colType = reader.GetString(1);
                             var allowNull = reader.GetString(2).ToLower() == "yes";
                             var primary = reader.GetString(3).ToLower() == "pri";
-                            currentTableColumns.Add(new TableRowBindind(column, colType, allowNull, primary));
+                            var def = reader.IsDBNull(4) ? null : reader.GetString(4);
+                            currentTableColumns.Add(new TableRowBindind(column, colType, allowNull, primary, def));
                             if (log.IsDebugEnabled)
                                 log.DebugFormat("CheckOrCreateTable: Found Column {0} in existing table {1}", column, table.TableName);
                         }
@@ -271,18 +300,17 @@ namespace DOL.Database.Handlers
             foreach (var binding in table.FieldElementBindings)
             {
                 var column = currentColumns.FirstOrDefault(col => col.ColumnName.Equals(binding.ColumnName, StringComparison.OrdinalIgnoreCase));
-
                 if (column != null)
                 {
-
+                    var def = GetColumnDefault(binding, table);
                     // Check Null && Type
-                    if ((binding.DataElement != null && binding.DataElement.AllowDbNull) != column.AllowDbNull
-                        || !GetDatabaseType(binding, table).Equals(column.ColumnType, StringComparison.OrdinalIgnoreCase))
+                    if (binding.DataElement is { AllowDbNull: true } != column.AllowDbNull
+                        || !GetDatabaseType(binding, table).Equals(column.ColumnType, StringComparison.OrdinalIgnoreCase)
+                        || (def != column.DefaultValue))
                     {
                         columnDefs.Add(string.Format("CHANGE `{1}` {0}", GetColumnDefinition(binding, table), binding.ColumnName));
                         alteredColumn.Add(binding.ColumnName);
                     }
-
                     continue;
                 }
 

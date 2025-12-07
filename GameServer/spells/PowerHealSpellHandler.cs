@@ -32,6 +32,19 @@ namespace DOL.GS.Spells
     {
         // constructor
         public PowerHealSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+
+        private bool m_healed = false;
+
+        /// <inheritdoc />
+        public override int CalculatePowerCost(GameLiving target)
+        {
+            // group heals seem to use full power even if no heals
+            if (!m_healed && Spell.Target.Equals("realm", StringComparison.OrdinalIgnoreCase))
+                return base.CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
+            else
+                return base.CalculatePowerCost(target);
+        }
+
         /// <summary>
         /// Execute heal spell
         /// </summary>
@@ -65,11 +78,7 @@ namespace DOL.GS.Spells
                 healed |= HealTarget(healTarget, spellValue);
             }
 
-            // group heals seem to use full power even if no heals
-            if (!healed && Spell.Target == "realm")
-                m_caster.Mana -= PowerCost(target) >> 1; // only 1/2 power if no heal
-            else
-                m_caster.Mana -= PowerCost(target);
+            ConsumePower(target);
 
             // send animation for non pulsing spells only
             if (Spell.Pulse == 0)

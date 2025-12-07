@@ -2,8 +2,11 @@
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using DOL.GS.PlayerClass;
 using DOL.Language;
 using System;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace DOL.GS.Spells
 {
@@ -36,96 +39,106 @@ namespace DOL.GS.Spells
 
         private void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
-            if (!(arguments is AttackedByEnemyEventArgs args))
+            if (arguments is not AttackedByEnemyEventArgs args)
             {
                 return;
             }
+            
             AttackData ad = args.AttackData;
+            if (ad is not { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
+                return;
 
-            if (ad is { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or  GameLiving.eAttackResult.HitStyle } )
+            var attacker = ad.Attacker;
+            var defender = ad.Target;
+            Spell spellToCast = ad.SpellHandler.Spell.Copy();
+            SpellLine line = ad.SpellHandler.SpellLine;
+            if (ad.SpellHandler.Parent is BomberSpellHandler bomber)
             {
-                Spell spellToCast = ad.SpellHandler.Spell.Copy();
-                SpellLine line = ad.SpellHandler.SpellLine;
-                if (ad.SpellHandler.Parent is BomberSpellHandler bomber)
-                {
-                    spellToCast = bomber.Spell.Copy();
-                    line = bomber.SpellLine;
-                }
-
-                int cost;
-                GamePlayer player = ad.Target as GamePlayer;
-                if (player != null && player.CharacterClass is Salvage)
-                {
-                    cost = ((spellToCast.Power * Spell.AmnesiaChance / 100) / 2) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
-                    spellToCast.CostPower = false;
-                }
-                else
-                {
-                    cost = (spellToCast.Power * Spell.AmnesiaChance / 100) / Math.Max(1, (ad.Target.Level / ad.Attacker.Level));
-                    spellToCast.CostPower = true;
-                    if (ad.Target.Mana < cost)
-                        return;
-                }
-                spellToCast.Power = cost;
-
-                double absorbPercent = Spell.LifeDrainReturn;
-                int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));
-
-                ad.Damage -= damageAbsorbed;
-
-                if (damageAbsorbed > 0)
-                {
-                    if (player != null)
-                        MessageToLiving(player, LanguageMgr.GetTranslation(player.Client, "SpellReflection.Self.Absorb", damageAbsorbed), eChatType.CT_Spell);
-
-                    if (ad.Attacker is GamePlayer attacker)
-                        MessageToLiving(attacker, LanguageMgr.GetTranslation(attacker.Client, "SpellReflection.Target.Absorbs", damageAbsorbed), eChatType.CT_Spell);
-                }
-
-                spellToCast.Damage = spellToCast.Damage * Spell.AmnesiaChance / 100;
-                spellToCast.Value = spellToCast.Value * Spell.AmnesiaChance / 100;
-                spellToCast.Duration = spellToCast.Duration * Spell.AmnesiaChance / 100;
-                spellToCast.CastTime = 0;
-                ushort ClientEffect = 0;
-
-                switch (ad.DamageType)
-                {
-                    case eDamageType.Body:
-                        ClientEffect = 6172;
-                        break;
-                    case eDamageType.Cold:
-                        ClientEffect = 6057;
-                        break;
-                    case eDamageType.Energy:
-                        ClientEffect = 6173;
-                        break;
-                    case eDamageType.Heat:
-                        ClientEffect = 6171;
-                        break;
-                    case eDamageType.Matter:
-                        ClientEffect = 6174;
-                        break;
-                    case eDamageType.Spirit:
-                        ClientEffect = 6175;
-                        break;
-                    default:
-                        ClientEffect = 6173;
-                        break;
-                }
-                foreach (GamePlayer pl in ad.Target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                {
-                    pl.Out.SendSpellEffectAnimation(ad.Target, ad.Target, ClientEffect, 0, false, 1);
-                }
-                if (Spell.Value < 100 && !Util.Chance((int)Spell.Value))
-                    return;
-                ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(ad.Target, spellToCast, line);
-                if (spellhandler is BomberSpellHandler bomberspell)
-                    bomberspell.ReduceSubSpellDamage = Spell.AmnesiaChance;
-                spellhandler.CastSpell(ad.Attacker);
-
-                if (Spell.HasSubSpell)
-                    CastSubSpells(ad.Attacker);
+                spellToCast = bomber.Spell.Copy();
+                line = bomber.SpellLine;
             }
+
+            int power;
+            double powerCalc;
+            double levelRatio = (double)defender.Level / attacker.Level;
+            GamePlayer? defenderPlayer = defender as GamePlayer;
+            spellToCast.PowerType = Spell.ePowerType.Mana; // Force spells to use mana at this point
+            powerCalc = spellToCast.Power * Spell.AmnesiaChance / 100.0;
+            powerCalc /= Math.Max(1.0, levelRatio);
+            if (defenderPlayer.CharacterClass.PowerType is Spell.ePowerType.Endurance)
+            {
+                spellToCast.PowerType = Spell.ePowerType.Endurance;
+                powerCalc *= 1.5; // +50% usage of endurance compared to mana
+            }
+            power = (int)Math.Round(powerCalc);
+            
+            switch (spellToCast.PowerType)
+            {
+                case Spell.ePowerType.None:
+                    power = 0;
+                    break;
+                
+                case Spell.ePowerType.Mana:
+                    if (ad.Target.Mana < power)
+                        return;
+                    break;
+
+                case Spell.ePowerType.Endurance:
+                    if (ad.Target.Endurance < power)
+                        return;
+                    break;
+
+                default:
+                    throw new NotImplementedException($"Unimplemented power type {Spell.PowerType} when reflecting Spell {Spell.Name} ({Spell.ID})");
+            }
+            
+            spellToCast.Power = power;
+
+            double absorbPercent = Spell.LifeDrainReturn;
+            int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.Damage + ad.CriticalDamage));
+
+            ad.Damage -= damageAbsorbed;
+
+            if (damageAbsorbed > 0)
+            {
+                if (defenderPlayer != null)
+                    MessageToLiving(defenderPlayer, LanguageMgr.GetTranslation(defenderPlayer.Client, "SpellReflection.Self.Absorb", damageAbsorbed), eChatType.CT_Spell);
+
+                if (ad.Attacker is GamePlayer playerAttacker)
+                    MessageToLiving(playerAttacker, LanguageMgr.GetTranslation(playerAttacker.Client, "SpellReflection.Target.Absorbs", damageAbsorbed), eChatType.CT_Spell);
+            }
+
+            spellToCast.Damage = spellToCast.Damage * Spell.AmnesiaChance / 100;
+            spellToCast.Value = spellToCast.Value * Spell.AmnesiaChance / 100;
+            spellToCast.Duration = spellToCast.Duration * Spell.AmnesiaChance / 100;
+            spellToCast.CastTime = 0;
+
+            ushort ClientEffect = ad.DamageType switch
+            {
+                eDamageType.Body => 6172,
+                eDamageType.Cold => 6057,
+                eDamageType.Energy => 6173,
+                eDamageType.Heat => 6171,
+                eDamageType.Matter => 6174,
+                eDamageType.Spirit => 6175,
+                _ => 6173
+            };
+
+            foreach (GamePlayer pl in ad.Target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                pl.Out.SendSpellEffectAnimation(ad.Target, ad.Target, ClientEffect, 0, false, 1);
+            }
+
+            if (Spell.Value < 100 && !Util.Chance((int)Spell.Value))
+                return;
+
+            ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(ad.Target, spellToCast, line);
+            if (spellhandler is BomberSpellHandler bomberspell)
+                bomberspell.ReduceSubSpellDamage = Spell.AmnesiaChance;
+
+            spellhandler.CastSpell(ad.Attacker);
+            if (Spell.HasSubSpell)
+                CastSubSpells(ad.Attacker);
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)

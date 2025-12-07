@@ -18,14 +18,15 @@
  */
 
 
-using System;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
-using DOL.GS.Spells;
 using DOL.AI.Brain;
 using DOL.Events;
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
+using DOL.GS.PlayerClass;
+using DOL.GS.Spells;
 using DOL.GS.Utils;
 using DOL.Language;
+using System;
 
 namespace DOL.GS.PropertyCalc
 {
@@ -52,28 +53,42 @@ namespace DOL.GS.PropertyCalc
             if (arguments is not AttackedByEnemyEventArgs args)
                 return;
 
-            GameLiving living = sender as GameLiving;
-            if (living == null)
+            GameLiving defender = sender as GameLiving;
+            if (defender == null)
                 return;
 
             AttackData ad = args.AttackData;
             if (ad is not { AttackType: AttackData.eAttackType.Spell or AttackData.eAttackType.DoT, AttackResult: GameLiving.eAttackResult.HitUnstyled or GameLiving.eAttackResult.HitStyle })
                 return;
 
-            int chanceToReflect = living.GetModified(eProperty.MythicalSpellReflect);
-            if (chanceToReflect <= 0 || !Util.Chance(chanceToReflect))
+            int chanceToReflect = defender.GetModified(eProperty.MythicalSpellReflect);
+            if (chanceToReflect < 100 && (chanceToReflect <= 0 || !Util.Chance(chanceToReflect)))
                 return;
 
-            Spell spellToCast = ad.SpellHandler.Spell.Copy();
-            SpellLine line = ad.SpellHandler.SpellLine;
+            Spell spellToCast;
+            SpellLine line;
 
             if (ad.SpellHandler.Parent is BomberSpellHandler bomber)
             {
                 spellToCast = bomber.Spell.Copy();
                 line = bomber.SpellLine;
             }
+            else
+            {
+                spellToCast = ad.SpellHandler.Spell.Copy();
+                line = ad.SpellHandler.SpellLine;
+            }
 
-            spellToCast.Power = spellToCast.Power * 20 / 100;
+            double power = spellToCast.Power * 0.20;
+            GamePlayer? defenderPlayer = ad.Target as GamePlayer;
+            spellToCast.PowerType = Spell.ePowerType.Mana;
+            if (defenderPlayer is { CharacterClass.PowerType: Spell.ePowerType.Endurance })
+            {
+                spellToCast.PowerType = Spell.ePowerType.Endurance;
+                power *= 1.5; // +50% usage of endurance compared to mana
+            }
+
+            spellToCast.Power = (int)Math.Round(power);
             spellToCast.Damage = spellToCast.Damage * 30 / 100;
             spellToCast.Value = spellToCast.Value * 30 / 100;
             spellToCast.Duration = spellToCast.Duration * 30 / 100;
@@ -86,9 +101,9 @@ namespace DOL.GS.PropertyCalc
 
             if (damageAbsorbed > 0)
             {
-                if (living is GamePlayer player)
+                if (defenderPlayer != null)
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "MythicalSpellReflect.Self.Absorb", damageAbsorbed), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    defenderPlayer.Out.SendMessage(LanguageMgr.GetTranslation(defenderPlayer.Client, "MythicalSpellReflect.Self.Absorb", damageAbsorbed), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
                 if (ad.Attacker is GamePlayer attacker)
                 {
@@ -107,20 +122,20 @@ namespace DOL.GS.PropertyCalc
                 _ => 6173,
             };
 
-            foreach (GamePlayer pl in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            foreach (GamePlayer pl in defender.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                pl.Out.SendSpellEffectAnimation(living, living, clientEffect, 0, false, 1);
+                pl.Out.SendSpellEffectAnimation(defender, defender, clientEffect, 0, false, 1);
             }
 
-            ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(living, spellToCast, line);
+            ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(defender, spellToCast, line);
             if (spellHandler is BomberSpellHandler bomberSpell)
             {
                 bomberSpell.ReduceSubSpellDamage = 30;
             }
 
             const string MYTH_REFLECT_ABSORB_FLAG = "MYTH_REFLECT_ABSORB_PCT_THIS_HIT";
-            living.TempProperties.setProperty(MYTH_REFLECT_ABSORB_FLAG, 30);
-            living.TempProperties.setProperty("MYTH_REFLECT_ABSORB_TICK", living.CurrentRegion.Time);
+            defender.TempProperties.setProperty(MYTH_REFLECT_ABSORB_FLAG, 30);
+            defender.TempProperties.setProperty("MYTH_REFLECT_ABSORB_TICK", defender.CurrentRegion.Time);
 
             spellHandler.StartSpell(ad.Attacker, false);
         }

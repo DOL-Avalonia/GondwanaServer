@@ -170,6 +170,8 @@ namespace DOL.Database
 
                     if (bind.DataElement.Varchar > 0)
                         column.ExtendedProperties.Add("VARCHAR", bind.DataElement.Varchar);
+                
+                    column.DefaultValue = bind.DataElement.DefaultDBValue ?? DBNull.Value;
                 }
             }
 

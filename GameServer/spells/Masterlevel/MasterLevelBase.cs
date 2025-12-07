@@ -1275,7 +1275,7 @@ namespace DOL.GS.Spells
         /// <param name="force"></param>
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            ConsumePower(target);
             base.FinishSpellCast(target, force);
         }
 

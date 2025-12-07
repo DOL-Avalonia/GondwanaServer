@@ -33,7 +33,7 @@ namespace DOL.GS.Spells
     {
         public override void FinishSpellCast(GameLiving target, bool force = false)
         {
-            m_caster.Mana -= PowerCost(target);
+            ConsumePower(target);
             if ((target is Keeps.GameKeepDoor || target is Keeps.GameKeepComponent) && Spell.SpellType != "SiegeArrow")
             {
                 MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoEffectOnTarget", m_caster.GetPersonalizedName(target)), eChatType.CT_SpellResisted);

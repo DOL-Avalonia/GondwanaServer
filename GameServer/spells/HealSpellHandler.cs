@@ -37,6 +37,18 @@ namespace DOL.GS.Spells
         // constructor
         public HealSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
+        private bool m_healed = false;
+
+        /// <inheritdoc />
+        public override int CalculatePowerCost(GameLiving target)
+        {
+            // group heals seem to use full power even if no heals
+            if (!m_healed && Spell.Target.Equals("realm", StringComparison.OrdinalIgnoreCase))
+                return base.CalculatePowerCost(target) >> 1; // only 1/2 power if no heal
+            else
+                return base.CalculatePowerCost(target);
+        }
+
         /// <summary>
         /// Execute heal spell
         /// </summary>
@@ -46,7 +58,6 @@ namespace DOL.GS.Spells
             var targets = SelectTargets(target, force);
             if (targets.Count <= 0) return false;
 
-            bool healed = false;
             int minHeal;
             int maxHeal;
 
@@ -123,14 +134,14 @@ namespace DOL.GS.Spells
                             CausesCombat = false,
                         };
                         healTarget.TakeDamage(ad);
-                        healed = true;
+                        m_healed = true;
 
                         MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", damageAmount), eChatType.CT_YouDied);
                     }
                     else if (harmvalue < 0)
                     {
                         heal = (heal * Math.Abs(harmvalue)) / 100;
-                        healed = true;
+                        m_healed = true;
                         MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedPartiallyHealed"), eChatType.CT_SpellResisted);
                     }
                     else
@@ -142,36 +153,27 @@ namespace DOL.GS.Spells
 
                 if (SpellLine.KeyName == GlobalSpellsLines.Item_Effects)
                 {
-                    healed |= ProcHeal(healTarget, heal);
+                    m_healed |= ProcHeal(healTarget, heal);
                 }
                 else
                 {
-                    healed |= HealTarget(healTarget, heal);
+                    m_healed |= HealTarget(healTarget, heal);
                 }
                 
                 if (CastSubSpellsWithSpell)
                 {
-                    healed |= CastSubSpells(target);
+                    m_healed |= CastSubSpells(target);
                 }
             }
 
-            // group heals seem to use full power even if no heals
-            if (healed)
+            if (m_healed || Spell.Target.ToLower() is "realm")
             {
                 Status = eStatus.Success; // Consume item charges
-                m_caster.Mana -= PowerCost(target);
+                ConsumePower(target);
             }
             else
             {
-                if (Spell.Target.ToLower() == "realm")
-                {
-                    Status = eStatus.Success; // Consume item charges
-                    m_caster.Mana -= PowerCost(target) >> 1; // only 1/2 power if no heal
-                }
-                else
-                {
-                    Status = eStatus.Failure;
-                }
+                Status = eStatus.Failure;
             }
 
             // send animation for non pulsing spells only
@@ -180,10 +182,10 @@ namespace DOL.GS.Spells
                 // show resisted effect if not healed
                 foreach (GameLiving healTarget in targets)
                     if (healTarget.IsAlive)
-                        SendEffectAnimation(healTarget, 0, false, healed ? (byte)1 : (byte)0);
+                        SendEffectAnimation(healTarget, 0, false, m_healed ? (byte)1 : (byte)0);
             }
 
-            if (!healed && Spell.CastTime == 0) m_startReuseTimer = false;
+            if (!m_healed && Spell.CastTime == 0) m_startReuseTimer = false;
 
             return true;
         }

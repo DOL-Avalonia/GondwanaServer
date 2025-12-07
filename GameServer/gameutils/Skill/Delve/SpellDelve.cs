@@ -128,12 +128,12 @@ namespace DOL.GS.Delve
 
         private int GetCostTypeID()
         {
-            switch (spellHandler.CostType.ToLower())
+            return spellHandler.PowerType switch
             {
-                case "health": return 2;
-                case "endurance": return 3;
-                default: return 0;
-            }
+                Spell.ePowerType.Health => 2,
+                Spell.ePowerType.Endurance => 3,
+                _ => 0
+            };
         }
 
         private static Dictionary<eDamageType, int> damageTypeToIdLookup = new Dictionary<eDamageType, int>()
