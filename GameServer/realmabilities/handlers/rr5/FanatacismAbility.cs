@@ -67,7 +67,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("All Heretic groupmates who are able to bind at a keep or tower lord receive a reduction in all spell damage taken for 45 seconds.");
             list.Add("");

@@ -75,7 +75,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Buff group with 25% damage reduction for 60 seconds, return damage reduced as power. 10min RUT.");
             list.Add("");

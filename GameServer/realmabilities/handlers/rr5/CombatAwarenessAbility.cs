@@ -37,7 +37,7 @@ namespace DOL.GS.RealmAbilities
             return 900;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Gives you a 50% 360° evade buff but also reduces your movement and melee damage by 50%");
             list.Add("");

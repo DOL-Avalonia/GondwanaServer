@@ -125,16 +125,16 @@ namespace DOL.GS.RealmAbilities
             }
         }
 
-        public virtual void AddReUseDelayInfo(IList<string> list)
+        public virtual void AddReUseDelayInfo(IList<string> list, GameClient client)
         {
             for (int i = 1; i <= MaxLevel; i++)
             {
                 int reUseTime = GetReUseDelay(i);
-                list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RealmAbility.AddReUseDelayInfo.Every", i, ((reUseTime == 0) ? "always" : FormatTimespan(reUseTime))));
+                list.Add(LanguageMgr.GetTranslation(client.Account.Language, "RealmAbility.AddReUseDelayInfo.Every", i, ((reUseTime == 0) ? "always" : FormatTimespan(reUseTime))));
             }
         }
 
-        public virtual void AddEffectsInfo(IList<string> list)
+        public virtual void AddEffectsInfo(IList<string> list, GameClient client)
         {
         }
 
@@ -158,28 +158,25 @@ namespace DOL.GS.RealmAbilities
             living.DisableSkill(this, GetReUseDelay(Level) * 1000);
         }
 
-        public override IList<string> DelveInfo
+        public override IList<string> GetDelveDescription(GameClient client)
         {
-            get
-            {
-                IList<string> list = base.DelveInfo;
-                int size = list.Count;
-                AddEffectsInfo(list);
+            IList<string> list = base.GetDelveDescription(client);
+            int size = list.Count;
+            AddEffectsInfo(list, client);
 
-                if (list.Count > size)
-                { // something was added
-                    list.Insert(size, "");  // add empty line
-                }
-
-                size = list.Count;
-                AddReUseDelayInfo(list);
-                if (list.Count > size)
-                { // something was added
-                    list.Insert(size, "");  // add empty line
-                }
-
-                return list;
+            if (size != 0 && list.Count > size)
+            { // something was added
+                list.Insert(size, "");  // add empty line
             }
+
+            size = list.Count;
+            AddReUseDelayInfo(list, client);
+            if (size != 0 && list.Count > size)
+            { // something was added
+                list.Insert(size, "");  // add empty line
+            }
+
+            return list;
         }
 
 

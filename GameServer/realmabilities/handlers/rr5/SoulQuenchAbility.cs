@@ -89,7 +89,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Insta-PBAE attack that drains 250 points (modified up or down by the Reavers SR level) from all nearby enemies and returns 75% to the Reaver.");
             list.Add("");

@@ -37,7 +37,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Gives the zerker an ABS buff that ticks up by 5% every 5 seconds for a max of 25% at 25 seconds. Lasts 30 seconds total.");
             list.Add("");

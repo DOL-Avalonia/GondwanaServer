@@ -63,7 +63,7 @@ namespace DOL.GS.RealmAbilities
             return 900;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Summon pets that will follow and stun enemies.");
             list.Add("");

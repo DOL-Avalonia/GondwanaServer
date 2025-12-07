@@ -37,7 +37,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Runemaster gets a 90% chance to evade all melee attacks (regardless of direction) for 15 seconds.");
             list.Add("");

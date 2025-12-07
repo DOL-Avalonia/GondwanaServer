@@ -70,8 +70,6 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            p.InitAfkTimers();
-
             string msg = args.Length > 1
                 ? string.Join(" ", args, 1, args.Length - 1)
                 : "AFK";

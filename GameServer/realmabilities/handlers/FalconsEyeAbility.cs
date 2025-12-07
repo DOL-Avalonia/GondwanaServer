@@ -47,20 +47,17 @@ namespace DOL.GS.RealmAbilities
                 }
             }
         }
-
-        public override IList<string> DelveInfo
+        
+        public override IList<string> GetDelveDescription(GameClient client)
         {
-            get
+            var list = new List<string>();
+            list.Add(m_description);
+            list.Add("");
+            for (int i = 1; i <= MaxLevel; i++)
             {
-                var list = new List<string>();
-                list.Add(m_description);
-                list.Add("");
-                for (int i = 1; i <= MaxLevel; i++)
-                {
-                    list.Add("Level " + i + ": Amount: " + Level * 5 + "% / " + GetAmountForLevel(i));
-                }
-                return list;
+                list.Add("Level " + i + ": Amount: " + Level * 5 + "% / " + GetAmountForLevel(i));
             }
+            return list;
         }
     }
 }

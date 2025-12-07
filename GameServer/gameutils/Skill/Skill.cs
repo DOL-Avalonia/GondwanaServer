@@ -20,6 +20,8 @@ using System;
 using System.Text;
 
 using DOL.Database;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace DOL.GS
 {
@@ -114,6 +116,11 @@ namespace DOL.GS
         /// Is this skill hidden from the player in spec list?
         /// </summary>
         public bool Hidden { get; set; } = false;
+
+        public virtual IList<string> GetDelveDescription(GameClient client)
+        {
+            return [];
+        }
     }
 
     /// <summary>

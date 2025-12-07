@@ -65,15 +65,16 @@ namespace DOL.GS.RealmAbilities
 
         public override int GetReUseDelay(int level) => 600;
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfShadowsAbility.AddEffectsInfo.Info1"));
+            var language = client.Account.Language;
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info1"));
             list.Add("");
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfShadowsAbility.AddEffectsInfo.Info2"));
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfShadowsAbility.AddEffectsInfo.Info3"));
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfShadowsAbility.AddEffectsInfo.Info4"));
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info2"));
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info3"));
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info4"));
             list.Add("");
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfShadowsAbility.AddEffectsInfo.Info5"));
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info5"));
         }
     }
 }

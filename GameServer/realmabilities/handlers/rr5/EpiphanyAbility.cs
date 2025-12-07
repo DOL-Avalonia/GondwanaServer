@@ -81,7 +81,7 @@ namespace DOL.GS.RealmAbilities
         }
 
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("25% Group power refresh.");
             list.Add("");

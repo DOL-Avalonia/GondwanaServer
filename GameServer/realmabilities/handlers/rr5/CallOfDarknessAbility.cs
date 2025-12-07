@@ -59,7 +59,7 @@ namespace DOL.GS.RealmAbilities
             return 900;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfDarknessAbility.AddEffectsInfo.Info1"));
             list.Add("");

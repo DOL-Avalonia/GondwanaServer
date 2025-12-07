@@ -25,9 +25,11 @@ namespace DOL.GS.Delve
     public class RealmAbilityDelve : SkillDelve
     {
         private Skill skill;
+        private GameClient client;
 
         public RealmAbilityDelve(GameClient client, int skillIndex)
         {
+            this.client = client;
             skill = client.Player.GetAllUsableSkills().Where(e => e.Item1.InternalID == skillIndex && e.Item1 is Ability).Select(e => e.Item1).FirstOrDefault();
 
             if (skill == null)
@@ -47,6 +49,11 @@ namespace DOL.GS.Delve
             if (skill is RealmAbility realmAbility)
             {
                 delve.AddElement("Name", realmAbility.Name);
+                
+                var desc = skill.GetDelveDescription(client);
+                if (desc.Count > 0)
+                    delve.AddElement("description_string", string.Join('\n', desc));
+
                 if (skill.Icon > 0)
                 {
                     delve.AddElement("icon", realmAbility.Icon);
@@ -77,6 +84,10 @@ namespace DOL.GS.Delve
             else if (skill != null)
             {
                 delve.AddElement("Name", skill.Name);
+                
+                var desc = skill.GetDelveDescription(client);
+                if (desc.Count > 0)
+                    delve.AddElement("description_string", string.Join('\n', desc));
             }
             else
             {

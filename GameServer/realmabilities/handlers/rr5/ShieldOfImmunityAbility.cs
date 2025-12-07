@@ -57,7 +57,7 @@ namespace DOL.GS.RealmAbilities
             return 900;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Shield that absorbs 90% melee/archer damage for 20 seconds.");
             list.Add("");

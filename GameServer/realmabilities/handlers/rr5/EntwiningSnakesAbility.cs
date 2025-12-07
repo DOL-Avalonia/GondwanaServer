@@ -70,7 +70,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Insta-cast spell that is PBAE 50% snare lasting 20 seconds with a 350 unit radius. Snare breaks on attack.");
             list.Add("");

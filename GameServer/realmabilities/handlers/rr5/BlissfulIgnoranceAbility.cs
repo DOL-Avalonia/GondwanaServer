@@ -113,7 +113,7 @@ namespace DOL.GS.RealmAbilities
             return 300;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("No penality Hit from self buffs. 30s duration, 5min RUT.");
             list.Add("");

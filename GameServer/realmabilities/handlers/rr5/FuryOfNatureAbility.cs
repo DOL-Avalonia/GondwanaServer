@@ -37,7 +37,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Doubles Style Damage for 30 seconds and heals the group, excluding the caster, like spreadheal with all the damage dealt");
             list.Add("");

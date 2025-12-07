@@ -81,7 +81,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Spells/Styles used by group have has a chance of not costing power or endurance. 30s duration, 10min RUT.");
             list.Add("");

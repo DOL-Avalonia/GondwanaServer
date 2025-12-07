@@ -85,7 +85,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("A 350 radius PBAE attack that deals medium crushing damage and disarms your opponents for 6 seconds");
             list.Add("");

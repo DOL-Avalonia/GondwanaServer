@@ -17,6 +17,7 @@
  *
  */
 using DOL.GS.PacketHandler;
+using DOL.GS.RealmAbilities;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,10 +26,12 @@ namespace DOL.GS.Delve
     public class AbilityDelve : SkillDelve
     {
         private Skill skill;
+        private GameClient client;
 
         public AbilityDelve(GameClient client, int skillIndex)
         {
             skill = client.Player.GetAllUsableSkills().Where(e => e.Item1.InternalID == skillIndex).OrderBy(e => e.Item1 is Ability ? 0 : 1).Select(e => e.Item1).FirstOrDefault();
+            this.client = client;
 
             if (skill == null)
                 skill = SkillBase.GetAbilityByInternalID(skillIndex);
@@ -49,6 +52,9 @@ namespace DOL.GS.Delve
             if (skill != null)
             {
                 delve.AddElement("Name", skill.Name);
+                var desc = skill.GetDelveDescription(client);
+                if (desc.Count > 0)
+                    delve.AddElement("description_string", string.Join('\n', desc));
             }
             else
             {

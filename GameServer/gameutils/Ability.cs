@@ -241,18 +241,16 @@ namespace DOL.GS
             return sb.ToString();
         }
 
-        public virtual IList<string> DelveInfo
+        public override IList<string> GetDelveDescription(GameClient client)
         {
-            get
+            var list = new List<string>(4);
+            
+            if (!string.IsNullOrEmpty(m_description))
             {
-                var list = new List<string>(4);
-                foreach (string part in m_description.Split(new char[] { '|' }))
-                {
-                    list.Add(part);
-                }
-
-                return list;
+                list.AddRange(m_description.Split(new char[] { '|' }));
             }
+
+            return list;
         }
 
         public bool IsPermanent

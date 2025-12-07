@@ -62,7 +62,7 @@ namespace DOL.GS.RealmAbilities
             return 300;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("Reduce all incoming damage by 10% and increase the Nightshade's chance to be missed by 10% for 30 seconds");
             list.Add("");

@@ -27,20 +27,17 @@ namespace DOL.GS.RealmAbilities
         {
             m_property = property;
         }
-
-        public override IList<string> DelveInfo
+        
+        public override IList<string> GetDelveDescription(GameClient client)
         {
-            get
+            var list = new List<string>();
+            list.Add(m_description);
+            list.Add("");
+            for (int i = 1; i <= MaxLevel; i++)
             {
-                var list = new List<string>();
-                list.Add(m_description);
-                list.Add("");
-                for (int i = 1; i <= MaxLevel; i++)
-                {
-                    list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RAStatEnhancer.DelveInfo.Info1", i, GetAmountForLevel(i)));
-                }
-                return list;
+                list.Add(LanguageMgr.GetTranslation(client.Account.Language, "RAStatEnhancer.DelveInfo.Info1", i, GetAmountForLevel(i)));
             }
+            return list;
         }
 
         public virtual int GetAmountForLevel(int level)

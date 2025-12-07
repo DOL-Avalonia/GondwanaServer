@@ -61,7 +61,7 @@ namespace DOL.GS.RealmAbilities
             return 300;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("a 15% increased chance to bypass their target's block, parry, and evade defenses.");
             list.Add("");

@@ -135,7 +135,7 @@ namespace DOL.GS.RealmAbilities
             return 300;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             list.Add("AE target 150 unit radius, 1500 unit range, blind enemies to user. 20s duration or attack by user, 5min RUT.");
             list.Add("");

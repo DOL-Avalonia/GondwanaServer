@@ -319,8 +319,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                         else if (sk is Ability ability)
                         {
                             caption = sk.Name;
-                            if (ability.DelveInfo.Count > 0)
-                                objectInfo.AddRange(ability.DelveInfo);
+                            var desc = ability.GetDelveDescription(client);
+                            if (desc.Count > 0)
+                                objectInfo.AddRange(desc);
                             else
                                 objectInfo.Add("There is no special information.");
                         }
@@ -621,8 +622,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                             return;
 
                         caption = abil.Name;
-                        if (abil.DelveInfo.Count > 0)
-                            objectInfo.AddRange(abil.DelveInfo);
+                        var desc = abil.GetDelveDescription(client);
+                        if (desc.Count > 0)
+                            objectInfo.AddRange(desc);
                         else
                             objectInfo.Add("There is no special information.");
                         break;
@@ -663,7 +665,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 if (ab != null)
                                 {
                                     caption = ab.Name;
-                                    objectInfo.AddRange(ab.DelveInfo);
+                                    var desc = ab.GetDelveDescription(client);
+                                    if (desc.Count > 0)
+                                        objectInfo.AddRange(desc);
+                                    else
+                                        objectInfo.Add("There is no special information.");
                                     break;
                                 }
                             }
@@ -802,9 +808,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                         {
                             Ability abil = (Ability)sk;
                             caption = abil.Name;
-
-                            if (abil.DelveInfo.Count > 0)
-                                objectInfo.AddRange(abil.DelveInfo);
+                            
+                            var desc = abil.GetDelveDescription(client);
+                            if (desc.Count > 0)
+                                objectInfo.AddRange(desc);
                             else
                                 objectInfo.Add("There is no special information.");
                         }

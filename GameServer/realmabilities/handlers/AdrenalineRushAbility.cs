@@ -57,7 +57,7 @@ namespace DOL.GS.RealmAbilities
             return 600;
         }
 
-        public override void AddEffectsInfo(IList<string> list)
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
         {
             if (ServerProperties.Properties.USE_NEW_ACTIVES_RAS_SCALING)
             {
