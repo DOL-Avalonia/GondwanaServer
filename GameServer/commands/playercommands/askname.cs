@@ -47,8 +47,8 @@ namespace DOL.GS.Commands
             {
                 if (!client.Player.SerializedAskNameList.Contains(name))
                 {
-                    targetPlayer.Out.SendDialogBox(eDialogCode.AskName, (ushort)(client.SessionID), 0, 0, 0, eDialogType.YesNo, false,
-                                 LanguageMgr.GetTranslation(client, "Commands.Players.Askname.Request", targetPlayer.GetPersonalizedName(client.Player)));
+                    var requestText = LanguageMgr.GetTranslation(targetPlayer.Client, "Commands.Players.Askname.Request", targetPlayer.GetPersonalizedName(client.Player));
+                    targetPlayer.Out.SendDialogBox(eDialogCode.AskName, (ushort)(client.SessionID), 0, 0, 0, eDialogType.YesNo, false, requestText);
                 }
             }
             else if (args.Length == 2 && args[1] == "remove")
