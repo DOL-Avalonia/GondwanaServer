@@ -541,15 +541,13 @@ namespace DOL.GS
             m_minotaurspell = minotaur;
             // Params
             this.InitFromCollection<DBSpellXCustomValues>(dbspell.CustomValues, param => param.KeyName, param => param.Value);
-
-            if (string.IsNullOrEmpty(dbspell.PowerType))
-                m_powerType = ePowerType.None;
-            else
+            m_powerType = ePowerType.Mana;
+            if (!string.IsNullOrEmpty(dbspell.PowerType))
             {
                 if (ePowerType.TryParse(dbspell.PowerType, true, out ePowerType type))
                     m_powerType = type;
                 else
-                    log!.Error($"Spell {Name} ({ID}) has invalid PowerType '{dbspell.PowerType}' in database.");
+                    log!.Error($"Spell {Name} ({ID}) has invalid PowerType '{dbspell.PowerType}' in database. Defaulting to {m_powerType}.");
             }
         }
 
