@@ -131,6 +131,13 @@ namespace DOL.GS.PropertyCalc
             defender.TempProperties.setProperty(MYTH_REFLECT_ABSORB_FLAG, 30);
             defender.TempProperties.setProperty("MYTH_REFLECT_ABSORB_TICK", defender.CurrentRegion.Time);
 
+            if (ad.SpellHandler.Spell.Target is "ground" || (ad.SpellHandler.Target != ad.Target && ad.SpellHandler.Spell.Radius > 0))
+            {
+                // Don't reflect if being the secondary target of an AOE
+                // TODO: Does this check work well when an AOE spell was redirected?
+                return;
+            }
+
             ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(defender, spellToCast, line);
             if (spellHandler is BomberSpellHandler bomberSpell)
             {

@@ -129,6 +129,13 @@ namespace DOL.GS.Spells
                 pl.Out.SendSpellEffectAnimation(ad.Target, ad.Target, ClientEffect, 0, false, 1);
             }
 
+            if (ad.SpellHandler.Spell.Target is "ground" || (ad.SpellHandler.Target != ad.Target && ad.SpellHandler.Spell.Radius > 0))
+            {
+                // Don't reflect if being the secondary target of an AOE
+                // TODO: Does this check work well when an AOE spell was redirected?
+                return;
+            }
+
             if (Spell.Value < 100 && !Util.Chance((int)Spell.Value))
                 return;
 
