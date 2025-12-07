@@ -143,9 +143,7 @@ namespace DOL.GS.Spells
             if (spellhandler is BomberSpellHandler bomberspell)
                 bomberspell.ReduceSubSpellDamage = Spell.AmnesiaChance;
 
-            spellhandler.CastSpell(ad.Attacker);
-            if (Spell.HasSubSpell)
-                CastSubSpells(ad.Attacker);
+            spellhandler.StartSpell(ad.Attacker, false);
         }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
