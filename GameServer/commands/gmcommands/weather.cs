@@ -1,4 +1,4 @@
-/*
+﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  * 
  * This program is free software; you can redistribute it and/or
@@ -25,7 +25,8 @@ namespace DOL.GS.Commands
         ePrivLevel.GM,
         "Sets the weather for the current region",
         "'/weather info' for information about the current weather in this region",
-        "'/weather start <line> <duration> <speed> <diffusion> <intensity>' to start a storm in this region",
+        "'/weather start <line> <width> <speed> <diffusion> <intensity>' to start a storm in this region",
+        "'/weather start <profileName>' to start a storm at your position using a weather profile",
         "'/weather start' to start a random storm in this region",
         "'/weather restart' to restart the storm in this region",
         "'/weather stop' to stop the storm in this region")]
@@ -59,6 +60,29 @@ namespace DOL.GS.Commands
                     case "start":
                         if (args.Length > 2)
                         {
+                            string arg2 = args[2];
+
+                            // 1) Try as a profile name first
+                            if (WeatherProfiles.Profiles.TryGetValue(arg2, out var profile))
+                            {
+                                if (!GameServer.Instance.WorldManager.WeatherManager.StartWeatherAtPlayer(client.Player, profile))
+                                {
+                                    DisplayMessage(client, $"Weather (start): Profile '{arg2}' could not be started at your position!");
+                                    break;
+                                }
+
+                                DisplayMessage(client, $"Weather (start): Profile '{arg2}' started at your position X:{client.Player.Position.X}, Y:{client.Player.Position.Y}.");
+                                break;
+                            }
+
+                            // 2) Not a profile → interpret as numeric parameters
+                            if (args.Length < 7)
+                            {
+                                DisplayMessage(client, "Weather (start): Wrong Arguments...");
+                                DisplaySyntax(client);
+                                return;
+                            }
+
                             try
                             {
                                 uint position = Convert.ToUInt32(args[2]);
@@ -66,11 +90,16 @@ namespace DOL.GS.Commands
                                 ushort speed = Convert.ToUInt16(args[4]);
                                 ushort diffusion = Convert.ToUInt16(args[5]);
                                 ushort intensity = Convert.ToUInt16(args[6]);
+
                                 if (!GameServer.Instance.WorldManager.WeatherManager.StartWeather(client.Player.CurrentRegionID, position, width, speed, diffusion, intensity))
                                 {
                                     DisplayMessage(client, "Weather (start): Weather could not be started in this Region!");
                                     break;
                                 }
+
+                                DisplayMessage(
+                                    client,
+                                    $"Weather (start): Custom storm started. Pos:{position}, Width:{width}, Speed:{speed}, Diffusion:{diffusion}, Intensity:{intensity}");
                             }
                             catch
                             {
@@ -81,16 +110,19 @@ namespace DOL.GS.Commands
                         }
                         else
                         {
+                            // /weather start → random
                             if (!GameServer.Instance.WorldManager.WeatherManager.StartWeather(client.Player.CurrentRegionID))
                             {
                                 DisplayMessage(client, "Weather (start): Weather could not be started in this Region!");
                                 break;
                             }
+
+                            DisplayMessage(client, "Weather (start): A random storm has been started in this region!");
                         }
 
-                        DisplayMessage(client, "Weather (start): The Weather has been started for this region!");
                         break;
                 }
+
                 PrintInfo(client);
                 return;
             }

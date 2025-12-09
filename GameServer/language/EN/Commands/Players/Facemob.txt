@@ -1,0 +1,6 @@
+Commands.Players.Facemob.Description:		Turns your character to face the nearest mob with the given name, if it is in the same region.
+Commands.Players.Facemob.Usage:				'/facemob [mob name]'
+Commands.Players.Facemob.Error.Name:		Please enter a mob name.
+Commands.Players.Facemob.Error.NotFound:	No mob named '{0}' could be found in this region.
+Commands.Players.Facemob.Facing:			You turn to face '{0}'.
+Commands.Players.Facemob.Error.MissingItem:	You cannot use this command, you don't have a {0} in your inventory.

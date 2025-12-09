@@ -1,0 +1,6 @@
+Commands.Players.Facemob.Description:		Tourne votre personnage vers le monstre portant le nom indiqué le plus proche, s'il se trouve dans la même région.
+Commands.Players.Facemob.Usage:				'/facemob [nom du monstre]'
+Commands.Players.Facemob.Error.Name:		Veuillez saisir un nom de monstre.
+Commands.Players.Facemob.Error.NotFound:	Aucun monstre nommé '{0}' n'a été trouvé dans cette région.
+Commands.Players.Facemob.Facing:			Vous vous tournez vers « {0} ».
+Commands.Players.Facemob.Error.MissingItem:	Vous ne pouvez pas utiliser cette commande car vous ne possédez pas de {0}.

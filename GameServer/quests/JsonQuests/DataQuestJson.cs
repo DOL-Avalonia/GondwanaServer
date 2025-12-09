@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using DOL.Language;
 using DOL.GS.Finance;
+using DOL.GS.ServerProperties;
 using DOL.MobGroups;
 using DOL.GS.Behaviour;
 
@@ -44,6 +45,7 @@ namespace DOL.GS.Quests
         public int[] QuestDependencyIDs = Array.Empty<int>();
         public eCharacterClass[] AllowedClasses = Array.Empty<eCharacterClass>();
         public eRace[] AllowedRaces = Array.Empty<eRace>();
+        public int[] QuestExclusionIDs = Array.Empty<int>();
 
         public long RewardMoney;
         public long RewardXP;
@@ -120,11 +122,47 @@ namespace DOL.GS.Quests
 
         public List<IQuestGoal> GetVisibleGoals(PlayerQuest data)
         {
-            return data.GoalStates
-                .Where(gs => gs.IsActive)
-                .Select(gs => Goals[gs.GoalId].ToQuestGoal(data, gs))
-                .Where(g => g is not DataQuestJsonGoal.GenericDataQuestGoal gen || gen.Goal.Visible)
-                .ToList();
+            if (!Properties.JSONQUEST_USE_OLDGOAL_LIST)
+            {
+                return data.GoalStates
+                    .Where(gs => gs.IsActive)
+                    .Select(gs => Goals[gs.GoalId].ToQuestGoal(data, gs))
+                    .Where(g => g is not DataQuestJsonGoal.GenericDataQuestGoal gen || gen.Goal.Visible)
+                    .ToList();
+            }
+
+            var visibleGoals = new List<IQuestGoal>();
+
+            foreach (var kv in Goals.OrderBy(kv => kv.Key))
+            {
+                var goalDef = kv.Value;
+                var state = data.GoalStates.Find(gs => gs.GoalId == kv.Key);
+
+                if (state == null)
+                    continue;
+
+                if (!goalDef.Visible)
+                    continue;
+
+                bool isNegative = goalDef.IsNegativeGoal;
+
+                if (!isNegative)
+                {
+                    if (state.State != eQuestGoalStatus.NotStarted && state.State != eQuestGoalStatus.Aborted)
+                    {
+                        visibleGoals.Add(goalDef.ToQuestGoal(data, state));
+                    }
+                }
+                else
+                {
+                    if (state.IsActive && !state.IsFinished)
+                    {
+                        visibleGoals.Add(goalDef.ToQuestGoal(data, state));
+                    }
+                }
+            }
+
+            return visibleGoals;
         }
 
         public bool CheckQuestQualification(GamePlayer player)
@@ -145,6 +183,26 @@ namespace DOL.GS.Quests
                 return false;
             if (player.Reputation > Reputation)
                 return false;
+            if (QuestDependencyIDs.Length > 0)
+            {
+                foreach (var depId in QuestDependencyIDs)
+                {
+                    bool done = player.QuestListFinished.Any(q => q.QuestId == depId);
+                    if (!done)
+                        return false;
+                }
+            }
+            if (QuestExclusionIDs.Length > 0)
+            {
+                foreach (var exclId in QuestExclusionIDs)
+                {
+                    bool inProgress = player.QuestList.Any(q => q.QuestId == exclId && q.Status == eQuestStatus.InProgress);
+                    bool finished = player.QuestListFinished.Any(q => q.QuestId == exclId);
+
+                    if (inProgress || finished)
+                        return false;
+                }
+            }
 
             // the player is doing this quest
             if (player.QuestList.Any(q => q.Quest == this && q.Status == eQuestStatus.InProgress))
@@ -251,6 +309,7 @@ namespace DOL.GS.Quests
             _db.OptionalRewardItemTemplates = string.Join("|", OptionalRewardItemTemplates.Select(i => i.Id_nb));
             _db.FinalRewardItemTemplates = string.Join("|", FinalRewardItemTemplates.Select(i => i.Id_nb));
             _db.QuestDependency = string.Join("|", QuestDependencyIDs);
+            _db.QuestExclusion = string.Join("|", QuestExclusionIDs);
             _db.AllowedClasses = string.Join("|", AllowedClasses.Select(c => (int)c));
             _db.AllowedRaces = string.Join("|", AllowedRaces.Select(c => (int)c));
             _db.GoalsJson = JsonConvert.SerializeObject(Goals.Select(kv => new { Id = kv.Key, Type = kv.Value.GetType().FullName, Data = kv.Value.GetDatabaseJsonObject() }).ToArray());
@@ -303,6 +362,7 @@ namespace DOL.GS.Quests
             IsDamned = db.IsDamned;
             ModelID = db.ModelId;
             QuestDependencyIDs = (db.QuestDependency ?? "").Split('|').Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => int.Parse(id)).ToArray();
+            QuestExclusionIDs = (db.QuestExclusion ?? "").Split('|').Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => int.Parse(id)) .ToArray();
             AllowedClasses = (db.AllowedClasses ?? "").Split('|').Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => (eCharacterClass)int.Parse(id)).ToArray();
             AllowedRaces = (db.AllowedRaces ?? "").Split('|').Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => (eRace)int.Parse(id)).ToArray();
 

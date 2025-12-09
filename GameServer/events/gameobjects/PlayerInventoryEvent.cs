@@ -48,5 +48,10 @@ namespace DOL.Events
         /// A bonus on an item changed.
         /// </summary>
         public static readonly PlayerInventoryEvent ItemBonusChanged = new PlayerInventoryEvent("PlayerInventory.ItemBonusChanged");
+        /// <summary>
+        /// Fired whenever a stack of an item changes in the player's inventory
+        /// (gain or loss). Delta &gt; 0 = gained, Delta &lt; 0 = lost.
+        /// </summary>
+        public static readonly PlayerInventoryEvent ItemCountChanged = new PlayerInventoryEvent("PlayerInventory.ItemCountChanged");
     }
 }

@@ -112,6 +112,12 @@ namespace DOL.GS.ServerProperties
         public static int MAX_REWARDQUEST_DESCRIPTION_LENGTH;
 
         /// <summary>
+        /// Display previous goals in a list above the current goals in the quest journal
+        /// </summary>
+        [ServerProperty("system", "jsonquest_show_oldgoal_list", "If true, DataQuestJson quest journal behaves like RewardQuest list: previous positive steps stay visible, negative steps only visible while active.", true)]
+        public static bool JSONQUEST_USE_OLDGOAL_LIST;
+
+        /// <summary>
         /// The tension players gain when hit by monsters
         /// </summary>
         [ServerProperty("system", "player_base_maxtension", "The Base Maximum Tension, before race & class multipliers, for the Adrenaline system.", 25000)]
@@ -920,6 +926,13 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("server", "autoselect_caster", "Set to True if you wish beneficial spells to target the caster if the current target isn't valid.  Allows self-healing without changing targets.", false)]
         public static bool AUTOSELECT_CASTER;
+
+        /// <summary>
+        /// ItemTemplateID required in inventory to use /facemob.
+        /// If empty, /facemob behaves normally with no requirement.
+        /// </summary>
+        [ServerProperty("world", "facemob_required_itemtemplate", "ItemTemplateID required in inventory to use /facemob (leave empty to disable requirement).", "")]
+        public static string FACEMOB_REQUIRED_ITEMTEMPLATE;
         #endregion
 
         #region RATES

@@ -31,6 +31,7 @@ using DOL.GS.ServerProperties;
 using DOL.GS.RealmAbilities;
 using DOL.GS.SkillHandler;
 using DOL.GS.Utils;
+using DOL.GS.Quests;
 using DOL.Language;
 
 using log4net;
@@ -4836,6 +4837,16 @@ namespace DOL.GS.Spells
             }
 
             ad.Attacker.DealDamage(ad);
+            if (ad.CriticalDamage > 0 && ad.AttackType == AttackData.eAttackType.Spell)
+            {
+                GamePlayer questOwner = ad.Attacker.GetPlayerAttacker(ad.Attacker);
+
+                if (questOwner != null && ad.Target is GameLiving targetLiving)
+                {
+                    CriticalHitGoal.OnPlayerCriticalHit(questOwner, targetLiving, ad);
+                }
+            }
+
             // Treat non-damaging effects as attacks to trigger an immediate response and BAF
             if (ad.Damage == 0 && ad.Target is GameNPC { Brain: IOldAggressiveBrain aggroBrain })
             {

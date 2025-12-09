@@ -375,6 +375,8 @@ namespace DOL.GS
                 (item as IGameInventoryItem)!.OnReceive(m_player);
             }
 
+            m_player.Notify(PlayerInventoryEvent.ItemCountChanged, m_player, new ItemCountChangedEventArgs(m_player, item, item.Count));
+
             return true;
         }
 
@@ -411,6 +413,7 @@ namespace DOL.GS
 
 
             var oldSlot = (eInventorySlot)item.SlotPosition;
+            int removedCount = item.Count;
 
             if (!base.RemoveItem(item))
                 return false;
@@ -482,6 +485,11 @@ namespace DOL.GS
                 (item as IGameInventoryItem)!.OnLose(m_player);
             }
 
+            if (removedCount > 0)
+            {
+                m_player.Notify(PlayerInventoryEvent.ItemCountChanged, m_player, new ItemCountChangedEventArgs(m_player, item, -removedCount));
+            }
+
             return true;
         }
 
@@ -501,7 +509,14 @@ namespace DOL.GS
                 return false;
             }
 
-            return base.AddCountToStack(item, count);
+            bool result = base.AddCountToStack(item, count);
+
+            if (result && count > 0)
+            {
+                m_player.Notify(PlayerInventoryEvent.ItemCountChanged, m_player, new ItemCountChangedEventArgs(m_player, item, count));
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -520,7 +535,14 @@ namespace DOL.GS
                 return false;
             }
 
-            return base.RemoveCountFromStack(item, count);
+            bool result = base.RemoveCountFromStack(item, count);
+
+            if (result && count > 0)
+            {
+                m_player.Notify(PlayerInventoryEvent.ItemCountChanged, m_player, new ItemCountChangedEventArgs(m_player, item, -count));
+            }
+
+            return result;
         }
 
         #endregion Add/Remove

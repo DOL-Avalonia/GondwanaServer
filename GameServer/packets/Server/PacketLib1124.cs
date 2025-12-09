@@ -41,6 +41,7 @@ using DOL.MobGroups;
 using log4net;
 using DOL.GameEvents;
 using DOL.GS.Geometry;
+using DOL.GS.ServerProperties;
 
 
 namespace DOL.GS.PacketHandler
@@ -669,10 +670,31 @@ namespace DOL.GS.PacketHandler
                     {
                         var goal = q.VisibleGoals[idx];
                         string desc;
-                        if (goal.ProgressTotal == 1)
-                            desc = $"{goal.Description}\r";
+
+                        if (Properties.JSONQUEST_USE_OLDGOAL_LIST)
+                        {
+                            string prefix = " • ";
+
+                            if (goal is DataQuestJsonGoal.GenericDataQuestGoal gen && gen.Goal.IsNegativeGoal)
+                            {
+                                prefix = "   ";
+                            }
+
+                            string baseText;
+                            if (goal.ProgressTotal == 1)
+                                baseText = goal.Description;
+                            else
+                                baseText = $"{goal.Description} ({goal.Progress} / {goal.ProgressTotal})";
+
+                            desc = prefix + baseText + "\r";
+                        }
                         else
-                            desc = $"{goal.Description} ({goal.Progress} / {goal.ProgressTotal})\r";
+                        {
+                            if (goal.ProgressTotal == 1)
+                                desc = $"{goal.Description}\r";
+                            else
+                                desc = $"{goal.Description} ({goal.Progress} / {goal.ProgressTotal})\r";
+                        }
 
                         pak.WriteShortLowEndian((ushort)desc.Length);
                         pak.WriteStringBytes(desc);

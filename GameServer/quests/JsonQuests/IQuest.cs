@@ -49,6 +49,9 @@ namespace DOL.GS.Quests
         Unknown = 0,
         Kill = 3,
         ScoutMission = 5,
+        Steal = 6,
+        CriticalHit = 7,
+        GetHarmed = 8,
     }
 
     [Flags]

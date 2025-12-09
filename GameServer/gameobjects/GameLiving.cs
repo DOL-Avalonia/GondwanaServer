@@ -50,6 +50,7 @@ using System.Collections.Immutable;
 using Vector3 = System.Numerics.Vector3;
 using DOL.GS.PacketHandler.Client.v168;
 using System.Threading;
+using DOL.GS.Quests;
 
 namespace DOL.GS
 {
@@ -2984,6 +2985,19 @@ namespace DOL.GS
                     }
                 }
 
+                if (mainHandAD.AttackResult == eAttackResult.HitUnstyled || mainHandAD.AttackResult == eAttackResult.HitStyle)
+                {
+                    if (mainHandAD.CriticalDamage > 0)
+                    {
+                        GamePlayer questOwner = owner.GetPlayerAttacker(owner);
+
+                        if (questOwner != null && mainHandAD.Target is GameLiving targetLiving)
+                        {
+                            CriticalHitGoal.OnPlayerCriticalHit(questOwner, targetLiving, mainHandAD);
+                        }
+                    }
+                }
+
                 //CMH
                 // 1.89:
                 // - Characters who are attacked by stealthed archers will now target the attacking archer if the attacked player does not already have a target.
@@ -3055,6 +3069,19 @@ namespace DOL.GS
 
                                 //Send messages about our left hand attack now
                                 owner.SendAttackingCombatMessages(leftHandAD);
+
+                                if (leftHandAD.AttackResult == eAttackResult.HitUnstyled || leftHandAD.AttackResult == eAttackResult.HitStyle)
+                                {
+                                    if (leftHandAD.CriticalDamage > 0)
+                                    {
+                                        GamePlayer questOwner = owner.GetPlayerAttacker(owner);
+
+                                        if (questOwner != null && leftHandAD.Target is GameLiving targetLivingLH)
+                                        {
+                                            CriticalHitGoal.OnPlayerCriticalHit(questOwner, targetLivingLH, leftHandAD);
+                                        }
+                                    }
+                                }
                             }
                             break;
                     }

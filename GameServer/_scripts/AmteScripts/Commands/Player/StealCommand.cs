@@ -2,6 +2,7 @@
 using DOL.Events;
 using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
+using DOL.GS.Quests;
 using DOL.GS.SkillHandler;
 using DOL.GS.Spells;
 using DOL.Language;
@@ -525,6 +526,7 @@ namespace DOL.GS.Commands
                 target.Out.SendMessage(LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealed", Money.GetString(vol.Money)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealGain", Money.GetString(vol.Money)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 TaskManager.UpdateTaskProgress(stealer, "SuccessfulPvPThefts", 1);
+                StealGoal.OnPlayerSuccessfulSteal(stealer, target);
             }
             else if (vol.Status == StealResultStatus.SUSSCES_ITEM)
             {
@@ -567,6 +569,7 @@ namespace DOL.GS.Commands
                             stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealItem", item.Name, stealer.GetPersonalizedName(target)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             target.Out.SendMessage(LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealedItem", item.Name, target.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             TaskManager.UpdateTaskProgress(stealer, "SuccessfulPvPThefts", 1);
+                            StealGoal.OnPlayerSuccessfulSteal(stealer, target);
                         }
                     }
                 }

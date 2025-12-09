@@ -29,6 +29,61 @@ using log4net;
 
 namespace DOL.GS
 {
+    public class WeatherProfile
+    {
+        public string Name { get; set; }
+
+        public uint Width { get; set; }
+        public ushort Speed { get; set; }
+        public ushort Intensity { get; set; }
+        public ushort FogDiffusion { get; set; }
+
+        // Optional: restrict to certain zones inside the region.
+        public HashSet<ushort> AllowedZones { get; set; } = new HashSet<ushort>();
+    }
+    public static class WeatherProfiles
+    {
+        public static readonly Dictionary<string, WeatherProfile> Profiles
+            = new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["storm_04"] = new WeatherProfile
+                {
+                    Name = "Storm 04",
+                    Width = 50000,
+                    Speed = 200,
+                    Intensity = 110,
+                    FogDiffusion = 20000,
+                    //AllowedZones = { 216 }
+                },
+                ["storm_03"] = new WeatherProfile
+                {
+                    Name = "Storm 03",
+                    Width = 60000,
+                    Speed = 180,
+                    Intensity = 140,
+                    FogDiffusion = 34000,
+                    //AllowedZones = { 247 }
+                },
+                ["storm_02"] = new WeatherProfile
+                {
+                    Name = "Storm 02",
+                    Width = 80000,
+                    Speed = 150,
+                    Intensity = 120,
+                    FogDiffusion = 26000,
+                    //AllowedZones = { 247 }
+                },
+                ["storm_01"] = new WeatherProfile
+                {
+                    Name = "Storm 01",
+                    Width = 60000,
+                    Speed = 80,
+                    Intensity = 40,
+                    FogDiffusion = 18000
+                },
+            };
+    }
+
     /// <summary>
     /// WeatherManager class handle current weather in compatible Regions.
     /// </summary>
@@ -37,7 +92,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Sync Lock Object
@@ -128,6 +183,17 @@ namespace DOL.GS
             return ChangeWeather(regionId, weather => weather.CreateWeather(position, width, speed, intensity, diffusion, SimpleScheduler.Ticks));
         }
 
+        public bool StartWeatherAtPlayer(GamePlayer player, WeatherProfile profile)
+        {
+            if (player == null || player.CurrentRegion == null)
+                return false;
+
+            ushort regionId = player.CurrentRegion.ID;
+            uint position = (uint)player.Position.X;
+
+            return StartWeather(regionId, position, profile.Width, profile.Speed, profile.FogDiffusion, profile.Intensity);
+        }
+
         /// <summary>
         /// Restart Weather for Region
         /// </summary>
@@ -203,6 +269,10 @@ namespace DOL.GS
             return true;
         }
 
+        public bool StartWeatherProfile(ushort regionId, WeatherProfile profile)
+        {
+            return ChangeWeather(regionId, weather => weather.CreateWeather(profile.Width, profile.Speed, profile.Intensity, profile.FogDiffusion, SimpleScheduler.Ticks));
+        }
         #region Update Handlers
         /// <summary>
         /// Stop Weather from given Weather Object
@@ -261,9 +331,40 @@ namespace DOL.GS
                 return;
 
             if (weather.StartTime == 0)
+            {
                 player.Out.SendWeather(0, 0, 0, 0, 0);
-            else
-                player.Out.SendWeather(weather.CurrentPosition(SimpleScheduler.Ticks), weather.Width, weather.Speed, weather.FogDiffusion, weather.Intensity);
+                return;
+            }
+
+            // Base values
+            uint position = weather.CurrentPosition(SimpleScheduler.Ticks);
+            uint width = weather.Width;
+            ushort speed = weather.Speed;
+            ushort diffusion = weather.FogDiffusion;
+            ushort intensity = weather.Intensity;
+
+            // Zone-aware adjustment
+            var zone = player.CurrentRegion?.GetZone(player.Coordinate);
+            if (zone != null)
+            {
+                switch (zone.ID)
+                {
+                    case 247:
+                        intensity = (ushort)Math.Min(120, intensity + 20);
+                        diffusion = (ushort)Math.Min(40000, diffusion + 4000);
+                        break;
+
+                    case 216:
+                        diffusion = (ushort)Math.Min(40000, diffusion + 8000);
+                        break;
+
+                    case 4:
+                        intensity = (ushort)Math.Max(0, intensity - 20);
+                        break;
+                }
+            }
+
+            player.Out.SendWeather(position, width, speed, diffusion, intensity);
         }
         #endregion
 

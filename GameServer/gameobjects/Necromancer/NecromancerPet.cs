@@ -23,6 +23,7 @@ using DOL.Database;
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
 using DOL.GS.Styles;
 using DOL.Language;
@@ -549,6 +550,17 @@ namespace DOL.GS
         {
             // Necromancer pets can always start to cast while in combat
             return true;
+        }
+
+        public override void ModifyAttack(AttackData attackData)
+        {
+            base.ModifyAttack(attackData);
+
+            if ((Owner as GamePlayer)!.Client.Account.PrivLevel > (int)ePrivLevel.Player && !Properties.ALLOW_GM_ATTACK)
+            {
+                attackData.Damage = 0;
+                attackData.CriticalDamage = 0;
+            }
         }
 
         /// <summary>

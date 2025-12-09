@@ -21,6 +21,7 @@ namespace DOL.GS.Quests
         public readonly ushort QuestId;
         public DataQuestJson Quest => DataQuestJsonMgr.GetQuest(QuestId);
         public readonly int GoalId;
+        public virtual bool IsNegativeGoal => false;
 
         public GameNPC Target { get; set; }
         public string Description { get; set; }

@@ -11,6 +11,7 @@ namespace DOL.GS.Quests
         public override eQuestGoalType Type => eQuestGoalType.Unknown;
         public override int ProgressTotal => 1;
         public override QuestZonePoint PointA => new(m_target);
+        public override bool IsNegativeGoal => true;
 
         public KilledGoal(DataQuestJson quest, int goalId, dynamic db) : base(quest, goalId, (object)db)
         {

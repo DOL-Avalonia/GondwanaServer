@@ -1106,13 +1106,14 @@ namespace DOL.GS
         /// <param name="realm">The realm of the object we search!</param>
         /// <param name="objectType">The type of the object you search</param>
         /// <returns>All objects with the specified parameters</returns>
-        public static GameObject[] GetObjectsByNameFromRegion(string name, ushort regionID, eRealm realm, Type objectType)
+        public static GameObject[] GetObjectsByNameFromRegion(string name, ushort regionID, eRealm realm, Type objectType, bool ignoreCase = false)
         {
             Region reg;
             if (!m_regions.TryGetValue(regionID, out reg))
                 return Array.Empty<GameObject>();
 
-            return (GameObject[])reg.Objects.Where(obj => obj != null && obj.Realm == realm && obj.Name == name).OfTypeAndToArray(objectType);
+            var comparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            return (GameObject[])reg.Objects.Where(obj => obj != null && obj.Realm == realm && string.Equals(obj.Name, name, comparison)).OfTypeAndToArray(objectType);
         }
 
         /// <summary>
@@ -1135,9 +1136,9 @@ namespace DOL.GS
         /// <param name="realm">The realm of the object we search!</param>
         /// <param name="objectType">The type of the object you search</param>
         /// <returns>All objects with the specified parameters</returns>b
-        public static GameObject[] GetObjectsByName(string name, eRealm realm, Type objectType)
+        public static GameObject[] GetObjectsByName(string name, eRealm realm, Type objectType, bool ignoreCase = false)
         {
-            return (GameObject[])m_regions.Values.Select(reg => GetObjectsByNameFromRegion(name, reg.ID, realm, objectType))
+            return (GameObject[])m_regions.Values.Select(reg => GetObjectsByNameFromRegion(name, reg.ID, realm, objectType, ignoreCase))
                 .SelectMany(objs => objs).OfTypeAndToArray(objectType);
         }
 

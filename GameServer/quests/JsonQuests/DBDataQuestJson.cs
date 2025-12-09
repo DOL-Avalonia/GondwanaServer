@@ -41,6 +41,7 @@ namespace DOL.Database
         private byte m_minLevel;
         private byte m_maxLevel;
         private string m_questDependency;
+        private string m_questExclusion;
         private string m_allowedClasses;
         private string m_allowedRaces;
         private bool m_isRenaissance;
@@ -256,6 +257,17 @@ namespace DOL.Database
         {
             get { return m_questDependency; }
             set { m_questDependency = value; Dirty = true; }
+        }
+
+        /// <summary>
+        /// Quests that PREVENT this quest if the player has them
+        /// (in progress or finished). Format: "18|12|26"
+        /// </summary>
+        [DataElement(AllowDbNull = true)]
+        public string QuestExclusion
+        {
+            get { return m_questExclusion; }
+            set { m_questExclusion = value; Dirty = true; }
         }
 
         /// <summary>

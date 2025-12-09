@@ -394,6 +394,8 @@ namespace DOL.GS
             set { taskXPlayer = value; }
         }
 
+        public bool HasCollectGetGoalInProgress { get; set; } = false;
+
         #region DoorCache
         protected Dictionary<int, eDoorState> m_doorUpdateList = null;
 
@@ -8000,8 +8002,14 @@ namespace DOL.GS
                         break;
                     }
             }
+
+            if (ad.Attacker is GameLiving attackerLiving)
+            {
+                GetHarmedGoal.OnPlayerHarmed(this, attackerLiving, ad);
+            }
+
             // vampiir
-            if (CharacterClass is PlayerClass.ClassVampiir)
+            if (CharacterClass is ClassVampiir)
             {
                 GameSpellEffect removeEffect = SpellHandler.FindEffectOnTarget(this, "VampiirSpeedEnhancement");
                 if (removeEffect != null)
