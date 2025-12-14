@@ -20,7 +20,9 @@
 using System;
 using System.Collections.Generic;
 using DOL.Database;
+using DOL.Events;
 using DOL.GS.Effects;
+using DOL.GS.Spells;
 using DOL.Language;
 
 namespace DOL.GS.RealmAbilities
@@ -30,9 +32,41 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class CallOfDarknessAbility : RR5RealmAbility
     {
+        private static DBSpell _dbspell;
+        private Spell _spell;
+        private SpellLine _spellline;
+        private GamePlayer _player;
+
         public const int DURATION = 60 * 1000;
 
         public CallOfDarknessAbility(DBAbility dba, int level) : base(dba, level) { }
+
+        private void BuildSpell()
+        {
+            _spellline = new SpellLine("RAs", "RealmAbilities", "RealmAbilities", true);
+
+            if (_dbspell == null)
+            {
+                _dbspell = new DBSpell
+                {
+                    SpellID = 8888,
+                    TooltipId = 8888,
+                    Name = "Call of Darkness",
+                    Icon = 7051,
+                    ClientEffect = 15184,
+                    Target = "self",
+                    Type = "CallOfDarkness",
+                    Duration = 60,
+                    CastTime = 0,
+                    MoveCast = false,
+                    Uninterruptible = false,
+                    Range = 0,
+                };
+                SkillBase.AddScriptedSpell(_spellline.KeyName, new Spell(_dbspell, 0));
+            }
+
+            _spell = new Spell(_dbspell, 0);
+        }
 
         /// <summary>
         /// Action
@@ -41,17 +75,26 @@ namespace DOL.GS.RealmAbilities
         public override void Execute(GameLiving living)
         {
             if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED)) return;
+            
+            BuildSpell();
 
-            GamePlayer player = living as GamePlayer;
-            if (player != null)
+            var spellHandler = new CallOfDarknessSpellHandler(living, _spell, _spellline);
+            if (_spell.CastTime > 0)
             {
-                CallOfDarknessEffect CallOfDarkness = player.EffectList.GetOfType<CallOfDarknessEffect>();
-                if (CallOfDarkness != null)
-                    CallOfDarkness.Cancel(false);
-
-                new CallOfDarknessEffect().Start(player);
+                spellHandler.CastingCompleteEvent += (spell) =>
+                {
+                    if (((SpellHandler)spell).Status is SpellHandler.eStatus.Success or SpellHandler.eStatus.Failure)
+                    {
+                        DisableSkill(living);
+                    }
+                };
+                spellHandler.StartSpell(living);
             }
-            DisableSkill(living);
+            else
+            {
+                if (spellHandler.StartSpell(living))
+                    DisableSkill(living);
+            }
         }
 
         public override int GetReUseDelay(int level)
@@ -59,14 +102,63 @@ namespace DOL.GS.RealmAbilities
             return 900;
         }
 
-        public override void AddEffectsInfo(IList<string> list, GameClient client)
+        public static void AddDelveInfos(IList<string> list, GameClient client)
         {
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfDarknessAbility.AddEffectsInfo.Info1"));
-            list.Add("");
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfDarknessAbility.AddEffectsInfo.Info2"));
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfDarknessAbility.AddEffectsInfo.Info3"));
-            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "CallOfDarknessAbility.AddEffectsInfo.Info4"));
+            var language = client?.Account?.Language ?? ServerProperties.Properties.SERV_LANGUAGE;
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfDarknessAbility.AddEffectsInfo.Info1"));
         }
 
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
+        {
+            var language = client?.Account?.Language ?? ServerProperties.Properties.SERV_LANGUAGE;
+            AddDelveInfos(list, client);
+            list.Add("");
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfDarknessAbility.AddEffectsInfo.Info2"));
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfDarknessAbility.AddEffectsInfo.Info3"));
+            list.Add(LanguageMgr.GetTranslation(language, "CallOfDarknessAbility.AddEffectsInfo.Info4"));
+        }
+    }
+
+    [SpellHandlerAttribute("CallOfDarkness")]
+    public class CallOfDarknessSpellHandler : SpellHandler
+    {
+        /// <inheritdoc />
+        public CallOfDarknessSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
+        {
+        }
+
+        /// <inheritdoc />
+        public override PlayerXEffect GetSavedEffect(GameSpellEffect effect)
+        {
+            // Remove when player quits
+            return null;
+        }
+
+        /// <inheritdoc />
+        public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
+        {
+            if (!base.ApplyEffectOnTarget(target, effectiveness))
+                return false;
+
+            foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                p.Out.SendSpellEffectAnimation(target, target, 7051, 0, false, 1);
+            }
+            return true;
+        }
+
+        /// <inheritdoc />
+        protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
+        {
+            return RealmAbilities.CallOfDarknessAbility.DURATION;
+        }
+
+        /// <inheritdoc />
+        public override string GetDelveDescription(GameClient delveClient)
+        {
+            var list = new List<string>();
+            CallOfDarknessAbility.AddDelveInfos(list, delveClient);
+            return string.Join("\n", list);
+        }
     }
 }

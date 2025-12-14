@@ -22,6 +22,7 @@ using DOL.GS.Effects;
 using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
 using DOL.GS.PropertyCalc;
+using DOL.GS.RealmAbilities;
 using DOL.Language;
 
 namespace DOL.GS.Spells
@@ -70,7 +71,7 @@ namespace DOL.GS.Spells
 
         public override int CalculateCastingTime()
         {
-            if (Caster.EffectList.GetOfType<CallOfDarknessEffect>() != null)
+            if (Caster.FindEffectOnTarget(typeof(CallOfDarknessSpellHandler))!= null)
                 return 3000;
 
             return base.CalculateCastingTime();
@@ -86,7 +87,7 @@ namespace DOL.GS.Spells
 
             // Cancel RR5 Call of Darkness if on caster.
 
-            IGameEffect callOfDarkness = FindStaticEffectOnTarget(Caster, typeof(CallOfDarknessEffect));
+            IGameEffect callOfDarkness = SpellHelper.FindEffectOnTarget(Caster, typeof(CallOfDarknessSpellHandler));
             if (callOfDarkness != null)
                 callOfDarkness.Cancel(false);
             return true;
