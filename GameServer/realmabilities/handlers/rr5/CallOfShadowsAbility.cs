@@ -13,34 +13,40 @@ namespace DOL.GS.RealmAbilities
     /// </summary>
     public class CallOfShadowsAbility : RR5RealmAbility
     {
-        private DBSpell _dbspell;
+        private static DBSpell _dbspell;
         private Spell _spell;
         private SpellLine _spellline;
         private GamePlayer _player;
 
         public CallOfShadowsAbility(DBAbility dba, int level) : base(dba, level)
         {
-            BuildSpell();
         }
 
         private void BuildSpell()
         {
-            _dbspell = new DBSpell
+            _spellline = new SpellLine("RAs", "RealmAbilities", "RealmAbilities", true);
+
+            if (_dbspell == null)
             {
-                Name = "Call of Shadows",
-                Icon = 7051,
-                ClientEffect = 15184,
-                Target = "self",
-                Type = "CallOfShadows",
-                Duration = 30,
-                CastTime = 0,
-                MoveCast = false,
-                Uninterruptible = false,
-                Range = 0
-            };
+                _dbspell = new DBSpell
+                {
+                    SpellID = 8889,
+                    TooltipId = 8889,
+                    Name = "Call of Shadows",
+                    Icon = 7051,
+                    ClientEffect = 15184,
+                    Target = "self",
+                    Type = "CallOfShadows",
+                    Duration = 30,
+                    CastTime = 0,
+                    MoveCast = false,
+                    Uninterruptible = false,
+                    Range = 0,
+                };
+                SkillBase.AddScriptedSpell(_spellline.KeyName, new Spell(_dbspell, 0));
+            }
 
             _spell = new Spell(_dbspell, 0);
-            _spellline = new SpellLine("RAs", "RealmAbilities", "RealmAbilities", true);
         }
 
         public override void Execute(GameLiving living)
@@ -49,7 +55,6 @@ namespace DOL.GS.RealmAbilities
                 return;
 
             _player = living as GamePlayer;
-
             if (_player!.IsRiding)
             {
                 _player.Out.SendMessage(LanguageMgr.GetTranslation(_player.Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CannotCastRiding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -65,7 +70,7 @@ namespace DOL.GS.RealmAbilities
 
         public override int GetReUseDelay(int level) => 600;
 
-        public override void AddEffectsInfo(IList<string> list, GameClient client)
+        public static void AddDelveInfos(IList<string> list, GameClient client)
         {
             var language = client.Account.Language;
             list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info1"));
@@ -73,8 +78,13 @@ namespace DOL.GS.RealmAbilities
             list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info2"));
             list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info3"));
             list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info4"));
+        }
+
+        public override void AddEffectsInfo(IList<string> list, GameClient client)
+        {
+            AddDelveInfos(list, client);
             list.Add("");
-            list.Add(LanguageMgr.GetTranslation(language, "CallOfShadowsAbility.AddEffectsInfo.Info5"));
+            list.Add(LanguageMgr.GetTranslation(client.Account.Language, "CallOfShadowsAbility.AddEffectsInfo.Info5"));
         }
     }
 }

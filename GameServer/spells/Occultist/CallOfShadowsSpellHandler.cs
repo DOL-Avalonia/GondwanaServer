@@ -4,9 +4,11 @@ using DOL.Events;
 using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using DOL.GS.RealmAbilities;
 using DOL.GS.Spells;
 using DOL.Language;
 using System;
+using System.Collections.Generic;
 using static DOL.GS.Spells.SpellHandler.OccultistForms;
 
 namespace DOL.GS.Spells
@@ -268,6 +270,14 @@ namespace DOL.GS.Spells
             if (!gp.TempProperties.getProperty(FLAG_ACTIVE, false)) return;
 
             gp.DisabledCastingTimeout = 0;
+        }
+
+        /// <inheritdoc />
+        public override string GetDelveDescription(GameClient delveClient)
+        {
+            List<string> strings = new List<string>();
+            CallOfShadowsAbility.AddDelveInfos(strings, delveClient);
+            return string.Join('\n', strings);
         }
     }
 }
