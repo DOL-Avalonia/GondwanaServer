@@ -11,13 +11,46 @@ namespace DOL.GS
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(AutoTranslateManager));
 
+        private class CacheKey(string From, string To, string Text)
+        {
+            public string From { get; } = From;
+            
+            public string To { get; } = To;
+            
+            public string Text { get; } = Text;
+
+            /// <inheritdoc />
+            public override bool Equals(object obj)
+            {
+                if (obj is CacheKey other)
+                {
+                    if (!string.Equals(From, other.From, StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    if (!string.Equals(To, other.To, StringComparison.OrdinalIgnoreCase))
+                        return false;
+
+                    if (!string.Equals(Text, other.Text, StringComparison.OrdinalIgnoreCase))
+                        return false;
+                }
+                return base.Equals(obj);
+            }
+
+            /// <inheritdoc />
+            public override int GetHashCode()
+            {
+                var a = string.GetHashCode(From, StringComparison.OrdinalIgnoreCase);
+                var b = string.GetHashCode(To, StringComparison.OrdinalIgnoreCase);
+                var c = string.GetHashCode(Text, StringComparison.OrdinalIgnoreCase);
+                return HashCode.Combine(a, b, c);
+            }
+        }
+
         // Cache: Key -> Translated Text
-        private static readonly ConcurrentDictionary<string, string> _cache =
-            new ConcurrentDictionary<string, string>(StringComparer.Ordinal);
+        private static readonly ConcurrentDictionary<CacheKey, string> _cache = new();
 
         // Pending Tasks: Key -> Running Task. Prevents duplicate API calls for identical requests.
-        private static readonly ConcurrentDictionary<string, Task<string>> _pendingTranslations = 
-            new ConcurrentDictionary<string, Task<string>>(StringComparer.Ordinal);
+        private static readonly ConcurrentDictionary<CacheKey, Task<string>> _pendingTranslations = new();
 
         private const int MaxTextLength = 2000;
         private const int MaxCacheEntries = 20000;
@@ -28,7 +61,7 @@ namespace DOL.GS
         /// </summary>
         public static async Task<string> TranslateAsync(GamePlayer sender, GamePlayer receiver, string originalText)
         {
-            if (receiver == null || !receiver.AutoTranslateEnabled || string.IsNullOrWhiteSpace(originalText))
+            if (receiver is not { AutoTranslateEnabled: true } || string.IsNullOrWhiteSpace(originalText))
                 return originalText;
 
             if (!Properties.AUTOTRANSLATE_ENABLE)
@@ -54,7 +87,7 @@ namespace DOL.GS
             if (fromLang == toLang) return originalText;
 
             // 1. Build Key
-            string key = BuildKey(fromLang, toLang, originalText);
+            var key = new CacheKey(fromLang, toLang, originalText);
 
             // 2. Check Cache
             if (_cache.TryGetValue(key, out var cached)) return cached;
@@ -86,17 +119,13 @@ namespace DOL.GS
             }
         }
 
-        private static string BuildKey(string from, string to, string text)
-        {
-            if (text.Length > MaxTextLength) text = text.Substring(0, MaxTextLength);
-            return $"{from}|{to}|{text}";
-        }
-
         private static string NormalizeLang(string lang)
         {
-            if (string.IsNullOrWhiteSpace(lang)) return "EN";
+            if (string.IsNullOrWhiteSpace(lang))
+                return "EN";
             int sep = lang.IndexOfAny(new[] { '-', '_' });
-            if (sep > 0) lang = lang.Substring(0, sep);
+            if (sep > 0)
+                lang = lang.Substring(0, sep);
             return lang.ToUpperInvariant();
         }
     }

@@ -73,13 +73,13 @@ namespace DOL.GS
 
             // Prepare URL and content
             string url = $"{endpoint}?key={Uri.EscapeDataString(apiKey)}";
-            var contentValues = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("q", text),
-                new KeyValuePair<string, string>("source", source),
-                new KeyValuePair<string, string>("target", target),
-                new KeyValuePair<string, string>("format", "text")
-            };
+            List<KeyValuePair<string, string>> contentValues =
+            [
+                new("q", text),
+                new("source", source),
+                new("target", target),
+                new("format", "text"),
+            ];
 
             try
             {
@@ -99,7 +99,7 @@ namespace DOL.GS
                         var serializer = new DataContractJsonSerializer(typeof(GoogleTranslateResponse));
                         var resultObj = serializer.ReadObject(stream) as GoogleTranslateResponse;
 
-                        if (resultObj?.Data?.Translations != null && resultObj.Data.Translations.Count > 0)
+                        if (resultObj?.Data?.Translations is { Count: > 0 })
                         {
                             string result = resultObj.Data.Translations[0].TranslatedText;
                             return WebUtility.HtmlDecode(result);
@@ -120,12 +120,12 @@ namespace DOL.GS
         {
             if (string.IsNullOrWhiteSpace(lang)) return "en";
             lang = lang.Trim().ToLowerInvariant();
-            int sepIndex = lang.IndexOfAny(new[] { '-', '_' });
+            int sepIndex = lang.IndexOfAny(['-', '_']);
             if (sepIndex > 0) lang = lang.Substring(0, sepIndex);
 
             if (lang == "eng") return "en";
-            if (lang == "fre" || lang == "fra") return "fr";
-            if (lang == "ger" || lang == "deu") return "de";
+            if (lang is "fre" or "fra") return "fr";
+            if (lang is "ger" or "deu") return "de";
 
             return lang;
         }
