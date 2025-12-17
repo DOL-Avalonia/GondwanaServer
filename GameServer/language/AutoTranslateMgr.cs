@@ -122,7 +122,11 @@ namespace DOL.GS
         private static string NormalizeLang(string lang)
         {
             if (string.IsNullOrWhiteSpace(lang))
-                return "EN";
+            {
+                lang = LanguageMgr.DefaultLanguage;
+                if (string.IsNullOrEmpty(lang))
+                    return "EN";
+            }
             int sep = lang.IndexOfAny(new[] { '-', '_' });
             if (sep > 0)
                 lang = lang.Substring(0, sep);
