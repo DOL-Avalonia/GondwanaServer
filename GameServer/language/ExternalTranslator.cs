@@ -18,7 +18,7 @@ namespace DOL.GS
         // Reusable HttpClient (Best Practice)
         private static readonly HttpClient _httpClient = new HttpClient();
 
-        private static volatile bool _temporarilyDisabled = false;
+        private static bool _temporarilyDisabled = false;
         private static DateTime _disabledUntilUtc = DateTime.MinValue;
         private const int OfflineBackoffMs = 30_000; // 30 seconds backoff on error
 
@@ -56,7 +56,9 @@ namespace DOL.GS
             // Circuit Breaker
             if (_temporarilyDisabled)
             {
-                if (DateTime.UtcNow < _disabledUntilUtc) return text;
+                if (DateTime.UtcNow < _disabledUntilUtc)
+                    return text;
+
                 _temporarilyDisabled = false; // Retry time reached
             }
 
