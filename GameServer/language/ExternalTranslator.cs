@@ -1,12 +1,13 @@
-﻿using System;
+﻿using DOL.GS.ServerProperties;
+using DOL.Language;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading.Tasks;
-using DOL.GS.ServerProperties;
-using log4net;
 
 namespace DOL.GS
 {
@@ -118,7 +119,12 @@ namespace DOL.GS
 
         private static string NormalizeLanguageCode(string lang)
         {
-            if (string.IsNullOrWhiteSpace(lang)) return "en";
+            if (string.IsNullOrWhiteSpace(lang))
+            {
+                lang = LanguageMgr.DefaultLanguage;
+                if (string.IsNullOrEmpty(lang))
+                    return "en";
+            }
             lang = lang.Trim().ToLowerInvariant();
             int sepIndex = lang.IndexOfAny(['-', '_']);
             if (sepIndex > 0) lang = lang.Substring(0, sepIndex);

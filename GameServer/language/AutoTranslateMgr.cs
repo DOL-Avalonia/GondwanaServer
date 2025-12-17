@@ -90,7 +90,8 @@ namespace DOL.GS
             var key = new CacheKey(fromLang, toLang, originalText);
 
             // 2. Check Cache
-            if (_cache.TryGetValue(key, out var cached)) return cached;
+            if (_cache.TryGetValue(key, out var cached))
+                return cached;
 
             // 3. Check/Create Pending Task (The magic deduplication logic)
             // GetOrAdd ensures we only create ONE task for this key, even if called 100 times concurrently
@@ -104,12 +105,13 @@ namespace DOL.GS
                 string translated = await task;
 
                 // 4. Update Cache if successful
-                if (!string.IsNullOrWhiteSpace(translated) && translated != originalText)
+                if (!string.IsNullOrWhiteSpace(translated))
                 {
-                    if (_cache.Count > MaxCacheEntries) _cache.Clear();
+                    if (_cache.Count > MaxCacheEntries)
+                        _cache.Clear(); // TODO: How does this even make sense?
                     _cache[key] = translated;
                 }
-                
+
                 return translated;
             }
             finally
