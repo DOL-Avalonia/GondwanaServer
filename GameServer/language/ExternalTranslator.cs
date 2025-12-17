@@ -18,7 +18,6 @@ namespace DOL.GS
         // Reusable HttpClient (Best Practice)
         private static readonly HttpClient _httpClient = new HttpClient();
 
-        private static bool _temporarilyDisabled = false;
         private static DateTime _disabledUntilUtc = DateTime.MinValue;
         private const int OfflineBackoffMs = 30_000; // 30 seconds backoff on error
 
@@ -54,13 +53,8 @@ namespace DOL.GS
             if (!Properties.AUTOTRANSLATE_ENABLE) return text;
 
             // Circuit Breaker
-            if (_temporarilyDisabled)
-            {
-                if (DateTime.UtcNow < _disabledUntilUtc)
-                    return text;
-
-                _temporarilyDisabled = false; // Retry time reached
-            }
+            if (DateTime.UtcNow < _disabledUntilUtc)
+                return text;
 
             var apiKey = Properties.AUTOTRANSLATE_GOOGLE_API_KEY;
             if (string.IsNullOrWhiteSpace(apiKey)) return text;
@@ -140,7 +134,6 @@ namespace DOL.GS
 
         private static void TripOfflineBreaker(string reason)
         {
-            _temporarilyDisabled = true;
             _disabledUntilUtc = DateTime.UtcNow.AddMilliseconds(OfflineBackoffMs);
             if (log.IsWarnEnabled) 
                 log.Warn($"ExternalTranslator disabled for {OfflineBackoffMs}ms. Reason: {reason}");
