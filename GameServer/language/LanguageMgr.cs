@@ -36,6 +36,9 @@ using DOL.GS.Geometry;
 using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
 using DOL.GS.Styles;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static DOL.GS.Spells.IllusionSpell;
 
 namespace DOL.Language
@@ -563,6 +566,137 @@ namespace DOL.Language
             string translation;
             TryGetTranslation(out translation, language, translationId, args);
             return translation;
+        }
+
+        public static async Task<string> GetAutoTranslation(GamePlayer player, string translationId, params object[] args)
+        {
+            string translation = null;
+            var language = player.Client?.Account?.Language;
+            if (TryGetTranslation(out translation, language, translationId, args))
+            {
+                return translation;
+            }
+
+            // No translation found in files for this language. Try auto translating from server language
+            // Unless this language is already the server language
+            if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
+            {
+                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, args))
+                {
+                    if (player.AutoTranslateEnabled)
+                    {
+                        translation = await AutoTranslateManager.TranslateCoreAsync(Properties.SERV_LANGUAGE, language, translation).ConfigureAwait(false);
+                    }
+                }
+            }
+            return translation;
+        }
+
+        public static async Task<string> GetAutoTranslation(GameClient client, string translationId, params object[] args)
+        {
+            return await GetAutoTranslation(client?.Player, translationId, args);
+        }
+
+        public static async Task<string> GetAutoTranslation(string language, string translationId, params object[] args)
+        {
+            string translation;
+            if (TryGetTranslation(out translation, language, translationId, args))
+            {
+                return translation;
+            }
+
+            // No translation found in files for this language. Try auto translating from server language
+            // Unless this language is already the server language
+            if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
+            {
+                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, args))
+                {
+                    translation = await AutoTranslateManager.TranslateCoreAsync(Properties.SERV_LANGUAGE, language, translation).ConfigureAwait(false);
+                }
+            }
+            return translation;
+        }
+
+        public static async Task<IEnumerable<KeyValuePair<string, string>>> GetAutoTranslations(IEnumerable<string> languages, string translationId, params object[] args)
+        {
+            var translations = await Task.WhenAll(languages.Select(async l => new KeyValuePair<string, string>(l, await GetAutoTranslation(l, translationId, args).ConfigureAwait(false))));
+            return translations;
+        }
+
+        public static async Task<IEnumerable<KeyValuePair<string, string>>> GetAutoTranslations(IEnumerable<string> languages, string translationId, Func<string, object[]> getArgs)
+        {
+            var translations = await Task.WhenAll(languages.Select(async l => new KeyValuePair<string, string>(l, await GetAutoTranslation(l, translationId, getArgs.Invoke(l)).ConfigureAwait(false))));
+            return translations;
+        }
+
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslations(IEnumerable<GamePlayer> players, string translationId, params object[] args)
+        {
+            Dictionary<string, string> translations = new();
+            Dictionary<string, string> noTranslations = new();
+            foreach (var p in players)
+            {
+                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
+                {
+                    if (p.AutoTranslateEnabled)
+                    {
+                        translations[lang] = null;
+                    }
+                    else
+                    {
+                        noTranslations[lang] = GetTranslation(lang, translationId, args);
+                    }
+                }
+            }
+
+            foreach (var (l, t) in await GetAutoTranslations(translations.Keys, translationId, args).ConfigureAwait(false))
+            {
+                translations[l] = t;
+            }
+
+            return players.Select(p =>
+            {
+                string translation = null;
+                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
+                {
+                    if (p.AutoTranslateEnabled)
+                    {
+                        translation = translations.GetValueOrDefault(lang);
+                    }
+                    else
+                    {
+                        translation = noTranslations.GetValueOrDefault(lang);
+                    }
+                }
+                return new KeyValuePair<GamePlayer, string>(p, translation);
+            }).ToArray();
+        }
+
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslations(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
+        {
+            List<KeyValuePair<GamePlayer, string>> translations = new();
+            List<Task<KeyValuePair<GamePlayer, string>>> tasks = new();
+            foreach (var p in players)
+            {
+                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
+                {
+                    if (p.AutoTranslateEnabled)
+                    {
+                        async Task<KeyValuePair<GamePlayer, string>> DoTranslate()
+                        {
+                            var str = await GetAutoTranslation(p, translationId, getArgs.Invoke(p)).ConfigureAwait(false);
+                            return new KeyValuePair<GamePlayer, string>(p, str);
+                        }
+                        tasks.Add(DoTranslate());
+                    }
+                    else
+                    {
+                        translations.Add(new (p, GetTranslation(lang, translationId, getArgs.Invoke(p))));
+                    }
+                }
+            }
+            
+            translations.AddRange(await Task.WhenAll(tasks));
+            return translations.ToArray();
         }
 
         public static IDictionary<string, string> GetAllTranslations(string translationId, params object[] args)

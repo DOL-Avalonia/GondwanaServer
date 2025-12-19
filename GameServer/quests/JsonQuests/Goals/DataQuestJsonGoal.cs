@@ -115,7 +115,7 @@ namespace DOL.GS.Quests
             if (personalize)
                 text = BehaviourUtils.GetPersonalizedMessage(text, player);
 
-            return AutoTranslateManager.MaybeTranslateServerText(player, text);
+            return string.Empty; // AutoTranslateManager.MaybeTranslateServerText(player, text);
         }
 
         public bool IsActive(PlayerQuest questData) => questData.GoalStates.Any(gs => gs.GoalId == GoalId && gs.IsActive) && Conditions?.Validate(questData, this) != false;

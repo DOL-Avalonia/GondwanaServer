@@ -1,5 +1,6 @@
 ﻿using DOL.GS.ServerProperties;
 using DOL.Language;
+using ICSharpCode.SharpZipLib.Zip;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -43,26 +44,42 @@ namespace DOL.GS
             public string TranslatedText { get; set; }
         }
         #endregion
-
-        /// <summary>
-        /// Asynchronous translation. Returns original text on failure/disabled.
-        /// </summary>
-        public static async Task<string> TranslateAsync(string text, string fromLanguage, string toLanguage)
+        private static HttpRequestMessage? CreateRequest(string text, string fromLanguage, string toLanguage)
         {
-            if (string.IsNullOrWhiteSpace(text)) return text;
-            if (!Properties.AUTOTRANSLATE_ENABLE) return text;
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
 
-            // Circuit Breaker
-            if (DateTime.UtcNow < _disabledUntilUtc)
-                return text;
+            // Global off switch.
+            if (!Properties.AUTOTRANSLATE_ENABLE)
+                return null;
+
+            var provider = (Properties.AUTOTRANSLATE_PROVIDER ?? "google").Trim().ToLowerInvariant();
+            if (provider != "google")
+                return null;
 
             var apiKey = Properties.AUTOTRANSLATE_GOOGLE_API_KEY;
-            if (string.IsNullOrWhiteSpace(apiKey)) return text;
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                if (log.IsDebugEnabled)
+                    log.Debug("ExternalTranslator: Google API key is empty, returning original text.");
+                return null;
+            }
+
+            // If we are currently in "offline" backoff mode, don't even try to talk to Google.
+            var now = DateTime.UtcNow;
+            if (now < _disabledUntilUtc)
+            {
+                if (log.IsDebugEnabled)
+                    log.Debug($"ExternalTranslator: temporarily disabled until {_disabledUntilUtc:o}, returning original text.");
+                return null;
+            }
 
             string source = NormalizeLanguageCode(fromLanguage);
             string target = NormalizeLanguageCode(toLanguage);
 
-            if (source.Equals(target, StringComparison.OrdinalIgnoreCase)) return text;
+            // If codes are identical after normalization, no need to call API.
+            if (string.Equals(source, target, StringComparison.OrdinalIgnoreCase))
+                return null;
 
             var endpoint = Properties.AUTOTRANSLATE_GOOGLE_ENDPOINT;
             if (string.IsNullOrWhiteSpace(endpoint))
@@ -75,33 +92,43 @@ namespace DOL.GS
                 new("q", text),
                 new("source", source),
                 new("target", target),
-                new("format", "text"),
+                new("format", "html"),
             ];
 
+            var req = new HttpRequestMessage(HttpMethod.Post, url);
+            var content = new FormUrlEncodedContent(contentValues);
+            req.Content = content;
+            return req;
+        }
+
+        /// <summary>
+        /// Asynchronous translation. Returns original text on failure/disabled.
+        /// </summary>
+        public static async Task<string> TranslateAsync(string text, string fromLanguage, string toLanguage)
+        {
             try
             {
-                using (var content = new FormUrlEncodedContent(contentValues))
+                using var request = CreateRequest(text, fromLanguage, toLanguage);
+                if (request is null)
+                    return null;
+
+                // This is the magic line. It awaits the network call without blocking the Server Thread.
+                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    // This is the magic line. It awaits the network call without blocking the Server Thread.
-                    var response = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
+                    TripOfflineBreaker($"HTTP {response.StatusCode}");
+                    return null;
+                }
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        TripOfflineBreaker($"HTTP {response.StatusCode}");
-                        return text;
-                    }
+                await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                var serializer = new DataContractJsonSerializer(typeof(GoogleTranslateResponse));
+                var resultObj = serializer.ReadObject(stream) as GoogleTranslateResponse;
 
-                    using (var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    {
-                        var serializer = new DataContractJsonSerializer(typeof(GoogleTranslateResponse));
-                        var resultObj = serializer.ReadObject(stream) as GoogleTranslateResponse;
-
-                        if (resultObj?.Data?.Translations is { Count: > 0 })
-                        {
-                            string result = resultObj.Data.Translations[0].TranslatedText;
-                            return WebUtility.HtmlDecode(result);
-                        }
-                    }
+                if (resultObj?.Data?.Translations is { Count: > 0 })
+                {
+                    string result = resultObj.Data.Translations[0].TranslatedText;
+                    return WebUtility.HtmlDecode(result);
                 }
             }
             catch (Exception ex)
@@ -110,7 +137,46 @@ namespace DOL.GS
                 TripOfflineBreaker(ex.Message);
             }
 
-            return text;
+            return null;
+        }
+
+        /// <summary>
+        /// Asynchronous translation. Returns original text on failure/disabled.
+        /// </summary>
+        public static string TranslateSync(string text, string fromLanguage, string toLanguage)
+        {
+            try
+            {
+                using var request = CreateRequest(text, fromLanguage, toLanguage);
+                if (request is null)
+                    return null;
+
+                // This is the magic line. It awaits the network call without blocking the Server Thread.
+                var response = _httpClient.Send(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    TripOfflineBreaker($"HTTP {response.StatusCode}");
+                    return null;
+                }
+
+                using var stream = response.Content.ReadAsStream();
+                var serializer = new DataContractJsonSerializer(typeof(GoogleTranslateResponse));
+                var resultObj = serializer.ReadObject(stream) as GoogleTranslateResponse;
+
+                if (resultObj?.Data?.Translations is { Count: > 0 })
+                {
+                    string result = resultObj.Data.Translations[0].TranslatedText;
+                    return WebUtility.HtmlDecode(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Warn($"ExternalTranslator Error: {ex.Message}");
+                TripOfflineBreaker(ex.Message);
+            }
+
+            return null;
         }
 
         private static string NormalizeLanguageCode(string lang)

@@ -15,7 +15,7 @@ namespace DOL.GS
             if (player == null || string.IsNullOrWhiteSpace(text))
                 return;
 
-            text = AutoTranslateManager.MaybeTranslateServerText(player, text);
+            text = string.Empty;  // AutoTranslateManager.MaybeTranslateServerText(player, text);
         }
 
         partial void BeforeSayTo(GamePlayer target, ref eChatLoc loc, ref string message, ref bool handled)

@@ -162,7 +162,7 @@ namespace DOL.GS.Scripts
                 {
                     try
                     {
-                        var singleTranslated = ExternalTranslator.Translate(originalKey, serverLang, playerLang);
+                        var singleTranslated = string.Empty;//;ExternalTranslator.Translate(originalKey, serverLang, playerLang);
                         if (!string.IsNullOrWhiteSpace(singleTranslated))
                             translatedKey = singleTranslated;
                     }
@@ -183,7 +183,7 @@ namespace DOL.GS.Scripts
             string translatedFull;
             try
             {
-                translatedFull = ExternalTranslator.Translate(placeholderText, serverLang, playerLang);
+                translatedFull =  string.Empty; // ExternalTranslator.Translate(placeholderText, serverLang, playerLang);
             }
             catch
             {
@@ -967,7 +967,7 @@ namespace DOL.GS.Scripts
                 string baseMsg = _body.Name + " " + text.Substring(3);
                 foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.YELL_DISTANCE))
                 {
-                    string localized = AutoTranslateManager.MaybeTranslateServerText(plr, baseMsg);
+                    string localized = string.Empty; // AutoTranslateManager.MaybeTranslateServerText(plr, baseMsg);
                     plr.Out.SendMessage(localized, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
                 }
             }

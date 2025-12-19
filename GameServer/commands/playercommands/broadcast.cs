@@ -25,6 +25,8 @@ using DOL.GS;
 using DOL.GS.ServerProperties;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -80,27 +82,29 @@ namespace DOL.GS.Commands
 
         private void Broadcast(GamePlayer player, string message)
         {
-            if ((eBroadcastType) Properties.BROADCAST_TYPE == eBroadcastType.Server)
+            var targets = GetTargets(player);
+            var senderLang = player.Client.Account.Language;
+            var senderName = player.Name;
+
+            Task.Run(async () =>
             {
-                foreach (GamePlayer p in GetTargets(player))
+                if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
-                    string finalMsg = AutoTranslateManager.MaybeTranslate(player, p, message);
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", player.Name, finalMsg), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    DiscordBot.Instance?.SendMessageBroadcast(player, message);
+                    
+                    foreach (var (p, translation) in await AutoTranslateManager.Translate(player, targets, message))
+                    {
+                        var msg = await LanguageMgr.GetAutoTranslation(p.Client.Account.Language, "Commands.Players.Broadcast.Message", player.Name, translation);
+                        p.Out.SendMessage(msg, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    }
+                    return;
                 }
-
-                DiscordBot.Instance?.SendMessageBroadcast(player, message);
-                return;
-            }
-
-            foreach (GamePlayer p in GetTargets(player))
-            {
-                if (GameServer.ServerRules.IsAllowedToUnderstand(p, player))
+                
+                foreach (var (p, translation) in await AutoTranslateManager.Translate(player, targets, message))
                 {
-                    string finalMsg = AutoTranslateManager.MaybeTranslate(player, p, message);
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", p.GetPersonalizedName(player), finalMsg), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Broadcast.Message", p.GetPersonalizedName(player), translation), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                 }
-            }
-
+            });
         }
 
         private List<GamePlayer> GetTargets(GamePlayer player)
