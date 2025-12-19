@@ -76,6 +76,19 @@ namespace DOL.GS
             return await TranslateCoreAsync(fromLang, toLang, originalText);
         }
 
+        public static async Task<string> Translate(GamePlayer receiver, string originalText)
+        {
+            if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
+                return originalText;
+
+            if (receiver is not { AutoTranslateEnabled: true })
+                return originalText;
+
+            var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+
+            return await TranslateCoreAsync(Properties.SERV_LANGUAGE, toLang, originalText);
+        }
+
         /// <summary>
         /// Retrieves translation asynchronously. 
         /// Uses Cache -> PendingTasks -> Google API.

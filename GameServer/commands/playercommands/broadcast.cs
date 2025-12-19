@@ -86,23 +86,31 @@ namespace DOL.GS.Commands
             var senderLang = player.Client.Account.Language;
             var senderName = player.Name;
 
+            if (targets.Count == 0)
+                return;
+            
             Task.Run(async () =>
             {
+                var translatedMsg = new Dictionary<GamePlayer, string>(await AutoTranslateManager.Translate(player, targets, message));
                 if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
                     DiscordBot.Instance?.SendMessageBroadcast(player, message);
                     
-                    foreach (var (p, translation) in await AutoTranslateManager.Translate(player, targets, message))
+                    var translatedKey = await LanguageMgr.GetAutoTranslationsThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [player.Name, translatedMsg.GetValueOrDefault(p, message)]);
+                    foreach (var (p, translation) in translatedKey)
                     {
-                        var msg = await LanguageMgr.GetAutoTranslation(p.Client.Account.Language, "Commands.Players.Broadcast.Message", player.Name, translation);
-                        p.Out.SendMessage(msg, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                        p.Out.SendMessage(translation, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                     }
                     return;
                 }
-                
-                foreach (var (p, translation) in await AutoTranslateManager.Translate(player, targets, message))
+
+                var translated = await LanguageMgr.GetAutoTranslationsThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [
+                    p.GetPersonalizedName(player),
+                    translatedMsg.GetValueOrDefault(p, message)
+                ]);
+                foreach (var (p, translation) in translated)
                 {
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Broadcast.Message", p.GetPersonalizedName(player), translation), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    p.Out.SendMessage(translation, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                 }
             });
         }

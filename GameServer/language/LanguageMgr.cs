@@ -525,9 +525,91 @@ namespace DOL.Language
         }
         #endregion GetLanguageDataObject
 
-        #region GetTranslation / TryGetTranslation
+        #region GetTranslation / TryGetTranslation / GetAutoTranslation
+        
+        #region TryGetTranslation
+
+        public static bool TryGetTranslation(out LanguageDataObject translation, GameClient client, ITranslatableObject obj)
+        {
+            return TryGetTranslation(out translation, (client?.Account == null ? String.Empty : client.Account.Language), obj);
+        }
+
+        public static bool TryGetTranslation(out LanguageDataObject translation, string language, ITranslatableObject obj)
+        {
+            if (obj == null)
+            {
+                translation = null;
+                return false;
+            }
+
+            if (Util.IsEmpty(language) || language == DefaultLanguage /*Use the objects base data (e.g. NPC.Name)*/)
+            {
+                translation = null;
+                return false;
+            }
+
+            translation = GetLanguageDataObject(language, obj.TranslationId, obj.TranslationIdentifier);
+            return (translation == null ? false : true);
+        }
+
+        public static bool TryGetTranslation(out string translation, GameClient client, string translationId, params object[] args)
+        {
+            bool result = TryGetTranslation(out translation, client?.Account?.Language, translationId, args);
+
+            if (client?.Account?.PrivLevel > 1 && client.Player != null && result)
+            {
+                if (client.ClientState == GameClient.eClientState.Playing)
+                {
+                    bool debug = client.Player.TempProperties.getProperty("LANGUAGEMGR-DEBUG", false);
+                    if (debug)
+                        translation = ("Id is " + translationId + " " + translation);
+                }
+            }
+
+            return result;
+        }
+
+
+
+        /// <summary>
+        /// This returns the last part of the translation text id if actual translation fails
+        /// This helps to avoid returning strings that are too long and overflow the client
+        /// When the name overflows players my not be targetable or even visible!
+        /// PLEASE DO NOT REMOVE THIS FUNCTIONALITY  - tolakram
+        /// </summary>
+        /// <param name="TranslationID"></param>
+        /// <returns></returns>
+        public static string GetTranslationErrorText(string lang, string TranslationID)
+        {
+            try
+            {
+                if (TranslationID.Contains(".") && TranslationID.TrimEnd().EndsWith(".") == false && TranslationID.StartsWith("'") == false)
+                {
+                    return lang + " " + TranslationID.Substring(TranslationID.LastIndexOf(".") + 1);
+                }
+                else
+                {
+                    // Odds are a literal string was passed with no translation, so just return the string unmodified
+                    return TranslationID;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error Getting Translation Error Text for " + lang + ":" + TranslationID, ex);
+            }
+
+            return lang + " Translation Error!";
+        }
+
+        public static bool TryGetTranslation(out string translation, string language, string translationId, params object[] args)
+        {
+            return soleInstance.TryGetTranslationImpl(out translation, ref language, translationId, ref args);
+        }
+
+        #endregion TryGetTranslation
 
         #region GetTranslation
+
         public static LanguageDataObject GetTranslation(GameClient client, ITranslatableObject obj)
         {
             LanguageDataObject translation;
@@ -568,36 +650,23 @@ namespace DOL.Language
             return translation;
         }
 
-        public static async Task<string> GetAutoTranslation(GamePlayer player, string translationId, params object[] args)
+        public static IDictionary<string, string> GetAllTranslations(string translationId, params object[] args)
         {
-            string translation = null;
-            var language = player.Client?.Account?.Language;
-            if (TryGetTranslation(out translation, language, translationId, args))
+            var dict = new Dictionary<string, string>(2);
+            foreach (string lang in GetAllSupportedLanguages())
             {
-                return translation;
+                string translation;
+                if (TryGetTranslation(out translation, lang, translationId, args))
+                    dict[lang] = translation;
             }
-
-            // No translation found in files for this language. Try auto translating from server language
-            // Unless this language is already the server language
-            if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
-            {
-                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, args))
-                {
-                    if (player.AutoTranslateEnabled)
-                    {
-                        translation = await AutoTranslateManager.TranslateCoreAsync(Properties.SERV_LANGUAGE, language, translation).ConfigureAwait(false);
-                    }
-                }
-            }
-            return translation;
+            return dict;
         }
 
-        public static async Task<string> GetAutoTranslation(GameClient client, string translationId, params object[] args)
-        {
-            return await GetAutoTranslation(client?.Player, translationId, args);
-        }
+        #endregion GetTranslation
+        
+        #region GetAutoTranslation
 
-        public static async Task<string> GetAutoTranslation(string language, string translationId, params object[] args)
+        private static async Task<string> GetAutoTranslationImpl(string language, string translationId, object[] args, bool autoTranslate, bool translateFormat)
         {
             string translation;
             if (TryGetTranslation(out translation, language, translationId, args))
@@ -609,27 +678,181 @@ namespace DOL.Language
             // Unless this language is already the server language
             if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
             {
-                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, args))
+                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, translateFormat ? args : Array.Empty<object>()))
                 {
-                    translation = await AutoTranslateManager.TranslateCoreAsync(Properties.SERV_LANGUAGE, language, translation).ConfigureAwait(false);
+                    if (autoTranslate)
+                    {
+                        var str = await AutoTranslateManager.TranslateCoreAsync(Properties.SERV_LANGUAGE, language, translation).ConfigureAwait(false);
+                        if (!string.IsNullOrEmpty(str))
+                        {
+                            translation = str;
+                        }
+
+                        if (translateFormat && args is { Length: > 0 })
+                        {
+                            try
+                            {
+                                translation = string.Format(translation, args);
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Error($"Failed to translate {translationId} to {language} with args [{string.Join(", ", args)}]: {ex}\n\tText: {translation}");
+                            }
+                        }
+                    }
                 }
             }
             return translation;
         }
+        
+        /// <summary>
+        /// Retrieves a translation from the language database, or tries to auto-translate from the default language.
+        /// </summary>
+        /// <param name="player">Player to translate for. Their preferences for auto-translation will be respected</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<string> GetAutoTranslation(GamePlayer player, string translationId, params object[] args)
+        {
+            return await GetAutoTranslationImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, false);
+        }
+        
+        /// <summary>
+        /// Retrieves a translation from the language database, or tries to auto-translate from the default language.
+        /// </summary>
+        /// <param name="player">Player to translate for. Their preferences for auto-translation will be respected</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, WILL be translated</param>
+        /// <returns></returns>
+        public static async Task<string> GetAutoTranslationWithArgs(GamePlayer player, string translationId, params object[] args)
+        {
+            return await GetAutoTranslationImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, true);
+        }
 
+        /// <summary>
+        /// Retrieves a translation from the language database, or tries to auto-translate from the default language.
+        /// </summary>
+        /// <param name="client">Player to translate for. Their preferences for auto-translation will be respected</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<string> GetAutoTranslation(GameClient client, string translationId, params object[] args)
+        {
+            return await GetAutoTranslation(client?.Player, translationId, args);
+        }
+
+        /// <summary>
+        /// Retrieves a translation from the language database, or tries to auto-translate from the default language.
+        /// </summary>
+        /// <param name="client">Player to translate for. Their preferences for auto-translation will be respected</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will translated</param>
+        /// <returns></returns>
+        public static async Task<string> GetAutoTranslationWithArgs(GameClient client, string translationId, params object[] args)
+        {
+            return await GetAutoTranslationWithArgs(client?.Player, translationId, args);
+        }
+
+        /// <summary>
+        /// Retrieves a translation from the language database, or tries to auto-translate from the default language.
+        /// </summary>
+        /// <param name="language">Language to translate to</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<string> GetAutoTranslation(string language, string translationId, params object[] args)
+        {
+            return await GetAutoTranslationImpl(language, translationId, args, true, false);
+        }
+
+        /// <summary>
+        /// Retrieves a translation from the language database, or tries to auto-translate from the default language.
+        /// </summary>
+        /// <param name="language">Language to translate to</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<string> GetAutoTranslationWithArgs(string language, string translationId, params object[] args)
+        {
+            return await GetAutoTranslationImpl(language, translationId, args, true, true);
+        }
+
+        /// <summary>
+        /// Bulk translate a key for a bunch of languages, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(string,string,object[])"/>
+        /// <param name="languages">Languages to translate to</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will NOT be translated</param>
+        /// <returns></returns>
         public static async Task<IEnumerable<KeyValuePair<string, string>>> GetAutoTranslations(IEnumerable<string> languages, string translationId, params object[] args)
         {
-            var translations = await Task.WhenAll(languages.Select(async l => new KeyValuePair<string, string>(l, await GetAutoTranslation(l, translationId, args).ConfigureAwait(false))));
-            return translations;
+            async Task<KeyValuePair<string, string>> Each(string lang)
+            {
+                var str = await GetAutoTranslation(lang, translationId, args).ConfigureAwait(false);
+                return new KeyValuePair<string, string>(lang, str);
+            }
+
+            return await Task.WhenAll(languages.Select(Each)).ConfigureAwait(false);
         }
 
-        public static async Task<IEnumerable<KeyValuePair<string, string>>> GetAutoTranslations(IEnumerable<string> languages, string translationId, Func<string, object[]> getArgs)
-        {
-            var translations = await Task.WhenAll(languages.Select(async l => new KeyValuePair<string, string>(l, await GetAutoTranslation(l, translationId, getArgs.Invoke(l)).ConfigureAwait(false))));
-            return translations;
-        }
-
+        /// <summary>
+        /// Bulk translate a key for a bunch of players, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(GamePlayer,string,object[])"/>
+        /// <param name="players">Players to translate for</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="args">Formatting arguments, will NOT be translated</param>
+        /// <returns></returns>
         public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslations(IEnumerable<GamePlayer> players, string translationId, params object[] args)
+        {
+            return await GetAutoTranslationsThenFormat(players, translationId, (string _) => args);
+        }
+        
+        /// <summary>
+        /// Bulk translate a key for a bunch of languages, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(string,string,object[])"/>
+        /// <param name="languages">Languages to translate to</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<KeyValuePair<string, string>>> GetAutoTranslationsThenFormat(IEnumerable<string> languages, string translationId, Func<string, object[]> getArgs)
+        {
+            var selector = async (string lang) => new KeyValuePair<string, string>(lang, await GetAutoTranslation(lang, translationId, getArgs.Invoke(lang)).ConfigureAwait(false));
+            var translations = await Task.WhenAll(languages.Select(selector)).ConfigureAwait(false);
+            return translations;
+        }
+        
+        /// <summary>
+        /// Bulk translate a key for a bunch of languages, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(string,string,object[])"/>
+        /// <param name="languages">Languages to translate to</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<KeyValuePair<string, string>>> GetAutoTranslationsThenFormat(IEnumerable<string> languages, string translationId, Func<string, Task<object[]>> getArgs)
+        {
+            async Task<KeyValuePair<string, string>> Each(string lang)
+            {
+                var args = await getArgs.Invoke(lang).ConfigureAwait(false);
+                var str = await GetAutoTranslation(lang, translationId, args).ConfigureAwait(false);
+                return new KeyValuePair<string, string>(lang, str);
+            }
+
+            return await Task.WhenAll(languages.Select(Each)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Bulk translate a key for a bunch of players, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(GamePlayer,string,object[])"/>
+        /// <param name="players">Players to translate for</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslationsThenFormat(IEnumerable<GamePlayer> players, string translationId, Func<string, object[]> getArgs)
         {
             Dictionary<string, string> translations = new();
             Dictionary<string, string> noTranslations = new();
@@ -643,14 +866,28 @@ namespace DOL.Language
                     }
                     else
                     {
-                        noTranslations[lang] = GetTranslation(lang, translationId, args);
+                        noTranslations[lang] = GetTranslation(lang, translationId, getArgs.Invoke(lang));
                     }
                 }
             }
 
-            foreach (var (l, t) in await GetAutoTranslations(translations.Keys, translationId, args).ConfigureAwait(false))
+            foreach (var (lang, t) in await GetAutoTranslations(translations.Keys, translationId).ConfigureAwait(false))
             {
-                translations[l] = t;
+                var str = t;
+                var args = getArgs.Invoke(lang);
+                if (args is { Length: > 0 })
+                {
+                    try
+                    {
+                        str = string.Format(str, args);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error($"Failed to translate {translationId} to ({lang}) with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
+                        str = $"#ERROR: {lang} {translationId}";
+                    }
+                }
+                translations[lang] = str;
             }
 
             return players.Select(p =>
@@ -671,45 +908,69 @@ namespace DOL.Language
             }).ToArray();
         }
 
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslations(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
+        /// <summary>
+        /// Bulk translate a key for a bunch of players, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(DOL.GS.GamePlayer,string,object[])"/>
+        /// <param name="players">Players to translate for</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="getArgs">Func supplying formatting arguments per player, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslationsThenFormat(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
         {
-            List<KeyValuePair<GamePlayer, string>> translations = new();
-            List<Task<KeyValuePair<GamePlayer, string>>> tasks = new();
-            foreach (var p in players)
+            var translations = await GetAutoTranslations(players, translationId);
+            return translations.Select(kv =>
             {
-                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
+                object[]? args = null;
+                var (p, str) = kv;
+                try
                 {
-                    if (p.AutoTranslateEnabled)
-                    {
-                        async Task<KeyValuePair<GamePlayer, string>> DoTranslate()
-                        {
-                            var str = await GetAutoTranslation(p, translationId, getArgs.Invoke(p)).ConfigureAwait(false);
-                            return new KeyValuePair<GamePlayer, string>(p, str);
-                        }
-                        tasks.Add(DoTranslate());
-                    }
-                    else
-                    {
-                        translations.Add(new (p, GetTranslation(lang, translationId, getArgs.Invoke(p))));
-                    }
+                    args = getArgs.Invoke(p);
+                    if (args is { Length: > 0 })
+                        str = string.Format(str, args);
                 }
-            }
-            
-            translations.AddRange(await Task.WhenAll(tasks));
-            return translations.ToArray();
+                catch (Exception ex)
+                {
+                    log.Error($"Failed to translate {translationId} for player {p.Name} ({p.Client.Account.Language}) with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
+                    str = $"#ERROR: {p.Client.Account.Language} {translationId}";
+                }
+                return new KeyValuePair<GamePlayer, string>(p, str);
+            });
         }
 
-        public static IDictionary<string, string> GetAllTranslations(string translationId, params object[] args)
+        /// <summary>
+        /// Bulk translate a key for a bunch of players, don't translate format arguments.
+        /// </summary>
+        /// <see cref="GetAutoTranslation(DOL.GS.GamePlayer,string,object[])"/>
+        /// <param name="players">Players to translate for</param>
+        /// <param name="translationId">Translation key to translate</param>
+        /// <param name="getArgs">Func supplying formatting arguments per player, will NOT be translated</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> GetAutoTranslationsThenFormat(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, Task<object[]>> getArgs)
         {
-            var dict = new Dictionary<string, string>(2);
-            foreach (string lang in GetAllSupportedLanguages())
+            var translations = await GetAutoTranslations(players, translationId);
+            return await Task.WhenAll(translations.Select(async kv =>
             {
-                string translation;
-                if (TryGetTranslation(out translation, lang, translationId, args))
-                    dict[lang] = translation;
-            }
-            return dict;
+                object[]? args = null;
+                var (p, str) = kv;
+                try
+                {
+                    args = await getArgs.Invoke(p);
+                    if (args is { Length: > 0 })
+                        str = string.Format(str, args);
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"Failed to translate {translationId} with args {args} for player {p.Name}: {ex}\n\tText: {str}");
+                    str = $"#ERROR: {p.Client.Account.Language} {translationId}";
+                }
+                return new KeyValuePair<GamePlayer, string>(p, str);
+            }));
         }
+        
+        #endregion GetAutoTranslations
+        
+        #region Miscellaneous Translations
 
         public static string GetDamageTypeNoun(string language, eDamageType resist)
         {
@@ -995,89 +1256,10 @@ namespace DOL.Language
         {
             return GetDamageTypeNoun(language, GlobalConstants.GetDamageTypeForResist(resist));
         }
-        #endregion GetTranslation
+        
+        #endregion Miscellaneous Translations
 
-        #region TryGetTranslation
-        public static bool TryGetTranslation(out LanguageDataObject translation, GameClient client, ITranslatableObject obj)
-        {
-            return TryGetTranslation(out translation, (client?.Account == null ? String.Empty : client.Account.Language), obj);
-        }
-
-        public static bool TryGetTranslation(out LanguageDataObject translation, string language, ITranslatableObject obj)
-        {
-            if (obj == null)
-            {
-                translation = null;
-                return false;
-            }
-
-            if (Util.IsEmpty(language) || language == DefaultLanguage /*Use the objects base data (e.g. NPC.Name)*/)
-            {
-                translation = null;
-                return false;
-            }
-
-            translation = GetLanguageDataObject(language, obj.TranslationId, obj.TranslationIdentifier);
-            return (translation == null ? false : true);
-        }
-
-        public static bool TryGetTranslation(out string translation, GameClient client, string translationId, params object[] args)
-        {
-            bool result = TryGetTranslation(out translation, client?.Account?.Language, translationId, args);
-
-            if (client?.Account?.PrivLevel > 1 && client.Player != null && result)
-            {
-                if (client.ClientState == GameClient.eClientState.Playing)
-                {
-                    bool debug = client.Player.TempProperties.getProperty("LANGUAGEMGR-DEBUG", false);
-                    if (debug)
-                        translation = ("Id is " + translationId + " " + translation);
-                }
-            }
-
-            return result;
-        }
-
-
-
-        /// <summary>
-        /// This returns the last part of the translation text id if actual translation fails
-        /// This helps to avoid returning strings that are too long and overflow the client
-        /// When the name overflows players my not be targetable or even visible!
-        /// PLEASE DO NOT REMOVE THIS FUNCTIONALITY  - tolakram
-        /// </summary>
-        /// <param name="TranslationID"></param>
-        /// <returns></returns>
-        public static string GetTranslationErrorText(string lang, string TranslationID)
-        {
-            try
-            {
-                if (TranslationID.Contains(".") && TranslationID.TrimEnd().EndsWith(".") == false && TranslationID.StartsWith("'") == false)
-                {
-                    return lang + " " + TranslationID.Substring(TranslationID.LastIndexOf(".") + 1);
-                }
-                else
-                {
-                    // Odds are a literal string was passed with no translation, so just return the string unmodified
-                    return TranslationID;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error Getting Translation Error Text for " + lang + ":" + TranslationID, ex);
-            }
-
-            return lang + " Translation Error!";
-        }
-
-
-        public static bool TryGetTranslation(out string translation, string language, string translationId, params object[] args)
-        {
-            return soleInstance.TryGetTranslationImpl(out translation, ref language, translationId, ref args);
-        }
-        #endregion TryGetTranslation
-
-        #endregion GetTranslation / TryGetTranslation
+        #endregion GetTranslation / TryGetTranslation / GetAutoTranslation
 
         #region utils
 
