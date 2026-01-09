@@ -96,8 +96,6 @@ namespace DOL.GS
 
         private List<Style> _counterAttackStyles = new();
 
-        public static readonly string AUTOTRANSLATE_PROPERTY = "autotranslate_enabled";
-
         #region Client/Character/VariousFlags
 
         /// <summary>
@@ -216,8 +214,8 @@ namespace DOL.GS
         /// </summary>
         public bool AutoTranslateEnabled
         {
-            get => TempProperties.getProperty(AUTOTRANSLATE_PROPERTY, false);
-            set => TempProperties.setProperty(AUTOTRANSLATE_PROPERTY, value);
+            get;
+            set;
         }
 
         /// <summary>
@@ -14660,6 +14658,7 @@ namespace DOL.GS
             OutlawTimeStamp = DBCharacter.OutlawTimeStamp;
             m_reputation = DBCharacter.Reputation;
             m_wanted = DBCharacter.IsWanted;
+            AutoTranslateEnabled = DBCharacter.EnableAutoTranslate;
 
             //update previous version by setting timestamp
             if (Reputation < 0 && OutlawTimeStamp == 0)
@@ -14854,6 +14853,7 @@ namespace DOL.GS
                 DBCharacter.Reputation = Reputation;
                 DBCharacter.IsWanted = Wanted;
                 DBCharacter.TaskTitleFlags = (ulong)TaskTitleFlags;
+                DBCharacter.EnableAutoTranslate = AutoTranslateEnabled;
 
                 DBCharacter.ActiveWeaponSlot = (byte)((byte)ActiveWeaponSlot | (byte)ActiveQuiverSlot);
                 if (m_stuckFlag)

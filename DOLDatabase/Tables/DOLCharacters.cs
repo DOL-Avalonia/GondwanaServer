@@ -201,6 +201,7 @@ namespace DOL.Database
         private byte m_activeSaddleBags = 0;
 
         private bool m_receiveROG; // toggle receiving ROGs for the player
+        private bool m_enableAutoTranslate = false; // toggle auto translations for the player
 
         /// <summary>
         /// Create the character row in table
@@ -253,6 +254,23 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_receiveROG = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the characters option to enable auto translations
+        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public bool EnableAutoTranslate
+        {
+            get
+            {
+                return m_enableAutoTranslate;
+            }
+            set
+            {
+                Dirty = true;
+                m_enableAutoTranslate = value;
             }
         }
 
