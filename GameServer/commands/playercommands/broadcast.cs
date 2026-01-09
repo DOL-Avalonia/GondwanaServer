@@ -83,8 +83,11 @@ namespace DOL.GS.Commands
         private void Broadcast(GamePlayer player, string message)
         {
             var targets = GetTargets(player);
-            var senderLang = player.Client.Account.Language;
-            var senderName = player.Name;
+
+            if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
+            {
+                DiscordBot.Instance?.SendMessageBroadcast(player, message);
+            }
 
             if (targets.Count == 0)
                 return;
@@ -94,9 +97,10 @@ namespace DOL.GS.Commands
                 var translatedMsg = new Dictionary<GamePlayer, string>(await AutoTranslateManager.Translate(player, targets, message));
                 if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
-                    DiscordBot.Instance?.SendMessageBroadcast(player, message);
-                    
-                    var translatedKey = await LanguageMgr.GetAutoTranslationsThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [player.Name, translatedMsg.GetValueOrDefault(p, message)]);
+                    var translatedKey = await LanguageMgr.TranslateThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [
+                        player.Name,
+                        translatedMsg.GetValueOrDefault(p, message)
+                    ]);
                     foreach (var (p, translation) in translatedKey)
                     {
                         p.Out.SendMessage(translation, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
@@ -104,7 +108,7 @@ namespace DOL.GS.Commands
                     return;
                 }
 
-                var translated = await LanguageMgr.GetAutoTranslationsThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [
+                var translated = await LanguageMgr.TranslateThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [
                     p.GetPersonalizedName(player),
                     translatedMsg.GetValueOrDefault(p, message)
                 ]);
