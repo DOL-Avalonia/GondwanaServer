@@ -94,27 +94,22 @@ namespace DOL.GS.Commands
             
             Task.Run(async () =>
             {
-                var translatedMsg = new Dictionary<GamePlayer, string>(await AutoTranslateManager.Translate(player, targets, message));
+                var keyTranslator = new KeyTranslator("Commands.Players.Broadcast.Message");
                 if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
-                    var translatedKey = await LanguageMgr.Translate(targets, "Commands.Players.Broadcast.Message", (p) => [
-                        player.Name,
-                        translatedMsg.GetValueOrDefault(p, message)
-                    ]);
-                    foreach (var (p, translation) in translatedKey)
+                    var tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.Name, msg]);
+                    foreach (var (p, str) in await Task.WhenAll(tasks))
                     {
-                        p.Out.SendMessage(translation, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                        p.Out.SendMessage(str, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                     }
-                    return;
                 }
-
-                var translated = await LanguageMgr.Translate(targets, "Commands.Players.Broadcast.Message", (p) => [
-                    p.GetPersonalizedName(player),
-                    translatedMsg.GetValueOrDefault(p, message)
-                ]);
-                foreach (var (p, translation) in translated)
+                else
                 {
-                    p.Out.SendMessage(translation, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    var tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.GetPersonalizedName(player), msg]);
+                    foreach (var (p, str) in await Task.WhenAll(tasks))
+                    {
+                        p.Out.SendMessage(str, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    }
                 }
             });
         }

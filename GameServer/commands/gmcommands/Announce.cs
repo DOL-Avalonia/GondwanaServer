@@ -123,12 +123,15 @@ namespace DOL.GS.Commands
             Task.Run(async () =>
             {
                 var players = targets.Select(c => c.Player);
-                var messages = new Dictionary<GamePlayer, string>(await AutoTranslateManager.Translate(sender, players, message));
-                var keys = new Dictionary<GamePlayer, string>(await LanguageMgr.Translate(players, translationId));
-                foreach (var p in players)
+                var translator = new KeyTranslator(translationId);
+                var tasks = players.AutoTranslate(message, sender).Select(async t =>
                 {
-                    var msg = messages.GetValueOrDefault(p, message);
-                    keys.TryGetValue(p, out var key);
+                    var (p, msg) = await t;
+                    var key = await translator.Translate(p);
+                    return (p, key, msg);
+                });
+                foreach (var (p, key, msg) in await Task.WhenAll(tasks))
+                {
                     handler(p, key, msg);
                 }
             });

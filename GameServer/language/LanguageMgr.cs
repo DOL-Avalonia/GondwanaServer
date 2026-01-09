@@ -17,32 +17,238 @@
  *
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-
 using DOL.Database;
 using DOL.GS;
-using log4net;
-using System.Diagnostics;
-using System.Transactions;
-using System.Numerics;
-using System.Linq;
 using DOL.GS.Finance;
 using DOL.GS.Geometry;
 using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
 using DOL.GS.Styles;
+using log4net;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Transactions;
 using static DOL.GS.Spells.IllusionSpell;
+using static DOL.Language.LanguageMgr;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DOL.Language
 {
+    public class KeyTranslator
+    {
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+
+        private readonly IDictionary<string, string> m_translations;
+        private readonly IDictionary<string, Task<string>> m_autoTranslations;
+
+        public string TranslationKey
+        {
+            get;
+            init;
+        }
+
+        public string OriginalLanguage
+        {
+            get;
+            init;
+        }
+
+        public string OriginalText
+        {
+            get;
+            init;
+        }
+
+        public KeyTranslator(string translationKey, bool threadSafe = true)
+        {
+            TranslationKey = translationKey;
+            OriginalLanguage = LanguageMgr.DefaultLanguage;
+            OriginalText = LanguageMgr.GetTranslation(OriginalLanguage, translationKey);
+            m_translations = threadSafe ? new ConcurrentDictionary<string, string>() : new Dictionary<string, string>();
+            m_autoTranslations = threadSafe ? new ConcurrentDictionary<string, Task<string>>() : new Dictionary<string, Task<string>>();
+            m_translations[OriginalLanguage] = OriginalText;
+        }
+
+        private async Task<string> TranslateImpl(string langTo, bool autoTranslate)
+        {
+            langTo = LanguageMgr.NormalizeLang(langTo);
+            if (!m_translations.TryGetValue(langTo, out string translation))
+            {
+                if (LanguageMgr.TryGetTranslation(out string staticTranslation, langTo, TranslationKey))
+                {
+                    translation = staticTranslation;
+                    m_translations[langTo] = staticTranslation;
+                }
+                else if (autoTranslate)
+                {
+                    if (!m_autoTranslations.TryGetValue(langTo, out Task<string> autoTranslation))
+                    {
+                        // TODO: Race condition here, does it matter?
+                        autoTranslation = AutoTranslateManager.Translate(OriginalLanguage, langTo, OriginalText);
+                        m_autoTranslations[langTo] = autoTranslation;
+                    }
+                    var result = await autoTranslation;
+                    translation = !string.IsNullOrEmpty(result) ? result : OriginalText;
+                }
+            }
+            return translation;
+        }
+
+        public async Task<string> Translate(string langTo, params object[] args)
+        {
+            var str = await TranslateImpl(langTo, true);
+
+            if (string.IsNullOrEmpty(str))
+                return str;
+                
+            if (args is { Length: > 0 })
+            {
+                try
+                {
+                    str = string.Format(str, args);
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"Failed to translate {TranslationKey} to {langTo} with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
+                }
+            }
+            return str;
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: {0}"
+        /// </summary>
+        /// <param name="receivers">Players to translate for</param>
+        /// <param name="inputLang">Language of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <param name="formatArgsSupplier">Function to format with</param>
+        /// <returns></returns>
+        public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> TranslatePlayerInput(IEnumerable<GamePlayer> receivers, string inputLang, string inputText, Func<GamePlayer, string, object[]> formatArgsSupplier)
+        {
+            AutoTranslator msgTranslator = new(lang: inputLang, text: inputText);
+            return receivers.Select(async p =>
+            {
+                var results = await Task.WhenAll(Translate(p), msgTranslator.Translate(p)).ConfigureAwait(false);
+                return new KeyValuePair<GamePlayer, string>(p, string.Format(results[0], formatArgsSupplier(p, results[1])));
+            });
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: hablo español"
+        /// </summary>
+        /// <param name="receivers">Players to translate for</param>
+        /// <param name="inputLang">Language of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <returns></returns>
+        public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> TranslatePlayerInput(IEnumerable<GamePlayer> receivers, string inputLang, string inputText)
+        {
+            return TranslatePlayerInput(receivers, inputLang, inputText, (_, msg) => [msg]);
+        }
+
+        public async Task<string> Translate([NotNull] GamePlayer receiver, params object[] args)
+        {
+            var langTo = receiver.Client?.Account?.Language;
+            var str = await TranslateImpl(langTo, receiver.AutoTranslateEnabled);
+
+            if (string.IsNullOrEmpty(str))
+                return str;
+                
+            if (args is { Length: > 0 })
+            {
+                try
+                {
+                    str = string.Format(str, args);
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"Failed to translate {TranslationKey} to {langTo} with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
+                }
+            }
+            return str;
+        }
+
+        public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> receivers, params object[] args)
+        {
+            if (args is { Length: > 0 })
+            {
+                return receivers.Select(async p =>
+                {
+                    var str = await Translate(p);
+                    return new KeyValuePair<GamePlayer, string>(p, string.Format(str, args));
+                });
+            }
+            else
+            {
+                return receivers.Select(async p =>
+                {
+                    var str = await Translate(p);
+                    return new KeyValuePair<GamePlayer, string>(p, str);
+                });
+            }
+        }
+    }
+
+    public static class LanguageHelpers
+    {
+        public static IEnumerable<Task<T>> Translate<T>(this IEnumerable<GamePlayer> players, string translationKey, Func<GamePlayer, string, T> selector, bool threadSafe = true)
+        {
+            var translator = new KeyTranslator(translationKey, threadSafe);
+            return players.Select(async p => selector(p, await translator.Translate(p)));
+        }
+
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(this IEnumerable<GamePlayer> players, string translationKey, bool threadSafe = true)
+        {
+            return Translate(players, translationKey, (p, str) => new KeyValuePair<GamePlayer, string>(p, str), threadSafe);
+        }
+
+        public static IEnumerable<Task<T>> AutoTranslate<T>(this IEnumerable<GamePlayer> players, string input, string inputLang, Func<GamePlayer, string, T> selector, bool threadSafe = true)
+        {
+            if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(input))
+                return players.Select(p => Task.FromResult(selector(p, input)));
+
+            var translator = new AutoTranslator(lang: inputLang, text: input, threadSafe);
+            return players.Select(async p =>
+            {
+                string translated = input;
+                if (p.AutoTranslateEnabled)
+                {
+                    translated = await translator.Translate(p);
+                }
+                return selector(p, translated);
+            });
+        }
+
+        public static IEnumerable<Task<T>> AutoTranslate<T>(this IEnumerable<GamePlayer> players, string input, GamePlayer source, Func<GamePlayer, string, T> selector, bool threadSafe = true)
+        {
+            return AutoTranslate(players, input, source.Client?.Account?.Language, selector, threadSafe);
+        }
+
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> AutoTranslate(this IEnumerable<GamePlayer> players, string input, string inputLang, bool threadSafe = true)
+        {
+            return AutoTranslate(players, input, inputLang, (p, str) => new KeyValuePair<GamePlayer, string>(p, str), threadSafe);
+        }
+
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> AutoTranslate(this IEnumerable<GamePlayer> players, string input, GamePlayer source, bool threadSafe = true)
+        {
+            return AutoTranslate(players, input, source.Client?.Account?.Language, (p, str) => new KeyValuePair<GamePlayer, string>(p, str), threadSafe);
+        }
+    }
+    
     public class LanguageMgr
     {
         private static LanguageMgr soleInstance = new LanguageMgr();
@@ -53,6 +259,20 @@ namespace DOL.Language
         public static string[] GetAllSupportedLanguages()
         {
             return new[] { ENGLISH, FRENCH };
+        }
+
+        public static string NormalizeLang(string lang)
+        {
+            if (string.IsNullOrWhiteSpace(lang))
+            {
+                lang = LanguageMgr.DefaultLanguage;
+                if (string.IsNullOrEmpty(lang))
+                    return "EN";
+            }
+            int sep = lang.IndexOfAny(new[] { '-', '_' });
+            if (sep > 0)
+                lang = lang.Substring(0, sep);
+            return lang.ToUpperInvariant();
         }
 
         public static void LoadTestDouble(LanguageMgr testDouble) { soleInstance = testDouble; }
