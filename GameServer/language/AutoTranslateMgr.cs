@@ -6,6 +6,7 @@ using DOL.GS.ServerProperties;
 using DOL.Language;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace DOL.GS
@@ -59,15 +60,15 @@ namespace DOL.GS
         private const int MaxCacheEntries = 20000;
 
         /// <summary>
-        /// Retrieves translation asynchronously. 
+        /// Retrieves auto-translation asynchronously. 
         /// Uses Cache -> PendingTasks -> Google API.
         /// </summary>
-        public static async Task<string> Translate(GamePlayer sender, GamePlayer receiver, string originalText)
+        public static async Task<string> Translate(GamePlayer? sender, [NotNull] GamePlayer receiver, string originalText)
         {
             if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
                 return originalText;
 
-            if (receiver is not { AutoTranslateEnabled: true })
+            if (!receiver.AutoTranslateEnabled)
                 return originalText;
 
             var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
@@ -76,69 +77,58 @@ namespace DOL.GS
             return await TranslateCoreAsync(fromLang, toLang, originalText);
         }
 
-        public static async Task<string> Translate(GamePlayer receiver, string originalText)
+        /// <summary>
+        /// Retrieves auto-translation asynchronously. 
+        /// Uses Cache -> PendingTasks -> Google API.
+        /// </summary>
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(string fromLang, IEnumerable<GamePlayer> receivers, string originalText)
         {
             if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
-                return originalText;
+                return receivers.Select(p => new KeyValuePair<GamePlayer, string>(p, originalText));
 
-            if (receiver is not { AutoTranslateEnabled: true })
-                return originalText;
+            var translations = new Dictionary<string, Task<string>>();
+            async Task<KeyValuePair<GamePlayer, string>> Each(GamePlayer receiver)
+            {
+                string ret = originalText;
+                if (receiver.AutoTranslateEnabled)
+                {
+                    var toLang = NormalizeLang(receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage);
+                    if (!translations.TryGetValue(toLang, out var task))
+                    {
+                        task = TranslateCoreAsync(fromLang, toLang, originalText);
+                        translations[toLang] = task;
+                    }
+                    ret = await task.ConfigureAwait(false);
+                }
+                return new(receiver, ret);
+            }
 
-            var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
-
-            return await TranslateCoreAsync(Properties.SERV_LANGUAGE, toLang, originalText);
+            return await Task.WhenAll(receivers.Select(Each)).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Retrieves translation asynchronously. 
+        /// Retrieves auto-translation asynchronously. 
         /// Uses Cache -> PendingTasks -> Google API.
         /// </summary>
-        public static async Task<KeyValuePair<GamePlayer, string>[]> Translate(GamePlayer sender, IEnumerable<GamePlayer> receivers, string originalText)
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(GamePlayer sender, IEnumerable<GamePlayer> receivers, string originalText)
         {
-            if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
-                return receivers.Select(p => new KeyValuePair<GamePlayer, string>(p, originalText)).ToArray();
+            var fromLang = sender?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+            return await Translate(fromLang, receivers, originalText).ConfigureAwait(false);
+        }
 
-            Dictionary<string, string> translations = new();
-            Dictionary<string, string> noTranslations = new();
-            foreach (var p in receivers)
-            {
-                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
-                {
-                    if (p.AutoTranslateEnabled)
-                    {
-                        translations[lang] = null;
-                    }
-                    else
-                    {
-                        noTranslations[lang] = originalText;
-                    }
-                }
-            }
+        /// <summary>
+        /// Retrieves auto-translation asynchronously. 
+        /// Uses Cache -> PendingTasks -> Google API.
+        /// </summary>
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> receivers, string originalText)
+        {
+            var fromLang = LanguageMgr.DefaultLanguage;
+            return await Translate(fromLang, receivers, originalText).ConfigureAwait(false);
+        }
 
-            string sourceLang = sender?.Client?.Account?.Language ?? Properties.SERV_LANGUAGE;
-            var results = await Task.WhenAll(translations.Keys.Select(async lang => new KeyValuePair<string, string>(lang, await TranslateCoreAsync(sourceLang, lang, originalText)))).ConfigureAwait(false);
-
-            foreach (var (l, t) in results)
-            {
-                translations[l] = t;
-            }
-
-            return receivers.Select(p =>
-            {
-                string translation = null;
-                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
-                {
-                    if (p.AutoTranslateEnabled)
-                    {
-                        translation = translations.GetValueOrDefault(lang);
-                    }
-                    else
-                    {
-                        translation = noTranslations.GetValueOrDefault(lang);
-                    }
-                }
-                return new KeyValuePair<GamePlayer, string>(p, translation);
-            }).ToArray();
+        public static string MaybeTranslate(GamePlayer sender, GamePlayer receiver, string msg)
+        {
+            return Translate(sender, receiver, msg).Result;
         }
 
         /// <summary>
@@ -191,16 +181,6 @@ namespace DOL.GS
                 // Always remove from pending list when done
                 _pendingTranslations.TryRemove(key, out _);
             }
-        }
-
-        public static string MaybeTranslate(GamePlayer sender, GamePlayer receiver, string text)
-        {
-            return Translate(sender, receiver, text).Result;
-        }
-
-        public static string MaybeTranslate(string sender, string receiver, string text)
-        {
-            return TranslateCoreAsync(sender, receiver, text).Result;
         }
 
         private static string NormalizeLang(string lang)

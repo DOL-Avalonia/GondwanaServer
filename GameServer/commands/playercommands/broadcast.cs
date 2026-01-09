@@ -97,7 +97,7 @@ namespace DOL.GS.Commands
                 var translatedMsg = new Dictionary<GamePlayer, string>(await AutoTranslateManager.Translate(player, targets, message));
                 if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
-                    var translatedKey = await LanguageMgr.TranslateThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [
+                    var translatedKey = await LanguageMgr.Translate(targets, "Commands.Players.Broadcast.Message", (p) => [
                         player.Name,
                         translatedMsg.GetValueOrDefault(p, message)
                     ]);
@@ -108,7 +108,7 @@ namespace DOL.GS.Commands
                     return;
                 }
 
-                var translated = await LanguageMgr.TranslateThenFormat(targets, "Commands.Players.Broadcast.Message", (p) => [
+                var translated = await LanguageMgr.Translate(targets, "Commands.Players.Broadcast.Message", (p) => [
                     p.GetPersonalizedName(player),
                     translatedMsg.GetValueOrDefault(p, message)
                 ]);

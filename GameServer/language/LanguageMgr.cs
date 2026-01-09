@@ -721,7 +721,7 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<string> TranslateThenFormat(GamePlayer player, string translationId, params object[] args)
+        public static async Task<string> Translate(GamePlayer player, string translationId, params object[] args)
         {
             return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, false);
         }
@@ -745,9 +745,9 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<string> TranslateThenFormat(GameClient client, string translationId, params object[] args)
+        public static async Task<string> Translate(GameClient client, string translationId, params object[] args)
         {
-            return await TranslateThenFormat(client?.Player, translationId, args);
+            return await Translate(client?.Player, translationId, args);
         }
 
         /// <summary>
@@ -769,7 +769,7 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<string> TranslateThenFormat(string language, string translationId, params object[] args)
+        public static async Task<string> Translate(string language, string translationId, params object[] args)
         {
             return await TranslateImpl(language, translationId, args, true, false);
         }
@@ -789,7 +789,7 @@ namespace DOL.Language
         /// <summary>
         /// Bulk translate a key for a bunch of languages, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(string,string,object[])"/>
+        /// <see cref="Translate(string,string,object[])"/>
         /// <param name="languages">Languages to translate to</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
@@ -798,7 +798,7 @@ namespace DOL.Language
         {
             async Task<KeyValuePair<string, string>> Each(string lang)
             {
-                var str = await TranslateThenFormat(lang, translationId, args).ConfigureAwait(false);
+                var str = await Translate(lang, translationId, args).ConfigureAwait(false);
                 return new KeyValuePair<string, string>(lang, str);
             }
 
@@ -808,27 +808,27 @@ namespace DOL.Language
         /// <summary>
         /// Bulk translate a key for a bunch of players, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(DOL.GS.GamePlayer,string,object[])"/>
+        /// <see cref="Translate(DOL.GS.GamePlayer,string,object[])"/>
         /// <param name="players">Players to translate for</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
         /// <returns></returns>
         public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, params object[] args)
         {
-            return await TranslateThenFormat(players, translationId, (string _) => args);
+            return await Translate(players, translationId, (string _) => args);
         }
         
         /// <summary>
         /// Bulk translate a key for a bunch of languages, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(string,string,object[])"/>
+        /// <see cref="Translate(string,string,object[])"/>
         /// <param name="languages">Languages to translate to</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<string, string>>> TranslateThenFormat(IEnumerable<string> languages, string translationId, Func<string, object[]> getArgs)
+        public static async Task<IEnumerable<KeyValuePair<string, string>>> Translate(IEnumerable<string> languages, string translationId, Func<string, object[]> getArgs)
         {
-            var selector = async (string lang) => new KeyValuePair<string, string>(lang, await TranslateThenFormat(lang, translationId, getArgs.Invoke(lang)).ConfigureAwait(false));
+            var selector = async (string lang) => new KeyValuePair<string, string>(lang, await Translate(lang, translationId, getArgs.Invoke(lang)).ConfigureAwait(false));
             var translations = await Task.WhenAll(languages.Select(selector)).ConfigureAwait(false);
             return translations;
         }
@@ -836,17 +836,17 @@ namespace DOL.Language
         /// <summary>
         /// Bulk translate a key for a bunch of languages, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(string,string,object[])"/>
+        /// <see cref="Translate(string,string,object[])"/>
         /// <param name="languages">Languages to translate to</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<string, string>>> TranslateThenFormat(IEnumerable<string> languages, string translationId, Func<string, Task<object[]>> getArgs)
+        public static async Task<IEnumerable<KeyValuePair<string, string>>> Translate(IEnumerable<string> languages, string translationId, Func<string, Task<object[]>> getArgs)
         {
             async Task<KeyValuePair<string, string>> Each(string lang)
             {
                 var args = await getArgs.Invoke(lang).ConfigureAwait(false);
-                var str = await TranslateThenFormat(lang, translationId, args).ConfigureAwait(false);
+                var str = await Translate(lang, translationId, args).ConfigureAwait(false);
                 return new KeyValuePair<string, string>(lang, str);
             }
 
@@ -856,12 +856,12 @@ namespace DOL.Language
         /// <summary>
         /// Bulk translate a key for a bunch of players, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(DOL.GS.GamePlayer,string,object[])"/>
+        /// <see cref="Translate(DOL.GS.GamePlayer,string,object[])"/>
         /// <param name="players">Players to translate for</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> TranslateThenFormat(IEnumerable<GamePlayer> players, string translationId, Func<string, object[]> getArgs)
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<string, object[]> getArgs)
         {
             Dictionary<string, string> translations = new();
             Dictionary<string, string> noTranslations = new();
@@ -923,12 +923,12 @@ namespace DOL.Language
         /// <summary>
         /// Bulk translate a key for a bunch of players, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(DOL.GS.GamePlayer,string,object[])"/>
+        /// <see cref="Translate(DOL.GS.GamePlayer,string,object[])"/>
         /// <param name="players">Players to translate for</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per player, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> TranslateThenFormat(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
         {
             var translations = await Translate(players, translationId);
             return translations.Select(kv =>
@@ -956,12 +956,12 @@ namespace DOL.Language
         /// <summary>
         /// Bulk translate a key for a bunch of players, don't translate format arguments.
         /// </summary>
-        /// <see cref="TranslateThenFormat(DOL.GS.GamePlayer,string,object[])"/>
+        /// <see cref="Translate(DOL.GS.GamePlayer,string,object[])"/>
         /// <param name="players">Players to translate for</param>
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per player, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> TranslateThenFormat(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, Task<object[]>> getArgs)
+        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, Task<object[]>> getArgs)
         {
             var translations = await Translate(players, translationId);
             return await Task.WhenAll(translations.Select(async kv =>
