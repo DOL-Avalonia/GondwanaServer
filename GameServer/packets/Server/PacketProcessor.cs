@@ -335,75 +335,75 @@ namespace DOL.GS.PacketHandler
                 return;
 
             //Check if client is connected
-            if (m_client.Socket.Connected)
+            if (!m_client.Socket.Connected)
+                return;
+
+            if (log.IsDebugEnabled)
+                log.Debug(Marshal.ToHexDump(
+                              string.Format("<=== <{2}> Packet 0x{0:X2} (0x{1:X2}) length: {3}", buf[2], buf[2] ^ 168,
+                                            (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length),
+                              buf));
+
+            if (buf.Length > 2048)
             {
-                if (log.IsDebugEnabled)
-                    log.Debug(Marshal.ToHexDump(
-                                  string.Format("<=== <{2}> Packet 0x{0:X2} (0x{1:X2}) length: {3}", buf[2], buf[2] ^ 168,
-                                                (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length),
-                                  buf));
-
-                if (buf.Length > 2048)
+                if (log.IsErrorEnabled)
                 {
-                    if (log.IsErrorEnabled)
-                    {
-                        string desc =
-                            String.Format(
-                                "Sending packets longer than 2048 cause client to crash, check Log for stacktrace. Packet code: 0x{0:X2}, account: {1}, packet size: {2}.",
-                                buf[2], (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length);
-                        log.Error(Marshal.ToHexDump(desc, buf) + "\n" + Environment.StackTrace);
+                    string desc =
+                        String.Format(
+                            "Sending packets longer than 2048 cause client to crash, check Log for stacktrace. Packet code: 0x{0:X2}, account: {1}, packet size: {2}.",
+                            buf[2], (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length);
+                    log.Error(Marshal.ToHexDump(desc, buf) + "\n" + Environment.StackTrace);
 
-                        if (Properties.IGNORE_TOO_LONG_OUTCOMING_PACKET)
-                        {
-                            log.Error("ALERT: Oversize packet detected and discarded.");
-                            m_client.Out.SendMessage("ALERT: Error sending an update to your client. Oversize packet detected and discarded. Please /report this issue!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
-                        }
-                        else
-                        {
-                            GameServer.Instance.Disconnect(m_client);
-                        }
+                    if (Properties.IGNORE_TOO_LONG_OUTCOMING_PACKET)
+                    {
+                        log.Error("ALERT: Oversize packet detected and discarded.");
+                        m_client.Out.SendMessage("ALERT: Error sending an update to your client. Oversize packet detected and discarded. Please /report this issue!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                    }
+                    else
+                    {
+                        GameServer.Instance.Disconnect(m_client);
+                    }
+                    return;
+                }
+            }
+
+            m_encoding.EncryptPacket(buf, 0, false);
+
+            try
+            {
+                var packetLength = (buf[0] << 8) + buf[1] + 3;
+                Statistics.BytesOut += packetLength;
+                Statistics.PacketsOut++;
+
+                lock (((ICollection)m_tcpQueue).SyncRoot)
+                {
+                    if (m_sendingTcp)
+                    {
+                        m_tcpQueue.Enqueue(buf);
                         return;
                     }
+
+                    m_sendingTcp = true;
                 }
 
-                m_encoding.EncryptPacket(buf, 0, false);
+                Buffer.BlockCopy(buf, 0, m_tcpSendBuffer, 0, packetLength);
 
-                try
-                {
-                    var packetLength = (buf[0] << 8) + buf[1] + 3;
-                    Statistics.BytesOut += packetLength;
-                    Statistics.PacketsOut++;
+                var start = GameTimer.GetTickCount();
 
-                    lock (((ICollection)m_tcpQueue).SyncRoot)
-                    {
-                        if (m_sendingTcp)
-                        {
-                            m_tcpQueue.Enqueue(buf);
-                            return;
-                        }
+                m_client.Socket.BeginSend(m_tcpSendBuffer, 0, packetLength, SocketFlags.None, m_asyncTcpCallback, m_client);
 
-                        m_sendingTcp = true;
-                    }
-
-                    Buffer.BlockCopy(buf, 0, m_tcpSendBuffer, 0, packetLength);
-
-                    var start = GameTimer.GetTickCount();
-
-                    m_client.Socket.BeginSend(m_tcpSendBuffer, 0, packetLength, SocketFlags.None, m_asyncTcpCallback, m_client);
-
-                    var took = GameTimer.GetTickCount() - start;
-                    if (took > 100 && log.IsWarnEnabled)
-                        log.WarnFormat("SendTCP.BeginSend took {0}ms! (TCP to client: {1})", took, m_client);
-                }
-                catch (Exception e)
-                {
-                    // assure that no exception is thrown into the upper layers and interrupt game loops!
-                    if (log.IsWarnEnabled)
-                        log.Warn("It seems <" + ((m_client.Account != null) ? m_client.Account.Name : "???") +
-                                 "> went linkdead. Closing connection. (SendTCP, " + e.GetType() + ": " + e.Message + ")");
-                    //DOLConsole.WriteWarning(e.ToString());
-                    GameServer.Instance.Disconnect(m_client);
-                }
+                var took = GameTimer.GetTickCount() - start;
+                if (took > 100 && log.IsWarnEnabled)
+                    log.WarnFormat("SendTCP.BeginSend took {0}ms! (TCP to client: {1})", took, m_client);
+            }
+            catch (Exception e)
+            {
+                // assure that no exception is thrown into the upper layers and interrupt game loops!
+                if (log.IsWarnEnabled)
+                    log.Warn("It seems <" + ((m_client.Account != null) ? m_client.Account.Name : "???") +
+                             "> went linkdead. Closing connection. (SendTCP, " + e.GetType() + ": " + e.Message + ")");
+                //DOLConsole.WriteWarning(e.ToString());
+                GameServer.Instance.Disconnect(m_client);
             }
         }
 

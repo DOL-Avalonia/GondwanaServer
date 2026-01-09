@@ -689,7 +689,7 @@ namespace DOL.Language
             {
                 if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, translateFormatted ? args : Array.Empty<object>()))
                 {
-                    if (autoTranslate)
+                    if (autoTranslate && !string.IsNullOrEmpty(translation))
                     {
                         var str = await AutoTranslateManager.TranslateCoreAsync(Properties.SERV_LANGUAGE, language, translation).ConfigureAwait(false);
                         if (!string.IsNullOrEmpty(str))
@@ -697,7 +697,7 @@ namespace DOL.Language
                             translation = str;
                         }
 
-                        if (!translateFormatted && args is { Length: > 0 })
+                        if (!translateFormatted && args is { Length: > 0 } && !string.IsNullOrEmpty(translation))
                         {
                             try
                             {
@@ -883,17 +883,20 @@ namespace DOL.Language
             foreach (var (lang, t) in await Translate(translations.Keys, translationId).ConfigureAwait(false))
             {
                 var str = t;
-                var args = getArgs.Invoke(lang);
-                if (args is { Length: > 0 })
+                if (!string.IsNullOrEmpty(str))
                 {
-                    try
+                    var args = getArgs.Invoke(lang);
+                    if (args is { Length: > 0 })
                     {
-                        str = string.Format(str, args);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error($"Failed to translate {translationId} to ({lang}) with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
-                        str = $"#ERROR: {lang} {translationId}";
+                        try
+                        {
+                            str = string.Format(str, args);
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error($"Failed to translate {translationId} to ({lang}) with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
+                            str = $"#ERROR: {lang} {translationId}";
+                        }
                     }
                 }
                 translations[lang] = str;
@@ -932,6 +935,9 @@ namespace DOL.Language
             {
                 object[]? args = null;
                 var (p, str) = kv;
+                if (string.IsNullOrEmpty(str))
+                    return kv;
+
                 try
                 {
                     args = getArgs.Invoke(p);
@@ -962,6 +968,9 @@ namespace DOL.Language
             {
                 object[]? args = null;
                 var (p, str) = kv;
+                if (string.IsNullOrEmpty(str))
+                    return kv;
+                
                 try
                 {
                     args = await getArgs.Invoke(p);
