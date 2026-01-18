@@ -29,6 +29,7 @@ using DOL.GS.Geometry;
 using DOL.GS.Keeps;
 using DOL.GS.Housing;
 using DOL.GS.Profession;
+using System.Threading.Tasks;
 
 namespace DOL.Tests
 {
@@ -374,25 +375,29 @@ namespace DOL.Tests
         {
             if (SendGuildInviteCommandMethod != null) SendGuildInviteCommandMethod(this, invitingPlayer, inviteMessage);
         }
-        public Action<TestPacketLib, GameNPC, GamePlayer, IQuestPlayerData> SendQuestOfferWindowMethod { get; set; }
-        public void SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
+        public Func<TestPacketLib, GameNPC, GamePlayer, IQuestPlayerData, Task> SendQuestOfferWindowMethod { get; set; }
+        public Task SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
         {
-            if (SendQuestOfferWindowMethod != null) SendQuestOfferWindowMethod(this, questNPC, player, quest);
+            if (SendQuestOfferWindowMethod != null) return SendQuestOfferWindowMethod(this, questNPC, player, quest);
+            return Task.CompletedTask;
         }
-        public Action<TestPacketLib, GameNPC, GamePlayer, IQuestPlayerData> SendQuestRewardWindowMethod { get; set; }
-        public void SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
+        public Func<TestPacketLib, GameNPC, GamePlayer, IQuestPlayerData, Task> SendQuestRewardWindowMethod { get; set; }
+        public Task SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
         {
-            if (SendQuestRewardWindowMethod != null) SendQuestRewardWindowMethod(this, questNPC, player, quest);
+            if (SendQuestRewardWindowMethod != null) return SendQuestRewardWindowMethod(this, questNPC, player, quest);
+            return Task.CompletedTask;
         }
-        public Action<TestPacketLib, GameNPC, ushort, string> SendQuestSubscribeCommandMethod { get; set; }
-        public void SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage)
+        public Func<TestPacketLib, GameNPC, ushort, string, Task> SendQuestSubscribeCommandMethod { get; set; }
+        public Task SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage)
         {
-            if (SendQuestSubscribeCommandMethod != null) SendQuestSubscribeCommandMethod(this, invitingNPC, questid, inviteMessage);
+            if (SendQuestSubscribeCommandMethod != null) return SendQuestSubscribeCommandMethod(this, invitingNPC, questid, inviteMessage);
+            return Task.CompletedTask;
         }
-        public Action<TestPacketLib, GameNPC, ushort, string> SendQuestAbortCommandMethod { get; set; }
-        public void SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage)
+        public Func<TestPacketLib, GameNPC, ushort, string, Task> SendQuestAbortCommandMethod { get; set; }
+        public Task SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage)
         {
-            if (SendQuestAbortCommandMethod != null) SendQuestAbortCommandMethod(this, abortingNPC, questid, abortMessage);
+            if (SendQuestAbortCommandMethod != null) return SendQuestAbortCommandMethod(this, abortingNPC, questid, abortMessage);
+            return Task.CompletedTask;
         }
         public Action<TestPacketLib> SendGroupWindowUpdateMethod { get; set; }
         public void SendGroupWindowUpdate()
@@ -603,15 +608,17 @@ namespace DOL.Tests
         {
             if (SendObjectUpdateMethod != null) SendObjectUpdateMethod(this, obj);
         }
-        public Action<TestPacketLib> SendQuestListUpdateMethod { get; set; }
-        public void SendQuestListUpdate()
+        public Func<TestPacketLib, Task> SendQuestListUpdateMethod { get; set; }
+        public Task SendQuestListUpdate()
         {
-            if (SendQuestListUpdateMethod != null) SendQuestListUpdateMethod(this);
+            if (SendQuestListUpdateMethod != null) return SendQuestListUpdateMethod(this);
+            return Task.CompletedTask;
         }
-        public Action<TestPacketLib, IQuestPlayerData> SendQuestUpdateMethod { get; set; }
-        public void SendQuestUpdate(IQuestPlayerData quest)
+        public Func<TestPacketLib, IQuestPlayerData, Task> SendQuestUpdateMethod { get; set; }
+        public Task SendQuestUpdate(IQuestPlayerData quest)
         {
-            if (SendQuestUpdateMethod != null) SendQuestUpdateMethod(this, quest);
+            if (SendQuestUpdateMethod != null) return SendQuestUpdateMethod(this, quest);
+            return Task.CompletedTask;
         }
         public Action<TestPacketLib, int, Position> SendMapObjectiveMethod { get; set; }
         public void SendMapObjective(int id, Position pos)

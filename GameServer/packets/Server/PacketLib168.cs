@@ -43,6 +43,7 @@ using log4net;
 using DOL.GS.ServerProperties;
 using System.Numerics;
 using DOL.MobGroups;
+using System.Threading.Tasks;
 
 namespace DOL.GS.PacketHandler
 {
@@ -1495,70 +1496,68 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        public virtual void SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
+        public virtual Task SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
         {
+            return Task.CompletedTask;
         }
 
-        public virtual void SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
+        public virtual Task SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest)
         {
+            return Task.CompletedTask;
         }
 
-        protected virtual void SendQuestWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest, bool offer)
+        protected virtual Task SendQuestWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest, bool offer)
         {
-        }
-
-        // i'm reusing the questsubscribe command for quest abort since its 99% the same, only different event dets fired
-        // data 3 defines wether it's subscribe or abort
-        public virtual void SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage)
-        {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog)))
-            {
-                pak.WriteByte(0x00);
-                pak.WriteByte(0x64);
-                pak.WriteShort(questid); //questid, data1
-                pak.WriteShort((ushort)invitingNPC.ObjectID); //data2
-                pak.WriteShort(0x00); // 0x00 means subscribe data3
-                pak.WriteShort(0x00);
-                pak.WriteByte(0x01); // yes/no response
-                pak.WriteByte(0x01); // autowrap message
-                if (!string.IsNullOrEmpty(inviteMessage))
-                {
-                    var player = m_gameClient.Player;
-                    if (player != null)
-                        inviteMessage = AutoTranslateManager.MaybeTranslate(null, player, inviteMessage);
-
-                    pak.WriteString(inviteMessage, inviteMessage.Length);
-                }
-                pak.WriteByte(0x00);
-                SendTCP(pak);
-            }
+            return Task.CompletedTask;
         }
 
         // i'm reusing the questsubscribe command for quest abort since its 99% the same, only different event dets fired
         // data 3 defines wether it's subscribe or abort
-        public virtual void SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage)
+        public virtual async Task SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog)))
+            await using var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog));
+            pak.WriteByte(0x00);
+            pak.WriteByte(0x64);
+            pak.WriteShort(questid); //questid, data1
+            pak.WriteShort((ushort)invitingNPC.ObjectID); //data2
+            pak.WriteShort(0x00); // 0x00 means subscribe data3
+            pak.WriteShort(0x00);
+            pak.WriteByte(0x01); // yes/no response
+            pak.WriteByte(0x01); // autowrap message
+            if (!string.IsNullOrEmpty(inviteMessage))
             {
-                pak.WriteByte(0x00);
-                pak.WriteByte(0x64);
-                pak.WriteShort(questid); //questid, data1
-                pak.WriteShort((ushort)abortingNPC.ObjectID); //data2
-                pak.WriteShort(0x01); // 0x01 means abort data3
-                pak.WriteShort(0x00);
-                pak.WriteByte(0x01); // yes/no response
-                pak.WriteByte(0x01); // autowrap message
-                if (!string.IsNullOrEmpty(abortMessage))
-                {
-                    var player = m_gameClient.Player;
-                    if (player != null)
-                        abortMessage = AutoTranslateManager.MaybeTranslate(null, player, abortMessage);
+                var player = m_gameClient.Player;
+                inviteMessage = await AutoTranslateManager.Translate(null, player, inviteMessage);
 
-                    pak.WriteString(abortMessage, abortMessage.Length);
-                }
-                pak.WriteByte(0x00);
-                SendTCP(pak);
+                pak.WriteString(inviteMessage, inviteMessage.Length);
             }
+            pak.WriteByte(0x00);
+            SendTCP(pak);
+        }
+
+        // i'm reusing the questsubscribe command for quest abort since its 99% the same, only different event dets fired
+        // data 3 defines wether it's subscribe or abort
+        public virtual async Task SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage)
+        {
+            await using var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog));
+            pak.WriteByte(0x00);
+            pak.WriteByte(0x64);
+            pak.WriteShort(questid); //questid, data1
+            pak.WriteShort((ushort)abortingNPC.ObjectID); //data2
+            pak.WriteShort(0x01); // 0x01 means abort data3
+            pak.WriteShort(0x00);
+            pak.WriteByte(0x01); // yes/no response
+            pak.WriteByte(0x01); // autowrap message
+            if (!string.IsNullOrEmpty(abortMessage))
+            {
+                var player = m_gameClient.Player;
+                if (player != null)
+                    abortMessage = await AutoTranslateManager.MaybeTranslate(null, player, abortMessage);
+
+                pak.WriteString(abortMessage, abortMessage.Length);
+            }
+            pak.WriteByte(0x00);
+            SendTCP(pak);
         }
 
         public virtual void SendDialogBox(eDialogCode code, ushort data1, ushort data2, ushort data3, ushort data4,
@@ -1666,38 +1665,33 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        public virtual void SendQuestUpdate(IQuestPlayerData quest)
+        public virtual async Task SendQuestUpdate(IQuestPlayerData quest)
         {
-            int questIndex = 0;
-
-                foreach (var q in m_gameClient.Player.QuestList)
-                {
-                    if (q == quest)
-                    {
-                        SendQuestPacket(q, questIndex);
-                        break;
-                    }
-
-                    if (q.Status != eQuestStatus.Done)
-                        questIndex++;
-                }
+            var kv = m_gameClient.Player.QuestList
+                .Where(q => q.Status != eQuestStatus.Done)
+                .Select((quest, index) => (quest, index))
+                .FirstOrDefault(kv => kv.quest == quest);
+            if (kv.quest != null)
+            {
+                await SendQuestPacket(kv.quest, kv.index);
+            }
         }
 
         public virtual void SendMapObjective(int id, Position position)
         {
         }
 
-        public virtual void SendQuestListUpdate()
+        public virtual async Task SendQuestListUpdate()
         {
             int questIndex = 0;
-                foreach (var quest in m_gameClient.Player.QuestList)
+            foreach (var quest in m_gameClient.Player.QuestList)
+            {
+                if (quest.Status != eQuestStatus.Done)
                 {
-                    if (quest.Status != eQuestStatus.Done)
-                    {
-                        SendQuestPacket(quest, questIndex);
-                        questIndex++;
-                    }
+                    await SendQuestPacket(quest, questIndex);
+                    questIndex++;
                 }
+            }
         }
 
         public virtual void SendGroupWindowUpdate()
@@ -4068,75 +4062,74 @@ namespace DOL.GS.PacketHandler
             return 0; // ??
         }
 
-        protected virtual void SendQuestPacket(IQuestPlayerData quest, int index)
+        protected virtual async Task SendQuestPacket(IQuestPlayerData quest, int index)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry)))
+            await using var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry));
+            pak.WriteByte((byte)index);
+
+            if (quest.Status != eQuestStatus.InProgress)
             {
-                pak.WriteByte((byte)index);
-
-                if (quest.Status != eQuestStatus.InProgress)
-                {
-                    pak.WriteByte(0);
-                    pak.WriteByte(0);
-                    pak.WriteByte(0);
-                }
-                else
-                {
-                    if (quest.Quest == null)
-                    {
-                        pak.WriteByte(0);
-                        pak.WriteByte(0);
-                        pak.WriteByte(0);
-                        SendTCP(pak);
-                        return;
-                    }
-
-                    GamePlayer receiver = m_gameClient.Player;
-
-                    string name = quest.Quest.Name ?? string.Empty;
-                    string desc = quest.Quest.Description ?? string.Empty;
-
-                    // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
-                    // We treat quest texts as "server texts", so sender = null
-                    if (receiver != null)
-                    {
-                        name = AutoTranslateManager.MaybeTranslate(null, receiver, name);
-                        desc = AutoTranslateManager.MaybeTranslate(null, receiver, desc);
-                    }
-
-                    // Make sure we don't exceed packet limits after translation
-                    if (name.Length > byte.MaxValue)
-                    {
-                        if (log.IsWarnEnabled)
-                            log.Warn($"quest name is too long for 1.68+ clients ({name.Length}) '{name}'");
-                        name = name.Substring(0, byte.MaxValue);
-                    }
-
-                    if (desc.Length > byte.MaxValue)
-                    {
-                        if (log.IsWarnEnabled)
-                            log.Warn($"quest description is too long for 1.68+ clients ({desc.Length}) '{desc}'");
-                        desc = desc.Substring(0, byte.MaxValue);
-                    }
-
-                    pak.WriteByte((byte)name.Length);
-                    pak.WriteByte((byte)desc.Length);
-                    pak.WriteByte(0); // unknown / reserved
-
-                    // Write Quest Name and Description without trailing 0
-                    pak.WriteStringBytes(name);
-                    pak.WriteStringBytes(desc);
-                }
-
-                SendTCP(pak);
+                pak.WriteByte(0);
+                pak.WriteByte(0);
+                pak.WriteByte(0);
             }
+            else
+            {
+                if (quest.Quest == null)
+                {
+                    pak.WriteByte(0);
+                    pak.WriteByte(0);
+                    pak.WriteByte(0);
+                    SendTCP(pak);
+                    return;
+                }
+
+                GamePlayer receiver = m_gameClient.Player;
+
+                string name = quest.Quest.Name ?? string.Empty;
+                string desc = quest.Quest.Description ?? string.Empty;
+
+                // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
+                // We treat quest texts as "server texts", so sender = null
+                if (receiver != null)
+                {
+                    name = await AutoTranslateManager.MaybeTranslate(null, receiver, name);
+                    desc = await AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+                }
+
+                // Make sure we don't exceed packet limits after translation
+                if (name.Length > byte.MaxValue)
+                {
+                    if (log.IsWarnEnabled)
+                        log.Warn($"quest name is too long for 1.68+ clients ({name.Length}) '{name}'");
+                    name = name.Substring(0, byte.MaxValue);
+                }
+
+                if (desc.Length > byte.MaxValue)
+                {
+                    if (log.IsWarnEnabled)
+                        log.Warn($"quest description is too long for 1.68+ clients ({desc.Length}) '{desc}'");
+                    desc = desc.Substring(0, byte.MaxValue);
+                }
+
+                pak.WriteByte((byte)name.Length);
+                pak.WriteByte((byte)desc.Length);
+                pak.WriteByte(0); // unknown / reserved
+
+                // Write Quest Name and Description without trailing 0
+                pak.WriteStringBytes(name);
+                pak.WriteStringBytes(desc);
+            }
+
+            SendTCP(pak);
         }
 
-        protected virtual void SendTaskInfo()
+        protected virtual Task SendTaskInfo()
         {
+            return Task.CompletedTask;
         }
 
-        protected string BuildTaskString()
+        protected async Task<string> BuildTaskString()
         {
             if (m_gameClient.Player == null)
                 return "";
@@ -4170,6 +4163,8 @@ namespace DOL.GS.PacketHandler
                 realmMission = "[" + rMission.Name + "]" + " " + rMission.Description + ".\n";
 
             string name = taskStr + personalMission + groupMission + realmMission;
+
+            name = await AutoTranslateManager.MaybeTranslate(m_gameClient.Player, name);
 
             if (name.Length > ushort.MaxValue)
             {

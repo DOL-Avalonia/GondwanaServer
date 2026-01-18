@@ -7,6 +7,7 @@ using DOL.GS.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -69,8 +70,11 @@ namespace DOL.GS.Quests
                     {
                         if (AdvanceGoal(quest, goal))
                         {
-                            string msg = TranslateGoalText(quest.Owner, switchActivatedMessage);
-                            quest.Owner.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            Task.Run(async () =>
+                            {
+                                string msg = await TranslateGoalText(quest.Owner, switchActivatedMessage);
+                                quest.Owner.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            });
                         }
                     }
                 }

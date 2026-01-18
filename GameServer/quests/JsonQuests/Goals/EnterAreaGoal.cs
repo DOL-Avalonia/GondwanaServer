@@ -5,6 +5,7 @@ using DOL.GS.PacketHandler;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -59,8 +60,11 @@ namespace DOL.GS.Quests
                 return;
             if (e == AreaEvent.PlayerEnter)
             {
-                string msg = TranslateGoalText(quest.Owner, m_text);
-                quest.Owner.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
+                Task.Run(async () =>
+                {
+                    string msg = await TranslateGoalText(quest.Owner, m_text);
+                    quest.Owner.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
+                });
                 OnPlayerEnterArea(quest, goal);
             }
             if (e == AreaEvent.PlayerLeave)

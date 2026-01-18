@@ -29,6 +29,7 @@ using DOL.GS.Quests;
 using DOL.MobGroups;
 using log4net;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.PacketHandler
 {
@@ -357,11 +358,10 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        protected override void SendQuestPacket(IQuestPlayerData quest, int index)
+        protected override async Task SendQuestPacket(IQuestPlayerData quest, int index)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry)))
+            await using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry)))
             {
-
                 pak.WriteByte((byte)index);
                 if (quest.Status != eQuestStatus.InProgress)
                 {
@@ -371,8 +371,19 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    string name = quest.Quest.Name;
-                    string desc = quest.Quest.Description;
+                    GamePlayer receiver = m_gameClient.Player;
+
+                    string name = quest.Quest.Name ?? string.Empty;
+                    string desc = quest.Quest.Description ?? string.Empty;
+
+                    // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
+                    // We treat quest texts as "server texts", so sender = null
+                    if (receiver != null)
+                    {
+                        name = await AutoTranslateManager.MaybeTranslate(null, receiver, name);
+                        desc = await AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+                    }
+
                     if (name.Length > byte.MaxValue)
                     {
                         if (log.IsWarnEnabled) log.Warn("quest name is too long for 1.71 clients (" + name.Length + ") '" + name + "'");

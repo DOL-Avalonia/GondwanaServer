@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Behaviour;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -93,8 +94,11 @@ namespace DOL.GS.Quests
             {
                 if (!string.IsNullOrWhiteSpace(m_text))
                 {
-                    string msg = TranslateGoalText(player, m_text);
-                    ChatUtil.SendPopup(player, msg);
+                    Task.Run(async () =>
+                    {
+                        string msg = await TranslateGoalText(player, m_text);
+                        ChatUtil.SendPopup(player, msg);
+                    });
                 }
 
                 for (int i = 0; i < delta && !goal.IsFinished && goal.Progress < ProgressTotal; i++)

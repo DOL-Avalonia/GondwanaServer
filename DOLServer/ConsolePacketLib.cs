@@ -33,6 +33,7 @@ using DOL.Database;
 using System.Numerics;
 using DOL.GS.Profession;
 using DOL.GS.Geometry;
+using System.Threading.Tasks;
 
 namespace DOLGameServerConsole
 {
@@ -126,10 +127,10 @@ namespace DOLGameServerConsole
         public void SendGroupInviteCommand(GamePlayer invitingPlayer, string inviteMessage) { }
         public void SendGuildLeaveCommand(GamePlayer invitingPlayer, string inviteMessage) { }
         public void SendGuildInviteCommand(GamePlayer invitingPlayer, string inviteMessage) { }
-        public void SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage) { }
-        public void SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest) { }
-        public void SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest) { }
-        public void SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage) { }
+        public Task SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage) { return Task.CompletedTask; }
+        public Task SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest) { return Task.CompletedTask; }
+        public Task SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest) { return Task.CompletedTask; }
+        public Task SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage) { return Task.CompletedTask; }
         public void SendGroupWindowUpdate() { }
         public void SendGroupMemberUpdate(bool updateIcons, bool updateMap, GameLiving living) { }
         public void SendGroupMembersUpdate(bool updateIcons, bool updateMap) { }
@@ -175,8 +176,8 @@ namespace DOLGameServerConsole
         public void SendObjectUpdate(GameObject obj) { }
         public void SendObjectRemove(GameObject obj) { }
         public void SendObjectCreate(GameObject obj) { }
-        public void SendQuestListUpdate() { }
-        public void SendQuestUpdate(IQuestPlayerData quest) { }
+        public Task SendQuestListUpdate() { return Task.CompletedTask; }
+        public Task SendQuestUpdate(IQuestPlayerData quest) { return Task.CompletedTask; }
         public void SendMapObjective(int id, Position where) { }
         public void SendConcentrationList() { }
         public void SendUpdateCraftingSkills() { }

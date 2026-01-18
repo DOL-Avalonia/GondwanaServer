@@ -135,12 +135,13 @@ namespace DOL.GS.Quests
         {
             DbQuest.Step = (int)eQuestStatus.Done;
             string questName = Quest.Name;
-            if (Quest is DataQuestJson dqQuest)
-                questName = dqQuest.GetNameForPlayer(Owner) ?? Quest.Name;
 
-            string completedMsg = string.Format(LanguageMgr.GetTranslation(Owner.Client, "AbstractQuest.FinishQuest.Completed", questName));
-
-            Owner.Out.SendMessage(completedMsg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+            Task.Run(async () =>
+            {
+                questName = await Quest.GetNameForPlayer(Owner) ?? Quest.Name;
+                string completedMsg = await LanguageMgr.Translate(Owner.Client.Player, "AbstractQuest.FinishQuest.Completed", questName);
+                Owner.Out.SendMessage(completedMsg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+            });
 
             // move quest from active list to finished list...
             Owner.AddFinishedQuest(this);

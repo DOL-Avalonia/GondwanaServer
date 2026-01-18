@@ -4,6 +4,7 @@ using DOL.GS.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -53,8 +54,11 @@ namespace DOL.GS.Quests
                     {
                         if (!string.IsNullOrWhiteSpace(m_text))
                         {
-                            string msg = TranslateGoalText(player, m_text);
-                            ChatUtil.SendPopup(player, msg);
+                            Task.Run(async () =>
+                            {
+                                string msg = await TranslateGoalText(player, m_text);
+                                ChatUtil.SendPopup(player, msg);
+                            });
                         }
                     }
                 }
