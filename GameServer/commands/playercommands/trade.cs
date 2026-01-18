@@ -17,12 +17,13 @@
  *
  */
 
+using DOL.GS;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
+using DOL.Language;
 using System.Collections;
 using System.Reflection;
-using DOL.Language;
-using DOL.GS;
-using DOL.GS.ServerProperties;
-using DOL.GS.PacketHandler;
+using System.Threading.Tasks;
 
 
 namespace DOL.GS.Commands
@@ -81,19 +82,20 @@ namespace DOL.GS.Commands
 
         private void Broadcast(GamePlayer player, string message)
         {
+            KeyTranslator keyTranslator = new("Commands.Players.Trade.Message");
+            AutoTranslator messageTranslator = new(player, message);
             foreach (GameClient c in WorldMgr.GetClientsOfRegion(player.CurrentRegionID))
             {
                 if (GameServer.ServerRules.IsAllowedToUnderstand(c.Player, player))
                 {
-                    c.Out.SendMessage(
-                        LanguageMgr.GetTranslation(
-                            player.Client.Account.Language,
-                            "Commands.Players.Trade.Message",
-                            c.Player.GetPersonalizedName(player), message),
-                        eChatType.CT_Trade, eChatLoc.CL_ChatWindow);
+                    Task.Run(async () => 
+                    {
+                        var results = await Task.WhenAll(keyTranslator.Translate(c.Player), messageTranslator.Translate(c.Player));
+                        c.Out.SendMessage(string.Format(results[0], c.Player.GetPersonalizedName(player), results[1]),
+                                          eChatType.CT_Trade, eChatLoc.CL_ChatWindow);
+                    });
                 }
             }
-
         }
 
     }

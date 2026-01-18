@@ -23,6 +23,8 @@ using DOL.Language;
 using DOL.GS;
 using DOL.GS.ServerProperties;
 using DOL.GS.PacketHandler;
+using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace DOL.GS.Commands
@@ -81,19 +83,20 @@ namespace DOL.GS.Commands
 
         private void Broadcast(GamePlayer player, string message)
         {
+            KeyTranslator keyTranslator = new("Commands.Players.LFG.Message");
+            AutoTranslator messageTranslator = new(player, message);
             foreach (GameClient c in WorldMgr.GetClientsOfRegion(player.CurrentRegionID))
             {
                 if (GameServer.ServerRules.IsAllowedToUnderstand(c.Player, player))
                 {
-                    c.Out.SendMessage(
-                        LanguageMgr.GetTranslation(
-                            player.Client.Account.Language,
-                            "Commands.Players.LFG.Message",
-                            c.Player.GetPersonalizedName(player), message),
-                        eChatType.CT_LFG, eChatLoc.CL_ChatWindow);
+                    Task.Run(async () => 
+                    {
+                        var results = await Task.WhenAll(keyTranslator.Translate(c.Player), messageTranslator.Translate(c.Player));
+                        c.Out.SendMessage(string.Format(results[0], c.Player.GetPersonalizedName(player), results[1]),
+                                          eChatType.CT_LFG, eChatLoc.CL_ChatWindow);
+                    });
                 }
             }
-
         }
 
     }
