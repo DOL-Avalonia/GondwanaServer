@@ -150,12 +150,19 @@ namespace DOL.GS.Scripts
                 originalResponses.Add(new(placeholder, originalKey));
                 return placeholder;
             });
+            
+            var translateText = AutoTranslateManager.Translate(serverLang, playerLang, toTranslate);
+            var translateResponses = Task.WhenAll(originalResponses.Select(async kv =>
+            {
+                var (placeholder, original) = kv;
+                return new KeyValuePair<string, string>(placeholder, await AutoTranslateManager.Translate(player, original));
+            }));
 
             // 2) Translate the full text with placeholders so Google sees full context
             string translatedFull;
             try
             {
-                translatedFull = await AutoTranslateManager.Translate(serverLang, playerLang, toTranslate);
+                translatedFull = await translateText;
             }
             catch (Exception ex)
             {
@@ -167,12 +174,7 @@ namespace DOL.GS.Scripts
                 return originalText;
 
             // 3) Replace placeholders with the final [translatedKey] texts
-            var translatedResponses = await Task.WhenAll(originalResponses.Select(async kv =>
-            {
-                var (placeholder, original) = kv;
-                return new KeyValuePair<string, string>(placeholder, await AutoTranslateManager.Translate(player, original));
-            }));
-
+            var translatedResponses = await translateResponses;
             foreach (var (kv, i) in translatedResponses.Select((kv, i) => (kv, i)))
             {
                 var (placeholder, translated) = kv;

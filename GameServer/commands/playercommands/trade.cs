@@ -97,7 +97,6 @@ namespace DOL.GS.Commands
                 }
             }
         }
-
     }
 }
 

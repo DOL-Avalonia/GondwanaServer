@@ -83,13 +83,12 @@ namespace DOL.GS.Commands
 
             string emoteStrRaw = string.Join(" ", args, 1, args.Length - 1);
             var players = client.Player.GetPlayersInRadius(WorldMgr.SAY_DISTANCE).Cast<GamePlayer>().Where(p => !p.IsIgnoring(client.Player)).ToList();
-
-            Task.Run(async () =>
+            var keyTranslator = new KeyTranslator("Commands.Players.Emote.Act");
+            var strangeTranslator = new KeyTranslator("Commands.Players.Emote.Strange");
+            var msgTranslator = new AutoTranslator(client.Player, emoteStrRaw);
+            foreach (var player in players)
             {
-                var keyTranslator = new KeyTranslator("Commands.Players.Emote.Act");
-                var strangeTranslator = new KeyTranslator("Commands.Players.Emote.Strange");
-                var msgTranslator = new AutoTranslator(client.Player, emoteStrRaw);
-                await Task.WhenAll(players.Select(async player =>
+                Task.Run(async () =>
                 {
                     if (GameServer.ServerRules.IsAllowedToUnderstand(client.Player, player))
                     {
@@ -102,8 +101,8 @@ namespace DOL.GS.Commands
                         var toSend = await strangeTranslator.Translate(player, client.Player.Name);
                         player.Out.SendMessage(toSend, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
                     }
-                }));
-            });
+                });
+            }
         }
     }
 }

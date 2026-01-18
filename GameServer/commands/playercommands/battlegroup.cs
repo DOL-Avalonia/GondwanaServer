@@ -59,28 +59,27 @@ namespace DOL.GS.Commands
             string rawText = string.Join(" ", args, 1, args.Length - 1);
             bool isLeader = (bool)mybattlegroup.Members[client.Player];
 
-            var members = mybattlegroup.Members.Keys.Cast<GamePlayer>().ToList();
-
-            Task.Run(async () =>
+            var members = mybattlegroup.Members.Keys.Cast<GamePlayer>();
+            var keyTranslator = new KeyTranslator("Commands.Players.Battlechat.ChatName");
+            var msgTranslator = new AutoTranslator(client.Player, rawText);
+            foreach (var player in members)
             {
-                var keyTranslator = new KeyTranslator("Commands.Players.Battlechat.ChatName");
-                var msgTranslator = new AutoTranslator(client.Player, rawText);
-                await Task.WhenAll(keyTranslator.Translate(members).Select(async task =>
+                Task.Run(async () =>
                 {
-                    var (player, key) = await task;
+                    var key = await keyTranslator.Translate(player);
                     var msg = await msgTranslator.Translate(player);
 
                     StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + key.Length + msg.Length);
                     text.Append(key);
                     text.Append(": \"");
                     text.Append(msg);
-                    text.Append("\"");
+                    text.Append('\"');
                     
                     eChatType type = isLeader ? eChatType.CT_BattleGroupLeader : eChatType.CT_BattleGroup;
 
                     player.Out.SendMessage(" " + player.GetPersonalizedName(client.Player) + text.ToString(), type, eChatLoc.CL_ChatWindow);
-                }));
-            });
+                });
+            }
         }
     }
 

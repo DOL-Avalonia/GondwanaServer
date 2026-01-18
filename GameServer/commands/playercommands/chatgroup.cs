@@ -58,14 +58,13 @@ namespace DOL.GS.Commands
 
             string rawText = string.Join(" ", args, 1, args.Length - 1);
             var members = mychatgroup.Members.Keys.Cast<GamePlayer>();
-
-            Task.Run(async () =>
+            var keyTranslator = new KeyTranslator("Commands.Players.Chatgroup.Chat");
+            var msgTranslator = new AutoTranslator(client.Player, rawText);
+            foreach (var player in members)
             {
-                var keyTranslator = new KeyTranslator("Commands.Players.Chatgroup.Chat");
-                var msgTranslator = new AutoTranslator(client.Player, rawText);
-                await Task.WhenAll(keyTranslator.Translate(members).Select(async task =>
+                Task.Run(async () =>
                 {
-                    var (player, key) = await task;
+                    var key = await keyTranslator.Translate(player);
                     var msg = await msgTranslator.Translate(player);
 
                     StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + key.Length + msg.Length);
@@ -75,8 +74,8 @@ namespace DOL.GS.Commands
                     text.Append('\"');
 
                     player.Out.SendMessage(" " + player.GetPersonalizedName(client.Player) + text.ToString(), eChatType.CT_Chat, eChatLoc.CL_ChatWindow);
-                }));
-            });
+                });
+            }
         }
     }
 
