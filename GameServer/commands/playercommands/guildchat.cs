@@ -18,6 +18,8 @@
  */
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -65,16 +67,19 @@ namespace DOL.GS.Commands
                 return;
 
             string rawText = string.Join(" ", args, 1, args.Length - 1);
-
+            var translator = new AutoTranslator(client.Player, rawText);
             foreach (GamePlayer ply in client.Player.Guild.GetListOfOnlineMembers())
             {
                 if (ply == null)
                     continue;
 
-                string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
-                string message = "[Guild] " + client.Player.Name + ": \"" + toSend + "\"";
+                Task.Run(async () =>
+                {
+                    string toSend = await translator.Translate(client.Player);
+                    string message = "[Guild] " + client.Player.Name + ": \"" + toSend + "\"";
 
-                ply.Out.SendMessage(message, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+                    ply.Out.SendMessage(message, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+                });
             }
         }
     }
@@ -125,16 +130,19 @@ namespace DOL.GS.Commands
                 return;
 
             string rawText = string.Join(" ", args, 1, args.Length - 1);
-
+            var translator = new AutoTranslator(client.Player, rawText);
             foreach (GamePlayer ply in client.Player.Guild.GetListOfOnlineMembers())
             {
                 if (!client.Player.Guild.HasRank(ply, Guild.eRank.OcHear))
                     continue;
 
-                string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
-                string message = "[Officers] " + client.Player.Name + ": \"" + toSend + "\"";
-
-                ply.Out.SendMessage(message, eChatType.CT_Officer, eChatLoc.CL_ChatWindow);
+                Task.Run(async () =>
+                {
+                    string toSend = await translator.Translate(client.Player);
+                    string message = "[Officers] " + client.Player.Name + ": \"" + toSend + "\"";
+                    
+                    ply.Out.SendMessage(message, eChatType.CT_Officer, eChatLoc.CL_ChatWindow);
+                });
             }
         }
     }
@@ -193,7 +201,7 @@ namespace DOL.GS.Commands
                 return;
 
             string rawText = string.Join(" ", args, 1, args.Length - 1);
-
+            var translator = new AutoTranslator(client.Player, rawText);
             foreach (Guild gui in client.Player.Guild.alliance.Guilds)
             {
                 foreach (GamePlayer ply in gui.GetListOfOnlineMembers())
@@ -201,10 +209,13 @@ namespace DOL.GS.Commands
                     if (!gui.HasRank(ply, Guild.eRank.AcHear))
                         continue;
 
-                    string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
-                    string message = "[Alliance] " + client.Player.Name + ": \"" + toSend + "\"";
+                    Task.Run(async () =>
+                    {
+                        string toSend = await translator.Translate(client.Player);
+                        string message = "[Alliance] " + client.Player.Name + ": \"" + toSend + "\"";
 
-                    ply.Out.SendMessage(message, eChatType.CT_Alliance, eChatLoc.CL_ChatWindow);
+                        ply.Out.SendMessage(message, eChatType.CT_Alliance, eChatLoc.CL_ChatWindow);
+                    });
                 }
             }
         }

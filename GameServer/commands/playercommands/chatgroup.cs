@@ -16,10 +16,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using Discord;
 using System;
 using System.Text;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -54,23 +57,26 @@ namespace DOL.GS.Commands
             }
 
             string rawText = string.Join(" ", args, 1, args.Length - 1);
+            var members = mychatgroup.Members.Keys.Cast<GamePlayer>();
 
-            foreach (GamePlayer ply in mychatgroup.Members.Keys)
+            Task.Run(async () =>
             {
-                string toSend = rawText;
+                var keyTranslator = new KeyTranslator("Commands.Players.Chatgroup.Chat");
+                var msgTranslator = new AutoTranslator(client.Player, rawText);
+                await Task.WhenAll(keyTranslator.Translate(members).Select(async task =>
+                {
+                    var (player, key) = await task;
+                    var msg = await msgTranslator.Translate(player);
 
-                toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+                    StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + key.Length + msg.Length);
+                    text.Append(key);
+                    text.Append(": \"");
+                    text.Append(msg);
+                    text.Append('\"');
 
-                StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + toSend.Length);
-                text.Append(LanguageMgr.GetTranslation(ply.Client.Account.Language, "Commands.Players.Chatgroup.Chat"));
-                text.Append(": \"");
-                text.Append(toSend);
-                text.Append("\"");
-
-                string message = text.ToString();
-
-                ply.Out.SendMessage(" " + ply.GetPersonalizedName(client.Player) + message, eChatType.CT_Chat, eChatLoc.CL_ChatWindow);
-            }
+                    player.Out.SendMessage(" " + player.GetPersonalizedName(client.Player) + text.ToString(), eChatType.CT_Chat, eChatLoc.CL_ChatWindow);
+                }));
+            });
         }
     }
 

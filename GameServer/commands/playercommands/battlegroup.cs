@@ -21,6 +21,8 @@ using System.Collections;
 using System.Text;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -57,21 +59,28 @@ namespace DOL.GS.Commands
             string rawText = string.Join(" ", args, 1, args.Length - 1);
             bool isLeader = (bool)mybattlegroup.Members[client.Player];
 
-            foreach (GamePlayer ply in mybattlegroup.Members.Keys)
+            var members = mybattlegroup.Members.Keys.Cast<GamePlayer>().ToList();
+
+            Task.Run(async () =>
             {
-                string toSend = AutoTranslateManager.MaybeTranslate(client.Player, ply, rawText);
+                var keyTranslator = new KeyTranslator("Commands.Players.Battlechat.ChatName");
+                var msgTranslator = new AutoTranslator(client.Player, rawText);
+                await Task.WhenAll(keyTranslator.Translate(members).Select(async task =>
+                {
+                    var (player, key) = await task;
+                    var msg = await msgTranslator.Translate(player);
 
-                StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + toSend.Length);
-                text.Append(LanguageMgr.GetTranslation(ply.Client.Account.Language, "Commands.Players.Battlechat.ChatName"));
-                text.Append(": \"");
-                text.Append(toSend);
-                text.Append("\"");
+                    StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + key.Length + msg.Length);
+                    text.Append(key);
+                    text.Append(": \"");
+                    text.Append(msg);
+                    text.Append("\"");
+                    
+                    eChatType type = isLeader ? eChatType.CT_BattleGroupLeader : eChatType.CT_BattleGroup;
 
-                string message = text.ToString();
-                eChatType type = isLeader ? eChatType.CT_BattleGroupLeader : eChatType.CT_BattleGroup;
-
-                ply.Out.SendMessage(" " + ply.GetPersonalizedName(client.Player) + message, type, eChatLoc.CL_ChatWindow);
-            }
+                    player.Out.SendMessage(" " + player.GetPersonalizedName(client.Player) + text.ToString(), type, eChatLoc.CL_ChatWindow);
+                }));
+            });
         }
     }
 

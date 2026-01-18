@@ -138,14 +138,24 @@ namespace DOL.Language
         /// <param name="inputText">Original message</param>
         /// <param name="formatArgsSupplier">Function to format with</param>
         /// <returns></returns>
-        public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> TranslatePlayerInput(IEnumerable<GamePlayer> receivers, string inputLang, string inputText, Func<GamePlayer, string, object[]> formatArgsSupplier)
+        public async Task<KeyValuePair<GamePlayer, string>> TranslatePlayerInput(GamePlayer receiver, string inputLang, string inputText, Func<GamePlayer, string, object[]> formatArgsSupplier)
         {
             AutoTranslator msgTranslator = new(lang: inputLang, text: inputText);
-            return receivers.Select(async p =>
-            {
-                var results = await Task.WhenAll(Translate(p), msgTranslator.Translate(p)).ConfigureAwait(false);
-                return new KeyValuePair<GamePlayer, string>(p, string.Format(results[0], formatArgsSupplier(p, results[1])));
-            });
+            var results = await Task.WhenAll(Translate(receiver), msgTranslator.Translate(receiver)).ConfigureAwait(false);
+            return new KeyValuePair<GamePlayer, string>(receiver, string.Format(results[0], formatArgsSupplier(receiver, results[1])));
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: {0}"
+        /// </summary>
+        /// <param name="receivers">Players to translate for</param>
+        /// <param name="inputLang">Language of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <param name="formatArgsSupplier">Function to format with</param>
+        /// <returns></returns>
+        public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> TranslatePlayerInput(IEnumerable<GamePlayer> receivers, string inputLang, string inputText, Func<GamePlayer, string, object[]> formatArgsSupplier)
+        {
+            return receivers.Select(p => TranslatePlayerInput(p, inputLang, inputText, formatArgsSupplier));
         }
 
         /// <summary>
@@ -1014,7 +1024,7 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<string, string>>> Translate(IEnumerable<string> languages, string translationId, params object[] args)
+        public static IEnumerable<Task<KeyValuePair<string, string>>> Translate(IEnumerable<string> languages, string translationId, params object[] args)
         {
             async Task<KeyValuePair<string, string>> Each(string lang)
             {
@@ -1022,7 +1032,7 @@ namespace DOL.Language
                 return new KeyValuePair<string, string>(lang, str);
             }
 
-            return await Task.WhenAll(languages.Select(Each)).ConfigureAwait(false);
+            return languages.Select(Each);
         }
 
         /// <summary>
@@ -1033,9 +1043,9 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="args">Formatting arguments, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, params object[] args)
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, params object[] args)
         {
-            return await Translate(players, translationId, (string _) => args);
+            return Translate(players, translationId, (string _) => args);
         }
         
         /// <summary>
@@ -1081,61 +1091,12 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per language, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<string, object[]> getArgs)
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<string, object[]> getArgs)
         {
-            Dictionary<string, string> translations = new();
-            Dictionary<string, string> noTranslations = new();
-            foreach (var p in players)
+            KeyTranslator translator = new(translationId);
+            return players.Select(async p =>
             {
-                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
-                {
-                    if (p.AutoTranslateEnabled)
-                    {
-                        translations[lang] = null;
-                    }
-                    else
-                    {
-                        noTranslations[lang] = GetTranslation(lang, translationId, getArgs.Invoke(lang));
-                    }
-                }
-            }
-
-            foreach (var (lang, t) in await Translate(translations.Keys, translationId).ConfigureAwait(false))
-            {
-                var str = t;
-                if (!string.IsNullOrEmpty(str))
-                {
-                    var args = getArgs.Invoke(lang);
-                    if (args is { Length: > 0 })
-                    {
-                        try
-                        {
-                            str = string.Format(str, args);
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Error($"Failed to translate {translationId} to ({lang}) with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
-                            str = $"#ERROR: {lang} {translationId}";
-                        }
-                    }
-                }
-                translations[lang] = str;
-            }
-
-            return players.Select(p =>
-            {
-                string translation = null;
-                if (p is { Client.Account.Language: { } lang, ObjectState: GameObject.eObjectState.Active })
-                {
-                    if (p.AutoTranslateEnabled)
-                    {
-                        translation = translations.GetValueOrDefault(lang);
-                    }
-                    else
-                    {
-                        translation = noTranslations.GetValueOrDefault(lang);
-                    }
-                }
+                string translation = await translator.Translate(p, getArgs(p.Client?.Account?.Language ?? DefaultLanguage));
                 return new KeyValuePair<GamePlayer, string>(p, translation);
             }).ToArray();
         }
@@ -1148,12 +1109,13 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per player, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, object[]> getArgs)
         {
-            var translations = await Translate(players, translationId);
-            return translations.Select(kv =>
+            var translations = Translate(players, translationId);
+            return translations.Select(async task =>
             {
                 object[]? args = null;
+                var kv = await task;
                 var (p, str) = kv;
                 if (string.IsNullOrEmpty(str))
                     return kv;
@@ -1181,12 +1143,13 @@ namespace DOL.Language
         /// <param name="translationId">Translation key to translate</param>
         /// <param name="getArgs">Func supplying formatting arguments per player, will NOT be translated</param>
         /// <returns></returns>
-        public static async Task<IEnumerable<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, Task<object[]>> getArgs)
+        public static IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> players, string translationId, Func<GamePlayer, Task<object[]>> getArgs)
         {
-            var translations = await Translate(players, translationId);
-            return await Task.WhenAll(translations.Select(async kv =>
+            var translations = Translate(players, translationId);
+            return translations.Select(async task =>
             {
                 object[]? args = null;
+                var kv = await task;
                 var (p, str) = kv;
                 if (string.IsNullOrEmpty(str))
                     return kv;
@@ -1203,7 +1166,60 @@ namespace DOL.Language
                     str = $"#ERROR: {p.Client.Account.Language} {translationId}";
                 }
                 return new KeyValuePair<GamePlayer, string>(p, str);
-            }));
+            });
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: {0}"
+        /// </summary>
+        /// <param name="receiver">Player to translate for</param>
+        /// <param name="inputLang">Language of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <param name="formatArgsSupplier">Function to format with</param>
+        /// <returns></returns>
+        public static async Task<string> TranslatePlayerInput(GamePlayer receiver, string inputLang, string translationId, string inputText, Func<string, object[]> formatArgsSupplier)
+        {
+            AutoTranslator msgTranslator = new(lang: inputLang, text: inputText);
+            var results = await Task.WhenAll(Translate(receiver, translationId), msgTranslator.Translate(receiver)).ConfigureAwait(false);
+            return string.Format(results[0], formatArgsSupplier(results[1]));
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: {0}"
+        /// </summary>
+        /// <param name="receiver">Player to translate for</param>
+        /// <param name="inputLang">Language of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <returns></returns>
+        public static Task<string> TranslatePlayerInput(GamePlayer receiver, string inputLang, string translationId, string inputText)
+        {
+            return TranslatePlayerInput(receiver, inputLang, translationId, inputText, (msg) => [msg]);
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: {0}"
+        /// </summary>
+        /// <param name="receiver">Player to translate for</param>
+        /// <param name="sender">Author of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <param name="formatArgsSupplier">Function to format with</param>
+        /// <returns></returns>
+        public static Task<string> TranslatePlayerInput(GamePlayer receiver, GamePlayer sender, string translationId, string inputText, Func<string, object[]> formatArgsSupplier)
+        {
+            return TranslatePlayerInput(receiver, sender?.Client?.Account?.Language ?? DefaultLanguage, translationId, inputText, formatArgsSupplier);
+        }
+
+        /// <summary>
+        /// Bulk translate a key with a player message. Useful for example for "Player says: {0}"
+        /// </summary>
+        /// <param name="receiver">Player to translate for</param>
+        /// <param name="sender">Author of the original message</param>
+        /// <param name="inputText">Original message</param>
+        /// <param name="formatArgsSupplier">Function to format with</param>
+        /// <returns></returns>
+        public static Task<string> TranslatePlayerInput(GamePlayer receiver, GamePlayer sender, string translationId, string inputText)
+        {
+            return TranslatePlayerInput(receiver, sender?.Client?.Account?.Language ?? DefaultLanguage, translationId, inputText);
         }
         
         #endregion Auto Translations

@@ -82,10 +82,11 @@ namespace DOL.GS.Commands
                 var playingAdvisors = advisors.Where(c => c is { Player.ObjectState: GameObject.eObjectState.Active }).Select(c => c.Player).ToList();
                 var translator = new KeyTranslator("Commands.Players.Advice.Advice");
                 var tasks = translator.TranslatePlayerInput(playingAdvisors, client.Account.Language, msg, (p, message) => [ realm, p.Name, message ]);
-                foreach (var (p, str) in await Task.WhenAll(tasks))
+                await Task.WhenAll(tasks.Select(async task =>
                 {
+                    var (p, str) = await task;
                     p.Out.SendMessage(str, eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
-                }
+                }));
             });
         }
 

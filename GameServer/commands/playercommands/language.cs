@@ -22,6 +22,7 @@ using System.Linq;
 
 using DOL.Database;
 using DOL.Language;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {

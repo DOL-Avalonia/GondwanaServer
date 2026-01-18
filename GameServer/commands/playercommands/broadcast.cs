@@ -95,22 +95,20 @@ namespace DOL.GS.Commands
             Task.Run(async () =>
             {
                 var keyTranslator = new KeyTranslator("Commands.Players.Broadcast.Message");
+                IEnumerable<Task<KeyValuePair<GamePlayer, string>>> tasks;
                 if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
-                    var tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.Name, msg]);
-                    foreach (var (p, str) in await Task.WhenAll(tasks))
-                    {
-                        p.Out.SendMessage(str, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
-                    }
+                    tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.Name, msg]);
                 }
                 else
                 {
-                    var tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.GetPersonalizedName(player), msg]);
-                    foreach (var (p, str) in await Task.WhenAll(tasks))
-                    {
-                        p.Out.SendMessage(str, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
-                    }
+                    tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.GetPersonalizedName(player), msg]);
                 }
+                await Task.WhenAll(tasks.Select(async task =>
+                {
+                    var (p, str) = await task; 
+                    p.Out.SendMessage(str, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                }));
             });
         }
 

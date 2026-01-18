@@ -40,7 +40,7 @@ namespace DOL.GS
         {
         }
 
-        public AutoTranslator([NotNull] GamePlayer sender, string text, bool threadSafe = true) : this(lang: sender.Client?.Account?.Language, text, threadSafe)
+        public AutoTranslator(GamePlayer? sender, string text, bool threadSafe = true) : this(lang: sender?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage, text, threadSafe)
         {
         }
 
@@ -131,6 +131,8 @@ namespace DOL.GS
 
                     if (!string.Equals(Text, other.Text, StringComparison.OrdinalIgnoreCase))
                         return false;
+
+                    return true;
                 }
                 return base.Equals(obj);
             }
@@ -158,18 +160,23 @@ namespace DOL.GS
         /// Retrieves auto-translation asynchronously. 
         /// Uses Cache -> PendingTasks -> Google API.
         /// </summary>
-        public static async Task<string> Translate(GamePlayer sender, [NotNull] GamePlayer receiver, string originalText)
+        public static async Task<string> Translate(GamePlayer? sender, [NotNull] GamePlayer receiver, string originalText)
         {
             if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
-                return originalText;
-
-            if (sender is null || !receiver.AutoTranslateEnabled)
                 return originalText;
 
             var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
             var fromLang = sender?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
 
             return await TranslateCoreAsync(fromLang, toLang, originalText);
+        }
+
+        public static async Task<string> MaybeTranslate(GamePlayer? sender, [NotNull] GamePlayer receiver, string originalText)
+        {
+            if (!receiver.AutoTranslateEnabled)
+                return originalText;
+            
+            return await Translate(sender, receiver, originalText);
         }
 
         /// <summary>
@@ -193,18 +200,18 @@ namespace DOL.GS
             if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
                 return originalText;
 
-            if (!receiver.AutoTranslateEnabled)
-                return originalText;
-
             var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
             var fromLang = LanguageMgr.DefaultLanguage;
 
             return await TranslateCoreAsync(fromLang, toLang, originalText);
         }
 
-        public static string MaybeTranslate(GamePlayer sender, GamePlayer receiver, string msg)
+        public static async Task<string> MaybeTranslate([NotNull] GamePlayer receiver, string originalText)
         {
-            return Translate(sender, receiver, msg).Result;
+            if (!receiver.AutoTranslateEnabled)
+                return originalText;
+            
+            return await Translate(receiver, originalText);
         }
 
         /// <summary>
