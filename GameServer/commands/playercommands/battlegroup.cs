@@ -191,7 +191,6 @@ namespace DOL.GS.Commands
                                 text.Append(grouped.Group.GroupMemberString(grouped));
                                 client.Out.SendMessage(text.ToString(), eChatType.CT_BattleGroup, eChatLoc.CL_SystemWindow);
                                 firstrun = 1;
-                                firstrun = 1;
                             }
                             else if (!ListedPeople.Contains(grouped))
                             {
