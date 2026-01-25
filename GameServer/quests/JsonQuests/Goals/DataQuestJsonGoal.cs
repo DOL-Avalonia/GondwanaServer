@@ -115,7 +115,7 @@ namespace DOL.GS.Quests
             if (personalize)
                 text = BehaviourUtils.GetPersonalizedMessage(text, player);
 
-            return await AutoTranslateManager.MaybeTranslate(player, text);
+            return await AutoTranslateManager.Translate(player, text);
         }
 
         public bool IsActive(PlayerQuest questData) => questData.GoalStates.Any(gs => gs.GoalId == GoalId && gs.IsActive) && Conditions?.Validate(questData, this) != false;
@@ -192,7 +192,7 @@ namespace DOL.GS.Quests
                 task.ContinueWith(async _ =>
                 {
                     var results = await Task.WhenAll(
-                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
                         TranslateGoalText(player, MessageStarted),
                         Quest.GetNameForPlayer(player)
                     );
@@ -274,7 +274,7 @@ namespace DOL.GS.Quests
                 Task.Run(async () =>
                 {
                     var results = await Task.WhenAll(
-                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
                         TranslateGoalText(player, MessageAborted),
                         Quest.GetNameForPlayer(player)
                     );
@@ -324,7 +324,7 @@ namespace DOL.GS.Quests
                 task = task.ContinueWith(async _ =>
                 {
                     var results = await Task.WhenAll(
-                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
                         TranslateGoalText(player, MessageDone),
                         Quest.GetNameForPlayer(player)
                     );
@@ -363,7 +363,7 @@ namespace DOL.GS.Quests
                 Task.Run(async () =>
                 {
                     var results = await Task.WhenAll(
-                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
                         TranslateGoalText(player, MessageCompleted),
                         Quest.GetNameForPlayer(player)
                     );

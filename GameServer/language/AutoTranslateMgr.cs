@@ -67,29 +67,6 @@ namespace DOL.GS
         /// Retrieves auto-translation asynchronously. 
         /// Uses Cache -> PendingTasks -> Google API.
         /// </summary>
-        public static async Task<string> Translate(GamePlayer? sender, [NotNull] GamePlayer receiver, string originalText)
-        {
-            if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
-                return originalText;
-
-            var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
-            var fromLang = sender?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
-
-            return await TranslateCoreAsync(fromLang, toLang, originalText);
-        }
-
-        public static async Task<string> MaybeTranslate(GamePlayer? sender, [NotNull] GamePlayer receiver, string originalText)
-        {
-            if (!receiver.AutoTranslateEnabled)
-                return originalText;
-            
-            return await Translate(sender, receiver, originalText);
-        }
-
-        /// <summary>
-        /// Retrieves auto-translation asynchronously. 
-        /// Uses Cache -> PendingTasks -> Google API.
-        /// </summary>
         public static async Task<string> Translate(string fromLang, string toLang, string originalText)
         {
             if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
@@ -101,24 +78,44 @@ namespace DOL.GS
         /// <summary>
         /// Retrieves auto-translation asynchronously. 
         /// Uses Cache -> PendingTasks -> Google API.
+        /// <param name="sender">Player who sent the text</param>
+        /// <param name="receiver">Player to translate for</param>
+        /// <param name="originalText">Text to translate</param>
+        /// <param name="force">If true, will translate even if the player has auto-translate disabled</param>
         /// </summary>
-        public static async Task<string> Translate([NotNull] GamePlayer receiver, string originalText)
+        public static async Task<string> Translate(GamePlayer? sender, [NotNull] GamePlayer receiver, string originalText, bool force = false)
         {
             if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
+                return originalText;
+
+            if (!force && !receiver.AutoTranslateEnabled)
+                return originalText;
+
+            var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+            var fromLang = sender?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+
+            return await TranslateCoreAsync(fromLang, toLang, originalText);
+        }
+
+        /// <summary>
+        /// Retrieves auto-translation asynchronously. 
+        /// Uses Cache -> PendingTasks -> Google API.
+        /// <param name="receiver">Player to translate for</param>
+        /// <param name="originalText">Text to translate</param>
+        /// <param name="force">If true, will translate even if the player has auto-translate disabled</param>
+        /// </summary>
+        public static async Task<string> Translate([NotNull] GamePlayer receiver, string originalText, bool force = false)
+        {
+            if (!Properties.AUTOTRANSLATE_ENABLE || string.IsNullOrWhiteSpace(originalText))
+                return originalText;
+
+            if (!force && !receiver.AutoTranslateEnabled)
                 return originalText;
 
             var toLang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
             var fromLang = LanguageMgr.DefaultLanguage;
 
             return await TranslateCoreAsync(fromLang, toLang, originalText);
-        }
-
-        public static async Task<string> MaybeTranslate([NotNull] GamePlayer receiver, string originalText)
-        {
-            if (!receiver.AutoTranslateEnabled)
-                return originalText;
-            
-            return await Translate(receiver, originalText);
         }
 
         /// <summary>
