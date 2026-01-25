@@ -1,112 +1,19 @@
-using System;
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using log4net;
 using DOL.GS.ServerProperties;
 using DOL.Language;
+using log4net;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
-    public class AutoTranslator
-    {
-        private readonly IDictionary<string, Task<string>> m_translations;
-
-        public string OriginalText
-        {
-            get;
-            init;
-        }
-
-        public string OriginalLanguage
-        {
-            get;
-            init;
-        }
-
-        public AutoTranslator(string lang, string text, bool threadSafe = true)
-        {
-            OriginalText = text;
-            OriginalLanguage = LanguageMgr.NormalizeLang(lang);
-            var initialValue = new KeyValuePair<string, Task<string>>(OriginalLanguage, Task.FromResult(OriginalText));
-            m_translations = threadSafe ? new ConcurrentDictionary<string, Task<string>>([initialValue]) : new Dictionary<string, Task<string>>([initialValue]);
-        }
-
-        public AutoTranslator(string text, bool threadSafe = true) : this(lang: LanguageMgr.DefaultLanguage, text: text, threadSafe)
-        {
-        }
-
-        public AutoTranslator(GamePlayer? sender, string text, bool threadSafe = true) : this(lang: sender?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage, text, threadSafe)
-        {
-        }
-
-        private async Task<string> TranslateImpl(string langTo)
-        {
-            langTo = LanguageMgr.NormalizeLang(langTo);
-            if (!m_translations.TryGetValue(langTo, out Task<string> task))
-            {
-                task = AutoTranslateManager.Translate(OriginalLanguage, langTo, OriginalText);
-                m_translations[langTo] = task;
-            }
-            return await task.ConfigureAwait(false);
-        }
-
-        public async Task<string> Translate(string langTo)
-        {
-            if (!Properties.AUTOTRANSLATE_ENABLE)
-                return OriginalText;
-
-            if (string.IsNullOrWhiteSpace(OriginalText))
-                return string.Empty;
-
-            return await TranslateImpl(langTo).ConfigureAwait(false);
-        }
-
-        public async Task<string> Translate([NotNull] GamePlayer receiver)
-        {
-            if (!Properties.AUTOTRANSLATE_ENABLE)
-                return OriginalText;
-
-            if (string.IsNullOrWhiteSpace(OriginalText))
-                return string.Empty;
-
-            if (!receiver.AutoTranslateEnabled)
-                return OriginalText;
-
-            var lang = receiver.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
-            return await TranslateImpl(lang).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Retrieves auto-translation asynchronously. 
-        /// Uses Cache -> PendingTasks -> Google API.
-        /// </summary>
-        public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> receivers)
-        {
-            if (!Properties.AUTOTRANSLATE_ENABLE)
-                return receivers.Select((p) => Task.FromResult(new KeyValuePair<GamePlayer, string>(p, OriginalText)));
-
-            if (string.IsNullOrWhiteSpace(OriginalText))
-                return receivers.Select((p) => Task.FromResult(new KeyValuePair<GamePlayer, string>(p, string.Empty)));
-
-            return receivers.Select(async p =>
-            {
-                string ret = OriginalText;
-                if (p.AutoTranslateEnabled)
-                {
-                    var toLang = LanguageMgr.NormalizeLang(p.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage);
-                    ret = await TranslateImpl(toLang);
-                }
-                return new KeyValuePair<GamePlayer, string>(p, ret);
-            });
-        }
-    }
-
-    public static class AutoTranslateManager
+    public static partial class AutoTranslateManager
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(AutoTranslateManager));
 
@@ -264,6 +171,101 @@ namespace DOL.GS
                 // Always remove from pending list when done
                 _pendingTranslations.TryRemove(key, out _);
             }
+        }
+
+        [GeneratedRegex(@"\[(.+?)\]")]
+        [return: NotNull]
+        public static partial Regex BracketsRegex();
+
+        [GeneratedRegex(@"\{(.+?)\}")]
+        [return: NotNull]
+        public static partial Regex BracesRegex();
+
+        public static async Task<(string translatedText, IDictionary<string, string>? mappings)> TranslatePlaceholderText(GamePlayer player, string originalText, bool translatePlaceholders = true, Regex regex = null)
+        {
+            if (player == null || string.IsNullOrWhiteSpace(originalText))
+                return (translatedText: originalText, null);
+
+            if (!player.AutoTranslateEnabled || !GS.ServerProperties.Properties.AUTOTRANSLATE_ENABLE)
+                return (translatedText: originalText, null);
+
+            string serverLang = LanguageMgr.DefaultLanguage; // FR on your server
+            string playerLang = player.Client?.Account?.Language ?? serverLang;
+
+            if (string.Equals(serverLang, playerLang, StringComparison.OrdinalIgnoreCase))
+                return (translatedText: originalText, null);
+            
+            regex = regex ?? BracketsRegex();
+
+            Dictionary<string, string>? keyMap = null;
+            if (translatePlaceholders)
+            {
+                keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            }
+            int index = 0;
+
+            // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
+            const string placeholderPrefix = "§§";
+            const string placeholderSuffix = "§§";
+
+            List<KeyValuePair<string, string>> originalResponses = null;
+            
+            if (translatePlaceholders)
+                originalResponses = new List<KeyValuePair<string, string>>();
+            string toTranslate = regex.Replace(originalText, match =>
+            {
+                string originalKey = match.Groups[1].Value.Trim();
+
+                // §§0§§, §§1§§, etc.
+                string placeholder = $"{placeholderPrefix}{index++}{placeholderSuffix}";
+
+                if (translatePlaceholders)
+                    originalResponses!.Add(new(placeholder, originalKey));
+                return placeholder;
+            });
+            
+            Task<string> translateText = AutoTranslateManager.Translate(serverLang, playerLang, toTranslate);
+            Task<KeyValuePair<string, string>[]> translateResponses = null;
+            if (translatePlaceholders)
+            {
+                translateResponses = Task.WhenAll(originalResponses.Select(async kv =>
+                {
+                    var (placeholder, original) = kv;
+                    return new KeyValuePair<string, string>(placeholder, await AutoTranslateManager.Translate(player, original));
+                }));
+            }
+
+            // 2) Translate the full text with placeholders so Google sees full context
+            string translatedFull;
+            try
+            {
+                translatedFull = await translateText;
+            }
+            catch (Exception ex)
+            {
+                log.ErrorFormat("Error while translating npc text for player {0} from {1} to {2}: {4}\nText: {3}", player.Name, serverLang, playerLang, ex, toTranslate);
+                return (originalText, null);
+            }
+
+            if (string.IsNullOrWhiteSpace(translatedFull))
+                return (originalText, null);
+
+            // 3) Replace placeholders with the final [translatedKey] texts
+            var translatedResponses = await translateResponses;
+            foreach (var (kv, i) in translatedResponses.Select((kv, i) => (kv, i)))
+            {
+                var (placeholder, translated) = kv;
+                translatedFull = translatedFull.Replace(placeholder, '[' + translated + ']');
+                if (translatePlaceholders) // keyMap is not null
+                    keyMap![translated] = originalResponses[i].Value;
+            }
+            
+            if (translatedFull.Contains(placeholderPrefix))
+            {
+                log.WarnFormat("Placeholder still found after translating npc text for player {0} from {1} to {2}\nText: {3}", player.Name, serverLang, playerLang, toTranslate);
+                return (originalText, null);
+            }
+            return (originalText, keyMap);
         }
     }
 }

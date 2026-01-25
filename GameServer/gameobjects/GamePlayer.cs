@@ -11569,11 +11569,12 @@ namespace DOL.GS
                 type = eChatType.CT_Staff;
             
             System.Threading.Tasks.Task task;
+            string displayed;
             if (!GameServer.ServerRules.IsAllowedToUnderstand(source, this))
             {
                 System.Threading.Tasks.Task.Run(async () =>
                 {
-                    var displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source));
+                    displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source));
                     Out.SendMessage(displayed, type, eChatLoc.CL_ChatWindow);
                 });
                 return true;
@@ -11581,7 +11582,7 @@ namespace DOL.GS
             var afkmessage = TempProperties.getProperty<string>(AFK_MESSAGE);
             System.Threading.Tasks.Task.Run(async () =>
             {
-                var displayed = await LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.Sends", str, (str) => [GetPersonalizedName(source), str]);
+                displayed = await LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.Sends", str, (str) => [GetPersonalizedName(source), str]);
                 Out.SendMessage(displayed, type, eChatLoc.CL_ChatWindow);
                 if (afkmessage != null)
                 {
@@ -11620,17 +11621,21 @@ namespace DOL.GS
 
             if (!target.PrivateMessageReceive(this, str))
             {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Send.target.DontUnderstandYou", GetPersonalizedName(target)),
-                                eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Send.target.DontUnderstandYou", GetPersonalizedName(target)),
+                                    eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                });
                 return false;
             }
 
             if (Client.Account.PrivLevel == 1 && target.Client.Account.PrivLevel > 1 && target.IsAnonymous)
                 return true;
-
-            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Send.YouSendTo", str, GetPersonalizedName(target)), eChatType.CT_Send,
-                            eChatLoc.CL_ChatWindow);
-
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Send.YouSendTo", str, GetPersonalizedName(target)), eChatType.CT_Send,
+                                eChatLoc.CL_ChatWindow);
+            });
             return true;
         }
 
@@ -11644,6 +11649,7 @@ namespace DOL.GS
         {
             if (!base.SayReceive(source, str))
                 return false;
+
             if (IsIgnoring(source))
                 return true;
             
@@ -11677,8 +11683,12 @@ namespace DOL.GS
                 return false;
             if (!base.Say(str))
                 return false;
-            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Say.YouSay", str), eChatType.CT_Say,
-                            eChatLoc.CL_ChatWindow);
+            
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.Say.YouSay", str);
+                Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            });
             return true;
         }
 
@@ -11725,7 +11735,12 @@ namespace DOL.GS
                 return false;
             if (!base.Yell(str))
                 return false;
-            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Yell.YouYell", str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                var displayed = await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Yell.YouYell", str);
+                Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            });
             return true;
         }
 
@@ -11771,8 +11786,11 @@ namespace DOL.GS
         {
             if (target == null)
             {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Whisper.SelectTarget"), eChatType.CT_System,
-                                eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Whisper.SelectTarget"), eChatType.CT_System,
+                                    eChatLoc.CL_ChatWindow);
+                });
                 return false;
             }
             if (!GameServer.ServerRules.IsAllowedToSpeak(this, "whisper"))
@@ -11780,7 +11798,12 @@ namespace DOL.GS
             if (!base.Whisper(target, str))
                 return false;
             if (target is GamePlayer)
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Whisper.YouWhisper", str, GetPersonalizedName(target)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Whisper.YouWhisper", str, GetPersonalizedName(target)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
+            }
             return true;
         }
 

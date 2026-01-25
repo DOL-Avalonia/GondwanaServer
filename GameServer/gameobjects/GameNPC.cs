@@ -46,6 +46,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -6453,14 +6454,17 @@ namespace DOL.GS
             {
                 return;
             }
+
             if (TriggerCooldownTimer is { Enabled: true })
             {
                 return;
             }
+
             if (trigger == eAmbientTrigger.interact && living == null)
             {
                 return;
             }
+
             TriggerPlayerLostTimer.Stop();
             MobXAmbientBehaviour chosen;
             if (preChosen != null)
@@ -6493,6 +6497,7 @@ namespace DOL.GS
                 TriggerCooldownTimer.AutoReset = false;
                 TriggerCooldownTimer.Start();
             }
+
             if (useTimer && trigger == eAmbientTrigger.interact && chosen.InteractTimerDelay > 0)
             {
                 if (chosen.InteractTriggerTimer != null)
@@ -6547,12 +6552,13 @@ namespace DOL.GS
                 {
                     if (!(npc is GameNPC))
                         continue;
-                    if ((string.IsNullOrEmpty(GuildName) && (Faction == null || string.IsNullOrEmpty(Faction.Name)))
-                    || (string.IsNullOrEmpty(GuildName) && npc.Faction != null && Faction != null && npc.Faction.Name == Faction.Name)
-                    || (GuildName != null && npc.GuildName == GuildName && (Faction == null || string.IsNullOrEmpty(Faction.Name)))
-                    || (GuildName != null && npc.GuildName == GuildName && npc.Faction != null && Faction != null && npc.Faction.Name == Faction.Name))
+
+                    if (string.Equals(GuildName ?? "", npc.GuildName ?? "", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        npc.StartAttack(living);
+                        if (string.Equals(Faction?.Name ?? "", npc.Faction?.Name ?? "", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            npc.StartAttack(living);
+                        }
                     }
                 }
             }
@@ -6728,8 +6734,8 @@ namespace DOL.GS
             }
 
             // issuing text
-            if (living is GamePlayer)
-                text = text.Replace("{class}", (living as GamePlayer)!.CharacterClass.Name).Replace("{race}", (living as GamePlayer)!.RaceName);
+            if (living is GamePlayer targetPlayer)
+                text = text.Replace("{class}", targetPlayer.CharacterClass!.Name).Replace("{race}", targetPlayer!.RaceName);
             if (living is GameNPC)
                 text = text.Replace("{class}", "NPC").Replace("{race}", "NPC");
 
@@ -6750,7 +6756,11 @@ namespace DOL.GS
             {
                 foreach (GamePlayer player in CurrentRegion.GetPlayersInRadius(Coordinate, 25000, false, false))
                 {
-                    player.Out.SendMessage(text, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    Task.Run(async () =>
+                    {
+                        var displayed = await AutoTranslateManager.Translate(player, text);
+                        player.Out.SendMessage(displayed, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    });
                 }
                 return;
             }

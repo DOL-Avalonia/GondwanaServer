@@ -48,7 +48,7 @@ namespace DOL.GS.Scripts
 
         private long _lastPhrase;
         private readonly GameNPC _body;
-        private readonly ConcurrentDictionary<string, Dictionary<string, string>> _playerResponseKeyMappings = new();
+        private readonly ConcurrentDictionary<string, IDictionary<string, string>> _playerResponseKeyMappings = new();
 
         public readonly Dictionary<string, DBEchangeur> EchangeurDB = new();
         public Dictionary<string, string> QuestTexts { get; private set; }
@@ -116,82 +116,6 @@ namespace DOL.GS.Scripts
             SaveIntoDatabase();
         }
 
-        private async Task<string> TranslateNpcText(GamePlayer player, string originalText)
-        {
-            if (player == null || string.IsNullOrWhiteSpace(originalText))
-                return originalText;
-
-            if (!player.AutoTranslateEnabled || !GS.ServerProperties.Properties.AUTOTRANSLATE_ENABLE)
-                return originalText;
-
-            string serverLang = LanguageMgr.DefaultLanguage; // FR on your server
-            string playerLang = player.Client?.Account?.Language ?? serverLang;
-
-            if (string.Equals(serverLang, playerLang, StringComparison.OrdinalIgnoreCase))
-                return originalText;
-
-            // Prepare / reset mapping for this player.
-            var keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            var regex = new Regex(@"\[(.+?)\]", RegexOptions.Compiled);
-            int index = 0;
-
-            // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
-            const string placeholderPrefix = "§§";
-            const string placeholderSuffix = "§§";
-
-            var originalResponses = new List<KeyValuePair<string, string>>();
-            string toTranslate = regex.Replace(originalText, match =>
-            {
-                string originalKey = match.Groups[1].Value.Trim();
-
-                // §§0§§, §§1§§, etc.
-                string placeholder = $"{placeholderPrefix}{index++}{placeholderSuffix}";
-
-                originalResponses.Add(new(placeholder, originalKey));
-                return placeholder;
-            });
-            
-            var translateText = AutoTranslateManager.Translate(serverLang, playerLang, toTranslate);
-            var translateResponses = Task.WhenAll(originalResponses.Select(async kv =>
-            {
-                var (placeholder, original) = kv;
-                return new KeyValuePair<string, string>(placeholder, await AutoTranslateManager.Translate(player, original));
-            }));
-
-            // 2) Translate the full text with placeholders so Google sees full context
-            string translatedFull;
-            try
-            {
-                translatedFull = await translateText;
-            }
-            catch (Exception ex)
-            {
-                log.ErrorFormat("Error while translating npc text for player {0} from {1} to {2}: {4}\nText: {3}", player.Name, serverLang, playerLang, ex, toTranslate);
-                return originalText;
-            }
-
-            if (string.IsNullOrWhiteSpace(translatedFull))
-                return originalText;
-
-            // 3) Replace placeholders with the final [translatedKey] texts
-            var translatedResponses = await translateResponses;
-            foreach (var (kv, i) in translatedResponses.Select((kv, i) => (kv, i)))
-            {
-                var (placeholder, translated) = kv;
-                translatedFull = translatedFull.Replace(placeholder, '[' + translated + ']');
-                keyMap[translated] = originalResponses[i].Value;
-            }
-            
-            if (translatedFull.Contains(placeholderPrefix))
-            {
-                log.WarnFormat("Placeholder still found after translating npc text for player {0} from {1} to {2}\nText: {3}", player.Name, serverLang, playerLang, toTranslate);
-                return originalText;
-            }
-            
-            _playerResponseKeyMappings[player.InternalID] = keyMap;
-            return translatedFull;
-        }
-
         private string ResolveResponseKey(GamePlayer player, string key)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -235,9 +159,10 @@ namespace DOL.GS.Scripts
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    TranslateNpcText(player, text).ContinueWith(async task =>
+                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
                     {
-                        var text = await task;
+                        var (text, mappings) = await task;
+                        _playerResponseKeyMappings[player.InternalID] = mappings;
                         player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     });
                 }
@@ -248,9 +173,10 @@ namespace DOL.GS.Scripts
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    TranslateNpcText(player, text).ContinueWith(async task =>
+                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
                     {
-                        var text = await task;
+                        var (text, mappings) = await task;
+                        _playerResponseKeyMappings[player.InternalID] = mappings;
                         player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     });
                 }
@@ -293,9 +219,10 @@ namespace DOL.GS.Scripts
                 string text = string.Format(response, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
                 if (!string.IsNullOrEmpty(text))
                 {
-                    TranslateNpcText(player, text).ContinueWith(async task =>
+                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
                     {
-                        var text = await task;
+                        var (text, mappings) = await task;
+                        _playerResponseKeyMappings[player.InternalID] = mappings;
                         player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     });
                 }
