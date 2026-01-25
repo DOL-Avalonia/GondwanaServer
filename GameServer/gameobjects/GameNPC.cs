@@ -109,34 +109,6 @@ namespace DOL.GS
         }
         #endregion
 
-        #region TextNPC hooks
-
-        /// <summary>
-        /// Allows TextNPC to modify or replace ambient text (MobXAmbientBehaviour)
-        /// before it is sent (Say/Yell/Broadcast/Popup).
-        /// If handled is set to true, GameNPC will not send anything itself.
-        /// </summary>
-        /// <param name="trigger">Ambient trigger (spawning, interact, etc.)</param>
-        /// <param name="player">Player concerned (may be null)</param>
-        /// <param name="behaviour">MobXAmbientBehaviour row selected</param>
-        /// <param name="text">Current text (placeholders already replaced)</param>
-        /// <param name="handled">Set to true if TextNPC already sent the text</param>
-        partial void BeforeAmbientText(eAmbientTrigger trigger, GamePlayer player, MobXAmbientBehaviour behaviour, ref string text, ref bool handled);
-
-        /// <summary>
-        /// Allows TextNPC to modify or replace a SayTo message
-        /// (NPC -> one player) before sending.
-        /// If handled is set to true, GameNPC will NOT send its own message.
-        /// </summary>
-        partial void BeforeSayTo(GamePlayer target, ref eChatLoc loc, ref string message, ref bool handled);
-
-        /// <summary>
-        /// Allows TextNPC to handle whispers to the NPC.
-        /// If handled is set to true, GameNPC will not run its default whisper logic.
-        /// </summary>
-        partial void BeforeWhisperReceive(GamePlayer player, string text, ref bool handled);
-        #endregion
-
         #region Formations/Spacing
 
         //Space/Offsets used in formations
@@ -4047,13 +4019,12 @@ namespace DOL.GS
             if (!base.WhisperReceive(source, text))
                 return false;
             
-            if (source is GamePlayer == false)
+            if (source is not GamePlayer)
                 return true;
 
             GamePlayer player = (GamePlayer)source;
 
             bool textNpcHandled = false;
-            BeforeWhisperReceive(player, text, ref textNpcHandled);
             if (textNpcHandled)
                 return true;
 
@@ -4103,36 +4074,43 @@ namespace DOL.GS
                 return;
 
             bool textNpcHandled = false;
-            BeforeSayTo(target, ref loc, ref message, ref textNpcHandled);
             if (textNpcHandled)
                 return;
 
             TurnTo(target);
-            string resultText = LanguageMgr.GetTranslation(target.Client.Account.Language, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), message);
-            switch (loc)
+            if (announce && loc == eChatLoc.CL_PopupWindow)
             {
-                case eChatLoc.CL_PopupWindow:
+                var keyTranslator = new KeyTranslator("GameNPC.SayTo.SpeaksTo");
+                var msgTranslator = new AutoTranslator(message);
+                Task.Run(async () =>
+                {
+                    var resultText = await LanguageMgr.Translate(target, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), await msgTranslator.Translate(target)); 
                     target.Out.SendMessage(resultText, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    if (announce)
+                });
+                foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE).Cast<GamePlayer>().Where(p => p != target))
+                {
+                    Task.Run(async () =>
                     {
-                        foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE))
-                        {
-                            if (!(target == player))
-                            {
-                                player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameNPC.SayTo.SpeaksTo",
-                                player.GetPersonalizedName(this), player.GetPersonalizedName(target)
-                                ), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                            }
-                        }
-                    }
-                    break;
-                case eChatLoc.CL_ChatWindow:
-                    target.Out.SendMessage(resultText, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                    break;
-                case eChatLoc.CL_SystemWindow:
-                    target.Out.SendMessage(resultText, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    break;
+                        var resultText = await keyTranslator.Translate(player, player.GetPersonalizedName(this), player.GetPersonalizedName(target));
+                        player.MessageFromArea(this, resultText, eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    });
+                }
+                return;
             }
+
+            eChatType type = loc switch
+            {
+                eChatLoc.CL_SystemWindow => eChatType.CT_System,
+                eChatLoc.CL_PopupWindow => eChatType.CT_System,
+                eChatLoc.CL_ChatWindow => eChatType.CT_Say,
+                _ => eChatType.CT_System
+            };
+            Task.Run(async () =>
+            {
+                var translatedMsg = await AutoTranslateManager.Translate(target, message);
+                var resultText = await LanguageMgr.Translate(target, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), translatedMsg); 
+                target.Out.SendMessage(resultText, type, loc);
+            });
         }
         #endregion
 
@@ -6734,20 +6712,24 @@ namespace DOL.GS
             }
 
             // issuing text
-            if (living is GamePlayer targetPlayer)
+            var targetPlayer = living as GamePlayer;
+            if (targetPlayer != null)
                 text = text.Replace("{class}", targetPlayer.CharacterClass!.Name).Replace("{race}", targetPlayer!.RaceName);
             if (living is GameNPC)
                 text = text.Replace("{class}", "NPC").Replace("{race}", "NPC");
 
             bool textNpcHandled = false;
-            BeforeAmbientText(trigger, living as GamePlayer, chosen, ref text, ref textNpcHandled);
             if (textNpcHandled)
                 return;
 
-            if (trigger == eAmbientTrigger.interact)
+            if (targetPlayer != null && trigger == eAmbientTrigger.interact)
             {
                 // for interact text we pop up a window
-                (living as GamePlayer)!.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                Task.Run(async () =>
+                {
+                    var translated = await AutoTranslateManager.Translate(targetPlayer, text);
+                    targetPlayer.Out.SendMessage(translated, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                });
                 return;
             }
 
