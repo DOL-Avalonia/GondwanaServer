@@ -96,8 +96,6 @@ namespace DOL.GS
 
         private List<Style> _counterAttackStyles = new();
 
-        public static readonly string AUTOTRANSLATE_PROPERTY = "autotranslate_enabled";
-
         #region Client/Character/VariousFlags
 
         /// <summary>
@@ -216,8 +214,8 @@ namespace DOL.GS
         /// </summary>
         public bool AutoTranslateEnabled
         {
-            get => TempProperties.getProperty(AUTOTRANSLATE_PROPERTY, false);
-            set => TempProperties.setProperty(AUTOTRANSLATE_PROPERTY, value);
+            get;
+            set;
         }
 
         /// <summary>
@@ -2244,7 +2242,7 @@ namespace DOL.GS
             if (!(gameObject is GamePlayer player) || player == this)
                 return gameObject.Name;
 
-            if (!DOL.GS.ServerProperties.Properties.HIDE_PLAYER_NAME || player.Client.Account.PrivLevel > 1 || Client.Account.PrivLevel > 1)
+            if (!DOL.GS.ServerProperties.Properties.HIDE_PLAYER_NAME)
                 return player.Name;
 
             if (SerializedAskNameList.Contains(player.Name) || SerializedFriendsList.Contains(player.Name))
@@ -11569,38 +11567,39 @@ namespace DOL.GS
             eChatType type = eChatType.CT_Send;
             if (source.Client.Account.PrivLevel > 1)
                 type = eChatType.CT_Staff;
-
-            if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
+            
+            System.Threading.Tasks.Task task;
+            string displayed;
+            if (!GameServer.ServerRules.IsAllowedToUnderstand(source, this))
             {
-                string displayed = str;
-                if (source != null)
-                    displayed = AutoTranslateManager.MaybeTranslate(source, this, str);
-
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SendReceive.Sends", GetPersonalizedName(source), displayed), type,
-                                eChatLoc.CL_ChatWindow);
-            }
-            else
-            {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source)),
-                                eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source));
+                    Out.SendMessage(displayed, type, eChatLoc.CL_ChatWindow);
+                });
                 return true;
             }
-
             var afkmessage = TempProperties.getProperty<string>(AFK_MESSAGE);
-            if (afkmessage != null)
+            System.Threading.Tasks.Task.Run(async () =>
             {
-                if (afkmessage == "")
+                displayed = await LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.Sends", str, (str) => [GetPersonalizedName(source), str]);
+                Out.SendMessage(displayed, type, eChatLoc.CL_ChatWindow);
+                if (afkmessage != null)
                 {
-                    source!.Out.SendMessage(LanguageMgr.GetTranslation(source.Client.Account.Language, "GameObjects.GamePlayer.SendReceive.Afk", source.GetPersonalizedName(this)),
-                                           eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    if (afkmessage == "")
+                    {
+                        displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.Afk", source.GetPersonalizedName(this));
+                        source!.Out.SendMessage(displayed, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    else
+                    {
+                        displayed = await LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.AfkMessage", str, (str) => [source.GetPersonalizedName(this), str]);
+                        source!.Out.SendMessage(
+                            displayed, eChatType.CT_Say,
+                            eChatLoc.CL_ChatWindow);
+                    }
                 }
-                else
-                {
-                    source!.Out.SendMessage(
-                        LanguageMgr.GetTranslation(source.Client.Account.Language, "GameObjects.GamePlayer.SendReceive.AfkMessage", source.GetPersonalizedName(this), afkmessage), eChatType.CT_Say,
-                        eChatLoc.CL_ChatWindow);
-                }
-            }
+            });
 
             return true;
         }
@@ -11622,17 +11621,21 @@ namespace DOL.GS
 
             if (!target.PrivateMessageReceive(this, str))
             {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Send.target.DontUnderstandYou", GetPersonalizedName(target)),
-                                eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Send.target.DontUnderstandYou", GetPersonalizedName(target)),
+                                    eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                });
                 return false;
             }
 
             if (Client.Account.PrivLevel == 1 && target.Client.Account.PrivLevel > 1 && target.IsAnonymous)
                 return true;
-
-            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Send.YouSendTo", str, GetPersonalizedName(target)), eChatType.CT_Send,
-                            eChatLoc.CL_ChatWindow);
-
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Send.YouSendTo", str, GetPersonalizedName(target)), eChatType.CT_Send,
+                                eChatLoc.CL_ChatWindow);
+            });
             return true;
         }
 
@@ -11646,22 +11649,26 @@ namespace DOL.GS
         {
             if (!base.SayReceive(source, str))
                 return false;
+
             if (IsIgnoring(source))
                 return true;
+            
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this) || Properties.ENABLE_DEBUG)
             {
-                string displayed = str;
-
-                if (source is GamePlayer sp)
-                    displayed = AutoTranslateManager.MaybeTranslate(sp, this, str);
-
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SayReceive.Says", GetPersonalizedName(source), displayed),
-                                eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    string displayed = await LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.SayReceive.Says", str, (str) => [GetPersonalizedName(source), str]);
+                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
             }
             else
-                Out.SendMessage(
-                    LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SayReceive.FalseLanguage", GetPersonalizedName(source)),
-                    eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SayReceive.FalseLanguage", GetPersonalizedName(source));
+                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
+            }
             return true;
         }
 
@@ -11676,8 +11683,12 @@ namespace DOL.GS
                 return false;
             if (!base.Say(str))
                 return false;
-            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Say.YouSay", str), eChatType.CT_Say,
-                            eChatLoc.CL_ChatWindow);
+            
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.Say.YouSay", str);
+                Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            });
             return true;
         }
 
@@ -11693,17 +11704,23 @@ namespace DOL.GS
                 return false;
             if (IsIgnoring(source))
                 return true;
+            
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
             {
-                string displayed = str;
-
-                if (source is GamePlayer sp)
-                    displayed = AutoTranslateManager.MaybeTranslate(sp, this, str);
-
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.YellReceive.Yells", GetPersonalizedName(source), displayed), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    string displayed = await LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.YellReceive.Yells", str, (str) => [GetPersonalizedName(source), str]);
+                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
             }
             else
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.YellReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.YellReceive.FalseLanguage", GetPersonalizedName(source));
+                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
+            }
             return true;
         }
 
@@ -11718,7 +11735,12 @@ namespace DOL.GS
                 return false;
             if (!base.Yell(str))
                 return false;
-            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Yell.YouYell", str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+
+            System.Threading.Tasks.Task.Run(async () =>
+            {
+                var displayed = await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Yell.YouYell", str);
+                Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            });
             return true;
         }
 
@@ -11737,15 +11759,20 @@ namespace DOL.GS
                 return true;
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
             {
-                string displayed = str;
-
-                if (source is GamePlayer sp)
-                    displayed = AutoTranslateManager.MaybeTranslate(sp, this, str);
-
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.WhisperReceive.Whispers", GetPersonalizedName(source), displayed), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    string displayed = await LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.WhisperReceive.Whispers", str, (str) => [GetPersonalizedName(source), str]);
+                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
             }
             else
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.WhisperReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.WhisperReceive.FalseLanguage", GetPersonalizedName(source));
+                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
+            }
             return true;
         }
 
@@ -11759,8 +11786,11 @@ namespace DOL.GS
         {
             if (target == null)
             {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Whisper.SelectTarget"), eChatType.CT_System,
-                                eChatLoc.CL_ChatWindow);
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Whisper.SelectTarget"), eChatType.CT_System,
+                                    eChatLoc.CL_ChatWindow);
+                });
                 return false;
             }
             if (!GameServer.ServerRules.IsAllowedToSpeak(this, "whisper"))
@@ -11768,7 +11798,12 @@ namespace DOL.GS
             if (!base.Whisper(target, str))
                 return false;
             if (target is GamePlayer)
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Whisper.YouWhisper", str, GetPersonalizedName(target)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            {
+                System.Threading.Tasks.Task.Run(async () =>
+                {
+                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Whisper.YouWhisper", str, GetPersonalizedName(target)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+                });
+            }
             return true;
         }
 
@@ -14660,6 +14695,7 @@ namespace DOL.GS
             OutlawTimeStamp = DBCharacter.OutlawTimeStamp;
             m_reputation = DBCharacter.Reputation;
             m_wanted = DBCharacter.IsWanted;
+            AutoTranslateEnabled = DBCharacter.EnableAutoTranslate;
 
             //update previous version by setting timestamp
             if (Reputation < 0 && OutlawTimeStamp == 0)
@@ -14854,6 +14890,7 @@ namespace DOL.GS
                 DBCharacter.Reputation = Reputation;
                 DBCharacter.IsWanted = Wanted;
                 DBCharacter.TaskTitleFlags = (ulong)TaskTitleFlags;
+                DBCharacter.EnableAutoTranslate = AutoTranslateEnabled;
 
                 DBCharacter.ActiveWeaponSlot = (byte)((byte)ActiveWeaponSlot | (byte)ActiveQuiverSlot);
                 if (m_stuckFlag)

@@ -27,6 +27,7 @@ using DOL.GS.Housing;
 using DOL.GS.Keeps;
 using DOL.GS.Quests;
 using DOL.GS.Profession;
+using System.Threading.Tasks;
 
 namespace DOL.GS.PacketHandler
 {
@@ -698,10 +699,10 @@ namespace DOL.GS.PacketHandler
         void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback);
         void SendGuildLeaveCommand(GamePlayer invitingPlayer, string inviteMessage);
         void SendGuildInviteCommand(GamePlayer invitingPlayer, string inviteMessage);
-        void SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest);
-        void SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest);
-        void SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage);
-        void SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage);
+        Task SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest);
+        Task SendQuestRewardWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest);
+        Task SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage);
+        Task SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage);
         void SendGroupWindowUpdate();
         void SendGroupMemberUpdate(bool updateIcons, bool updateMap, GameLiving living);
         void SendGroupMembersUpdate(bool updateIcons, bool updateMap);
@@ -745,8 +746,8 @@ namespace DOL.GS.PacketHandler
         void SendObjectDelete(GameObject obj);
         void SendObjectDelete(ushort oid);
         void SendObjectUpdate(GameObject obj);
-        void SendQuestListUpdate();
-        void SendQuestUpdate(IQuestPlayerData quest);
+        Task SendQuestListUpdate();
+        Task SendQuestUpdate(IQuestPlayerData quest);
         void SendMapObjective(int id, Position where);
         void SendConcentrationList();
         void SendUpdateCraftingSkills();

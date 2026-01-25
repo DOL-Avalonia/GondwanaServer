@@ -18,6 +18,8 @@
  */
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -80,26 +82,26 @@ namespace DOL.GS.Commands
             }
 
             string emoteStrRaw = string.Join(" ", args, 1, args.Length - 1);
-
-            foreach (GamePlayer player in client.Player.GetPlayersInRadius(WorldMgr.SAY_DISTANCE))
+            var players = client.Player.GetPlayersInRadius(WorldMgr.SAY_DISTANCE).Cast<GamePlayer>().Where(p => !p.IsIgnoring(client.Player)).ToList();
+            var keyTranslator = new KeyTranslator("Commands.Players.Emote.Act");
+            var strangeTranslator = new KeyTranslator("Commands.Players.Emote.Strange");
+            var msgTranslator = new AutoTranslator(client.Player, emoteStrRaw);
+            foreach (var player in players)
             {
-                if (player == null)
-                    continue;
-
-                if (player.IsIgnoring(client.Player as GameLiving))
-                    continue;
-
-                if (GameServer.ServerRules.IsAllowedToUnderstand(client.Player, player))
+                Task.Run(async () =>
                 {
-                    string toSend = AutoTranslateManager.MaybeTranslate(client.Player, player, emoteStrRaw);
-                    string ownRealm = LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Emote.Act", client.Player.Name, toSend);
-                    player.Out.SendMessage(ownRealm, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
-                }
-                else
-                {
-                    string diffRealm = LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Emote.Strange", client.Player.Name);
-                    player.Out.SendMessage(diffRealm, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
-                }
+                    if (GameServer.ServerRules.IsAllowedToUnderstand(client.Player, player))
+                    {
+                        var msg = await msgTranslator.Translate(player);
+                        var toSend = await keyTranslator.Translate(player, client.Player.Name, msg);
+                        player.Out.SendMessage(toSend, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                    }
+                    else
+                    {
+                        var toSend = await strangeTranslator.Translate(player, client.Player.Name);
+                        player.Out.SendMessage(toSend, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                    }
+                });
             }
         }
     }

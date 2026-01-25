@@ -25,6 +25,8 @@ using DOL.GS;
 using DOL.GS.ServerProperties;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -80,27 +82,34 @@ namespace DOL.GS.Commands
 
         private void Broadcast(GamePlayer player, string message)
         {
-            if ((eBroadcastType) Properties.BROADCAST_TYPE == eBroadcastType.Server)
-            {
-                foreach (GamePlayer p in GetTargets(player))
-                {
-                    string finalMsg = AutoTranslateManager.MaybeTranslate(player, p, message);
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", player.Name, finalMsg), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
-                }
+            var targets = GetTargets(player);
 
+            if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
+            {
                 DiscordBot.Instance?.SendMessageBroadcast(player, message);
+            }
+
+            if (targets.Count == 0)
                 return;
-            }
-
-            foreach (GamePlayer p in GetTargets(player))
+            
+            Task.Run(async () =>
             {
-                if (GameServer.ServerRules.IsAllowedToUnderstand(p, player))
+                var keyTranslator = new KeyTranslator("Commands.Players.Broadcast.Message");
+                IEnumerable<Task<KeyValuePair<GamePlayer, string>>> tasks;
+                if ((eBroadcastType)Properties.BROADCAST_TYPE == eBroadcastType.Server)
                 {
-                    string finalMsg = AutoTranslateManager.MaybeTranslate(player, p, message);
-                    p.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Broadcast.Message", p.GetPersonalizedName(player), finalMsg), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                    tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.Name, msg]);
                 }
-            }
-
+                else
+                {
+                    tasks = keyTranslator.TranslatePlayerInput(targets, player.Client.Account.Language, message, (p, msg) => [p.GetPersonalizedName(player), msg]);
+                }
+                await Task.WhenAll(tasks.Select(async task =>
+                {
+                    var (p, str) = await task; 
+                    p.Out.SendMessage(str, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
+                }));
+            });
         }
 
         private List<GamePlayer> GetTargets(GamePlayer player)

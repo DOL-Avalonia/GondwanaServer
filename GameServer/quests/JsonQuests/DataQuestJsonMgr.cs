@@ -157,17 +157,20 @@ public static class DataQuestJsonMgr
         var dq = new PlayerQuest(player, dbQuest);
         if (player.AddQuest(dq))
         {
-            if (!string.IsNullOrWhiteSpace(dq.Quest.AcceptText))
+            Task.Run(async () =>
             {
-                var raw = dq.Quest.AcceptText.Replace(@"\n", "\n");
-                var text = dq.Quest.GetAcceptTextForPlayer(player);
-                if (!string.IsNullOrEmpty(text))
-                    text = text.Replace(@"\n", "\n");
+                if (!string.IsNullOrWhiteSpace(dq.Quest.AcceptText))
+                {
+                    var text = await dq.Quest.GetAcceptTextForPlayer(player);
+                    if (!string.IsNullOrEmpty(text))
+                        text = text.Replace(@"\n", "\n");
 
-                var finalMsg = Util.SplitCSV(text, true);
+                    var finalMsg = Util.SplitCSV(text, true);
 
-                player.Out.SendCustomTextWindow(npc.Name + " dit", finalMsg);
-            }
+                    player.Out.SendCustomTextWindow(npc.Name + " dit", finalMsg);
+                }
+                await player.Out.SendQuestListUpdate();
+            });
             dq.SaveIntoDatabase();
             if (quest.RelatedMobGroups != null)
             {
@@ -177,7 +180,6 @@ public static class DataQuestJsonMgr
                 }
             }
             quest.SendNPCsQuestEffects(player);
-            player.Out.SendQuestListUpdate();
         }
 
         foreach (var e in GameEventManager.Instance.GetEventsStartedByQuest(dq.Quest.Id + "-start").Where(e => e.IsReady && e.StartConditionType == StartingConditionType.Quest))

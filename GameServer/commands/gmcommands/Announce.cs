@@ -16,14 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using DOL.GS;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
+using DOL.Language;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-
-using DOL.GS;
-using DOL.GS.ServerProperties;
-using DOL.GS.PacketHandler;
-using DOL.Language;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -45,85 +47,62 @@ namespace DOL.GS.Commands
             string message = string.Join(" ", args, 2, args.Length - 2);
             if (message == "")
                 return;
-
+            
+            var senderName = client.Player.Name;
             switch (args.GetValue(1)!.ToString()!.ToLower())
             {
                 #region Log
                 case "log":
                     {
-                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        Announce(client.Player, "Commands.GM.Announce.LogAnnounce", message, (p, key, msg) =>
                         {
-                            if (target == null || target.Player == null)
-                                continue;
-
-                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
-                            target.Out.SendMessage(LanguageMgr.GetTranslation(target, "Commands.GM.Announce.LogAnnounce", toSend), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                        }
-
+                            var str = string.Format(key, msg);
+                            p.Out.SendMessage(str, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        });
                         break;
                     }
                 #endregion Log
                 #region Window
                 case "window":
                     {
-                        var messages = new List<string>();
-                        messages.Add(message);
-
-                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        Announce(client.Player, "Commands.GM.Announce.WindowAnnounce", message, (p, key, msg) =>
                         {
-                            if (target == null || target.Player == null)
-                                continue;
-
-                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
-                            var msgs = new List<string> { toSend };
-
-                            target.Player.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(target, "Commands.GM.Announce.WindowAnnounce", client.Player.Name), msgs);
-                        }
-
+                            var str = string.Format(key, senderName);
+                            p.Out.SendCustomTextWindow(str, [msg]);
+                        });
                         break;
                     }
                 #endregion Window
                 #region Send
                 case "send":
                     {
-                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        Announce(client.Player, "Commands.GM.Announce.SendAnnounce", message, (p, key, msg) =>
                         {
-                            if (target == null || target.Player == null)
-                                continue;
-
-                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
-                            target.Out.SendMessage(LanguageMgr.GetTranslation(target, "Commands.GM.Announce.SendAnnounce", toSend), eChatType.CT_Send, eChatLoc.CL_ChatWindow);
-                        }
-
+                            var str = string.Format(key, msg);
+                            p.Out.SendMessage(str, eChatType.CT_Send, eChatLoc.CL_ChatWindow);
+                        });
                         break;
                     }
                 #endregion Send
                 #region Center
                 case "center":
                     {
-                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        Announce(client.Player, "Commands.GM.Announce.SendAnnounce", message, (p, key, msg) =>
                         {
-                            if (target == null || target.Player == null)
-                                continue;
-
-                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
-                            target.Out.SendMessage(toSend, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
-                        }
-
+                            var str = string.Format(key, msg);
+                            p.Out.SendMessage(str, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                        });
                         break;
                     }
                 #endregion Center
                 #region Confirm
                 case "confirm":
                     {
-                        foreach (GameClient target in WorldMgr.GetAllPlayingClients())
+                        Announce(client.Player, "Commands.GM.Announce.ConfirmAnnounce", message, (p, key, msg) =>
                         {
-                            if (target == null || target.Player == null)
-                                continue;
-
-                            string toSend = AutoTranslateManager.MaybeTranslate(client.Player, target.Player, message);
-                            target.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, LanguageMgr.GetTranslation(target, "Commands.GM.Announce.ConfirmAnnounce", client.Player.Name, toSend));
-                        }
+                            var str = string.Format(key, senderName, msg);
+                            p.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, str);
+                        });
                         break;
                     }
                 #endregion Confirm
@@ -135,6 +114,27 @@ namespace DOL.GS.Commands
                     }
                     #endregion Default
             }
+        }
+
+        private void Announce(GamePlayer sender, string translationId, string message, Action<GamePlayer, string, string> handler)
+        {
+            var targets = WorldMgr.GetAllPlayingClients();
+
+            Task.Run(async () =>
+            {
+                var players = targets.Select(c => c.Player);
+                var translator = new KeyTranslator(translationId);
+                var tasks = players.AutoTranslate(message, sender).Select(async t =>
+                {
+                    var (p, msg) = await t;
+                    var key = await translator.Translate(p);
+                    return (p, key, msg);
+                });
+                foreach (var (p, key, msg) in await Task.WhenAll(tasks))
+                {
+                    handler(p, key, msg);
+                }
+            });
         }
     }
 }

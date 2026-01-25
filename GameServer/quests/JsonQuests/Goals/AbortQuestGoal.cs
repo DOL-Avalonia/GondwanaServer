@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DOL.GS.Behaviour;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -39,8 +40,11 @@ namespace DOL.GS.Quests
                 questData.AbortQuest();
                 if (!string.IsNullOrWhiteSpace(m_text))
                 {
-                    string msg = TranslateGoalText(questData.Owner, m_text);
-                    ChatUtil.SendPopup(questData.Owner, msg);
+                    Task.Run(async () =>
+                    {
+                        string msg = await TranslateGoalText(questData.Owner, m_text);
+                        ChatUtil.SendPopup(questData.Owner, msg);
+                    });
                 }
 
                 return 0;

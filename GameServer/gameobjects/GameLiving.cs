@@ -6359,7 +6359,6 @@ namespace DOL.GS
             }
 
             Notify(GameLivingEvent.SayReceive, this, new SayReceiveEventArgs(source, this, str));
-
             return true;
         }
 
@@ -6397,7 +6396,7 @@ namespace DOL.GS
             }
 
             // whisper to Targeted NPC.
-            if (TargetObject != null && TargetObject is GameNPC)
+            if (TargetObject is GameNPC)
             {
                 GameNPC targetNPC = (GameNPC)TargetObject;
                 targetNPC.WhisperReceive(this, str);

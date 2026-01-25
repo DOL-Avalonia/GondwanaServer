@@ -14,14 +14,17 @@ using DOL.GameEvents;
 using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
 using DOL.GS.Quests;
+using DOL.GS.Spells;
 using log4net;
 using static DOL.Database.ArtifactBonus;
 using static DOL.GS.GameNPC;
 using static DOL.GS.Quests.DataQuestJsonGoal;
 using DOL.Territories;
 using DOL.Language;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Scripts
 {
@@ -45,9 +48,9 @@ namespace DOL.GS.Scripts
 
         private long _lastPhrase;
         private readonly GameNPC _body;
-        private readonly Dictionary<string, Dictionary<string, string>> _playerResponseKeyMappings = new Dictionary<string, Dictionary<string, string>>();
+        private readonly ConcurrentDictionary<string, IDictionary<string, string>> _playerResponseKeyMappings = new();
 
-        public readonly Dictionary<string, DBEchangeur> EchangeurDB = new Dictionary<string, DBEchangeur>();
+        public readonly Dictionary<string, DBEchangeur> EchangeurDB = new();
         public Dictionary<string, string> QuestTexts { get; private set; }
         public Dictionary<string, string> Reponses { get; private set; }
         public Dictionary<string, eEmote> EmoteReponses { get; private set; }
@@ -113,112 +116,10 @@ namespace DOL.GS.Scripts
             SaveIntoDatabase();
         }
 
-        private string TranslateNpcText(GamePlayer player, string originalText)
-        {
-            if (player == null || string.IsNullOrWhiteSpace(originalText))
-                return originalText;
-
-            if (!player.AutoTranslateEnabled || !GS.ServerProperties.Properties.AUTOTRANSLATE_ENABLE)
-                return originalText;
-
-            string serverLang = LanguageMgr.DefaultLanguage; // FR on your server
-            string playerLang = player.Client?.Account?.Language ?? serverLang;
-
-            if (string.Equals(serverLang, playerLang, StringComparison.OrdinalIgnoreCase))
-                return originalText;
-
-            // Prepare / reset mapping for this player.
-            if (!_playerResponseKeyMappings.TryGetValue(player.InternalID, out var keyMap))
-            {
-                keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                _playerResponseKeyMappings[player.InternalID] = keyMap;
-            }
-
-            var regex = new Regex(@"\[(.+?)\]", RegexOptions.Compiled);
-            int index = 0;
-
-            // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
-            const string placeholderPrefix = "§§";
-            const string placeholderSuffix = "§§";
-
-            var placeholderToBracket = new Dictionary<string, string>();
-
-            string placeholderText = regex.Replace(originalText, match =>
-            {
-                string originalKey = match.Groups[1].Value.Trim();
-
-                // §§0§§, §§1§§, etc.
-                string placeholder = $"{placeholderPrefix}{index++}{placeholderSuffix}";
-
-                bool isResponseKey =
-                    (Reponses != null && Reponses.ContainsKey(originalKey)) ||
-                    (QuestReponses != null && QuestReponses.ContainsKey(originalKey)) ||
-                    (StartEventResponses != null && StartEventResponses.ContainsKey(originalKey)) ||
-                    (StopEventResponses != null && StopEventResponses.ContainsKey(originalKey));
-
-                string translatedKey = originalKey;
-
-                if (isResponseKey)
-                {
-                    try
-                    {
-                        var singleTranslated = ExternalTranslator.Translate(originalKey, serverLang, playerLang);
-                        if (!string.IsNullOrWhiteSpace(singleTranslated))
-                            translatedKey = singleTranslated;
-                    }
-                    catch
-                    {
-                        translatedKey = originalKey;
-                    }
-
-                    // Save mapping translatedKey -> originalKey so whispers work.
-                    keyMap[translatedKey] = originalKey;
-                }
-
-                placeholderToBracket[placeholder] = "[" + translatedKey + "]";
-                return placeholder;
-            });
-
-            // 2) Translate the full text with placeholders so Google sees full context
-            string translatedFull;
-            try
-            {
-                translatedFull = ExternalTranslator.Translate(placeholderText, serverLang, playerLang);
-            }
-            catch
-            {
-                return originalText;
-            }
-
-            if (string.IsNullOrWhiteSpace(translatedFull))
-                return originalText;
-
-            // 3) Replace placeholders with the final [translatedKey] texts
-            foreach (var kvp in placeholderToBracket)
-            {
-                translatedFull = translatedFull.Replace(kvp.Key, kvp.Value);
-            }
-
-            if (translatedFull.Contains(placeholderPrefix))
-            {
-                return originalText;
-            }
-
-            return translatedFull;
-        }
-
         private string ResolveResponseKey(GamePlayer player, string key)
         {
             if (string.IsNullOrWhiteSpace(key))
                 return key;
-
-            if ((Reponses != null && Reponses.ContainsKey(key)) ||
-                (QuestReponses != null && QuestReponses.ContainsKey(key)) ||
-                (StartEventResponses != null && StartEventResponses.ContainsKey(key)) ||
-                (StopEventResponses != null && StopEventResponses.ContainsKey(key)))
-            {
-                return key;
-            }
 
             if (player == null)
                 return key;
@@ -226,7 +127,7 @@ namespace DOL.GS.Scripts
             if (_playerResponseKeyMappings.TryGetValue(player.InternalID, out var keyMap))
             {
                 if (keyMap.TryGetValue(key, out var originalKey))
-                    return originalKey;
+                    key = originalKey;
             }
 
             return key;
@@ -258,8 +159,12 @@ namespace DOL.GS.Scripts
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    text = TranslateNpcText(player, text);
-                    player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
+                    {
+                        var (text, mappings) = await task;
+                        _playerResponseKeyMappings[player.InternalID] = mappings;
+                        player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    });
                 }
             }
             else if (!string.IsNullOrEmpty(Interact_Text))
@@ -268,8 +173,12 @@ namespace DOL.GS.Scripts
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    text = TranslateNpcText(player, text);
-                    player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
+                    {
+                        var (text, mappings) = await task;
+                        _playerResponseKeyMappings[player.InternalID] = mappings;
+                        player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    });
                 }
             }
 
@@ -304,15 +213,18 @@ namespace DOL.GS.Scripts
                 return false;
 
             string normalizedKey = ResolveResponseKey(player, str);
-
             //Message
-            if (Reponses != null && Reponses.ContainsKey(normalizedKey))
+            if (Reponses != null && Reponses.TryGetValue(normalizedKey, out string response))
             {
-                string text = string.Format(Reponses[normalizedKey], player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                string text = string.Format(response, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
                 if (!string.IsNullOrEmpty(text))
                 {
-                    text = TranslateNpcText(player, text);
-                    player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
+                    {
+                        var (text, mappings) = await task;
+                        _playerResponseKeyMappings[player.InternalID] = mappings;
+                        player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    });
                 }
             }
 
@@ -648,7 +560,7 @@ namespace DOL.GS.Scripts
 
         private IEnumerable<RequireItemInfo> GetRequireItems(DBEchangeur ech)
         {
-            List<RequireItemInfo> items = new List<RequireItemInfo>();
+            List<RequireItemInfo> items = new();
 
             var val1 = this.ParseItem(ech.PriceRessource1);
 
@@ -708,7 +620,7 @@ namespace DOL.GS.Scripts
 
         private void RemoveItemsFromPlayer(GamePlayer player, IEnumerable<RequireItemInfo> requireItems, InventoryItem gaveItem)
         {
-            List<GameInventoryItem> items = new List<GameInventoryItem>();
+            List<GameInventoryItem> items = new();
             var playerItems = new Dictionary<string, int>();
 
             foreach (var val in requireItems)
@@ -967,7 +879,7 @@ namespace DOL.GS.Scripts
                 string baseMsg = _body.Name + " " + text.Substring(3);
                 foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.YELL_DISTANCE))
                 {
-                    string localized = AutoTranslateManager.MaybeTranslateServerText(plr, baseMsg);
+                    string localized = string.Empty; // AutoTranslateManager.MaybeTranslateServerText(plr, baseMsg);
                     plr.Out.SendMessage(localized, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
                 }
             }
@@ -1356,8 +1268,8 @@ namespace DOL.GS.Scripts
 
         public IList<string> DelveInfo()
         {
-            List<string> text = new List<string>
-                {
+            List<string> text = new()
+            {
                     " + OID: " + _body.ObjectID,
                     " + Class: " + _body.GetType(),
                     " + Position: " + _body.Position + " Heading=" + _body.Heading,

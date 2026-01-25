@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -80,7 +81,11 @@ namespace DOL.GS.Quests
                         {
                             player.Inventory.RemoveCountFromStack(usedItem, 1);
                         }
-                        string msg = TranslateGoalText(player, m_text); player.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
+                        Task.Run(async () =>
+                        {
+                            string msg = await TranslateGoalText(player, m_text);
+                            player.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
+                        });
                     }
                     
                 }

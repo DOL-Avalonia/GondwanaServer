@@ -105,7 +105,7 @@ namespace DOL.GS.Quests
         /// from server language (FR) to the player's language using AutoTranslate.
         /// Returns original text if translation is disabled or fails.
         /// </summary>
-        protected string TranslateGoalText(GamePlayer player, string template, bool personalize = true)
+        protected async Task<string> TranslateGoalText(GamePlayer player, string template, bool personalize = true)
         {
             if (player == null || string.IsNullOrWhiteSpace(template))
                 return template;
@@ -115,7 +115,7 @@ namespace DOL.GS.Quests
             if (personalize)
                 text = BehaviourUtils.GetPersonalizedMessage(text, player);
 
-            return AutoTranslateManager.MaybeTranslateServerText(player, text);
+            return await AutoTranslateManager.MaybeTranslate(player, text);
         }
 
         public bool IsActive(PlayerQuest questData) => questData.GoalStates.Any(gs => gs.GoalId == GoalId && gs.IsActive) && Conditions?.Validate(questData, this) != false;
@@ -170,20 +170,34 @@ namespace DOL.GS.Quests
             var player = questData.Owner;
             if (StartItemTemplate != null)
                 GiveItem(player, StartItemTemplate);
+
+            Task task = Task.CompletedTask;
             if (Visible)
             {
-                player.Out.SendQuestUpdate(questData);
-                string desc = TranslateGoalText(player, Description);
+                task.ContinueWith(async _ =>
+                {
+                    var translate = TranslateGoalText(player, Description);
+                    await player.Out.SendQuestUpdate(questData);
+                    string desc = await translate;
 
-                if (ProgressTotal == 1)
-                    ChatUtil.SendScreenCenter(player, desc);
-                else
-                    ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                    if (ProgressTotal == 1)
+                        ChatUtil.SendScreenCenter(player, desc);
+                    else
+                        ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                });
             }
+
             if (!string.IsNullOrWhiteSpace(MessageStarted))
             {
-                string msg = TranslateGoalText(player, MessageStarted);
-                ChatUtil.SendImportant(player, $"[Quest {Quest.Name}] " + msg);
+                task.ContinueWith(async _ =>
+                {
+                    var results = await Task.WhenAll(
+                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        TranslateGoalText(player, MessageStarted),
+                        Quest.GetNameForPlayer(player)
+                    );
+                    ChatUtil.SendImportant(player, string.Format(results[0], results[1], results[2]));
+                });
             }
             return goalData;
         }
@@ -199,18 +213,21 @@ namespace DOL.GS.Quests
                 return EndGoal(questData, goalData);
             }
             questData.SaveIntoDatabase();
-            if (Visible)
+            
+            Task.Run(async () =>
             {
-                var player = questData.Owner;
-                questData.Owner.Out.SendQuestUpdate(questData);
-
-                string desc = TranslateGoalText(player, Description);
-
-                if (ProgressTotal == 1)
-                    ChatUtil.SendScreenCenter(player, desc);
-                else
-                    ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
-            }
+                if (Visible)
+                {
+                    var player = questData.Owner;
+                    var translateTask = TranslateGoalText(player, Description);
+                    await questData.Owner.Out.SendQuestUpdate(questData);
+                    string desc = await translateTask;
+                    if (ProgressTotal == 1)
+                        ChatUtil.SendScreenCenter(player, desc);
+                    else
+                        ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                }
+            });
             return false;
         }
         public virtual void DecreaseGoal(PlayerQuest questData, PlayerGoalState goalData)
@@ -219,15 +236,19 @@ namespace DOL.GS.Quests
             questData.SaveIntoDatabase();
             if (Visible)
             {
-                var player = questData.Owner;
-                questData.Owner.Out.SendQuestUpdate(questData);
+                Task.Run(async () =>
+                {
+                    var player = questData.Owner;
+                    var translate = TranslateGoalText(player, Description);
+                    questData.Owner.Out.SendQuestUpdate(questData);
 
-                string desc = TranslateGoalText(player, Description);
+                    string desc = await translate;
 
-                if (ProgressTotal == 1)
-                    ChatUtil.SendScreenCenter(player, desc);
-                else
-                    ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                    if (ProgressTotal == 1)
+                        ChatUtil.SendScreenCenter(player, desc);
+                    else
+                        ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                });
             }
         }
 
@@ -250,8 +271,15 @@ namespace DOL.GS.Quests
             var player = questData.Owner;
             if (goalState.State == eQuestGoalStatus.Aborted && !string.IsNullOrWhiteSpace(MessageAborted))
             {
-                string msg = TranslateGoalText(player, MessageAborted);
-                ChatUtil.SendImportant(player, $"[Quest {Quest.Name}] " + msg);
+                Task.Run(async () =>
+                {
+                    var results = await Task.WhenAll(
+                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        TranslateGoalText(player, MessageAborted),
+                        Quest.GetNameForPlayer(player)
+                    );
+                    ChatUtil.SendImportant(player, string.Format(results[0], results[1], results[2]));
+                });
             }
         }
 
@@ -276,19 +304,32 @@ namespace DOL.GS.Quests
             goalData.State = eQuestGoalStatus.DoneAndActive;
 
             var player = questData.Owner;
+            var task = Task.CompletedTask;
             if (Visible)
             {
-                string desc = TranslateGoalText(player, Description);
-
-                if (ProgressTotal == 1)
-                    ChatUtil.SendScreenCenter(player, desc);
-                else
-                    ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                task = task.ContinueWith(async _ =>
+                {
+                    var translate = TranslateGoalText(player, Description);
+                    await player.Out.SendQuestUpdate(questData);
+                    string desc = await translate;
+                    if (ProgressTotal == 1)
+                        ChatUtil.SendScreenCenter(player, desc);
+                    else
+                        ChatUtil.SendScreenCenter(player, $"{desc} - {goalData.Progress}/{ProgressTotal}");
+                });
             }
+
             if (!string.IsNullOrWhiteSpace(MessageDone))
             {
-                string msg = TranslateGoalText(player, MessageDone);
-                ChatUtil.SendImportant(player, $"[Quest {Quest.Name}] " + msg);
+                task = task.ContinueWith(async _ =>
+                {
+                    var results = await Task.WhenAll(
+                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        TranslateGoalText(player, MessageDone),
+                        Quest.GetNameForPlayer(player)
+                    );
+                    ChatUtil.SendImportant(player, string.Format(results[0], results[1], results[2]));
+                });
             }
             EndOtherGoals(questData, except ?? new List<DataQuestJsonGoal>());
 
@@ -319,8 +360,15 @@ namespace DOL.GS.Quests
             goalData.State = eQuestGoalStatus.Completed;
             if (!string.IsNullOrWhiteSpace(MessageCompleted))
             {
-                string msg = TranslateGoalText(player, MessageCompleted);
-                ChatUtil.SendImportant(player, $"[Quest {Quest.Name}] " + msg);
+                Task.Run(async () =>
+                {
+                    var results = await Task.WhenAll(
+                        AutoTranslateManager.MaybeTranslate(player, "[Quest {0}] {1}"),
+                        TranslateGoalText(player, MessageCompleted),
+                        Quest.GetNameForPlayer(player)
+                    );
+                    ChatUtil.SendImportant(player, string.Format(results[0], results[1], results[2]));
+                });
             }
 
             foreach (var e in GameEventManager.Instance.GetEventsStartedByQuest(Quest.Id + "-" + GoalId)!.Where(e => e.IsReady && e.StartConditionType == StartingConditionType.Quest))
@@ -400,8 +448,7 @@ namespace DOL.GS.Quests
 
         public class GenericDataQuestGoal : IQuestGoal
         {
-            private readonly string _description;
-            public string Description => _description ?? Goal.Description ?? string.Empty;
+            public string Description => Goal.Description ?? string.Empty;
             public eQuestGoalType Type => Goal.Type;
             public int Progress { get; set; }
             public int ProgressTotal => Goal.ProgressTotal;
@@ -417,9 +464,6 @@ namespace DOL.GS.Quests
                 Goal = goal;
                 Progress = progress;
                 Status = status;
-
-                var player = questData?.Owner;
-                _description = goal.TranslateGoalText(player, goal.Description) ?? goal.Description ?? string.Empty;
             }
         }
     }

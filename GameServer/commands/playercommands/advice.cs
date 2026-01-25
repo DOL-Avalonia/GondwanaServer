@@ -16,8 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using DOL.Language;
+using DOL.GS;
 using DOL.GS.PacketHandler;
+using DOL.Language;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Commands
 {
@@ -68,15 +72,22 @@ namespace DOL.GS.Commands
                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Advice.AdvicersOn", total), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return;
             }
-            foreach (GameClient playerClient in WorldMgr.GetAllClients())
+
+            var advisors = WorldMgr.GetAllClients()
+                .Where(c => (c is { Account.PrivLevel: > 1 }) || (c is { Player.Advisor: true } && c.Player.Realm == client.Player.Realm))
+                .ToList();
+            string realm = getRealmString(client.Player.Realm);
+            Task.Run(async () =>
             {
-                if (playerClient.Player == null) continue;
-                if ((playerClient.Player.Advisor && playerClient.Player.Realm == client.Player.Realm) || playerClient.Account.PrivLevel > 1)
+                var playingAdvisors = advisors.Where(c => c is { Player.ObjectState: GameObject.eObjectState.Active }).Select(c => c.Player).ToList();
+                var translator = new KeyTranslator("Commands.Players.Advice.Advice");
+                var tasks = translator.TranslatePlayerInput(playingAdvisors, client.Account.Language, msg, (p, message) => [ realm, p.Name, message ]);
+                await Task.WhenAll(tasks.Select(async task =>
                 {
-                    string toSend = AutoTranslateManager.MaybeTranslate(client.Player, playerClient.Player, msg);
-                    playerClient.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Advice.Advice", getRealmString(client.Player.Realm), client.Player.Name, toSend), eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
-                }
-            }
+                    var (p, str) = await task;
+                    p.Out.SendMessage(str, eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
+                }));
+            });
         }
 
         public string getRealmString(eRealm Realm)

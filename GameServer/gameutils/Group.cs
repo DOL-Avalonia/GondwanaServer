@@ -25,6 +25,7 @@ using DOL.Events;
 using DOL.Language;
 using AmteScripts.Managers;
 using DOL.Database;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
@@ -470,28 +471,31 @@ namespace DOL.GS
         /// <param name="loc">message location</param>
         public virtual void SendMessageToGroupMembers(GameLiving from, string msg, eChatType type, eChatLoc loc)
         {
-            string message;
+            AutoTranslator messageTranslator = new AutoTranslator(from as GamePlayer, msg);
             if (from != null)
             {
                 foreach (GamePlayer player in GetPlayersInTheGroup())
                 {
-                    string finalMsg = msg;
+                    Task.Run(async () =>
+                    {
+                        string finalMsg = await messageTranslator.Translate(player);
 
-                    if (from is GamePlayer fromPlayer)
-                        finalMsg = AutoTranslateManager.MaybeTranslate(fromPlayer, player, msg);
-
-                    player.Out.SendMessage(string.Format("[Party] {0}: \"{1}\"", player.GetPersonalizedName(from), finalMsg), type, loc);
+                        player.Out.SendMessage(string.Format("[Party] {0}: \"{1}\"", player.GetPersonalizedName(from), finalMsg), type, loc);
+                    });
                 }
-
-                message = string.Format("[Party] {0}: \"{1}\"", from.GetName(0, true), msg);
-                return;
             }
             else
             {
-                message = string.Format("[Party] {0}", msg);
-            }
+                foreach (GamePlayer player in GetPlayersInTheGroup())
+                {
+                    Task.Run(async () =>
+                    {
+                        string finalMsg = await messageTranslator.Translate(player);
 
-            SendMessageToGroupMembers(message, type, loc);
+                        player.Out.SendMessage(string.Format("[Party] {0}", finalMsg), type, loc);
+                    });
+                }
+            }
         }
 
         /// <summary>
