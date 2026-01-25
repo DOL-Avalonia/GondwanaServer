@@ -75,19 +75,20 @@ namespace DOL.GS.Commands
 
             var advisors = WorldMgr.GetAllClients()
                 .Where(c => (c is { Account.PrivLevel: > 1 }) || (c is { Player.Advisor: true } && c.Player.Realm == client.Player.Realm))
+                .Where(c => c is { Player.ObjectState: GameObject.eObjectState.Active }).Select(c => c.Player)
                 .ToList();
             string realm = getRealmString(client.Player.Realm);
-            Task.Run(async () =>
+            var keyTranslator = new KeyTranslator("Commands.Players.Advice.Advice");
+            var msgTranslator = new AutoTranslator(client.Player, msg);
+            foreach (var player in advisors)
             {
-                var playingAdvisors = advisors.Where(c => c is { Player.ObjectState: GameObject.eObjectState.Active }).Select(c => c.Player).ToList();
-                var translator = new KeyTranslator("Commands.Players.Advice.Advice");
-                var tasks = translator.TranslatePlayerInput(playingAdvisors, client.Account.Language, msg, (p, message) => [ realm, p.Name, message ]);
-                await Task.WhenAll(tasks.Select(async task =>
+                Task.Run(async () =>
                 {
-                    var (p, str) = await task;
-                    p.Out.SendMessage(str, eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
-                }));
-            });
+                    var translatedMsg = await msgTranslator.Translate(player);
+                    var displayed = await keyTranslator.Translate(player, realm, client.Player.Name, translatedMsg);
+                    player.Out.SendMessage(displayed, eChatType.CT_Staff, eChatLoc.CL_ChatWindow);
+                });
+            }
         }
 
         public string getRealmString(eRealm Realm)

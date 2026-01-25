@@ -89,7 +89,7 @@ namespace DOL.GS.PacketHandler
 
             pak.WriteShort(quest.Quest.Id);
             pak.WriteByte((byte)quest.Goals.Count); // #goals count
-            foreach (var desc in await Task.WhenAll(quest.Goals.Select(g => AutoTranslateManager.MaybeTranslate(m_gameClient.Player, g.Description))))
+            foreach (var desc in await Task.WhenAll(quest.Goals.Select(g => AutoTranslateManager.Translate(m_gameClient.Player, g.Description))))
             {
                 pak.WritePascalString($"{desc}\r");
             }

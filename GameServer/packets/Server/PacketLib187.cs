@@ -108,7 +108,7 @@ namespace DOL.GS.PacketHandler
 
             pak.WriteShort(quest.Quest.Id);
             pak.WriteByte((byte)quest.Goals.Count); // #goals count
-            foreach (var desc in await Task.WhenAll(quest.Goals.Select(g => AutoTranslateManager.MaybeTranslate(m_gameClient.Player, g.Description))))
+            foreach (var desc in await Task.WhenAll(quest.Goals.Select(g => AutoTranslateManager.Translate(m_gameClient.Player, g.Description))))
             {
                 pak.WritePascalString($"{desc}\r");
             }
@@ -243,8 +243,8 @@ namespace DOL.GS.PacketHandler
 
             // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
             // We treat quest texts as "server texts", so sender = null
-            name = await AutoTranslateManager.MaybeTranslate(null, receiver, name);
-            desc = await AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+            name = await AutoTranslateManager.Translate(null, receiver, name);
+            desc = await AutoTranslateManager.Translate(null, receiver, desc);
 
             if (name.Length > byte.MaxValue)
                 name = name.Substring(0, 256);
@@ -258,7 +258,7 @@ namespace DOL.GS.PacketHandler
             for (var idx = 0; idx < data.VisibleGoals.Count; ++idx)
             {
                 var goal = data.VisibleGoals[idx];
-                desc = await AutoTranslateManager.MaybeTranslate(null, receiver, goal.Description);
+                desc = await AutoTranslateManager.Translate(null, receiver, goal.Description);
                 if (goal.ProgressTotal == 1)
                     desc = $"{desc}\r";
                 else

@@ -879,8 +879,11 @@ namespace DOL.GS.Scripts
                 string baseMsg = _body.Name + " " + text.Substring(3);
                 foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.YELL_DISTANCE))
                 {
-                    string localized = string.Empty; // AutoTranslateManager.MaybeTranslateServerText(plr, baseMsg);
-                    plr.Out.SendMessage(localized, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                    Task.Run(async () =>
+                    {
+                        string localized = await AutoTranslateManager.Translate(plr, baseMsg);
+                        plr.Out.SendMessage(localized, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
+                    });
                 }
             }
 

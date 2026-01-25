@@ -55,8 +55,8 @@ namespace DOL.GS.PacketHandler
                 string name = quest.Quest.Name;
                 string desc = quest.Quest.Description;
                 var receiver = m_gameClient.Player;
-                name = await AutoTranslateManager.MaybeTranslate(null, receiver, name);
-                desc = await AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+                name = await AutoTranslateManager.Translate(null, receiver, name);
+                desc = await AutoTranslateManager.Translate(null, receiver, desc);
                 if (name.Length > byte.MaxValue)
                 {
                     if (log.IsWarnEnabled) log.Warn("quest name is too long for 1.71 clients (" + name.Length + ") '" + name + "'");

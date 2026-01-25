@@ -2242,7 +2242,7 @@ namespace DOL.GS
             if (!(gameObject is GamePlayer player) || player == this)
                 return gameObject.Name;
 
-            if (!DOL.GS.ServerProperties.Properties.HIDE_PLAYER_NAME)
+            if (!DOL.GS.ServerProperties.Properties.HIDE_PLAYER_NAME || player.Client.Account.PrivLevel > 1 || Client.Account.PrivLevel > 1)
                 return player.Name;
 
             if (SerializedAskNameList.Contains(player.Name) || SerializedFriendsList.Contains(player.Name))

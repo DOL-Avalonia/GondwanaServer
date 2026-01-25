@@ -301,8 +301,8 @@ namespace DOL.GS.PacketHandler
 
                     // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
                     // We treat quest texts as "server texts", so sender = null
-                    name = await AutoTranslateManager.MaybeTranslate(null, receiver, name);
-                    desc = await AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+                    name = await AutoTranslateManager.Translate(null, receiver, name);
+                    desc = await AutoTranslateManager.Translate(null, receiver, desc);
 
                     if (name.Length > byte.MaxValue)
                     {

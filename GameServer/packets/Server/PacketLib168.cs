@@ -1552,7 +1552,7 @@ namespace DOL.GS.PacketHandler
             {
                 var player = m_gameClient.Player;
                 if (player != null)
-                    abortMessage = await AutoTranslateManager.MaybeTranslate(null, player, abortMessage);
+                    abortMessage = await AutoTranslateManager.Translate(null, player, abortMessage);
 
                 pak.WriteString(abortMessage, abortMessage.Length);
             }
@@ -4093,8 +4093,8 @@ namespace DOL.GS.PacketHandler
                 // We treat quest texts as "server texts", so sender = null
                 if (receiver != null)
                 {
-                    name = await AutoTranslateManager.MaybeTranslate(null, receiver, name);
-                    desc = await AutoTranslateManager.MaybeTranslate(null, receiver, desc);
+                    name = await AutoTranslateManager.Translate(null, receiver, name);
+                    desc = await AutoTranslateManager.Translate(null, receiver, desc);
                 }
 
                 // Make sure we don't exceed packet limits after translation
@@ -4164,7 +4164,7 @@ namespace DOL.GS.PacketHandler
 
             string name = taskStr + personalMission + groupMission + realmMission;
 
-            name = await AutoTranslateManager.MaybeTranslate(m_gameClient.Player, name);
+            name = await AutoTranslateManager.Translate(m_gameClient.Player, name);
 
             if (name.Length > ushort.MaxValue)
             {
