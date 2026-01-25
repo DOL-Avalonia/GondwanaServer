@@ -119,22 +119,20 @@ namespace DOL.GS.Commands
         private void Announce(GamePlayer sender, string translationId, string message, Action<GamePlayer, string, string> handler)
         {
             var targets = WorldMgr.GetAllPlayingClients();
-
-            Task.Run(async () =>
+            var translator = new KeyTranslator(translationId);
+            var msgTranslator = new AutoTranslator(sender, message);
+            foreach (var player in targets.Select(c => c.Player))
             {
-                var players = targets.Select(c => c.Player);
-                var translator = new KeyTranslator(translationId);
-                var tasks = players.AutoTranslate(message, sender).Select(async t =>
+                if (player == null)
+                    return;
+
+                Task.Run(async () =>
                 {
-                    var (p, msg) = await t;
-                    var key = await translator.Translate(p);
-                    return (p, key, msg);
+                    var key = await translator.Translate(player);
+                    var msg = await msgTranslator.Translate(player);
+                    handler(player, key, msg);
                 });
-                foreach (var (p, key, msg) in await Task.WhenAll(tasks))
-                {
-                    handler(p, key, msg);
-                }
-            });
+            }
         }
     }
 }
