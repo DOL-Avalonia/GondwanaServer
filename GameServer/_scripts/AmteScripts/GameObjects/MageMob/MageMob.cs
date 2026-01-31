@@ -34,5 +34,13 @@ namespace DOL.GS.Scripts
         {
             get { return (ushort)(m_powerRegenerationPeriod * 0.77); }
         }
+
+        /// <summary>
+        /// Helper method to get spell lines easily from the body
+        /// </summary>
+        public SpellLine GetSpellLine(string keyName)
+        {
+            return SkillBase.GetSpellLine(keyName);
+        }
     }
 }

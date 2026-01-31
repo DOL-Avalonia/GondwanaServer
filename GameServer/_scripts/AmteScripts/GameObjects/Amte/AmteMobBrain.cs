@@ -11,7 +11,7 @@ namespace DOL.AI.Brain
     public class AmteMobBrain : StandardMobBrain
     {
         public int AggroLink { get; set; }
-
+        private const int MinProtectionScan = 1000;
         public override int ThinkInterval => Math.Max(1000, 3000 - AggroLevel * 20);
 
         public AmteMobBrain()
@@ -26,6 +26,56 @@ namespace DOL.AI.Brain
             var old = (IOldAggressiveBrain)brain;
             AggroLevel = old.AggroLevel;
             AggroRange = old.AggroRange;
+        }
+
+        public override void Think()
+        {
+            // 1. Check for distressed Mages BEFORE standard logic
+            if (Body.IsAlive && !Body.IsReturningHome && !Body.IsIncapacitated && !Body.IsPeaceful)
+            {
+                if (Body is AmteMob || Body is TerritoryGuard)
+                {
+                    if (CheckProtectiveInstincts())
+                    {
+                        return;
+                    }
+                }
+            }
+
+            base.Think();
+        }
+
+        /// <summary>
+        /// Scans for friendly MageMobs who are being attacked.
+        /// </summary>
+        protected virtual bool CheckProtectiveInstincts()
+        {
+            if (Body.TargetObject is GamePlayer) return false;
+
+            int scanRange = AggroRange > MinProtectionScan ? AggroRange : MinProtectionScan;
+            int engageRange = AggroRange > 250 ? AggroRange : 250;
+
+            // Find nearby MageMobs in combat within scan range
+            foreach (MageMob mage in Body.GetNPCsInRadius((ushort)scanRange).OfType<MageMob>())
+            {
+                if (!mage.InCombat || mage.TargetObject == null) continue;
+
+                if (Body.IsWithinRadius(mage.TargetObject, engageRange + 200) || mage.GetDistanceTo(mage.TargetObject) < 400)
+                {
+                    Body.StopFollowing();
+                    Body.TargetObject = mage.TargetObject;
+
+                    AddToAggroList(mage.TargetObject as GameLiving, 200);
+                    Body.StartAttack(Body.TargetObject);
+
+                    if (Util.Chance(20))
+                    {
+                        Body.Say("Protect the Battlemage!");
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override int CalculateAggroLevelToTarget(GameLiving target)
