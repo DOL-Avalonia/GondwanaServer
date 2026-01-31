@@ -1,5 +1,7 @@
 using DOL.GS;
 using DOL.GS.Geometry;
+using System;
+using System.Collections.Generic;
 using Vector = DOL.GS.Geometry.Vector;
 
 namespace DOL.AI.Brain
@@ -51,22 +53,28 @@ namespace DOL.AI.Brain
                     Body.StopCurrentSpellcast();
                 }
 
-                // Run FAST (160% Speed)
-                PerformKiteMove(closestThreat, SpeedFast);
-                TryCastInstantSpells(closestThreat);
+                if (!Body.IsMoving || Body.Destination.IsWithinDistance(closestThreat.Position, Math.Ceiling(DangerDistance * 0.80)))
+                {
+                    // Run FAST (160% Speed)
+                    TryCastInstantSpells(closestThreat);
+                    PerformKiteMove(closestThreat, SafeDistanceMin, SpeedFast);
+                }
             }
             // --- ADJUSTMENT ---
             else if (distToThreat < SafeDistanceMin)
             {
                 if (!Body.IsCasting)
                 {
-                    // Reposition (130% Speed)
-                    PerformKiteMove(closestThreat, SpeedSlow);
-                    TryCastInstantSpells(closestThreat);
+                    if (!Body.IsMoving || Body.Destination.IsWithinDistance(closestThreat.Position, Math.Ceiling(SafeDistanceMin * 0.80)))
+                    {
+                        // Reposition (130% Speed)
+                        TryCastInstantSpells(closestThreat);
+                        PerformKiteMove(closestThreat, SafeDistanceMin, SpeedSlow);
+                    }
                 }
             }
             // --- NUKE ---
-            else if (distToThreat >= SafeDistanceMin && distToThreat <= MaxCombatRange)
+            else if (distToThreat is >= SafeDistanceMin and <= MaxCombatRange)
             {
                 if (Body.IsMoving)
                 {
@@ -77,7 +85,6 @@ namespace DOL.AI.Brain
                 {
                     Body.TargetObject = closestThreat;
                 }
-                Body.TurnTo(closestThreat);
 
                 if (!Body.IsCasting)
                 {
@@ -96,15 +103,15 @@ namespace DOL.AI.Brain
         private GamePlayer GetClosestPlayerThreat()
         {
             GamePlayer closest = null;
-            double shortestDist = MaxCombatRange + 500;
+            double shortestDist = double.MaxValue;
 
-            foreach (GamePlayer player in Body.GetPlayersInRadius((ushort)shortestDist))
+            foreach (GamePlayer player in Body.GetPlayersInRadius((ushort)MaxCombatRange))
             {
                 if (IsPlayerIgnored(player)) continue;
 
                 if (GameServer.ServerRules.IsAllowedToAttack(Body, player, true))
                 {
-                    double d = Body.GetDistanceTo(player);
+                    double d = Body.GetDistanceSquaredTo(player);
                     if (d < shortestDist)
                     {
                         shortestDist = d;
@@ -119,27 +126,26 @@ namespace DOL.AI.Brain
         {
             if (player == null) return true;
             if (!player.IsAlive) return true;
-            if (player.IsStealthed) return true;
+            if (player.IsStealthed || !player.IsVisibleTo(Body)) return true;
             if (player.ObjectState != GameObject.eObjectState.Active) return true;
             return false;
         }
 
-        private void PerformKiteMove(GameLiving enemy, double speedFactor)
+        private void PerformKiteMove(GameLiving enemy, double distance, double speedFactor)
         {
-            var angleToEnemy = Body.Coordinate.GetOrientationTo(enemy.Coordinate);
-            var angleAway = angleToEnemy + Angle.Degrees(180);
-
-            // If we are panicking (SpeedFast), we run further, otherwise just a short hop
-            int fleeDist = (speedFactor >= SpeedFast) ? 500 : 250;
+            var curCoordinate = Body.Coordinate;
+            var angleAway = enemy.Coordinate.GetOrientationTo(Body.Coordinate);
 
             angleAway += Angle.Degrees(Util.Random(-15, 15));
 
-            var targetPoint = Body.Coordinate + Vector.Create(angleAway, fleeDist);
+            distance += Util.Random(1, 50);
+            var targetPoint = curCoordinate + Vector.Create(angleAway, distance);
 
             if (Body.MaxDistance > 0 && !targetPoint.IsWithinDistance(Body.Home, Body.MaxDistance))
             {
-                var angleToHome = Body.Coordinate.GetOrientationTo(Body.Home.Coordinate);
-                targetPoint = Body.Coordinate + Vector.Create(angleToHome, fleeDist);
+                var enemyCoordinate = enemy.Coordinate;
+                var angleToHome = enemy.Coordinate.GetOrientationTo(Body.Home.Coordinate);
+                targetPoint = enemyCoordinate + Vector.Create(angleToHome, distance + 1);
             }
 
             var safePoint = PathingMgr.Instance.GetClosestPointAsync(Body.CurrentZone, targetPoint, 128, 128, 256);
@@ -147,24 +153,33 @@ namespace DOL.AI.Brain
 
             // Apply the speed multiplier
             short speed = (short)(Body.MaxSpeed * speedFactor);
-            Body.PathTo(destination, speed);
+            Body.PathTo(destination, speed, false);
         }
 
         private void TryCastInstantSpells(GameLiving target)
         {
             if (Body.IsCasting) return;
 
-            if (Body.InstantHarmfulSpells != null && Body.InstantHarmfulSpells.Count > 0)
+            var possibleSpells = new List<Spell>();
+            if (Body.InstantHarmfulSpells is { Count: > 0 })
             {
                 foreach (Spell spell in Body.InstantHarmfulSpells)
                 {
                     if (Body.GetSkillDisabledDuration(spell) > 0) continue;
                     if (!Body.IsWithinRadius(target, spell.Range)) continue;
+                    
+                    possibleSpells.Add(spell);
+                }
+            }
 
-                    Body.TurnTo(target, false);
-
-                    Body.CastSpell(spell, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
-                    return;
+            if (possibleSpells.Count > 0)
+            {
+                Body.StopMoving();
+                Body.TurnTo(target, false);
+                foreach (Spell spell in Body.InstantHarmfulSpells)
+                {
+                    if (Body.CastSpell(spell, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells)))
+                        break;
                 }
             }
         }

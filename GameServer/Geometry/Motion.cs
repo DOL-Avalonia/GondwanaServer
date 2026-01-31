@@ -16,6 +16,8 @@ public class Motion
         => GetPositionAfter(Environment.TickCount - StartTimeInMilliSeconds);
     public double FullDistance => Destination.DistanceTo(Start, ignoreZ: true);
     public double RemainingDistance => Destination.DistanceTo(CurrentPosition, ignoreZ: true);
+    public int FullDuration => FullDistance == 0 || Speed == 0 ? 0 : (int)(FullDistance / Speed * 1000);
+    public int RemainingDuration => RemainingDistance == 0 || Speed == 0 ? 0 : (int)(RemainingDistance / Speed * 1000);
 
     public Position GetPositionAfter(int elapsedTimeInMilliSeconds)
     {

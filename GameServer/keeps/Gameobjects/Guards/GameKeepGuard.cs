@@ -996,7 +996,7 @@ namespace DOL.GS.Keeps
         /// <summary>
         /// Adding special handling for walking to a point for patrol guards to be in a formation
         /// </summary>
-        public override bool WalkTo(Coordinate destination, short speed)
+        public override bool WalkTo(Coordinate destination, short speed, bool capSpeed = true)
         {
             int offX = 0; int offY = 0;
             if (IsMovingOnPath && PatrolGroup != null)
@@ -1004,7 +1004,7 @@ namespace DOL.GS.Keeps
                 PatrolGroup.GetMovementOffset(this, out offX, out offY);
             }
             var offset = Vector.Create(x: offX, y: offY );
-            return base.WalkTo(destination - offset, speed);
+            return base.WalkTo(destination - offset, speed, capSpeed);
         }
 
         public override void WalkToSpawn(short speed)
@@ -1014,8 +1014,7 @@ namespace DOL.GS.Keeps
                 StopAttack();
                 StopFollowing();
 
-                StandardMobBrain brain = Brain as StandardMobBrain;
-                if (brain != null && brain.HasAggro)
+                if (Brain is StandardMobBrain { HasAggro: true } brain)
                 {
                     brain.ClearAggroList();
                 }

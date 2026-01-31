@@ -1509,21 +1509,18 @@ namespace DOL.GS
             m_arriveAtTargetAction = null;
         }
 
-        [Obsolete("Use WalkTo(Coordinate, short) instead!")]
-        public virtual void WalkTo(int targetX, int targetY, int targetZ, short speed)
-            => WalkTo(Coordinate.Create(x: targetX, y: targetY, z: targetZ ), speed);
-
         /// <summary>
         /// Walk to a certain spot at a given speed.
         /// </summary>
         /// <param name="destination"></param>
         /// <param name="speed"></param>
-        public virtual bool WalkTo(Coordinate destination, short speed)
+        /// <param name="capSpeed"></param>
+        public virtual bool WalkTo(Coordinate destination, short speed, bool capSpeed = true)
         {
             if (IsTurningDisabled)
                 return false;
 
-            if (speed > MaxSpeed)
+            if (capSpeed && speed > MaxSpeed)
                 speed = MaxSpeed;
 
             if (speed <= 0)
@@ -1609,11 +1606,11 @@ namespace DOL.GS
         /// <param name="dest"></param>
         /// <param name="speed"></param>
         /// <returns>true if a path was found</returns>
-        public bool PathTo(Coordinate destination, short speed)
+        public bool PathTo(Coordinate destination, short speed, bool capSpeed = true)
         {
             if (!PathCalculator.ShouldPath(this, destination))
             {
-                return WalkTo(destination, speed);
+                return WalkTo(destination, speed, capSpeed);
             }
 
             // Initialize pathing if possible and required
@@ -1621,7 +1618,7 @@ namespace DOL.GS
             {
                 if (!PathCalculator.IsSupported(this))
                 {
-                    return WalkTo(destination, speed);
+                    return WalkTo(destination, speed, capSpeed);
                 }
                 // TODO: Only make this check once on spawn since it internally calls .CurrentZone + hashtable lookup?
                 PathCalculator = new PathCalculator(this);
@@ -1638,19 +1635,19 @@ namespace DOL.GS
             // Directly walk towards the target (or call the customly provided action)
             if (nextMotionTarget.Equals(Coordinate.Nowhere))
             {
-                return WalkTo(destination, speed);
+                return WalkTo(destination, speed, capSpeed);
             }
 
             // Do the actual pathing bit: Walk towards the next pathing node
-            return WalkTo(nextMotionTarget, speed, npc => npc.PathTo(destination, speed));
+            return WalkTo(nextMotionTarget, speed, npc => npc.PathTo(destination, speed, capSpeed), capSpeed);
         }
-        
-        private bool WalkTo(Coordinate destination, short speed, Action<GameNPC> goToNextNodeCallback)
+
+        private bool WalkTo(Coordinate destination, short speed, Action<GameNPC> goToNextNodeCallback, bool capSpeed = true)
         {
             if (IsTurningDisabled)
                 return false;
 
-            if (speed > MaxSpeed)
+            if (capSpeed && speed > MaxSpeed)
                 speed = MaxSpeed;
 
             if (speed <= 0)
@@ -6744,14 +6741,15 @@ namespace DOL.GS
                         player.Out.SendMessage(displayed, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                     });
                 }
-                return;
             }
-            if (chosen.Voice.StartsWith("y"))
+            else if (chosen.Voice.StartsWith("y"))
             {
                 Yell(text);
-                return;
             }
-            Say(text);
+            else
+            {
+                Say(text);
+            }
         }
         #endregion
 

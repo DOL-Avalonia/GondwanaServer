@@ -33,7 +33,7 @@ namespace DOL.AI.Brain
             // 1. Check for distressed Mages BEFORE standard logic
             if (Body.IsAlive && !Body.IsReturningHome && !Body.IsIncapacitated && !Body.IsPeaceful)
             {
-                if (Body is AmteMob || Body is TerritoryGuard)
+                if (Body is AmteMob or TerritoryGuard)
                 {
                     if (CheckProtectiveInstincts())
                     {
@@ -52,21 +52,21 @@ namespace DOL.AI.Brain
         {
             if (Body.TargetObject is GamePlayer) return false;
 
-            int scanRange = AggroRange > MinProtectionScan ? AggroRange : MinProtectionScan;
-            int engageRange = AggroRange > 250 ? AggroRange : 250;
+            int scanRange = Math.Max(AggroRange, MinProtectionScan);
+            int engageRange = Math.Max(AggroRange, 250);
 
             // Find nearby MageMobs in combat within scan range
             foreach (MageMob mage in Body.GetNPCsInRadius((ushort)scanRange).OfType<MageMob>())
             {
-                if (!mage.InCombat || mage.TargetObject == null) continue;
+                if (!mage.InCombat || mage.TargetObject is not GameLiving mageTarget) continue;
 
-                if (Body.IsWithinRadius(mage.TargetObject, engageRange + 200) || mage.GetDistanceTo(mage.TargetObject) < 400)
+                if (Body.IsWithinRadius(mageTarget, engageRange + 200) || mage.IsWithinRadius(mage.TargetObject, 400))
                 {
                     Body.StopFollowing();
-                    Body.TargetObject = mage.TargetObject;
+                    Body.TargetObject = mageTarget;
 
-                    AddToAggroList(mage.TargetObject as GameLiving, 200);
-                    Body.StartAttack(Body.TargetObject);
+                    AddToAggroList(mageTarget, 200);
+                    Body.StartAttack(mageTarget);
 
                     if (Util.Chance(20))
                     {
