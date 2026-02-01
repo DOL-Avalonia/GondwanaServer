@@ -164,30 +164,34 @@ namespace DOL.AI.Brain
         {
             if (!IsActive)
                 return;
-            
+
+            if (Body.IsCasting)
+                return;
+
+            var prevTarget = Body.TargetObject;
             Body.TargetObject = CalculateNextAttackTarget();
-            if (Body.TargetObject != null)
+            
+            bool hasSquad = GetSquadMembers(Body.Coordinate).Any();
+            bool success = false;
+            // Prioritize offense/defense based on squad status
+            if (!hasSquad)
             {
-                // --- NUKE ---
-                if (Body.IsMoving)
-                {
-                    Body.StopMoving();
-                }
-                
-                if (!Body.IsCasting)
-                {
-                    // Prioritize offense/defense based on squad status
-                    if (GetSquadMembers(Body.Coordinate).Any())
-                    {
-                        if (!CheckSpells(eCheckSpellType.Offensive))
-                            CheckSpells(eCheckSpellType.Defensive);
-                    }
-                    else
-                    {
-                        if (!CheckSpells(eCheckSpellType.Defensive))
-                            CheckSpells(eCheckSpellType.Offensive);
-                    }
-                }
+                success = CheckSpells(eCheckSpellType.Defensive);
+            }
+            
+            if (!success && Body.TargetObject != null)
+            {
+                success = CheckSpells(eCheckSpellType.Offensive);
+            }
+
+            if (hasSquad && !success)
+            {
+                success = CheckSpells(eCheckSpellType.Defensive);
+            }
+            
+            if (!success && Body.TargetObject != null)
+            {
+                MoveInRange(Body.TargetObject);
             }
         }
 
@@ -236,7 +240,7 @@ namespace DOL.AI.Brain
             if (Body.MaxDistance > 0 && !targetLoc.IsWithinDistance(Body.Home, Body.MaxDistance))
             {
                 var angleHome = myCoordinate.GetOrientationTo(Body.Home.Coordinate);
-                targetLoc = myCoordinate + Vector.Create(angleHome, 250);
+                targetLoc = myCoordinate + Vector.Create(angleHome, distance);
             }
 
             var safePoint = PathingMgr.Instance.GetClosestPointAsync(Body.CurrentZone, targetLoc, 128, 128, 256);

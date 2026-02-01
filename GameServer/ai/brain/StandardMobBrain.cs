@@ -1332,6 +1332,7 @@ namespace DOL.AI.Brain
                         {
                             continue;
                         }
+
                         if (spell.Target.ToLower() is not ("enemy" or "area" or "cone"))
                         {
                             continue;
@@ -1357,18 +1358,17 @@ namespace DOL.AI.Brain
                             }
                         }
                     }
+
                     if (spell_rec.Count > 0)
                     {
                         spellToCast = (Spell)spell_rec[Util.Random((spell_rec.Count - 1))];
 
                         if ((spellToCast!.Uninterruptible || Body.canQuickCast) && CheckOffensiveSpells(spellToCast))
                             casted = true;
-                        else
-                            if (!Body.IsBeingInterrupted && CheckOffensiveSpells(spellToCast))
+                        else if (!Body.IsBeingInterrupted && CheckOffensiveSpells(spellToCast))
                             casted = true;
                     }
                 }
-
                 return casted;
             }
             return casted;
@@ -1679,6 +1679,9 @@ namespace DOL.AI.Brain
 
             if (Body.TargetObject != null && (spell.Duration == 0 || (Body.TargetObject is GameLiving living && !(living is ShadowNPC) && LivingHasEffect(living, spell) == false)))
             {
+                if (Body.IsMoving && !spell.IsInstantCast)
+                    Body.StopMoving();
+                
                 casted = Body.CastSpell(spell, m_mobSpellLine);
 
                 if (casted && spell.CastTime > 0)

@@ -1,5 +1,6 @@
 using DOL.GS;
 using DOL.GS.Geometry;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using Vector = DOL.GS.Geometry.Vector;
@@ -69,18 +70,58 @@ namespace DOL.AI.Brain
             if (!IsActive)
                 return;
 
+            if (Body.IsCasting)
+                return;
+
             Body.TargetObject = CalculateNextAttackTarget();
+            bool success = false;
             if (Body.TargetObject != null)
             {
-                // --- NUKE ---
-                if (!Body.IsCasting)
-                {
-                    if (!CheckSpells(eCheckSpellType.Defensive))
-                    {
-                        CheckSpells(eCheckSpellType.Offensive);
-                    }
-                }
+                success = CheckSpells(eCheckSpellType.Offensive);
             }
+
+            if (!success)
+            {
+                success = CheckSpells(eCheckSpellType.Defensive);
+            }
+
+            if (!success && Body.TargetObject != null)
+            {
+                MoveInRange(Body.TargetObject);
+            }
+        }
+
+        protected virtual void MoveInRange(GameObject target)
+        {
+            if (target is null)
+                return;
+            
+            if (Body is not { Spells.Count: > 0 })
+                return;
+
+            int shortestRange = MaxCombatRange;
+            var myRangeBonus = Body.GetModified(eProperty.SpellRange);
+            foreach (Spell spell in Body.Spells)
+            {
+                if (Body.GetSkillDisabledDuration(spell) > 0)
+                {
+                    continue;
+                }
+
+                if (spell.Target.ToLower() is not ("enemy" or "area" or "cone"))
+                {
+                    continue;
+                }
+
+                var castRange = spell.Range;
+                castRange = (int)((castRange / 100.0 * myRangeBonus));
+                shortestRange = Math.Min(castRange, shortestRange);
+            }
+            
+            var walkRange = (int)(shortestRange * 0.9);
+            var minWalk = Math.Max(walkRange, SafeDistanceMin);
+            var maxWalk = Math.Min(minWalk, walkRange);
+            Body.Follow(target, minWalk, maxWalk);
         }
 
         protected GamePlayer GetClosestPlayerThreat()

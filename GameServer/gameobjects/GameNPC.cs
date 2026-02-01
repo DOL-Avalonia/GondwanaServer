@@ -1721,7 +1721,7 @@ namespace DOL.GS
             if (m_followTimer.IsAlive)
                 m_followTimer.Stop();
 
-            if (target == null || target.ObjectState != eObjectState.Active)
+            if (target is not { ObjectState: eObjectState.Active })
                 return;
 
             m_followMaxDist = maxDistance;
@@ -1794,7 +1794,7 @@ namespace DOL.GS
             GameLiving followLiving = followTarget as GameLiving;
 
             //Stop following if target living is dead
-            if (followLiving != null && !followLiving.IsAlive)
+            if (followLiving is { IsAlive: false })
             {
                 StopFollowing();
                 Notify(GameNPCEvent.FollowLostTarget, this, new FollowLostTargetEventArgs(followTarget));
@@ -1802,7 +1802,7 @@ namespace DOL.GS
             }
 
             //Stop following if we have no target
-            if (followTarget == null || followTarget.ObjectState != eObjectState.Active || CurrentRegionID != followTarget.CurrentRegionID)
+            if (followTarget is not { ObjectState: eObjectState.Active } || CurrentRegionID != followTarget.CurrentRegionID)
             {
                 StopFollowing();
                 Notify(GameNPCEvent.FollowLostTarget, this, new FollowLostTargetEventArgs(followTarget));
