@@ -42,5 +42,10 @@ namespace DOL.GS.Scripts
         {
             return SkillBase.GetSpellLine(keyName);
         }
+
+        /// <inheritdoc />
+        public override void FollowAttackTarget(GameObject target = null)
+        {
+        }
     }
 }

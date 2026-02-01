@@ -4232,7 +4232,7 @@ namespace DOL.GS
             StopMoving();
             StopMovingOnPath();
 
-            if (Brain is IControlledBrain brain && brain.AggressionState == eAggressionState.Passive)
+            if (Brain is IControlledBrain { AggressionState: eAggressionState.Passive })
                 return;
 
             //if (target != TargetObject)
@@ -4240,10 +4240,17 @@ namespace DOL.GS
             StartMeleeAttackTimer();
 
             base.StartAttack(target);
+            FollowAttackTarget(target);
+        }
+
+        public virtual void FollowAttackTarget(GameObject target = null)
+        {
+            target ??= TargetObject;
+            if (target is null)
+                return;
 
             if (AttackState)
             {
-
                 if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
                 {
                     // Archer mobs sometimes bug and keep trying to fire at max range unsuccessfully so force them to get just a tad closer.
@@ -4254,7 +4261,6 @@ namespace DOL.GS
                     Follow(target, STICKMINIMUMRANGE, STICKMAXIMUMRANGE);
                 }
             }
-
         }
 
 

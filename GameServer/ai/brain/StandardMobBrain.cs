@@ -105,46 +105,24 @@ namespace DOL.AI.Brain
 
         #region AI
 
-        /// <summary>
-        /// Do the mob AI
-        /// </summary>
-        public override void Think()
+        protected virtual bool CheckReset()
         {
-            //Satyr:
-            //This is a general information. When i review this Think-Procedure and the interaction between it and some
-            //code of GameNPC.cs i have the feeling this is a mixture of much ideas of diffeent people, much unfinished
-            //features like random-walk which does not actually fit to the rest of this Brain-logic.
-            //In other words:
-            //If somebody feeling like redoing this stuff completly i would appreciate it. It might be worth redoing
-            //instead of trying desperately to make something work that is simply chaoticly moded by too much
-            //diffeent inputs.
-            //For NOW i made the aggro working the following way (close to live but not yet 100% equal):
-            //Mobs will not aggro on their way back home (in fact they should even under some special circumstances)
-            //They will completly forget all Aggro when respawned and returned Home.
-
             bool wasInCombat = m_wasInCombat;
             m_wasInCombat = Body.InCombat;
-
             // If the NPC is tethered and has been pulled too far it will
             // de-aggro and return to its spawn point.
             if (Body.IsOutOfTetherRange && !Body.InCombat)
             {
                 Body.Reset();
-                return;
+                return true;
             }
-
-            if (Body.IsIncapacitated)
-                return;
-
-            // If the NPC is Moving on path, it can detect closed doors and open them
-            if (Body.IsMovingOnPath) DetectDoor();
 
             // Note: Offensive spells are checked in GameNPC:SpellAction timer
 
             // If NPC doing a full reset, we don't think further
             if (Body.IsResetting)
             {
-                return;
+                return true;
             }
 
             // If NPC has a max distance and we are outside, full reset
@@ -155,7 +133,7 @@ namespace DOL.AI.Brain
                 if (maxdistance > 0 && distance > maxdistance)
                 {
                     Body.Reset();
-                    return;
+                    return true;
                 }
             }
 
@@ -170,15 +148,14 @@ namespace DOL.AI.Brain
                 }
                 else
                 {
-                    return;
+                    return true;
                 }
             }
-            
-            //Lets just let CheckSpells() make all the checks for us
-            //Check for just positive spells
-            if (CheckSpells(eCheckSpellType.Defensive))
-                return;
+            return false;
+        }
 
+        protected virtual bool ThinkScan()
+        {
             if (AggroRange > 0)
             {
                 var currentPlayersSeen = new List<GamePlayer>();
@@ -224,15 +201,26 @@ namespace DOL.AI.Brain
                 CheckPlayerAggro();
                 CheckNPCAggro();
             }
+            return false;
+        }
 
+        protected virtual bool ThinkCombat()
+        {
             // If we found a target to aggro, stop thinking and attack
             if (HasAggro)
             {
                 Body.FireAmbientSentence(GameNPC.eAmbientTrigger.fighting, Body.TargetObject as GameLiving);
                 AttackMostWanted();
-                return;
+                return true;
             }
+            return false;
+        }
 
+        protected virtual bool ThinkIdle()
+        {
+            if (Body.IsCasting)
+                return true;
+            
             // Reset target
             Body.TargetObject = null;
             if (Body.AttackState)
@@ -255,6 +243,50 @@ namespace DOL.AI.Brain
             }
 
             CheckStealth();
+            return true;
+        }
+
+        /// <summary>
+        /// Do the mob AI
+        /// </summary>
+        public override void Think()
+        {
+            //Satyr:
+            //This is a general information. When i review this Think-Procedure and the interaction between it and some
+            //code of GameNPC.cs i have the feeling this is a mixture of much ideas of diffeent people, much unfinished
+            //features like random-walk which does not actually fit to the rest of this Brain-logic.
+            //In other words:
+            //If somebody feeling like redoing this stuff completly i would appreciate it. It might be worth redoing
+            //instead of trying desperately to make something work that is simply chaoticly moded by too much
+            //diffeent inputs.
+            //For NOW i made the aggro working the following way (close to live but not yet 100% equal):
+            //Mobs will not aggro on their way back home (in fact they should even under some special circumstances)
+            //They will completly forget all Aggro when respawned and returned Home.
+
+            // If the NPC is Moving on path, it can detect closed doors and open them
+            if (Body.IsMovingOnPath) DetectDoor();
+
+            if (Body.IsIncapacitated)
+                return;
+
+            if (CheckReset())
+                return;
+            
+            //Lets just let CheckSpells() make all the checks for us
+            //Check for just positive spells
+            if (!Body.IsCasting)
+            {
+                if (CheckSpells(eCheckSpellType.Defensive))
+                    return;
+            }
+
+            if (ThinkScan())
+                return;
+
+            if (ThinkCombat())
+                return;
+
+            ThinkIdle();
         }
 
         public virtual Coordinate GetFormationCoordinate(Coordinate loc)
@@ -746,8 +778,10 @@ namespace DOL.AI.Brain
             if (!IsActive)
                 return;
 
-            Body.TargetObject = CalculateNextAttackTarget();
+            if (Body.IsCasting)
+                return;
 
+            Body.TargetObject = CalculateNextAttackTarget();
             if (Body.TargetObject != null)
             {
                 if (!CheckSpells(eCheckSpellType.Offensive))
@@ -1225,7 +1259,7 @@ namespace DOL.AI.Brain
 
             bool casted = false;
 
-            if (Body != null && Body.Spells != null && Body.Spells.Count > 0)
+            if (Body is { Spells.Count: > 0 })
             {
                 ArrayList spell_rec = new ArrayList();
                 Spell spellToCast = null;
@@ -1262,7 +1296,7 @@ namespace DOL.AI.Brain
                                 needpet = true;
                             }
                         }
-                        if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null)
+                        if (Body.ControlledBrain is { Body: not null })
                         {
                             if (Util.Chance(30) && Body.ControlledBrain != null && spell.SpellType.ToLower() == "heal" &&
                                 Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range &&
@@ -1326,7 +1360,6 @@ namespace DOL.AI.Brain
                     if (spell_rec.Count > 0)
                     {
                         spellToCast = (Spell)spell_rec[Util.Random((spell_rec.Count - 1))];
-
 
                         if ((spellToCast!.Uninterruptible || Body.canQuickCast) && CheckOffensiveSpells(spellToCast))
                             casted = true;
@@ -1673,7 +1706,7 @@ namespace DOL.AI.Brain
 
             bool casted = false;
 
-            if (Body.TargetObject is GameLiving living && !(living is ShadowNPC) && (spell.Duration == 0 || !living.HasEffect(spell) || spell.SpellType.ToUpper() == "DIRECTDAMAGEWITHDEBUFF"))
+            if (Body.TargetObject is GameLiving living && GameServer.ServerRules.IsAllowedToAttack(Body, living, true) && (spell.Duration == 0 || !living.HasEffect(spell) || spell.SpellType.ToUpper() == "DIRECTDAMAGEWITHDEBUFF"))
             {
                 // Offensive spells require the caster to be facing the target
                 if (Body.TargetObject != Body)

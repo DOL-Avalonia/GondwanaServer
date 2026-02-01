@@ -28,54 +28,35 @@ namespace DOL.AI.Brain
             AggroRange = old.AggroRange;
         }
 
-        public override void Think()
+        /// <inheritdoc />
+        protected override bool ThinkScan()
         {
-            // 1. Check for distressed Mages BEFORE standard logic
-            if (Body.IsAlive && !Body.IsReturningHome && !Body.IsIncapacitated && !Body.IsPeaceful)
+            if (Body.TargetObject is not GamePlayer)
             {
-                if (Body is AmteMob or TerritoryGuard)
+                int scanRange = Math.Max(AggroRange, MinProtectionScan);
+                int engageRange = Math.Max(AggroRange, 250);
+
+                // Find nearby MageMobs in combat within scan range
+                foreach (MageMob mage in Body.GetNPCsInRadius((ushort)scanRange).OfType<MageMob>())
                 {
-                    if (CheckProtectiveInstincts())
+                    if (!mage.InCombat || mage.TargetObject is not GameLiving mageTarget) continue;
+
+                    if (Body.IsWithinRadius(mageTarget, engageRange + 200) || mage.IsWithinRadius(mage.TargetObject, 400))
                     {
-                        return;
+                        if (AggroTable.ContainsKey(mageTarget)) 
+                            continue; // already aggroed on this target
+
+                        AddToAggroList(mageTarget, 200);
+
+                        if (Util.Chance(20))
+                        {
+                            Body.Say("Protect the Battlemage!");
+                        }
+                        return true;
                     }
                 }
             }
-
-            base.Think();
-        }
-
-        /// <summary>
-        /// Scans for friendly MageMobs who are being attacked.
-        /// </summary>
-        protected virtual bool CheckProtectiveInstincts()
-        {
-            if (Body.TargetObject is GamePlayer) return false;
-
-            int scanRange = Math.Max(AggroRange, MinProtectionScan);
-            int engageRange = Math.Max(AggroRange, 250);
-
-            // Find nearby MageMobs in combat within scan range
-            foreach (MageMob mage in Body.GetNPCsInRadius((ushort)scanRange).OfType<MageMob>())
-            {
-                if (!mage.InCombat || mage.TargetObject is not GameLiving mageTarget) continue;
-
-                if (Body.IsWithinRadius(mageTarget, engageRange + 200) || mage.IsWithinRadius(mage.TargetObject, 400))
-                {
-                    Body.StopFollowing();
-                    Body.TargetObject = mageTarget;
-
-                    AddToAggroList(mageTarget, 200);
-                    Body.StartAttack(mageTarget);
-
-                    if (Util.Chance(20))
-                    {
-                        Body.Say("Protect the Battlemage!");
-                    }
-                    return true;
-                }
-            }
-            return false;
+            return base.ThinkScan();
         }
 
         public override int CalculateAggroLevelToTarget(GameLiving target)

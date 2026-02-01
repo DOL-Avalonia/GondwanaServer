@@ -1,13 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
 using DOL.GS;
 using DOL.GS.Geometry;
 using DOL.GS.Scripts;
+using System.Collections.Generic;
+using System.Linq;
+using static DOL.GS.Region;
 using Vector = DOL.GS.Geometry.Vector;
 
 namespace DOL.AI.Brain
 {
-    public class SuperMageMobBrain : AmteMobBrain
+    public class SuperMageMobBrain : MageMobBrain
     {
         private const int SafeDistanceMin = 850;
         private const int PanicDistance = 350;
@@ -24,93 +25,59 @@ namespace DOL.AI.Brain
 
         public override int ThinkInterval => 800;
 
-        public override void Think()
+        protected override bool ThinkCombat()
         {
-            if (!Body.IsAlive || Body.IsResetting || Body.IsReturningHome || Body.IsIncapacitated || Body.IsTurningDisabled)
+            GamePlayer threat = GetClosestPlayerThreat();
+            if (threat != null)
             {
-                base.Think();
-                return;
-            }
-
-            if (HasAggro || Body.InCombat)
-                HandleCombatLogic();
-            else
-                HandlePeaceLogic();
-        }
-
-        private void HandleCombatLogic()
-        {
-            GamePlayer threat = GetClosestThreat();
-
-            if (threat == null)
-            {
-                if (Body.TargetObject != null) base.Think();
-                return;
-            }
-
-            float distToThreat = Body.GetDistanceTo(threat);
-            // Use AggroRange to determine squad formation distance
-            int squadRange = AggroRange > 0 ? AggroRange : 1000;
-
-            var nearbyAllies = Body.GetNPCsInRadius((ushort)squadRange)
-                                   .OfType<MageMob>()
-                                   .Where(m => m != Body && m.IsAlive)
-                                   .ToList();
-
-            bool hasSquad = nearbyAllies.Count > 0;
-
-            if (distToThreat < PanicDistance)
-            {
-                if (Body.IsCasting) Body.StopCurrentSpellcast();
-                // 160% Speed
-                MoveTactically(threat, SpeedPanic, hasSquad ? nearbyAllies : null);
-                TryCastInstantSpells(threat);
-            }
-            else if (distToThreat < SafeDistanceMin)
-            {
-                if (!Body.IsCasting)
+                // Use AggroRange to determine squad formation distance
+                float distSquaredToThreat = Body.GetDistanceSquaredTo(threat);
+                const float panicDistSquared = PanicDistance * PanicDistance;
+                const float safeDistSquared = SafeDistanceMin * SafeDistanceMin;
+                if (distSquaredToThreat < panicDistSquared)
                 {
-                    // 130% Speed
-                    MoveTactically(threat, SpeedTactical, hasSquad ? nearbyAllies : null);
+                    if (Body.IsCasting)
+                        Body.StopCurrentSpellcast();
+
+                    // 160% Speed
                     TryCastInstantSpells(threat);
-                }
-            }
-            else
-            {
-                if (Body.IsMoving) Body.StopMoving();
-
-                if (Body.TargetObject != threat)
-                {
-                    Body.TargetObject = threat;
-                    Body.TurnTo(threat);
-                }
-
-                if (!Body.IsCasting)
-                {
-                    // Prioritize offense/defense based on squad status
-                    if (hasSquad)
+                    if (!Body.IsMoving)
                     {
-                        if (!CheckSpells(eCheckSpellType.Offensive))
-                            CheckSpells(eCheckSpellType.Defensive);
-                    }
-                    else
-                    {
-                        if (!CheckSpells(eCheckSpellType.Defensive))
-                            CheckSpells(eCheckSpellType.Offensive);
+                        PerformKiteMove(threat, SpeedPanic, PanicDistance);
                     }
                 }
+                else if (distSquaredToThreat < safeDistSquared)
+                {
+                    if (!Body.IsCasting)
+                    {
+                        // 130% Speed
+                        TryCastInstantSpells(threat);
+                        if (!Body.IsMoving)
+                        {
+                            PerformKiteMove(threat, SpeedTactical, SafeDistanceMin);
+                        }
+                    }
+                }
+                return true;
             }
+            
+            AttackMostWanted();
+            return HasAggro || Body.InCombat;
         }
 
-        private void HandlePeaceLogic()
+        protected override bool ThinkIdle()
         {
-            if (Body.IsReturningHome) return;
+            if (Body.IsReturningHome)
+                return true;
 
             // Check if player/pet is nearby (alertness check)
             bool playerNearby = false;
             foreach (GameLiving living in Body.GetPlayersInRadius(PlayerScanRadius))
             {
-                if (living is GamePlayer || living is GamePet)
+                if (living is GamePlayer or GamePet
+                    && living.IsVisibleTo(Body)
+                    && !living.IsStealthed
+                    && GameServer.ServerRules.IsAllowedToAttack(living, Body, true))
                 {
                     playerNearby = true;
                     break;
@@ -120,36 +87,35 @@ namespace DOL.AI.Brain
             // Only form squads if players/pets are nearby
             if (!playerNearby)
             {
-                base.Think();
-                return;
+                return false;
             }
 
             // 1. Escort AmteMobs (Using AggroRange)
             int scanRange = AggroRange > 0 ? AggroRange : 1000;
-
             var infantry = Body.GetNPCsInRadius((ushort)scanRange)
-                               .OfType<AmteMob>()
-                               .Where(n => !(n is MageMob) && !n.InCombat && n.IsAlive)
-                               .OrderBy(n => Body.GetDistanceTo(n))
-                               .FirstOrDefault();
-
+                .Cast<GameNPC>()
+                .Where(n => n is AmteMob { InCombat: false, IsAlive: true, ObjectState: GameObject.eObjectState.Active } and not MageMob)
+                .Cast<AmteMob>()
+                .OrderBy(n => Body.GetDistanceSquaredTo(n))
+                .FirstOrDefault();
             if (infantry != null)
             {
                 Angle angleBehind = infantry.Orientation + Angle.Degrees(180);
                 angleBehind += Angle.Degrees(Util.Random(-30, 30));
-
                 Coordinate dest = infantry.Coordinate + Vector.Create(angleBehind, EscortDistance);
-
-                if (!Body.IsWithinRadius(dest, 150))
+                if (Body.IsWithinRadius(dest, 150))
+                {
+                    if (Body.IsMoving)
+                    {
+                        Body.StopMoving();
+                        Body.TurnTo(infantry.Orientation);
+                    }
+                }
+                else if (!Body.IsMoving || !Body.Destination.IsWithinDistance(dest, 150))
                 {
                     Body.PathTo(dest, Body.MaxSpeed);
                 }
-                else if (Body.IsMoving)
-                {
-                    Body.StopMoving();
-                    Body.TurnTo(infantry.Orientation);
-                }
-                return;
+                return true;
             }
 
             // 2. Flock with other MageMobs (Using AggroRange)
@@ -157,7 +123,6 @@ namespace DOL.AI.Brain
                                  .OfType<MageMob>()
                                  .Where(m => m != Body && !m.InCombat && m.IsAlive)
                                  .ToList();
-
             if (squadMates.Count > 0)
             {
                 long totalX = Body.Coordinate.X;
@@ -172,45 +137,84 @@ namespace DOL.AI.Brain
                 int avgY = (int)(totalY / (squadMates.Count + 1));
                 Coordinate centerMass = Coordinate.Create(avgX, avgY, Body.Coordinate.Z);
 
-                if (!Body.IsWithinRadius(centerMass, 300))
+                if (Body.IsWithinOrMovingIntoRadius(centerMass, 300))
                 {
-                    Body.PathTo(centerMass, (short)(Body.MaxSpeed / 2));
+                    var closest = squadMates.OrderBy(m => Body.GetDistanceSquaredTo(m)).First();
+                    if (Body.IsWithinOrMovingIntoRadius(closest, 120))
+                    {
+                        var angleAway = closest.Coordinate.GetOrientationTo(Body.Coordinate);
+                        var dest = Body.Coordinate + Vector.Create(angleAway, 150);
+                        Body.PathTo(dest, 50);
+                        return true;
+                    }
                 }
                 else
                 {
-                    foreach (var mate in squadMates)
+                    Body.PathTo(centerMass, (short)(Body.MaxSpeed / 2));
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /// <inheritdoc />
+        protected override void AttackMostWanted()
+        {
+            if (!IsActive)
+                return;
+            
+            Body.TargetObject = CalculateNextAttackTarget();
+            if (Body.TargetObject != null)
+            {
+                // --- NUKE ---
+                if (Body.IsMoving)
+                {
+                    Body.StopMoving();
+                }
+                
+                if (!Body.IsCasting)
+                {
+                    // Prioritize offense/defense based on squad status
+                    if (GetSquadMembers(Body.Coordinate).Any())
                     {
-                        if (Body.IsWithinRadius(mate, 120))
-                        {
-                            var angleAway = mate.Coordinate.GetOrientationTo(Body.Coordinate);
-                            var dest = Body.Coordinate + Vector.Create(angleAway, 150);
-                            Body.PathTo(dest, 50);
-                            return;
-                        }
+                        if (!CheckSpells(eCheckSpellType.Offensive))
+                            CheckSpells(eCheckSpellType.Defensive);
+                    }
+                    else
+                    {
+                        if (!CheckSpells(eCheckSpellType.Defensive))
+                            CheckSpells(eCheckSpellType.Offensive);
                     }
                 }
             }
-            else
-            {
-                base.Think();
-            }
         }
 
-        private void MoveTactically(GameLiving enemy, double speedFactor, List<MageMob> squadMates)
+        private IEnumerable<MageMob> GetSquadMembers(Coordinate where)
         {
-            var angleFromEnemy = enemy.Coordinate.GetOrientationTo(Body.Coordinate);
-            var moveVector = Vector.Create(angleFromEnemy, 300);
+            int squadRange = AggroRange > 0 ? AggroRange : 1000;
+            return Body.CurrentRegion.GetNPCsInRadius(where, (ushort)squadRange, false, false)
+                .Cast<GameNPC>()
+                .Where(m => m is MageMob { IsAlive: true, ObjectState: GameObject.eObjectState.Active } mageMob && mageMob != Body)
+                .Cast<MageMob>();
+        }
 
-            if (squadMates != null && squadMates.Count > 0)
+        protected override void PerformKiteMove(GameLiving enemy, double speedFactor, double distance)
+        {
+            var myCoordinate = Body.Coordinate;
+            var angleFromEnemy = enemy.Coordinate.GetOrientationTo(myCoordinate) + Angle.Degrees(Util.Random(-20, 20));
+            var moveVector = Vector.Create(angleFromEnemy, distance);
+            Coordinate targetLoc = myCoordinate + moveVector;
+            var nearbyAllies = GetSquadMembers(targetLoc).ToList();
+            if (nearbyAllies is { Count: > 0 })
             {
                 Vector repulsion = Vector.Zero;
                 int neighbors = 0;
 
-                foreach (MageMob mate in squadMates)
+                foreach (MageMob mate in nearbyAllies)
                 {
-                    if (Body.GetDistanceTo(mate) < SquadSpacing)
+                    if (Body.IsWithinRadius(mate, SquadSpacing))
                     {
-                        var angleFromNeighbor = mate.Coordinate.GetOrientationTo(Body.Coordinate);
+                        var angleFromNeighbor = mate.Coordinate.GetOrientationTo(myCoordinate);
                         repulsion += Vector.Create(angleFromNeighbor, 150);
                         neighbors++;
                     }
@@ -218,26 +222,18 @@ namespace DOL.AI.Brain
 
                 if (neighbors > 0)
                 {
-                    moveVector = (moveVector + repulsion);
+                    targetLoc += repulsion;
                 }
             }
-            else
-            {
-                Angle wobble = Angle.Degrees(Util.Random(-20, 20));
-                moveVector = Vector.Create(angleFromEnemy + wobble, 300);
-            }
-
-            Coordinate targetLoc = Body.Coordinate + moveVector;
 
             if (Body.MaxDistance > 0 && !targetLoc.IsWithinDistance(Body.Home, Body.MaxDistance))
             {
-                var angleHome = Body.Coordinate.GetOrientationTo(Body.Home.Coordinate);
-                targetLoc = Body.Coordinate + Vector.Create(angleHome, 250);
+                var angleHome = myCoordinate.GetOrientationTo(Body.Home.Coordinate);
+                targetLoc = myCoordinate + Vector.Create(angleHome, 250);
             }
 
             var safePoint = PathingMgr.Instance.GetClosestPointAsync(Body.CurrentZone, targetLoc, 128, 128, 256);
             Coordinate finalDest = safePoint.HasValue ? Coordinate.Create(safePoint.Value) : targetLoc;
-
             // Apply speed factor
             Body.PathTo(finalDest, (short)(Body.MaxSpeed * speedFactor));
         }
@@ -258,26 +254,6 @@ namespace DOL.AI.Brain
                     return;
                 }
             }
-        }
-
-        private GamePlayer GetClosestThreat()
-        {
-            GamePlayer best = null;
-            double bestDist = 2000;
-
-            foreach (GamePlayer p in Body.GetPlayersInRadius(2000))
-            {
-                if (!p.IsAlive || p.IsStealthed || p.ObjectState != GameObject.eObjectState.Active) continue;
-                if (!GameServer.ServerRules.IsAllowedToAttack(Body, p, true)) continue;
-
-                double d = Body.GetDistanceTo(p);
-                if (d < bestDist)
-                {
-                    bestDist = d;
-                    best = p;
-                }
-            }
-            return best;
         }
     }
 }

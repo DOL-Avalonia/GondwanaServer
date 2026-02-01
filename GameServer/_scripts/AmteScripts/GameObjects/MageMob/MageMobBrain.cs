@@ -18,72 +18,64 @@ namespace DOL.AI.Brain
 
         public override int ThinkInterval => 800;
 
-        public override void Think()
+        protected override bool ThinkCombat()
         {
-            if (!Body.IsAlive || Body.IsResetting || Body.IsReturningHome || Body.IsIncapacitated || Body.IsTurningDisabled)
-            {
-                base.Think();
-                return;
-            }
-
-            if (!HasAggro)
-            {
-                base.Think();
-                return;
-            }
-
             GamePlayer closestThreat = GetClosestPlayerThreat();
-
-            if (closestThreat == null)
+            if (closestThreat != null)
             {
-                if (Body.TargetObject != null)
+                float distToThreatSquared = Body.GetDistanceSquaredTo(closestThreat);
+                const float dangerDistSquared = (DangerDistance * DangerDistance);
+                const float safeDistSquared = (SafeDistanceMin * SafeDistanceMin);
+                // --- PANIC ---
+                if (distToThreatSquared < dangerDistSquared)
                 {
-                    base.Think();
-                }
-                return;
-            }
-
-            float distToThreat = Body.GetDistanceTo(closestThreat);
-
-            // --- PANIC ---
-            if (distToThreat < DangerDistance)
-            {
-                if (Body.IsCasting)
-                {
-                    Body.StopCurrentSpellcast();
-                }
-
-                if (!Body.IsMoving || Body.Destination.IsWithinDistance(closestThreat.Position, Math.Ceiling(DangerDistance * 0.80)))
-                {
-                    // Run FAST (160% Speed)
-                    TryCastInstantSpells(closestThreat);
-                    PerformKiteMove(closestThreat, SafeDistanceMin, SpeedFast);
-                }
-            }
-            // --- ADJUSTMENT ---
-            else if (distToThreat < SafeDistanceMin)
-            {
-                if (!Body.IsCasting)
-                {
-                    if (!Body.IsMoving || Body.Destination.IsWithinDistance(closestThreat.Position, Math.Ceiling(SafeDistanceMin * 0.80)))
+                    if (Body.IsCasting)
                     {
-                        // Reposition (130% Speed)
+                        Body.StopCurrentSpellcast();
+                    }
+
+                    if (!Body.IsMoving || Body.Destination.IsWithinDistance(closestThreat.Position, Math.Ceiling(DangerDistance * 0.80)))
+                    {
+                        // Run FAST (160% Speed)
                         TryCastInstantSpells(closestThreat);
-                        PerformKiteMove(closestThreat, SafeDistanceMin, SpeedSlow);
+                        PerformKiteMove(closestThreat, DangerDistance, SpeedFast);
                     }
                 }
+                // --- ADJUSTMENT ---
+                else if (distToThreatSquared < safeDistSquared)
+                {
+                    if (!Body.IsCasting)
+                    {
+                        if (!Body.IsMoving || Body.Destination.IsWithinDistance(closestThreat.Position, Math.Ceiling(SafeDistanceMin * 0.80)))
+                        {
+                            // Reposition (130% Speed)
+                            TryCastInstantSpells(closestThreat);
+                            PerformKiteMove(closestThreat, SafeDistanceMin, SpeedSlow);
+                        }
+                    }
+                }
+                return false;
             }
-            // --- NUKE ---
-            else if (distToThreat is >= SafeDistanceMin and <= MaxCombatRange)
+
+            AttackMostWanted();
+            return HasAggro || Body.InCombat;
+        }
+
+        /// <summary>
+        /// Selects and attacks the next target or does nothing
+        /// </summary>
+        protected override void AttackMostWanted()
+        {
+            if (!IsActive)
+                return;
+
+            Body.TargetObject = CalculateNextAttackTarget();
+            if (Body.TargetObject != null)
             {
+                // --- NUKE ---
                 if (Body.IsMoving)
                 {
                     Body.StopMoving();
-                }
-
-                if (Body.TargetObject != closestThreat)
-                {
-                    Body.TargetObject = closestThreat;
                 }
 
                 if (!Body.IsCasting)
@@ -94,18 +86,14 @@ namespace DOL.AI.Brain
                     }
                 }
             }
-            else
-            {
-                base.Think();
-            }
         }
 
-        private GamePlayer GetClosestPlayerThreat()
+        protected GamePlayer GetClosestPlayerThreat()
         {
             GamePlayer closest = null;
             double shortestDist = double.MaxValue;
 
-            foreach (GamePlayer player in Body.GetPlayersInRadius((ushort)MaxCombatRange))
+            foreach (GamePlayer player in Body.GetPlayersInRadius((ushort)SafeDistanceMin))
             {
                 if (IsPlayerIgnored(player)) continue;
 
@@ -131,7 +119,7 @@ namespace DOL.AI.Brain
             return false;
         }
 
-        private void PerformKiteMove(GameLiving enemy, double distance, double speedFactor)
+        protected virtual void PerformKiteMove(GameLiving enemy, double distance, double speedFactor)
         {
             var curCoordinate = Body.Coordinate;
             var angleAway = enemy.Coordinate.GetOrientationTo(Body.Coordinate);
@@ -159,6 +147,9 @@ namespace DOL.AI.Brain
         private void TryCastInstantSpells(GameLiving target)
         {
             if (Body.IsCasting) return;
+
+            if (!GameServer.ServerRules.IsAllowedToAttack(Body, target, true))
+                return;
 
             var possibleSpells = new List<Spell>();
             if (Body.InstantHarmfulSpells is { Count: > 0 })

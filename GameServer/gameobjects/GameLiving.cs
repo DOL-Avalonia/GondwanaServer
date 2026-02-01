@@ -6288,6 +6288,10 @@ namespace DOL.GS
         public virtual bool IsMoving => CurrentSpeed != 0;
         
         public virtual Motion Motion { get; set; } = new Motion();
+
+        public bool IsWithinOrMovingIntoRadius(Position target, float distance, bool ignoreZ = false) => target.Region == CurrentRegion && IsWithinOrMovingIntoRadius(target.Coordinate, distance, ignoreZ);
+        public bool IsWithinOrMovingIntoRadius(GameObject target, float distance, bool ignoreZ = false) => IsWithinOrMovingIntoRadius(target.Position, distance, ignoreZ);
+        public bool IsWithinOrMovingIntoRadius(Coordinate target, float distance, bool ignoreZ = false) => (IsMoving ? Motion.Destination : Coordinate).IsWithinDistance(target, distance, ignoreZ);
         
         public override Angle Orientation
         {
@@ -7178,7 +7182,7 @@ namespace DOL.GS
                     m_runningSpellHandler = spellhandler;
                     m_runningSpellHandler.CastingCompleteEvent += new CastingCompleteCallback(OnAfterSpellCastSequence);
                 }
-
+                 
                 spellhandler.Ability = ab;
                 return spellhandler.CastSpell();
             }
