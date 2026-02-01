@@ -211,7 +211,12 @@ namespace DOL.AI.Brain
             {
                 Vector repulsion = Vector.Zero;
                 int neighbors = 0;
-
+                foreach (MageMob mate in nearbyAllies)
+                {
+                    moveVector += mate.Coordinate - myCoordinate;
+                }
+                moveVector /= (nearbyAllies.Count + 1);
+                targetLoc = myCoordinate + moveVector;
                 foreach (MageMob mate in nearbyAllies)
                 {
                     if (targetLoc.IsWithinDistance(mate.Coordinate, SquadSpacing))
