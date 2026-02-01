@@ -1708,12 +1708,14 @@ namespace DOL.AI.Brain
 
             if (Body.TargetObject is GameLiving living && GameServer.ServerRules.IsAllowedToAttack(Body, living, true) && (spell.Duration == 0 || !living.HasEffect(spell) || spell.SpellType.ToUpper() == "DIRECTDAMAGEWITHDEBUFF"))
             {
+                if (Body.IsMoving && !spell.IsInstantCast)
+                    Body.StopMoving();
+
                 // Offensive spells require the caster to be facing the target
                 if (Body.TargetObject != Body)
                     Body.TurnTo(Body.TargetObject);
 
                 casted = Body.CastSpell(spell, m_mobSpellLine);
-
                 if (casted && spell.CastTime > 0 && Body.IsMoving)
                     Body.StopFollowing();
             }

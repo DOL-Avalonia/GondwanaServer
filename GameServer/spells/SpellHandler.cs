@@ -679,7 +679,7 @@ namespace DOL.GS.Spells
         public virtual bool CastSpell(GameLiving targetObject)
         {
             //Disactivate AFK
-            if (Caster is GamePlayer pl && pl.PlayerAfkMessage != null)
+            if (Caster is GamePlayer { PlayerAfkMessage: not null } pl)
             {
                 pl.ResetAFK(false);
             }
@@ -791,12 +791,12 @@ namespace DOL.GS.Spells
             {
                 StartCastTimer(m_spellTarget);
 
-                if ((Caster is GamePlayer && (Caster as GamePlayer)!.IsStrafing) || Caster.IsMoving)
+                if (Caster.IsMoving || Caster is GamePlayer { IsStrafing: true })
                     CasterMoves();
             }
             else
             {
-                if (Caster.ControlledBrain == null || Caster.ControlledBrain.Body == null || !(Caster.ControlledBrain.Body is NecromancerPet))
+                if (Caster.ControlledBrain?.Body is not NecromancerPet)
                 {
                     SendCastAnimation(0);
                 }

@@ -1,6 +1,7 @@
 using DOL.GS;
 using DOL.GS.Geometry;
 using DOL.GS.Scripts;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 using static DOL.GS.Region;
@@ -17,7 +18,7 @@ namespace DOL.AI.Brain
         // Squad Parameters
         private const int SquadSpacing = 250;
         private const int EscortDistance = 450;
-        private const int PlayerScanRadius = 1200; // Player detection radius
+        private const int PlayerScanRadius = WorldMgr.VISIBILITY_DISTANCE / 2; // Player detection radius
 
         // Speed Modifiers
         private const double SpeedPanic = 1.6;
@@ -39,10 +40,10 @@ namespace DOL.AI.Brain
                     if (Body.IsCasting)
                         Body.StopCurrentSpellcast();
 
-                    // 160% Speed
-                    TryCastInstantSpells(threat);
                     if (!Body.IsMoving)
                     {
+                        // 160% Speed
+                        TryCastInstantSpells(threat);
                         PerformKiteMove(threat, SpeedPanic, PanicDistance);
                     }
                 }
@@ -50,10 +51,10 @@ namespace DOL.AI.Brain
                 {
                     if (!Body.IsCasting)
                     {
-                        // 130% Speed
-                        TryCastInstantSpells(threat);
                         if (!Body.IsMoving)
                         {
+                            // 130% Speed
+                            TryCastInstantSpells(threat);
                             PerformKiteMove(threat, SpeedTactical, SafeDistanceMin);
                         }
                     }
@@ -103,7 +104,8 @@ namespace DOL.AI.Brain
                 Angle angleBehind = infantry.Orientation + Angle.Degrees(180);
                 angleBehind += Angle.Degrees(Util.Random(-30, 30));
                 Coordinate dest = infantry.Coordinate + Vector.Create(angleBehind, EscortDistance);
-                if (Body.IsWithinRadius(dest, 150))
+                const int tolerance = EscortDistance + GameNPC.CONST_WALKTOTOLERANCE;
+                if (Body.IsWithinRadius(dest, tolerance))
                 {
                     if (Body.IsMoving)
                     {
@@ -111,7 +113,7 @@ namespace DOL.AI.Brain
                         Body.TurnTo(infantry.Orientation);
                     }
                 }
-                else if (!Body.IsMoving || !Body.Destination.IsWithinDistance(dest, 150))
+                else if (!Body.IsMoving || !Body.Destination.IsWithinDistance(dest, tolerance))
                 {
                     Body.PathTo(dest, Body.MaxSpeed);
                 }
@@ -212,9 +214,9 @@ namespace DOL.AI.Brain
 
                 foreach (MageMob mate in nearbyAllies)
                 {
-                    if (Body.IsWithinRadius(mate, SquadSpacing))
+                    if (targetLoc.IsWithinDistance(mate.Coordinate, SquadSpacing))
                     {
-                        var angleFromNeighbor = mate.Coordinate.GetOrientationTo(myCoordinate);
+                        var angleFromNeighbor = mate.Coordinate.GetOrientationTo(targetLoc);
                         repulsion += Vector.Create(angleFromNeighbor, 150);
                         neighbors++;
                     }
@@ -236,24 +238,6 @@ namespace DOL.AI.Brain
             Coordinate finalDest = safePoint.HasValue ? Coordinate.Create(safePoint.Value) : targetLoc;
             // Apply speed factor
             Body.PathTo(finalDest, (short)(Body.MaxSpeed * speedFactor));
-        }
-
-        private void TryCastInstantSpells(GameLiving target)
-        {
-            if (Body.IsCasting) return;
-
-            if (Body.InstantHarmfulSpells != null && Body.InstantHarmfulSpells.Count > 0)
-            {
-                foreach (Spell s in Body.InstantHarmfulSpells)
-                {
-                    if (Body.GetSkillDisabledDuration(s) > 0) continue;
-                    if (!Body.IsWithinRadius(target, s.Range)) continue;
-
-                    Body.TurnTo(target, false);
-                    Body.CastSpell(s, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
-                    return;
-                }
-            }
         }
     }
 }

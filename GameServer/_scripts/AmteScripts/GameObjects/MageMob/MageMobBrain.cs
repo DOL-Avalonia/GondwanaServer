@@ -54,7 +54,7 @@ namespace DOL.AI.Brain
                         }
                     }
                 }
-                return false;
+                return true;
             }
 
             AttackMostWanted();
@@ -73,11 +73,6 @@ namespace DOL.AI.Brain
             if (Body.TargetObject != null)
             {
                 // --- NUKE ---
-                if (Body.IsMoving)
-                {
-                    Body.StopMoving();
-                }
-
                 if (!Body.IsCasting)
                 {
                     if (!CheckSpells(eCheckSpellType.Defensive))
@@ -144,7 +139,7 @@ namespace DOL.AI.Brain
             Body.PathTo(destination, speed, false);
         }
 
-        private void TryCastInstantSpells(GameLiving target)
+        protected virtual void TryCastInstantSpells(GameLiving target)
         {
             if (Body.IsCasting) return;
 
