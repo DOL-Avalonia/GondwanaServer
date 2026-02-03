@@ -1138,7 +1138,7 @@ namespace DOL.GameEvents
             GetAllPlayersInvolved().ForEach(p => p.QuestList.FirstOrDefault(q => q.QuestId == actionCancelQuestId)?.AbortQuest());
         }
 
-        public async Task Stop(EndingConditionType end)
+        public async Task Stop(EndingConditionType end, bool silent = false)
         {
             var prev = CompareExchangeStatus(EventStatus.Ending, EventStatus.Started);
             if (prev != EventStatus.Started)
@@ -1155,24 +1155,25 @@ namespace DOL.GameEvents
                 EndTime = DateTimeOffset.UtcNow;
                 var (endText, endSound) = GetEndingTextAndSound(end);
 
-                if (!string.IsNullOrEmpty(endText) && EventZones?.Any() == true)
+                if (!silent)
                 {
-                    SendEventNotification((string lang) => FormatEventMessage(GetFormattedEndText(lang, Owner, endText)), (Discord == 2 || Discord == 3), true);
-                    //Enjoy the message
-                }
-
-                if (endSound > 0 && EventZones?.Any() == true)
-                {
-                    foreach (var player in GetPlayersInEventZones(EventZones))
+                    if (!string.IsNullOrEmpty(endText) && EventZones?.Any() == true)
                     {
-                        player.Out.SendSoundEffect((ushort)endSound, player.Position, 0);
+                        SendEventNotification((string lang) => FormatEventMessage(GetFormattedEndText(lang, Owner, endText)), (Discord == 2 || Discord == 3), true);
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(5));
-                }
-                else
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    if (endSound > 0 && EventZones?.Any() == true)
+                    {
+                        foreach (var player in GetPlayersInEventZones(EventZones))
+                        {
+                            player.Out.SendSoundEffect((ushort)endSound, player.Position, 0);
+                        }
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+                    }
+                    else
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+                    }
                 }
 
                 if (end == EndingConditionType.Kill && IsKillingEvent)

@@ -46,6 +46,8 @@ GameUtils.Guild.Territory.Lord.TerritoryCondition:      We will only offer our s
 GameUtils.Guild.Territory.Lord.Interrupted:             It looks like we have company, come back when you get rid of it.
 GameUtils.Guild.Territory.Lord.TooFar:                  Come back when you want to form an alliance.
 GameUtils.Guild.Territory.Lord.ConditionChanged:        I changed my mind. Talk to me again and we can figure it out.
+GameUtils.Guild.Territory.Boss.TalkRefusal:				Greetings, {0}. I do not discuss matters of state with the rank and file. Move along.
+GameUtils.Guild.Territory.Boss.CaptureDisabled:			Your guild lacks the authority to seize this land.
 GameUtils.Guild.Territory.Capture.Timer:                Territory capture
 GameUtils.Guild.Territory.Capture.Start:                {0} begins to take control of {1}!
 GameUtils.Guild.Territory.Capture.Captured:             {0} has taken control of {1}!

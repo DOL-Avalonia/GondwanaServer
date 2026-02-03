@@ -46,6 +46,8 @@ GameUtils.Guild.Territory.Lord.TerritoryCondition:      Nous n'offrirons notre s
 GameUtils.Guild.Territory.Lord.Interrupted:             On dirait qu'on a de la compagnie, revenez quand vous vous en serez débarassé.
 GameUtils.Guild.Territory.Lord.ConditionChanged:        J'ai changé d'avis. Parlez-moi à nouveau et on pourra peut-être négocier.
 GameUtils.Guild.Territory.Lord.TooFar:                  Revenez quand vous souhaiterez former une alliance.
+GameUtils.Guild.Territory.Boss.TalkRefusal:				Bonjour {0}, je ne discute pas avec les bleus, circulez.
+GameUtils.Guild.Territory.Boss.CaptureDisabled:			Votre guilde n'a pas l'autorité nécessaire pour revendiquer ce territoire.
 GameUtils.Guild.Territory.Capture.Timer:                Prise du territoire
 GameUtils.Guild.Territory.Capture.Start:                {0} commence à prendre le contrôle du territoire {1}!
 GameUtils.Guild.Territory.Capture.Captured:             {0} a pris le territoire {1}!

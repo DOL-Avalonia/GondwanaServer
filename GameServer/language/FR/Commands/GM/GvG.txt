@@ -1,0 +1,5 @@
+GvG.Manager.CaptureRestricted:	Les territoires ne peuvent être capturés qu'entre 11h00 et 00h00.
+
+GvG.Command.Status:		Statut d'ouverture forcée GvG actuel : {0}
+GvG.Command.ForcedOpen:		Le GvG est maintenant en OUVERTURE FORCÉE (restrictions horaires ignorées).
+GvG.Command.TimeSchedule:	Le GvG suit désormais le PLANNING HORAIRE.

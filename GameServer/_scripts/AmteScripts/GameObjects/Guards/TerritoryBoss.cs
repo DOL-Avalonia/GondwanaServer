@@ -3,12 +3,10 @@ using DOL.Database;
 using DOL.Events;
 using DOL.GS;
 using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using DOL.Language;
 using DOL.Territories;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DOL.GS.Scripts
@@ -16,8 +14,7 @@ namespace DOL.GS.Scripts
     /// <summary>
     /// Beware, Changing this class Name or Namespace breaks TerritoryManager
     /// </summary>
-    public class TerritoryBoss
-        : AmteMob, IGuardNPC
+    public class TerritoryBoss : AmteMob, IGuardNPC
     {
         private string originalGuildName;
 
@@ -71,25 +68,69 @@ namespace DOL.GS.Scripts
                 return false;
             if (!player.GuildRank.Claim)
             {
-                player.Out.SendMessage(string.Format("Bonjour {0}, je ne discute pas avec les bleus, circulez.", player.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.Territory.Boss.TalkRefusal", player.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return true;
             }
 
             return true;
         }
 
-
         public override void Die(GameObject killer)
         {
-            base.Die(killer);
+            bool shouldCapture = false;
+            GamePlayer killingPlayer = killer as GamePlayer;
 
-            if (killer is GamePlayer { Guild: { GuildType: Guild.eGuildType.PlayerGuild } guild })
+            if (killingPlayer != null && killingPlayer.Guild != null)
             {
-                this.GuildName = killer.GuildName;
-                TerritoryManager.Instance.ChangeGuildOwner(this, guild);
+                bool isSystemGuild = killingPlayer.Guild.IsSystemGuild;
+
+                if (!isSystemGuild && !string.IsNullOrEmpty(Properties.SERVER_GUILDS))
+                {
+                    if (Properties.SERVER_GUILDS.Split('|').Contains(killingPlayer.Guild.GuildID))
+                        isSystemGuild = true;
+                }
+
+                if (!isSystemGuild)
+                {
+                    var territory = TerritoryManager.GetTerritoryFromMobId(this.InternalID);
+                    if (territory != null && GvGManager.IsCaptureAllowed(territory, killingPlayer))
+                    {
+                        shouldCapture = true;
+                    }
+                }
+                else
+                {
+                    killingPlayer.Out.SendMessage(LanguageMgr.GetTranslation(killingPlayer.Client.Account.Language, "GameUtils.Guild.Territory.Boss.CaptureDisabled"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
+
+            if (shouldCapture)
+            {
+                this.GuildName = killingPlayer!.GuildName;
+                TerritoryManager.Instance.ChangeGuildOwner(this, killingPlayer.Guild);
+
+                base.Die(killer);
+            }
+            else
+            {
+                this.GuildName = originalGuildName;
+
+                var eventToStop = this.Event;
+                this.Event = null;
+
+                try
+                {
+                    base.Die(killer);
+                }
+                finally
+                {
+                    if (eventToStop != null)
+                    {
+                        Task.Run(() => eventToStop.Stop(DOL.GameEvents.EndingConditionType.Kill, silent: true));
+                    }
+                }
             }
         }
-
 
         public override void LoadFromDatabase(DataObject obj)
         {

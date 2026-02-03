@@ -457,12 +457,16 @@ namespace DOL.Territories
 
         public static Territory GetTerritoryFromMobId(string mobId)
         {
+            if (string.IsNullOrEmpty(mobId)) return null;
+
             foreach (var territory in Instance.Territories)
             {
-                if (territory.Mobs.Any(m => m.InternalID.Equals(mobId)))
+                if (territory.Mobs != null &&
+                    territory.Mobs.Any(m => m != null && m.InternalID != null && m.InternalID.Equals(mobId)))
+                {
                     return territory;
+                }
             }
-
             return null;
         }
 

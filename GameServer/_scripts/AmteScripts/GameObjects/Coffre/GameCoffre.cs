@@ -22,7 +22,7 @@ namespace DOL.GS.Scripts
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public const string CROCHET = "Crochet"; //Id_nb des crochets
         public const int UNLOCK_TIME = 10; //Temps pour crocheter une serrure en secondes
@@ -373,6 +373,18 @@ namespace DOL.GS.Scripts
                     {
                         if (IsSwitch)
                         {
+                            if (IsTerritoryLinked)
+                            {
+                                var territory = TerritoryManager.GetCurrentTerritory(this);
+                                bool allowed = false;
+                                if (territory != null && !territory.IsNeutral())
+                                {
+                                    if (player.Guild != null && player.Guild == territory.OwnerGuild)
+                                        allowed = true;
+                                }
+                                if (!allowed) continue;
+                            }
+
                             if (!isActivated && !HandleLockedSwitch(player))
                             {
                                 continue;
@@ -714,10 +726,24 @@ namespace DOL.GS.Scripts
                 return false;
             }
 
-            if (IsTerritoryLinked && !TerritoryManager.IsPlayerInOwnedTerritory(player, this))
+            if (IsTerritoryLinked)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "GameChest.TerritoryNotOwned"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                return false;
+                var territory = TerritoryManager.GetCurrentTerritory(this);
+                bool accessGranted = false;
+
+                if (territory != null && !territory.IsNeutral())
+                {
+                    if (player.Guild != null && player.Guild == territory.OwnerGuild)
+                    {
+                        accessGranted = true;
+                    }
+                }
+
+                if (!accessGranted)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "GameChest.TerritoryNotOwned"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
             }
 
             if (!base.Interact(player) || !player.IsAlive) return false;

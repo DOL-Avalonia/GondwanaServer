@@ -318,12 +318,12 @@ namespace DOL.GS
 
         public static int MaxTerritoriesForLevel(long level) => level switch
         {
-            < 2 => 2,
-            < 4 => 3,
-            < 7 => 4,
-            < 10 => 5,
-            < 15 => 6,
-            >= 15 => 7
+            < 2 => 1,
+            < 5 => 2,
+            < 10 => 3,
+            //< 10 => 5,
+            < 18 => 4,
+            >= 18 => 5
         };
 
         /// <summary>
@@ -344,7 +344,8 @@ namespace DOL.GS
             < 13 => 9,
             < 15 => 12,
             < 20 => 15,
-            >= 20 => 20
+            < 25 => 20,
+            >= 25 => 30
         };
 
         /// <summary>
@@ -559,7 +560,7 @@ namespace DOL.GS
                     return;
                 }
                 this.TerritoryBonusBountyPoints += 1;
-                this.TerritoryBonusExperienceFactor += 0.02;
+                this.TerritoryBonusExperienceFactor += 0.03;
             }
 
             foreach (var resist in territory.BonusResist)
