@@ -286,6 +286,7 @@ SpellDescription.DamageReturn.MainDescription:			Ricosează {0}% din daunele dir
 SpellDescription.OffProcShear.Main1:					Înlătură proc-urile ofensive active ale țintei.
 SpellDescription.OffProcShear.Main2:					Aplică un proc blestemat de înlocuire ale cărui sub-vrăji îi vindecă pe inamicii țintei când lovesc.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc de înlocuire:
+SpellDescription.RewindTime.MainDescription:			Teleportează ținta înapoi la poziția pe care o ocupa acum {0} secunde.
 
 
 # ML Spells ShortDescriptions

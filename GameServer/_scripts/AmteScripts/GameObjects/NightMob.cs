@@ -28,7 +28,7 @@ namespace DOL.GS.Scripts
 
         private int ScanHour(RegionTimer callingTimer)
         {
-            int hour = (int)(WorldMgr.GetCurrentGameTime() / 1000 / 60 / 54);
+            int hour = (int)(WorldMgr.GetCurrentGameTime() / 1000 / 60 / 60);
             bool add = false;
 
             if (StartHour < EndHour)
@@ -75,7 +75,7 @@ namespace DOL.GS.Scripts
         public override void CustomCopy(GameObject source)
         {
             NightMob nightMobCopy = source as NightMob;
-            StartHour = nightMobCopy.StartHour;
+            StartHour = nightMobCopy!.StartHour;
             EndHour = nightMobCopy.EndHour;
             base.CustomCopy(source);
         }

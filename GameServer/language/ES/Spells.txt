@@ -287,6 +287,7 @@ SpellDescription.DamageReturn.MainDescription:			Devuelve {0}% del daño directo
 SpellDescription.OffProcShear.Main1:					Elimina procs ofensivos activos del objetivo.
 SpellDescription.OffProcShear.Main2:					Aplica un proc maldito de reemplazo cuyos subhechizos curan a los enemigos del objetivo cuando estos golpean.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc de reemplazo:
+SpellDescription.RewindTime.MainDescription:			Teletransporta al objetivo a la posición que ocupaba hace {0} segundos.
 
 
 # ML Spells ShortDescriptions

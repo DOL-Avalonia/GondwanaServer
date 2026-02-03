@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Váš cíl je již zasažen efektem tohot
 SpellHandler.SpeedEnhancement.CombatRecent:	Nedávno jste byli v boji; kouzlo na vás nepůsobí!
 SpellHandler.WaterBreathing.StartEffect:	Můžete se volně pohybovat a dýchat pod vodou jako na vzduchu!
 SpellHandler.WaterBreathing.EndEffect:		Natahujete vodu a zjišťujete, že již nemůžete dýchat pod vodou!
+SpellHandler.RewindTime.Success:			Čas se vrací! Vracíš se tam, kde jsi byl před {0} sekundami.
+SpellHandler.RewindTime.NoHistory:			Cíl zatím nemá zaznamenanou žádnou časovou historii.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Již máte aktivní pozemní efekt a nemůžete seslat další!
 SpellHandler.PowerShield.EffectStart:		Starobylá magie posiluje vaši životní esenci.

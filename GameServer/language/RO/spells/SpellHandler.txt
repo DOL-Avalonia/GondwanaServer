@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Ținta ta este deja afectată de un efect
 SpellHandler.SpeedEnhancement.CombatRecent:	Ai fost recent în luptă; vraja nu are efect asupra ta!
 SpellHandler.WaterBreathing.StartEffect:	Te poți mișca liber și poți respira sub apă ca în aer!
 SpellHandler.WaterBreathing.EndEffect:		Înghiți apă și îți dai seama că nu mai poți respira sub apă!
+SpellHandler.RewindTime.Success:			Timpul se întoarce! Te întorci unde erai acum {0} secunde.
+SpellHandler.RewindTime.NoHistory:			Ținta nu are încă un istoric temporal înregistrat.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Ai deja un efect de sol activ și nu poți arunca încă unul!
 SpellHandler.PowerShield.EffectStart:		Magie străveche îți întărește esența vitală.

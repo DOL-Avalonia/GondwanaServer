@@ -287,6 +287,7 @@ SpellDescription.DamageReturn.MainDescription:			Phản trả {0}% sát thương
 SpellDescription.OffProcShear.Main1:					Gỡ các proc tấn công đang hoạt động của mục tiêu.
 SpellDescription.OffProcShear.Main2:					Áp proc thay thế bị nguyền; các tiểu phép của nó sẽ hồi máu cho kẻ địch của mục tiêu khi họ đánh trúng.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc thay thế:
+SpellDescription.RewindTime.MainDescription:			Dịch chuyển mục tiêu về vị trí mà họ đã ở đó {0} giây trước.
 
 
 # ML Spells ShortDescriptions

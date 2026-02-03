@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Your target already has an effect of that
 SpellHandler.SpeedEnhancement.CombatRecent:	You've been in combat recently, the spell has no effect on you!
 SpellHandler.WaterBreathing.StartEffect:	You find yourself able to move freely and breathe water like air!
 SpellHandler.WaterBreathing.EndEffect:		With a gulp and a gasp you realize that you are unable to breathe underwater any longer!
+SpellHandler.RewindTime.Success:			Time rewinds! You return to where you were {0} seconds ago.
+SpellHandler.RewindTime.NoHistory:			The target has no time history recorded yet.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	You already have a ground effect active and cannot cast another!
 SpellHandler.PowerShield.EffectStart:			An ancient magic enhances your vital essence.

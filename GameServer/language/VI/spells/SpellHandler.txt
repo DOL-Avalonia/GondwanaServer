@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Mục tiêu của bạn đã bị ảnh h
 SpellHandler.SpeedEnhancement.CombatRecent:	Bạn vừa tham chiến gần đây; phép không có tác dụng với bạn!
 SpellHandler.WaterBreathing.StartEffect:	Bạn có thể di chuyển tự do và thở dưới nước như trên không!
 SpellHandler.WaterBreathing.EndEffect:		Bạn sặc nước và nhận ra mình không còn thở dưới nước được nữa!
+SpellHandler.RewindTime.Success:			Thời gian đảo ngược! Bạn quay lại vị trí của {0} giây trước.
+SpellHandler.RewindTime.NoHistory:			Mục tiêu chưa có lịch sử thời gian được ghi lại.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Bạn đã có một hiệu ứng mặt đất đang hoạt động và không thể niệm thêm cái khác!
 SpellHandler.PowerShield.EffectStart:		Ma pháp cổ xưa cường hóa bản thể sinh mệnh của bạn.

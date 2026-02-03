@@ -288,6 +288,7 @@ SpellDescription.DamageReturn.MainDescription:			Renvoie {0}% des dégâts magiq
 SpellDescription.OffProcShear.Main1:				Retire tout proc offensif actif de la cible.
 SpellDescription.OffProcShear.Main2:				Applique un proc de remplacement maudit dont le sous-sort soigne les ennemis de la cible lorsqu'elle frappe.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc de remplacement :
+SpellDescription.RewindTime.MainDescription:			Téléporte la cible à la position qu'elle occupait il y a {0} secondes.
 
 
 # ML Spells ShortDescriptions

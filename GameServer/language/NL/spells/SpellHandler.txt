@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Je doel is al getroffen door een effect v
 SpellHandler.SpeedEnhancement.CombatRecent:	Je was recent in gevecht; de spreuk heeft geen effect op jou!
 SpellHandler.WaterBreathing.StartEffect:	Je kunt vrij bewegen en onder water ademen alsof je in de lucht bent!
 SpellHandler.WaterBreathing.EndEffect:		Je slikt water in en beseft dat je niet langer onder water kunt ademen!
+SpellHandler.RewindTime.Success:			Het doelwit heeft nog geen tijdgeschiedenis geregistreerd.
+SpellHandler.RewindTime.NoHistory:			Teleporteert het doelwit terug naar de positie van {0} seconden geleden.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Je hebt al een actief grondeffect en kunt er geen tweede uitspreken!
 SpellHandler.PowerShield.EffectStart:		Oude magie versterkt je levensessentie.

@@ -287,6 +287,7 @@ SpellDescription.DamageReturn.MainDescription:			Restituisce il {0}% del danno d
 SpellDescription.OffProcShear.Main1:					Rimuove i proc offensivi attivi dal bersaglio.
 SpellDescription.OffProcShear.Main2:					Applica un proc maledetto di sostituzione i cui sotto-incantesimi curano i nemici del bersaglio quando colpiscono.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc di sostituzione:
+SpellDescription.RewindTime.MainDescription:			Teletrasporta il bersaglio nella posizione in cui si trovava {0} secondi fa.
 
 
 # ML Spells ShortDescriptions

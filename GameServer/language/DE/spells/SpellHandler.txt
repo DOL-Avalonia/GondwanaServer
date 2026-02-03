@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Ihr Ziel ist bereits von einem Effekt die
 SpellHandler.SpeedEnhancement.CombatRecent:	Sie waren kürzlich im Kampf, der Zauber hat auf Sie keine Wirkung!
 SpellHandler.WaterBreathing.StartEffect:	Sie können sich frei bewegen und unter Wasser wie an der Luft atmen!
 SpellHandler.WaterBreathing.EndEffect:		Sie schlucken Wasser und erkennen plötzlich, dass Sie nicht mehr unter Wasser atmen können!
+SpellHandler.RewindTime.Success:			Die Zeit dreht sich zurück! Du kehrst dorthin zurück, wo du vor {0} Sekunden warst.
+SpellHandler.RewindTime.NoHistory:			Für das Ziel wurde noch kein Zeitverlauf aufgezeichnet.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Sie haben bereits einen aktiven Bodeneffekt und können keinen weiteren wirken!
 SpellHandler.PowerShield.EffectStart:		Uralte Magie stärkt Ihre Lebensessenz.

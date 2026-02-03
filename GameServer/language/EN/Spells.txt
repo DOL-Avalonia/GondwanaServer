@@ -288,6 +288,7 @@ SpellDescription.DamageReturn.MainDescription:			Reflects {0}% of incoming melee
 SpellDescription.OffProcShear.Main1:				Remove any active Offensive Proc(s) from the target.
 SpellDescription.OffProcShear.Main2:				Applies a cursed replacement proc whose subspell heals the target's enemies on their hits.
 SpellDescription.OffProcShear.ReplacementHeader:		Replacement proc:
+SpellDescription.RewindTime.MainDescription:			Teleports the target back to the position they occupied {0} seconds ago.
 
 
 # ML Spells ShortDescriptions

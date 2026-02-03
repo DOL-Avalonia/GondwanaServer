@@ -287,6 +287,7 @@ SpellDescription.DamageReturn.MainDescription:			Vrací {0}% přímého magické
 SpellDescription.OffProcShear.Main1:					Odstraní aktivní ofenzivní proky z cíle.
 SpellDescription.OffProcShear.Main2:					Ap likuje prok prokletí náhrady, jehož podkouzla léčí nepřátele cíle, když zasáhnou.
 SpellDescription.OffProcShear.ReplacementHeader:		Náhradní proc:
+SpellDescription.RewindTime.MainDescription:			Teleportuje cíl zpět na pozici, kterou zaujímal před {0} sekundami.
 
 
 # ML Spells ShortDescriptions

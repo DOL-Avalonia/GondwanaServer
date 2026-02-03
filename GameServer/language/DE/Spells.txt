@@ -286,6 +286,7 @@ SpellDescription.DamageReturn.MainDescription:			Leitet {0}% direkten Magieschad
 SpellDescription.OffProcShear.Main1:					Entfernt aktive Offensiv‑Procs vom Ziel.
 SpellDescription.OffProcShear.Main2:					Wendet einen verfluchten Ersatz‑Proc an, dessen Unterzauber die Feinde des Ziels bei deren Treffern heilt.
 SpellDescription.OffProcShear.ReplacementHeader:		Ersatz‑Proc:
+SpellDescription.RewindTime.MainDescription:			Teleportiert das Ziel an die Position zurück, die es vor {0} Sekunden eingenommen hat.
 
 
 # ML Spells ShortDescriptions

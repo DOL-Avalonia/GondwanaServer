@@ -40,11 +40,8 @@ namespace DOL.GS.Commands
                 {
                     if (args.Length == 3)
                     {
-                        uint speed = 0;
-                        uint time = 0;
-
-                        speed = Convert.ToUInt32(args[1]);
-                        time = Convert.ToUInt32(args[2]);
+                        uint speed = Convert.ToUInt32(args[1]);
+                        uint time = Convert.ToUInt32(args[2]);
 
                         WorldMgr.StartDay(speed, time / 1000.0);
                         return;
@@ -61,33 +58,29 @@ namespace DOL.GS.Commands
 
             if (client.Player != null)
             {
-                uint cTime = WorldMgr.GetCurrentGameTime(client.Player) / 1000;
+                uint cTime = WorldMgr.GetCurrentGameTime(client.Player);
 
-                uint hour = cTime / 60 / 60;
-                uint minute = cTime / 60 % 60;
-                uint seconds = cTime % 60;
+                // If WorldMgr returns 0-86400000:
+                uint hour = cTime / 1000 / 60 / 60;
+                uint minute = cTime / 1000 / 60 % 60;
+                uint seconds = cTime / 1000 % 60;
                 bool pm = false;
 
-                if (hour == 0)
-                {
-                    hour = 12;
-                }
-                else if (hour == 12)
-                {
+                if (hour == 12)
                     pm = true;
-                }
                 else if (hour > 12)
                 {
                     hour -= 12;
                     pm = true;
                 }
+                else if (hour == 0)
+                    hour = 12;
 
-                client.Out.SendMessage(
-                    LanguageMgr.GetTranslation(
-                        client.Account.Language,
-                        "Commands.Players.Time.Print",
-                        hour.ToString(), minute.ToString("00"), seconds.ToString("00"), (pm ? " pm" : "")),
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Time.Print", hour.ToString(), minute.ToString("00"), seconds.ToString("00"), (pm ? " pm" : " am")), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                // Display Night Time status
+                bool isNight = client.Player.CurrentRegion.IsNightTime;
+                client.Out.SendMessage($"Night time: {isNight}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
     }

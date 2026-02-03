@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Votre cible est déjà affectée par un e
 SpellHandler.SpeedEnhancement.CombatRecent:	Vous avez été en combat récemment, le sort n'a aucun effet sur vous !
 SpellHandler.WaterBreathing.StartEffect:	Vous vous trouvez capable de bouger librement et de respirer sous l'eau comme dans l'air !
 SpellHandler.WaterBreathing.EndEffect:		Vous buvez la tasse et réalisez soudain que vous n'êtes plus capable de respirer sous l'eau !
+SpellHandler.RewindTime.Success:			Le temps remonte ! Vous revenez à votre position d'il y a {0} secondes.
+SpellHandler.RewindTime.NoHistory:			La cible n'a pas encore d'historique temporel enregistré.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Vous avez déjà un effet de sol actif et ne pouvez pas en lancer un autre !
 SpellHandler.PowerShield.EffectStart:			Une magie ancienne accroît votre essence vitale.

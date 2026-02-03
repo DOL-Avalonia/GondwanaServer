@@ -276,6 +276,8 @@ SpellHandler.Silence.AlreadyAffected:		Tu objetivo ya está afectado por un efec
 SpellHandler.SpeedEnhancement.CombatRecent:	Has estado en combate recientemente; el hechizo no tiene efecto en ti.
 SpellHandler.WaterBreathing.StartEffect:	Puedes moverte libremente y respirar bajo el agua como en el aire.
 SpellHandler.WaterBreathing.EndEffect:		Tragas agua y te das cuenta de que ya no puedes respirar bajo el agua.
+SpellHandler.RewindTime.Success:			¡El tiempo retrocede! Regresas a donde estabas hace {0} segundos.
+SpellHandler.RewindTime.NoHistory:			El objetivo aún no tiene un historial temporal registrado.
 
 SpellHandler.GroundAreaEffect.AlreadyActive:	Ya tienes un efecto de suelo activo y no puedes lanzar otro.
 SpellHandler.PowerShield.EffectStart:		Una magia ancestral refuerza tu esencia vital.

@@ -710,7 +710,7 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("world", "world_pickup_distance", "How far before you can no longer pick up an object (loot for example).", 256)]
         public static int WORLD_PICKUP_DISTANCE;
 
-        [ServerProperty("world", "world_day_increment", "Day Increment (0 to 512, default is 24).  Larger increments make shorter days.", (uint)24)]
+        [ServerProperty("world", "world_day_increment", "Larger increments make shorter days. Because night time is 25% faster, it should ideally be a multiple of 4.", (uint)24)]
         public static uint WORLD_DAY_INCREMENT;
 
         [ServerProperty("world", "world_npc_update_interval", "How often (milliseconds) will npc's broadcast updates to the clients. Minimum allowed = 1000 (1 second). 0 will disable this update.", (uint)8000)]
@@ -1592,6 +1592,39 @@ namespace DOL.GS.ServerProperties
         public static bool EXPAND_WILD_MINION;
         #endregion
 
+        #region ECONOMY
+        /// <summary>
+        /// Minimum word count required to publish a book in the library.
+        /// </summary>
+        [ServerProperty("economy", "book_min_words", "Minimum word count required to publish a book.", 25)]
+        public static int BOOK_MIN_WORDS;
+
+        /// <summary>
+        /// Base price (in copper) used when the book has exactly BOOK_MIN_WORDS words.
+        /// </summary>
+        [ServerProperty("economy", "book_base_price_copper_at_min_words", "Base price (in copper) at minimum word count.", 600)]
+        public static int BOOK_BASE_PRICE_COPPER_AT_MIN_WORDS;
+
+        /// <summary>
+        /// Bonus percent applied per positive vote (e.g. 2 = +2% per upvote).
+        /// </summary>
+        [ServerProperty("economy", "book_rating_positive_bonus_percent", "Bonus percent per positive vote (+% per upvote).", 2)]
+        public static int BOOK_RATING_POSITIVE_BONUS_PERCENT;
+
+        /// <summary>
+        /// Maximum bonus percent cap from votes (e.g. 200 = price can be increased up to +200% max).
+        /// </summary>
+        [ServerProperty("economy", "book_max_rating_multiplier_percent", "Maximum percent cap for rating bonus (price cap).", 200)]
+        public static int BOOK_MAX_RATING_MULTIPLIER_PERCENT;
+
+        /// <summary>
+        /// If enabled, publishing may be refused if the text looks like spam/gibberish.
+        /// </summary>
+        [ServerProperty("economy", "book_enable_publish_heuristics", "If true, publishing may be refused when text looks like spam/gibberish.", true)]
+        public static bool BOOK_ENABLE_PUBLISH_HEURISTICS;
+
+        #endregion
+
         #region PVP / RVR
         /// <summary>
         /// Grace period in minutes to allow relog near enemy structure after link death
@@ -1766,6 +1799,12 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("duel", "duel_rematch_cooldown_seconds",
             "Cooldown in seconds before the same two players can duel again after a duel ended by a kill (win/loss). Surrenders/cancels do not trigger.", 200)]
         public static int DUEL_REMATCH_COOLDOWN_SECONDS;
+
+        /// <summary>
+        /// Duration in seconds for the King of the Hill objective before it moves
+        /// </summary>
+        [ServerProperty("pvp", "koth_duration_seconds", "Duration in seconds for the King of the Hill objective before it moves", 900)]
+        public static int KOTH_DURATION_SECONDS;
 
         #endregion
 
@@ -2824,8 +2863,11 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("guild", "guild_jailrelease_guild_only", "Whether `/gc jailrelease` should only be useable for guild members", true)]
         public static bool GUILD_JAILRELEASE_GUILD_ONLY;
 
+        [ServerProperty("guild", "guild_require_register", "If true, guilds must be formed via a stamped guild register book.", true)]
+        public static bool GUILD_REQUIRE_REGISTER = true;
 
-
+        [ServerProperty("guild", "guild_register_min_words", "Minimum word count required for a guild register story.", 50)]
+        public static int GUILD_REGISTER_MIN_WORDS = 50;
         #endregion
 
         #region CRAFT / SALVAGE

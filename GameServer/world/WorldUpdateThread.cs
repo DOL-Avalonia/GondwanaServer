@@ -41,7 +41,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Minimum Player Update Loop Refresh Rate. (ms)
@@ -129,6 +129,8 @@ namespace DOL.GS
         /// <param name="nowTicks">The actual time of the refresh.</param>
         private static void UpdatePlayerWorld(GamePlayer player, uint nowTicks)
         {
+            player.RecordPositionHistory();
+
             // Update Player Player's
             if (ServerProperties.Properties.WORLD_PLAYERTOPLAYER_UPDATE_INTERVAL > 0)
                 UpdatePlayerOtherPlayers(player, nowTicks);

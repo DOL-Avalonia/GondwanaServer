@@ -6307,6 +6307,66 @@ namespace DOL.GS
             }
             return base.MoveTo(position);
         }
+
+        private const int MAX_REWIND_HISTORY_MS = 30000;
+        private const int RECORD_HISTORY_INTERVAL = 500;
+
+        private readonly LinkedList<PositionSnapshot> m_positionHistory = new LinkedList<PositionSnapshot>();
+        private long m_lastPositionRecordTime = 0;
+
+        /// <summary>
+        /// Records the current position into history for the Time Rewind spell.
+        /// </summary>
+        public void RecordPositionHistory()
+        {
+            long now = GameTimer.GetTickCount();
+
+            if (now - m_lastPositionRecordTime < RECORD_HISTORY_INTERVAL)
+                return;
+
+            m_lastPositionRecordTime = now;
+
+            lock (m_positionHistory)
+            {
+                m_positionHistory.AddLast(new PositionSnapshot(now, this.Position));
+
+                // Cleanup: Remove points older than 30 seconds
+                while (m_positionHistory.Count > 0 &&
+                       (now - m_positionHistory.First!.Value.Timestamp) > MAX_REWIND_HISTORY_MS)
+                {
+                    m_positionHistory.RemoveFirst();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finds where the living was 'millisecondsAgo'.
+        /// </summary>
+        public Position? GetPositionFromPast(int millisecondsAgo)
+        {
+            long targetTime = GameTimer.GetTickCount() - millisecondsAgo;
+
+            lock (m_positionHistory)
+            {
+                if (m_positionHistory.Count == 0) return null;
+
+                // Iterate backwards (newest to oldest) to find the closest time
+                var node = m_positionHistory.Last;
+                while (node != null)
+                {
+                    if (node.Value.Timestamp <= targetTime)
+                    {
+                        return node.Value.Pos;
+                    }
+                    node = node.Previous;
+                }
+
+                if (m_positionHistory.First != null)
+                    return m_positionHistory.First.Value.Pos;
+            }
+
+            return null;
+        }
         #endregion
         #region Stealth
         /// <summary>

@@ -212,14 +212,9 @@ namespace DOL.GS
         private const uint DAY = 86400000;
 
         /// <summary>
-        /// This holds the tick when the day started
+        /// Handles the new day and night cycle system
         /// </summary>
-        private static uint m_dayStartTick;
-
-        /// <summary>
-        /// This holds the speed of our days
-        /// </summary>
-        private static uint m_dayIncrement;
+        private static DayNightCycle m_dayNightCycle;
 
         /// <summary>
         /// A timer that will send the daytime to all playing
@@ -550,10 +545,16 @@ namespace DOL.GS
                 m_WorldUpdateThread.IsBackground = true;
                 m_WorldUpdateThread.Start();
 
-                m_dayIncrement = Math.Max(0, Math.Min(1000, ServerProperties.Properties.WORLD_DAY_INCREMENT)); // increments > 1000 do not render smoothly on clients
-                m_dayStartTick = GameTimer.GetTickCount() - GetDayDuration() / 2; // set start time to 12pm
-                m_dayResetTimer = new Timer(new TimerCallback(DayReset), null, GetDayDuration() / 2, GetDayDuration());
+                m_dayNightCycle = new DayNightCycle();
 
+                m_dayNightCycle.NewDayStarted += (s, e) =>
+                {
+                    Territories.TerritoryManager.Instance.ProceedPayments();
+                };
+
+                m_dayNightCycle.Init();
+
+                m_dayResetTimer = new Timer(new TimerCallback(DayReset), null, 15 * 60 * 1000, 15 * 60 * 1000);
                 m_pingCheckTimer = new Timer(new TimerCallback(PingCheck), null, 10 * 1000, 0); // every 10s a check
 
                 m_relocationThread = new Thread(new ThreadStart(RelocateRegions));
@@ -691,8 +692,6 @@ namespace DOL.GS
         /// <param name="sender"></param>
         private static void DayReset(object sender)
         {
-            Territories.TerritoryManager.Instance.ProceedPayments();
-            m_dayStartTick = GameTimer.GetTickCount();
             foreach (GameClient client in GetAllPlayingClients())
             {
                 if (client.Player != null && client.Player.CurrentRegion != null && client.Player.CurrentRegion.UseTimeManager)
@@ -705,40 +704,17 @@ namespace DOL.GS
         /// <summary>
         /// Starts a new day with a certain percent of the increment
         /// </summary>
-        /// <param name="dayInc"></param>
-        /// <param name="percent">0..1</param>
         public static void StartDay(uint dayInc, double percent)
         {
-            uint dayStart = (uint)(percent * DAY);
-            m_dayIncrement = dayInc;
-
-            if (m_dayIncrement == 0)
+            if (m_dayNightCycle != null)
             {
-                // day should stand still so pause the timer
-                m_dayStartTick = dayStart;
-                m_dayResetTimer.Change(Timeout.Infinite, Timeout.Infinite);
-            }
-            else
-            {
-                m_dayStartTick = GameTimer.GetTickCount() - (dayStart / m_dayIncrement); // set start time to ...
-                m_dayResetTimer.Change((DAY - dayStart) / m_dayIncrement, Timeout.Infinite);
-            }
-
-            foreach (GameClient client in GetAllPlayingClients())
-            {
-                if (client.Player != null && client.Player.CurrentRegion != null && client.Player.CurrentRegion.UseTimeManager)
-                {
-                    client.Out.SendTime();
-                }
+                m_dayNightCycle.ChangeGameTime(dayInc, percent);
             }
         }
-
 
         /// <summary>
         /// Gets the game time for a players current region
         /// </summary>
-        /// <param name="client"></param>
-        /// <returns></returns>
         public static uint GetCurrentGameTime(GamePlayer player)
         {
             if (player.CurrentRegion != null)
@@ -750,37 +726,28 @@ namespace DOL.GS
         /// <summary>
         /// Gets the current game time
         /// </summary>
-        /// <returns>current time</returns>
         public static uint GetCurrentGameTime()
         {
-            if (m_dayIncrement == 0)
-            {
-                return m_dayStartTick;
-            }
-            else
-            {
-                var diff = GameTimer.GetTickCount() - m_dayStartTick;
-                var curTime = diff * m_dayIncrement;
-                return curTime % DAY;
-            }
+            if (m_dayNightCycle == null) return 0;
+            return (uint)m_dayNightCycle.CurrentGameTime;
         }
 
         /// <summary>
         /// Gets the tick at which the day started
+        /// (This concept doesn't exist in the new system, returning 0 to prevent errors if old scripts call it)
         /// </summary>
-        /// <returns>day start time</returns>
         public static uint GetDayStartTime()
         {
-            return m_dayStartTick;
+            return 0;
         }
 
         /// <summary>
         /// Gets the duration of a day
         /// </summary>
-        /// <returns>day duration</returns>
         public static uint GetDayDuration()
         {
-            return DAY / Math.Max(1, m_dayIncrement);
+            uint increment = GetDayIncrement();
+            return DAY / Math.Max(1, increment);
         }
 
         /// <summary>
@@ -788,13 +755,41 @@ namespace DOL.GS
         /// </summary>
         public static uint GetTimeBeforeNextDay()
         {
-            return GetDayDuration() - (GameTimer.GetTickCount() - GetDayStartTime());
+            if (m_dayNightCycle == null) return 0;
+
+            double currentTime = m_dayNightCycle.CurrentGameTime;
+            double increment = GetDayIncrement();
+            double nightIncrement = increment * 1.25; // Matching the 1.25 factor from DayNightCycle
+
+            const uint DAY_DURATION_MS = 86400000;
+            const uint HALF_DAY = DAY_DURATION_MS / 2; // 12 hours duration
+            const uint QUARTER_DAY = DAY_DURATION_MS / 4; // 06:00
+            const uint THREE_QUARTER_DAY = QUARTER_DAY * 3; // 18:00
+
+            if (currentTime < QUARTER_DAY)
+            {
+                double timeInMorningNight = (QUARTER_DAY - currentTime) / nightIncrement;
+                double timeInDay = (HALF_DAY) / increment;
+                double timeInEveningNight = (QUARTER_DAY) / nightIncrement;
+
+                return (uint)(timeInMorningNight + timeInDay + timeInEveningNight);
+            }
+            else if (currentTime < THREE_QUARTER_DAY)
+            {
+                double timeInDay = (THREE_QUARTER_DAY - currentTime) / increment;
+                double timeInEveningNight = (QUARTER_DAY) / nightIncrement;
+
+                return (uint)(timeInDay + timeInEveningNight);
+            }
+            else
+            {
+                return (uint)((DAY_DURATION_MS - currentTime) / nightIncrement);
+            }
         }
 
         /// <summary>
         /// Returns the day increment
         /// </summary>
-        /// <returns>the day increment</returns>
         public static uint GetDayIncrement(GamePlayer player)
         {
             if (player.CurrentRegion != null)
@@ -803,10 +798,10 @@ namespace DOL.GS
             return GetDayIncrement();
         }
 
-
         public static uint GetDayIncrement()
         {
-            return m_dayIncrement;
+            if (m_dayNightCycle == null) return 24;
+            return m_dayNightCycle.DayIncrement;
         }
 
 #if NETFRAMEWORK
@@ -838,6 +833,9 @@ namespace DOL.GS
         {
             try
             {
+                if (m_dayNightCycle != null)
+                    m_dayNightCycle.Stop();
+
                 if (m_pingCheckTimer != null)
                 {
                     m_pingCheckTimer.Dispose();

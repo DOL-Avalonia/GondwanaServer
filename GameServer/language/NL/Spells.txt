@@ -287,6 +287,7 @@ SpellDescription.DamageReturn.MainDescription:			Kaast {0}% van directe magische
 SpellDescription.OffProcShear.Main1:					Verwijdert actieve offensieve procs van het doelwit.
 SpellDescription.OffProcShear.Main2:					Brengt een vervloekte vervangende proc aan waarvan de subspreuken de vijanden van het doelwit healen wanneer zij raken.
 SpellDescription.OffProcShear.ReplacementHeader:		Vervangings‑proc:
+SpellDescription.RewindTime.MainDescription:			Teleporteert het doelwit terug naar de positie van {0} seconden geleden.
 
 
 # ML Spells ShortDescriptions
