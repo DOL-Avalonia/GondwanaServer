@@ -14,3 +14,5 @@ TeleportNPC.WrongTime:					Vous avez choisi le mauvais moment pour venir ici, ce
 TeleportNPC.QuestNotCompleted:			Vous devez avoir terminé la quête "{0}" afin de prouver que vous êtes digne d'aller à cet endroit !
 TeleportNPC.QuestStepNotCompleted:		Vous devez actuellement faire la quête "{0}" (étape {1}) pour que je vous téléporte à cet endroit !
 TeleportNPC.ConditionsNotMet:			Je ne peux pas encore vous transporter à cet endroit !
+TeleportNPC.ItemConsumed:			La magie épuise votre {0} ; il tombe en poussière !
+TeleportNPC.ItemDegrading:			Le voyage abîme votre {0} ({1}% de condition restante).

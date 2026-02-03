@@ -7,11 +7,7 @@ namespace DOL.AI.Brain
 {
     public class TeleportNPCBrain : AmteMobBrain
     {
-        public override int ThinkInterval
-        {
-            get { return 500; }
-        }
-
+        public override int ThinkInterval => 500;
         private uint m_previousTick = 0;
 
         public override void Think()
@@ -20,8 +16,15 @@ namespace DOL.AI.Brain
             
             if (Body is not TeleportNPC teleportNPC)
                 return;
-            
-            teleportNPC.JumpArea();
+
+            if (teleportNPC.IsAreaPulseActive)
+            {
+                teleportNPC.HandleAreaPulseThink();
+            }
+            else
+            {
+                teleportNPC.JumpArea();
+            }
 
             var currentTick = Body.CurrentRegion.GameTime;
             if (teleportNPC.HasHourConditions && teleportNPC.JumpPositions.Values.Any(j => j.Conditions.IsActiveAtTick(m_previousTick)) != teleportNPC.JumpPositions.Values.Any(j => j.Conditions.IsActiveAtTick(currentTick)))

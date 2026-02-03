@@ -24,7 +24,7 @@ namespace DOL.GS.Scripts
 {
     public class TeleportNPC : GameNPC
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region Variables
         public Dictionary<string, JumpPos> JumpPositions;
@@ -36,47 +36,40 @@ namespace DOL.GS.Scripts
         protected bool m_busy;
         
         public bool HasHourConditions { get; private set; }
-        
         public bool IsTerritoryLinked { get; set; }
-        
         public ushort RequiredModel { get; set; }
 
-        public int Range
-        {
-            get { return m_Range; }
-            set { m_Range = value; }
-        }
+        public int Range { get => m_Range; set => m_Range = value; }
+        public byte MinLevel { get => m_MinLevel; set => m_MinLevel = value; }
+        public string Text { get => m_Text; set => m_Text = value; }
+        public string Text_Refuse { get => m_Text_Refuse; set => m_Text_Refuse = value; }
 
-        public byte MinLevel
-        {
-            get { return m_MinLevel; }
-            set { m_MinLevel = value; }
-        }
-
-        public string Text
-        {
-            get { return m_Text; }
-            set { m_Text = value; }
-        }
-
-        public string Text_Refuse
-        {
-            get { return m_Text_Refuse; }
-            set { m_Text_Refuse = value; }
-        }
-
-        public bool? IsOutlawFriendly
-        {
-            get;
-            set;
-        }
+        public bool? IsOutlawFriendly { get; set; }
 
         public bool ShowTPIndicator { get; set; }
-        
         public string WhisperPassword { get; set; } = String.Empty;
         
-        private static HashSet<GamePlayer> AuthorizedPlayers = new ();
+        private static HashSet<GamePlayer> AuthorizedPlayers = new();
+        public bool ShowBoundary { get; set; }
+        public int BoundaryModel { get; set; } = 2069;
+        private readonly List<GameStaticItem> _boundaryObjects = new();
 
+        public bool UseAreaPulse { get; set; }
+        public int AreaPulseSeconds { get; set; }
+        public ushort AreaPulseClientEffect { get; set; }
+        public ushort AreaPulseCastEffect { get; set; }
+        public ushort AreaPulsePlayerEffect { get; set; }
+        private long _nextPulseMs;
+        public int AreaPulseCastTicks { get; set; } = 20;
+        private const int AREA_PULSE_BLAST_MS = 500;
+        private bool _areaPulseInProgress;
+
+        public bool IsAreaPulseActive =>
+            UseAreaPulse &&
+            AreaPulseSeconds > 0 &&
+            Range > 0 &&
+            JumpPositions != null &&
+            JumpPositions.Keys.Any(k => k.StartsWith("Area", StringComparison.OrdinalIgnoreCase));
         #endregion
 
         #region Interaction
@@ -112,7 +105,6 @@ namespace DOL.GS.Scripts
             player.Out.SendModelChange(m_teleporterIndicator, m_teleporterIndicator.GetModelForPlayer(player));
         }
 
-        /// <inheritdoc />
         public override void RefreshEffects(GamePlayer player)
         {
             base.RefreshEffects(player);
@@ -145,21 +137,24 @@ namespace DOL.GS.Scripts
         {
             if (IsTerritoryLinked == true)
             {
-                switch (CurrentTerritory?.IsOwnedBy(player))
+                var territory = CurrentTerritory ?? TerritoryManager.GetCurrentTerritory(this);
+                bool accessGranted = false;
+
+                if (territory != null && !territory.IsNeutral())
                 {
-                    case true:
-                        break;
-                    
-                    case null:
-                        log.Warn($"TextNPC {Name} (${InternalID}) has `IsTerritoryLinked = true`, but is not in a territory");
-                        goto case false;
-                        
-                    case false:
-                        if (!silent)
-                        {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NotInOwnedTerritory"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                        }
-                        return false;
+                    if (player.Guild != null && player.Guild == territory.OwnerGuild)
+                    {
+                        accessGranted = true;
+                    }
+                }
+
+                if (!accessGranted)
+                {
+                    if (!silent)
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NotInOwnedTerritory"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    }
+                    return false;
                 }
             }
 
@@ -289,10 +284,24 @@ namespace DOL.GS.Scripts
             if (!(source is GamePlayer player) || String.IsNullOrEmpty(item?.Id_nb))
                 return false;
 
-            if (IsTerritoryLinked && !TerritoryManager.IsPlayerInOwnedTerritory(player, this))
+            if (IsTerritoryLinked)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NotInOwnedTerritory"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                return false;
+                var territory = CurrentTerritory ?? TerritoryManager.GetCurrentTerritory(this);
+                bool accessGranted = false;
+
+                if (territory != null && !territory.IsNeutral())
+                {
+                    if (player.Guild != null && player.Guild == territory.OwnerGuild)
+                    {
+                        accessGranted = true;
+                    }
+                }
+
+                if (!accessGranted)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NotInOwnedTerritory"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    return false;
+                }
             }
 
             foreach (JumpPos pos in JumpPositions.Values)
@@ -337,7 +346,7 @@ namespace DOL.GS.Scripts
             {
                 conditionsNotMet.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.TooMuchExperience"));
             }
-            if (!string.IsNullOrEmpty(jumpPos.Conditions.Item) && player.Inventory.GetFirstItemByID(jumpPos.Conditions.Item, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null)
+            if (!string.IsNullOrEmpty(jumpPos.Conditions.Item) && !jumpPos.Conditions.PlayerHasItem(player))
             {
                 conditionsNotMet.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.ItemRequired"));
             }
@@ -414,26 +423,334 @@ namespace DOL.GS.Scripts
         }
         #endregion
 
+        #region Area pulse logic
+        public void HandleAreaPulseThink()
+        {
+            if (!IsAreaPulseActive)
+                return;
+
+            if (HasHourConditions)
+            {
+                var areaJump = JumpPositions.Values.FirstOrDefault(j => j.Name.StartsWith("Area", StringComparison.OrdinalIgnoreCase));
+
+                if (areaJump != null && !areaJump.Conditions.IsActiveAtTick(WorldMgr.GetCurrentGameTime()))
+                {
+                    return;
+                }
+            }
+
+            long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            if (_nextPulseMs <= 0)
+            {
+                _nextPulseMs = nowMs + (long)AreaPulseSeconds * 1000L;
+                return;
+            }
+
+            if (nowMs < _nextPulseMs)
+                return;
+
+            _nextPulseMs = nowMs + (long)AreaPulseSeconds * 1000L;
+
+            StartAreaPulseSequence();
+        }
+
+        private void StartAreaPulseSequence()
+        {
+            if (_areaPulseInProgress)
+                return;
+
+            if (ObjectState != eObjectState.Active || CurrentRegion == null)
+                return;
+
+            if (!JumpPositions.Keys.Any(k => k.StartsWith("Area", StringComparison.OrdinalIgnoreCase)))
+                return;
+
+            _areaPulseInProgress = true;
+
+            if (AreaPulseCastTicks <= 0)
+            {
+                RegionTimer blastTimer = new RegionTimer(this, AreaPulseBlastCallback);
+                blastTimer.Start(100);
+                return;
+            }
+
+            if (AreaPulseCastEffect > 0)
+            {
+                ushort castTicks = (ushort)AreaPulseCastTicks;
+                foreach (GamePlayer p in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                {
+                    p.Out.SendSpellCastAnimation(this, AreaPulseCastEffect, castTicks);
+                }
+            }
+            else if (AreaPulseClientEffect > 0)
+            {
+                ushort castTicks = (ushort)AreaPulseCastTicks;
+                foreach (GamePlayer p in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                {
+                    p.Out.SendSpellCastAnimation(this, AreaPulseClientEffect, castTicks);
+                }
+            }
+
+            int castMs = AreaPulseCastTicks * 100;
+
+            if (AreaPulseClientEffect <= 0 && AreaPulsePlayerEffect <= 0 && AreaPulseCastEffect <= 0)
+            {
+                RegionTimer t = new RegionTimer(this, AreaPulseTeleportCallback);
+                t.Start(castMs);
+                return;
+            }
+
+            RegionTimer nextPhaseTimer = new RegionTimer(this, AreaPulseBlastCallback);
+            nextPhaseTimer.Start(castMs);
+        }
+
+        private int AreaPulseBlastCallback(RegionTimer timer)
+        {
+            try
+            {
+                if (ObjectState != eObjectState.Active || CurrentRegion == null)
+                {
+                    _areaPulseInProgress = false;
+                    return 0;
+                }
+
+                if (AreaPulseClientEffect > 0)
+                {
+                    foreach (GamePlayer p in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                    {
+                        p.Out.SendSpellEffectAnimation(this, this, AreaPulseClientEffect, 0, false, 1);
+                    }
+                }
+
+                if (AreaPulsePlayerEffect > 0)
+                {
+                    var validJumps = JumpPositions.Values.Where(j => j.Name.StartsWith("Area", StringComparison.OrdinalIgnoreCase)).ToList();
+
+                    if (validJumps.Count > 0)
+                    {
+                        foreach (GamePlayer p in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                        {
+                            if (p.GetDistanceTo(this) <= m_Range)
+                            {
+                                if (IsTerritoryLinked)
+                                {
+                                    if (CurrentTerritory == null || CurrentTerritory.IsNeutral()
+                                        || p.Guild == null || p.Guild != CurrentTerritory.OwnerGuild)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                bool canJumpAny = false;
+                                foreach (var jump in validJumps)
+                                {
+                                    if (jump.CanJump(p))
+                                    {
+                                        canJumpAny = true;
+                                        break;
+                                    }
+                                }
+
+                                if (canJumpAny)
+                                {
+                                    p.Out.SendSpellEffectAnimation(this, p, AreaPulsePlayerEffect, 0, false, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                RegionTimer tpTimer = new RegionTimer(this, AreaPulseTeleportCallback);
+                tpTimer.Start(AREA_PULSE_BLAST_MS);
+            }
+            catch
+            {
+                _areaPulseInProgress = false;
+            }
+
+            return 0;
+        }
+
+        private int AreaPulseTeleportCallback(RegionTimer timer)
+        {
+            try
+            {
+                if (ObjectState != eObjectState.Active || CurrentRegion == null)
+                {
+                    _areaPulseInProgress = false;
+                    return 0;
+                }
+
+                if (m_Range <= 0)
+                {
+                    _areaPulseInProgress = false;
+                    return 0;
+                }
+
+                var validJumps = JumpPositions.Values.Where(j => j.Name.StartsWith("Area", StringComparison.OrdinalIgnoreCase)).ToList();
+
+                if (validJumps.Count == 0)
+                {
+                    _areaPulseInProgress = false;
+                    return 0;
+                }
+
+                validJumps.Sort((a, b) => {
+                    bool aHasSlot = a.Conditions.RequiredSlot > 0;
+                    bool bHasSlot = b.Conditions.RequiredSlot > 0;
+
+                    if (aHasSlot && !bHasSlot) return -1;
+                    if (!aHasSlot && bHasSlot) return 1;
+
+                    if (aHasSlot && bHasSlot)
+                    {
+                        return a.Conditions.RequiredSlot.CompareTo(b.Conditions.RequiredSlot);
+                    }
+
+                    return 0;
+                });
+
+                foreach (GamePlayer player in GetPlayersInRadius((ushort)m_Range))
+                {
+                    if (player == null) continue;
+                    if (!WillTalkTo(player, silent: true)) continue;
+                    if (player.InCombat) continue;
+
+                    if (IsTerritoryLinked)
+                    {
+                        if (CurrentTerritory == null || CurrentTerritory.IsNeutral()
+                            || player.Guild == null || player.Guild != CurrentTerritory.OwnerGuild)
+                        {
+                            continue;
+                        }
+                    }
+
+                    foreach (var pos in validJumps)
+                    {
+                        if (pos.CanJump(player))
+                        {
+                            pos.Jump(this, player);
+                            break;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                _areaPulseInProgress = false;
+            }
+
+            return 0;
+        }
+        #endregion
+
         #region JumpArea
         public void JumpArea()
         {
             if (m_Range <= 0 || JumpPositions.Count < 1)
                 return;
 
-            JumpPos pos = JumpPositions["Area"];
+            var validJumps = JumpPositions.Values.Where(j => j.Name.StartsWith("Area", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            validJumps.Sort((a, b) => {
+                bool aHasSlot = a.Conditions.RequiredSlot > 0;
+                bool bHasSlot = b.Conditions.RequiredSlot > 0;
+
+                if (aHasSlot && !bHasSlot) return -1;
+                if (!aHasSlot && bHasSlot) return 1;
+                if (aHasSlot && bHasSlot) return a.Conditions.RequiredSlot.CompareTo(b.Conditions.RequiredSlot);
+                return 0;
+            });
+
             foreach (GamePlayer player in GetPlayersInRadius((ushort)m_Range))
             {
                 if (player.Level >= m_MinLevel)
                 {
                     if (player.InCombat)
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"TeleportNPC.NoTPCombat"),
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NoTPCombat"),
                                                eChatType.CT_Important,
                                                eChatLoc.CL_SystemWindow);
+                    }
                     else
-                        pos.Jump(this, player);
+                    {
+                        if (IsTerritoryLinked)
+                        {
+                            if (CurrentTerritory == null || CurrentTerritory.IsNeutral()
+                                || player.Guild == null || player.Guild != CurrentTerritory.OwnerGuild)
+                            {
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NotInOwnedTerritory"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                                continue;
+                            }
+                        }
+
+                        foreach (var pos in validJumps)
+                        {
+                            if (pos.CanJump(player))
+                            {
+                                pos.Jump(this, player);
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                     player.Out.SendMessage(string.Format(m_Text_Refuse, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+        }
+        #endregion
+
+        #region NEW: Boundary ring spawn/cleanup
+        private void ClearBoundary()
+        {
+            foreach (var o in _boundaryObjects)
+            {
+                try { o.RemoveFromWorld(); } catch { }
+            }
+            _boundaryObjects.Clear();
+        }
+
+        private void SpawnBoundary()
+        {
+            ClearBoundary();
+
+            if (!ShowBoundary || m_Range <= 100)
+                return;
+
+            if (ObjectState != eObjectState.Active || CurrentRegion == null)
+                return;
+
+            int model = BoundaryModel > 0 ? BoundaryModel : 2069;
+            double k = 28.0 / (2.0 * Math.PI * 1000.0);
+            int count = (int)Math.Round((2.0 * Math.PI * m_Range) * k);
+            count = Math.Max(6, Math.Min(64, count));
+
+            int ringRadius = Math.Max(64, m_Range - 50);
+            var center = this.Position;
+
+            for (int i = 0; i < count; i++)
+            {
+                double t = (2.0 * Math.PI * i) / count;
+
+                Angle outward = Angle.Radians(t);
+                Vector offset = Vector.Create(outward, ringRadius);
+                Angle towardCenter = Angle.Radians(t + Math.PI);
+
+                var mini = new GameStaticItem
+                {
+                    Model = (ushort)model,
+                    Name = "Boundary",
+                    Position = Position.Create(
+                        regionID: CurrentRegionID,
+                        x: center.X + offset.X,
+                        y: center.Y + offset.Y,
+                        z: center.Z,
+                        heading: towardCenter.InHeading
+                    )
+                };
+
+                mini.AddToWorld();
+                _boundaryObjects.Add(mini);
             }
         }
         #endregion
@@ -453,6 +770,14 @@ namespace DOL.GS.Scripts
             IsTerritoryLinked = db.IsTerritoryLinked;
             ShowTPIndicator = db.ShowTPIndicator;
             WhisperPassword = db.WhisperPassword;
+            ShowBoundary = db.ShowBoundary;
+            BoundaryModel = db.BoundaryModel;
+            UseAreaPulse = db.UseAreaPulse;
+            AreaPulseSeconds = db.AreaPulseSeconds;
+            AreaPulseClientEffect = (ushort)Math.Max(0, db.AreaPulseClientEffect);
+            AreaPulseCastEffect = (ushort)Math.Max(0, db.AreaPulseCastEffect);
+            AreaPulsePlayerEffect = (ushort)Math.Max(0, db.AreaPulsePlayerEffect);
+            AreaPulseCastTicks = Math.Max(0, db.AreaPulseCastTicks);
 
             //Set this value only when OR Exclusive
             if (db.IsOutlawFriendly ^ db.IsRegularFriendly)
@@ -483,7 +808,7 @@ namespace DOL.GS.Scripts
             if (add)
                 db = new DBTeleportNPC();
 
-            db.JumpPosition = GetJumpPosString();
+            db!.JumpPosition = GetJumpPosString();
             db.Level = m_MinLevel;
             db.MobID = InternalID;
             db.Range = m_Range;
@@ -492,6 +817,16 @@ namespace DOL.GS.Scripts
             db.IsTerritoryLinked = IsTerritoryLinked;
             db.WhisperPassword = WhisperPassword;
             db.ShowTPIndicator = ShowTPIndicator;
+            db.ShowBoundary = ShowBoundary;
+            db.BoundaryModel = BoundaryModel;
+            db.UseAreaPulse = UseAreaPulse;
+            db.AreaPulseSeconds = AreaPulseSeconds;
+            db.AreaPulseClientEffect = AreaPulseClientEffect;
+            db.AreaPulseCastEffect = AreaPulseCastEffect;
+            db.AreaPulsePlayerEffect = AreaPulsePlayerEffect;
+
+            db.AreaPulseCastTicks = Math.Max(0, AreaPulseCastTicks);
+            db.AreaPulseCastTicks = Math.Max(0, db.AreaPulseCastTicks);
 
             if (IsOutlawFriendly.HasValue)
             {
@@ -510,6 +845,7 @@ namespace DOL.GS.Scripts
             else
                 GameServer.Database.SaveObject(db);
         }
+
         public override void DeleteFromDatabase()
         {
             base.DeleteFromDatabase();
@@ -620,6 +956,14 @@ namespace DOL.GS.Scripts
                 }
             }
 
+            SpawnBoundary();
+
+            if (IsAreaPulseActive)
+            {
+                long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                _nextPulseMs = nowMs + (long)AreaPulseSeconds * 1000L;
+            }
+
             if (ShowTPIndicator)
             {
                 if (m_teleporterIndicator == null)
@@ -639,7 +983,6 @@ namespace DOL.GS.Scripts
             return true;
         }
 
-        /// <inheritdoc />
         public override bool MoveTo(Position position)
         {
             if (!base.MoveTo(position))
@@ -647,11 +990,14 @@ namespace DOL.GS.Scripts
                 return false;
             }
             m_teleporterIndicator?.MoveTo(position + Vector.Create(z: 1));
+            SpawnBoundary();
             return true;
         }
 
         public override bool RemoveFromWorld()
         {
+            ClearBoundary();
+
             if (m_teleporterIndicator != null)
             {
                 m_teleporterIndicator.RemoveFromWorld();
@@ -662,9 +1008,11 @@ namespace DOL.GS.Scripts
 
         public bool ShouldShowInvisibleModel(GamePlayer player)
         {
-            if (IsTerritoryLinked && CurrentTerritory?.IsOwnedBy(player) == false)
+            if (IsTerritoryLinked)
             {
-                return false;
+                var territory = CurrentTerritory ?? TerritoryManager.GetCurrentTerritory(this);
+                if (territory == null || territory.IsNeutral() || player.Guild == null || player.Guild != territory.OwnerGuild)
+                    return false;
             }
 
             return JumpPositions.Values.Any(c => c.CanJump(player));
@@ -723,7 +1071,7 @@ namespace DOL.GS.Scripts
                     return false;
                 if (player.Level < Conditions.LevelMin || player.Level > Conditions.LevelMax)
                     return false;
-                if (!string.IsNullOrEmpty(Conditions.Item) && player.Inventory.GetFirstItemByID(Conditions.Item, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == null)
+                if (!string.IsNullOrEmpty(Conditions.Item) && !Conditions.PlayerHasItem(player))
                     return false;
                 if (!string.IsNullOrEmpty(Conditions.ActiveEventId))
                 {
@@ -761,9 +1109,38 @@ namespace DOL.GS.Scripts
                     return;
                 if (!string.IsNullOrEmpty(Conditions.Item))
                 {
-                    if (!player.Inventory.RemoveTemplate(Conditions.Item, 1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
-                        return;
-                    InventoryLogging.LogInventoryAction(player, source, eInventoryActionType.Other, Conditions.ItemTemplate, 1);
+                    if (Conditions.RequiredSlot > 0)
+                    {
+                        var item = player.Inventory.GetItem((eInventorySlot)Conditions.RequiredSlot);
+
+                        if (Conditions.ConditionAmount > 0 && item != null)
+                        {
+                            if (item.Condition > 0)
+                                item.Condition -= Conditions.ConditionAmount;
+
+                            if (item.Condition <= 0)
+                            {
+                                player.Inventory.RemoveItem(item);
+                                string msg = LanguageMgr.GetTranslation(player.Client, "TeleportNPC.ItemConsumed", item.Name);
+                                player.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            }
+                            else
+                            {
+                                player.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
+                                if (item.ConditionPercent <= 70)
+                                {
+                                    string msg = LanguageMgr.GetTranslation(player.Client, "TeleportNPC.ItemDegrading", item.Name, item.ConditionPercent);
+                                    player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!player.Inventory.RemoveTemplate(Conditions.Item, 1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                            return;
+                        InventoryLogging.LogInventoryAction(player, source, eInventoryActionType.Other, Conditions.ItemTemplate, 1);
+                    }
                 }
                 player.MoveTo(Position);
                 if (Conditions.Bind)
@@ -795,7 +1172,24 @@ namespace DOL.GS.Scripts
             public ItemTemplate ItemTemplate { get; private set; }
             public int RequiredCompletedQuestID { get; set; }
             public int RequiredQuestStepID { get; set; }
-        
+            public int RequiredSlot { get; set; }
+            public int ConditionAmount { get; set; }
+
+            public bool PlayerHasItem(GamePlayer player)
+            {
+                if (string.IsNullOrEmpty(Item)) return true;
+
+                if (RequiredSlot > 0)
+                {
+                    var item = player.Inventory.GetItem((eInventorySlot)RequiredSlot);
+                    return item != null && item.Id_nb.Equals(Item, StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    return player.Inventory.GetFirstItemByID(Item, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) != null;
+                }
+            }
+
             public bool IsActiveAtTick(uint tick)
             {
                 if (HourMin <= 0 && HourMax >= 24)
@@ -807,9 +1201,9 @@ namespace DOL.GS.Scripts
                 uint maxTick = ((uint)HourMax) * 60 * 60 * 1000;
 
                 //Heure
-                if (maxTick < minTick && (minTick > tick || tick <= maxTick))
+                if (maxTick > minTick && (tick < minTick || tick >= maxTick))
                     return false;
-                if (maxTick > minTick && (minTick > tick || tick >= maxTick))
+                if (maxTick < minTick && (tick < minTick && tick >= maxTick))
                     return false;
                 if (maxTick == minTick && tick != minTick)
                     return false;
@@ -858,6 +1252,12 @@ namespace DOL.GS.Scripts
                                 case "EventID":
                                     ActiveEventId = arg[1];
                                     break;
+                                case "Slot":
+                                    RequiredSlot = int.Parse(arg[1]);
+                                    break;
+                                case "Condition":
+                                    ConditionAmount = int.Parse(arg[1]);
+                                    break;
                             }
                         }
                     }
@@ -888,6 +1288,18 @@ namespace DOL.GS.Scripts
                     if (sb.Length > 0) sb.Append("/");
                     sb.Append("Item=");
                     sb.Append(Item);
+                }
+                if (RequiredSlot > 0)
+                {
+                    if (sb.Length > 0) sb.Append("/");
+                    sb.Append("Slot=");
+                    sb.Append(RequiredSlot);
+                }
+                if (ConditionAmount > 0)
+                {
+                    if (sb.Length > 0) sb.Append("/");
+                    sb.Append("Condition=");
+                    sb.Append(ConditionAmount);
                 }
                 if (LevelMin > 1)
                 {
@@ -946,6 +1358,12 @@ namespace DOL.GS.Scripts
                     if (sb.Length > 0) sb.Append("\n");
                     sb.Append("Item: ");
                     sb.Append(Item);
+                    if (RequiredSlot > 0)
+                    {
+                        sb.Append(" (in slot " + ((eInventorySlot)RequiredSlot).ToString() + ")");
+                        if (ConditionAmount > 0)
+                            sb.Append(" (Consumes " + ConditionAmount + " condition)");
+                    }
                 }
                 if (LevelMin > 1 || LevelMax < 50)
                 {

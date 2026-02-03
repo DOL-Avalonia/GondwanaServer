@@ -1,18 +1,20 @@
-Commands.GM.TeleportNPC.Description:			Gestions des TeleportNPC:
-Commands.GM.TeleportNPC.Usage.Create:			'/teleportnpc create [isRenaissance]' crée un nouveau TeleportNPC [isRenaissance] définit si ce npc a besoin de la renaissance du joueur pour interagir
-Commands.GM.TeleportNPC.Usage.Create.Douanier:			'/teleportnpc create douanier <gold> [isRenaissance]' Crée un Douanier où <gold> correspond au coût en Or du jump, [isRenaissance] définit si ce npc a besoin de la renaissance du joueur pour interagir
-Commands.GM.TeleportNPC.Usage.Text:			'/teleportnpc text <texte>' texte affiché lorsque le joueur peut se téléporter, le texte doit contenir {5}
-Commands.GM.TeleportNPC.Usage.Refuse:			'/teleportnpc refuse <texte>' texte affiché lorsque le joueur ne peut pas être téléporté
-Commands.GM.TeleportNPC.Usage.Radius:			'/teleportnpc radius <0 - 500>' rayon dans lequel les joueurs seront téléportés (pas de texte)
-Commands.GM.TeleportNPC.Usage.Level:			'/teleportnpc level <min level>' règle le niveau minimum pour être téléporté
-Commands.GM.TeleportNPC.Usage.AddJump:			'/teleportnpc addjump <X> <Y> <Z> <Heading> <RegionID> <Name>' ajoute un jump (ATTENTION Gloc, mettre \"Area\" comme nom pour un téléporteur automatique)
-Commands.GM.TeleportNPC.Usage.Jump:			'/teleportnpc jump' liste les jumps avec leurs conditions
-Commands.GM.TeleportNPC.Usage.RemoveJump:			'/teleportnpc removejump <Name>' supprime un jump (lieu)
-Commands.GM.TeleportNPC.Usage.Password:				'/teleportnpc password <phrase>' Définit un mot de passe requis pour activer le PNJ
-Commands.GM.TeleportNPC.Usage.Conditions.Visible:		'/teleportnpc conditions <nom du jump> visible <on/off>' Détermine si le jump est dans la liste des jumps lorsqu'on interagit avec le PNJ
-Commands.GM.TeleportNPC.Usage.Conditions.Item:				'/teleportnpc conditions <nom du jump> item <template>' Item nécessaire pour pouvoir être téléporté
-Commands.GM.TeleportNPC.Usage.Conditions.Niveaux:		'/teleportnpc conditions <nom du jump> niveaux <min> [max]' Niveau mini et max du jump
-Commands.GM.TeleportNPC.Usage.Conditions.Bind:		'/teleportnpc conditions <nom du jump> bind <on/off>' Bind le joueur après l'avoir téléporté
+Commands.GM.TeleportNPC.Description:						Gestions des TeleportNPC:
+Commands.GM.TeleportNPC.Usage.Create:						/teleportnpc create [isRenaissance]' crée un nouveau TeleportNPC [isRenaissance] définit si ce npc a besoin de la renaissance du joueur pour interagir
+Commands.GM.TeleportNPC.Usage.Create.Douanier:				/teleportnpc create douanier <gold> [isRenaissance]' Crée un Douanier où <gold> correspond au coût en Or du jump, [isRenaissance] définit si ce npc a besoin de la renaissance du joueur pour interagir
+Commands.GM.TeleportNPC.Usage.Text:							/teleportnpc text <texte>' texte affiché lorsque le joueur peut se téléporter, le texte doit contenir {5}
+Commands.GM.TeleportNPC.Usage.Refuse:						/teleportnpc refuse <texte>' texte affiché lorsque le joueur ne peut pas être téléporté
+Commands.GM.TeleportNPC.Usage.Radius:						/teleportnpc radius <0 - 500>' rayon dans lequel les joueurs seront téléportés (pas de texte)
+Commands.GM.TeleportNPC.Usage.Level:						/teleportnpc level <min level>' règle le niveau minimum pour être téléporté
+Commands.GM.TeleportNPC.Usage.AddJump:						/teleportnpc addjump <X> <Y> <Z> <Heading> <RegionID> <Name>' ajoute un jump (ATTENTION Gloc, mettre \"Area\" comme nom pour un téléporteur automatique)
+Commands.GM.TeleportNPC.Usage.Jump:							/teleportnpc jump' liste les jumps avec leurs conditions
+Commands.GM.TeleportNPC.Usage.RemoveJump:					/teleportnpc removejump <Name>' supprime un jump (lieu)
+Commands.GM.TeleportNPC.Usage.Password:						/teleportnpc password <phrase>' Définit un mot de passe requis pour activer le PNJ
+Commands.GM.TeleportNPC.Usage.Conditions.Visible:			/teleportnpc conditions <nom du jump> visible <on/off>' Détermine si le jump est dans la liste des jumps lorsqu'on interagit avec le PNJ
+Commands.GM.TeleportNPC.Usage.Conditions.Item:				/teleportnpc conditions <nom du jump> item <template>' Item nécessaire pour pouvoir être téléporté
+Commands.GM.TeleportNPC.Usage.Conditions.Slot:				/teleportnpc conditions <jump> slot <id>' Requiert que l'objet soit équipé dans un slot précis (0 = sac).
+Commands.GM.TeleportNPC.Usage.Conditions.Condition:			/teleportnpc conditions <jump> condition <montant>' Montant de durabilité/condition consommé sur l'objet (0 = rien).
+Commands.GM.TeleportNPC.Usage.Conditions.Niveaux:			/teleportnpc conditions <nom du jump> niveaux <min> [max]' Niveau mini et max du jump
+Commands.GM.TeleportNPC.Usage.Conditions.Bind:				/teleportnpc conditions <nom du jump> bind <on/off>' Bind le joueur après l'avoir téléporté
 Commands.GM.TeleportNPC.Usage.AdditionalDescription:		Dans chaque texte: {0} = nom du joueur, {1} = nom de famille, {2} = nom de sa guilde, {3} = nom de sa classe, {4} = nom de sa race, {5} liste des jumps (sauf refuse)
 Commands.GM.TeleportNPC.Usage.TerritoryLinked:				/teleportnpc territorylinked <on/off> Active ou désactive le lien du téléporteur à la propriété du territoire.
 Commands.GM.TeleportNPC.Usage.ShowTeleporterIndicator:		/teleportnpc showindicator <on/off> Active ou désactive la visibilité de l'indicateur du téléporteur.
@@ -20,3 +22,11 @@ Commands.GM.TeleportNPC.Usage.Conditions.Hours:				/teleportnpc conditions <nom 
 Commands.GM.TeleportNPC.Usage.Conditions.Event:				/teleportnpc conditions <nom du jump> event <eventID> Définit un event qui doit etre en court pour activer la téléportation.
 Commands.GM.TeleportNPC.Usage.Conditions.CompletedQuest:	/teleportnpc conditions <nom du jump> completedquest <questID> Définit l'ID de quête terminée requis.
 Commands.GM.TeleportNPC.Usage.Conditions.QuestStep:			/teleportnpc conditions <nom du jump> queststep <questID> <stepID> Définit l'ID de l'étape de quête requis pour la téléportation.
+Commands.GM.TeleportNPC.Usage.ShowBoundary:					/teleportnpc showboundary <on/off>' Active ou désactive le cercle visuel de portée.
+Commands.GM.TeleportNPC.Usage.BoundaryModel:				/teleportnpc boundarymodel <modelID>' Définit le modèle 3D utilisé pour le cercle.
+Commands.GM.TeleportNPC.Usage.AreaPulse.Use:				/teleportnpc useareapulse <on/off>' Active ou désactive l'effet de pulsation de zone.
+Commands.GM.TeleportNPC.Usage.AreaPulse.Seconds:			/teleportnpc areapulseseconds <secondes>' Définit l'intervalle en secondes de la pulsation.
+Commands.GM.TeleportNPC.Usage.AreaPulse.CastTicks:			/teleportnpc areapulsecastticks <ticks>' Durée de l'animation de cast (en ticks).
+Commands.GM.TeleportNPC.Usage.AreaPulse.ClientEffect:		/teleportnpc areapulseclienteffect <id>' Effet visuel joué sur le PNJ lui-même.
+Commands.GM.TeleportNPC.Usage.AreaPulse.CastEffect:			/teleportnpc areapulsecasteffect <id>' ID de l'animation de lancement de sort.
+Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect:		/teleportnpc areapulseplayereffect <id>' Effet visuel joué sur les joueurs à portée.

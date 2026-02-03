@@ -24,6 +24,8 @@ namespace DOL.GS.Scripts
          "Commands.GM.TeleportNPC.Usage.Password",
          "Commands.GM.TeleportNPC.Usage.Conditions.Visible",
          "Commands.GM.TeleportNPC.Usage.Conditions.Item",
+         "Commands.GM.TeleportNPC.Usage.Conditions.Slot",
+         "Commands.GM.TeleportNPC.Usage.Conditions.Condition",
          "Commands.GM.TeleportNPC.Usage.Conditions.Niveaux",
          "Commands.GM.TeleportNPC.Usage.Conditions.Bind",
          "Commands.GM.TeleportNPC.Usage.AdditionalDescription",
@@ -32,7 +34,15 @@ namespace DOL.GS.Scripts
          "Commands.GM.TeleportNPC.Usage.Conditions.CompletedQuest",
          "Commands.GM.TeleportNPC.Usage.Conditions.QuestStep",
          "Commands.GM.TeleportNPC.Usage.TerritoryLinked",
-         "Commands.GM.TeleportNPC.Usage.ShowTeleporterIndicator")]
+         "Commands.GM.TeleportNPC.Usage.ShowTeleporterIndicator",
+         "Commands.GM.TeleportNPC.Usage.ShowBoundary",
+         "Commands.GM.TeleportNPC.Usage.BoundaryModel",
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.Use",
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.Seconds",
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.CastTicks",
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.ClientEffect",
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.CastEffect",
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect")]
     public class TeleportNPCCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -309,6 +319,92 @@ namespace DOL.GS.Scripts
                     ReloadTeleportNPC(client, npc);
                     break;
 
+                #region Show Boundary
+                case "showboundary":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (args[2].Equals("on", StringComparison.CurrentCultureIgnoreCase)) npc.ShowBoundary = true;
+                    else if (args[2].Equals("off", StringComparison.CurrentCultureIgnoreCase)) npc.ShowBoundary = false;
+                    else { DisplaySyntax(client); return; }
+                    npc.SaveIntoDatabase();
+                    player.Out.SendMessage("Show boundary set to " + npc.ShowBoundary + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    ReloadTeleportNPC(client, npc);
+                    break;
+
+                case "boundarymodel":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (int.TryParse(args[2], out int bModel))
+                    {
+                        npc.BoundaryModel = bModel;
+                        npc.SaveIntoDatabase();
+                        player.Out.SendMessage("Boundary model set to " + bModel, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        ReloadTeleportNPC(client, npc);
+                    }
+                    break;
+                #endregion
+
+                #region Area Pulse Settings
+                case "useareapulse":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (args[2].Equals("on", StringComparison.CurrentCultureIgnoreCase)) npc.UseAreaPulse = true;
+                    else if (args[2].Equals("off", StringComparison.CurrentCultureIgnoreCase)) npc.UseAreaPulse = false;
+                    npc.SaveIntoDatabase();
+                    player.Out.SendMessage("UseAreaPulse set to " + npc.UseAreaPulse, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    ReloadTeleportNPC(client, npc);
+                    break;
+
+                case "areapulseseconds":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (int.TryParse(args[2], out int seconds))
+                    {
+                        npc.AreaPulseSeconds = seconds;
+                        npc.SaveIntoDatabase();
+                        player.Out.SendMessage("AreaPulseSeconds set to " + seconds, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        ReloadTeleportNPC(client, npc);
+                    }
+                    break;
+
+                case "areapulsecastticks":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (int.TryParse(args[2], out int ticks))
+                    {
+                        npc.AreaPulseCastTicks = ticks;
+                        npc.SaveIntoDatabase();
+                        player.Out.SendMessage("AreaPulseCastTicks set to " + ticks, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        ReloadTeleportNPC(client, npc);
+                    }
+                    break;
+
+                case "areapulseclienteffect":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (ushort.TryParse(args[2], out ushort effect))
+                    {
+                        npc.AreaPulseClientEffect = effect;
+                        npc.SaveIntoDatabase();
+                        player.Out.SendMessage("AreaPulseClientEffect (Self) set to " + effect, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    break;
+
+                case "areapulsecasteffect":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (ushort.TryParse(args[2], out ushort effectCast))
+                    {
+                        npc.AreaPulseCastEffect = effectCast;
+                        npc.SaveIntoDatabase();
+                        player.Out.SendMessage("AreaPulseCastEffect (Animation) set to " + effectCast, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    break;
+
+                case "areapulseplayereffect":
+                    if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
+                    if (ushort.TryParse(args[2], out ushort effectPlayer))
+                    {
+                        npc.AreaPulsePlayerEffect = effectPlayer;
+                        npc.SaveIntoDatabase();
+                        player.Out.SendMessage("AreaPulsePlayerEffect (Target) set to " + effectPlayer, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    break;
+                #endregion
+
                 #region password
                 case "password":
                     if (npc == null || args.Length < 2)
@@ -401,14 +497,32 @@ namespace DOL.GS.Scripts
 
                 #region item
                 case "item":
+                case "objet":
                     jump.Conditions.Item = args[4];
-                    DisplayMessage(client,
-                                   "Le jump \"" + jump.Name + "\" nécessite maintenant l'item avec le template: \""
-                                   + args[4] + "\".");
+                    DisplayMessage(client, "Le jump \"" + jump.Name + "\" nécessite maintenant l'item avec le template: \"" + args[4] + "\".");
+                    break;
+
+                case "slot":
+                    if (int.TryParse(args[4], out int slot))
+                    {
+                        jump.Conditions.RequiredSlot = slot;
+                        DisplayMessage(client, "Le jump \"" + jump.Name + "\" nécessite l'item équipé dans le slot: " + slot + ".");
+                    }
+                    else { DisplaySyntax(client); return; }
+                    break;
+
+                case "condition":
+                    if (int.TryParse(args[4], out int condAmount))
+                    {
+                        jump.Conditions.ConditionAmount = condAmount;
+                        DisplayMessage(client, "Le jump \"" + jump.Name + "\" consommera " + condAmount + " points de condition de l'item.");
+                    }
+                    else { DisplaySyntax(client); return; }
                     break;
                 #endregion
 
                 #region niveaux
+                case "level":
                 case "niveau":
                 case "niveaux":
                     if (int.TryParse(args[4], out min))
@@ -450,7 +564,10 @@ namespace DOL.GS.Scripts
                     break;
 
                 #region hours
+                case "hour":
                 case "hours":
+                case "heure":
+                case "heures":
                     if (int.TryParse(args[4], out min) && int.TryParse(args[5], out max))
                     {
                         jump.Conditions.HourMin = min;
@@ -467,6 +584,7 @@ namespace DOL.GS.Scripts
 
                 #region completedquest
                 case "completedquest":
+                case "quest":
                     if (int.TryParse(args[4], out questID))
                     {
                         jump.Conditions.RequiredCompletedQuestID = questID;
@@ -482,6 +600,7 @@ namespace DOL.GS.Scripts
 
                 #region queststep
                 case "queststep":
+                case "step":
                     if (int.TryParse(args[4], out questID) && int.TryParse(args[5], out stepID))
                     {
                         jump.Conditions.RequiredQuestStepID = stepID;

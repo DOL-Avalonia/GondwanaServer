@@ -13,7 +13,7 @@ namespace DOL.Database
     [DataTable(TableName = "TeleportNPC")]
     public class DBTeleportNPC : DataObject
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
@@ -34,6 +34,14 @@ namespace DOL.Database
         private bool m_IsTerritoryLinked;
         private bool m_ShowTPIndicator;
         private string m_whisperPassword = String.Empty;
+        private bool m_ShowBoundary;
+        private int m_BoundaryModel;
+        private bool m_UseAreaPulse;
+        private int m_AreaPulseSeconds;
+        private int m_AreaPulseClientEffect;
+        private int m_AreaPulseCastEffect;
+        private int m_AreaPulsePlayerEffect;
+        private int m_AreaPulseCastTicks = 20;
 
         [DataElement(AllowDbNull = false)]
         public string MobID
@@ -177,6 +185,62 @@ namespace DOL.Database
                 Dirty = true;
                 m_whisperPassword = value;
             }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public bool ShowBoundary
+        {
+            get { return m_ShowBoundary; }
+            set { Dirty = true; m_ShowBoundary = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int BoundaryModel
+        {
+            get { return m_BoundaryModel; }
+            set { Dirty = true; m_BoundaryModel = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public bool UseAreaPulse
+        {
+            get { return m_UseAreaPulse; }
+            set { Dirty = true; m_UseAreaPulse = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int AreaPulseSeconds
+        {
+            get { return m_AreaPulseSeconds; }
+            set { Dirty = true; m_AreaPulseSeconds = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int AreaPulseClientEffect
+        {
+            get { return m_AreaPulseClientEffect; }
+            set { Dirty = true; m_AreaPulseClientEffect = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int AreaPulseCastEffect
+        {
+            get { return m_AreaPulseCastEffect; }
+            set { Dirty = true; m_AreaPulseCastEffect = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int AreaPulsePlayerEffect
+        {
+            get { return m_AreaPulsePlayerEffect; }
+            set { Dirty = true; m_AreaPulsePlayerEffect = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int AreaPulseCastTicks
+        {
+            get { return m_AreaPulseCastTicks; }
+            set { Dirty = true; m_AreaPulseCastTicks = value; }
         }
     }
 }
