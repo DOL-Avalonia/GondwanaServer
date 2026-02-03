@@ -1,1 +1,6 @@
-DataQuestJson.JsonQuest.Timer:			You are already doing a timer quest, you cannot do another one in the same time.
+DataQuestJson.JsonQuest.Timer:								You are already doing a timer quest, you cannot do another one in the same time.
+DataQuestJson.JsonQuest.Inventory.FullNeedSlots:			Your inventory is full, you need {0} free slot(s) to complete this quest.
+DataQuestJson.JsonQuest.Inventory.BackpackFullDropped:		Your backpack is full, {0} is dropped on the ground.
+DataQuestJson.JsonQuest.AcceptQuest.NotEnoughSpace:			You don't have enough inventory space to accept this quest. Please make room for {0} and try again.
+DataQuestJson.JsonQuest.Repeat.DailyCompleted:				You have completed the daily quest "{0}". It will be available again tomorrow!
+DataQuestJson.JsonQuest.Repeat.WeeklyCompleted:				You have completed the weekly quest "{0}". It will be available again next week!

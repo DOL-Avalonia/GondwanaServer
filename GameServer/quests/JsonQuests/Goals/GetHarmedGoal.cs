@@ -17,6 +17,8 @@ namespace DOL.GS.Quests
     /// - TargetRegion: ushort (for NPC or region restriction; 0 => any region)
     /// - HitCount: number of hits required before the quest is cancelled (>=1)
     /// - AreaCenter / AreaRadius / AreaRegion: optional area restriction
+    /// - BodyType: optional restriction on attacker body type (e.g. "Animal", "Undead")
+    /// - MinCon / MaxCon: optional restriction on attacker con level relative to victim (-3 to +3)
     /// When Progress reaches HitCount, the entire quest is aborted.
     /// </summary>
     public class GetHarmedGoal : DataQuestJsonGoal
@@ -28,6 +30,10 @@ namespace DOL.GS.Quests
         private readonly bool _anyTarget;
         private readonly bool _playerOnly;
         private readonly GameNPC _targetNpc;
+
+        private readonly NpcTemplateMgr.eBodyType? _bodyType = null;
+        private readonly int? _minCon = null;
+        private readonly int? _maxCon = null;
 
         private readonly Region _region;
         private readonly ushort _regionId;
@@ -58,12 +64,25 @@ namespace DOL.GS.Quests
                 _region = WorldMgr.GetRegion(_regionId);
             }
 
+            if (db.BodyType != null)
+            {
+                string btStr = (string)db.BodyType;
+                if (!string.IsNullOrWhiteSpace(btStr) && Enum.TryParse(btStr, true, out NpcTemplateMgr.eBodyType parsedBT))
+                {
+                    _bodyType = parsedBT;
+                }
+            }
+
+            if (db.MinCon != null) _minCon = (int)db.MinCon;
+            if (db.MaxCon != null) _maxCon = (int)db.MaxCon;
+
             if (!_anyTarget && !_playerOnly)
             {
                 if (_regionId == 0)
                     throw new Exception($"[DataQuestJson] Quest {quest.Id}: GetHarmedGoal {goalId} needs a TargetRegion when TargetName is an NPC.");
 
                 _targetNpc = WorldMgr.GetNPCsByNameFromRegion(_targetName, _regionId, eRealm.None).FirstOrDefault();
+
                 if (_targetNpc == null)
                     throw new Exception($"[DataQuestJson] Quest {quest.Id}: can't load GetHarmedGoal {goalId}, target npc (name: {_targetName}, reg: {_regionId}) is not found");
             }
@@ -105,6 +124,10 @@ namespace DOL.GS.Quests
             dict.Add("TargetName", _targetName);
             dict.Add("TargetRegion", _regionId);
             dict.Add("HitCount", _hitCount);
+
+            if (_bodyType.HasValue) dict.Add("BodyType", _bodyType.Value.ToString());
+            if (_minCon.HasValue) dict.Add("MinCon", _minCon.Value);
+            if (_maxCon.HasValue) dict.Add("MaxCon", _maxCon.Value);
 
             if (_area != null)
             {
@@ -158,13 +181,38 @@ namespace DOL.GS.Quests
                 ad.AttackResult != eAttackResult.HitUnstyled)
                 return;
 
+            if (_bodyType.HasValue)
+            {
+                if (attacker is GameNPC npcAttacker)
+                {
+                    if (npcAttacker.BodyType != (ushort)_bodyType.Value)
+                        return;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (_minCon.HasValue || _maxCon.HasValue)
+            {
+                int conLevel = (int)victim.GetConLevel(attacker);
+
+                if (_minCon.HasValue && conLevel < _minCon.Value) return;
+                if (_maxCon.HasValue && conLevel > _maxCon.Value) return;
+            }
+
             if (attacker is GamePlayer attackerPlayer)
             {
                 if (!GameServer.ServerRules.IsAllowedToAttack(attackerPlayer, victim, false))
                     return;
 
                 if (attackerPlayer.IsPlayerGreyCon(victim))
-                    return;
+                {
+                    // If MinCon allows grey (-3), we accept it. Otherwise we reject grey kills by default.
+                    if (!_minCon.HasValue || _minCon.Value > -3)
+                        return;
+                }
             }
 
             if (_playerOnly)
@@ -182,8 +230,6 @@ namespace DOL.GS.Quests
                     npc.Name != _targetNpc.Name)
                     return;
             }
-            // else: _anyTarget => any attacker (player or NPC) is allowed
-
 
             bool finished = AdvanceGoal(questData, state);
 

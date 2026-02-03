@@ -35,6 +35,7 @@ public static class DataQuestJsonMgr
         ReloadQuests();
         GameEventMgr.AddHandlerUnique(GameObjectEvent.Interact, OnInteract);
         GameEventMgr.AddHandlerUnique(GamePlayerEvent.AcceptQuest, OnAcceptQuest);
+        GameEventMgr.AddHandlerUnique(GameLivingEvent.Whisper, OnWhisper);
     }
 
     public static DataQuestJson GetQuest(ushort id)
@@ -124,6 +125,22 @@ public static class DataQuestJsonMgr
             }
         }
     }
+
+    public static void OnWhisper(DOLEvent e, object sender, EventArgs args)
+    {
+        if (args is not WhisperEventArgs arguments)
+            return;
+
+        var player = sender as GamePlayer;
+        if (player == null)
+            return;
+
+        foreach (var quest in player.QuestList.ToList())
+        {
+            quest.Notify(e, sender, args);
+        }
+    }
+
     public static bool IsDoingTimerQuest(GamePlayer player)
     {
         //return if player is doing a quest that has a goal with a timer
@@ -142,7 +159,7 @@ public static class DataQuestJsonMgr
         //if player has no inventory space and  first quest goal has startitem
         if (player.Inventory.FindFirstEmptySlot(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack) == eInventorySlot.Invalid && quest.Goals.Count > 0 && quest.Goals[1].StartItemTemplate != null)
         {
-            player.Out.SendMessage(string.Format("You don't have enough inventory space to accept this quest. Please make room for {0} and try again.", quest.Goals[1].StartItemTemplate.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.AcceptQuest.NotEnoughSpace", quest.Goals[1].StartItemTemplate.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return;
         }
         ChatUtil.SendScreenCenter(player, $"Quest \"{quest.Name}\" accepted!");

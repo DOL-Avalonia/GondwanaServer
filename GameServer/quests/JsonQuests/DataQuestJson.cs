@@ -64,6 +64,7 @@ namespace DOL.GS.Quests
         public bool EndResetEvent;
         public string StartEventId;
         public string EndEventId;
+        public byte RepeatInterval;
 
         public List<MobGroup> RelatedMobGroups { get; private set; }
 
@@ -211,6 +212,11 @@ namespace DOL.GS.Quests
             // the player is doing this quest
             if (player.QuestList.Any(q => q.Quest == this && q.Status == eQuestStatus.InProgress))
                 return false;
+            // If repeating quest: ignore lifetime finished-count and use cooldown rules
+            if ((eQuestRepeatInterval)RepeatInterval != eQuestRepeatInterval.None)
+            {
+                return DataQuestJsonRepeatRules.CanPlayerAccept(this, player);
+            }
             var count = player.QuestListFinished.Count(q => q.Quest == this);
             if (count >= MaxCount)
                 return false;
@@ -223,7 +229,7 @@ namespace DOL.GS.Quests
             var player = data.Owner;
             if (!player.Inventory.IsSlotsFree(inventorySpaceRequired, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
-                player.Out.SendMessage(string.Format("Your inventory is full, you need {0} free slot(s) to complete this quest.", inventorySpaceRequired), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.Inventory.FullNeedSlots", inventorySpaceRequired), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -255,6 +261,10 @@ namespace DOL.GS.Quests
                 player.RecoverReputation(Reputation);
 
             data.FinishQuest();
+
+            // record cooldown for daily/weekly quests
+            DataQuestJsonRepeatRules.OnQuestJsonCompleted(this, player);
+
             SendNPCsQuestEffects(player);
             TaskManager.UpdateTaskProgress(player, "QuestsCompleted", 1);
         }
@@ -274,7 +284,7 @@ namespace DOL.GS.Quests
             {
                 InventoryLogging.LogInventoryAction(quest._db.ObjectId, $"(QUEST;{quest.Name})", "", $"(ground;{player.InternalID};{player.Name})", eInventoryActionType.Quest, item, item.Count);
                 player.CreateItemOnTheGround(item);
-                player.Out.SendMessage(string.Format("Your backpack is full, {0} is dropped on the ground.", itemTemplate.Name), eChatType.CT_Important, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.Inventory.BackpackFullDropped", itemTemplate.Name), eChatType.CT_Important, eChatLoc.CL_PopupWindow);
             }
             else
                 InventoryLogging.LogInventoryAction(quest._db.ObjectId, $"(QUEST;{quest.Name})", player, eInventoryActionType.Quest, item, item.Count);
@@ -323,6 +333,7 @@ namespace DOL.GS.Quests
             _db.EndResetEvent = EndResetEvent;
             _db.StartEventId = StartEventId;
             _db.EndEventId = EndEventId;
+            _db.RepeatInterval = RepeatInterval;
             if (_db.IsPersisted)
                 GameServer.Database.SaveObject(_db);
             else
@@ -390,6 +401,7 @@ namespace DOL.GS.Quests
             EndResetEvent = db.EndResetEvent;
             StartEventId = db.StartEventId;
             EndEventId = db.EndEventId;
+            RepeatInterval = db.RepeatInterval;
 
             var goals = JsonConvert.DeserializeObject<JArray>(db.GoalsJson);
             foreach (var json in goals)

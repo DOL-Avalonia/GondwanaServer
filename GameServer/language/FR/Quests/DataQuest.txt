@@ -1,1 +1,6 @@
-DataQuestJson.JsonQuest.Timer:			Vous faites déjà une quête chronométrée, vous ne pouvez pas en faire une autre du même type en même temps.
+DataQuestJson.JsonQuest.Timer:								Vous faites déjà une quête chronométrée, vous ne pouvez pas en faire une autre du même type en même temps.
+DataQuestJson.JsonQuest.Inventory.FullNeedSlots:			Votre inventaire est plein, il vous faut {0} emplacement(s) libre(s) pour terminer cette quête.
+DataQuestJson.JsonQuest.Inventory.BackpackFullDropped:		Votre sac est plein, {0} est déposé au sol.
+DataQuestJson.JsonQuest.AcceptQuest.NotEnoughSpace:			Vous n'avez pas assez de place dans votre inventaire pour accepter cette quête. Faites de la place pour {0} et réessayez.
+DataQuestJson.JsonQuest.Repeat.DailyCompleted:				Vous venez d'achever la quête quotidienne "{0}". Elle sera à nouveau disponible demain !
+DataQuestJson.JsonQuest.Repeat.WeeklyCompleted:				Vous venez d'achever la quête hebdomadaire "{0}". Elle sera à nouveau disponible la semaine prochaine !

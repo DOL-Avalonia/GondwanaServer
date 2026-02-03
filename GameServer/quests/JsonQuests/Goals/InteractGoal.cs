@@ -11,6 +11,7 @@ namespace DOL.GS.Quests
     public class InteractGoal : DataQuestJsonGoal
     {
         private readonly string m_text;
+        private readonly string m_responseText;
 
         public override eQuestGoalType Type => eQuestGoalType.Unknown;
         public override int ProgressTotal => 1;
@@ -21,6 +22,7 @@ namespace DOL.GS.Quests
             Target = WorldMgr.GetNPCsByNameFromRegion((string)db.TargetName ?? "", (ushort)db.TargetRegion, eRealm.None)
                 .FirstOrDefault(quest.Npc);
             m_text = db.Text;
+            m_responseText = db.ResponseText;
             hasInteraction = true;
         }
 
@@ -30,6 +32,7 @@ namespace DOL.GS.Quests
             dict.Add("TargetName", Target.Name);
             dict.Add("TargetRegion", Target.CurrentRegionID);
             dict.Add("Text", m_text);
+            dict.Add("ResponseText", m_responseText);
             return dict;
         }
 
@@ -39,25 +42,49 @@ namespace DOL.GS.Quests
         protected override void NotifyActive(PlayerQuest quest, PlayerGoalState goal, DOLEvent e, object sender, EventArgs args)
         {
             var player = quest.Owner;
+            bool requiresResponse = !string.IsNullOrWhiteSpace(m_responseText);
 
-            if (args is InteractWithEventArgs interact)
+            // CASE 1: Standard Interaction (Clicking the NPC)
+            if (e == GameObjectEvent.InteractWith && args is InteractWithEventArgs interact)
             {
+                if (requiresResponse)
+                    return;
+
                 if (interact.Target is ITextNPC textNPC && textNPC.CheckQuestAvailable(player, Quest.Name, GoalId))
                     return;
 
-                if (e == GameObjectEvent.InteractWith && interact.Target.Name == Target.Name && interact.Target.CurrentRegion == Target.CurrentRegion)
+                if (interact.Target.Name == Target.Name && interact.Target.CurrentRegion == Target.CurrentRegion)
                 {
-                    if (AdvanceGoal(quest, goal))
+                    CompleteInteractGoal(quest, goal, player);
+                }
+            }
+            // CASE 2: Text Response (Whisper)
+            else if (e == GameLivingEvent.Whisper && args is WhisperEventArgs whisper)
+            {
+                if (!requiresResponse)
+                    return;
+
+                if (whisper.Target is ITextNPC textNPC && textNPC.CheckQuestAvailable(player, Quest.Name, GoalId))
+                    return;
+
+                if (whisper.Target.Name == Target.Name && whisper.Target.CurrentRegion == Target.CurrentRegion && string.Equals(whisper.Text, m_responseText, StringComparison.OrdinalIgnoreCase))
+                {
+                    CompleteInteractGoal(quest, goal, player);
+                }
+            }
+        }
+
+        private void CompleteInteractGoal(PlayerQuest quest, PlayerGoalState goal, GamePlayer player)
+        {
+            if (AdvanceGoal(quest, goal))
+            {
+                if (!string.IsNullOrWhiteSpace(m_text))
+                {
+                    Task.Run(async () =>
                     {
-                        if (!string.IsNullOrWhiteSpace(m_text))
-                        {
-                            Task.Run(async () =>
-                            {
-                                string msg = await TranslateGoalText(player, m_text);
-                                ChatUtil.SendPopup(player, msg);
-                            });
-                        }
-                    }
+                        string msg = await TranslateGoalText(player, m_text);
+                        ChatUtil.SendPopup(player, msg);
+                    });
                 }
             }
         }

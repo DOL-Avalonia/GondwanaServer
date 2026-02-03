@@ -42,6 +42,30 @@ namespace DOL.GS.Commands
                                        new DOLEventHandler(EventPlayerMove));
         }
 
+        private static readonly HashSet<int> StealPriorityItemTypes = new HashSet<int> {35, 24, 32, 33, 29, 37, 26};
+
+        private static bool IsBackpackSlot(InventoryItem item)
+        {
+            int slot = (int)item.SlotPosition;
+            return slot >= (int)eInventorySlot.FirstBackpack && slot <= (int)eInventorySlot.LastBackpack;
+        }
+
+        private static bool IsPvPTreasure(InventoryItem item)
+        {
+            string classType = item.Template?.ClassType;
+
+            if (string.IsNullOrEmpty(classType))
+                return false;
+
+            return classType.Equals("DOL.GS.PvPTreasure", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsPriorityItemType(InventoryItem item)
+        {
+            int itemType = item.Template?.Item_Type ?? 0;
+            return StealPriorityItemTypes.Contains(itemType);
+        }
+
         public static void EventPlayerMove(DOLEvent d, object sender, EventArgs e)
         {
             GamePlayer player = sender as GamePlayer;
@@ -389,7 +413,7 @@ namespace DOL.GS.Commands
                 stealer.SaveIntoDatabase();
 
                 Random rand = new Random(DateTime.UtcNow.Millisecond);
-                if (rand.Next() > 50)
+                if (rand.Next(1, 101) > 50)
                 {
                     var mezzerClient = WorldMgr.GetClientByPlayerID(mezzerId, true, true);
 
@@ -523,57 +547,91 @@ namespace DOL.GS.Commands
             {
                 stealer.AddMoney(Currency.Copper.Mint(vol.Money));
                 target.RemoveMoney(Currency.Copper.Mint(vol.Money));
-                target.Out.SendMessage(LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealed", Money.GetString(vol.Money)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealGain", Money.GetString(vol.Money)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                target.Out.SendMessage(
+                    LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealed", Money.GetString(vol.Money)),
+                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                stealer.Out.SendMessage(
+                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealGain", Money.GetString(vol.Money)),
+                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
                 TaskManager.UpdateTaskProgress(stealer, "SuccessfulPvPThefts", 1);
-                StealGoal.OnPlayerSuccessfulSteal(stealer, target);
+                StealGoal.OnPlayerSuccessfulSteal(stealer, target, vol.Money, 0);
+                return;
             }
-            else if (vol.Status == StealResultStatus.SUSSCES_ITEM)
+
+            if (vol.Status != StealResultStatus.SUSSCES_ITEM)
+                return;
+
+            if (!stealer.Inventory.IsSlotsFree(1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
-
-                if (!stealer.Inventory.IsSlotsFree(1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
-                {
-                    stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.FullInventory"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                }
-                else
-                {
-                    var items = new List<InventoryItem>();
-                    foreach (var item in target.Inventory.AllItems)
-                    {
-                        if (item.IsDropable && item.IsTradable)
-                        {
-                            items.Add(item);
-                        }
-                    }
-
-                    int stealableItems = items.Count();
-                    if (stealableItems < 1)
-                    {
-                        stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.NothingToSteal"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                    }
-                    else
-                    {
-                        var slot = stealer.Inventory.FindFirstEmptySlot(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
-
-                        if (slot == eInventorySlot.Invalid)
-                        {
-                            stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.FullBag"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                        }
-                        else
-                        {
-                            int index = new Random(DateTime.Now.Millisecond).Next(0, stealableItems - 1);
-                            var item = items.ElementAt(index);
-                            target.Inventory.RemoveItem(item);
-                            stealer.Inventory.AddItem(slot, item);
-
-                            stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealItem", item.Name, stealer.GetPersonalizedName(target)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                            target.Out.SendMessage(LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealedItem", item.Name, target.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                            TaskManager.UpdateTaskProgress(stealer, "SuccessfulPvPThefts", 1);
-                            StealGoal.OnPlayerSuccessfulSteal(stealer, target);
-                        }
-                    }
-                }
+                stealer.Out.SendMessage(
+                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.FullInventory"),
+                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return;
             }
+
+            eInventorySlot freeSlot = stealer.Inventory.FindFirstEmptySlot(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
+            if (freeSlot == eInventorySlot.Invalid)
+            {
+                stealer.Out.SendMessage(
+                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.FullBag"),
+                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            var tier1 = new List<InventoryItem>();
+            var tier2 = new List<InventoryItem>();
+            var tier3 = new List<InventoryItem>();
+
+            foreach (var it in target.Inventory.AllItems)
+            {
+                if (it == null)
+                    continue;
+
+                if (!IsBackpackSlot(it))
+                    continue;
+
+                if (!it.IsDropable || !it.IsTradable)
+                    continue;
+
+                if (IsPvPTreasure(it))
+                    tier1.Add(it);
+                else if (IsPriorityItemType(it))
+                    tier2.Add(it);
+                else
+                    tier3.Add(it);
+            }
+
+            List<InventoryItem> pickFrom =
+                tier1.Count > 0 ? tier1 :
+                tier2.Count > 0 ? tier2 :
+                tier3;
+
+            if (pickFrom.Count < 1)
+            {
+                stealer.Out.SendMessage(
+                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.NothingToSteal"),
+                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            int idx = Util.Random(0, pickFrom.Count - 1);
+            InventoryItem stolenItem = pickFrom[idx];
+            target.Inventory.RemoveItem(stolenItem);
+            stealer.Inventory.AddItem(freeSlot, stolenItem);
+
+            stealer.Out.SendMessage(
+                LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealItem", stolenItem.Name, stealer.GetPersonalizedName(target)),
+                eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+            target.Out.SendMessage(
+                LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealedItem", stolenItem.Name, target.Name),
+                eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+            TaskManager.UpdateTaskProgress(stealer, "SuccessfulPvPThefts", 1);
+            StealGoal.OnPlayerSuccessfulSteal(stealer, target, 0, 1);
         }
     }
 

@@ -20,6 +20,13 @@ using DOL.Database.Attributes;
 
 namespace DOL.Database
 {
+    public enum eQuestRepeatInterval : byte
+    {
+        None = 0,
+        Daily = 1,
+        Weekly = 2
+    }
+
     /// <summary>
     /// Holds all the DataQuests available
     /// </summary>
@@ -68,6 +75,7 @@ namespace DOL.Database
         private bool m_endResetEvent;
         private string m_startEventId;
         private string m_endEventId;
+        private byte m_repeatInterval;
 
         public DBDataQuestJson()
         {
@@ -379,5 +387,11 @@ namespace DOL.Database
             set { Dirty = true; m_endEventId = value; }
         }
 
+        [DataElement(AllowDbNull = false)]
+        public byte RepeatInterval
+        {
+            get => m_repeatInterval;
+            set { m_repeatInterval = value; Dirty = true; }
+        }
     }
 }
