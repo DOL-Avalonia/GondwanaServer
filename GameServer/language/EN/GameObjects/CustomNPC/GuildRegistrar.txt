@@ -1,0 +1,40 @@
+# GuildRegistrar NPC
+GuildRegistrar.Keyword.FormGuild:       form a guild
+GuildRegistrar.Keyword.ConsultRegister: consult the guild register
+
+GuildRegistrar.Interact.NormalMode:     Hail, traveler. Have you come to [{0}]?
+
+GuildRegistrar.Interact.RegisterMode.Line1: Hail. If you wish to found a guild, you must present a stamped Guild Register.
+GuildRegistrar.Interact.RegisterMode.Line2: Have you come to [{0}]?
+GuildRegistrar.Interact.RegisterMode.Line3: Or would you like to [{0}]?
+
+GuildRegistrar.Whisper.Form.Normal.Line1: Gather {0} souls who would pledge to your cause and bring them before me.
+GuildRegistrar.Whisper.Form.Normal.Line2: The tithe is one gold piece. Once paid, command: /gc form <guildname>.
+
+GuildRegistrar.Whisper.Form.Register.Line1: Hand me the legalized register. The title shall be the guild name, and the founders must be inscribed within.
+GuildRegistrar.Whisper.Form.Register.Line2: Any founder named in the text may present the document.
+GuildRegistrar.Whisper.Form.Register.Line3: Would you like to [{0}]?
+
+GuildRegistrar.Receive.NotRequired:     By the new laws, a register is not required. Gather your founders and use /gc form <guildname>.
+GuildRegistrar.Receive.NotBook:         This is not a proper register book. Provide a valid document.
+GuildRegistrar.Receive.NoLedger:        This document has no ledger entry. I cannot process it.
+GuildRegistrar.Receive.NotRegister:     This document is not a Guild Register. I require the proper paperwork.
+GuildRegistrar.Receive.NotStamped:      This register lacks the Treasury Seal. Bring me a *stamped* Guild Register.
+GuildRegistrar.Receive.InvalidName:     This register title cannot be used as a guild name. It violates our naming protocols.
+GuildRegistrar.Receive.NameTaken:       That guild name is already claimed by another order.
+GuildRegistrar.Receive.IncompleteList:  The register is incomplete; the list of founders is lacking.
+GuildRegistrar.Receive.NotFounder:      Only a founder named within the register may present it for finalization.
+
+GuildRegistrar.Validate.FounderNotFound:I cannot find '{0}' in the grand census. Are you certain they exist?
+GuildRegistrar.Validate.FounderInGuild: '{0}' has already pledged allegiance to another banner. They cannot found a new order.
+GuildRegistrar.Validate.SameAccount:    For the integrity of the realm, two founders cannot belong to the same household.
+
+GuildRegistrar.Error.CreateFailed:      The spirits of the realm resist this union. The creation has failed; seek the Gods.
+GuildRegistrar.Error.TakeItemFailed:    I could not take the register from your pack. Try again.
+GuildRegistrar.Error.BookUpdateFailed:  The guild is formed, but the archives could not be updated. Inform an administrator.
+
+GuildRegistrar.Success:                 It is done. By register and seal, the guild "{0}" is now recognized by the Crown.
+
+GuildRegistrar.List.None:               No guild registers are currently on file.
+GuildRegistrar.List.Count:              Guild registers on record: {0}
+GuildRegistrar.List.StampedBy:          Stamped by:

@@ -1,10 +1,60 @@
-Librarian.InteractText01:			Hello sir, welcome to the library!
-Librarian.InteractText02:			How can I help you?
-Librarian.InteractText03:			[Consult the books]
-Librarian.InteractText04:			[Add a book]
-Librarian.ResponseText01:			Here is the list of the library's books:
-Librarian.ResponseText02:			Please give me your book and I will add it to the list.
-Librarian.ResponseText03:			I cannot find this book.
-Librarian.ResponseText04:			You are not the author of this book!
-Librarian.ResponseText05:			Sorry, this book is not recorded.
-Librarian.ResponseText06:			What is this?!
+Librarian.InteractText01:				Hello there! Welcome to the library.
+Librarian.InteractText02:				How may I help you today?
+
+Librarian.Menu.ConsultBooks:			Consult the books
+Librarian.Menu.AddBook:					Add a book
+Librarian.Menu.CollectRoyalties:		Collect royalties
+Librarian.Menu.ConsultGuildRegister:	Consult the guild register
+
+Librarian.Prefix.VotePlus:				Vote + 
+Librarian.Prefix.VoteMinus:				Vote - 
+Librarian.Prefix.Buy:					Buy 
+Librarian.Prefix.Read:					Read 
+Librarian.Prefix.LegacyBook:			Book
+
+Librarian.ResponseText01:				Here are the books currently on our shelves:
+Librarian.ResponseText02:				Hand me the book you wrote, and I will place it in the library.
+Librarian.ResponseText03:				I'm afraid I don't understand. Try choosing one of the options.
+Librarian.ResponseText04:				Hold now, this book is not yours to publish.
+Librarian.ResponseText05:				Hmm… I can't find any record of that book.
+Librarian.ResponseText06:				What is this supposed to be? I only accept book scrolls.
+
+Librarian.Book.NotFound:				I can't find that book in the library.
+Librarian.Read.AuthorOnly:				Only the author may read a book here freely.
+
+Librarian.BookList.VotesPrefixPositive:	Positive: 
+Librarian.BookList.VotesPrefixNegative:	Negative:
+
+Librarian.GuildRegister.None:			I'm sorry, there are no guild registers to consult at the moment.
+Librarian.GuildRegister.Count:			Guild registers available: {0}
+Librarian.GuildRegister.StampedBy:		Stamped by
+
+Librarian.Preview.Author:				Author: 
+Librarian.Preview.Price:				Price: 
+Librarian.Preview.Votes:				Votes: Positive: 
+Librarian.Preview.VotesSeparator:		/ Negative: 
+Librarian.Preview.PreviewLabel:			Preview: 
+
+Librarian.RoyalScroll.Dialog:			This book is written on 'Noble Parchment'. Most of the time, such parchments are meant for the Royal Treasury Clerk to legalize a guild register. Are you certain you wish to publish it here in the library?
+Librarian.RoyalScroll.Cancelled:		Very well. If you meant to legalize a guild, take that register to the Royal Treasury Clerk.
+
+Librarian.Publish.RegisterBlocked:		That is a guild register. It belongs with the Treasury Clerk, not on my shelves.
+Librarian.Publish.Added:				There we are! your book is now published and available to readers.
+Librarian.Publish.Removed:				As you wish. I have removed your book from the library.
+
+Librarian.Publish.TooShort:				I can't publish this yet. It needs at least {0} words, and it has only {1}.
+Librarian.Publish.Gibberish:			I'm afraid this text looks like nonsense. Bring me something worthy of reading.
+Librarian.Publish.Prohibited:			I cannot publish this. A forbidden term was found: '{0}'.
+
+Librarian.Buy.NotForSale:				That book cannot be purchased.
+Librarian.Buy.NotEnoughMoney:			You'll need {0} to buy that book.
+Librarian.Buy.CreateItemFail:			Something went wrong—I can't prepare the copy for you.
+Librarian.Buy.NoInventorySpace:			Your pack is full. Make room, then come back to me.
+Librarian.Buy.Success:					You buy "{0}" for {1}.
+
+Librarian.Vote.CannotVoteOwn:			You can't vote on your own book—let the readers decide.
+Librarian.Vote.AlreadyVoted:			You have already cast your vote for this book.
+Librarian.Vote.Recorded:				Your vote is noted. Thank you.
+
+Librarian.Royalties.None:				No royalties are waiting for you today.
+Librarian.Royalties.Collected:			Here you are! {0} in royalties, as promised.

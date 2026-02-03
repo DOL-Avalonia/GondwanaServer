@@ -1,5 +1,66 @@
 # RoyalTreasuryClerk NPC
-RoyalTreasuryClerk.Checking:		Let me check to see if you are owed any items ...
-RoyalTreasuryClerk.Nostone:             I see you are missing your Personal Bind Recall Stone.  Would you like [another]?
-RoyalTreasuryClerk.Other:		another
-RoyalTreasuryClerk.Stonegive:           Very well then, here's your Personal Bind Recall Stone, may it serve you well.
+RoyalTreasuryClerk.Checking:			Let me check to see if you are owed any items ...
+RoyalTreasuryClerk.Nostone:             I see you are missing your Personal Bind Recall Stone. Would you like [another]?
+RoyalTreasuryClerk.Other:				another
+RoyalTreasuryClerk.Stonegive:			Very well then, here's your Personal Bind Recall Stone, may it serve you well.
+
+RoyalTreasuryClerk.Stone.Checking:		While you are here, I can also assist with bind recall services.
+RoyalTreasuryClerk.Stone.Missing:		You are missing your Personal Bind Recall Stone. Would you like [another]?
+RoyalTreasuryClerk.Stone.HaveOne:		Your Personal Bind Recall Stone is in your possession. If you lose it, ask for another.
+RoyalTreasuryClerk.Stone.Give:			Very well. Here is a new Personal Bind Recall Stone—guard it carefully.
+
+RoyalTreasuryClerk.Keyword.GuildRegister:	guild register
+RoyalTreasuryClerk.Interact.Intro.Line1:	The Royal Treasury Clerk taps a heavy ledger.
+RoyalTreasuryClerk.Interact.Intro.Line2:	If you have the necessary documentation to found a guild, I can legalize a [{0}].
+
+RoyalTreasuryClerk.Whisper.Guild.Line1:		To be recognized by law, you must present a Guild Register.
+RoyalTreasuryClerk.Whisper.Guild.Line2:		It must be written on a 'Parchemin noble vierge' using 'Encre de chancellerie'.
+RoyalTreasuryClerk.Whisper.Guild.Line3:		Bring me the written register (the book item), and I will examine it.
+
+RoyalTreasuryClerk.Validate.NotRegister:	This is not a proper register book. Please bring me a valid document.
+RoyalTreasuryClerk.Validate.NotParchment:	This is not written on noble parchment. I require a register made from a 'Parchemin noble vierge'.
+RoyalTreasuryClerk.Validate.NotInk:			This register is not written in chancery ink. I require 'Encre de chancellerie'.
+RoyalTreasuryClerk.Validate.TooShort:		This manifesto is too short. A guild register must contain at least {0} words. Yours has {1}.
+RoyalTreasuryClerk.Validate.Gibberish:		This register appears to contain nonsense. Rewrite it properly before returning.
+RoyalTreasuryClerk.Validate.Prohibited			This register contains prohibited content ('{0}'). Rewrite it properly.
+RoyalTreasuryClerk.Validate.TitleProhibited:	The title contains prohibited content ('{0}'). Choose another guild name.
+RoyalTreasuryClerk.Validate.NameInvalid:		This title cannot be registered as a guild name. Ensure it follows naming protocols.
+RoyalTreasuryClerk.Validate.NameTaken:		That name is already claimed by another guild. You must choose a unique name.
+
+RoyalTreasuryClerk.Resume.Lost:				Our paperwork has vanished from the archives. We must begin again.
+RoyalTreasuryClerk.Resume.NoActive:			No active register was found in your inventory. Begin with a guild register.
+RoyalTreasuryClerk.Resume.Leader.Line1:		We were in the middle of a registration procedure.
+RoyalTreasuryClerk.Resume.Leader.Line2:		Your register is in order.
+RoyalTreasuryClerk.Resume.Leader.Line3:		We shall begin with the head of the order. Speak the name of the Guild Leader.
+RoyalTreasuryClerk.Resume.Member.Line1:		I have inscribed {0} as the leader.
+RoyalTreasuryClerk.Resume.Member.Line2:		Now, I must list the founding members. State the name of the next signatory ({0}/{1}).
+RoyalTreasuryClerk.Resume.Stamp.Line1:		The scroll is complete and all founders are present.
+RoyalTreasuryClerk.Resume.Stamp.Line2:		One final formality: hand me the 'Cachet de chancellerie' (guild_stamp) to seal this document into law.
+
+RoyalTreasuryClerk.Process.Start.Line1:		Very well... the prose is acceptable, and the parchment is in order.
+RoyalTreasuryClerk.Process.Start.Line2:		We must now record the signatories of this charter.
+RoyalTreasuryClerk.Process.Start.Line3:		To begin, state the name of the Guild Leader.
+RoyalTreasuryClerk.Process.LeaderSaved.Line1:	Excellent. {0} is noted as the leader.
+RoyalTreasuryClerk.Process.LeaderSaved.Line2:	Proceed with the other founders. I require {0} more names for the archives.
+RoyalTreasuryClerk.Process.DuplicateMember:		That citizen is already listed among the founders. Give me a different name.
+RoyalTreasuryClerk.Process.MemberSaved:			It is noted. State the next founder ({0}/{1}).
+RoyalTreasuryClerk.Process.AwaitStamp.Line1:	The documentation is complete.
+RoyalTreasuryClerk.Process.AwaitStamp.Line2:	You must now affix the official seal. Hand me the 'Cachet de chancellerie' to legalize this register.
+
+RoyalTreasuryClerk.Confirm.Dialog.Line1:	The Register Title shall be the Guild Name:
+RoyalTreasuryClerk.Confirm.Dialog.Line2:	Do you confirm this is the correct name?
+RoyalTreasuryClerk.Confirm.Declined:		Very well. Tell me the corrected name for the guild.
+
+RoyalTreasuryClerk.Stamp.WrongItem:			That is not the proper seal. Bring me a 'Cachet de chancellerie'.
+RoyalTreasuryClerk.Stamp.TakeFail:			I could not take the seal. Please try again.
+RoyalTreasuryClerk.Stamp.NoLedger:			This document has no ledger entry in my books. I cannot process it.
+RoyalTreasuryClerk.Stamp.AlreadyDone:		This register is already legalized. Bring it to the Guild Registrar.
+RoyalTreasuryClerk.Stamp.Incomplete:		This register is incomplete. I cannot stamp it.
+RoyalTreasuryClerk.Stamp.Success.Line1:		It is done. By seal and ledger, this register is legalized.
+RoyalTreasuryClerk.Stamp.Success.Line2:		Bring it to the Guild Registrar to materialize the guild.
+
+RoyalTreasuryClerk.Founder.NoName:			Please whisper a character name.
+RoyalTreasuryClerk.Founder.NotFound:		That name is not recorded in our census. Whisper another name.
+RoyalTreasuryClerk.Founder.InGuild:			That citizen is already sworn to a guild. Whisper another name.
+RoyalTreasuryClerk.Founder.NoAccount:		That character has no valid residency entry. Whisper another name.
+RoyalTreasuryClerk.Founder.SameAccount:		For the integrity of the realm, two founders cannot share the same household. Give me a different name.

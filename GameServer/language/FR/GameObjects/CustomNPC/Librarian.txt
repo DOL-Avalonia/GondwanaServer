@@ -1,10 +1,60 @@
-Librarian.InteractText01:			Bonjour et bienvenue à la bibliothèque !
-Librarian.InteractText02:			Que voulez-vous ?
-Librarian.InteractText03:			[Voir les livres]
-Librarian.InteractText04:			[Ajouter un livre]
-Librarian.ResponseText01:			Voici la liste des livres que je détiens:
-Librarian.ResponseText02:			Donnez-moi votre livre et je l'ajouterai.
-Librarian.ResponseText03:			Je ne trouve pas ce livre.
-Librarian.ResponseText04:			Vous n'êtes pas l'auteur de ce livre !
-Librarian.ResponseText05:			Désolé, ce livre est introuvable.
-Librarian.ResponseText06:			Qu'est-ce que c'est ?!
+Librarian.InteractText01:				Bonjour à vous ! Soyez le bienvenu à la bibliothèque.
+Librarian.InteractText02:				Que puis-je faire pour vous ?
+
+Librarian.Menu.ConsultBooks:			Voir les livres
+Librarian.Menu.AddBook:					Ajouter un livre
+Librarian.Menu.CollectRoyalties:		Récupérer les redevances
+Librarian.Menu.ConsultGuildRegister:	Voir le registre de guildes
+
+Librarian.Prefix.VotePlus:				Vote + 
+Librarian.Prefix.VoteMinus:				Vote - 
+Librarian.Prefix.Buy:					Acheter 
+Librarian.Prefix.Read:					Lire 
+Librarian.Prefix.LegacyBook:			Livre
+
+Librarian.ResponseText01:				Voici les ouvrages actuellement disponibles sur nos étagères :
+Librarian.ResponseText02:				Donnez-moi le livre que vous avez écrit, et je le mettrai à disposition ici.
+Librarian.ResponseText03:				Je ne comprends pas bien… choisissez plutôt l'une des options proposées.
+Librarian.ResponseText04:				Doucement ! Ce livre ne vous appartient pas : vous ne pouvez pas le publier.
+Librarian.ResponseText05:				Hum… je ne trouve aucune trace de cet ouvrage.
+Librarian.ResponseText06:				Qu'est-ce donc ? Je n'accepte que des parchemins de livre.
+
+Librarian.Book.NotFound:				Je ne retrouve pas ce livre dans la bibliothèque.
+Librarian.Read.AuthorOnly:				Seul l'auteur peut lire gratuitement un livre ici.
+
+Librarian.BookList.VotesPrefixPositive:	Positif : 
+Librarian.BookList.VotesPrefixNegative:	Négatif : 
+
+Librarian.GuildRegister.None:			Désolé… je n'ai aucun registre de guilde à vous montrer pour l'instant.
+Librarian.GuildRegister.Count:			Registres de guildes disponibles : {0}
+Librarian.GuildRegister.StampedBy:		Cacheté par
+
+Librarian.Preview.Author:				Auteur : 
+Librarian.Preview.Price:				Prix : 
+Librarian.Preview.Votes:				Votes : Positifs : 
+Librarian.Preview.VotesSeparator:		/ Négatifs : 
+Librarian.Preview.PreviewLabel:			Aperçu : 
+
+Librarian.RoyalScroll.Dialog:			Ce livre est écrit sur du 'Parchemin Noble'. La plupart du temps, ce type de parchemin est destiné au Commis du Trésor Royal pour légaliser un registre de guilde. Êtes-vous certain de vouloir le publier ici, à la bibliothèque ?
+Librarian.RoyalScroll.Cancelled:		Très bien. Si votre intention est de créer une guilde, apportez ce registre au Commis du Trésor Royal.
+
+Librarian.Publish.RegisterBlocked:		Ceci est un registre de guilde. Sa place est auprès du Commis du Trésor Royal, pas sur mes étagères.
+Librarian.Publish.Added:				Voilà ! Votre livre est désormais publié et accessible aux lecteurs.
+Librarian.Publish.Removed:				Comme vous le souhaitez. J'ai retiré votre livre de la bibliothèque.
+
+Librarian.Publish.TooShort:				Je ne peux pas publier ceci pour l'instant. Il faut au moins {0} mots, et il n'y en a que {1}.
+Librarian.Publish.Gibberish:			Pardonnez-moi, mais ce texte ressemble à du charabia. Revenez avec quelque chose de lisible.
+Librarian.Publish.Prohibited:			Je ne peux pas publier cela. Un terme interdit a été détecté : '{0}'.
+
+Librarian.Buy.NotForSale:				Ce livre ne peut pas être acheté.
+Librarian.Buy.NotEnoughMoney:			Il vous faut {0} pour acheter ce livre.
+Librarian.Buy.CreateItemFail:			Il y a un souci… je n'arrive pas à préparer l'exemplaire.
+Librarian.Buy.NoInventorySpace:			Votre sac est plein. Faites de la place, puis revenez me voir.
+Librarian.Buy.Success:					Vous achetez "{0}" pour {1}.
+
+Librarian.Vote.CannotVoteOwn:			Vous ne pouvez pas voter pour votre propre livre, laissez les lecteurs décider !
+Librarian.Vote.AlreadyVoted:			Vous avez déjà voté pour ce livre.
+Librarian.Vote.Recorded:				Vote enregistré. Merci à vous.
+
+Librarian.Royalties.None:				Aucune redevance ne vous attend aujourd'hui.
+Librarian.Royalties.Collected:			Tenez ! {0} de redevances, comme convenu.

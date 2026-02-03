@@ -17,6 +17,15 @@ namespace DOL.GS.Scripts
     public class BookCommandHandler : ICommandHandler
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+
+        private static bool IsBlankParchment(InventoryItem item)
+        {
+            if (item == null)
+                return false;
+
+            return item.Id_nb == "scroll" || item.Id_nb == "scroll_royal";
+        }
+
         public void OnCommand(GameClient client, string[] args)
         {
             GamePlayer player = client.Player;
@@ -28,7 +37,7 @@ namespace DOL.GS.Scripts
                     return;
                 }
 
-                string ScrollTitle = args[2];
+                string ScrollTitle = args.Length >= 3 ? args[2] : "";
 
                 DBBook theScroll = null;
 
@@ -59,7 +68,7 @@ namespace DOL.GS.Scripts
                         ScrollTitle = String.Join(" ", args, 2, args.Length - 2);
                         var item = player.Inventory.GetItem(eInventorySlot.LastBackpack);
 
-                        if (item == null || (item.Id_nb != "scroll") || (item.Name != "Parchemin vierge"))
+                        if (!IsBlankParchment(item))
                         {
                             player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.NeedBlankScroll"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             return;
@@ -75,6 +84,8 @@ namespace DOL.GS.Scripts
                         if (!player.Inventory.RemoveItem(item))
                             return;
 
+                        bool isRoyal = item.Id_nb == "scroll_royal";
+
                         theScroll = new DBBook
                         {
                             Name = "[" + player.Name + "] " + ScrollTitle,
@@ -84,6 +95,10 @@ namespace DOL.GS.Scripts
                             PlayerID = player.InternalID,
                             Ink = "",
                             InkId = "",
+                            IsGuildRegistry = isRoyal,
+                            IsStamped = false,
+                            StampBy = string.Empty,
+                            StampDate = DateTime.MinValue
                         };
                         theScroll.Save();
 
@@ -91,7 +106,8 @@ namespace DOL.GS.Scripts
                         {
                             Name = "[" + player.Name + "] " + ScrollTitle,
                             Model = 498,
-                            MaxCondition = (int)theScroll.ID
+                            MaxCondition = (int)theScroll.ID,
+                            Price = theScroll.CurrentPriceCopper
                         };
                         GameServer.Database.AddObject(iu);
                         player.Inventory.AddItem(eInventorySlot.LastBackpack, GameInventoryItem.Create(iu));
@@ -116,17 +132,52 @@ namespace DOL.GS.Scripts
                     #endregion
                     #region Suppression
                     case "remove":
-                        for (var i = eInventorySlot.FirstBackpack; i <= eInventorySlot.LastBackpack; i++)
+                        long bookDbId = theScroll!.ID;
+                        string bookTitle = theScroll.Title;
+                        string bookInternalName = theScroll.Name;
+
+                        foreach (GameClient clientToClean in WorldMgr.GetAllPlayingClients())
                         {
-                            InventoryItem itm = player.Inventory.GetItem(i);
-                            if (itm != null && itm.Name == theScroll!.Name)
+                            GamePlayer targetPlayer = clientToClean.Player;
+                            if (targetPlayer == null || targetPlayer.Inventory == null) continue;
+
+                            bool playerInventoryChanged = false;
+
+                            for (var i = eInventorySlot.FirstBackpack; i <= eInventorySlot.LastVault; i++)
                             {
-                                player.Inventory.RemoveCountFromStack(itm, itm.Count);
-                                InventoryLogging.LogInventoryAction(player, "", "(destroy)", eInventoryActionType.Other, itm, itm.Count);
+                                InventoryItem itm = targetPlayer.Inventory.GetItem(i);
+
+                                if (itm != null && itm.MaxCondition == (int)bookDbId && itm.Name == bookInternalName)
+                                {
+                                    int countToRemove = itm.Count;
+                                    targetPlayer.Inventory.RemoveCountFromStack(itm, countToRemove);
+                                    playerInventoryChanged = true;
+                                }
+                            }
+
+                            if (playerInventoryChanged)
+                            {
+                                targetPlayer.Out.SendInventorySlotsUpdate(null);
                             }
                         }
+
+                        var uniqueTemplate = GameServer.Database.SelectObject<ItemUnique>(it => it.MaxCondition == (int)bookDbId && it.Model == 498);
+
+                        if (uniqueTemplate != null)
+                        {
+                            try
+                            {
+                                GameServer.Database.DeleteObject(uniqueTemplate);
+                            }
+                            catch (Exception ex)
+                            {
+                                log.Error($"Failed to delete ItemUnique template for book {bookDbId}: {ex.Message}");
+                            }
+                        }
+
                         GameServer.Database.DeleteObject(theScroll);
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.Burned", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.Burned", bookTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         break;
                     #endregion
                     #region Correction
@@ -155,7 +206,6 @@ namespace DOL.GS.Scripts
                 Aide(player);
             }
         }
-
 
         public DBBook GetBookFromTitle(string ScrollTitle)
         {

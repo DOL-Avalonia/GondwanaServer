@@ -1,5 +1,68 @@
+
 # RoyalTreasuryClerk NPC
-RoyalTreasuryClerk.Checking:		Voyons voir si il te manque des objets...
-RoyalTreasuryClerk.Nostone:             Je vois que tu n'as plus ta pierre de rappel. En veux-tu une [autre]?
-RoyalTreasuryClerk.Other:		autre
-RoyalTreasuryClerk.Stonegive:           Ok pas de soucis, voici ta pierre de rappel. J'espere que tu en feras bon usage.
+RoyalTreasuryClerk.Checking:			Voyons voir si il te manque des objets...
+RoyalTreasuryClerk.Nostone:				Je vois que tu n'as plus ta pierre de rappel. En veux-tu une [autre]?
+RoyalTreasuryClerk.Other:				autre
+RoyalTreasuryClerk.Stonegive:			Ok pas de soucis, voici ta pierre de rappel. J'espère que tu en feras bon usage.
+
+RoyalTreasuryClerk.Stone.Checking:		Tant que vous êtes là, je peux aussi m'occuper des services liés à la Pierre de rappel.
+RoyalTreasuryClerk.Stone.Missing:		Je vois que votre Pierre de rappel vous fait défaut. Désirez-vous en obtenir une [autre] ?
+RoyalTreasuryClerk.Stone.HaveOne:		Je vois que vous êtes bien en possession d'une Pierre de rappel. En cas de perte, demandez-en une autre.
+RoyalTreasuryClerk.Stone.Give:			Très bien. Voici une nouvelle Pierre de rappel, gardez-la précieusement.
+
+RoyalTreasuryClerk.Keyword.GuildRegister:	registre de guilde
+RoyalTreasuryClerk.Interact.Intro.Line1:	Le Greffier du Trésor Royal tapote un lourd registre.
+RoyalTreasuryClerk.Interact.Intro.Line2:	Si vous avez les documents nécessaires pour fonder une guilde, je peux légaliser un [{0}].
+
+RoyalTreasuryClerk.Whisper.Guild.Line1:		Pour être reconnu par la loi, vous devez présenter un Registre de Guilde.
+RoyalTreasuryClerk.Whisper.Guild.Line2:		Il doit être rédigé sur un 'Parchemin noble vierge' avec de l'Encre de chancellerie'.
+RoyalTreasuryClerk.Whisper.Guild.Line3:		Apportez-moi le registre écrit (l'objet livre), et je l'examinerai.
+
+RoyalTreasuryClerk.Validate.NotRegister:	Ce n'est pas un registre valide. Veuillez me présenter un document conforme.
+RoyalTreasuryClerk.Validate.NotParchment:	Ceci n'est pas écrit sur un parchemin noble. J'exige un registre fait de 'Parchemin noble vierge'.
+RoyalTreasuryClerk.Validate.NotInk:			Ce registre n'est pas écrit à l'encre de chancellerie. J'exige de l'Encre de chancellerie'.
+RoyalTreasuryClerk.Validate.TooShort:		Ce manifeste est trop court. Un registre de guilde doit contenir au moins {0} mots. Le vôtre en a {1}.
+RoyalTreasuryClerk.Validate.Gibberish:		Ce registre semble contenir du charabia. Réécrivez-le correctement avant de revenir.
+RoyalTreasuryClerk.Validate.Prohibited:		Ce registre contient du contenu interdit ('{0}'). Réécrivez-le correctement.
+RoyalTreasuryClerk.Validate.TitleProhibited:	Le titre contient du contenu interdit ('{0}'). Choisissez un autre nom de guilde.
+RoyalTreasuryClerk.Validate.NameInvalid:	Ce titre ne peut pas être enregistré comme nom de guilde. Assurez-vous qu'il respecte les protocoles.
+RoyalTreasuryClerk.Validate.NameTaken:		Ce nom est déjà revendiqué par une autre guilde. Vous devez choisir un nom unique.
+
+RoyalTreasuryClerk.Resume.Lost:				Nos papiers ont disparu des archives. Nous devons recommencer.
+RoyalTreasuryClerk.Resume.NoActive:			Aucun registre actif n'a été trouvé dans votre inventaire. Commencez avec un registre de guilde.
+RoyalTreasuryClerk.Resume.Leader.Line1:		Nous étions au milieu d'une procédure d'enregistrement.
+RoyalTreasuryClerk.Resume.Leader.Line2:		Votre registre est en ordre.
+RoyalTreasuryClerk.Resume.Leader.Line3:		Nous commencerons par le chef de Guilde. Donnez-moi son nom.
+RoyalTreasuryClerk.Resume.Member.Line1:		J'ai inscrit {0} en tant que chef.
+RoyalTreasuryClerk.Resume.Member.Line2:		Je dois maintenant lister les membres fondateurs. Donnez le nom du prochain signataire ({0}/{1}).
+RoyalTreasuryClerk.Resume.Stamp.Line1:		Le parchemin est complet et tous les fondateurs sont présents.
+RoyalTreasuryClerk.Resume.Stamp.Line2:		Une dernière formalité : donnez-moi un 'Cachet de chancellerie' pour sceller ce document dans la loi.
+
+RoyalTreasuryClerk.Process.Start.Line1:		Très bien... la prose est acceptable et le parchemin est en ordre.
+RoyalTreasuryClerk.Process.Start.Line2:		Nous devons maintenant enregistrer les signataires de cette charte.
+RoyalTreasuryClerk.Process.Start.Line3:		Pour commencer, prononcez le nom du Chef de Guilde.
+RoyalTreasuryClerk.Process.LeaderSaved.Line1:	Excellent. {0} est noté comme chef.
+RoyalTreasuryClerk.Process.LeaderSaved.Line2:	Continuez avec les autres fondateurs. J'ai besoin de {0} noms supplémentaires pour les archives.
+RoyalTreasuryClerk.Process.DuplicateMember:		Ce citoyen est déjà listé parmi les fondateurs. Donnez-moi un nom différent.
+RoyalTreasuryClerk.Process.MemberSaved:			C'est noté. Donnez-moi le nom du prochain fondateur ({0}/{1}).
+RoyalTreasuryClerk.Process.AwaitStamp.Line1:	La documentation est complète.
+RoyalTreasuryClerk.Process.AwaitStamp.Line2:	Vous devez maintenant apposer le sceau officiel. Donnez-moi un 'Cachet de chancellerie' pour légaliser ce registre.
+
+RoyalTreasuryClerk.Confirm.Dialog.Line1:		Le titre du registre sera le nom de la guilde :
+RoyalTreasuryClerk.Confirm.Dialog.Line2:		Confirmez-vous que ce nom est correct ?
+RoyalTreasuryClerk.Confirm.Declined:			Très bien. Dites-moi le nom corrigé pour la guilde.
+
+RoyalTreasuryClerk.Stamp.WrongItem:				Ce n'est pas le bon sceau. Apportez-moi un 'Cachet de chancellerie'.
+RoyalTreasuryClerk.Stamp.TakeFail:				Je n'ai pas pu prendre le sceau. Veuillez réessayer.
+RoyalTreasuryClerk.Stamp.NoLedger:				Ce document n'a aucune entrée dans mes livres. Je ne peux pas le traiter.
+RoyalTreasuryClerk.Stamp.AlreadyDone:			Ce registre est déjà légalisé. Apportez-le au Registraire de Guilde.
+RoyalTreasuryClerk.Stamp.Incomplete:			Ce registre est incomplet. Je ne peux pas le tamponner.
+
+RoyalTreasuryClerk.Stamp.Success.Line1:			C'est fait. Par sceau et registre, ce document est légalisé.
+RoyalTreasuryClerk.Stamp.Success.Line2:			Apportez-le au Registraire de Guilde pour matérialiser la guilde.
+
+RoyalTreasuryClerk.Founder.NoName:				Veuillez chuchoter un nom de personnage.
+RoyalTreasuryClerk.Founder.NotFound:			Ce nom n'est pas enregistré dans notre recensement. Citez-moi un autre nom.
+RoyalTreasuryClerk.Founder.InGuild:				Ce citoyen a déjà prêté serment à une guilde. Citez-moi un autre nom.
+RoyalTreasuryClerk.Founder.NoAccount:			Ce personnage n'a pas d'entrée de résidence valide. Citez-moi un autre nom.
+RoyalTreasuryClerk.Founder.SameAccount:			Pour l'intégrité du royaume, deux fondateurs ne peuvent partager le même foyer. Donnez-moi un autre nom.

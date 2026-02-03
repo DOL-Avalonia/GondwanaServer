@@ -10,7 +10,7 @@ namespace DOL.GS.Scripts
 {
     public class BooksMgr
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         [ScriptLoadedEvent]
         public static void ScriptLoaded(DOLEvent e, object sender, EventArgs args)
@@ -75,6 +75,23 @@ namespace DOL.GS.Scripts
                 sb.Append(dbBook.Text[i]);
             }
             player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+        }
+
+        public static InventoryItem CreateBookItem(DBBook book)
+        {
+            var baseTemplate = GameServer.Database.SelectObject<ItemTemplate>(t => t.Id_nb == "scroll");
+            if (baseTemplate == null) return null;
+
+            var iu = new ItemUnique(baseTemplate)
+            {
+                Id_nb = "scroll" + Guid.NewGuid(),
+                Name = "[" + book.Author + "] " + book.Title,
+                Model = 498,
+                MaxCondition = (int)book.ID
+            };
+
+            GameServer.Database.AddObject(iu);
+            return GameInventoryItem.Create(iu);
         }
     }
 }

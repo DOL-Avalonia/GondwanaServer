@@ -1,0 +1,40 @@
+# GuildRegistrar NPC
+GuildRegistrar.Keyword.FormGuild:       former une guilde
+GuildRegistrar.Keyword.ConsultRegister: consulter le registre de guilde
+
+GuildRegistrar.Interact.NormalMode:     Salutations, voyageur. Êtes-vous venu pour [{0}] ?
+
+GuildRegistrar.Interact.RegisterMode.Line1: Salutations. Si vous souhaitez fonder une guilde, présentez un Registre de Guilde tamponné.
+GuildRegistrar.Interact.RegisterMode.Line2: Êtes-vous venu pour [{0}] ?
+GuildRegistrar.Interact.RegisterMode.Line3: Ou désirez-vous [{0}] ?
+
+GuildRegistrar.Whisper.Form.Normal.Line1: Rassemblez {0} âmes prêtes à rallier votre cause et amenez-les devant moi.
+GuildRegistrar.Whisper.Form.Normal.Line2: La dîme est d'une pièce d'or. Une fois payée, ordonnez : /gc form <nom_guilde>.
+
+GuildRegistrar.Whisper.Form.Register.Line1: Donnez-moi le registre légalisé. Le titre sera le nom de la guilde, et les fondateurs doivent y être inscrits.
+GuildRegistrar.Whisper.Form.Register.Line2: Tout fondateur nommé dans le texte peut présenter le document.
+GuildRegistrar.Whisper.Form.Register.Line3: Désirez-vous [{0}] ?
+
+GuildRegistrar.Receive.NotRequired:     Selon les nouvelles lois, un registre n'est pas requis. Rassemblez vos fondateurs et utilisez /gc form <nom_guilde>.
+GuildRegistrar.Receive.NotBook:         Ce n'est pas un registre valide. Fournissez un document conforme.
+GuildRegistrar.Receive.NoLedger:        Ce document n'a aucune entrée dans mes livres. Je ne peux pas le traiter.
+GuildRegistrar.Receive.NotRegister:     Ce document n'est pas un Registre de Guilde. J'exige les papiers appropriés.
+GuildRegistrar.Receive.NotStamped:      Ce registre n'a pas le Sceau du Trésor. Apportez-moi un Registre de Guilde *tamponné*.
+GuildRegistrar.Receive.InvalidName:     Le titre de ce registre ne peut pas servir de nom de guilde. Il viole nos protocoles de nommage.
+GuildRegistrar.Receive.NameTaken:       Ce nom de guilde est déjà revendiqué par un autre ordre.
+GuildRegistrar.Receive.IncompleteList:  Le registre est incomplet ; la liste des fondateurs est insuffisante.
+GuildRegistrar.Receive.NotFounder:      Seul un fondateur nommé dans le registre peut le présenter pour finalisation.
+
+GuildRegistrar.Validate.FounderNotFound:Je ne trouve pas '{0}' dans le grand recensement. Êtes-vous certain qu'il existe ?
+GuildRegistrar.Validate.FounderInGuild: '{0}' a déjà prêté allégeance à une autre bannière. Il ne peut pas fonder un nouvel ordre.
+GuildRegistrar.Validate.SameAccount:    Halte. Pour l'intégrité du royaume, deux fondateurs ne peuvent appartenir au même foyer.
+
+GuildRegistrar.Error.CreateFailed:      Les esprits du royaume résistent à cette union. La création a échoué ; implorez les Dieux.
+GuildRegistrar.Error.TakeItemFailed:    Je n'ai pas pu prendre le registre dans votre sac. Réessayez.
+GuildRegistrar.Error.BookUpdateFailed:  La guilde est formée, mais les archives n'ont pas pu être mises à jour. Informez un administrateur.
+
+GuildRegistrar.Success:                 C'est fait. Par registre et sceau, la guilde "{0}" est désormais reconnue par la Couronne.
+
+GuildRegistrar.List.None:               Aucun registre de guilde n'est actuellement archivé.
+GuildRegistrar.List.Count:              Registres de guilde archivés : {0}
+GuildRegistrar.List.StampedBy:          Tamponné par :

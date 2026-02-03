@@ -1,7 +1,8 @@
 Copyist.InteractText01:				Hello sir! What can I do for you?
-Copyist.InteractText02:				I can duplicate a book you wrote for 2 gold!
+Copyist.InteractText02:				I can duplicate a book you wrote for {0}!
 Copyist.ResponseText01:				Sorry, only the author of a book can request a copy.
-Copyist.ResponseText02:				You need 5 gold to duplicate a book.
+Copyist.ResponseText02:				You need {0} to duplicate a book.
 Copyist.ResponseText03:				Here is the copy of your book, sir.
 Copyist.ResponseText04:				Sorry, this book no longer exists.
 Copyist.ResponseText05:				Sorry, I can duplicate only one book...
+Copyist.NoInventorySpace:			Your backpack is stuffed. I won't risk losing the copy. Please return when you’ve made room.

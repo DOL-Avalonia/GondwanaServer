@@ -13,7 +13,7 @@ namespace DOL.Database
     [DataTable(TableName = "Book")]
     public class DBBook : DataObject
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
@@ -48,6 +48,39 @@ namespace DOL.Database
 
         [DataElement(AllowDbNull = false, Index = true)]
         public bool IsInLibrary { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public int WordCount { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public int BasePriceCopper { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public int CurrentPriceCopper { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public int UpVotes { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public int DownVotes { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public long RoyaltiesPendingCopper { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public long TotalSold { get; set; }
+
+        [DataElement(AllowDbNull = false, Index = true)]
+        public bool IsGuildRegistry { get; set; }
+
+        [DataElement(AllowDbNull = false, Index = true)]
+        public bool IsStamped { get; set; }
+
+        [DataElement(AllowDbNull = false)]
+        public string StampBy { get; set; } = string.Empty;
+
+        [DataElement(AllowDbNull = true)]
+        public DateTime StampDate { get; set; }
 
         public DBBook()
         {
