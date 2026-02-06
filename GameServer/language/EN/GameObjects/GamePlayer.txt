@@ -33,7 +33,9 @@ GameObjects.GamePlayer.Attack.HitsYou:					{0} hits you for {1}{2} damage!
 GameObjects.GamePlayer.Attack.HitsYouCritical:			{0} critical hits you for an additionnal {1} damage!
 GameObjects.GamePlayer.Attack.Intercepted:				{0} steps in front of {1} and takes the blow!	
 GameObjects.GamePlayer.Attack.InterceptedHit:			{0} {1}{2} but hit {3} for {4}{5} damage!		
-GameObjects.GamePlayer.Attack.InterceptHit:				{0} {1}{2} and hit for {3}{4} damage!	
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2} but {3} doesn't seem to be harmed!
+GameObjects.GamePlayer.Attack.InterceptHit:				{0} {1}{2} and hit for {3}{4} damage!
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:		{0} {1}{2} but it seems to do no harm!	
 GameObjects.GamePlayer.Attack.Interrupted:				{0} is attacking you and your {1} is interrupted!	
 GameObjects.GamePlayer.Attack.InterruptedCrafting:			You interrupt your crafting.
 GameObjects.GamePlayer.Attack.Location.Arm:				arm	

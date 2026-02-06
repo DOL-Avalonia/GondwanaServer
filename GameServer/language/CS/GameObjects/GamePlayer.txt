@@ -32,7 +32,9 @@ GameObjects.GamePlayer.Attack.HitsYou:              {0} tě zasahuje za {1}{2} p
 GameObjects.GamePlayer.Attack.HitsYouCritical:      {0} tě kriticky zasahuje za {1} dodatečného poškození!
 GameObjects.GamePlayer.Attack.Intercepted:          {0} se postaví před {1} a útok zachytí!
 GameObjects.GamePlayer.Attack.InterceptedHit:       {0} {1}{2}, ale zasahuješ {3} za {4}{5} poškození!
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2}, ale zdá se, že {3} není nijak poškozen!
 GameObjects.GamePlayer.Attack.InterceptHit:         {0} {1}{2} a zasahuješ za {3}{4} poškození!
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:	{0} {1}{2}, ale zdá se, že to nezpůsobilo žádnou škodu!
 GameObjects.GamePlayer.Attack.Interrupted:          {0} na tebe útočí a tvůj/tvá {1} je přerušen/a!
 GameObjects.GamePlayer.Attack.InterruptedCrafting:  Přerušuješ výrobu předmětu.
 GameObjects.GamePlayer.Attack.Location.Arm:         Paže

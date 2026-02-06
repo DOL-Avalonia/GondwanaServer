@@ -19,6 +19,7 @@ namespace DOL.GS.Scripts
 {
     public class TextNPC : AmteMob, ITextNPC
     {
+        private RegionTimer _hourCheckTimer;
         public TextNPCPolicy TextNPCData { get; set; }
 
         public TextNPCPolicy GetTextNPCPolicy(GameLiving target = null)
@@ -92,6 +93,44 @@ namespace DOL.GS.Scripts
         {
             base.DeleteFromDatabase();
             TextNPCData.DeleteFromDatabase();
+        }
+
+        public override bool AddToWorld()
+        {
+            bool success = base.AddToWorld();
+            if (success)
+            {
+                if (TextNPCData != null && TextNPCData.Condition != null &&
+                   (TextNPCData.Condition.Heure_min > 0 || TextNPCData.Condition.Heure_max < 24))
+                {
+                    _hourCheckTimer = new RegionTimer(this, CheckHourConditions);
+                    _hourCheckTimer.Start(15000);
+                }
+            }
+            return success;
+        }
+
+        public override bool RemoveFromWorld()
+        {
+            if (_hourCheckTimer != null)
+            {
+                _hourCheckTimer.Stop();
+                _hourCheckTimer = null;
+            }
+            return base.RemoveFromWorld();
+        }
+
+        /// <summary>
+        /// Callback for the timer. Refreshes the Quest Indicator for nearby players
+        /// if the open/close state has changed based on game time.
+        /// </summary>
+        private int CheckHourConditions(RegionTimer timer)
+        {
+            foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                player.Out.SendNPCsQuestEffect(this, this.GetQuestIndicator(player));
+            }
+            return 15000;
         }
 
         public override eQuestIndicator GetQuestIndicator(GamePlayer player)

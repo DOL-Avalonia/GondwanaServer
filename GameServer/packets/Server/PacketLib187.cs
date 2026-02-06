@@ -34,7 +34,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.87 clients
@@ -281,7 +281,7 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                 {
-                    pak.WriteByte((byte)idx);
+                    pak.WriteByte((byte)(idx + 1));
                     WriteTemplateData(pak, goal.QuestItem, 1);
                 }
             }

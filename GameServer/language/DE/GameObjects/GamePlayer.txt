@@ -33,7 +33,9 @@ GameObjects.GamePlayer.Attack.HitsYou:	{0} trifft Euch mit {1}{2} Schaden!
 GameObjects.GamePlayer.Attack.HitsYouCritical:	{0} trifft Euch kritisch mit {1} zusätzlichen Schaden!
 GameObjects.GamePlayer.Attack.Intercepted:	{0} stellt sich vor {1} und fängt den Schlag ab!
 GameObjects.GamePlayer.Attack.InterceptedHit:	{0} {1}{2} an aber trefft {3} für {4}{5} Schaden!
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2}, aber {3} scheint nicht verletzt zu sein!
 GameObjects.GamePlayer.Attack.InterceptHit:	{0} {1} wird getroffen und {2} richtet {3}{4} Punkte Schaden an!
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:	{0} {1}{2}, aber es scheint keinen Schaden anzurichten!
 GameObjects.GamePlayer.Attack.Interrupted:	{0} greift Euch an und Euer {1} wurde unterbrochen!
 GameObjects.GamePlayer.Attack.InterruptedCrafting:	Ihr unterbrecht Eure Handwerksarbeit.
 GameObjects.GamePlayer.Attack.Location.Arm:	Euren Arm

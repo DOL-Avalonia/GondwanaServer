@@ -29,10 +29,11 @@ namespace DOL.GS.Quests
         public abstract int ProgressTotal { get; }
         public virtual QuestZonePoint PointA => QuestZonePoint.None;
         public virtual QuestZonePoint PointB => QuestZonePoint.None;
-        public virtual ItemTemplate QuestItem => null;
+        public virtual ItemTemplate QuestItem => DummyItemTemplate;
         public virtual bool Visible => true;
         public ItemTemplate GiveItemTemplate { get; set; }
         public ItemTemplate StartItemTemplate { get; set; }
+        public ItemTemplate DummyItemTemplate { get; set; }
         public bool hasInteraction { get; set; } = false;
 
         public string MessageStarted { get; set; }
@@ -79,6 +80,9 @@ namespace DOL.GS.Quests
                 item = db.StartItem ?? "";
             if (!string.IsNullOrWhiteSpace(item))
                 StartItemTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(item);
+            item = db.DummyItem ?? "";
+            if (!string.IsNullOrWhiteSpace(item))
+                DummyItemTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(item);
             if (db.StartGoalsDone != null)
                 foreach (var id in db.StartGoalsDone)
                     StartGoalsDone.Add((int)id);
@@ -418,6 +422,7 @@ namespace DOL.GS.Quests
                 { "Description", Description },
                 { "GiveItem", GiveItemTemplate?.Id_nb },
                 { "StartItem", StartItemTemplate?.Id_nb },
+                { "DummyItem", DummyItemTemplate?.Id_nb },
                 { "MessageStarted", MessageStarted },
                 { "MessageAborted", MessageAborted },
                 { "MessageDone", MessageDone },

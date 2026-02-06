@@ -60,7 +60,7 @@ namespace DOL.GS
     /// </summary>
     public abstract class GameLiving : GameObject
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region Combat
         /// <summary>
@@ -5210,6 +5210,17 @@ namespace DOL.GS
             //			}
         }
 
+        public struct PositionSnapshot
+        {
+            public long Timestamp;
+            public Position Pos;
+
+            public PositionSnapshot(long time, Position pos)
+            {
+                Timestamp = time;
+                Pos = pos;
+            }
+        }
         #endregion
         #region Stats, Resists
         /// <summary>
@@ -6310,15 +6321,32 @@ namespace DOL.GS
 
         private const int MAX_REWIND_HISTORY_MS = 30000;
         private const int RECORD_HISTORY_INTERVAL = 500;
+        private const int HISTORY_BUFFER_SIZE = MAX_REWIND_HISTORY_MS / RECORD_HISTORY_INTERVAL;
 
-        private readonly LinkedList<PositionSnapshot> m_positionHistory = new LinkedList<PositionSnapshot>();
+        private PositionSnapshot[] m_positionHistory;
+        private int m_historyWriteIndex = 0;
+        private int m_historyCount = 0;
         private long m_lastPositionRecordTime = 0;
+        private readonly object m_historyLock = new object();
 
         /// <summary>
-        /// Records the current position into history for the Time Rewind spell.
+        /// Records the current position into a circular buffer for the Time Rewind spell.
+        /// Optimized for low RAM usage, fast locking, and AI filtering.
         /// </summary>
         public void RecordPositionHistory()
         {
+            if (!this.IsAlive)
+                return;
+
+            if (this is GameNPC npc)
+            {
+                if (npc.IsPeaceful)
+                    return;
+
+                if (!npc.InCombat)
+                    return;
+            }
+
             long now = GameTimer.GetTickCount();
 
             if (now - m_lastPositionRecordTime < RECORD_HISTORY_INTERVAL)
@@ -6326,43 +6354,60 @@ namespace DOL.GS
 
             m_lastPositionRecordTime = now;
 
-            lock (m_positionHistory)
+            if (m_positionHistory == null)
             {
-                m_positionHistory.AddLast(new PositionSnapshot(now, this.Position));
-
-                // Cleanup: Remove points older than 30 seconds
-                while (m_positionHistory.Count > 0 &&
-                       (now - m_positionHistory.First!.Value.Timestamp) > MAX_REWIND_HISTORY_MS)
+                lock (m_historyLock)
                 {
-                    m_positionHistory.RemoveFirst();
+                    if (m_positionHistory == null)
+                        m_positionHistory = new PositionSnapshot[HISTORY_BUFFER_SIZE];
                 }
+            }
+
+            lock (m_historyLock)
+            {
+                m_positionHistory[m_historyWriteIndex] = new PositionSnapshot(now, this.Position);
+                m_historyWriteIndex = (m_historyWriteIndex + 1) % HISTORY_BUFFER_SIZE;
+
+                if (m_historyCount < HISTORY_BUFFER_SIZE)
+                    m_historyCount++;
             }
         }
 
         /// <summary>
-        /// Finds where the living was 'millisecondsAgo'.
+        /// Finds where the living was 'millisecondsAgo' using the circular buffer.
         /// </summary>
         public Position? GetPositionFromPast(int millisecondsAgo)
         {
-            long targetTime = GameTimer.GetTickCount() - millisecondsAgo;
+            if (m_historyCount == 0 || m_positionHistory == null) return null;
 
-            lock (m_positionHistory)
+            long now = GameTimer.GetTickCount();
+            long targetTime = now - millisecondsAgo;
+
+            lock (m_historyLock)
             {
-                if (m_positionHistory.Count == 0) return null;
-
-                // Iterate backwards (newest to oldest) to find the closest time
-                var node = m_positionHistory.Last;
-                while (node != null)
+                long oldestTime = m_positionHistory[(m_historyWriteIndex - m_historyCount + HISTORY_BUFFER_SIZE) % HISTORY_BUFFER_SIZE].Timestamp;
+                if (targetTime <= oldestTime)
                 {
-                    if (node.Value.Timestamp <= targetTime)
-                    {
-                        return node.Value.Pos;
-                    }
-                    node = node.Previous;
+                    return m_positionHistory[(m_historyWriteIndex - m_historyCount + HISTORY_BUFFER_SIZE) % HISTORY_BUFFER_SIZE].Pos;
                 }
 
-                if (m_positionHistory.First != null)
-                    return m_positionHistory.First.Value.Pos;
+                for (int i = 0; i < m_historyCount; i++)
+                {
+                    int index = (m_historyWriteIndex - 1 - i + HISTORY_BUFFER_SIZE) % HISTORY_BUFFER_SIZE;
+
+                    PositionSnapshot snap = m_positionHistory[index];
+
+                    if (snap.Timestamp <= targetTime)
+                    {
+                        return snap.Pos;
+                    }
+                }
+
+                if (m_historyCount > 0)
+                {
+                    int newestIndex = (m_historyWriteIndex - 1 + HISTORY_BUFFER_SIZE) % HISTORY_BUFFER_SIZE;
+                    return m_positionHistory[newestIndex].Pos;
+                }
             }
 
             return null;

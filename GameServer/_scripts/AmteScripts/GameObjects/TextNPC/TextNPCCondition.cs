@@ -217,9 +217,9 @@ namespace DOL.GS.Scripts
             uint maxTick = ((uint)Heure_max) * 60 * 60 * 1000;
 
             //Heure
-            if (maxTick < minTick && (minTick > tick || tick <= maxTick))
+            if (maxTick > minTick && (tick < minTick || tick >= maxTick))
                 return false;
-            if (maxTick > minTick && (minTick > tick || tick >= maxTick))
+            if (maxTick < minTick && (tick < minTick && tick >= maxTick))
                 return false;
             if (maxTick == minTick && tick != minTick)
                 return false;

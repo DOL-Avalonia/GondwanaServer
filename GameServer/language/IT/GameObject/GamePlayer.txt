@@ -32,7 +32,9 @@ GameObjects.GamePlayer.Attack.HitsYou:              {0} ti colpisce per {1}{2} d
 GameObjects.GamePlayer.Attack.HitsYouCritical:      {0} ti colpisce criticamente per {1} danni aggiuntivi!
 GameObjects.GamePlayer.Attack.Intercepted:          {0} si mette davanti a {1} e intercetta il colpo!
 GameObjects.GamePlayer.Attack.InterceptedHit:       {0} {1}{2}, ma colpisci {3} per {4}{5} danni!
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2} ma {3} non sembra subire danni!
 GameObjects.GamePlayer.Attack.InterceptHit:         {0} {1}{2} e colpisci per {3}{4} danni!
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:	{0} {1}{2} ma sembra non causare alcun danno!
 GameObjects.GamePlayer.Attack.Interrupted:          {0} ti attacca e il tuo/la tua {1} viene interrotto/a!
 GameObjects.GamePlayer.Attack.InterruptedCrafting:  Interrompi la creazione dell'oggetto.
 GameObjects.GamePlayer.Attack.Location.Arm:         Braccio

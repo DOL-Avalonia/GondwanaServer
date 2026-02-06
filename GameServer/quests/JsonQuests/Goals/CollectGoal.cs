@@ -17,7 +17,7 @@ namespace DOL.GS.Quests
         public override eQuestGoalType Type => eQuestGoalType.Unknown;
         public override int ProgressTotal => m_itemCount;
         public override QuestZonePoint PointA => new(Target);
-        public override ItemTemplate QuestItem => m_item;
+        public override ItemTemplate QuestItem => DummyItemTemplate ?? m_item;
 
         public CollectGoal(DataQuestJson quest, int goalId, dynamic db) : base(quest, goalId, (object)db)
         {

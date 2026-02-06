@@ -82,7 +82,16 @@ namespace DOL.GS.Scripts
          "Commands.GM.TextNPC.AdditionalDescription")]
     public class TextNPCCommandHandler : AbstractCommandHandler, ICommandHandler
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+
+        private void RefreshIndicators(GameNPC npc)
+        {
+            if (npc == null) return;
+            foreach (GamePlayer player in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                player.Out.SendNPCsQuestEffect(npc, npc.GetQuestIndicator(player));
+            }
+        }
 
         public void OnCommand(GameClient client, string[] args)
         {
@@ -625,6 +634,7 @@ namespace DOL.GS.Scripts
                                 player.Out.SendMessage("Quest réponse \"" + reponse + "\" ajoutée", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                             textnpc.SaveIntoDatabase();
+                            RefreshIndicators((GameNPC)npc);
 
                             var values = args[3].Split('-');
                             if (textnpc.QuestReponsesValues.ContainsKey(reponse))
@@ -660,6 +670,7 @@ namespace DOL.GS.Scripts
                         else
                             player.Out.SendMessage("Ce pnj n'a pas de quest réponse '" + reponse + "'.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
+                        RefreshIndicators((GameNPC)npc);
                     }
                     else
                     {
@@ -672,6 +683,8 @@ namespace DOL.GS.Scripts
                         textnpc = npc.GetOrCreateTextNPCPolicy(player);
                         textnpc.Condition.CanGiveQuest = indicator;
                         textnpc.SaveIntoDatabase();
+                        RefreshIndicators((GameNPC)npc);
+                        player.Out.SendMessage($"Indicator set to {indicator}. Visuals refreshed.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
 
@@ -705,6 +718,7 @@ namespace DOL.GS.Scripts
                     player.Out.SendMessage(
                         "Le niveau est maintenant de " + textnpc.Condition.Level_min + " minimum et " + textnpc.Condition.Level_max + " maximum.",
                         eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    RefreshIndicators((GameNPC)npc);
                     break;
 
                 case "guild":
@@ -739,6 +753,8 @@ namespace DOL.GS.Scripts
                     }
                     else
                         DisplaySyntax(client);
+
+                    RefreshIndicators((GameNPC)npc);
                     break;
 
                 case "guilda":
@@ -778,6 +794,8 @@ namespace DOL.GS.Scripts
                     }
                     else
                         DisplaySyntax(client);
+
+                    RefreshIndicators((GameNPC)npc);
                     break;
 
                 case "race":
@@ -821,6 +839,8 @@ namespace DOL.GS.Scripts
                     }
                     else
                         DisplaySyntax(client);
+
+                    RefreshIndicators((GameNPC)npc);
                     break;
 
                 case "class":
@@ -863,6 +883,8 @@ namespace DOL.GS.Scripts
                     }
                     else
                         DisplaySyntax(client);
+
+                    RefreshIndicators((GameNPC)npc);
                     break;
 
                 case "hour":
@@ -884,6 +906,7 @@ namespace DOL.GS.Scripts
                     {
                         player.Out.SendMessage("L'heure max ou min n'est pas valide.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
+                    RefreshIndicators((GameNPC)npc);
                     player.Out.SendMessage("L'heure est maintenant comprise entre " + textnpc.Condition.Heure_min + "h et " + textnpc.Condition.Heure_max + "h.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     break;
                 #endregion

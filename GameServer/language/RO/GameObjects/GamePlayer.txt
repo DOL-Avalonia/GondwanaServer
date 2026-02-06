@@ -32,7 +32,9 @@ GameObjects.GamePlayer.Attack.HitsYou:              {0} te lovește pentru {1}{2
 GameObjects.GamePlayer.Attack.HitsYouCritical:      {0} te lovește critic pentru {1} daune suplimentare!
 GameObjects.GamePlayer.Attack.Intercepted:          {0} se pune în fața lui/ei {1} și interceptează lovitura!
 GameObjects.GamePlayer.Attack.InterceptedHit:       {0} {1}{2}, dar îl/o lovești pe {3} pentru {4}{5} daune.
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2}, dar {3} nu pare să fie rănit!
 GameObjects.GamePlayer.Attack.InterceptHit:         {0} {1}{2} și lovești pentru {3}{4} daune.
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:	{0} {1}{2}, dar se pare că nu provoacă nicio daună!
 GameObjects.GamePlayer.Attack.Interrupted:          {0} te atacă și {1} îți este întrerupt(ă)!
 GameObjects.GamePlayer.Attack.InterruptedCrafting:  Îți întrerupi fabricarea obiectului.
 GameObjects.GamePlayer.Attack.Location.Arm:         Braț

@@ -32,7 +32,9 @@ GameObjects.GamePlayer.Attack.HitsYou:              {0} raakt jou voor {1}{2} sc
 GameObjects.GamePlayer.Attack.HitsYouCritical:      {0} raakt je kritisch voor {1} extra schade!
 GameObjects.GamePlayer.Attack.Intercepted:          {0} stapt voor {1} en onderschept de slag!
 GameObjects.GamePlayer.Attack.InterceptedHit:       {0} {1}{2}, maar je raakt {3} voor {4}{5} schade!
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2} maar {3} lijkt niet gewond te raken!
 GameObjects.GamePlayer.Attack.InterceptHit:         {0} {1}{2} en je raakt voor {3}{4} schade!
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:	{0} {1}{2} maar het lijkt geen schade aan te richten!
 GameObjects.GamePlayer.Attack.Interrupted:          {0} valt je aan en je {1} wordt onderbroken!
 GameObjects.GamePlayer.Attack.InterruptedCrafting:  Je onderbreekt het maken van het voorwerp.
 GameObjects.GamePlayer.Attack.Location.Arm:         Arm

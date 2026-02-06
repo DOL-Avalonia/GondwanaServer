@@ -32,7 +32,9 @@ GameObjects.GamePlayer.Attack.HitsYou:              {0} đánh trúng bạn, gâ
 GameObjects.GamePlayer.Attack.HitsYouCritical:      {0} đánh chí mạng bạn, gây thêm {1} sát thương!
 GameObjects.GamePlayer.Attack.Intercepted:          {0} lao ra trước {1} và chắn đòn!
 GameObjects.GamePlayer.Attack.InterceptedHit:       {0} {1}{2}, nhưng bạn đánh trúng {3} gây {4}{5} sát thương!
+GameObjects.GamePlayer.Attack.InterceptedHitNoEffect:	{0} {1}{2} nhưng {3} dường như không hề hấn gì!
 GameObjects.GamePlayer.Attack.InterceptHit:         {0} {1}{2} và bạn gây {3}{4} sát thương!
+GameObjects.GamePlayer.Attack.InterceptHitNoEffect:	{0} {1}{2} nhưng có vẻ như không gây ra sát thương nào!
 GameObjects.GamePlayer.Attack.Interrupted:          {0} tấn công bạn và hành động {1} của bạn bị gián đoạn!
 GameObjects.GamePlayer.Attack.InterruptedCrafting:  Bạn ngừng chế tạo vật phẩm.
 GameObjects.GamePlayer.Attack.Location.Arm:         Cánh tay

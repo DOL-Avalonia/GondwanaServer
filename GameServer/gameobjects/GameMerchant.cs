@@ -319,7 +319,16 @@ namespace DOL.GS
             int itemCount = Math.Max(1, item.Count);
             int packSize = Math.Max(1, item.PackSize);
 
-            long val = item.Price * itemCount / packSize * ServerProperties.Properties.ITEM_SELL_RATIO / 100;
+            // Default sell ratio from server properties (usually 50)
+            int sellRatio = ServerProperties.Properties.ITEM_SELL_RATIO;
+
+            // Custom Potion/Parchment Logic: Adjust ratio based on charges
+            if (IsChargedMagicalItem(item))
+            {
+                sellRatio = GetMagicalItemSellRatio(item);
+            }
+
+            long val = item.Price * itemCount / packSize * sellRatio / 100;
 
             if (!item.IsDropable || item.Flags == 1)
             {
@@ -340,6 +349,49 @@ namespace DOL.GS
                 player.Out.SendMessage(message, eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
             }
             return val;
+        }
+
+        /// <summary>
+        /// Logic to identify the specific stackable potions/perchments defined by the server rules.
+        /// Use Flag 3 on all Potions items and Flag 4 for all Perchments.
+        /// </summary>
+        private bool IsChargedMagicalItem(InventoryItem item)
+        {
+            if (item == null) return false;
+            if (item.Object_Type != 41) return false;
+            if (item.Item_Type != 40) return false;
+            if (item.MaxCount != 1) return false;
+            if (item.MaxCharges <= 1) return false;
+            if (item.Template.Flags != 3 && item.Template.Flags != 4) return false;
+            if (item.SpellID <= 0) return false;
+
+            if (item.SpellID1 != 0 || item.Charges1 != 0 || item.MaxCharges1 != 0 ||
+                item.ProcChance != 0 || item.ProcSpellID != 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Calculates the sell percentage based on remaining charges.
+        /// </summary>
+        private int GetMagicalItemSellRatio(InventoryItem item)
+        {
+            if (item.MaxCharges <= 0) return 10;
+
+            double percent = (double)item.Charges / item.MaxCharges;
+
+            if (percent > 0.80) return 50;
+
+            if (percent > 0.60) return 40;
+
+            if (percent > 0.40) return 30;
+
+            if (percent > 0.20) return 20;
+
+            return 10;
         }
 
         #endregion
@@ -459,23 +511,28 @@ namespace DOL.GS
             Notify(GameObjectEvent.Interact, this, new InteractEventArgs(player));
             player.Notify(GameObjectEvent.InteractWith, player, new InteractWithEventArgs(this));
 
+            bool accessGranted = false;
 
-            if (CurrentTerritory?.IsOwnedBy(player) == false)
+            if (CurrentTerritory != null && !CurrentTerritory.IsNeutral())
+            {
+                if (player.Guild != null && CurrentTerritory.OwnerGuild == player.Guild)
+                {
+                    accessGranted = true;
+                }
+            }
+
+            if (!accessGranted)
             {
                 /*
-                if (territory.IsNeutral())
+                if (player.Reputation < 0)
                 {
-                    if (player.Reputation < 0)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.Interact.Territory.Outlaws"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.Interact.Territory.Outlaws"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-                        Notify(GameObjectEvent.InteractFailed, this, new InteractEventArgs(player));
-                        return false;
-                    }
+                    Notify(GameObjectEvent.InteractFailed, this, new InteractEventArgs(player));
+                    return false;
                 }
                 */
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.Interact.Territory.NotSameGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
                 Notify(GameObjectEvent.InteractFailed, this, new InteractEventArgs(player));
                 return false;
             }

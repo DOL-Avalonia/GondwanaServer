@@ -692,7 +692,7 @@ namespace DOL.GS.PacketHandler
                     }
                     else
                     {
-                        pak.WriteByte((byte)idx);
+                        pak.WriteByte((byte)(idx + 1));
                         WriteTemplateData(pak, goal.QuestItem, 1);
                     }
                 }

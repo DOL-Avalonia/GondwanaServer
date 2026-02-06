@@ -15,3 +15,6 @@ GameUtils.GamePlayerInventory.NoSkillInUsingWeaponType:						Vous n'avez pas les
 GameUtils.GamePlayerInventory.NoSkillInWearingArmorType:					Vous n'avez pas les compétences pour porter ce type d'armure !
 GameUtils.GamePlayerInventory.CantPutItemInQuiver:							Vous ne pouvez pas placer votre {0} dans votre carquois !
 GameUtils.GamePlayerInventory.CannotPutItemFromThisRealm:					Vous ne pouvez pas placer un objet de ce royaume !
+GameUtils.GamePlayerInventory.PotionVialFull:								Cette fiole est déjà pleine !
+GameUtils.GamePlayerInventory.CombinePotions:								Vous combinez les potions ({0}/{1}).
+GameUtils.GamePlayerInventory.RefillPotion:									Vous remplissez la potion ({0}/{1}).

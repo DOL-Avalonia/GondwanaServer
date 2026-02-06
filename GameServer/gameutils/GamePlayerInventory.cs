@@ -1235,6 +1235,42 @@ namespace DOL.GS
                 fromItem.SlotPosition > (int)eInventorySlot.LastBackpack)
                 return false;
 
+            if (IsStackablePotion(fromItem) && IsStackablePotion(toItem))
+            {
+                if (fromItem.Name.Equals(toItem.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (toItem.Charges >= toItem.MaxCharges)
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PotionVialFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
+                    int totalCharges = fromItem.Charges + toItem.Charges;
+
+                    if (totalCharges <= toItem.MaxCharges)
+                    {
+                        toItem.Charges = totalCharges;
+                        m_player.Out.SendInventoryItemsUpdate(new InventoryItem[] { toItem });
+                        RemoveItem(fromItem);
+
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.CombinePotions", toItem.Charges, toItem.MaxCharges), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return true;
+                    }
+                    else
+                    {
+                        int remainder = totalCharges - toItem.MaxCharges;
+
+                        toItem.Charges = toItem.MaxCharges;
+                        fromItem.Charges = remainder;
+
+                        m_player.Out.SendInventoryItemsUpdate(new InventoryItem[] { fromItem, toItem });
+
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.RefillPotion", toItem.Charges, toItem.MaxCharges), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return true;
+                    }
+                }
+            }
+
             if (fromItem is IGameInventoryItem)
             {
                 if ((fromItem as IGameInventoryItem)!.Combine(m_player, toItem))
@@ -1243,15 +1279,13 @@ namespace DOL.GS
                 }
             }
 
-            //Is the fromItem a dye or dyepack?
-            //TODO shouldn't be done with model check
-            switch (fromItem.Model)
+            // DYE LOGIC
+            // Check if the item has one of the Dye Flags (11, 12, 13, 14)
+            int flag = fromItem.Template.Flags;
+
+            if (flag >= 11 && flag <= 14)
             {
-                case 229:
-                case 494:
-                case 495:
-                case 538:
-                    return DyeItem(fromItem, toItem);
+                return DyeItem(fromItem, toItem);
             }
 
             return false;
@@ -1416,6 +1450,32 @@ namespace DOL.GS
             return false;
         }
 
+        /// <summary>
+        /// Checks if an item meets the specific Potion Stacking criteria.
+        /// Use Flag 3 on all Potions items.
+        /// </summary>
+        private bool IsStackablePotion(InventoryItem item)
+        {
+            if (item == null) return false;
+            if (item.Object_Type != 41) return false;
+            if (item.Item_Type != 40) return false;
+            if (item.MaxCount != 1) return false;
+            if (item.MaxCharges <= 1) return false;
+            if (item.Template.Flags != 3) return false;
+            if (item.SpellID <= 0) return false;
+
+            if (item.SpellID1 != 0 ||
+                item.Charges1 != 0 ||
+                item.MaxCharges1 != 0 ||
+                item.ProcChance != 0 ||
+                item.ProcSpellID != 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         #endregion Combine/Exchange/Stack Items
 
         #region Encumberance
@@ -1450,17 +1510,23 @@ namespace DOL.GS
 
         #region Dyes
 
+        /// <summary>
+        /// Applies a dye to an item based on Template Flags.
+        /// Flag 11 = Cloth/Cloak/Barding (Old Model 229)
+        /// Flag 12 = Leather (Old Model 494)
+        /// Flag 13 = Metal/Shields/Saddles (Old Model 495)
+        /// Flag 14 = Basic Weapons/Items (Old Model 538)
+        /// </summary>
         protected virtual bool DyeItem(InventoryItem dye, InventoryItem objectToDye)
         {
             bool canApply = false;
-            //TODO should not be tested via model
 
             int itemObjType = objectToDye.Object_Type;
             int itemItemType = objectToDye.Item_Type;
 
-            switch (dye.Model)
+            switch (dye.Template.Flags)
             {
-                case 229: //Dyes
+                case 11:
                     if (itemObjType == 32) //Cloth
                     {
                         canApply = true;
@@ -1475,13 +1541,13 @@ namespace DOL.GS
                     }
 
                     break;
-                case 494: //Dye pack
+                case 12:
                     if (itemObjType == 33) //Leather
                     {
                         canApply = true;
                     }
                     break;
-                case 495: //Dye pack
+                case 13:
                     if ((itemObjType == 42) // Shield
                         || (itemObjType == 34) // Studded
                         || (itemObjType == 35) // Chain
@@ -1494,7 +1560,7 @@ namespace DOL.GS
                         canApply = true;
                     }
                     break;
-                case 538: //Dye pot
+                case 14:
                     if (itemObjType >= 1 && itemObjType <= 26)
                     {
                         canApply = true;

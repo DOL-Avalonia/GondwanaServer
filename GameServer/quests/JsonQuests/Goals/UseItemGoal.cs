@@ -18,7 +18,7 @@ namespace DOL.GS.Quests
 
         public override eQuestGoalType Type => eQuestGoalType.Unknown;
         public override int ProgressTotal => 1;
-        public override ItemTemplate QuestItem => m_item;
+        public override ItemTemplate QuestItem => DummyItemTemplate ?? m_item;
         private readonly Area.Circle m_area;
         private readonly ushort m_areaRegion;
         private readonly bool hasArea = false;

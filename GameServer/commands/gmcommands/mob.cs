@@ -33,6 +33,7 @@ using DOL.GS.Movement;
 using DOL.GS.PacketHandler;
 using DOL.GS.Quests;
 using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
 using DOL.GS.Styles;
 using DOL.GS.Utils;
 using DOL.Language;
@@ -45,7 +46,8 @@ namespace DOL.GS.Commands
          ePrivLevel.GM, //minimum privelege level
          "Mob creation and modification commands.", //command description
                                                     // usage
-         "'/mob create [ClassName(DOL.GS.GameNPC)] [eRealm(0)]' to create a new mob.",
+         "'/mob create [ClassName] [eRealm(0)]' to create a specific class (Old Way).",
+         "'/mob create <Name> <Model> <Level> [Aggro] [Range]' to create a mob with stats (New Way).",
          "'/mob fastcreate <ModelID> <level> [save(default = 0; use 1 to save)] <name>' to create mob with specified info.",
          "'/mob nfastcreate <ModelID> <level> <number> [radius(10)] [name]' to create multiple mobs within radius.",
          "'/mob nrandcreate <number> [radius(50)]' to create multiple random mobs within radius.",
@@ -361,63 +363,135 @@ namespace DOL.GS.Commands
 
         private void create(GameClient client, string[] args)
         {
-            string theType = "DOL.GS.GameNPC";
-            byte realm = 0;
+            string name = "New Mob";
+            ushort model = 408;
+            byte level = 1;
+            int aggro = 0;
+            int range = 0;
+            bool isNewSyntax = false;
+            int paramsFoundIndex = -1;
 
-            if (args.Length > 2)
-                theType = args[2];
-
-            if (args.Length > 3)
+            if (args.Length >= 4)
             {
-                if (!byte.TryParse(args[3], out realm))
+                for (int i = 2; i < args.Length - 1; i++)
                 {
-                    DisplaySyntax(client, args[1]);
-                    return;
+                    if (ushort.TryParse(args[i], out ushort tempModel) && byte.TryParse(args[i + 1], out byte tempLevel))
+                    {
+                        model = tempModel;
+                        level = tempLevel;
+                        paramsFoundIndex = i;
+                        isNewSyntax = true;
+                        break;
+                    }
                 }
             }
 
-            //Create a new mob
             GameNPC mob = null;
 
-            foreach (Assembly script in ScriptMgr.GameServerScripts)
+            if (isNewSyntax)
             {
-                try
-                {
-                    client.Out.SendDebugMessage(script.FullName);
-                    mob = (GameNPC)script.CreateInstance(theType, false);
+                mob = new GameNPC();
 
-                    if (mob != null)
-                        break;
-                }
-                catch (Exception e)
+                if (paramsFoundIndex > 2)
+                    name = String.Join(" ", args, 2, paramsFoundIndex - 2);
+                else
+                    name = "New Mob";
+
+                if (args.Length > paramsFoundIndex + 2)
+                    int.TryParse(args[paramsFoundIndex + 2], out aggro);
+                if (args.Length > paramsFoundIndex + 3)
+                    int.TryParse(args[paramsFoundIndex + 3], out range);
+
+                var dummyTemplate = NpcTemplateMgr.GetTemplate(2000000000);
+                if (dummyTemplate != null)
                 {
-                    client.Out.SendMessage(e.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    mob.NPCTemplate = dummyTemplate;
+                }
+                else
+                {
+                    client.Out.SendMessage("Warning: Dummy NPC Template 2000000000 not found in database/memory.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+
+                mob.Position = client.Player.Position;
+                mob.Name = name;
+                mob.Model = model;
+                mob.ModelDb = model;
+                mob.Level = level;
+                mob.Realm = 0;
+
+                if (aggro > 0 || range > 0)
+                {
+                    mob.Flags &= ~GameNPC.eFlags.PEACE;
+
+                    if (mob.Brain is IOldAggressiveBrain aggroBrain)
+                    {
+                        if (aggro > 0) aggroBrain.AggroLevel = aggro;
+                        if (range > 0) aggroBrain.AggroRange = range;
+                    }
+                }
+                else
+                {
+                    mob.Flags |= GameNPC.eFlags.PEACE;
                 }
             }
-
-            if (mob == null)
+            else
             {
-                client.Out.SendMessage("There was an error creating an instance of " + theType + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return;
+                string theType = "DOL.GS.GameNPC";
+                byte realm = 0;
+
+                if (args.Length > 2)
+                    theType = args[2];
+
+                if (args.Length > 3)
+                {
+                    if (!byte.TryParse(args[3], out realm))
+                    {
+                        DisplaySyntax(client, args[1]);
+                        return;
+                    }
+                }
+
+                foreach (Assembly script in ScriptMgr.GameServerScripts)
+                {
+                    try
+                    {
+                        mob = (GameNPC)script.CreateInstance(theType, false);
+                        if (mob != null) break;
+                    }
+                    catch (Exception e)
+                    {
+                        client.Out.SendMessage(e.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    }
+                }
+
+                if (mob == null)
+                {
+                    client.Out.SendMessage("There was an error creating an instance of " + theType + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+
+                mob.Position = client.Player.Position;
+                mob.Level = 1;
+                mob.Realm = (eRealm)realm;
+                mob.Name = "New Mob";
+                mob.Model = 408;
+                mob.ModelDb = 408;
+                mob.Flags |= GameNPC.eFlags.PEACE;
             }
 
-            //Fill the object variables
-            mob.Position = client.Player.Position;
-            mob.Level = 1;
-            mob.Realm = (eRealm)realm;
-            mob.Name = "New Mob";
-            mob.Model = 408;
-
-            //Fill the living variables
             mob.MaxSpeedBase = 200;
             mob.GuildName = "";
             mob.Size = 50;
-            mob.Flags |= GameNPC.eFlags.PEACE;
             mob.AddToWorld();
-            mob.LoadedFromScript = false; // allow saving
+            mob.LoadedFromScript = false;
             mob.SaveIntoDatabase();
+
             client.Out.SendMessage("Mob created: OID=" + mob.ObjectID, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage("The mob has been created with the peace flag, so it can't be attacked, to remove type /mob peace", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+            if (mob.IsPeaceful)
+                client.Out.SendMessage("The mob has the PEACE flag, type /mob peace to remove it.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            else
+                client.Out.SendMessage($"Mob created aggressive (Level: {((mob.Brain as IOldAggressiveBrain)?.AggroLevel ?? 0)} Range: {((mob.Brain as IOldAggressiveBrain)?.AggroRange ?? 0)}).", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         }
 
         private void fastcreate(GameClient client, string[] args)
@@ -1644,17 +1718,60 @@ namespace DOL.GS.Commands
 
         private void levela(GameClient client, GameNPC targetMob, string[] args)
         {
+            if (args.Length < 3)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
+
             byte level;
 
             try
             {
                 level = Convert.ToByte(args[2]);
-                targetMob.Level = level; // Also calls AutoSetStats()
+
+                targetMob.Level = level;
+                targetMob.Strength = (short)((Properties.MOB_AUTOSET_STR_BASE > 0 ? Properties.MOB_AUTOSET_STR_BASE : 1) +
+                                     ((level - 1) * Properties.MOB_AUTOSET_STR_MULTIPLIER));
+
+                targetMob.Constitution = (short)((Properties.MOB_AUTOSET_CON_BASE > 0 ? Properties.MOB_AUTOSET_CON_BASE : 1) +
+                                         ((level - 1) * Properties.MOB_AUTOSET_CON_MULTIPLIER));
+
+                targetMob.Dexterity = (short)((Properties.MOB_AUTOSET_DEX_BASE > 0 ? Properties.MOB_AUTOSET_DEX_BASE : 1) +
+                                      ((level - 1) * Properties.MOB_AUTOSET_DEX_MULTIPLIER));
+
+                targetMob.Quickness = (short)((Properties.MOB_AUTOSET_QUI_BASE > 0 ? Properties.MOB_AUTOSET_QUI_BASE : 1) +
+                                      ((level - 1) * Properties.MOB_AUTOSET_QUI_MULTIPLIER));
+
+                targetMob.Intelligence = (short)((Properties.MOB_AUTOSET_INT_BASE > 0 ? Properties.MOB_AUTOSET_INT_BASE : 1) +
+                                         ((level - 1) * Properties.MOB_AUTOSET_INT_MULTIPLIER));
+
+                targetMob.Empathy = (short)(29 + level);
+                targetMob.Piety = (short)(29 + level);
+                targetMob.Charisma = (short)(29 + level);
+                targetMob.WeaponDps = (int)((1.4 + 0.3 * level + level * level * 0.002) * 10);
+                targetMob.WeaponSpd = 30;
+                targetMob.ArmorFactor = (int)((1.0 + (level / 100.0)) * level * 1.8);
+
+                // ABS Logic: ((Level - 10) * 0.5 - (Level - 60) * Level * 0.0015).Clamp(0, 75);
+                double absCalc = (level - 10) * 0.5 - (level - 60) * level * 0.0015;
+                targetMob.ArmorAbsorb = Math.Max(0, Math.Min(75, (int)absCalc));
+                targetMob.Health = targetMob.MaxHealth;
+                targetMob.Mana = targetMob.MaxMana;
+
+                if (targetMob.Inventory != null)
+                {
+                    targetMob.SwitchWeapon(targetMob.ActiveWeaponSlot);
+                }
+
                 targetMob.SaveIntoDatabase();
-                client.Out.SendMessage("Mob level changed to: " + targetMob.Level + " and stats adjusted", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendObjectUpdate(targetMob);
+
+                client.Out.SendMessage($"Mob level set to {targetMob.Level}. Stats, AF, ABS, and DPS have been recalculated.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                client.Out.SendMessage("Error: " + ex.Message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 DisplaySyntax(client, args[1]);
             }
         }

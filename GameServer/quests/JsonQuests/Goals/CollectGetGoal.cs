@@ -25,7 +25,7 @@ namespace DOL.GS.Quests
         public override QuestZonePoint PointA =>
             Quest.Npc != null ? new QuestZonePoint(Quest.Npc) : QuestZonePoint.None;
 
-        public override ItemTemplate QuestItem => m_item;
+        public override ItemTemplate QuestItem => DummyItemTemplate ?? m_item;
 
         public CollectGetGoal(DataQuestJson quest, int goalId, dynamic db)
             : base(quest, goalId, (object)db)

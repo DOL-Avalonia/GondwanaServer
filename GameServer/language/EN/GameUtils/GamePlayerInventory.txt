@@ -15,3 +15,6 @@ GameUtils.GamePlayerInventory.NoSkillInUsingWeaponType:					You have no skill in
 GameUtils.GamePlayerInventory.NoSkillInWearingArmorType:				You have no skill in wearing this armor type!
 GameUtils.GamePlayerInventory.CantPutItemInQuiver:						You can't put your {0} in your quiver!
 GameUtils.GamePlayerInventory.CannotPutItemFromThisRealm:				You cannot put an item from this realm!
+GameUtils.GamePlayerInventory.PotionVialFull:							This potion vial is already full!
+GameUtils.GamePlayerInventory.CombinePotions:							You combine the potions ({0}/{1}).
+GameUtils.GamePlayerInventory.RefillPotion:								You refill the potion ({0}/{1}).

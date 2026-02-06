@@ -3,6 +3,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
 using DOL.GS.Geometry;
 using DOL.Language;
+using DOL.AI.Brain;
 
 namespace DOL.GS.Spells
 {
@@ -21,10 +22,9 @@ namespace DOL.GS.Spells
         {
             if (target == null) return false;
 
-            // Calculate how far back to go (Spell Value is usually stored as double)
+            // Calculate how far back to go
             int rewindMillis = (int)(Spell.Value * 1000);
-
-            if (rewindMillis <= 0) rewindMillis = 5000; // Default to 5s if not set
+            if (rewindMillis <= 0) rewindMillis = 5000;
 
             Position? pastPos = target.GetPositionFromPast(rewindMillis);
 
@@ -45,9 +45,32 @@ namespace DOL.GS.Spells
                     player.Out.SendMessage(msg, eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
 
-                foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                if (target is GameNPC npc)
                 {
-                    p.Out.SendSpellEffectAnimation(Caster, target, Spell.ClientEffect, 0, false, 1);
+                    GameObject currentTarget = npc.TargetObject;
+
+                    if (currentTarget != null && npc.InCombat)
+                    {
+                        int dist = (int)npc.GetDistanceTo(currentTarget);
+                        int newMaxDistance = Math.Max(3000, dist + 1000);
+
+                        npc.Follow(currentTarget,
+                            npc.AttackRange > 0 ? npc.AttackRange : 100,
+                            newMaxDistance);
+
+                        if (npc.Brain is StandardMobBrain)
+                        {
+                            npc.StartAttack(currentTarget);
+                        }
+                    }
+                }
+
+                if (WorldMgr.GetRegion(dest.RegionID) != null)
+                {
+                    foreach (GamePlayer p in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                    {
+                        p.Out.SendSpellEffectAnimation(Caster, target, Spell.ClientEffect, 0, false, 1);
+                    }
                 }
 
                 return true;

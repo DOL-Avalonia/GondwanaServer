@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using DOL.Database;
 using DOL.GS.PacketHandler;
 using DOL.Language;
@@ -56,16 +57,20 @@ namespace DOL.GS.Quests
             cd.NextAvailableUtc = nextUtc;
             GameServer.Database.SaveObject(cd);
 
-            string questName = quest.GetNameForPlayer(player) ?? quest.Name;
+            Task.Run(async () =>
+            {
+                string resolvedName = await quest.GetNameForPlayer(player);
+                string questName = resolvedName ?? quest.Name;
 
-            if (repeat == eQuestRepeatInterval.Daily)
-            {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.Repeat.DailyCompleted", questName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            }
-            else if (repeat == eQuestRepeatInterval.Weekly)
-            {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.Repeat.WeeklyCompleted", questName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            }
+                if (repeat == eQuestRepeatInterval.Daily)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.Repeat.DailyCompleted", questName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+                else if (repeat == eQuestRepeatInterval.Weekly)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DataQuestJson.JsonQuest.Repeat.WeeklyCompleted", questName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+            });
         }
     }
 }

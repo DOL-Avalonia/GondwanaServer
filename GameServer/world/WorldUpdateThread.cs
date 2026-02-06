@@ -242,7 +242,12 @@ namespace DOL.GS
             var query = player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().Where(n => n.IsVisibleTo(player));
             if (!all)
                 query = query.Where(n => n.IsMoving);
-            query.Foreach(player.Client.Out.SendObjectUpdate);
+
+            foreach (GameNPC npc in query)
+            {
+                player.Client.Out.SendObjectUpdate(npc);
+                npc.RecordPositionHistory();
+            }
         }
 
         /// <summary>

@@ -7220,11 +7220,25 @@ namespace DOL.GS
                         if (target != null && target != ad.Target)
                         {
                             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.Intercepted", GetPersonalizedName(ad.Target), GetPersonalizedName(target)), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.InterceptedHit", attackTypeMsg, target.GetName(0, false), hitWeapon, GetPersonalizedName(ad.Target), ad.Damage, modmessage), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            if (ad.Damage != 0)
+                            {
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.InterceptedHit", attackTypeMsg, target.GetName(0, false), hitWeapon, GetPersonalizedName(ad.Target), ad.Damage, modmessage), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            }
+                            if (ad.Damage == 0)
+                            {
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.InterceptedHitNoEffect", attackTypeMsg, target.GetName(0, false), hitWeapon, GetPersonalizedName(ad.Target)), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                            }
                         }
-                        else
+                        else if (ad.Damage != 0)
+                        {
                             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.InterceptHit", attackTypeMsg,
                                 ad.Target.GetName(0, false, Client.Account.Language, (ad.Target as GameNPC)), hitWeapon, ad.Damage, modmessage), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                        }
+                        else if (ad.Damage == 0)
+                        {
+                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.InterceptHitNoEffect", attackTypeMsg,
+                                ad.Target.GetName(0, false, Client.Account.Language, (ad.Target as GameNPC)), hitWeapon), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                        }
 
                         // critical hit
                         if (ad.CriticalDamage > 0)
