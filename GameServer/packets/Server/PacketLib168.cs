@@ -2531,7 +2531,7 @@ namespace DOL.GS.PacketHandler
                 {
                     AbstractCraftingSkill curentCraftingSkill = CraftingMgr.getSkillbyEnum((eCraftingSkill)de.Key);
                     pak.WriteShort(Convert.ToUInt16(de.Value)); //points
-                    pak.WriteByte(curentCraftingSkill.Icon); //icon
+                    pak.WriteByte(Convert.ToByte(de.Key));
                     pak.WriteInt(1);
                     pak.WritePascalString(curentCraftingSkill.Name); //name
                 }
