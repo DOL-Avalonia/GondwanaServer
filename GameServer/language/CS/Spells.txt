@@ -288,6 +288,11 @@ SpellDescription.OffProcShear.Main1:					Odstraní aktivní ofenzivní proky z c
 SpellDescription.OffProcShear.Main2:					Ap likuje prok prokletí náhrady, jehož podkouzla léčí nepřátele cíle, když zasáhnou.
 SpellDescription.OffProcShear.ReplacementHeader:		Náhradní proc:
 SpellDescription.RewindTime.MainDescription:			Teleportuje cíl zpět na pozici, kterou zaujímal před {0} sekundami.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Obnoví {0} zdraví Prokletému cíli a prodlouží jeho trýznivou existenci o {1} sekund. Způsobí {0} {2} poškození neprokletým cílům.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Obnoví {0} zdraví Prokletému cíli. Způsobí {0} {1} poškození neprokletým cílům.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prodlouží trvání trýznivé existence Prokletého cíle o {0} sekund. Nemá žádný účinek na neprokleté cíle.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Bonusový efekt (Pouze Prokletý cíl):
+SpellDescription.ZombieHeal.Header.SideEffect:            Vedlejší účinek (Postih pro živé cíle):
 
 
 # ML Spells ShortDescriptions

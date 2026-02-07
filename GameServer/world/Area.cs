@@ -27,6 +27,7 @@ using System.Numerics;
 using static DOL.GS.WarMapMgr;
 using System.Drawing;
 using Vector = DOL.GS.Geometry.Vector;
+using DOL.GameEvents;
 
 namespace DOL.GS
 {
@@ -37,6 +38,35 @@ namespace DOL.GS
     /// </summary>
     public class Area
     {
+        /// <summary>
+        /// Helper to determine which boundary model to use based on active events
+        /// </summary>
+        public static int GetActiveBoundaryModel(DBArea dbArea)
+        {
+            if (dbArea == null) return 0;
+
+            if (!string.IsNullOrEmpty(dbArea.EventList))
+            {
+                var eventIds = dbArea.EventList.Split(';');
+                foreach (var id in eventIds)
+                {
+                    var ev = GameEventManager.Instance.GetEventByID(id.Trim());
+                    if (ev != null && ev.IsRunning)
+                    {
+                        if (dbArea.BoundaryEvent > 0)
+                            return dbArea.BoundaryEvent;
+                    }
+                }
+            }
+            return dbArea.Boundary;
+        }
+
+        public static int GetBoundarySpacing(DBArea dbArea)
+        {
+            if (dbArea == null || dbArea.BoundarySpacing <= 0) return 250;
+            return dbArea.BoundarySpacing;
+        }
+
         public class Square : AbstractArea
         {
             /// <summary>
@@ -161,6 +191,50 @@ namespace DOL.GS
                 float dx = Coordinate.X - interX;
                 float dy = Coordinate.Y - interY;
                 return dx * dx + dy * dy;
+            }
+
+            protected override Coordinate GetRandomPointInside()
+            {
+                int randX = Util.Random(0, m_Width);
+                int randY = Util.Random(0, m_Height);
+                return Coordinate.Create(DbArea.X + randX, DbArea.Y + randY, DbArea.Z);
+            }
+
+            public override void SpawnBoundary()
+            {
+                ClearBoundary();
+                if (DbArea == null || Region == null) return;
+
+                int model = GetActiveBoundaryModel(DbArea);
+                if (model <= 0) return;
+                int spacing = GetBoundarySpacing(DbArea);
+
+                int xMin = DbArea.X;
+                int yMin = DbArea.Y;
+                int xMax = DbArea.X + m_Width;
+                int yMax = DbArea.Y + m_Height;
+
+                Action<int, int, ushort> spawnMarker = (x, y, heading) => {
+                    var mini = new GameStaticItem
+                    {
+                        Model = (ushort)model,
+                        Name = "Boundary",
+                        Position = Position.Create(Region.ID, x, y, DbArea.Z, heading)
+                    };
+                    mini.AddToWorld();
+                    m_boundaryObjects.Add(mini);
+                };
+
+                for (int x = xMin; x <= xMax; x += spacing)
+                {
+                    spawnMarker(x, yMin, 2048);
+                    spawnMarker(x, yMax, 0);
+                }
+                for (int y = yMin; y <= yMax; y += spacing)
+                {
+                    spawnMarker(xMin, y, 3072);
+                    spawnMarker(xMax, y, 1024);
+                }
             }
 
             public override void LoadFromDatabase(DBArea area)
@@ -501,6 +575,145 @@ namespace DOL.GS
             {
                 screenDescription = GetDescriptionForPlayer(player);
                 return screenDescription;
+            }
+        }
+
+        public class Rectangle : Square
+        {
+            public override void LoadFromDatabase(DBArea area)
+            {
+                base.LoadFromDatabase(area);
+                m_Width = area.Radius;
+                m_Height = area.MaxRadius > 0 ? area.MaxRadius : area.Radius * 2;
+            }
+        }
+
+        public class Ellipse : Circle
+        {
+            protected int m_MaxRadius;
+
+            public override void LoadFromDatabase(DBArea area)
+            {
+                base.LoadFromDatabase(area);
+                m_Radius = area.Radius;
+                m_MaxRadius = area.MaxRadius > 0 ? area.MaxRadius : area.Radius * 2;
+            }
+
+            public override bool IsContaining(Coordinate point, bool checkZ)
+            {
+                var diff = point - Coordinate;
+                double xTerm = Math.Pow(diff.X, 2) / Math.Pow(m_Radius, 2);
+                double yTerm = Math.Pow(diff.Y, 2) / Math.Pow(m_MaxRadius, 2);
+                double distSq = xTerm + yTerm;
+                return distSq <= 1.0;
+            }
+
+            public override void SpawnBoundary()
+            {
+                ClearBoundary();
+                if (DbArea == null || Region == null) return;
+
+                int model = GetActiveBoundaryModel(DbArea);
+                if (model <= 0) return;
+
+                double a = m_Radius;    // semi-major (X axis)
+                double b = m_MaxRadius; // semi-minor (Y axis)
+
+                double perimeter = Math.PI * (3 * (a + b) - Math.Sqrt((3 * a + b) * (a + 3 * b)));
+                int spacing = GetBoundarySpacing(DbArea);
+                int count = (int)Math.Round(perimeter / spacing);
+                count = Math.Max(6, Math.Min(128, count));
+
+                for (int i = 0; i < count; i++)
+                {
+                    double t = (2.0 * Math.PI * i) / count;
+
+                    int offX = (int)(a * Math.Cos(t));
+                    int offY = (int)(b * Math.Sin(t));
+
+                    double normalX = b * Math.Cos(t);
+                    double normalY = a * Math.Sin(t);
+
+                    float headAngle = (float)Math.Atan2(normalX, normalY);
+
+                    var mini = new GameStaticItem
+                    {
+                        Model = (ushort)model,
+                        Name = "Ellipse Boundary",
+                        Position = Position.Create(Region.ID, DbArea.X + offX, DbArea.Y + offY, DbArea.Z, Angle.Radians(headAngle).InHeading)
+                    };
+                    mini.AddToWorld();
+                    m_boundaryObjects.Add(mini);
+                }
+            }
+
+            protected override Coordinate GetRandomPointInside()
+            {
+                double angle = Util.RandomDouble() * Math.PI * 2;
+                double r = Math.Sqrt(Util.RandomDouble());
+                int newX = DbArea.X + (int)(r * DbArea.Radius * Math.Cos(angle));
+                int newY = DbArea.Y + (int)(r * DbArea.MaxRadius * Math.Sin(angle));
+                return Coordinate.Create(newX, newY, DbArea.Z);
+            }
+        }
+
+        public class Tore : Circle
+        {
+            protected int m_MaxRadius;
+            protected long m_maxDistSq;
+
+            public override void LoadFromDatabase(DBArea area)
+            {
+                base.LoadFromDatabase(area);
+                m_Radius = area.Radius;
+                m_RadiusRadius = area.Radius * area.Radius;
+                m_MaxRadius = area.MaxRadius > 0 ? area.MaxRadius : area.Radius * 2;
+                m_maxDistSq = (long)m_MaxRadius * m_MaxRadius;
+            }
+
+            public override bool IsContaining(Coordinate point, bool checkZ)
+            {
+                var diff = point - Coordinate;
+                double distSq = (double)diff.X * diff.X + (double)diff.Y * diff.Y;
+                return (distSq >= m_RadiusRadius && distSq <= m_maxDistSq);
+            }
+
+            public override void SpawnBoundary()
+            {
+                ClearBoundary();
+                if (DbArea == null || Region == null) return;
+
+                int model = GetActiveBoundaryModel(DbArea);
+                if (model <= 0) return;
+
+                InternalSpawnCircleOverride(m_Radius, true, model);
+                InternalSpawnCircleOverride(m_MaxRadius, false, model);
+            }
+
+            private void InternalSpawnCircleOverride(int radius, bool inward, int model)
+            {
+                if (radius <= 0) return;
+                int spacing = GetBoundarySpacing(DbArea);
+                double perimeter = 2.0 * Math.PI * radius;
+                int count = (int)Math.Round(perimeter / spacing);
+                count = Math.Max(6, Math.Min(128, count));
+
+                for (int i = 0; i < count; i++)
+                {
+                    double t = (2.0 * Math.PI * i) / count;
+                    Angle angle = Angle.Radians(t);
+                    Vector offset = Vector.Create(angle, radius);
+                    ushort heading = inward ? Angle.Radians(t + Math.PI).InHeading : angle.InHeading;
+
+                    var mini = new GameStaticItem
+                    {
+                        Model = (ushort)model,
+                        Name = "Tore Boundary",
+                        Position = Position.Create(Region.ID, DbArea.X + offset.X, DbArea.Y + offset.Y, DbArea.Z, heading)
+                    };
+                    mini.AddToWorld();
+                    m_boundaryObjects.Add(mini);
+                }
             }
         }
     }

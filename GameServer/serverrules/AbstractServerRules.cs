@@ -728,14 +728,13 @@ namespace DOL.GS.ServerRules
             if (player?.Client.Account.PrivLevel > (uint)ePrivLevel.Player) return string.Empty;
 
             // player restrictions
+            if (SpellHandler.FindEffectOnTarget(living, "Petrify") != null) return "GameObjects.GamePlayer.UseSlot.CantMountPetrified";
             if (living.IsMoving) return "GameObjects.GamePlayer.UseSlot.CantMountMoving";
             if (living.IsMezzed) return "GameObjects.GamePlayer.UseSlot.CantMountMezzed";
             if (living.IsStunned) return "GameObjects.GamePlayer.UseSlot.CantMountStunned";
             if (living.InCombat) return "GameObjects.GamePlayer.UseSlot.CantMountCombat";
             if (living.IsSitting) return "GameObjects.GamePlayer.UseSlot.CantCallMountSeated";
             if (living.IsStealthed) return "GameObjects.GamePlayer.UseSlot.CantMountStealthed";
-            if (living.IsDamned) return "GameObjects.GamePlayer.UseSlot.CantMountDamned";
-            if (SpellHandler.FindEffectOnTarget(living, "Petrify") != null) return "GameObjects.GamePlayer.UseSlot.CantMountPetrified";
             if (SpellHandler.FindEffectOnTarget(player, "SummonMonster") != null || SpellHandler.FindEffectOnTarget(player, "CallOfShadows") != null || SpellHandler.FindEffectOnTarget(player, "BringerOfDeath") != null)
             {
                 return "GameObjects.GamePlayer.UseSlot.CantMountThisForm";

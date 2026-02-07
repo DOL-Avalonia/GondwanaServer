@@ -435,6 +435,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:    Sei sovraccar
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:      Guadagni potere nella linea di incantesimi {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			L'intensa radiazione spaventa la tua cavalcatura e vieni disarcionato!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		L'influenza radioattiva svanisce.
+GameObjects.GamePlayer.CursedArea.Immune:				La tua forma ti protegge dalle radiazioni.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Sei entrato in una zona radioattiva! Senti un malessere che prende il sopravvento...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Contaminazione
+GameObjects.GamePlayer.CursedArea.MutationStart:		L'infezione muta! Il tuo corpo inizia a marcire e a rallentare!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutazione
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Il tuo corpo si sta decomponendo velocemente, infliggi {0} danni!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Sei completamente mutato in un'Anima Dannata!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Errore: Incantesimo Dannazione non trovato nel DB.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Il tuo corpo maledetto cade a terra.
+GameObjects.GamePlayer.CursedArea.Reanimate:			La radiazione rianima il tuo cadavere all'istante!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Decontaminazione
+GameObjects.GamePlayer.CursedArea.DeconStart:			Lasci la zona radioattiva, ma la contaminazione persiste sulla tua pelle...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		La radiazione si è finalmente dissipata. Sei pulito.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Sei rientrato nella zona prima che la decontaminazione fosse completa! La mutazione riprende immediatamente!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			La tua forma ti protegge da ulteriori radiazioni, ma il tuo corpo deve ancora decontaminarsi.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		La radiazione è troppo forte per una normale cavalcatura!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Evocazione cavalcatura...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:           Provi a usare {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:        Ora sparerai automaticamente.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Ora sparerai e ricaricherai automaticamente.
@@ -446,7 +466,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Non puoi evocare una cava
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Non puoi evocare una cavalcatura in un dungeon!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:        Non puoi montare mentre ti muovi.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:     Non puoi montare mentre sei in furtività.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:        Non puoi montare mentre sei maledetto!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:        Solo una cavalcatura epica può sopportare il peso della tua anima dannata!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:     Non puoi montare mentre sei pietrificato!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:      Non puoi montare in questa forma!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:         Non puoi montare mentre l'incantesimo “{0}” è attivo su di te!

@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		Je wordt door {0} voor {1} levenspunten ge
 SpellHandler.HealSpell.CriticalHeal:		Je voert een kritieke genezing uit en herstelt {0} extra levenspunten!
 SpellHandler.HealSpell.EfficientHealingBuff:	Je efficiënte genezingsverhoging geeft je {0} extra genezingspunten!
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Je efficiënte uithoudingsverhoging geeft je {0} extra uithoudingspunten tijdens het genezen!
-SpellHandler.HealSpell.TargetDamnedDamaged:		Je bent vervloekt! De genezingsspreuk brengt je {0} schade toe in plaats van je te genezen!
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} is verdoemd! De genezingsspreuk richt {1} schade aan in plaats van gezondheid te herstellen!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	Je bent verdoemd! De genezingsspreuk richt {0} schade aan in plaats van gezondheid te herstellen!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	De genezing is minder effectief omdat je vervloekt bent!
 SpellHandler.HealSpell.DamnedNoHeal:		De genezingsspreuk heeft geen effect op je omdat je vervloekt bent!
 SpellHandler.HealSpell.YouDiseased:			Je bent ziek; genezing wordt met {0}% verminderd!
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} ontvangt een kritieke g
 SpellHandler.LifeDrain.DamnedYouHealed:		Je wordt geheeld en krijgt {0} levenspunten terug!
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Je ontvangt een kritieke genezing en krijgt {0} levenspunten terug!
 SpellHandler.SpreadHeal.GroupFullyHealed:	Je groep is al volledig genezen!
+SpellHandler.ZombieHeal.SelfHeal:				Je vervloekte vlees herstelt zich en geneest je voor {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	De duur van je Verdoemenis is verlengd met {0} seconden.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Je hebt de Verdoemenis van {0} met {1} seconden verlengd.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Je wordt gedragen door een Zefier en kunt niet worden aangevallen!
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Je doel wordt gedragen door een Zefier en kan niet worden aangevallen!
@@ -176,6 +180,8 @@ SpellHandler.ResurrectSpellHandler.RezExpired:		Je verrijzenisspreuk is verlopen
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Je doel overweegt al een verrijzenis!
 SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		De speler die je hebt verrezen leverde bij zijn dood geen rijkspunten op.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Daarom ontvang je geen rijkspunten voor zijn verrijzenis.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	De vloek die dit lijk in zijn greep houdt is te machtig; je wederopstandingsspreuk sist weg!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Je ziel is gebonden door een machtige vloek! Je kunt op deze plek niet worden herrezen.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Je concentratie neemt af.
 SpellHandler.Battlewarder.WarderFallen:		Je Slagwachter is gevallen!

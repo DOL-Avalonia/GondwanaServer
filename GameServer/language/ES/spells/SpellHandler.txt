@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		{0} te cura por {1} puntos de vida.
 SpellHandler.HealSpell.CriticalHeal:		Realizas una curación crítica y restauras {0} puntos de vida adicionales.
 SpellHandler.HealSpell.EfficientHealingBuff:	Tu mejora de eficiencia de curación te otorga {0} puntos de curación adicionales.
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Tu mejora de eficiencia de aguante te otorga {0} puntos de aguante adicionales al curar.
-SpellHandler.HealSpell.TargetDamnedDamaged:		¡Estás maldito! El hechizo de curación te inflige {0} de daño en lugar de curarte.
+SpellHandler.HealSpell.TargetDamnedDamaged:		¡{0} está en la perdición! ¡El hechizo de sanación inflige {1} de daño en lugar de restaurar salud!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	¡Estás en la perdición! ¡El hechizo de sanación inflige {0} de daño en lugar de restaurar salud!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	La curación es menos efectiva porque estás maldito.
 SpellHandler.HealSpell.DamnedNoHeal:		El hechizo de curación no surte efecto sobre ti porque estás maldito.
 SpellHandler.HealSpell.YouDiseased:			Estás enfermo, la curación se reduce en un {0}%.
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} recibe una curación cr
 SpellHandler.LifeDrain.DamnedYouHealed:		Eres curado y recuperas {0} puntos de vida.
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Recibes una curación crítica y recuperas {0} puntos de vida.
 SpellHandler.SpreadHeal.GroupFullyHealed:	Tu grupo ya está completamente curado.
+SpellHandler.ZombieHeal.SelfHeal:				Tu carne maldita se regenera, sanándote {0} puntos.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	La duración de tu Condenación se ha prolongado {0} segundos.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Has prolongado la Condenación de {0} por {1} segundos.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Estás siendo llevado por un Céfiro y no puedes ser atacado.
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Tu objetivo está siendo llevado por un Céfiro y no puede ser atacado.
@@ -176,6 +180,8 @@ SpellHandler.ResurrectSpellHandler.RezExpired:		Tu hechizo de resurrección ha e
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Tu objetivo ya está considerando una resurrección.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		El jugador que resucitaste no otorgó puntos de reino al morir.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Por lo tanto, no obtienes puntos de reino por su resurrección.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	¡La maldición que atenaza este cadáver es demasiado poderosa, tu hechizo de resurrección se desvanece!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	¡Tu alma está ligada por una poderosa maldición! No puedes ser resucitado en este lugar.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Tu concentración disminuye.
 SpellHandler.Battlewarder.WarderFallen:		¡Tu Guardián de Batalla ha caído!

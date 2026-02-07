@@ -288,6 +288,11 @@ SpellDescription.OffProcShear.Main1:					Elimina procs ofensivos activos del obj
 SpellDescription.OffProcShear.Main2:					Aplica un proc maldito de reemplazo cuyos subhechizos curan a los enemigos del objetivo cuando estos golpean.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc de reemplazo:
 SpellDescription.RewindTime.MainDescription:			Teletransporta al objetivo a la posición que ocupaba hace {0} segundos.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Restaura {0} de salud a un objetivo Condenado y prolonga su atormentada existencia {1} segundos. Inflige {0} de daño {2} a objetivos no Condenados.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restaura {0} de salud a un objetivo Condenado. Inflige {0} de daño {1} a objetivos no Condenados.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prolonga la duración de la atormentada existencia de un objetivo Condenado {0} segundos. No tiene efecto en objetivos no Condenados.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Efecto de Bonificación (Solo objetivo Condenado):
+SpellDescription.ZombieHeal.Header.SideEffect:            Efecto Secundario (Penalización para objetivos vivos):
 
 
 # ML Spells ShortDescriptions

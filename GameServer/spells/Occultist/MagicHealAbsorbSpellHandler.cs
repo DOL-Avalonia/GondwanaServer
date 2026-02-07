@@ -182,10 +182,17 @@ namespace DOL.GS.Spells
                     {
                         int damageAmount = (healAmount * targetHarmValue) / 100;
                         target.TakeDamage(target, eDamageType.Natural, damageAmount, 0);
+
                         if (target is GamePlayer player)
                         {
-                            MessageToLiving(player, LanguageMgr.GetTranslation(player.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", damageAmount), eChatType.CT_YouDied);
+                            MessageToLiving(player, LanguageMgr.GetTranslation(player.Client, "SpellHandler.HealSpell.TargetDamnedDamagedYou", damageAmount), eChatType.CT_YouDied);
                         }
+
+                        if (Caster != target && Caster is GamePlayer casterPlayer)
+                        {
+                            MessageToLiving(casterPlayer, LanguageMgr.GetTranslation(casterPlayer.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", m_caster.GetPersonalizedName(target), damageAmount), eChatType.CT_Important);
+                        }
+
                         healAmount = 0;
                     }
                 }

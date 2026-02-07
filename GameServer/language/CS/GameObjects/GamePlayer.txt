@@ -435,6 +435,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:    Jsi přetíž
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:      Získáváš moc v linii kouzel {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			Intenzivní radiace vyděsila tvé zvíře a byl jsi shozen!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		Radioaktivní vliv mizí.
+GameObjects.GamePlayer.CursedArea.Immune:				Tvá podoba tě chrání před radiací.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Vstoupil jsi do radioaktivní zóny! Cítíš, jak se tě zmocňuje nevolnost...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Kontaminace
+GameObjects.GamePlayer.CursedArea.MutationStart:		Infekce mutuje! Tvé tělo začíná hnít a zpomalovat se!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutace
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Tvé tělo se rychle rozkládá, působíš {0} poškození!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Plně jsi zmutoval v Zatracenou duši!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Chyba: Kouzlo zatracení nenalezeno v DB.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Tvé prokleté tělo padá k zemi.
+GameObjects.GamePlayer.CursedArea.Reanimate:			Radiace okamžitě oživila tvou mrtvolu!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Dekontaminace
+GameObjects.GamePlayer.CursedArea.DeconStart:			Opouštíš radioaktivní zónu, ale kontaminace zůstává na tvé kůži...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		Radiace se konečně rozptýlila. Jsi čistý.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Vstoupil jsi znovu do zóny před dokončením dekontaminace! Mutace okamžitě pokračuje!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Tvá podoba tě chrání před další radiací, ale tvé tělo se musí stále dekontaminovat.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		Radiace je příliš silná pro běžné zvíře!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Vyvolávání zvířete...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:           Pokoušíš se použít {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:        Nyní budeš střílet automaticky.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Nyní budeš automaticky střílet a přebíjet.
@@ -446,7 +466,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Zde nemůžeš přivolat 
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     V kobce nemůžeš přivolat jízdní zvíře!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:        Nemůžeš nasednout při pohybu.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:     Nemůžeš nasednout, když jsi v utajení.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:        Nemůžeš nasednout, když jsi prokletý/prokletá!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:			Pouze epický jezdecký držák dokáže unést váhu tvé prokleté duše!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:     Nemůžeš nasednout, když jsi zkamenělý/zkamenělá!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:      V této podobě nemůžeš nasednout!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:         Nemůžeš nasednout, dokud na tobě trvá kouzlo „{0}“!

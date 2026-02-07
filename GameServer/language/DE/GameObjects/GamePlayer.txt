@@ -436,6 +436,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:	Ihr seid überla
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:	Ihr verbessert Euch bei den Zaubersprüchen der "{0}"-Linie!
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			Die intensive Strahlung versetzt dein Reittier in Panik und wirft dich ab!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		Der radioaktive Einfluss schwindet.
+GameObjects.GamePlayer.CursedArea.Immune:				Deine Gestalt schützt dich vor der Strahlung.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Du hast eine radioaktive Zone betreten! Du spürst, wie eine Krankheit von dir Besitz ergreift...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Kontamination
+GameObjects.GamePlayer.CursedArea.MutationStart:		Die Infektion mutiert! Dein Körper beginnt zu verrotten und wird langsamer!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutation
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Dein Körper zerfällt schnell, du verursachst {0} Schaden!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Du bist vollständig zu einer Verdammten Seele mutiert!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Fehler: Verdammungszauber nicht in DB gefunden.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Dein verfluchter Körper fällt.
+GameObjects.GamePlayer.CursedArea.Reanimate:			Die Strahlung reanimiert deine Leiche sofort!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Dekontamination
+GameObjects.GamePlayer.CursedArea.DeconStart:			Du verlässt die radioaktive Zone, aber die Kontamination haftet noch auf deiner Haut...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		Die Strahlung hat sich endlich verflüchtigt. Du bist sauber.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Du hast die Zone vor Abschluss der Dekontamination wieder betreten! Die Mutation wird sofort fortgesetzt!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Deine Gestalt schützt dich vor weiterer Strahlung, aber dein Körper muss sich noch dekontaminieren.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		Die Strahlung ist zu stark für ein gewöhnliches Reittier!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Reittier beschwören...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:	Ihr versucht folgendes zu benutzen: {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:	Eurer Schuss wird nun automatisch freigegeben.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:	Eurer Schuss wird nun automatisch nachgeladen und freigegeben.
@@ -447,7 +467,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:	Du kannst hier kein Reittier be
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:	Du kannst in einem Dungeon kein Reittier beschwören!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:	Ihr könnt nicht auf Euer Reittier steigen, während Ihr Euch bewegt.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:	Ihr könnt nicht aufsitzen, während Ihr getarnt seid.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:	Du kannst nicht aufsitzen, während du verdammt bist!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:	Nur ein episches Reittier kann die Last deiner verdammten Seele tragen!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:	Du kannst nicht aufsitzen, während du versteinert bist!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:	Du kannst in dieser Gestalt nicht aufsitzen!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:	Du kannst nicht aufsitzen, während der Zauber „{0}“ auf dir liegt!

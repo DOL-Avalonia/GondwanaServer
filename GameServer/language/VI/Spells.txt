@@ -288,6 +288,11 @@ SpellDescription.OffProcShear.Main1:					Gỡ các proc tấn công đang hoạt
 SpellDescription.OffProcShear.Main2:					Áp proc thay thế bị nguyền; các tiểu phép của nó sẽ hồi máu cho kẻ địch của mục tiêu khi họ đánh trúng.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc thay thế:
 SpellDescription.RewindTime.MainDescription:			Dịch chuyển mục tiêu về vị trí mà họ đã ở đó {0} giây trước.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Hồi phục {0} máu cho một mục tiêu bị Nguyền Rủa và kéo dài sự tồn tại khổ đau của họ thêm {1} giây. Gây ra {0} sát thương {2} cho các mục tiêu không bị Nguyền Rủa.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Hồi phục {0} máu cho một mục tiêu bị Nguyền Rủa. Gây ra {0} sát thương {1} cho các mục tiêu không bị Nguyền Rủa.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Kéo dài thời gian tồn tại khổ đau của mục tiêu bị Nguyền Rủa thêm {0} giây. Không có tác dụng với mục tiêu không bị Nguyền Rủa.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Hiệu ứng Thưởng (Chỉ mục tiêu bị Nguyền Rủa):
+SpellDescription.ZombieHeal.Header.SideEffect:            Tác dụng phụ (Hình phạt mục tiêu Sống):
 
 
 # ML Spells ShortDescriptions

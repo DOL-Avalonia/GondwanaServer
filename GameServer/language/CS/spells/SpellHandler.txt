@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		{0} vás léčí o {1} životů.
 SpellHandler.HealSpell.CriticalHeal:		Provádíte kritické léčení a obnovujete o {0} životů více!
 SpellHandler.HealSpell.EfficientHealingBuff:	Váš efekt „efektivita léčení“ vám poskytuje {0} dodatečných léčivých bodů!
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Váš efekt „efektivita výdrže“ vám při léčení poskytuje {0} dodatečných bodů výdrže!
-SpellHandler.HealSpell.TargetDamnedDamaged:		Jste proklet! Léčivé kouzlo vám způsobí {0} poškození místo léčení!
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} je proklet! Léčivé kouzlo způsobuje {1} poškození namísto obnovení zdraví!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	Jsi proklet! Léčivé kouzlo způsobuje {0} poškození namísto obnovení zdraví!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	Léčení je méně účinné, protože jste proklet!
 SpellHandler.HealSpell.DamnedNoHeal:		Léčivé kouzlo na vás nepůsobí, protože jste proklet!
 SpellHandler.HealSpell.YouDiseased:			Jste nemocný, léčení je sníženo o {0}%!
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} obdrží kritické lé�
 SpellHandler.LifeDrain.DamnedYouHealed:		Jste vyléčen a obnovíte si {0} životů!
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Obdržíte kritické léčení a obnovíte si {0} životů!
 SpellHandler.SpreadHeal.GroupFullyHealed:	Vaše skupina je již plně vyléčena!
+SpellHandler.ZombieHeal.SelfHeal:				Tvé prokleté tělo se sceluje a léčí tě za {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	Trvání tvého Prokletí bylo prodlouženo o {0} sekund.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Prodloužil jsi Prokletí na {0} o {1} sekund.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Jste nesen Zefýrem a nemůžete být napaden!
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Váš cíl je nesen Zefýrem a nemůže být napaden!
@@ -176,6 +180,8 @@ SpellHandler.ResurrectSpellHandler.RezExpired:		Vaše kouzlo vzkříšení vypr�
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Váš cíl již zvažuje vzkříšení!
 SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		Hráč, kterého jste vzkřísili, po smrti nepřinesl žádné body království.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Proto za jeho vzkříšení nezískáte body království.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	Prokletí svírající tuto mrtvolu je příliš mocné, tvé oživovací kouzlo vyšumělo!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Tvá duše je svázána mocným prokletím! Na tomto místě nemůžeš být oživen.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Vaše soustředění slábne.
 SpellHandler.Battlewarder.WarderFallen:		Váš Strážce bitvy padl!

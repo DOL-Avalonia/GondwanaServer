@@ -288,6 +288,11 @@ SpellDescription.OffProcShear.Main1:					Verwijdert actieve offensieve procs van
 SpellDescription.OffProcShear.Main2:					Brengt een vervloekte vervangende proc aan waarvan de subspreuken de vijanden van het doelwit healen wanneer zij raken.
 SpellDescription.OffProcShear.ReplacementHeader:		Vervangings‑proc:
 SpellDescription.RewindTime.MainDescription:			Teleporteert het doelwit terug naar de positie van {0} seconden geleden.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Herstelt {0} gezondheid bij een verdoemd doelwit en verlengt hun gekwelde bestaan met {1} seconden. Richt {0} {2}-schade aan bij niet-verdoemde doelwitten.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Herstelt {0} gezondheid bij een verdoemd doelwit. Richt {0} {1}-schade aan bij niet-verdoemde doelwitten.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Verlengt de duur van het gekwelde bestaan van een verdoemd doelwit met {0} seconden. Heeft geen effect op niet-verdoemde doelwitten.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Bonuseffect (Alleen verdoemd doelwit):
+SpellDescription.ZombieHeal.Header.SideEffect:            Bijwerking (Straf voor levend doelwit):
 
 
 # ML Spells ShortDescriptions

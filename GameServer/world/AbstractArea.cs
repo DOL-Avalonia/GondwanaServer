@@ -28,6 +28,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DOL.GS.Spells;
 
 namespace DOL.GS
 {
@@ -38,6 +39,9 @@ namespace DOL.GS
     public abstract class AbstractArea : IArea, ITranslatableObject
     {
         protected DBArea dbArea = null;
+        protected readonly List<GameStaticItem> m_boundaryObjects = new List<GameStaticItem>();
+        protected RegionTimer m_effectLoopTimer;
+        protected bool m_lastEventState = false;
         protected bool m_canBroadcast = false;
         /// <summary>
         /// Variable holding whether or not players can broadcast in this area
@@ -160,6 +164,14 @@ namespace DOL.GS
         {
             get { return m_sound; }
             set { m_sound = value; }
+        }
+
+        public bool IsRadioactive { get; set; } = false;
+
+        public static int GetBoundarySpacing(DBArea dbArea)
+        {
+            if (dbArea == null || dbArea.BoundarySpacing <= 0) return 250;
+            return dbArea.BoundarySpacing;
         }
 
         public virtual string GetDescriptionForPlayer(GamePlayer player)
@@ -292,6 +304,11 @@ namespace DOL.GS
                 }
             }
 
+            if (IsRadioactive)
+            {
+                player.OnLeaveRadioactiveArea();
+            }
+
             player.IsAllowToVolInThisArea = true;
             GameEventManager.Instance.PlayerLeavesArea(player, this);
             player.Notify(AreaEvent.PlayerLeave, this, new AreaEventArgs(this, player));
@@ -327,10 +344,236 @@ namespace DOL.GS
                 player.Out.SendRegionEnterSound(Sound);
             }
 
+            if (IsRadioactive)
+            {
+                player.OnEnterRadioactiveArea();
+            }
+
             player.IsAllowToVolInThisArea = this.CanVol;
             player.Notify(AreaEvent.PlayerEnter, this, new AreaEventArgs(this, player));
             GameEventManager.Instance.PlayerEntersArea(player, this);
         }
+
+        #region Event Status
+        /// <summary>
+        /// Checks if any event listed in the Area's EventList is currently running.
+        /// </summary>
+        protected bool IsEventActive()
+        {
+            if (DbArea == null || string.IsNullOrEmpty(DbArea.EventList))
+                return false;
+
+            var eventIds = DbArea.EventList.Split(';');
+            foreach (var id in eventIds)
+            {
+                var ev = GameEventManager.Instance.GetEventByID(id.Trim());
+                if (ev != null && ev.IsRunning)
+                    return true;
+            }
+            return false;
+        }
+        #endregion
+
+        #region Boundary Logic
+        public virtual void ClearBoundary()
+        {
+            foreach (var obj in m_boundaryObjects) obj.Delete();
+            m_boundaryObjects.Clear();
+        }
+
+        public virtual void SpawnBoundary()
+        {
+            ClearBoundary();
+            if (DbArea == null || Region == null) return;
+
+            // Determine which model to use based on Event Status
+            int model = DbArea.Boundary;
+            if (IsEventActive() && DbArea.BoundaryEvent > 0)
+            {
+                model = DbArea.BoundaryEvent;
+            }
+
+            if (model <= 0) return;
+
+            int radius = DbArea.Radius;
+            if (radius <= 0) return;
+
+            int spacing = GetBoundarySpacing(DbArea);
+            double k = spacing / (2.0 * Math.PI * 1000.0);
+            int count = (int)Math.Round((2.0 * Math.PI * radius) * k);
+            count = Math.Max(6, Math.Min(128, count));
+
+            for (int i = 0; i < count; i++)
+            {
+                double t = (2.0 * Math.PI * i) / count;
+                Angle outward = Angle.Radians(t);
+                Vector offset = Vector.Create(outward, radius);
+
+                var mini = new GameStaticItem
+                {
+                    Model = (ushort)model,
+                    Name = "Boundary",
+                    Position = Position.Create(Region.ID, DbArea.X + offset.X, DbArea.Y + offset.Y, DbArea.Z, outward.InHeading)
+                };
+                mini.AddToWorld();
+                m_boundaryObjects.Add(mini);
+            }
+        }
+        #endregion
+
+        #region Effect Loop Logic
+        public virtual void StartEffectLoop()
+        {
+            StopEffectLoop();
+            if (DbArea == null || Region == null) return;
+
+            if (DbArea.SpellID <= 0 && DbArea.SpellIDEvent <= 0 && string.IsNullOrEmpty(DbArea.EventList))
+                return;
+
+            GameNPC timerOwner = new GameNPC();
+            timerOwner.Name = "AreaEffectController";
+            timerOwner.Flags |= GameNPC.eFlags.CANTTARGET | GameNPC.eFlags.DONTSHOWNAME;
+            timerOwner.Model = 667;
+            timerOwner.Position = Position.Create(Region.ID, DbArea.X, DbArea.Y, DbArea.Z, 0);
+            timerOwner.AddToWorld();
+
+            int freq = DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 2000;
+            m_effectLoopTimer = new RegionTimer(timerOwner, EffectLoopCallback);
+            m_effectLoopTimer.Start(freq);
+        }
+
+        public virtual void StopEffectLoop()
+        {
+            if (m_effectLoopTimer != null)
+            {
+                m_effectLoopTimer.Stop();
+                if (m_effectLoopTimer.Owner != null) m_effectLoopTimer.Owner.Delete();
+                m_effectLoopTimer = null;
+            }
+        }
+
+        protected virtual int EffectLoopCallback(RegionTimer timer)
+        {
+            if (DbArea == null || Region == null) return 0;
+
+            bool currentEventState = IsEventActive();
+            if (currentEventState != m_lastEventState)
+            {
+                m_lastEventState = currentEventState;
+                SpawnBoundary();
+            }
+
+            int activeSpellID = (currentEventState && DbArea.SpellIDEvent > 0) ? DbArea.SpellIDEvent : DbArea.SpellID;
+            if (activeSpellID <= 0) return Math.Max(1000, DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 5000);
+
+            int baseAmount = DbArea.EffectAmount;
+            double varFactor = DbArea.EffectVariance / 100.0;
+
+            int actualAmount = baseAmount;
+            int actualLevel = DbArea.StormLevel > 0 ? DbArea.StormLevel : 1;
+
+            if (varFactor > 0)
+            {
+                int rangeAmt = (int)Math.Round(baseAmount * varFactor);
+                actualAmount = Util.Random(baseAmount - rangeAmt, baseAmount + rangeAmt);
+
+                int rangeLvl = (int)Math.Round(actualLevel * varFactor);
+                actualLevel = Util.Random(actualLevel - rangeLvl, actualLevel + rangeLvl);
+            }
+            actualAmount = Math.Max(1, actualAmount);
+            actualLevel = Math.Max(1, Math.Min(255, actualLevel));
+
+            for (int i = 0; i < actualAmount; i++)
+            {
+                Coordinate randomPoint = GetRandomPointInside();
+                if (randomPoint.Equals(Coordinate.Nowhere)) continue;
+
+                GameNPC stormPoint = new GameNPC();
+                stormPoint.Model = 667;
+                stormPoint.Name = "Storm";
+                stormPoint.Flags = GameNPC.eFlags.CANTTARGET | GameNPC.eFlags.DONTSHOWNAME;
+                stormPoint.Position = Position.Create(Region.ID, randomPoint.X, randomPoint.Y, randomPoint.Z, 0);
+                stormPoint.Level = (byte)actualLevel;
+                stormPoint.Size = DbArea.StormSize > 0 ? DbArea.StormSize : (byte)50;
+                stormPoint.AddToWorld();
+
+                new RegionTimer(stormPoint, (t) =>
+                {
+                    if (stormPoint.ObjectState != GameObject.eObjectState.Active) return 0;
+
+                    Spell spell = SkillBase.GetSpellByID(activeSpellID);
+                    ushort effectID = (ushort)(spell != null ? spell.ClientEffect : activeSpellID);
+
+                    foreach (GamePlayer player in Region.GetPlayersInRadius(randomPoint, (ushort)WorldMgr.VISIBILITY_DISTANCE, false, false))
+                    {
+                        player.Out.SendSpellEffectAnimation(stormPoint, stormPoint, effectID, 0, false, 1);
+                    }
+
+                    if (spell != null)
+                    {
+                        SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
+                        ISpellHandler handler = ScriptMgr.CreateSpellHandler(stormPoint, spell, line);
+                        if (handler != null)
+                        {
+                            handler.StartSpell(stormPoint);
+                        }
+                    }
+                    return 0;
+                }).Start(250);
+
+                new RegionTimer(stormPoint, t => {
+                    if (stormPoint.ObjectState == GameObject.eObjectState.Active) stormPoint.Delete();
+                    return 0;
+                }).Start(3000);
+            }
+
+            int baseFreq = DbArea.EffectFrequency;
+            int nextInterval = baseFreq;
+            if (varFactor > 0)
+            {
+                int varMs = (int)(baseFreq * varFactor);
+                nextInterval = Util.Random(baseFreq - varMs, baseFreq + varMs);
+            }
+            return Math.Max(500, nextInterval);
+        }
+
+        protected virtual Coordinate GetRandomPointInside()
+        {
+            if (DbArea == null) return Coordinate.Nowhere;
+
+            double angle = Util.RandomDouble() * Math.PI * 2;
+            double dist;
+
+            if (this is Area.Tore)
+            {
+                int inner = DbArea.Radius;
+                int outer = DbArea.MaxRadius > inner ? DbArea.MaxRadius : inner * 2;
+                dist = Math.Sqrt(Util.RandomDouble() * (outer * outer - inner * inner) + (inner * inner));
+            }
+            else if (this is Area.Ellipse)
+            {
+                double r = Math.Sqrt(Util.RandomDouble());
+                int newX = DbArea.X + (int)(r * DbArea.Radius * Math.Cos(angle));
+                int newY = DbArea.Y + (int)(r * DbArea.MaxRadius * Math.Sin(angle));
+                return Coordinate.Create(newX, newY, DbArea.Z);
+            }
+            else if (this is Area.Polygon)
+            {
+                int randX = Util.Random(0, DbArea.Radius);
+                int randY = Util.Random(0, DbArea.Radius);
+                return Coordinate.Create(DbArea.X + randX, DbArea.Y + randY, DbArea.Z);
+            }
+            else
+            {
+                int radius = DbArea.Radius;
+                dist = Math.Sqrt(Util.RandomDouble()) * radius;
+            }
+
+            int finalX = DbArea.X + (int)(Math.Cos(angle) * dist);
+            int finalY = DbArea.Y + (int)(Math.Sin(angle) * dist);
+            return Coordinate.Create(finalX, finalY, DbArea.Z);
+        }
+        #endregion
 
         public abstract void LoadFromDatabase(DBArea area);
     }

@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		{0} chữa bạn hồi {1} điểm sinh l�
 SpellHandler.HealSpell.CriticalHeal:		Bạn chữa chí mạng và hồi thêm {0} điểm sinh lực!
 SpellHandler.HealSpell.EfficientHealingBuff:	Cường hóa hiệu suất hồi máu cho bạn thêm {0} điểm hồi máu!
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Cường hóa hiệu suất thể lực cho bạn thêm {0} điểm thể lực khi chữa!
-SpellHandler.HealSpell.TargetDamnedDamaged:		Bạn bị nguyền! Phép hồi máu gây {0} sát thương thay vì chữa lành!
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} đã bị nguyền rủa! Phép hồi máu gây ra {1} sát thương thay vì hồi phục sinh lực!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	Bạn đã bị nguyền rủa! Phép hồi máu gây ra {0} sát thương thay vì hồi phục sinh lực!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	Hồi máu kém hiệu quả vì bạn đang bị nguyền!
 SpellHandler.HealSpell.DamnedNoHeal:		Phép hồi máu không có tác dụng với bạn vì bạn đang bị nguyền!
 SpellHandler.HealSpell.YouDiseased:			Bạn bị bệnh; hồi máu giảm {0}%!
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} được chữa chí m�
 SpellHandler.LifeDrain.DamnedYouHealed:		Bạn được chữa lành và hồi {0} điểm sinh lực!
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Bạn được chữa chí mạng và hồi {0} điểm sinh lực!
 SpellHandler.SpreadHeal.GroupFullyHealed:	Nhóm của bạn đã được hồi phục hoàn toàn!
+SpellHandler.ZombieHeal.SelfHeal:				Da thịt bị nguyền rủa của bạn đang liền lại, hồi máu cho bạn {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	Thời gian bị Nguyền Rủa của bạn đã được kéo dài thêm {0} giây.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Bạn đã kéo dài sự Nguyền Rủa lên {0} thêm {1} giây.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Bạn đang được Zephyr nâng đỡ và không thể bị tấn công!
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Mục tiêu của bạn đang được Zephyr nâng đỡ và không thể bị tấn công!
@@ -176,6 +180,8 @@ SpellHandler.ResurrectSpellHandler.RezExpired:		Phép hồi sinh của bạn đ�
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Mục tiêu của bạn đã cân nhắc hồi sinh!
 SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		Người chơi bạn hồi sinh không mang lại điểm vương quốc khi chết.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Vì vậy, bạn không nhận điểm vương quốc từ việc hồi sinh đó.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	Lời nguyền đang bám lấy cái xác này quá mạnh mẽ, phép hồi sinh của bạn đã tan biến!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Linh hồn của bạn đang bị trói buộc bởi một lời nguyền quyền năng! Bạn không thể hồi sinh ở nơi này.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Sự tập trung của bạn giảm dần.
 SpellHandler.Battlewarder.WarderFallen:		Hộ Vệ Chiến Trường của bạn đã ngã xuống!

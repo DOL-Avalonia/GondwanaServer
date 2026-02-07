@@ -13,6 +13,7 @@ namespace DOL.Database
         private int m_y;
         private int m_z;
         private int m_radius;
+        private int m_maxRadius;
         private ushort m_region;
         private string m_classType = string.Empty;
         private bool m_canBroadcast;
@@ -23,6 +24,18 @@ namespace DOL.Database
         private bool m_safeArea;
         private int realmPoints;
         private bool m_isPvp;
+        private int m_boundary = 0;
+        private int m_boundaryEvent = 0;
+        private int m_boundarySpacing = 0;
+        private int m_spellID = 0;
+        private int m_spellIDEvent = 0;
+        private int m_effectAmount = 0;
+        private int m_effectFrequency = 0;
+        private byte m_stormLevel = 25;
+        private byte m_stormSize = 60;
+        private double m_effectVariance;
+        private string m_eventList;
+        private bool m_isRadioactive;
 
         public DBArea()
         {
@@ -107,6 +120,17 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_radius = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MaxRadius
+        {
+            get { return m_maxRadius; }
+            set
+            {
+                Dirty = true;
+                m_maxRadius = value;
             }
         }
 
@@ -251,6 +275,94 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_isPvp = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int Boundary
+        {
+            get { return m_boundary; }
+            set { Dirty = true; m_boundary = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int BoundaryEvent
+        {
+            get { return m_boundaryEvent; }
+            set { Dirty = true; m_boundaryEvent = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int BoundarySpacing
+        {
+            get => m_boundarySpacing;
+            set { Dirty = true; m_boundarySpacing = value; }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int SpellID
+        {
+            get => m_spellID;
+            set { Dirty = true; m_spellID = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int SpellIDEvent
+        {
+            get => m_spellIDEvent;
+            set { Dirty = true; m_spellIDEvent = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int EffectAmount
+        {
+            get => m_effectAmount;
+            set { Dirty = true; m_effectAmount = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int EffectFrequency
+        {
+            get => m_effectFrequency;
+            set { Dirty = true; m_effectFrequency = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public byte StormLevel
+        {
+            get => m_stormLevel;
+            set { Dirty = true; m_stormLevel = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public byte StormSize
+        {
+            get => m_stormSize;
+            set { Dirty = true; m_stormSize = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public double EffectVariance
+        {
+            get => m_effectVariance;
+            set { Dirty = true; m_effectVariance = value; }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public string EventList
+        {
+            get => m_eventList;
+            set { Dirty = true; m_eventList = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public bool IsRadioactive
+        {
+            get { return m_isRadioactive; }
+            set
+            {
+                Dirty = true;
+                m_isRadioactive = value;
             }
         }
     }

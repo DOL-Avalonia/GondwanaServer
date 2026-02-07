@@ -289,6 +289,11 @@ SpellDescription.OffProcShear.Main1:				Remove any active Offensive Proc(s) from
 SpellDescription.OffProcShear.Main2:				Applies a cursed replacement proc whose subspell heals the target's enemies on their hits.
 SpellDescription.OffProcShear.ReplacementHeader:		Replacement proc:
 SpellDescription.RewindTime.MainDescription:			Teleports the target back to the position they occupied {0} seconds ago.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Restores {0} health to a Damned target and extends their tormented existence by {1} seconds. Inflicts {0} {2} damage to non-Damned targets.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restores {0} health to a Damned target. Inflicts {0} {1} damage to non-Damned targets.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Extends the duration of a Damned target's tormented existence by {0} seconds. Has no effect on non-Damned targets.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Bonus Effect (Damned Target Only):
+SpellDescription.ZombieHeal.Header.SideEffect:            Side Effect (Living Target Penalty):
 
 
 # ML Spells ShortDescriptions

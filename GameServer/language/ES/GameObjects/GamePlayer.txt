@@ -435,6 +435,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:    Estás sobrec
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:      Ganas poder en la línea de hechizos {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			¡La intensa radiación asusta a tu montura y te tira al suelo!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		La influencia radiactiva se desvanece.
+GameObjects.GamePlayer.CursedArea.Immune:				Tu forma te protege de la radiación.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			¡Has entrado en una zona radiactiva! Sientes que una enfermedad se apodera de ti...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Contaminación
+GameObjects.GamePlayer.CursedArea.MutationStart:		¡La infección muta! ¡Tu cuerpo comienza a pudrirse y a ralentizarse!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutación
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Tu cuerpo se descompone rápidamente, ¡infliges {0} de daño!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		¡Has mutado completamente en un Alma Maldita!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Error: Hechizo de condenación no encontrado en la BD.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Tu cuerpo maldito cae.
+GameObjects.GamePlayer.CursedArea.Reanimate:			¡La radiación reanima tu cadáver al instante!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Descontaminación
+GameObjects.GamePlayer.CursedArea.DeconStart:			Sales de la zona radiactiva, pero la contaminación persiste en tu piel...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		La radiación finalmente se ha disipado. Estás limpio.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		¡Reingresaste a la zona antes de completar la descontaminación! ¡La mutación se reanuda inmediatamente!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Tu forma te protege de más radiación, pero tu cuerpo aún debe descontaminarse.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		¡La radiación es demasiado fuerte para una montura normal!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Invocando montura...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:           Intentas usar {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:        Ahora dispararás automáticamente.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Ahora dispararás y recargarás automáticamente.
@@ -446,7 +466,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       ¡No puedes invocar una m
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     ¡No puedes invocar una montura en una mazmorra!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:        No puedes montar mientras te estás moviendo.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:     No puedes montar mientras estás en sigilo.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:        ¡No puedes montar mientras estás maldito!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:        ¡Solo una montura épica puede soportar el peso de tu alma condenada!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:     ¡No puedes montar mientras estás petrificado!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:      ¡No puedes montar en esta forma!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:         ¡No puedes montar mientras el hechizo “{0}” está sobre ti!

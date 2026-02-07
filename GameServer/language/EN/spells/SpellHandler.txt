@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		You are healed by {0} for {1} hit points.
 SpellHandler.HealSpell.CriticalHeal:		Your heal criticals for an extra {0} hit points!
 SpellHandler.HealSpell.EfficientHealingBuff:	Your Efficient Healing buff grants you an additional {0} in the Heal!
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Your Efficient Endurance buff grants you {0} Endurance from the Heal!
-SpellHandler.HealSpell.TargetDamnedDamaged:		You are damned! The healing spell inflicts {0} damage instead of restoring health!
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} is damned! The healing spell inflicts {1} damage instead of restoring health!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	You are damned! The healing spell inflicts {0} damage instead of restoring health!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	The healing spell has reduced effectiveness because you are damned!
 SpellHandler.HealSpell.DamnedNoHeal:		The healing spell has no effect because you are damned!
 SpellHandler.HealSpell.YouDiseased:			You are diseased, healing has been reduced by {0}% !
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} is critically healed an
 SpellHandler.LifeDrain.DamnedYouHealed:				You are healed and gain {0} health points!
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	You are critically healed and gain {0} health points!
 SpellHandler.SpreadHeal.GroupFullyHealed:	Your group is already fully healed!
+SpellHandler.ZombieHeal.SelfHeal:				Your cursed flesh knits together, healing you for {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	The duration of your Damnation has been extended by {0} seconds.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	You extended the Damnation on {0} by {1} seconds.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		You're in a Zephyr and can't be attacked!
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Your target is in a Zephyr and can't be attacked!
@@ -166,16 +170,18 @@ SpellHandler.WrathofChampions.HitMob:		You hit the {0} for {1} damage(s).
 SpellHandler.WrathofChampions.HitPlayer:	You hit {0} for {1} damage(s).
 SpellHandler.WrathofChampions.PlayerHitBy:	{0} hits you for {1} damage(s).
 
-SpellHandler.ResurrectSpellHandler.ResurrectDialog:		Do you allow {0} to resurrect you with {1} percent hits?
+SpellHandler.ResurrectSpellHandler.ResurrectDialog:			Do you allow {0} to resurrect you with {1} percent hits?
 SpellHandler.ResurrectSpellHandler.NoResurrectAttempt:		No one is currently trying to resurrect you.
 SpellHandler.ResurrectSpellHandler.ResurrectDeclined:		You decline to be resurrected.
-SpellHandler.ResurrectSpellHandler.ResurrectedBy:		You have been resurrected by {0}!
-SpellHandler.ResurrectSpellHandler.ResurrectedByToken:	A miraculous force revives you!
+SpellHandler.ResurrectSpellHandler.ResurrectedBy:			You have been resurrected by {0}!
+SpellHandler.ResurrectSpellHandler.ResurrectedByToken:		A miraculous force revives you!
 SpellHandler.ResurrectSpellHandler.SelfTokenResurrectDialog:	A miraculous force revives you! It will restore {0}% health.
-SpellHandler.ResurrectSpellHandler.RezExpired:			Your resurrection spell has expired.
+SpellHandler.ResurrectSpellHandler.RezExpired:				Your resurrection spell has expired.
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Your target is already considering a resurrection!
-SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		The player you resurrected was not worth realm points on death.
-SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		You thus get no realm points for the resurrect.
+SpellHandler.ResurrectSpellHandler.NoRealmPoints1:			The player you resurrected was not worth realm points on death.
+SpellHandler.ResurrectSpellHandler.NoRealmPoints2:			You thus get no realm points for the resurrect.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	The curse gripping this corpse is too powerful, your resurrection spell fizzles!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Your soul is bound by a powerful curse! You cannot be resurrected in this place.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Your concentration fades.
 SpellHandler.Battlewarder.WarderFallen:		Your Battle Warder has fallen!

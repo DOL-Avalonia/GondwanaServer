@@ -436,6 +436,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:		Vous êtes enco
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:		Vous gagnez de la puissance dans la ligne de sorts {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			Les radiations intenses paniquent votre monture et vous êtes désarçonné !
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		L'influence radioactive se dissipe.
+GameObjects.GamePlayer.CursedArea.Immune:				Votre forme vous protège des radiations.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Vous êtes entré dans une zone radioactive ! Vous sentez une maladie s'installer...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Contamination
+GameObjects.GamePlayer.CursedArea.MutationStart:		L'infection mute ! Votre corps commence à pourrir et à ralentir !
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutation
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Votre corps se décompose rapidement, vous subissez {0} points de dégâts !
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Vous avez complètement muté en une âme Damnée !
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Erreur : Sort Damnation introuvable dans la BDD.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Votre corps maudit s'effondre.
+GameObjects.GamePlayer.CursedArea.Reanimate:			Les radiations réaniment votre cadavre instantanément !
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Décontamination
+GameObjects.GamePlayer.CursedArea.DeconStart:			Vous quittez la zone radioactive, mais la contamination persiste sur votre peau...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		Les radiations se sont finalement dissipées. Vous êtes sain.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Vous êtes rentré dans la zone avant la fin de la décontamination ! La mutation reprend immédiatement !
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Votre forme vous protège de nouvelles radiations, mais votre corps doit encore se décontaminer.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		Les radiations sont trop fortes pour une monture ordinaire !
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Vous appelez votre monture...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:			Vous essayez d'utiliser {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:			Vous allez maintenant tirer automatiquement.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:	Vous allez maintenant tirer et recharger automatiquement.
@@ -447,7 +467,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:		Vous ne pouvez pas invoquer de
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:		Vous ne pouvez pas invoquer de monture dans un donjon !
 GameObjects.GamePlayer.UseSlot.CantMountMoving:			Vous ne pouvez pas monter à cheval lorsque vous bougez.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:		Vous ne pouvez pas monter à cheval si vous êtes en furtivité.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:			Vous ne pouvez pas monter à cheval en étant damné·e !
+GameObjects.GamePlayer.UseSlot.CantMountDamned:			Seule une monture épique peut supporter le poids de votre âme damnée !
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:		Vous ne pouvez pas monter à cheval en étant pétrifié·e !
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:		Vous ne pouvez pas monter à cheval sous cette forme !
 GameObjects.GamePlayer.UseSlot.CantMountMorph:			Vous ne pouvez pas monter à cheval en étant sous l'effet d'un enchantement "{0}"!

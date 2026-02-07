@@ -435,6 +435,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:    Je bent overb
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:      Je wint macht in de spreukenlijn {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			De intense straling maakt je rijdier bang en je wordt eraf geworpen!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		De radioactieve invloed verdwijnt.
+GameObjects.GamePlayer.CursedArea.Immune:				Je gedaante beschermt je tegen de straling.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Je bent een radioactieve zone binnengegaan! Je voelt dat een ziekte vat op je krijgt...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Besmetting
+GameObjects.GamePlayer.CursedArea.MutationStart:		De infectie muteert! Je lichaam begint te rotten en te vertragen!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutatie
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Je lichaam vergaat snel, je doet {0} schade!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Je bent volledig gemuteerd in een Verdoemde ziel!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Fout: Verdoemenis-spreuk niet gevonden in DB.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Je vervloekte lichaam valt neer.
+GameObjects.GamePlayer.CursedArea.Reanimate:			De straling wekt je lijk onmiddellijk weer tot leven!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Ontsmetting
+GameObjects.GamePlayer.CursedArea.DeconStart:			Je verlaat de radioactieve zone, maar de besmetting blijft op je huid...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		De straling is eindelijk verdwenen. Je bent schoon.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Je bent de zone weer binnengegaan voordat de ontsmetting voltooid was! De mutatie gaat onmiddellijk verder!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Je gedaante beschermt je tegen verdere straling, maar je lichaam moet nog ontsmetten.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		De straling is te sterk voor een gewoon rijdier!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Rijdier oproepen...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:           Je probeert {0} te gebruiken.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:        Je zult nu automatisch schieten.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Je zult nu automatisch schieten en herladen.
@@ -446,7 +466,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Je kunt hier geen rijdier
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Je kunt geen rijdier oproepen in een kerker!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:        Je kunt niet opstijgen terwijl je beweegt.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:     Je kunt niet opstijgen terwijl je in stealth bent.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:        Je kunt niet opstijgen terwijl je verdoemd bent!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:        Alleen een episch rijdier kan het gewicht van je verdoemde ziel dragen!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:     Je kunt niet opstijgen terwijl je versteend bent!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:      Je kunt in deze gedaante niet opstijgen!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:         Je kunt niet opstijgen zolang de spreuk “{0}” op je ligt!

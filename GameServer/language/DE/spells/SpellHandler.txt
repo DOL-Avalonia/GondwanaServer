@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		Sie werden von {0} um {1} Lebenspunkte geh
 SpellHandler.HealSpell.CriticalHeal:		Sie wirken eine kritische Heilung und stellen {0} zusätzliche Lebenspunkte wieder her!
 SpellHandler.HealSpell.EfficientHealingBuff:	Ihr Effizienz-Heilungsbuff gewährt Ihnen {0} zusätzliche Heilungspunkte!
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Ihr Effizienz-Ausdauerbuff gewährt Ihnen beim Heilen {0} zusätzliche Ausdauerpunkte!
-SpellHandler.HealSpell.TargetDamnedDamaged:		Sie sind verflucht! Der Heilzauber fügt Ihnen {0} Schaden zu, anstatt Sie zu heilen!
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} ist verdammt! Der Heilzauber verursacht {1} Schaden, anstatt Gesundheit wiederherzustellen!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	Du bist verdammt! Der Heilzauber verursacht {0} Schaden, anstatt Gesundheit wiederherzustellen!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	Der Heilzauber ist weniger effektiv, weil Sie verflucht sind!
 SpellHandler.HealSpell.DamnedNoHeal:		Der Heilzauber wirkt nicht auf Sie, weil Sie verflucht sind!
 SpellHandler.HealSpell.YouDiseased:			Sie sind krank, die Heilung wird um {0}% reduziert!
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} erhält einen kritische
 SpellHandler.LifeDrain.DamnedYouHealed:		Sie werden geheilt und erhalten {0} Lebenspunkte zurück!
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Sie erhalten einen kritischen Heilungsbonus und bekommen {0} Lebenspunkte zurück!
 SpellHandler.SpreadHeal.GroupFullyHealed:	Ihre Gruppe ist bereits vollständig geheilt!
+SpellHandler.ZombieHeal.SelfHeal:				Dein verfluchtes Fleisch wächst zusammen und heilt dich um {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	Die Dauer deiner Verdammnis wurde um {0} Sekunden verlängert.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Du hast die Verdammnis von {0} um {1} Sekunden verlängert.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Sie werden von einem Zephyr getragen und können nicht angegriffen werden!
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Ihr Ziel wird von einem Zephyr getragen und kann nicht angegriffen werden!
@@ -176,6 +180,8 @@ SpellHandler.ResurrectSpellHandler.RezExpired:		Ihr Wiederbelebungszauber ist ab
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Ihr Ziel erwägt bereits eine Wiederbelebung!
 SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		Der Spieler, den Sie wiederbelebt haben, brachte bei seinem Tod keine Reichspunkte.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Sie erhalten daher bei seiner Wiederbelebung keine Reichspunkte.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	Der Fluch, der diese Leiche umklammert, ist zu mächtigs; dein Wiederbelebungszauber verpufft!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Deine Seele ist an einen mächtigen Fluch gebunden! Du kannst an diesem Ort nicht wiederbelebt werden.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Ihre Konzentration lässt nach.
 SpellHandler.Battlewarder.WarderFallen:		Ihr Schlachtwächter ist gefallen!

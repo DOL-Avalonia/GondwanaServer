@@ -436,6 +436,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:	You are encumber
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:			You gain power in the {0} spell list!		
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			The intense radiation panics your mount and you are thrown off!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		The radioactive influence fades.
+GameObjects.GamePlayer.CursedArea.Immune:				Your form protects you from the radiation.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			You have entered a radioactive zone! You feel a sickness taking hold...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Contamination
+GameObjects.GamePlayer.CursedArea.MutationStart:		The infection mutates! Your body begins to rot and slow down!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutation
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Your body is decaying fast, you deal {0} damage!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		You have fully mutated into a Damned soul!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Error: Damnation spell not found in DB.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Your cursed body falls.
+GameObjects.GamePlayer.CursedArea.Reanimate:			The radiation reanimates your corpse instantly!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Decontamination
+GameObjects.GamePlayer.CursedArea.DeconStart:			You leave the radioactive zone, but the contamination lingers on your skin...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		The radiation has finally dissipated. You are clean.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		You re-entered the zone before decontamination was complete! The mutation resumes immediately!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Your form protects you from further radiation, but your body must still decontaminate.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:			The radiation is too strong for a regular mount!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:			Summoning Mount...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:				You attempt to use {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:				You will now automatically release your shot.		
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:		You will now automatically release your shot and reload.			
@@ -444,10 +464,10 @@ GameObjects.GamePlayer.UseSlot.CantFire:					You can't fire or use this item!
 GameObjects.GamePlayer.UseSlot.CantMountCombat:				You are in combat and cannot call your mount.
 GameObjects.GamePlayer.UseSlot.CantMountHere:		    	You cannot summon a mount here!		
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:			You cannot summon a mount here!
-GameObjects.GamePlayer.UseSlot.CantMountInDungeon:		    You cannot call your mount while in a dungeon !
+GameObjects.GamePlayer.UseSlot.CantMountInDungeon:		    You cannot call your mount while in a dungeon!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:				You can't mount while you're moving.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:			You can't mount while you're in stealth.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:				You can't mount while you're damned!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:				Only an Epic Mount can bear the weight of your Damned soul!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:			You can't mount while you're petrified!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:			You can't mount while you're under this form!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:				You can't mount while you're under a "{0}" enchantment!

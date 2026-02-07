@@ -145,7 +145,15 @@ namespace DOL.GS.Spells
                         CausesCombat = false,
                     };
                     target.TakeDamage(ad);
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", dmg), eChatType.CT_YouDied);
+                    if (target is GamePlayer targetPlayer)
+                    {
+                        MessageToLiving(targetPlayer, LanguageMgr.GetTranslation(targetPlayer.Client, "SpellHandler.HealSpell.TargetDamnedDamagedYou", dmg), eChatType.CT_YouDied);
+                    }
+
+                    if (Caster != target)
+                    {
+                        MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", m_caster.GetPersonalizedName(target), dmg), eChatType.CT_Important);
+                    }
                 }
                 else if (harmvalue < 0)
                 {

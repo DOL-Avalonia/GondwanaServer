@@ -435,6 +435,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:    Bạn đang q
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:      Bạn mạnh lên trong dòng phép {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			Bức xạ cực mạnh khiến thú cưỡi hoảng loạn và hất bạn xuống!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		Ảnh hưởng của phóng xạ đang phai dần.
+GameObjects.GamePlayer.CursedArea.Immune:				Hình dạng của bạn bảo vệ bạn khỏi bức xạ.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Bạn đã vào khu vực phóng xạ! Bạn cảm thấy cơn bệnh đang ập đến...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Nhiễm độc
+GameObjects.GamePlayer.CursedArea.MutationStart:		Mầm bệnh đang đột biến! Cơ thể bạn bắt đầu thối rữa và chậm lại!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Đột biến
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Cơ thể bạn đang phân hủy nhanh chóng, bạn gây {0} sát thương!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Bạn đã hoàn toàn đột biến thành một Linh Hồn Bị Nguyền Rủa!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Lỗi: Không tìm thấy phép Damnation trong DB.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Cơ thể bị nguyền rủa của bạn gục ngã.
+GameObjects.GamePlayer.CursedArea.Reanimate:			Bức xạ hồi sinh xác của bạn ngay lập tức!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Khử nhiễm
+GameObjects.GamePlayer.CursedArea.DeconStart:			Bạn rời khỏi vùng phóng xạ, nhưng chất độc vẫn còn bám trên da...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		Bức xạ cuối cùng đã tan biến. Bạn đã sạch sẽ.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Bạn đã quay lại vùng này trước khi quá trình khử nhiễm hoàn tất! Quá trình đột biến tiếp tục ngay lập tức!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Hình dạng của bạn bảo vệ bạn khỏi bức xạ thêm nữa, nhưng cơ thể bạn vẫn phải khử nhiễm.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		Bức xạ quá mạnh đối với thú cưỡi thông thường!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Đang triệu hồi thú cưỡi...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:           Bạn cố gắng dùng {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:        Bạn sẽ bắn tự động.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Bạn sẽ bắn và nạp lại tự động.
@@ -446,7 +466,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Không thể gọi thú c
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Không thể gọi thú cưỡi trong hầm ngục!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:        Không thể lên ngựa khi đang di chuyển.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:     Không thể lên ngựa khi đang ẩn thân.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:        Không thể lên ngựa khi đang bị nguyền!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:        Chỉ có thú cưỡi Sử Thi mới có thể gánh chịu sức nặng từ linh hồn bị nguyền rủa của ngươi!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:     Không thể lên ngựa khi đang hóa đá!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:      Không thể lên ngựa ở hình dạng này!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:         Không thể lên ngựa khi đang chịu phép “{0}”!

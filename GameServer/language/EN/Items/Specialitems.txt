@@ -43,5 +43,6 @@ Items.Specialitems.StorageBag.BadItem:				You cannot put this item in this bag!
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Your {0} shatters after triggering on death!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Failed to destroy item for some reason!
+Items.Specialitems.DieTriggerSpell.FailRez:			The curse affecting your corpse is too strong here, the resurrection spell fizzles!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Your {0} is depleted and has been removed from your inventory.

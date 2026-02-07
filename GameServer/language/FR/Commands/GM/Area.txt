@@ -1,3 +1,20 @@
-Commands.GM.Area.Description:	Commande de gestion des zones (area)
-Commands.GM.Area.Usage.Create:	'/area create <name> <type(circle|square|safe|bind)> <radius> <broadcast(y|n)> <soundid> <allowVol(true|false)> true by default'
-Commands.GM.Area.AreaCreated:	Zone créé - Description : {0}, X={1}, Y={2}, Z={3}, Radius={4}, Broadcast={5}, Sound={6}.
+Commands.GM.Area.Description:		Commande de gestion des zones (area)
+Commands.GM.Area.Usage.Create:		'/area create <name> <type(circle|square|safe|bind)> <radius> <broadcast(y|n)> <soundid> <allowVol(true|false)> true par défaut'
+Commands.GM.Area.AreaCreated:		Zone créée - Description : {0}, X={1}, Y={2}, Z={3}, Radius={4}, Broadcast={5}, Sound={6}.
+Commands.GM.Area.Usage.AllowVol:	'/area allowvol <true|false>' - Active ou désactive le vol dans la zone.
+Commands.GM.Area.Usage.Sound:		'/area sound set <soundID>' - Définit l'ID du son d'ambiance (0-255).
+Commands.GM.Area.Usage.RealmPoints:	'/area realmpoints set <valeur>' - Définit le bonus de points de royaume.
+Commands.GM.Area.Usage.IsPvP:		'/area ispvp <true|false>' - Active ou désactive le mode PvP de la zone.
+Commands.GM.Area.Usage.IsSafe:		'/area issafe <true|false>' - Active ou désactive la zone sûre (pas de combat).
+Commands.GM.Area.Usage.Radius:		'/area radius set <valeur>' - Met à jour le rayon de la zone.
+Commands.GM.Area.Usage.Maxradius:	'/area maxradius set <valeur>' - Met à jour le rayon maximum de la zone.
+Commands.GM.Area.Usage.Boundary:	'/area boundary set <modelID>' - Définit le modèle habituel de la frontière.
+Commands.GM.Area.Usage.BoundaryEvent:	'/area boundaryevent set <modelID>' - Définit le modèle d'événement de frontière.
+Commands.GM.Area.Usage.BoundarySpacing:	'/area boundaryspacing set <valeur>' - Définit l'espacement entre les objets de frontière.
+Commands.GM.Area.Usage.Spell:		'/area spell set <spellID>' - Définit le sort permanent dans la zone.
+Commands.GM.Area.Usage.SpellEvent:	'/area spellevent set <spellID>' - Définit le sort déclenché par événement.
+Commands.GM.Area.Usage.StormLevel:	'/area stormlevel set <0-255>' - Définit l'intensité de la tempête.
+Commands.GM.Area.Usage.StormSize:	'/area stormsize set <0-255>' - Définit la taille des nuages de tempête.
+Commands.GM.Area.Usage.EventList:	'/area eventlist <add|remove|set> <eventName>' - Gère les événements de zone.
+Commands.GM.Area.Usage.IsRadioactive:	'/area radioactive <on|off>' - Active ou désactive les dégâts radioactifs.
+Commands.GM.Area.Usage.Remove:		'/area remove' - Supprime la zone dans laquelle vous vous trouvez.

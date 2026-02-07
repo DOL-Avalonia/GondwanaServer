@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
@@ -67,6 +68,29 @@ namespace DOL.GS.Spells
             
             SendEffectAnimation(target, 0, false, 1);
             GamePlayer targetPlayer = target as GamePlayer;
+
+            if (targetPlayer != null)
+            {
+                if (targetPlayer.IsRadioactiveAreaActive)
+                {
+                    bool isMonsterRez = this is MonsterRez;
+
+                    if (!isMonsterRez)
+                    {
+                        if (Caster is GamePlayer casterPlayer)
+                        {
+                            string msg = LanguageMgr.GetTranslation(casterPlayer.Client, "SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster");
+                            casterPlayer.Out.SendMessage(msg, eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                        }
+
+                        string targetMsg = LanguageMgr.GetTranslation(targetPlayer.Client, "SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget");
+                        targetPlayer.Out.SendMessage(targetMsg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                        return false;
+                    }
+                }
+            }
+
             if (targetPlayer == null)
             {
                 //not a player
@@ -277,6 +301,22 @@ namespace DOL.GS.Spells
         {
             if (!base.CheckBeginCast(target, quiet))
                 return false;
+
+            if (target is GamePlayer player && player.IsDamned)
+            {
+                bool inRadioactiveArea = player.CurrentAreas.Any(a => (a is AbstractArea aa) && aa.IsRadioactive);
+                bool isMonsterRez = this is MonsterRez;
+
+                if (inRadioactiveArea && !isMonsterRez)
+                {
+                    if (Caster is GamePlayer p)
+                    {
+                        string msg = LanguageMgr.GetTranslation(p.Client, "SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster");
+                        MessageToCaster(msg, eChatType.CT_SpellResisted);
+                    }
+                    return false;
+                }
+            }
 
             //Lifeflight, the base call to Checkbegincast uses its own power check, which is bad for rez spells
             //TODO(Mishura): Is this still needed?

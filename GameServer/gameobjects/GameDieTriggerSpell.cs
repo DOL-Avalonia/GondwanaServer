@@ -86,6 +86,18 @@ namespace DOL.GS
                 return false;
             }
 
+            if (IsResurrectionSpell(spell))
+            {
+                if (deadOwner.IsDamned && deadOwner.IsRadioactiveAreaActive)
+                {
+                    if (spell.SpellType != "ReanimateCorpse")
+                    {
+                        deadOwner.Out.SendMessage(LanguageMgr.GetTranslation(deadOwner.Client, "Items.Specialitems.DieTriggerSpell.FailRez"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                }
+            }
+
             ISpellHandler handler = ScriptMgr.CreateSpellHandler(deadOwner, spell, line);
             if (handler == null)
             {

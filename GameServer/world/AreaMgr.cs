@@ -10,7 +10,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public static bool LoadAllAreas()
         {
@@ -50,10 +50,13 @@ namespace DOL.GS
                     area.CanBroadcast = thisArea.CanBroadcast;
                     area.IsSafeArea = thisArea.SafeArea;
                     area.CheckLOS = thisArea.CheckLOS;
+                    area.IsRadioactive = thisArea.IsRadioactive;
                     Region region = WorldMgr.GetRegion(thisArea.Region);
                     if (region == null)
                         continue;
                     region.AddArea(area);
+                    area.SpawnBoundary();
+                    area.StartEffectLoop();
                     log.Info("Area added: " + thisArea.Description);
                 }
                 return true;

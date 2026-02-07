@@ -287,6 +287,11 @@ SpellDescription.OffProcShear.Main1:					Entfernt aktive Offensiv‑Procs vom Zi
 SpellDescription.OffProcShear.Main2:					Wendet einen verfluchten Ersatz‑Proc an, dessen Unterzauber die Feinde des Ziels bei deren Treffern heilt.
 SpellDescription.OffProcShear.ReplacementHeader:		Ersatz‑Proc:
 SpellDescription.RewindTime.MainDescription:			Teleportiert das Ziel an die Position zurück, die es vor {0} Sekunden eingenommen hat.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Stellt bei einem verdammten Ziel {0} Gesundheit wieder her und verlängert dessen qualvolle Existenz um {1} Sekunden. Fügt nicht verdammten Zielen {0} {2}-Schaden zu.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Stellt bei einem verdammten Ziel {0} Gesundheit wieder her. Fügt nicht verdammten Zielen {0} {1}-Schaden zu.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Verlängert die qualvolle Existenz eines verdammten Ziels um {0} Sekunden. Hat keine Auswirkungen auf nicht verdammte Ziele.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Bonuseffekt (Nur verdammte Ziele):
+SpellDescription.ZombieHeal.Header.SideEffect:            Nebenwirkung (Strafe für lebende Ziele):
 
 
 # ML Spells ShortDescriptions

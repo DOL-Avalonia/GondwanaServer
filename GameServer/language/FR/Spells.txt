@@ -289,6 +289,11 @@ SpellDescription.OffProcShear.Main1:				Retire tout proc offensif actif de la ci
 SpellDescription.OffProcShear.Main2:				Applique un proc de remplacement maudit dont le sous-sort soigne les ennemis de la cible lorsqu'elle frappe.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc de remplacement :
 SpellDescription.RewindTime.MainDescription:			Téléporte la cible à la position qu'elle occupait il y a {0} secondes.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Restaure {0} points de vie à une cible Damnée et prolonge son tourment de {1} secondes. Inflige {0} dégâts {2} aux cibles non-Damnées.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restaure {0} points de vie à une cible Damnée. Inflige {0} dégâts {2} aux cibles non-Damnées.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prolonge la durée de la Damnation de la cible de {0} secondes. Sans effet sur les cibles non-Damnées.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Effet Bonus (Cible Damnée Uniquement):
+SpellDescription.ZombieHeal.Header.SideEffect:            Pénalité (Cible Vivante Uniquement):
 
 
 # ML Spells ShortDescriptions

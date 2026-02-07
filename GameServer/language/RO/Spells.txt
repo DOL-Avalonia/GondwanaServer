@@ -287,6 +287,11 @@ SpellDescription.OffProcShear.Main1:					Înlătură proc-urile ofensive active 
 SpellDescription.OffProcShear.Main2:					Aplică un proc blestemat de înlocuire ale cărui sub-vrăji îi vindecă pe inamicii țintei când lovesc.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc de înlocuire:
 SpellDescription.RewindTime.MainDescription:			Teleportează ținta înapoi la poziția pe care o ocupa acum {0} secunde.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Restabilește {0} viață unui obiectiv Blestemat și îi prelungește existența chinuită cu {1} secunde. Provoacă {0} daune {2} țintelor care nu sunt Blestemate.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restabilește {0} viață unui obiectiv Blestemat. Provoacă {0} daune {1} țintelor care nu sunt Blestemate.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prelungește durata existenței chinuite a unei ținte Blestemate cu {0} secunde. Nu are efect asupra țintelor care nu sunt Blestemate.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Efect Bonus (Doar ținte Blestemate):
+SpellDescription.ZombieHeal.Header.SideEffect:            Efect Secundar (Penalizare pentru ținte vii):
 
 
 # ML Spells ShortDescriptions

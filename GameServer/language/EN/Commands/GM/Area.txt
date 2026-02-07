@@ -1,3 +1,20 @@
-Commands.GM.Area.Description:	Various commands to help you with areas:
-Commands.GM.Area.Usage.Create:	'/area create <name> <type(circle|square|safe|bind)> <radius> <broadcast(y|n)> <soundid> <allowSteal(true|false)> true by default'
-Commands.GM.Area.AreaCreated:	Area created - Description: {0}, X={1}, Y={2}, Z={3}, Radius={4}, Broadcast={5}, Sound={6}.
+Commands.GM.Area.Description:		Various commands to help you with areas:
+Commands.GM.Area.Usage.Create:		'/area create <name> <type(circle|square|safe|bind)> <radius> <broadcast(y|n)> <soundid> <allowSteal(true|false)> true by default'
+Commands.GM.Area.AreaCreated:		Area created - Description: {0}, X={1}, Y={2}, Z={3}, Radius={4}, Broadcast={5}, Sound={6}.
+Commands.GM.Area.Usage.AllowVol:	'/area allowvol <true|false>' - Enables or disables stealing in the area.
+Commands.GM.Area.Usage.Sound:		'/area sound set <soundID>' - Sets the ambient sound ID (0-255).
+Commands.GM.Area.Usage.RealmPoints:	'/area realmpoints set <value>' - Sets the RP bonus amount.
+Commands.GM.Area.Usage.IsPvP:		'/area ispvp <true|false>' - Flags the area as a PvP zone.
+Commands.GM.Area.Usage.IsSafe:		'/area issafe <true|false>' - Flags the area as a Safe zone (no combat).
+Commands.GM.Area.Usage.Radius:		'/area radius set <value>' - Updates the area's radius.
+Commands.GM.Area.Usage.Maxradius:	'/area maxradius set <value>' - Updates the area's maximum radius.
+Commands.GM.Area.Usage.Boundary:	'/area boundary set <modelID>' - Sets the regular model for the boundary.
+Commands.GM.Area.Usage.BoundaryEvent:	'/area boundaryevent set <modelID>' - Sets the boundary event model.
+Commands.GM.Area.Usage.BoundarySpacing:	'/area boundaryspacing set <value>' - Sets distance between boundary objects.
+Commands.GM.Area.Usage.Spell:		'/area spell set <spellID>' - Sets the permanent spell effect in the area.
+Commands.GM.Area.Usage.SpellEvent:	'/area spellevent set <spellID>' - Sets the event-triggered spell.
+Commands.GM.Area.Usage.StormLevel:	'/area stormlevel set <0-255>' - Sets the storm intensity.
+Commands.GM.Area.Usage.StormSize:	'/area stormsize set <0-255>' - Sets the storm cloud size.
+Commands.GM.Area.Usage.EventList:	'/area eventlist <add|remove|set> <eventName>' - Manages area event conditions.
+Commands.GM.Area.Usage.IsRadioactive:	'/area radioactive <on|off>' - Toggles radioactive damage.
+Commands.GM.Area.Usage.Remove:		'/area remove' - Deletes the area you are standing in.

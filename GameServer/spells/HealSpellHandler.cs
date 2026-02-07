@@ -136,7 +136,8 @@ namespace DOL.GS.Spells
                         healTarget.TakeDamage(ad);
                         m_healed = true;
 
-                        MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", damageAmount), eChatType.CT_YouDied);
+                        MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedDamaged", m_caster.GetPersonalizedName(healTarget), damageAmount), eChatType.CT_Important);
+                        MessageToLiving(healTarget, LanguageMgr.GetTranslation((healTarget as GamePlayer)?.Client, "SpellHandler.HealSpell.TargetDamnedDamagedYou", damageAmount), eChatType.CT_YouDied);
                     }
                     else if (harmvalue < 0)
                     {
@@ -353,7 +354,7 @@ namespace DOL.GS.Spells
 
             #endregion PVP DAMAGE
 
-            if (m_caster == target && (SpellHandler.FindEffectOnTarget(m_caster, "Damnation") != null))
+            if (m_caster == target)
             {
                 MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.SelfHealed", heal), eChatType.CT_Spell);
                 if (heal < amount && amount > 0)
@@ -414,21 +415,24 @@ namespace DOL.GS.Spells
 
             int heal = target.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, (int)Math.Round(amount));
 
-            if (m_caster == target && heal > 0 && (SpellHandler.FindEffectOnTarget(m_caster, "Damnation") != null))
+            if (m_caster == target)
             {
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.SelfHealed", heal), eChatType.CT_Spell);
-
-                if (heal < amount && amount > 0)
+                if (heal > 0)
                 {
-                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.FullyHealedSelf"), eChatType.CT_Spell);
-                    #region PVP DAMAGE
+                    MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.SelfHealed", heal), eChatType.CT_Spell);
 
-                    if (target.DamageRvRMemory > 0 && (target is GamePlayer || (target as NecromancerPet)?.GetLivingOwner() is not null))
+                    if (heal < amount && amount > 0)
                     {
-                        target.DamageRvRMemory = 0; //Remise a zéro compteur dommages/heal rps
-                    }
+                        MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HealSpell.FullyHealedSelf"), eChatType.CT_Spell);
+                        #region PVP DAMAGE
 
-                    #endregion PVP DAMAGE
+                        if (target.DamageRvRMemory > 0 && (target is GamePlayer || (target as NecromancerPet)?.GetLivingOwner() is not null))
+                        {
+                            target.DamageRvRMemory = 0; //Remise a zéro compteur dommages/heal rps
+                        }
+
+                        #endregion PVP DAMAGE
+                    }
                 }
             }
             else if (heal > 0)

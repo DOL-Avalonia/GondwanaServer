@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		{0} te vindecă cu {1} puncte de viață.
 SpellHandler.HealSpell.CriticalHeal:		Efectuezi o vindecare critică și restaurezi {0} puncte de viață suplimentare!
 SpellHandler.HealSpell.EfficientHealingBuff:	Îmbunătățirea ta de eficiență a vindecării îți oferă {0} puncte de vindecare suplimentare!
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Îmbunătățirea ta de eficiență a rezistenței îți oferă {0} puncte de rezistență suplimentare la vindecare!
-SpellHandler.HealSpell.TargetDamnedDamaged:		Ești blestemat! Vraja de vindecare îți provoacă {0} daune în loc să te vindece!
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} este blestemat! Vraja de vindecare provoacă {1} daune în loc să restabilească sănătatea!
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	Ești blestemat! Vraja de vindecare provoacă {0} daune în loc să restabilească sănătatea!
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	Vindecarea este mai puțin eficientă deoarece ești blestemat!
 SpellHandler.HealSpell.DamnedNoHeal:		Vraja de vindecare nu are efect asupra ta deoarece ești blestemat!
 SpellHandler.HealSpell.YouDiseased:			Ești bolnav, vindecarea este redusă cu {0}%!
@@ -138,6 +139,9 @@ SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} primește o vindecare c
 SpellHandler.LifeDrain.DamnedYouHealed:		Ești vindecat și recuperezi {0} puncte de viață!
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Primești o vindecare critică și recuperezi {0} puncte de viață!
 SpellHandler.SpreadHeal.GroupFullyHealed:	Grupul tău este deja pe deplin vindecat!
+SpellHandler.ZombieHeal.SelfHeal:				Carnea ta blestemată se sudează, vindecându-te cu {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	Durata Condamnării tale a fost prelungită cu {0} secunde.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Ai prelungit Condamnarea lui {0} cu {1} secunde.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Ești purtat de un Zefir și nu poți fi atacat!
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Ținta ta este purtată de un Zefir și nu poate fi atacată!
@@ -176,6 +180,8 @@ SpellHandler.ResurrectSpellHandler.RezExpired:		Vraja ta de înviere a expirat.
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Ținta ta ia deja în considerare o înviere!
 SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		Jucătorul pe care l-ai înviat nu a oferit puncte de regat la moarte.
 SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Prin urmare, nu primești puncte de regat pentru învierea lui.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	Blestemul care cuprinde acest cadavru este prea puternic, vraja ta de înviere eșuează!
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Sufletul tău este legat de un blestem puternic! Nu poți fi înviat în acest loc.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Concentrarea ta scade.
 SpellHandler.Battlewarder.WarderFallen:		Gardianul tău de Bătălie a căzut!

@@ -43,5 +43,6 @@ Items.Specialitems.StorageBag.BadItem:				Vous ne pouvez pas mettre cet object d
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Votre {0} se brise après s'être déclenché lors de la mort !
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Échec de la destruction de l'objet pour une raison inconnue !
+Items.Specialitems.DieTriggerSpell.FailRez:			La malédiction qui vous affecte en ces lieux est trop puissante, votre sort de résurrection échoue !
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Votre {0} est épuisé et a été retiré de votre inventaire.

@@ -121,7 +121,8 @@ SpellHandler.HealSpell.YouAreHealed:		Vous êtes soigné par {0} pour {1} points
 SpellHandler.HealSpell.CriticalHeal:		Vous réalisez un soin critique et récupérez {0} points de vie supplémentaires !
 SpellHandler.HealSpell.EfficientHealingBuff:	Votre buff de guérison efficace vous apporte {0} points de soin supplémentaires !
 SpellHandler.HealSpell.EfficientEnduranceBuff:	Votre buff d'endurance efficace vous apporte {0} points d'endurance supplémentaires lors du soin !
-SpellHandler.HealSpell.TargetDamnedDamaged:		Vous êtes damné ! Le sort de guérison vous inflige {0} dommages au lieu de vous soigner !
+SpellHandler.HealSpell.TargetDamnedDamaged:		{0} est damné ! Le sort de guérison lui inflige {0} dommages au lieu de le soigner !
+SpellHandler.HealSpell.TargetDamnedDamagedYou:	Vous êtes damné ! Le sort de guérison vous inflige {0} dommages au lieu de vous soigner !
 SpellHandler.HealSpell.TargetDamnedPartiallyHealed:	Le sort de guérison est moins efficace car vous etes damné !
 SpellHandler.HealSpell.DamnedNoHeal:		Le sort de guérison ne vous affecte pas car vous etes damné !
 SpellHandler.HealSpell.YouDiseased:			Vous êtes malade, le soin est réduit de {0}% !
@@ -137,7 +138,10 @@ SpellHandler.LifeDrain.DamnedTargetHealed:				{0} est soignée et regagne {1} po
 SpellHandler.LifeDrain.DamnedTargetCriticallyHealed:	{0} reçoit un bonus critique en soin et regagne {1} points de vie !
 SpellHandler.LifeDrain.DamnedYouHealed:				Vous êtes soigné et regagnez {0} points de vie !
 SpellHandler.LifeDrain.DamnedYouCriticallyHealed:	Vous recevez un bonus critique en soin et regagnez {0} points de vie !
-SpellHandler.SpreadHeal.GroupFullyHealed:	Votre groupe est déjà complètement soigné !
+SpellHandler.SpreadHeal.GroupFullyHealed:		Votre groupe est déjà complètement soigné !
+SpellHandler.ZombieHeal.SelfHeal:				Votre chair maudite se recompose, vous soignant de {0}.
+SpellHandler.ZombieHeal.DecayExtendedTarget:	La durée de votre Damnation a été prolongée de {0} secondes.
+SpellHandler.ZombieHeal.DecayExtendedCaster:	Vous avez prolongé la Damnation de {0} de {1} secondes.
 
 SpellHandler.Zephyr.NoAttackInZephyr:		Vous êtes transporté par un Zéphyr et ne pouvez pas être attaqué !
 SpellHandler.Zephyr.TargetNoAttackInZephyr:	Votre cible est transportée par un Zéphyr et ne peut pas être attaquée !
@@ -166,16 +170,18 @@ SpellHandler.WrathofChampions.HitMob:		Vous frappez le {0} pour {1} dommages.
 SpellHandler.WrathofChampions.HitPlayer:	Vous frappez {0} pour {1} dommages.
 SpellHandler.WrathofChampions.PlayerHitBy:	{0} vous frappe pour {1} dommages.
 
-SpellHandler.ResurrectSpellHandler.ResurrectDialog:		Autorisez-vous {0} à vous ressusciter avec {1} pourcent de points de vie ?
+SpellHandler.ResurrectSpellHandler.ResurrectDialog:			Autorisez-vous {0} à vous ressusciter avec {1} pourcent de points de vie ?
 SpellHandler.ResurrectSpellHandler.NoResurrectAttempt:		Personne n'essaie actuellement de vous ressusciter.
 SpellHandler.ResurrectSpellHandler.ResurrectDeclined:		Vous refusez d'être ressuscité.
-SpellHandler.ResurrectSpellHandler.ResurrectedBy:		Vous avez été ressuscité par {0} !
-SpellHandler.ResurrectSpellHandler.ResurrectedByToken:	Une force miraculeuse vous ranime !
+SpellHandler.ResurrectSpellHandler.ResurrectedBy:			Vous avez été ressuscité par {0} !
+SpellHandler.ResurrectSpellHandler.ResurrectedByToken:		Une force miraculeuse vous ranime !
 SpellHandler.ResurrectSpellHandler.SelfTokenResurrectDialog:	Une force miraculeuse vous ranime ! Elle vous rendra {0}% de vie.
-SpellHandler.ResurrectSpellHandler.RezExpired:			Votre sort de résurrection a expiré.
+SpellHandler.ResurrectSpellHandler.RezExpired:				Votre sort de résurrection a expiré.
 SpellHandler.ResurrectSpellHandler.AlreadyConsideringResurrect:	Votre cible envisage déjà une résurrection !
-SpellHandler.ResurrectSpellHandler.NoRealmPoints1:		Le joueur que vous avez ressuscité ne valait aucun points de royaume à sa mort.
-SpellHandler.ResurrectSpellHandler.NoRealmPoints2:		Vous ne gagnez donc pas de points de royaume lors de sa résurrection.
+SpellHandler.ResurrectSpellHandler.NoRealmPoints1:			Le joueur que vous avez ressuscité ne valait aucun points de royaume à sa mort.
+SpellHandler.ResurrectSpellHandler.NoRealmPoints2:			Vous ne gagnez donc pas de points de royaume lors de sa résurrection.
+SpellHandler.ResurrectSpellHandler.CurseTooStrongCaster:	La malédiction qui affecte ce cadavre est trop puissante, votre sort de résurrection échoue !
+SpellHandler.ResurrectSpellHandler.CurseTooStrongTarget:	Votre âme est liée par une puissante malédiction ! Vous ne pouvez pas être ressuscité en ce lieu.
 
 SpellHandler.Battlewarder.ConcentrationFades:	Votre concentration s'estompe.
 SpellHandler.Battlewarder.WarderFallen:		Votre Garde de Bataille est tombé !

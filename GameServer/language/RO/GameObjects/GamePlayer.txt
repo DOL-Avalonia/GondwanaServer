@@ -435,6 +435,26 @@ GameObjects.GamePlayer.UpdateEncumberance.EncumberedMoveSlowly:    Ești supraî
 
 GameObjects.GamePlayer.UpdateSpellLine.GainPower:      Câștigi putere în linia de vrăji {0}.
 
+GameObjects.GamePlayer.CursedArea.MountPanic:			Radiațiile intense îți sperie montura și ești aruncat din șa!
+GameObjects.GamePlayer.CursedArea.InfluenceFades:		Influența radioactivă dispare.
+GameObjects.GamePlayer.CursedArea.Immune:				Forma ta te protejează de radiații.
+GameObjects.GamePlayer.CursedArea.EnteredZone:			Ai intrat într-o zonă radioactivă! Simți cum te cuprinde o boală...
+GameObjects.GamePlayer.CursedArea.Timer.Contamination:	Contaminare
+GameObjects.GamePlayer.CursedArea.MutationStart:		Infecția suferă mutații! Corpul tău începe să putrezească și să încetinească!
+GameObjects.GamePlayer.CursedArea.Timer.Mutation:		Mutație
+GameObjects.GamePlayer.CursedArea.BurnDamage:			Corpul tău se descompune rapid, provoci {0} daune!
+GameObjects.GamePlayer.CursedArea.MutationComplete:		Ai mutat complet într-un Suflet blestemat!
+GameObjects.GamePlayer.CursedArea.ErrorSpellMissing:	Eroare: Vraja Damnation nu a fost găsită în baza de date.
+GameObjects.GamePlayer.CursedArea.CursedDeath:			Corpul tău blestemat cade.
+GameObjects.GamePlayer.CursedArea.Reanimate:			Radiațiile îți reanimează cadavrul instantaneu!
+GameObjects.GamePlayer.CursedArea.Timer.Decon:			Decontaminare
+GameObjects.GamePlayer.CursedArea.DeconStart:			Părăsești zona radioactivă, dar contaminarea persistă pe pielea ta...
+GameObjects.GamePlayer.CursedArea.DeconComplete:		Radiațiile s-au risipit în sfârșit. Ești curat.
+GameObjects.GamePlayer.CursedArea.DeconInterrupted:		Ai reintrat în zonă înainte de finalizarea decontaminării! Mutația se reia imediat!
+GameObjects.GamePlayer.CursedArea.ImmuneDecon:			Forma ta te protejează de alte radiații, dar corpul tău trebuie totuși să se decontamineze.
+
+GameObjects.GamePlayer.UseSlot.RadiationMountFail:		Radiațiile sunt prea puternice pentru o montură obișnuită!
+GameObjects.GamePlayer.UseSlot.Timer.SummonMount:		Se invocă montura...
 GameObjects.GamePlayer.UseSlot.AttemptToUse:           Încerci să folosești {0}.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShot:        Vei trage acum automat.
 GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Vei trage și reîncărca automat.
@@ -446,7 +466,7 @@ GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Nu poți invoca o montur�
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Nu poți invoca o montură într-un dungeon!
 GameObjects.GamePlayer.UseSlot.CantMountMoving:        Nu poți încăleca în timp ce te miști.
 GameObjects.GamePlayer.UseSlot.CantMountStealthed:     Nu poți încăleca cât timp ești în furtivitate.
-GameObjects.GamePlayer.UseSlot.CantMountDamned:        Nu poți încăleca cât timp ești blestemat!
+GameObjects.GamePlayer.UseSlot.CantMountDamned:        Doar o montură epică poate îndura greutatea sufletului tău blestemat!
 GameObjects.GamePlayer.UseSlot.CantMountPetrified:     Nu poți încăleca cât timp ești împietrit!
 GameObjects.GamePlayer.UseSlot.CantMountThisForm:      Nu poți încăleca în această formă!
 GameObjects.GamePlayer.UseSlot.CantMountMorph:         Nu poți încăleca cât timp vraja „{0}” este asupra ta!

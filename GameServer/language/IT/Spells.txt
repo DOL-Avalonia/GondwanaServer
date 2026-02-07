@@ -288,6 +288,11 @@ SpellDescription.OffProcShear.Main1:					Rimuove i proc offensivi attivi dal ber
 SpellDescription.OffProcShear.Main2:					Applica un proc maledetto di sostituzione i cui sotto-incantesimi curano i nemici del bersaglio quando colpiscono.
 SpellDescription.OffProcShear.ReplacementHeader:		Proc di sostituzione:
 SpellDescription.RewindTime.MainDescription:			Teletrasporta il bersaglio nella posizione in cui si trovava {0} secondi fa.
+SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Ripristina {0} salute a un bersaglio Dannato e prolunga la sua tormentata esistenza di {1} secondi. Infligge {0} danni da {2} ai bersagli non Dannati.
+SpellDescription.ZombieHeal.MainDescription.HealOnly:     Ripristina {0} salute a un bersaglio Dannato. Infligge {0} danni da {1} ai bersagli non Dannati.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prolunga la durata della tormentata esistenza di un bersaglio Dannato di {0} secondi. Non ha effetto sui bersagli non Dannati.
+SpellDescription.ZombieHeal.Header.BonusEffect:           Effetto Bonus (Solo bersagli Dannati):
+SpellDescription.ZombieHeal.Header.SideEffect:            Effetto Collaterale (Penalità bersagli viventi):
 
 
 # ML Spells ShortDescriptions

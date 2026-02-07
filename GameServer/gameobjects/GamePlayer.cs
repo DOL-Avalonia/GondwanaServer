@@ -2048,6 +2048,11 @@ namespace DOL.GS
         {
             GamePlayer player = (GamePlayer)sender;
 
+            if (m_radioactiveAreaCount > 0 && !IsDamned)
+            {
+                StartRadioactiveLogic();
+            }
+
             if (player.IsUnderwater && player.CanBreathUnderWater == false)
                 player.Diving(waterBreath.Holding);
             //We need two different sickness spells because RvR sickness is not curable by Healer NPC -Unty
@@ -9029,11 +9034,408 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Radioactive / Damned Area Logic
+        /// </summary>
+        protected RegionTimer m_radioactiveTimer;
+        protected RegionTimer m_decontaminationTimer;
+        protected int m_radioactiveStage = 0;
+        protected long m_radioactiveDecayStartTick;
+        protected const string DAMNED_SPEED_DEBUFF = "DamnedSpeedDebuff";
+        protected int m_radioactiveAreaCount = 0;
+        public bool IsRadioactiveAreaActive => m_radioactiveAreaCount > 0;
+
+        public virtual void OnEnterRadioactiveArea()
+        {
+            m_radioactiveAreaCount++;
+
+            if (m_radioactiveAreaCount >= 1)
+            {
+                if (IsOnHorse)
+                {
+                    InventoryItem horseItem = Inventory.GetItem(eInventorySlot.Horse);
+                    bool isEpicMount = false;
+                    if (horseItem != null && horseItem.Model == 2912 && horseItem.SPD_ABS >= 49 && horseItem.SPD_ABS <= 63)
+                    {
+                        isEpicMount = true;
+                    }
+
+                    if (!isEpicMount)
+                    {
+                        IsOnHorse = false;
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.MountPanic"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    }
+                }
+
+                if (m_radioactiveTimer == null || !m_radioactiveTimer.IsAlive)
+                {
+                    StartRadioactiveLogic();
+                }
+            }
+        }
+
+        public virtual void OnLeaveRadioactiveArea()
+        {
+            m_radioactiveAreaCount--;
+
+            if (m_radioactiveAreaCount <= 0)
+            {
+                m_radioactiveAreaCount = 0;
+                StopRadioactiveLogic(true);
+            }
+        }
+
+        protected void StartRadioactiveLogic()
+        {
+            if (m_radioactiveTimer != null)
+            {
+                m_radioactiveTimer.Stop();
+                m_radioactiveTimer = null;
+            }
+
+            if (IsImmuneToRadiation())
+            {
+                m_radioactiveTimer = new RegionTimer(this, RadioactiveTimerCallback);
+                m_radioactiveTimer.Start(1000);
+                return;
+            }
+
+            if (m_decontaminationTimer != null && m_decontaminationTimer.IsAlive)
+            {
+                m_decontaminationTimer.Stop();
+                m_decontaminationTimer = null;
+                Out.SendCloseTimerWindow();
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.DeconInterrupted"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                if (m_radioactiveStage < 2)
+                    m_radioactiveStage = 2;
+
+                m_radioactiveDecayStartTick = CurrentRegion.Time;
+
+                Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Timer.Mutation"), 15);
+                TempProperties.setProperty(DAMNED_SPEED_DEBUFF, true);
+                UpdateMaxSpeed();
+            }
+            else
+            {
+                if (m_radioactiveStage != 99)
+                    m_radioactiveStage = 0;
+            }
+
+            m_radioactiveTimer = new RegionTimer(this, RadioactiveTimerCallback);
+            m_radioactiveTimer.Start(1000);
+        }
+
+        protected void StopRadioactiveLogic(bool leftArea)
+        {
+            if (m_radioactiveTimer != null)
+            {
+                m_radioactiveTimer.Stop();
+                m_radioactiveTimer = null;
+            }
+
+            if (TempProperties.getProperty<bool>(DAMNED_SPEED_DEBUFF, false))
+            {
+                TempProperties.removeProperty(DAMNED_SPEED_DEBUFF);
+                UpdateMaxSpeed();
+            }
+
+            if (m_decontaminationTimer != null && m_decontaminationTimer.IsAlive)
+            {
+                return;
+            }
+
+            if (m_radioactiveStage >= 2 && m_radioactiveStage < 99)
+            {
+                StartDecontamination();
+            }
+            else
+            {
+                m_radioactiveStage = 0;
+                Out.SendCloseTimerWindow();
+                if (leftArea)
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.InfluenceFades"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+        }
+
+        protected void StartDecontamination()
+        {
+            if (m_decontaminationTimer != null)
+            {
+                m_decontaminationTimer.Stop();
+                m_decontaminationTimer = null;
+            }
+
+            int duration = Util.Random(45, 50);
+
+            if (m_radioactiveAreaCount <= 0)
+            {
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.DeconStart"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+
+            Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Timer.Decon"), (ushort)duration);
+
+            m_decontaminationTimer = new RegionTimer(this, DecontaminationTimerCallback);
+            m_decontaminationTimer.Start(duration * 1000);
+        }
+
+        protected virtual int DecontaminationTimerCallback(RegionTimer timer)
+        {
+            m_radioactiveStage = 0;
+            m_decontaminationTimer = null;
+            Out.SendCloseTimerWindow();
+            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.DeconComplete"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            return 0;
+        }
+
+        protected bool IsImmuneToRadiation()
+        {
+            if (SpellHandler.FindEffectOnTarget(this, "CallOfShadows") != null) return true;
+            if (SpellHandler.FindEffectOnTarget(this, "BringerOfDeath") != null) return true;
+            if (SpellHandler.FindEffectOnTarget(this, "SummonMonster") != null) return true;
+            if (CharacterClass.ID == (int)eCharacterClass.Necromancer && this.IsShade) return true;
+
+            return false;
+        }
+
+        protected virtual int RadioactiveTimerCallback(RegionTimer timer)
+        {
+            if (!IsAlive || ObjectState != eObjectState.Active)
+            {
+                Out.SendCloseTimerWindow();
+                return 1000;
+            }
+
+            if (IsDamned)
+            {
+                if (m_decontaminationTimer != null)
+                {
+                    m_decontaminationTimer.Stop();
+                    m_decontaminationTimer = null;
+                    Out.SendCloseTimerWindow();
+                }
+
+                var damnation = EffectList.OfType<GameSpellEffect>()
+                  .FirstOrDefault(e => e.SpellHandler is DamnationSpellHandler);
+
+                if (damnation != null)
+                {
+                    damnation.AddRemainingTime(1500);
+                }
+
+                if (m_radioactiveStage != 99)
+                {
+                    m_radioactiveStage = 99;
+                    Out.SendCloseTimerWindow();
+                }
+
+                return 2000;
+            }
+
+            if (IsImmuneToRadiation())
+            {
+                if (m_radioactiveStage >= 2)
+                {
+                    if (m_decontaminationTimer == null || !m_decontaminationTimer.IsAlive)
+                    {
+                        StartDecontamination();
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.ImmuneDecon"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+
+                    if (TempProperties.getProperty<bool>(DAMNED_SPEED_DEBUFF, false))
+                    {
+                        TempProperties.removeProperty(DAMNED_SPEED_DEBUFF);
+                        UpdateMaxSpeed();
+                    }
+                }
+                else if (m_radioactiveStage != 0)
+                {
+                    m_radioactiveStage = 0;
+                    Out.SendCloseTimerWindow();
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Immune"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+
+                return 1000;
+            }
+
+            if (m_decontaminationTimer != null && m_decontaminationTimer.IsAlive)
+            {
+                m_decontaminationTimer.Stop();
+                m_decontaminationTimer = null;
+                Out.SendCloseTimerWindow();
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.DeconInterrupted"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                if (m_radioactiveStage < 2) m_radioactiveStage = 2;
+
+                m_radioactiveDecayStartTick = CurrentRegion.Time;
+                Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Timer.Mutation"), 15);
+                TempProperties.setProperty(DAMNED_SPEED_DEBUFF, true);
+                UpdateMaxSpeed();
+            }
+
+            // Stage 0: Entry -> Incubation
+            if (m_radioactiveStage == 0)
+            {
+                m_radioactiveStage = 1;
+                int incubationTime = Util.Random(29000, 35000);
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.EnteredZone"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Timer.Contamination"), (ushort)(incubationTime / 1000));
+
+                return incubationTime;
+            }
+
+            // Stage 1: Incubation -> Mutation
+            if (m_radioactiveStage == 1)
+            {
+                m_radioactiveStage = 2;
+                m_radioactiveDecayStartTick = CurrentRegion.Time;
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.MutationStart"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Timer.Mutation"), 15);
+
+                TempProperties.setProperty(DAMNED_SPEED_DEBUFF, true);
+                UpdateMaxSpeed();
+
+                return 1000;
+            }
+
+            // Stage 2: Mutation (Rotting)
+            if (m_radioactiveStage == 2)
+            {
+                int dmg = (int)(MaxHealth * 0.03);
+                if (dmg < 1) dmg = 1;
+
+                TakeDamage(null, eDamageType.Natural, dmg, 0);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.BurnDamage", dmg), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
+
+                if (!IsAlive) return 1000;
+
+                if (CurrentRegion.Time - m_radioactiveDecayStartTick >= 15000)
+                {
+                    TransformToZombie();
+                    return 2000;
+                }
+
+                return 1000;
+            }
+
+            return 1000;
+        }
+
+        public void TransformToZombie()
+        {
+            m_radioactiveStage = 99;
+            Out.SendCloseTimerWindow();
+
+            if (IsOnHorse)
+            {
+                InventoryItem horseItem = Inventory.GetItem(eInventorySlot.Horse);
+
+                bool isEpicMount = false;
+                if (horseItem != null &&
+                    horseItem.Model == 2912 &&
+                    horseItem.SPD_ABS >= 49 &&
+                    horseItem.SPD_ABS <= 63)
+                {
+                    isEpicMount = true;
+                }
+
+                if (!isEpicMount)
+                {
+                    IsOnHorse = false;
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.MountPanic"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
+
+            if (TempProperties.getProperty<bool>(DAMNED_SPEED_DEBUFF, false))
+            {
+                TempProperties.removeProperty(DAMNED_SPEED_DEBUFF);
+                UpdateMaxSpeed();
+            }
+
+            Spell damnationSpell = SkillBase.GetSpellByID(25314);
+
+            if (damnationSpell != null)
+            {
+                SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
+                ISpellHandler handler = ScriptMgr.CreateSpellHandler(this, damnationSpell, line);
+                handler.StartSpell(this);
+
+                Out.SendSpellEffectAnimation(this, this, 13153, 0, false, 1);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.MutationComplete"), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+            }
+            else
+            {
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.ErrorSpellMissing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+        }
+
+        public override short MaxSpeed
+        {
+            get
+            {
+                short speed = base.MaxSpeed;
+                if (TempProperties.getProperty<bool>(DAMNED_SPEED_DEBUFF, false))
+                {
+                    speed = (short)(speed * 0.60);
+                }
+                return speed;
+            }
+        }
+
+        /// <summary>
         /// Called when the player dies
         /// </summary>
         /// <param name="killer">the killer</param>
         public override void Die(GameObject killer)
         {
+            bool inRadioactiveArea = m_radioactiveAreaCount > 0;
+
+            if (inRadioactiveArea)
+            {
+                if (IsDamned)
+                {
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.CursedDeath"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+                else
+                {
+                    base.Die(killer);
+                    this.Health = (int)(MaxHealth * 0.25);
+                    this.Mana = (int)(MaxMana * 0.25);
+                    this.Endurance = (int)(MaxEndurance * 0.25);
+
+                    this.StopReleaseTimer();
+                    this.Out.SendPlayerRevive(this);
+                    this.UpdatePlayerStatus();
+
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Reanimate"), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+
+                    TransformToZombie();
+                    return;
+                }
+            }
+
+            // Reset radioactive/decontamination status on death
+            if (m_radioactiveTimer != null)
+            {
+                m_radioactiveTimer.Stop();
+                m_radioactiveTimer = null;
+            }
+            if (m_decontaminationTimer != null)
+            {
+                m_decontaminationTimer.Stop();
+                m_decontaminationTimer = null;
+            }
+            m_radioactiveStage = 0;
+            if (TempProperties.getProperty<bool>(DAMNED_SPEED_DEBUFF, false))
+            {
+                TempProperties.removeProperty(DAMNED_SPEED_DEBUFF);
+                UpdateMaxSpeed();
+            }
+            Out.SendCloseTimerWindow();
+
             // ambiant talk
             if (killer is GameNPC)
                 (killer as GameNPC)!.FireAmbientSentence(GameNPC.eAmbientTrigger.killing, this);
@@ -10767,6 +11169,22 @@ namespace DOL.GS
                                 }
 
                                 string reason = GameServer.ServerRules.ReasonForDisallowMounting(this);
+                                bool isEpicMount = useItem != null && useItem.Model == 2912 && useItem.SPD_ABS >= 49 && useItem.SPD_ABS <= 63;
+
+                                if (m_radioactiveAreaCount > 0 && !isEpicMount)
+                                {
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.RadiationMountFail"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    StopWhistleTimers();
+                                    return;
+                                }
+
+                                if (IsDamned && !isEpicMount)
+                                {
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.CantMountDamned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    StopWhistleTimers();
+                                    return;
+                                }
+
                                 if (!String.IsNullOrEmpty(reason))
                                 {
                                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, reason), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -10792,11 +11210,10 @@ namespace DOL.GS
                                     StopWhistleTimers();
                                     return;
                                 }
-
                                 if (HasEnabledAPulseSpell)
                                     PulseSpell.CancelPulsingSpell(this, PulseSpell.Spell.SpellType);
 
-                                Out.SendTimerWindow("Summoning Mount", 5);
+                                Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.Timer.SummonMount"), 5);
                                 foreach (GamePlayer plr in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                                 {
                                     if (plr == null) continue;
