@@ -3725,37 +3725,28 @@ namespace DOL.GS
 
             if (!defenseDisabled)
             {
-                eAttackResult? defResult = null;
                 ad.EvadeChance ??= TryEvade(ad, lastAD, attackerConLevel, attackerCount);
-                if (Util.ChanceDouble((double)ad.EvadeChance))
-                {
-                    if (!Properties.ENABLE_DEBUG)
-                        return eAttackResult.Evaded;
-                    defResult = eAttackResult.Evaded;
-                }
+                ad.ParryChance ??= TryParry(ad, lastAD, attackerConLevel, attackerCount);
+                ad.BlockChance ??= TryBlock(ad, lastAD, attackerConLevel, attackerCount, engage);
 
-                if (ad.IsMeleeAttack)
+                double avoidance = ad.EvadeChance.Value + ad.ParryChance.Value + ad.BlockChance.Value;
+                // TODO: cap total avoidance?
+                double roll = Util.RandomDouble();
+                if (roll < avoidance)
                 {
-                    ad.ParryChance ??= TryParry(ad, lastAD, attackerConLevel, attackerCount);
-                    if (defResult is null && Util.ChanceDouble((double)ad.ParryChance))
+                    if (roll < ad.EvadeChance.Value)
                     {
-                        if (!Properties.ENABLE_DEBUG)
-                            return eAttackResult.Parried;
-                        defResult = eAttackResult.Parried;
+                        return eAttackResult.Evaded;
+                    }
+                    else if (roll < ad.EvadeChance.Value + ad.ParryChance.Value)
+                    {
+                        return eAttackResult.Parried;
+                    }
+                    else // roll < evade + parry + block
+                    {
+                        return eAttackResult.Blocked;
                     }
                 }
-
-                ad.BlockChance ??= TryBlock(ad, lastAD, attackerConLevel, attackerCount, engage);
-                if (defResult is null && Util.ChanceDouble((double)ad.BlockChance))
-                {
-                    // reactive effects on block moved to GamePlayer
-                    if (!Properties.ENABLE_DEBUG)
-                        return eAttackResult.Blocked;
-                    defResult = eAttackResult.Blocked;
-                }
-
-                if (defResult is not null)
-                    return defResult.Value;
             }
 
             // Guard
