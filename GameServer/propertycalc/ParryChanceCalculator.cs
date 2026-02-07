@@ -48,7 +48,9 @@ namespace DOL.GS.PropertyCalc
                 int parrySpec = 0;
                 if (player.HasSpecialization(Specs.Parry))
                 {
-                    parrySpec = (player.Dexterity * 2 - 100) / 4 + (player.GetModifiedSpecLevel(Specs.Parry) - 1) * (10 / 2) + 50;
+                    var dexMod = (player.Dexterity * 2 - 100) / 4;
+                    var specMod = (player.GetModifiedSpecLevel(Specs.Parry) - 1);
+                    parrySpec = dexMod + specMod * (10 / 2) + 50;
                 }
                 if (parrySpec > 500)
                 {

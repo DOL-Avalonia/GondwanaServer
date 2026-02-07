@@ -3645,7 +3645,7 @@ namespace DOL.GS
             this.Notify(GameLivingEvent.IncomingAttack, this, new IncomingAttackEventArgs(ad));
 
             bool stealthStyle = false;
-            if (ad.Style != null && ad.Style.StealthRequirement && ad.Attacker is GamePlayer && StyleProcessor.CanUseStyle((GamePlayer)ad.Attacker, ad.Target, ad.Style, weapon))
+            if (ad.Style is { StealthRequirement: true } && ad.Attacker is GamePlayer && StyleProcessor.CanUseStyle((GamePlayer)ad.Attacker, ad.Target, ad.Style, weapon))
             {
                 stealthStyle = true;
                 defenseDisabled = true;
@@ -3725,28 +3725,37 @@ namespace DOL.GS
 
             if (!defenseDisabled)
             {
+                eAttackResult? defResult = null;
                 ad.EvadeChance ??= TryEvade(ad, lastAD, attackerConLevel, attackerCount);
                 if (Util.ChanceDouble((double)ad.EvadeChance))
                 {
-                    return eAttackResult.Evaded;
+                    if (!Properties.ENABLE_DEBUG)
+                        return eAttackResult.Evaded;
+                    defResult = eAttackResult.Evaded;
                 }
 
                 if (ad.IsMeleeAttack)
                 {
                     ad.ParryChance ??= TryParry(ad, lastAD, attackerConLevel, attackerCount);
-
-                    if (Util.ChanceDouble((double)ad.ParryChance))
+                    if (defResult is null && Util.ChanceDouble((double)ad.ParryChance))
                     {
-                        return eAttackResult.Parried;
+                        if (!Properties.ENABLE_DEBUG)
+                            return eAttackResult.Parried;
+                        defResult = eAttackResult.Parried;
                     }
                 }
 
                 ad.BlockChance ??= TryBlock(ad, lastAD, attackerConLevel, attackerCount, engage);
-                if (Util.ChanceDouble((double)ad.BlockChance))
+                if (defResult is null && Util.ChanceDouble((double)ad.BlockChance))
                 {
                     // reactive effects on block moved to GamePlayer
-                    return eAttackResult.Blocked;
+                    if (!Properties.ENABLE_DEBUG)
+                        return eAttackResult.Blocked;
+                    defResult = eAttackResult.Blocked;
                 }
+
+                if (defResult is not null)
+                    return defResult.Value;
             }
 
             // Guard
@@ -3765,7 +3774,7 @@ namespace DOL.GS
                     // check player is wearing shield and NO two handed weapon
                     InventoryItem leftHand = guard.GuardSource.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
                     InventoryItem rightHand = guard.GuardSource.AttackWeapon;
-                    if (((rightHand == null || rightHand.Hand != 1) && leftHand != null && leftHand.Object_Type == (int)eObjectType.Shield) || guard.GuardSource is GameNPC)
+                    if ((rightHand is not { Hand: 1 } && leftHand is { Object_Type: (int)eObjectType.Shield }) || guard.GuardSource is GameNPC)
                     {
                         // TODO
                         // insert actual formula for guarding here, this is just a guessed one based on block.
@@ -3806,13 +3815,14 @@ namespace DOL.GS
             }
 
             //Dashing Defense
-            if (dashing != null &&
-                dashing.GuardSource.ObjectState == eObjectState.Active &&
-                dashing.GuardSource.IsStunned == false &&
-                dashing.GuardSource.IsMezzed == false &&
-                dashing.GuardSource.ActiveWeaponSlot != eActiveWeaponSlot.Distance &&
-                dashing.GuardSource.IsAlive &&
-                !stealthStyle)
+            if (dashing?.GuardSource is
+                {
+                    ObjectState: eObjectState.Active,
+                    IsStunned: false,
+                    IsMezzed: false,
+                    ActiveWeaponSlot: eActiveWeaponSlot.Distance,
+                    IsAlive: true
+                } && !stealthStyle)
             {
                 // check distance
                 if (dashing.GuardSource.IsWithinRadius(dashing.GuardTarget, DashingDefenseEffect.GUARD_DISTANCE))
@@ -3821,7 +3831,7 @@ namespace DOL.GS
                     InventoryItem leftHand = dashing.GuardSource.Inventory.GetItem(eInventorySlot.LeftHandWeapon);
                     InventoryItem rightHand = dashing.GuardSource.AttackWeapon;
                     InventoryItem twoHand = dashing.GuardSource.Inventory.GetItem(eInventorySlot.TwoHandWeapon);
-                    if ((rightHand == null || rightHand.Hand != 1) && leftHand != null && leftHand.Object_Type == (int)eObjectType.Shield)
+                    if (rightHand is not { Hand: 1 } && leftHand is { Object_Type: (int)eObjectType.Shield })
                     {
                         int guardLevel = dashing.GuardSource.GetAbilityLevel(Abilities.Guard); // multiply by 3 to be a bit qorse than block (block woudl be 5 since you get guard I with shield 5, guard II with shield 10 and guard III with shield 15)
                         double guardchance = dashing.GuardSource.GetModified(eProperty.BlockChance) * leftHand.Quality * 0.00001;
@@ -3946,7 +3956,7 @@ namespace DOL.GS
                 {
                     missrate -= ad.Style.BonusToHit; // add style bonus
                 }
-                if (lastAD != null && lastAD.AttackResult == eAttackResult.HitStyle && lastAD.Style != null)
+                if (lastAD is { AttackResult: eAttackResult.HitStyle, Style: not null })
                 {
                     // add defence bonus from last executed style if any
                     missrate += lastAD.Style.BonusToDefense;
@@ -4050,7 +4060,7 @@ namespace DOL.GS
 
                 evadeChance += 0.01 * attackerConLevel; // 1% per con level distance multiplied by evade level
 
-                if (lastAD != null && lastAD.Style != null)
+                if (lastAD is { Style: not null })
                 {
                     evadeChance += lastAD.Style.BonusToDefense * 0.01;
                 }
