@@ -262,7 +262,7 @@ namespace DOL.GS
                 log.WarnFormat("Placeholder still found after translating npc text for player {0} from {1} to {2}\nText: {3}", player.Name, serverLang, playerLang, toTranslate);
                 return (originalText, null);
             }
-            return (originalText, keyMap);
+            return (translatedFull, keyMap);
         }
     }
 }
