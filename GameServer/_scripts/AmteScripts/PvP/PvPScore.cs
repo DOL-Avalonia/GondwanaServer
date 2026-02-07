@@ -172,6 +172,26 @@ namespace AmteScripts.PvP
         [DefaultValue(0)]
         public int Boss_BossKillsPoints { get; set; }
 
+        // --- For session type #7: King of the Hill ---
+        [DefaultValue(0)]
+        public int KotH_Ticks { get; set; }
+        [DefaultValue(0)]
+        public int KotH_Captures { get; set; }
+        [DefaultValue(0)]
+        public int KotH_Points { get; set; }
+        [DefaultValue(0)]
+        public int KotH_PressurePoints { get; set; }
+        [DefaultValue(0)]
+        public int KotH_CapturePoints { get; set; }
+
+        // --- For session type #8: Core Run (Red Light/Green Light) ---
+        [DefaultValue(0)]
+        public int CoreRun_CoresDelivered { get; set; }
+        [DefaultValue(0)]
+        public int CoreRun_CenterReached { get; set; }
+        [DefaultValue(0)]
+        public int CoreRun_Eliminations { get; set; } // Times died to Red Light
+
         public virtual void TakeItems(PvPScore rhs, bool copy = false)
         {
             Treasure_BroughtTreasuresPoints += rhs.Treasure_BroughtTreasuresPoints;
@@ -226,6 +246,14 @@ namespace AmteScripts.PvP
             Boss_BossHitsPoints += rhs.Boss_BossHitsPoints;
             Boss_BossKillsCount += rhs.Boss_BossKillsCount;
             Boss_BossKillsPoints += rhs.Boss_BossKillsPoints;
+            KotH_Ticks += rhs.KotH_Ticks;
+            KotH_Captures += rhs.KotH_Captures;
+            KotH_Points += rhs.KotH_Points;
+            KotH_PressurePoints += rhs.KotH_PressurePoints;
+            KotH_CapturePoints += rhs.KotH_CapturePoints;
+            CoreRun_CoresDelivered += rhs.CoreRun_CoresDelivered;
+            CoreRun_CenterReached += rhs.CoreRun_CenterReached;
+            CoreRun_Eliminations += rhs.CoreRun_Eliminations;
             return this;
         }
 
@@ -268,6 +296,16 @@ namespace AmteScripts.PvP
                     return PvP_SoloKillsPoints + PvP_GroupKillsPoints +
                         Boss_BossHitsPoints +
                         Boss_BossKillsPoints;
+
+                case eSessionTypes.KingOfTheHill: // King of the Hill
+                    return PvP_SoloKillsPoints + PvP_GroupKillsPoints +
+                        KotH_Points +
+                        KotH_CapturePoints +
+                        KotH_PressurePoints;
+
+                case eSessionTypes.CoreRun: // Core Run
+                    return PvP_SoloKillsPoints + PvP_GroupKillsPoints + 
+                        (CoreRun_CoresDelivered * 20) + (CoreRun_CenterReached * 10) - (CoreRun_Eliminations * 3);
 
                 default:
                     return 0;

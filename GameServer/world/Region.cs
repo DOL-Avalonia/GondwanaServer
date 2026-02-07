@@ -116,7 +116,7 @@ namespace DOL.GS
         /// </summary>
         private Dictionary<ushort, IArea> m_Areas;
 
-        protected Dictionary<ushort, IArea> Areas
+        public Dictionary<ushort, IArea> Areas
         {
             get { return m_Areas; }
         }

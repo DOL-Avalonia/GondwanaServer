@@ -4440,6 +4440,21 @@ namespace DOL.GS
                     }
                 }
             }
+
+            if (IsBoss && PvpManager.Instance.CurrentSessionType == PvpManager.eSessionTypes.BossHunt)
+            {
+                GamePlayer attackerPlayer = ad.Attacker as GamePlayer;
+                if (attackerPlayer == null && ad.Attacker is GameLiving livingAttacker)
+                {
+                    attackerPlayer = livingAttacker.GetController() as GamePlayer;
+                }
+
+                if (attackerPlayer != null && ad.Damage > 0 && PvpManager.Instance.IsInActivePvpZone(attackerPlayer))
+                {
+                    PvpManager.Instance.HandleBossHit(attackerPlayer, this, ad.Damage);
+                }
+            }
+
             base.TakeDamage(ad);
         }
 
@@ -4751,6 +4766,20 @@ namespace DOL.GS
                             Task.Run(() => GameEventManager.Instance.StopEvent(ev, EndingConditionType.Kill, player));
                         }
                     }
+                }
+            }
+
+            if (IsBoss && PvpManager.Instance.CurrentSessionType == PvpManager.eSessionTypes.BossHunt)
+            {
+                GamePlayer killerPlayer = killer as GamePlayer;
+                if (killerPlayer == null && killer is GameLiving livingKiller)
+                {
+                    killerPlayer = livingKiller.GetController() as GamePlayer;
+                }
+
+                if (killerPlayer != null && PvpManager.Instance.IsInActivePvpZone(killerPlayer))
+                {
+                    PvpManager.Instance.HandleBossKill(killerPlayer, this);
                 }
             }
 

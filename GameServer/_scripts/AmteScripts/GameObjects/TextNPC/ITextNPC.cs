@@ -48,7 +48,7 @@ namespace DOL.GS.Scripts
 
         private long _lastPhrase;
         private readonly GameNPC _body;
-        private readonly ConcurrentDictionary<string, IDictionary<string, string>> _playerResponseKeyMappings = new();
+        private ConcurrentDictionary<string, IDictionary<string, string>> _playerResponseKeyMappings;
 
         public readonly Dictionary<string, DBEchangeur> EchangeurDB = new();
         public Dictionary<string, string> QuestTexts { get; private set; }
@@ -77,6 +77,7 @@ namespace DOL.GS.Scripts
 
         public TextNPCPolicy(GameNPC body)
         {
+            _playerResponseKeyMappings = new ConcurrentDictionary<string, IDictionary<string, string>>();
             Condition = new TextNPCCondition("");
             QuestTexts = new Dictionary<string, string>();
             Reponses = new Dictionary<string, string>();
@@ -97,6 +98,7 @@ namespace DOL.GS.Scripts
 
         public TextNPCPolicy(GameNPC body, TextNPCPolicy policy)
         {
+            _playerResponseKeyMappings = new ConcurrentDictionary<string, IDictionary<string, string>>();
             Condition = policy.Condition;
             QuestTexts = new Dictionary<string, string>(policy.QuestTexts);
             Reponses = new Dictionary<string, string>(policy.Reponses);
@@ -118,15 +120,16 @@ namespace DOL.GS.Scripts
 
         private string ResolveResponseKey(GamePlayer player, string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-                return key;
+            if (string.IsNullOrWhiteSpace(key)) return key;
+            if (player == null) return key;
 
-            if (player == null)
-                return key;
+            // Defensive check
+            if (_playerResponseKeyMappings == null)
+                _playerResponseKeyMappings = new ConcurrentDictionary<string, IDictionary<string, string>>();
 
             if (_playerResponseKeyMappings.TryGetValue(player.InternalID, out var keyMap))
             {
-                if (keyMap.TryGetValue(key, out var originalKey))
+                if (keyMap != null && keyMap.TryGetValue(key, out var originalKey))
                     key = originalKey;
             }
 
