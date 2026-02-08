@@ -5,11 +5,1717 @@
 #Pattern enclosed in slash "/" are compiled as Regular Expressions
 #Example: if a pattern is "/bar.*/" then all names beginning with "bar" would be rejected
 
-faggot
-penis
-bitch
+anus
+arschloch
+arse*
+assrammer
+ash0le
+ash0les
+asholes
+Ass Monkey
+Assface
+assh0le
+assh0lez
 asshole
+assholes
+assholz
+asswipe
+azzhole
+bassterds
+bastard
+bastards
+bastardz
+basterds
+basterdz
+Biatch
+bitch
+bitches
+bi7ch
+bitch*
+bollock*
+b!+ch
+blowjob
+Blow Job
+boffing
+butthole
+buttwipe
+c0ck
+c0cks
+c0k
+Carpet Muncher
+cawk
+cawks
+Clit
+cnts
+cntz
+cockhead
+cock-head
+cocks
+CockSucker
+cock-sucker
 cunt
-nigger
+cunts
+cuntz
+dick
+dild0
+dild0s
+dildo
+dildos
+dilld0
+dilld0s
 fuck
+f u c k
+f u c k e r
+fag1t
+faget
+fagg1t
+faggit
+faggot
+fagit
+faggot
+fucker
+fuckin
+fucking
+fucks
+Fudge Packer
+Fukah
+Fuken
+fuker
+Fukin
+Fukk
+Fukkah
+Fukken
+Fukker
+Fukkin
+g00k
+gayboy
+gaygirl
+God-damned
+h00r
+h0ar
+h0re
+jackoff
+japs
+jerk-off
+jisim
+jiss
+jizm
+kunt
+kunts
+kuntz
+Lesbian
+Lezzian
+Lipshits
+Lipshitz
+masochist
+masokist
+massterbait
+masstrbait
+masstrbate
+masterbaiter
+masterbate
+masterbates
+Motha Fucker
+Motha Fuker
+Motha Fukkah
+Motha Fukker
+Mother Fucker
+Mother Fukah
+Mother Fuker
+Mother Fukkah
+Mother Fukker
+mother-fucker
+Mutha Fucker
+Mutha Fukah
+Mutha Fuker
+Mutha Fukkah
+Mutha Fukker
+n1gr
+nastt
+nigger
+nigur
+niiger
+niigr
+orgasim
+orgasm
+orgasum
+oriface
+orifice
+orifiss
+peeenus
+peeenusss
+peenus
+peinus
+pen1s
+penas
+penis
+penis-breath
+penus
+penuus
+Phuc
+Phuck
+Phuk
+Phuker
+Phukker
+polac
+polack
+polak
+Poonani
+pr1c
+pr1ck
+pr1k
+pusse
+pussee
+pussy
+puuke
+puuker
+recktum
+rectum
+retard
+sadist
+scank
+schlong
+screwing
+semen
+sex
+sexy
+Sh!t
+sh1t
+sh1ter
+sh1ts
+sh1tter
+sh1tz
 shit
+shits
+shitter
+Shitty
+Shity
+shitz
+Shyt
+Shyte
+Shytty
+Shyty
+sluts
+Slutty
+slutz
+son-of-a-bitch
+testical
+testicle
+titt
+w00se
+va1jina
+vag1na
+vagiina
+vagina
+vaj1na
+vajina
+vullva
+vulva
+w0p
+wh00r
+wh0re
+whore
+xrated
+xxx
+*damn
+*dyke
+*fuck*
+*shit*
+@$$
+baiser
+bander
+bigornette
+bite
+bitte
+bloblos
+bordel
+brackmard
+branlage
+branler
+branlette
+branleur
+branleuse
+brouter le cresson
+caca
+chatte
+chiasse
+chier
+chiottes
+clito
+clitoris
+connard
+connasse
+conne
+couilles
+couillon
+couille molle
+cramouille
+déconne
+déconner
+emmerdant
+emmerder
+emmerdeur
+emmerdeuse
+enculé
+enculée
+enculeur
+enculeurs
+enfoiré
+enfoirée
+étron
+fille de pute
+fils de pute
+folle
+foutre
+gerbe
+gerber
+gouine
+grogniasse
+gueule
+jouir
+la putain de ta mère
+MALPT
+ménage à trois
+merde
+merdeuse
+merdeux
+meuf
+nègre
+negro
+nique ta mère
+nique ta race
+palucher
+pédale
+pédé
+péter
+péteux
+pipi
+pisser
+pouffiasse
+pousse-crotte
+putain
+pute
+sac à foutre
+sac à merde
+salaud
+salope
+suce
+tapette
+tanche
+teuch
+tringler
+trique
+troncher
+trouduc
+trou du cul
+turlute
+zigounette
+zizi
+Hitler
+H1tl3r
+Polpot
+Kim Jong Un
+Kim Jong Il
+Kim Jong-Un
+Kim Jong-Il
+
+/\bahole\b/
+/\banus\b/
+/\bash0le\b/
+/\bash0les\b/
+/\basholes\b/
+/\bass\b/
+/\bAss Monkey\b/
+/\bAssface\b/
+/\bassh0le\b/
+/\bassh0lez\b/
+/\basshole\b/
+/\bassholes\b/
+/\bassholz\b/
+/\basswipe\b/
+/\bazzhole\b/
+/\bbassterds\b/
+/\bbastard\b/
+/\bbastards\b/
+/\bbastardz\b/
+/\bbasterds\b/
+/\bbasterdz\b/
+/\bBiatch\b/
+/\bbitch\b/
+/\bbitches\b/
+/\bBlow Job\b/
+/\bboffing\b/
+/\bbutthole\b/
+/\bbuttwipe\b/
+/\bc0ck\b/
+/\bc0cks\b/
+/\bc0k\b/
+/\bCarpet Muncher\b/
+/\bcawk\b/
+/\bcawks\b/
+/\bClit\b/
+/\bcnts\b/
+/\bcntz\b/
+/\bcock\b/
+/\bcockhead\b/
+/\bcock-head\b/
+/\bcocks\b/
+/\bCockSucker\b/
+/\bcock-sucker\b/
+/\bcrap\b/
+/\bcum\b/
+/\bcunt\b/
+/\bcunts\b/
+/\bcuntz\b/
+/\bdick\b/
+/\bdild0\b/
+/\bdild0s\b/
+/\bdildo\b/
+/\bdildos\b/
+/\bdilld0\b/
+/\bdilld0s\b/
+/\bdominatricks\b/
+/\bdominatrics\b/
+/\bdominatrix\b/
+/\bdyke\b/
+/\benema\b/
+/\bf u c k\b/
+/\bf u c k e r\b/
+/\bfag\b/
+/\bfag1t\b/
+/\bfaget\b/
+/\bfagg1t\b/
+/\bfaggit\b/
+/\bfaggot\b/
+/\bfagit\b/
+/\bfags\b/
+/\bfagz\b/
+/\bfaig\b/
+/\bfaigs\b/
+/\bfart\b/
+/\bflipping the bird\b/
+/\bfuck\b/
+/\bfucker\b/
+/\bfuckin\b/
+/\bfucking\b/
+/\bfucks\b/
+/\bFudge Packer\b/
+/\bfuk\b/
+/\bFukah\b/
+/\bFuken\b/
+/\bfuker\b/
+/\bFukin\b/
+/\bFukk\b/
+/\bFukkah\b/
+/\bFukken\b/
+/\bFukker\b/
+/\bFukkin\b/
+/\bg00k\b/
+/\bgay\b/
+/\bgayboy\b/
+/\bgaygirl\b/
+/\bgays\b/
+/\bgayz\b/
+/\bGod-damned\b/
+/\bh00r\b/
+/\bh0ar\b/
+/\bh0re\b/
+/\bhells\b/
+/\bhoar\b/
+/\bhoor\b/
+/\bhoore\b/
+/\bjackoff\b/
+/\bjap\b/
+/\bjaps\b/
+/\bjerk-off\b/
+/\bjisim\b/
+/\bjiss\b/
+/\bjizm\b/
+/\bjizz\b/
+/\bknob\b/
+/\bknobs\b/
+/\bknobz\b/
+/\bkunt\b/
+/\bkunts\b/
+/\bkuntz\b/
+/\bLesbian\b/
+/\bLezzian\b/
+/\bLipshits\b/
+/\bLipshitz\b/
+/\bmasochist\b/
+/\bmasokist\b/
+/\bmassterbait\b/
+/\bmasstrbait\b/
+/\bmasstrbate\b/
+/\bmasterbaiter\b/
+/\bmasterbate\b/
+/\bmasterbates\b/
+/\bMotha Fucker\b/
+/\bMotha Fuker\b/
+/\bMotha Fukkah\b/
+/\bMotha Fukker\b/
+/\bMother Fucker\b/
+/\bMother Fukah\b/
+/\bMother Fuker\b/
+/\bMother Fukkah\b/
+/\bMother Fukker\b/
+/\bmother-fucker\b/
+/\bMutha Fucker\b/
+/\bMutha Fukah\b/
+/\bMutha Fuker\b/
+/\bMutha Fukkah\b/
+/\bMutha Fukker\b/
+/\bn1gr\b/
+/\bnastt\b/
+/\bnigger\b/
+/\bnigur\b/
+/\bniiger\b/
+/\bniigr\b/
+/\borafis\b/
+/\borgasim\b/
+/\borgasm\b/
+/\borgasum\b/
+/\boriface\b/
+/\borifice\b/
+/\borifiss\b/
+/\bpacki\b/
+/\bpackie\b/
+/\bpacky\b/
+/\bpaki\b/
+/\bpakie\b/
+/\bpaky\b/
+/\bpecker\b/
+/\bpeeenus\b/
+/\bpeeenusss\b/
+/\bpeenus\b/
+/\bpeinus\b/
+/\bpen1s\b/
+/\bpenas\b/
+/\bpenis\b/
+/\bpenis-breath\b/
+/\bpenus\b/
+/\bpenuus\b/
+/\bPhuc\b/
+/\bPhuck\b/
+/\bPhuk\b/
+/\bPhuker\b/
+/\bPhukker\b/
+/\bpolac\b/
+/\bpolack\b/
+/\bpolak\b/
+/\bPoonani\b/
+/\bpr1c\b/
+/\bpr1ck\b/
+/\bpr1k\b/
+/\bpusse\b/
+/\bpussee\b/
+/\bpussy\b/
+/\bpuuke\b/
+/\bpuuker\b/
+/\bqueer\b/
+/\bqueers\b/
+/\bqueerz\b/
+/\bqweers\b/
+/\bqweerz\b/
+/\bqweir\b/
+/\brecktum\b/
+/\brectum\b/
+/\bretard\b/
+/\bsadist\b/
+/\bscank\b/
+/\bschlong\b/
+/\bscrewing\b/
+/\bsemen\b/
+/\bsex\b/
+/\bsexy\b/
+/\bSh!t\b/
+/\bsh1t\b/
+/\bsh1ter\b/
+/\bsh1ts\b/
+/\bsh1tter\b/
+/\bsh1tz\b/
+/\bshit\b/
+/\bshits\b/
+/\bshitter\b/
+/\bShitty\b/
+/\bShity\b/
+/\bshitz\b/
+/\bShyt\b/
+/\bShyte\b/
+/\bShytty\b/
+/\bShyty\b/
+/\bskanck\b/
+/\bskank\b/
+/\bskankee\b/
+/\bskankey\b/
+/\bskanks\b/
+/\bSkanky\b/
+/\bslut\b/
+/\bsluts\b/
+/\bSlutty\b/
+/\bslutz\b/
+/\bson-of-a-bitch\b/
+/\btit\b/
+/\bturd\b/
+/\bva1jina\b/
+/\bvag1na\b/
+/\bvagiina\b/
+/\bvagina\b/
+/\bvaj1na\b/
+/\bvajina\b/
+/\bvullva\b/
+/\bvulva\b/
+/\bw0p\b/
+/\bwh00r\b/
+/\bwh0re\b/
+/\bwhore\b/
+/\bxrated\b/
+/\bxxx\b/
+/\bb!\+ch\b/
+/\bblowjob\b/
+/\bclit\b/
+/\barschloch\b/
+/\bb!tch\b/
+/\bb17ch\b/
+/\bb1tch\b/
+/\bbi\+ch\b/
+/\bboiolas\b/
+/\bbuceta\b/
+/\bchink\b/
+/\bcipa\b/
+/\bclits\b/
+/\bdirsa\b/
+/\bejakulate\b/
+/\bfatass\b/
+/\bfcuk\b/
+/\bfux0r\b/
+/\bhoer\b/
+/\bhore\b/
+/\bjism\b/
+/\bkawk\b/
+/\bl3itch\b/
+/\bl3i\+ch\b/
+/\bmasturbate\b/
+/\bmasterbat\b/
+/\bmasterbat3\b/
+/\bmotherfucker\b/
+/\bs\.o\.b\.\b/
+/\bmofo\b/
+/\bnazi\b/
+/\bnigga\b/
+/\bnutsack\b/
+/\bphuck\b/
+/\bpimpis\b/
+/\bscrotum\b/
+/\bsh!t\b/
+/\bshemale\b/
+/\bshi\+\b/
+/\bsh!\+\b/
+/\bsmut\b/
+/\bteets\b/
+/\btits\b/
+/\bboobs\b/
+/\bb00bs\b/
+/\bteez\b/
+/\btestical\b/
+/\btesticle\b/
+/\btitt\b/
+/\bw00se\b/
+/\bwank\b/
+/\bwhoar\b/
+/\bdamn\b/
+/\b\$\$\b/
+/\bamcik\b/
+/\bandskota\b/
+/\barse\b/
+/\bassrammer\b/
+/\bayir\b/
+/\bbi7ch\b/
+/\bbollock\b/
+/\bbreasts\b/
+/\bbutt-pirate\b/
+/\bcabron\b/
+/\bcazzo\b/
+/\bchraa\b/
+/\bchuj\b/
+/\bcunt\b/
+/\bd4mn\b/
+/\bdaygo\b/
+/\bdego\b/
+/\bdike\b/
+/\bdupa\b/
+/\bdziwka\b/
+/\bejackulate\b/
+/\bEkrem\b/
+/\bEkto\b/
+/\benculer\b/
+/\bfaen\b/
+/\bfanculo\b/
+/\bfanny\b/
+/\bfeces\b/
+/\bfeg\b/
+/\bFelcher\b/
+/\bficken\b/
+/\bfitt\b/
+/\bFlikker\b/
+/\bforeskin\b/
+/\bFotze\b/
+/\bFu\(\b/
+/\bfutkretzn\b/
+/\bguiena\b/
+/\bh0r\b/
+/\bh4x0r\b/
+/\bhell\b/
+/\bhelvete\b/
+/\bhonkey\b/
+/\bHuevon\b/
+/\bhui\b/
+/\binjun\b/
+/\bkanker\b/
+/\bkike\b/
+/\bklootzak\b/
+/\bkraut\b/
+/\bknulle\b/
+/\bkuk\b/
+/\bkuksuger\b/
+/\bKurac\b/
+/\bkurwa\b/
+/\bkusi\b/
+/\bkyrpa\b/
+/\bmamhoon\b/
+/\bmerd\b/
+/\bmibun\b/
+/\bmonkleigh\b/
+/\bmouliewop\b/
+/\bmuie\b/
+/\bmulkku\b/
+/\bmuschi\b/
+/\bnazis\b/
+/\bnepesaurio\b/
+/\borospu\b/
+/\bpaska\b/
+/\bperse\b/
+/\bpicka\b/
+/\bpierdol\b/
+/\bpillu\b/
+/\bpimmel\b/
+/\bpiss\b/
+/\bpizda\b/
+/\bpoontsee\b/
+/\bpoop\b/
+/\bporn\b/
+/\bp0rn\b/
+/\bpr0n\b/
+/\bpreteen\b/
+/\bpula\b/
+/\bpule\b/
+/\bputa\b/
+/\bputo\b/
+/\bqahbeh\b/
+/\bqueef\b/
+/\brautenberg\b/
+/\bschaffer\b/
+/\bscheiss\b/
+/\bschlampe\b/
+/\bschmuck\b/
+/\bscrew\b/
+/\bsharmuta\b/
+/\bsharmute\b/
+/\bshipal\b/
+/\bshiz\b/
+/\bskribz\b/
+/\bskurwysyn\b/
+/\bsphencter\b/
+/\bspic\b/
+/\bspierdalaj\b/
+/\bsplooge\b/
+/\bsuka\b/
+/\bb00b\b/
+/\btwat\b/
+/\bvittu\b/
+/\bwetback\b/
+/\bwichser\b/
+/\bwop\b/
+/\byed\b/
+/\bzabourah\b/
+
+# === FRENCH / MULTI-LANG ===
+/\bbordel\b/
+/\bbuzna\b/
+/\bčumět\b/
+/\bčurák\b/
+/\bdebil\b/
+/\bdo piče\b/
+/\bdo prdele\b/
+/\bdršťka\b/
+/\bdržka\b/
+/\bflundra\b/
+/\bhajzl\b/
+/\bhovno\b/
+/\bchcanky\b/
+/\bchuj\b/
+/\bjebat\b/
+/\bkokot\b/
+/\bkokotina\b/
+/\bkoňomrd\b/
+/\bkunda\b/
+/\bkurva\b/
+/\bmamrd\b/
+/\bmrdat\b/
+/\bmrdka\b/
+/\bmrdník\b/
+/\boslošoust\b/
+/\bpiča\b/
+/\bpíčus\b/
+/\bpíchat\b/
+/\bpizda\b/
+/\bprcat\b/
+/\bprdel\b/
+/\bprdelka\b/
+/\bsračka\b/
+/\bsrát\b/
+/\bšoustat\b/
+/\bšulin\b/
+/\bvypíčenec\b/
+/\bzkurvit\b/
+/\bzkurvysyn\b/
+/\bzmrd\b/
+/\bžrát\b/
+/\banalritter\b/
+/\barsch\b/
+/\barschficker\b/
+/\barschlecker\b/
+/\barschloch\b/
+/\bbimbo\b/
+/\bbratze\b/
+/\bbumsen\b/
+/\bbonze\b/
+/\bdödel\b/
+/\bfick\b/
+/\bflittchen\b/
+/\bfratze\b/
+/\bhackfresse\b/
+/\bhure\b/
+/\bhurensohn\b/
+/\bische\b/
+/\bkackbratze\b/
+/\bkacke\b/
+/\bkacken\b/
+/\bkackwurst\b/
+/\bkampflesbe\b/
+/\bkanake\b/
+/\bkimme\b/
+/\blümmel\b/
+/\bMILF\b/
+/\bmöpse\b/
+/\bmorgenlatte\b/
+/\bmöse\b/
+/\bmufti\b/
+/\bnackt\b/
+/\bneger\b/
+/\bnippel\b/
+/\bnutte\b/
+/\bonanieren\b/
+/\borgasmus\b/
+/\bpimmel\b/
+/\bpimpern\b/
+/\bpinkeln\b/
+/\bpissen\b/
+/\bpisser\b/
+/\bpopel\b/
+/\bpoppen\b/
+/\bporno\b/
+/\breudig\b/
+/\brosette\b/
+/\bschabracke\b/
+/\bscheiße\b/
+/\bscheisser\b/
+/\bschiesser\b/
+/\bschnackeln\b/
+/\bschwanzlutscher\b/
+/\bschwuchtel\b/
+/\btittchen\b/
+/\btitten\b/
+/\bvögeln\b/
+/\bvollpfosten\b/
+/\bwichse\b/
+/\bwichsen\b/
+/\b2 chicas 1 taza\b/
+/\b2g1c\b/
+/\b4r5e\b/
+/\b5h1t\b/
+/\b5 hit\b/
+/\ba55\b/
+/\bculo\b/
+/\bacrotomofilia\b/
+/\bbolsillo caliente de alabama\b/
+/\boleoducto de alaska\b/
+/\banal\b/
+/\banilingus\b/
+/\bano\b/
+/\buna mierda\b/
+/\bar5e\b/
+/\bgilipollas\b/
+/\bfollador de culo\b/
+/\bculo-gorro\b/
+/\bculo-pirata\b/
+/\bbolsa de culo\b/
+/\bbandido\b/
+/\bassbanger\b/
+/\bmordida\b/
+/\bpayaso\b/
+/\brompeculos\b/
+/\bculos\b/
+/\bcara de culo\b/
+/\bhijo de puta\b/
+/\benculada\b/
+/\basno duende\b/
+/\bidiota\b/
+/\bEstúpido\b/
+/\bimbéciles\b/
+/\basaltante\b/
+/\bladrón de traseros\b/
+/\blamer el culo\b/
+/\blameculos\b/
+/\bculo mono\b/
+/\bmascador de culos\b/
+/\baspirar\b/
+/\bchupador de culos\b/
+/\bauto erótico\b/
+/\bautoerotico\b/
+/\bperra\b/
+/\bbabeland\b/
+/\bmasa para bebes\b/
+/\bjugo de bebe\b/
+/\bmordaza de bola\b/
+/\bsalsa de bolas\b/
+/\bpatear la pelota\b/
+/\bpelota lamiendo\b/
+/\bsaco de pelota\b/
+/\bchupando bolas\b/
+/\bbolsa de pelota\b/
+/\bpelotas\b/
+/\bsaco de bolas\b/
+/\bbampot\b/
+/\bbang bros\b/
+/\ba pelo\b/
+/\bapenas legal\b/
+/\bdesnudo\b/
+/\bbastardo\b/
+/\bbastinado\b/
+/\bbbw\b/
+/\bbdsm\b/
+/\bfrijol\b/
+/\bfrijoles\b/
+/\bbestial\b/
+/\bcuchillo de castor\b/
+/\blabios de castor\b/
+/\bcampana\b/
+/\bbestialidad\b/
+/\bgrande y negro\b/
+/\bpechos grandes\b/
+/\bgrandes aldabas\b/
+/\bgrandes tetas\b/
+/\btontas\b/
+/\bcerradura de pájaro\b/
+/\bquejándose\b/
+/\bgallo negro\b/
+/\bacción rubia\b/
+/\brubia sobre rubia acción\b/
+/\bsangriento\b/
+/\bmamada\b/
+/\bsopla tu carga\b/
+/\bmamadas\b/
+/\bgofre azul\b/
+/\btonto\b/
+/\bmierda\b/
+/\bcojones\b/
+/\bbollok\b/
+/\bbollox\b/
+/\besclavitud\b/
+/\bmetedura de pata\b/
+/\bteta\b/
+/\bbobo\b/
+/\btetas\b/
+/\bbooooooobs\b/
+/\bllamada de botín\b/
+/\bsenos\b/
+/\bduchas marrones\b/
+/\bacción morena\b/
+/\btío\b/
+/\bbukkake\b/
+/\bbullyke\b/
+/\bvibra de bala\b/
+/\bagujero de tapón\b/
+/\bboca de tonel\b/
+/\bconejito hijo de puta\b/
+/\btetona\b/
+/\bculata\b/
+/\btrasero-pirata\b/
+/\bnalgas\b/
+/\bojete\b/
+/\bmasticar trasero\b/
+/\bverga\b/
+/\bdedo de camello\b/
+/\bcamgirl\b/
+/\bputa de la cam\b/
+/\bcamwhore\b/
+/\bmasticador de alfombras\b/
+/\bmascador de alfombras\b/
+/\bgraznar\b/
+/\bchinchilla\b/
+/\bgrieta\b/
+/\bChoad\b/
+/\bcapullos de rosa de chocolate\b/
+/\bChode\b/
+/\bcipá\b/
+/\bcírculo idiota\b/
+/\bcl1t\b/
+/\bvapor de cleveland\b/
+/\bclítoris\b/
+/\babrazaderas de trébol\b/
+/\bracimo de mierda\b/
+/\bnuez\b/
+/\bpolla\b/
+/\bchupapollas\b/
+/\bmordedura de gallo\b/
+/\bhamburguesa\b/
+/\bcara de gallo\b/
+/\bcabeza de gallo\b/
+/\bjockey\b/
+/\baldaba\b/
+/\bmaestro de gallos\b/
+/\btraficante de gallos\b/
+/\bcockmongruel\b/
+/\bmono gallo\b/
+/\bgallo\b/
+/\bcomepollas\b/
+/\bnariz de gallo\b/
+/\bpepita\b/
+/\bpollas\b/
+/\bherrero\b/
+/\bfumador de pollas\b/
+/\bmamar\b/
+/\bmamando\b/
+/\bpollasuka\b/
+/\bcoca\b/
+/\bcocinando\b/
+/\bcoksucka\b/
+/\bcoochie\b/
+/\bchulo\b/
+/\bmapache\b/
+/\bmapaches\b/
+/\bcooter\b/
+/\bcoprolagnia\b/
+/\bcoprofilia\b/
+/\bcornhole\b/
+/\btimonel\b/
+/\btonterías\b/
+/\bcremita\b/
+/\bdesmoronamiento\b/
+/\bbasurero\b/
+/\bdevorador de semen\b/
+/\bcorrida\b/
+/\bcummer\b/
+/\bcorrerse\b/
+/\bse corre\b/
+/\bzorra\b/
+/\bcunilingus\b/
+/\bcunillingus\b/
+/\bcoño\b/
+/\bcunnilingus\b/
+/\bcara de chocho\b/
+/\blamer el coño\b/
+/\blamecoños\b/
+/\blamiendo coños\b/
+/\bcuntrag\b/
+/\bcoños\b/
+/\bcyalis\b/
+/\bcyberfuc\b/
+/\bcyberfuck\b/
+/\bcibernético\b/
+/\bciberfuckers\b/
+/\bd1ck\b/
+/\bmaldita sea\b/
+/\bmaldición\b/
+/\bmoreno\b/
+/\bviolación en una cita\b/
+/\bcita\b/
+/\bGarganta profunda\b/
+/\bdendrofilia\b/
+/\bbolsa de pene\b/
+/\bbatidor de pollas\b/
+/\bcara de pene\b/
+/\bpendejo\b/
+/\bjugo de polla\b/
+/\bdickleche\b/
+/\btraficante de pollas\b/
+/\bbofetada\b/
+/\bcomadreja\b/
+/\bdickweed\b/
+/\bdique\b/
+/\bconsolador\b/
+/\bconsoladores\b/
+/\bmoras\b/
+/\bzarzamora\b/
+/\bborrachos\b/
+/\bdirección\b/
+/\balmohadas sucias\b/
+/\bsucio sanchez\b/
+/\bdlck\b/
+/\bestilo perro\b/
+/\bfollador de perros\b/
+/\bestilo perrito\b/
+/\bpersiguiendo\b/
+/\ba cuatro patas\b/
+/\bdolcett\b/
+/\bdominación\b/
+/\bdomos\b/
+/\bponche de burro\b/
+/\bburro\b/
+/\bbolsa de basura\b/
+/\bchiflado\b/
+/\bdoosh\b/
+/\bdoble polla\b/
+/\bdoble penetración\b/
+/\bducha\b/
+/\bacción doble penetración\b/
+/\bjoroba seca\b/
+/\bestupideces\b/
+/\bdvda\b/
+/\bcome mi culo\b/
+/\becchi\b/
+/\beyacular\b/
+/\beyaculado\b/
+/\beyacula\b/
+/\beyaculando\b/
+/\beyaculación\b/
+/\berótico\b/
+/\berotismo\b/
+/\bescolta\b/
+/\beunuco\b/
+/\bCabron\b/
+/\bf4nny\b/
+/\bmaricón\b/
+/\bmarica\b/
+/\bmariconear\b/
+/\bmaricas\b/
+/\bfannyflaps\b/
+/\bfannyfucker\b/
+/\bfanyy\b/
+/\bpedo\b/
+/\btirado un pedo\b/
+/\btirando pedos\b/
+/\bgordo\b/
+/\bjoder\b/
+/\bfecal\b/
+/\bfeck\b/
+/\bfelación\b/
+/\bFelch\b/
+/\bfelching\b/
+/\bfieltro\b/
+/\bchorros femeninos\b/
+/\bdominación femenina\b/
+/\bfijándose\b/
+/\bpistola con la mano\b/
+/\bfollar con los dedos\b/
+/\bdedo follado\b/
+/\bfollador de dedos\b/
+/\bfolladores de dedos\b/
+/\bfollando con los dedos\b/
+/\bfolla con los dedos\b/
+/\bdigitación\b/
+/\bfollar con el puño\b/
+/\bpuño follado\b/
+/\bfollador de puños\b/
+/\bfolladores de puños\b/
+/\bfollando con el puño\b/
+/\bfollando con los puños\b/
+/\bfolla con los puños\b/
+/\bpuño\b/
+/\blanzallamas\b/
+/\bbrida\b/
+/\bbuscar\b/
+/\bbuscador de\b/
+/\bfetichismo de pies\b/
+/\bpaja de pies\b/
+/\bfrotándose\b/
+/\bbotones de mierda\b/
+/\bjodido\b/
+/\bhijos de puta\b/
+/\bimbécil\b/
+/\bmaldito\b/
+/\bmalditos\b/
+/\bmierdamierdahijo de puta\b/
+/\bfóllame\b/
+/\bfolla\b/
+/\bcabrones\b/
+/\bempaquetador de dulces\b/
+/\bempacador de chocolate\b/
+/\bfukwhi\b/
+/\bfukwit\b/
+/\bfutanari\b/
+/\bPunto G\b/
+/\borgia\b/
+/\bgangbanged\b/
+/\borgias\b/
+/\bsexo gay\b/
+/\bculo gay\b/
+/\bgaybob\b/
+/\bgaydo\b/
+/\bseñor gay\b/
+/\btardo gay\b/
+/\bgaywad\b/
+/\bgenitales\b/
+/\bpolla gigante\b/
+/\bchica en\b/
+/\bniña en la cima\b/
+/\blas chicas se volvieron locas\b/
+/\bcabracx\b/
+/\bcabra\b/
+/\bgokkun\b/
+/\bbaño de oro\b/
+/\bbuena chica\b/
+/\bgooch\b/
+/\bbuena caca\b/
+/\bgoregasmo\b/
+/\bgringo\b/
+/\bir a tientas\b/
+/\bsexo en grupo\b/
+/\bGuido\b/
+/\bguro\b/
+/\btrabajo manual\b/
+/\bpaja\b/
+/\bnúcleo duro\b/
+/\bduro\b/
+/\bsexo duro\b/
+/\bheeb\b/
+/\binfierno\b/
+/\bhentai\b/
+/\bel ella\b/
+/\bHo\b/
+/\bhomo\b/
+/\bhomoerótico\b/
+/\bcariño\b/
+/\bHonky\b/
+/\bmás caliente\b/
+/\bcórneo\b/
+/\bcaliente carl\b/
+/\bchica caliente\b/
+/\bsexo caliente\b/
+/\bcomo matar\b/
+/\bcomo asesinar\b/
+/\bgordo enorme\b/
+/\bfollando\b/
+/\bincesto\b/
+/\bcoito\b/
+/\bmasturbar\b/
+/\bcebo de la cárcel\b/
+/\bJailbait\b/
+/\bjapón\b/
+/\brosquilla de gelatina\b/
+/\bhacerse una paja\b/
+/\bmasturbarse\b/
+/\bjigaboo\b/
+/\bjiggerboo\b/
+/\besperma\b/
+/\bjuggs\b/
+/\bpozo\b/
+/\bkinbaku\b/
+/\bpervertido\b/
+/\brizado\b/
+/\bkiunt\b/
+/\bmando\b/
+/\bperillas\b/
+/\bnudoso\b/
+/\bperilla\b/
+/\bcabeza de chorlito\b/
+/\bbromista\b/
+/\bgolpe\b/
+/\bkondum\b/
+/\bkondums\b/
+/\bchiflar\b/
+/\bcoquetear\b/
+/\bkum\b/
+/\bkúmer\b/
+/\bkummer\b/
+/\bcumming\b/
+/\bkums\b/
+/\bkunilingus\b/
+/\bkyke\b/
+/\bpicazón\b/
+/\blabios\b/
+/\brestricción de cuero\b/
+/\bchaqueta recta de cuero\b/
+/\bfiesta de limon\b/
+/\blmfao\b/
+/\blolita\b/
+/\bhaciendo el amor\b/
+/\blujuria\b/
+/\bcodiciando\b/
+/\bm0f0\b/
+/\bm0fo\b/
+/\bm45terbato\b/
+/\bma5terb8\b/
+/\bma5terbato\b/
+/\bHazme llegar\b/
+/\bchorros masculinos\b/
+/\bmasoquista\b/
+/\bmaestro-bate\b/
+/\bmaestrob8\b/
+/\bmaestro murciélago\b/
+/\bmasterbación\b/
+/\bmasterbaciones\b/
+/\bmenaje\b/
+/\ballupato\b/
+/\bammucchiata\b/
+/\banale\b/
+/\barrapato\b/
+/\barrusa\b/
+/\barruso\b/
+/\bassatanato\b/
+/\bbagascia\b/
+/\bbagassa\b/
+/\bbagnarsi\b/
+/\bbaldracca\b/
+/\bballe\b/
+/\bbattere\b/
+/\bbattona\b/
+/\bbelino\b/
+/\bbiga\b/
+/\bbocchinara\b/
+/\bbocchino\b/
+/\bbofilo\b/
+/\bboiata\b/
+/\bbrinca\b/
+/\bbucaiolo\b/
+/\bbudiùlo\b/
+/\bbusone\b/
+/\bcacca\b/
+/\bcaciocappella\b/
+/\bcadavere\b/
+/\bcagare\b/
+/\bcagata\b/
+/\bcagna\b/
+/\bcasci\b/
+/\bcazzata\b/
+/\bcazzimma\b/
+/\bcazzo\b/
+/\bcesso\b/
+/\bcazzone\b/
+/\bchecca\b/
+/\bchiappa\b/
+/\bchiavare\b/
+/\bchiavata\b/
+/\bciospo\b/
+/\bciucciami il cazzo\b/
+/\bcoglione\b/
+/\bcoglioni\b/
+/\bcornuto\b/
+/\bcozza\b/
+/\bculattina\b/
+/\bculattone\b/
+/\bditalino\b/
+/\bfava\b/
+/\bfemminuccia\b/
+/\bfica\b/
+/\bfiga\b/
+/\bfiglio di buona donna\b/
+/\bfiglio di puttana\b/
+/\bfigone\b/
+/\bfinocchio\b/
+/\bfottere\b/
+/\bfottersi\b/
+/\bfracicone\b/
+/\bfregna\b/
+/\bfrocio\b/
+/\bfroscio\b/
+/\bgoldone\b/
+/\bguardone\b/
+/\bimbecille\b/
+/\bincazzarsi\b/
+/\bincoglionirsi\b/
+/\bingoio\b/
+/\bleccaculo\b/
+/\blecchino\b/
+/\blofare\b/
+/\bloffa\b/
+/\bloffare\b/
+/\bmannaggia\b/
+/\bmerda\b/
+/\bmerdata\b/
+/\bmerdoso\b/
+/\bmignotta\b/
+/\bminchia\b/
+/\bminchione\b/
+/\bmona\b/
+/\bmonta\b/
+/\bmontare\b/
+/\bmussa\b/
+/\bnave scuola\b/
+/\bnerchia\b/
+/\bpadulo\b/
+/\bpalle\b/
+/\bpalloso\b/
+/\bpatacca\b/
+/\bpatonza\b/
+/\bpecorina\b/
+/\bpesce\b/
+/\bpicio\b/
+/\bpincare\b/
+/\bpippa\b/
+/\bpinnolone\b/
+/\bpipì\b/
+/\bpippone\b/
+/\bpirla\b/
+/\bpisciare\b/
+/\bpiscio\b/
+/\bpisello\b/
+/\bpistolotto\b/
+/\bpomiciare\b/
+/\bpompa\b/
+/\bpompino\b/
+/\bporca\b/
+/\bporca madonna\b/
+/\bporca miseria\b/
+/\bporca puttana\b/
+/\bporco\b/
+/\bporco due\b/
+/\bporco zio\b/
+/\bpotta\b/
+/\bpuppami\b/
+/\bputtana\b/
+/\bquaglia\b/
+/\brecchione\b/
+/\bregina\b/
+/\brincoglionire\b/
+/\brizzarsi\b/
+/\brompiballe\b/
+/\brompipalle\b/
+/\bruffiano\b/
+/\bsbattere\b/
+/\bsbattersi\b/
+/\bsborra\b/
+/\bsborrata\b/
+/\bsborrone\b/
+/\bsbrodolata\b/
+/\bscopare\b/
+/\bscopata\b/
+/\bscorreggiare\b/
+/\bsega\b/
+/\bslinguare\b/
+/\bslinguata\b/
+/\bsmandrappata\b/
+/\bsoccia\b/
+/\bsocmel\b/
+/\bsorca\b/
+/\bspagnola\b/
+/\bspompinare\b/
+/\bsticchio\b/
+/\bstronza\b/
+/\bstronzata\b/
+/\bstronzo\b/
+/\bsucchiami\b/
+/\bsucchione\b/
+/\bsveltina\b/
+/\bsverginare\b/
+/\btarzanello\b/
+/\bterrone\b/
+/\btesta di cazzo\b/
+/\btette\b/
+/\btirare\b/
+/\btopa\b/
+/\btroia\b/
+/\btrombare\b/
+/\bvacca\b/
+/\bvaffanculo\b/
+/\bvangare\b/
+/\bzinne\b/
+/\bzio cantante\b/
+/\bzoccola\b/
+/\baardappels afgieten\b/
+/\bachter het raam zitten\b/
+/\bafberen\b/
+/\baflebberen\b/
+/\bafrossen\b/
+/\bafrukken\b/
+/\baftrekken\b/
+/\bafwerkplaats\b/
+/\bafzeiken\b/
+/\bafzuigen\b/
+/\been halve man en een paardekop\b/
+/\banita\b/
+/\basbak\b/
+/\baso\b/
+/\bbagger schijten\b/
+/\bbalen\b/
+/\bbedonderen\b/
+/\bbefborstel\b/
+/\bbeffen\b/
+/\bbekken\b/
+/\bbelazeren\b/
+/\bbesodemieterd zijn\b/
+/\bbesodemieteren\b/
+/\bbeurt\b/
+/\bboemelen\b/
+/\bboerelul\b/
+/\bboerenpummel\b/
+/\bbokkelul\b/
+/\bbotergeil\b/
+/\bbroekhoesten\b/
+/\bbrugpieper\b/
+/\bbuffelen\b/
+/\bbuiten de pot piesen\b/
+/\bda's kloten van de bok\b/
+/\bde ballen\b/
+/\bde hoer spelen\b/
+/\bde hond uitlaten\b/
+/\bde koffer induiken\b/
+/\bdel\b/
+/\bde pijp uitgaan\b/
+/\bdombo\b/
+/\bdraaikont\b/
+/\bdriehoog achter wonen\b/
+/\bdrol\b/
+/\bdrooggeiler\b/
+/\bdroogkloot\b/
+/\been beurt geven\b/
+/\been nummertje maken\b/
+/\been wip maken\b/
+/\beikel\b/
+/\bengerd\b/
+/\bflamoes\b/
+/\bflikken\b/
+/\bflikker\b/
+/\bgadverdamme\b/
+/\bgalbak\b/
+/\bgat\b/
+/\bgedoogzone\b/
+/\bgeilneef\b/
+/\bgesodemieter\b/
+/\bgodverdomme\b/
+/\bgraftak\b/
+/\bgras maaien\b/
+/\bgratenkut\b/
+/\bgreppeldel\b/
+/\bgriet\b/
+/\bhoempert\b/
+/\bhoer\b/
+/\bhoerenbuurt\b/
+/\bhoerenloper\b/
+/\bhoerig\b/
+/\bhol\b/
+/\bhufter\b/
+/\bhuisdealer\b/
+/\bjohny\b/
+/\bkanen\b/
+/\bkettingzeug\b/
+/\bklaarkomen\b/
+/\bklerebeer\b/
+/\bklojo\b/
+/\bklooien\b/
+/\bklootjesvolk\b/
+/\bklootoog\b/
+/\bklootzak\b/
+/\bkloten\b/
+/\bknor\b/
+/\bkont\b/
+/\bkontneuken\b/
+/\bkrentekakker\b/
+/\bkut\b/
+/\bkuttelikkertje\b/
+/\bkwakkie\b/
+/\bliefdesgrot\b/
+/\blul\b/
+/\blul-de-behanger\b/
+/\blulhannes\b/
+/\blummel\b/
+/\bmafketel\b/
+/\bmatennaaier\b/
+/\bmatje\b/
+/\bmof\b/
+/\bmuts\b/
+/\bnaaien\b/
+/\bnaakt\b/
+/\bneuken\b/
+/\bneukstier\b/
+/\boetlul\b/
+/\bopgeilen\b/
+/\bopkankeren\b/
+/\boprotten\b/
+/\bopsodemieteren\b/
+/\bop z'n hondjes\b/
+/\bop z'n sodemieter geven\b/
+/\bopzouten\b/
+/\bouwehoer\b/
+/\bouwehoeren\b/
+/\bouwe rukker\b/
+/\bpaal\b/
+/\bpaardelul\b/
+/\bpalen\b/
+/\bpenoze\b/
+/\bpiesen\b/
+/\bpijpbekkieg\b/
+/\bpijpen\b/
+/\bpik\b/
+/\bpleurislaaier\b/
+/\bpoep\b/
+/\bpoepen\b/
+/\bpoot\b/
+/\bportiekslet\b/
+/\bpotverdorie\b/
+/\bpubliciteitsgeil\b/
+/\braaskallen\b/
+/\breet\b/
+/\breetridder\b/
+/\breet trappen\b/
+/\bvoor zijn\b/
+/\bremsporen\b/
+/\breutelen\b/
+/\brothoer\b/
+/\brotzak\b/
+/\brukhond\b/
+/\brukken\b/
+/\bschatje\b/
+/\bschijt\b/
+/\bschijten\b/
+/\bschoft\b/
+/\bschuinsmarcheerder\b/
+/\bshit\b/
+/\bslempen\b/
+/\bslet\b/
+/\bsletterig\b/
+/\bslik mijn zaad\b/
+/\bsnol\b/
+/\bspuiten\b/
+/\bstandje\b/
+/\bstandje-69\b/
+/\bstoephoer\b/
+/\bstootje\b/
+/\bstront\b/
+/\bsufferd\b/
+/\btapijtnek\b/
+/\bteef\b/
+/\btemeier\b/
+/\bteringlijer\b/
+/\btoeter\b/
+/\btongzoeng\b/
+/\btriootjeg\b/
+/\btrottoir prostituée\b/
+/\btrottoirteef\b/
+/\bvergallen\b/
+/\bverkloten\b/
+/\bverneuken\b/
+/\bviespeuk\b/
+/\bvingeren\b/
+/\bvleesroos\b/
+/\bvoor jan lul\b/
+/\bvoor jan-met-de-korte-achternaam\b/
+/\bwatje\b/
+/\bwelzijnsmafia\b/
+/\bwijf\b/
+/\bwippen\b/
+/\bwuftje\b/
+/\bzaadje\b/
+/\bzakkenwasser\b/
+/\bzeiken\b/
+/\bzeiker\b/
+/\bzuigen\b/
+/\bzuiplap\b/
+/\bbaiser\b/
+/\bbander\b/
+/\bbigornette\b/
+/\bbite\b/
+/\bbitte\b/
+/\bloblos\b/
+/\bbraquemard\b/
+/\bbranlage\b/
+/\bbranler\b/
+/\bbranlette\b/
+/\bbranleur\b/
+/\bbranleuse\b/
+/\bbrouter le cresson\b/
+/\bcaca\b/
+/\bchatte\b/
+/\bchiasse\b/
+/\bchier\b/
+/\bchiottes\b/
+/\bclito\b/
+/\bclitoris\b/
+/\bcon\b/
+/\bconnard\b/
+/\bconnasse\b/
+/\bconne\b/
+/\bcouilles\b/
+/\bcouillon\b/
+/\bcouille molle\b/
+/\bcramouille\b/
+/\bcul\b/
+/\bdéconne\b/
+/\bdéconner\b/
+/\bemmerdant\b/
+/\bemmerder\b/
+/\bemmerdeur\b/
+/\bemmerdeuse\b/
+/\benculé\b/
+/\benculée\b/
+/\benculeur\b/
+/\benculeurs\b/
+/\benfoiré\b/
+/\benfoirée\b/
+/\bétron\b/
+/\bfille de pute\b/
+/\bfils de pute\b/
+/\bfolle\b/
+/\bfoutre\b/
+/\bgerbe\b/
+/\bgerber\b/
+/\bgouine\b/
+/\bgrogniasse\b/
+/\bgueule\b/
+/\bjouir\b/
+/\bla putain de ta mère\b/
+/\bMALPT\b/
+/\bménage à trois\b/
+/\bmerde\b/
+/\bmerdeuse\b/
+/\bmerdeux\b/
+/\bmeuf\b/
+/\bnègre\b/
+/\bnegro\b/
+/\bnique ta mère\b/
+/\bnique ta race\b/
+/\bpalucher\b/
+/\bpédale\b/
+/\bpédé\b/
+/\bpéter\b/
+/\bpéteux\b/
+/\bpipi\b/
+/\bpisser\b/
+/\bpouffiasse\b/
+/\bpousse-crotte\b/
+/\bputain\b/
+/\bpute\b/
+/\bsac à foutre\b/
+/\bsac à merde\b/
+/\bsalaud\b/
+/\bsalope\b/
+/\bsuce\b/
+/\btapette\b/
+/\btanche\b/
+/\bteuch\b/
+/\btringler\b/
+/\btrique\b/
+/\btroncher\b/
+/\btrouduc\b/
+/\btrou du cul\b/
+/\bturlute\b/
+/\bzigounette\b/
+/\bzizi\b/
+/\bHitler\b/
+/\bH1tl3r\b/
+/\bPolpot\b/
+/\bKim Jong Un\b/
+/\bKim Jong Il\b/
+/\bKim Jong-Un\b/
+/\bKim Jong-Il\b/

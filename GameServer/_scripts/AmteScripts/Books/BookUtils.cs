@@ -46,146 +46,37 @@ namespace DOL.GS
             "auch","noch","nur","schon","sehr","mehr","weniger","man"
         };
 
-        // ====== Prohibited terms (loaded from file) ======
-        // Normalized terms (ascii-like, spaces collapsed, lowercase, no diacritics)
-        private static readonly HashSet<string> ProhibitedTerms = new(StringComparer.OrdinalIgnoreCase);
-        private static readonly HashSet<string> ProhibitedAllowlist = new(StringComparer.OrdinalIgnoreCase);
-
-        private static Regex _prohibitedRegex = new Regex("$^", RegexOptions.Compiled);
-        private static readonly object _badwordsLock = new object();
-        private static bool _badwordsLoaded = false;
-        private const string BadWordsRelativePath = "GameServer/language/prohibitedwords.txt";
-
-        static BookUtils()
-        {
-            EnsureBadWordsLoaded();
-        }
-
+        // ====== Prohibited terms (InvalidNamesManager) ======
         /// <summary>
-        /// Force reload badwords.txt at runtime (optional).
-        /// </summary>
-        public static void ReloadBadWords()
-        {
-            lock (_badwordsLock)
-            {
-                _badwordsLoaded = false;
-                ProhibitedTerms.Clear();
-                _prohibitedRegex = new Regex("$^", RegexOptions.Compiled);
-            }
-
-            EnsureBadWordsLoaded();
-        }
-
-        private static void EnsureBadWordsLoaded()
-        {
-            if (_badwordsLoaded) return;
-
-            lock (_badwordsLock)
-            {
-                if (_badwordsLoaded) return;
-
-                try
-                {
-                    string baseDir = AppDomain.CurrentDomain.BaseDirectory ?? "";
-                    string filePath = Path.Combine(baseDir, BadWordsRelativePath);
-
-                    if (!File.Exists(filePath))
-                    {
-                        // Don’t crash the server if file is missing.
-                        Console.WriteLine($"[BookUtils] badwords file not found: {filePath}");
-                        _badwordsLoaded = true;
-                        return;
-                    }
-
-                    int added = LoadBadWordsFile(filePath);
-
-                    _prohibitedRegex = BuildProhibitedRegex();
-                    _badwordsLoaded = true;
-
-                    Console.WriteLine($"[BookUtils] badwords loaded: {added} entries from {filePath}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("[BookUtils] badwords load failed: " + ex);
-                    _badwordsLoaded = true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Loads prohibited terms from a text file.
-        /// Format:
-        ///   - One term per line
-        ///   - Empty lines ignored
-        ///   - Lines starting with # or // are comments
-        /// </summary>
-        private static int LoadBadWordsFile(string filePath)
-        {
-            int added = 0;
-
-            foreach (var rawLine in File.ReadAllLines(filePath))
-            {
-                string line = (rawLine ?? "").Trim();
-
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                if (line.StartsWith("#", StringComparison.OrdinalIgnoreCase) ||
-                    line.StartsWith("//", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // Normalize the term same way as input text
-                string term = NormalizeForFilter(line);
-                if (string.IsNullOrWhiteSpace(term))
-                    continue;
-
-                // Support multi-word terms too (e.g., "some phrase")
-                if (ProhibitedTerms.Add(term))
-                    added++;
-            }
-
-            return added;
-        }
-
-        private static Regex BuildProhibitedRegex()
-        {
-            var terms = ProhibitedTerms
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Select(t => Regex.Escape(t))
-                .Distinct()
-                .ToList();
-
-            if (terms.Count == 0)
-                return new Regex("$^", RegexOptions.Compiled); // match nothing
-
-            // We match against a NORMALIZED text (letters/digits/spaces only).
-            // Word boundary is okay in that normalized space.
-            string pattern = @"\b(?:" + string.Join("|", terms) + @")\b";
-            return new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        }
-
-        /// <summary>
-        /// Returns true if the text contains prohibited terms after normalization.
-        /// Outputs the matched term (normalized) for logging/UI.
+        /// Returns true if the text contains prohibited terms using the centralized InvalidNamesManager.
+        /// It checks both the raw text and the normalized text for maximum restrictiveness.
         /// </summary>
         public static bool ContainsProhibitedTerms(string text, out string matched)
         {
             matched = string.Empty;
             if (string.IsNullOrWhiteSpace(text)) return false;
 
-            EnsureBadWordsLoaded();
+            var invalidNamesMgr = GameServer.Instance?.PlayerManager?.InvalidNames;
+
+            if (invalidNamesMgr == null)
+            {
+                return false;
+            }
 
             string normalized = NormalizeForFilter(text);
+            if (invalidNamesMgr[normalized])
+            {
+                matched = "Restricted content found (Normalized Check)";
+                return true;
+            }
 
-            var m = _prohibitedRegex.Match(normalized);
-            if (!m.Success) return false;
+            if (invalidNamesMgr[text])
+            {
+                matched = "Restricted content found (Raw Check)";
+                return true;
+            }
 
-            string term = m.Value;
-            if (ProhibitedAllowlist.Contains(term))
-                return false;
-
-            matched = term;
-            return true;
+            return false;
         }
 
         /// <summary>
