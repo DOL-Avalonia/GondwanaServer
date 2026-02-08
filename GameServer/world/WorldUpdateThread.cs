@@ -155,7 +155,7 @@ namespace DOL.GS
         private static void UpdatePlayerOtherPlayers(GamePlayer player, uint nowTicks)
         {
             // Get All Player in Range
-            var players = player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GamePlayer>().Where(p => p != null && p.IsVisibleTo(player) && (!p.IsStealthed || player.CanDetect(p))).ToArray();
+            var players = player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GamePlayer>().ToArray();
 
             try
             {
@@ -166,7 +166,7 @@ namespace DOL.GS
                     GameObject obj = WorldMgr.GetRegion(objKey.Item1).GetObject(objKey.Item2);
                     // We have a Player in cache that is not in vincinity
                     // For updating "out of view" we allow a halved refresh time. 
-                    if (obj is GamePlayer lostPlayer && !players.Contains(lostPlayer) && (nowTicks - objEntry.Value) >= GetPlayertoPlayerUpdateInterval)
+                    if (obj is GamePlayer lostPlayer && (!players.Contains(lostPlayer) || !(lostPlayer.IsVisibleTo(player) && (!lostPlayer.IsStealthed || player.CanDetect(lostPlayer)))) && (nowTicks - objEntry.Value) >= GetPlayertoPlayerUpdateInterval)
                     {
                         long dummy;
                         
@@ -258,7 +258,7 @@ namespace DOL.GS
         private static void UpdatePlayerItems(GamePlayer player, uint nowTicks)
         {
             // Get All Static Item in Range
-            var objs = player.GetItemsInRadius(WorldMgr.OBJ_UPDATE_DISTANCE).Cast<GameStaticItem>().Where(i => i != null && i.IsVisibleTo(player)).ToArray();
+            var objs = player.GetItemsInRadius(WorldMgr.OBJ_UPDATE_DISTANCE).Cast<GameStaticItem>().ToArray();
 
             try
             {
@@ -268,10 +268,9 @@ namespace DOL.GS
                     var objKey = objEntry.Key;
                     GameObject obj = WorldMgr.GetRegion(objKey.Item1).GetObject(objKey.Item2);
                     // We have a Static Item in cache that is not in vincinity
-                    if (obj is GameStaticItem && !objs.Contains((GameStaticItem)obj) && (nowTicks - objEntry.Value) >= GetPlayerItemUpdateInterval)
+                    if (obj is GameStaticItem item && (!objs.Contains(item) || !item.IsVisibleTo(player)) && (nowTicks - objEntry.Value) >= GetPlayerItemUpdateInterval)
                     {
-                        long dummy;
-                        player.Client.GameObjectUpdateArray.TryRemove(objKey, out dummy);
+                        player.Client.GameObjectUpdateArray.TryRemove(objKey, out long _);
                     }
                 }
             }

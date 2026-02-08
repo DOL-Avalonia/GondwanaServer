@@ -5251,17 +5251,7 @@ namespace DOL.GS
             //			}
         }
 
-        public struct PositionSnapshot
-        {
-            public long Timestamp;
-            public Position Pos;
-
-            public PositionSnapshot(long time, Position pos)
-            {
-                Timestamp = time;
-                Pos = pos;
-            }
-        }
+        public record struct PositionSnapshot(long Timestamp, Position Pos);
         #endregion
         #region Stats, Resists
         /// <summary>
