@@ -1165,6 +1165,28 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Gets or sets the effectiveness of the target's avoidance when attacking with dual-wielding weapons.
+        /// </summary>
+        /// <remarks>A lower value reduces the chance for the target to block or evade our dual-wielding
+        /// attacks. For example, a value of 0.5 means the target's chance to block or evade is halved when we use two weapons.</remarks>
+        public double DualWieldTargetAvoidanceEffectiveness
+        {
+            get;
+            set;
+        } = 0.5;
+
+        /// <summary>
+        /// Gets or sets the effectiveness of the target's avoidance when attacking with a two-handed weapon.
+        /// </summary>
+        /// <remarks>A lower value reduces the chance for the target to parry our two-handed
+        /// attacks. For example, a value of 0.5 means the target's chance to parry is halved when we use two weapons.</remarks>
+        public double TwoHandedTargetAvoidanceEffectiveness
+        {
+            get;
+            set;
+        } = 0.5;
+
+        /// <summary>
         /// determines the spec level for current AttackWeapon
         /// </summary>
         public virtual int WeaponSpecLevel(InventoryItem weapon)
@@ -4066,9 +4088,9 @@ namespace DOL.GS
                 else if (evadeChance > 0.995)
                     evadeChance = 0.995;
             }
-            if (ad.AttackType == AttackData.eAttackType.MeleeDualWield)
+            if (ad.AttackType is AttackData.eAttackType.MeleeDualWield)
             {
-                evadeChance = Math.Max(evadeChance - 0.25, 0);
+                evadeChance *= ad.Attacker.DualWieldTargetAvoidanceEffectiveness;
             }
             //Excalibur : infi RR5
             GamePlayer p = ad.Attacker as GamePlayer;
@@ -4150,6 +4172,11 @@ namespace DOL.GS
                         parryChance = ServerProperties.Properties.PARRY_CAP;
                     else if (parryChance > 0.995)
                         parryChance = 0.995;
+
+                    if (ad.AttackType is AttackData.eAttackType.MeleeTwoHand)
+                    {
+                        parryChance *= ad.Attacker.TwoHandedTargetAvoidanceEffectiveness;
+                    }
                 }
             }
             //Excalibur : infi RR5
@@ -4258,9 +4285,9 @@ namespace DOL.GS
                         engage.Cancel(false);
                 }
             }
-            if (ad.AttackType == AttackData.eAttackType.MeleeDualWield)
+            if (ad.AttackType is AttackData.eAttackType.MeleeDualWield)
             {
-                blockChance = Math.Max(blockChance - 0.25, 0);
+                blockChance *= ad.Attacker.DualWieldTargetAvoidanceEffectiveness;
             }
             //Excalibur : infi RR5
             GamePlayer p = ad.Attacker as GamePlayer;
