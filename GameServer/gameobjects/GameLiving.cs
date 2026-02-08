@@ -2959,16 +2959,29 @@ namespace DOL.GS
                 }
                 else
                 {
+                    // https://github.com/OpenDAoC/OpenDAoC-Core/blob/cde284586a5c1037ae86d674bff5cc9c3df15d5f/GameServer/ECS-Components/Actions/WeaponAction.cs#L265-L278
+                    // TODO refine, can we move it above, simplify this whole thing?
+                    bool isDualWield = true;
+                    if (mainWeapon is null or { Item_Type: Slot.TWOHAND } or { SlotPosition: Slot.RANGED })
+                        isDualWield = false;
+                    else if (leftWeapon is null or { Object_Type: (int)eObjectType.Shield })
+                        isDualWield = false;
+                    else if (owner is GamePlayer)
+                    {
+                        isDualWield = mainWeapon is not { Object_Type: (int)eObjectType.HandToHand or (int)eObjectType.TwoHandedWeapon }
+                            && leftWeapon is not { Object_Type: (int)eObjectType.HandToHand or (int)eObjectType.TwoHandedWeapon };
+                    }
+
                     // one of two hands is used for attack if no style, treated as a main hand attack
                     if (style == null && Util.Chance(50))
                     {
                         mainWeapon = leftWeapon;
-                        mainHandAD = owner.MakeAttack(m_target, mainWeapon, style, mainHandEffectiveness, m_interruptDuration, true);
+                        mainHandAD = owner.MakeAttack(m_target, mainWeapon, style, mainHandEffectiveness, m_interruptDuration, isDualWield);
                         mainHandAD.AnimationId = -1; // virtual code for left weapons swing animation
                     }
                     else
                     {
-                        mainHandAD = owner.MakeAttack(m_target, mainWeapon, style, mainHandEffectiveness, m_interruptDuration, true);
+                        mainHandAD = owner.MakeAttack(m_target, mainWeapon, style, mainHandEffectiveness, m_interruptDuration, isDualWield);
                     }
                 }
 
