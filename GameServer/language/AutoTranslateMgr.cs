@@ -202,8 +202,8 @@ namespace DOL.GS
             int index = 0;
 
             // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
-            const string placeholderPrefix = "§§";
-            const string placeholderSuffix = "§§";
+            const string placeholderPrefix = "<span translate=\"no\">";
+            const string placeholderSuffix = "</span>";
 
             List<KeyValuePair<string, string>> originalResponses = null;
             
