@@ -4242,6 +4242,24 @@ namespace DOL.GS.PacketHandler
                 }
             }
         }
+        
+        public virtual void SendMessage(Task<string> msg, eChatType type, eChatLoc loc)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendMessage(message, type, loc);
+            });
+        }
+        
+        public virtual void SendCustomDialog(Task<string> msg, CustomDialogResponse callback)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendCustomDialog(message, callback);
+            });
+        }
 
         protected virtual void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {

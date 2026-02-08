@@ -54,6 +54,15 @@ namespace DOLGameServerConsole
                 log.Debug(string.Format("({0}, {1}): {2}", type, loc, msg));
             }
         }
+        
+        public void SendMessage(Task<string> msg, eChatType type, eChatLoc loc)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendMessage(message, type, loc);
+            });
+        }
 
         public void SendCustomDialog(string msg, CustomDialogResponse callback)
         {
@@ -70,6 +79,15 @@ namespace DOLGameServerConsole
                     log.Debug(string.Format("Accepting dialog: {0} {1}\n\"{2}\"", callback.Target, callback.Method, msg));
                 callback(null, 1);
             }
+        }
+        
+        public void SendCustomDialog(Task<string> msg, CustomDialogResponse callback)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendCustomDialog(message, callback);
+            });
         }
 
         public byte GetPacketCode(eServerPackets packetCode) { return 0; }

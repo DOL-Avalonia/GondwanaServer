@@ -217,6 +217,22 @@ namespace DOL.Tests
         {
             if (SendMessageMethod != null) SendMessageMethod(this, msg, type, loc);
         }
+        public void SendMessage(Task<string> msg, eChatType type, eChatLoc loc)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendMessage(message, type, loc);
+            });
+        }
+        public void SendCustomDialog(Task<string> msg, CustomDialogResponse callback)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendCustomDialog(message, callback);
+            });
+        }
         public Action<TestPacketLib, GamePlayer> SendPlayerCreateMethod { get; set; }
         public void SendPlayerCreate(GamePlayer playerToCreate)
         {
