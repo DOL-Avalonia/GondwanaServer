@@ -38,6 +38,7 @@ namespace DOL.GS.Scripts
             private ConcurrentDictionary<string, string> ResponseToBookTitle { get; } = new();
             public long LastAccessed { get; set; } = long.MinValue;
             public bool HasBooks { get; set; } = false;
+            public DBBook? CurrentBook { get; set; }
 
             public async Task<string> TranslateResponseKey(string baseKey)
             {
@@ -56,7 +57,7 @@ namespace DOL.GS.Scripts
                     return string.Empty;
 
                 TranslationKeyToPrefix[baseKey] = translated;
-                return translated + " ";
+                return translated;
             }
 
             public async Task<string> TranslateBookTitle(DBBook book)
@@ -97,7 +98,7 @@ namespace DOL.GS.Scripts
             {
                 if (TranslationKeyToPrefix.TryGetValue(baseKey, out string? translated))
                 {
-                    return translated + " ";
+                    return translated;
                 }
                 return orElse;
             }
@@ -107,6 +108,10 @@ namespace DOL.GS.Scripts
                 if (prefix is not null)
                 {
                     translatedTitle = translatedTitle.Substring(prefix.Length).Trim();
+                }
+                if (string.IsNullOrEmpty(translatedTitle))
+                {
+                    return CurrentBook?.Title ?? orElse;
                 }
 
                 return ResponseToBookTitle.TryGetValue(translatedTitle, out string? value) ? value : orElse;
@@ -499,6 +504,7 @@ namespace DOL.GS.Scripts
             var player = cache.Player;
             bool isAuthor = (book.PlayerID == player.InternalID);
             string price = Money.GetString(book.CurrentPriceCopper);
+            cache.CurrentBook = book;
 
             var sb = new StringBuilder(1024);
             var taskTitle = cache.TranslateBookTitle(book);
@@ -533,17 +539,17 @@ namespace DOL.GS.Scripts
             if (!isAuthor)
             {
                 // Vote buttons
-                player.Out.SendMessage($"[{await taskUpvote!}{title}]  [{await taskDownvote!}{title}]",
+                player.Out.SendMessage($"[{await taskUpvote!}]  [{await taskDownvote!}]",
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
                 // Buy button
-                player.Out.SendMessage($"[{await taskBuy!}{title}]",
+                player.Out.SendMessage($"[{await taskBuy!} {title}]",
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
             else
             {
                 // Read button (author only)
-                player.Out.SendMessage($"[{await taskRead!}{title}]",
+                player.Out.SendMessage($"[{await taskRead!} {title}]",
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
         }
@@ -715,6 +721,7 @@ namespace DOL.GS.Scripts
 
         private void BuyBook(PlayerCache cache, DBBook book)
         {
+            cache.CurrentBook = book;
             var buyer = cache.Player;
             int priceCopper = book.CurrentPriceCopper;
             if (priceCopper <= 0)
@@ -774,7 +781,7 @@ namespace DOL.GS.Scripts
                 buyer.Out.SendMessage(success,
                                       eChatType.CT_Merchant, eChatLoc.CL_PopupWindow);
 
-                buyer.Out.SendMessage($"[{await taskUpvote}{title}]  [{await taskDownvote}{title}]",
+                buyer.Out.SendMessage($"[{await taskUpvote}]  [{await taskDownvote}]",
                                       eChatType.CT_System, eChatLoc.CL_PopupWindow);
             });
         }
