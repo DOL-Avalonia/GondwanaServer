@@ -4,6 +4,7 @@ using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
+using DOL.Numbers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -121,9 +122,18 @@ namespace DOL.GS.Scripts
                 return bookToRead;
             }
         }
-        
+
+        /// <summary>
+        /// How long to keep player cache entries before cleaning them up
+        /// </summary>
+        private const long CACHE_KEEPALIVE_MILLISECONDS = 30 * 60 * 1000;
+        /// <summary>
+        /// How often to check for stale cache entries
+        /// </summary>
+        private const int CACHE_CHECK_INTERVAL_MILLISECONDS = 30 * 1000;
         private readonly ConcurrentDictionary<string, PlayerCache> _playerCaches = new();
-        
+        private RegionTimer? _cleanupTimer;
+
         private const string INTERACT_KEY_CONSULT_BOOKS = "Librarian.Menu.ConsultBooks";
         private const string INTERACT_KEY_CONSULT_GUILDS = "Librarian.Menu.ConsultGuildRegister";
         private const string INTERACT_KEY_ADD_BOOK = "Librarian.Menu.AddBook";
@@ -136,20 +146,49 @@ namespace DOL.GS.Scripts
         
         private PlayerCache EnsurePlayerCache(GamePlayer player)
         {
-            var cache = _playerCaches.GetOrAdd(player.InternalID, _ => new PlayerCache(player));
+            var cache = _playerCaches.GetOrAdd(player.InternalID + ':' + player.Language, _ => new PlayerCache(player));
             cache.LastAccessed = Environment.TickCount64;
             return cache;
         }
         
         private PlayerCache? GetPlayerCache(GamePlayer player)
         {
-            if (!_playerCaches.TryGetValue(player.InternalID, out PlayerCache cache))
+            if (!_playerCaches.TryGetValue(player.InternalID + ':' + player.Language, out PlayerCache cache))
             {
                 return null;
             }
 
             cache.LastAccessed = Environment.TickCount64;
             return cache;
+        }
+
+        /// <inheritdoc />
+        public override bool AddToWorld()
+        {
+            if (!base.AddToWorld())
+                return false;
+
+            _cleanupTimer = new RegionTimer(this, CleanupTimer);
+            _cleanupTimer.Start(CACHE_CHECK_INTERVAL_MILLISECONDS);
+            return true;
+        }
+
+        /// <inheritdoc />
+        public override bool RemoveFromWorld()
+        {
+            if (!base.RemoveFromWorld())
+                return false;
+
+            _cleanupTimer.Stop();
+            return true;
+        }
+
+        private int CleanupTimer(RegionTimer callingTimer)
+        {
+            var now = Environment.TickCount64;
+            var toRemove = _playerCaches.Where(kv => kv.Value.LastAccessed + CACHE_KEEPALIVE_MILLISECONDS < now).Select(kv => kv.Key).ToList();
+            toRemove.ForEach(key => _playerCaches.TryRemove(key, out _));
+            return CACHE_CHECK_INTERVAL_MILLISECONDS;
         }
 
         public override bool Interact(GamePlayer player)

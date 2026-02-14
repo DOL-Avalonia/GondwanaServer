@@ -273,6 +273,8 @@ namespace DOL.GS
             get { return m_client; }
         }
 
+        public string Language => Client?.Account?.Language ?? Properties.SERV_LANGUAGE;
+
         /// <summary>
         /// Returns the PacketSender for this player
         /// </summary>
