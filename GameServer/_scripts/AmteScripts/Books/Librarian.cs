@@ -1,3 +1,4 @@
+#nullable enable
 using DOL.Database;
 using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
@@ -8,9 +9,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Transactions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DOL.GS.Scripts
 {
@@ -26,54 +30,127 @@ namespace DOL.GS.Scripts
         private static bool Eq(string? a, string? b)
             => a != null && b != null && string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 
-        [NotNull] private readonly ConcurrentDictionary<string, IDictionary<string, string>> _playerResponseKeyMappings = new();
+        private record class PlayerCache(GamePlayer Player)
+        {
+            private ConcurrentDictionary<string, string> ResponseToTranslationKey { get; } = new();
+            private ConcurrentDictionary<string, string> TranslationKeyToPrefix { get; } = new();
+            private ConcurrentDictionary<string, string> ResponseToBookTitle { get; } = new();
+            public long LastAccessed { get; set; } = long.MinValue;
+            public bool HasBooks { get; set; } = false;
+
+            public async Task<string> TranslateResponseKey(string baseKey)
+            {
+                var translated = await LanguageMgr.Translate(Player, baseKey);
+                if (string.IsNullOrEmpty(translated))
+                    return string.Empty;
+
+                ResponseToTranslationKey[translated.ToLowerInvariant()] = baseKey;
+                return translated;
+            }
+
+            public async Task<string> TranslatePrefixKey(string baseKey)
+            {
+                var translated = await LanguageMgr.Translate(Player, baseKey);
+                if (string.IsNullOrEmpty(translated))
+                    return string.Empty;
+
+                TranslationKeyToPrefix[baseKey] = translated;
+                return translated + " ";
+            }
+
+            public async Task<string> TranslateBookTitle(DBBook book)
+            {
+                var lang = book.Language;
+                var title = book.Title;
+                if (string.IsNullOrEmpty(lang))
+                    lang = Properties.SERV_LANGUAGE;
+
+                var translated = await AutoTranslateManager.Translate(lang, Player, title);
+                if (string.IsNullOrEmpty(translated))
+                    return string.Empty;
+
+                ResponseToBookTitle[translated] = title;
+                return translated;
+            }
+
+            public async Task<string> TranslateBookText(DBBook book)
+            {
+                var lang = book.Language;
+                var text = book.Text;
+                if (string.IsNullOrEmpty(lang))
+                    lang = Properties.SERV_LANGUAGE;
+
+                var translated = await AutoTranslateManager.Translate(lang, Player, text);
+                if (string.IsNullOrEmpty(translated))
+                    return string.Empty;
+
+                return translated;
+            }
+
+            public string? GetResponseKey(string translation, string? orElse = null)
+            {
+                return ResponseToTranslationKey.TryGetValue(translation.ToLowerInvariant(), out string? value) ? value : orElse;
+            }
+
+            public string? GetResponsePrefix(string baseKey, string? orElse = null)
+            {
+                if (TranslationKeyToPrefix.TryGetValue(baseKey, out string? translated))
+                {
+                    return translated + " ";
+                }
+                return orElse;
+            }
+
+            public string? GetBookTitleID(string translatedTitle, string? prefix = null, string? orElse = null)
+            {
+                if (prefix is not null)
+                {
+                    translatedTitle = translatedTitle.Substring(prefix.Length).Trim();
+                }
+
+                return ResponseToBookTitle.TryGetValue(translatedTitle, out string? value) ? value : orElse;
+            }
+
+            public DBBook? GetBook(string translatedtitle, string? prefix = null, bool onlyInLibrary = true)
+            {
+                string? originalTitle = GetBookTitleID(translatedtitle, prefix);
+                if (originalTitle is null)
+                    return null;
+                
+                DBBook? bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.IsInLibrary == onlyInLibrary && b.Title == originalTitle);
+                return bookToRead;
+            }
+        }
+        
+        private readonly ConcurrentDictionary<string, PlayerCache> _playerCaches = new();
         
         private const string INTERACT_KEY_CONSULT_BOOKS = "Librarian.Menu.ConsultBooks";
         private const string INTERACT_KEY_CONSULT_GUILDS = "Librarian.Menu.ConsultGuildRegister";
         private const string INTERACT_KEY_ADD_BOOK = "Librarian.Menu.AddBook";
         private const string INTERACT_KEY_COLLECT_ROYALTIES = "Librarian.Menu.CollectRoyalties";
-        private const string INTERACT_KEY_VOTE_UP = "Librarian.Prefix.VotePlus";
-        private const string INTERACT_KEY_VOTE_DOWN = "Librarian.Prefix.VoteMinus";
-        private const string INTERACT_KEY_BUY = "Librarian.Prefix.Buy";
-        private const string INTERACT_KEY_READ = "Librarian.Prefix.Read";
-        private const string INTERACT_KEY_LEGACYREAD = "Librarian.Prefix.LegacyBook";
-
-        private async Task<string> TranslateResponseKey(GamePlayer player, string baseKey)
+        private const string INTERACT_KEY_PREFIX_VOTE_UP = "Librarian.Prefix.VotePlus";
+        private const string INTERACT_KEY_PREFIX_VOTE_DOWN = "Librarian.Prefix.VoteMinus";
+        private const string INTERACT_KEY_PREFIX_BUY = "Librarian.Prefix.Buy";
+        private const string INTERACT_KEY_PREFIX_READ = "Librarian.Prefix.Read";
+        private const string INTERACT_KEY_PREFIX_LEGACYREAD = "Librarian.Prefix.LegacyBook";
+        
+        private PlayerCache EnsurePlayerCache(GamePlayer player)
         {
-            var mapping = _playerResponseKeyMappings.GetOrAdd(player.Name, _ => new ConcurrentDictionary<string, string>());
-            if (true || !mapping!.TryGetValue(baseKey, out string mapped))
+            var cache = _playerCaches.GetOrAdd(player.InternalID, _ => new PlayerCache(player));
+            cache.LastAccessed = Environment.TickCount64;
+            return cache;
+        }
+        
+        private PlayerCache? GetPlayerCache(GamePlayer player)
+        {
+            if (!_playerCaches.TryGetValue(player.InternalID, out PlayerCache cache))
             {
-                mapped = await LanguageMgr.Translate(player, baseKey);
-                mapping[baseKey] = mapped;
+                return null;
             }
-            return mapped;
+
+            cache.LastAccessed = Environment.TickCount64;
+            return cache;
         }
-
-        private string? GetResponseKey(GamePlayer player, string baseKey, string orElse = null)
-        {
-            if (!_playerResponseKeyMappings.TryGetValue(player.Name, out IDictionary<string, string> mappings))
-                return orElse;
-
-            if (!mappings!.TryGetValue(baseKey, out string response))
-                return orElse;
-
-            return response;
-        }
-
-        private string? GetResponsePrefix(GamePlayer player, string baseKey, string orElse = null)
-        {
-            string? response = GetResponseKey(player, baseKey, orElse);
-            if (Equals(response, orElse))
-                return orElse;
-
-            return response + " ";
-        }
-
-        private string PrefixVotePlus(GamePlayer p) => GetResponsePrefix(p, INTERACT_KEY_VOTE_UP);
-        private string PrefixVoteMinus(GamePlayer p) => GetResponsePrefix(p, INTERACT_KEY_VOTE_DOWN);
-        private string PrefixBuy(GamePlayer p) => GetResponsePrefix(p, INTERACT_KEY_BUY);
-        private string PrefixRead(GamePlayer p) => GetResponsePrefix(p, INTERACT_KEY_READ);
-        private string PrefixLegacy(GamePlayer p) => GetResponsePrefix(p, INTERACT_KEY_LEGACYREAD);
 
         public override bool Interact(GamePlayer player)
         {
@@ -82,13 +159,15 @@ namespace DOL.GS.Scripts
 
             Task.Run(async () =>
             {
+                var cache = EnsurePlayerCache(player);
+                
                 // Start them all... in parallel, so that if translation is slow it doesn't delay the first ones.
                 var text1 = LanguageMgr.Translate(player, "Librarian.InteractText01");
                 var text2 = LanguageMgr.Translate(player, "Librarian.InteractText02");
-                var consultBooks = TranslateResponseKey(player, INTERACT_KEY_CONSULT_BOOKS);
-                var consultGuilds = Properties.GUILD_REQUIRE_REGISTER ? TranslateResponseKey(player, INTERACT_KEY_CONSULT_GUILDS) : null;
-                var addBook = TranslateResponseKey(player, INTERACT_KEY_ADD_BOOK);
-                var royalties = TranslateResponseKey(player, INTERACT_KEY_COLLECT_ROYALTIES);
+                var consultBooks = cache.TranslateResponseKey(INTERACT_KEY_CONSULT_BOOKS);
+                var consultGuilds = Properties.GUILD_REQUIRE_REGISTER ? cache.TranslateResponseKey(INTERACT_KEY_CONSULT_GUILDS) : null;
+                var addBook = cache.TranslateResponseKey(INTERACT_KEY_ADD_BOOK);
+                var royalties = cache.TranslateResponseKey(INTERACT_KEY_COLLECT_ROYALTIES);
                 
                 // Await them so we don't have a delay between greeting and menu
                 await text1;
@@ -100,13 +179,6 @@ namespace DOL.GS.Scripts
                 }
                 await addBook;
                 await royalties;
-                
-                // Translate those for the responses...
-                await TranslateResponseKey(player, INTERACT_KEY_VOTE_UP);
-                await TranslateResponseKey(player, INTERACT_KEY_VOTE_DOWN);
-                await TranslateResponseKey(player, INTERACT_KEY_BUY);
-                await TranslateResponseKey(player, INTERACT_KEY_READ);
-                await TranslateResponseKey(player, INTERACT_KEY_LEGACYREAD);
                 
                 // Greeting popup
                 player.Out.SendMessage(
@@ -139,23 +211,38 @@ namespace DOL.GS.Scripts
             if (!base.WhisperReceive(source, text) || player == null)
                 return false;
 
-            text = (text ?? string.Empty).Trim();
+            var cache = GetPlayerCache(player);
+            if (cache is null) // Cache is gone / player didn't talk to librarian first
+                return Interact(player);
+            
+            string? response = cache.GetResponseKey(text);
+            if (response is not null)
+            {
+                switch (response)
+                {
+                    // Consult register list
+                    case INTERACT_KEY_CONSULT_GUILDS when Properties.GUILD_REQUIRE_REGISTER:
+                        SendGuildRegisterList(player);
+                        return true;
+                        
+                    // List normal books
+                    case INTERACT_KEY_CONSULT_BOOKS:
+                        SendBookList(cache);
+                        return true;
+                    
+                    case INTERACT_KEY_ADD_BOOK:
+                        player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.ResponseText02"),
+                                               eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                        return true;
+                    
+                    case INTERACT_KEY_COLLECT_ROYALTIES:
+                        CollectRoyalties(player);
+                        return true;
+                }
+            }
 
-            // Menu labels
-            var consultBooks = GetResponseKey(player, INTERACT_KEY_CONSULT_BOOKS);
-            var consultGuilds = Properties.GUILD_REQUIRE_REGISTER ? GetResponseKey(player, INTERACT_KEY_CONSULT_GUILDS) : null;
-            var addBook = GetResponseKey(player, INTERACT_KEY_ADD_BOOK);
-            var royalties = GetResponseKey(player, INTERACT_KEY_COLLECT_ROYALTIES);
-
-            // Consult register list
             if (Properties.GUILD_REQUIRE_REGISTER)
             {
-                if (Eq(text, consultGuilds))
-                {
-                    SendGuildRegisterList(player);
-                    return true;
-                }
-                
                 // Click on a register title -> show FULL TEXT
                 var regClicked = GameServer.Database.SelectObject<DBBook>(b => b.Title == text && b.Author == GUILD_REGISTER_AUTHOR);
                 if (regClicked != null)
@@ -165,82 +252,55 @@ namespace DOL.GS.Scripts
                 }
             }
 
-            // List normal books
-            if (Eq(text, consultBooks))
-            {
-                SendBookList(player);
+            if (!cache.HasBooks)
                 return true;
-            }
-
-            if (Eq(text, addBook))
-            {
-                Task.Run(async () =>
-                {
-                    player.Out.SendMessage(await LanguageMgr.Translate(player, "Librarian.ResponseText02"),
-                                           eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                });
-                return true;
-            }
-
-            if (Eq(text, royalties))
-            {
-                CollectRoyalties(player);
-                return true;
-            }
-
+            
             // Author-only full read shortcut: "Read "
-            string readPrefix = PrefixRead(player);
+            string? readPrefix = cache.GetResponsePrefix(INTERACT_KEY_PREFIX_READ);
             if (readPrefix is not null && text.StartsWith(readPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                Task.Run(async () =>
+                var bookToRead = cache.GetBook(text, readPrefix);
+                if (bookToRead == null)
                 {
-                    string title = text.Substring(readPrefix.Length).Trim();
+                    player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.Book.NotFound"),
+                                           eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    return true;
+                }
 
-                    var bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.IsInLibrary && b.Title == title);
-                    if (bookToRead == null)
-                    {
-                        player.Out.SendMessage(await LanguageMgr.Translate(player, "Librarian.Book.NotFound"),
-                                               eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                        return;
-                    }
+                if (bookToRead.PlayerID != player.InternalID)
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.Read.AuthorOnly"),
+                                           eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    return true;
+                }
 
-                    if (bookToRead.PlayerID != player.InternalID)
-                    {
-                        player.Out.SendMessage(await LanguageMgr.Translate(player, "Librarian.Read.AuthorOnly"),
-                                               eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                        return;
-                    }
-
-                    BooksMgr.ReadBook(player, bookToRead);
-                });
+                BooksMgr.ReadBook(player, bookToRead);
                 return true;
             }
 
             // Vote + / Vote -
-            string votePlusPrefix = PrefixVotePlus(player);
-            string voteMinusPrefix = PrefixVoteMinus(player);
+            string? votePlusPrefix = cache.GetResponsePrefix(INTERACT_KEY_PREFIX_VOTE_UP);
+            string? voteMinusPrefix = cache.GetResponsePrefix(INTERACT_KEY_PREFIX_VOTE_DOWN);
             if (votePlusPrefix is not null && text.StartsWith(votePlusPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                var title = text.Substring(votePlusPrefix.Length).Trim();
-                Vote(player, title, +1);
+                var title = cache.GetBookTitleID(text, votePlusPrefix);
+                Vote(cache, title, +1);
                 return true;
             }
 
             if (voteMinusPrefix is not null && text.StartsWith(voteMinusPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                var title = text.Substring(voteMinusPrefix.Length).Trim();
-                Vote(player, title, -1);
+                var title = cache.GetBookTitleID(text, voteMinusPrefix);
+                Vote(cache, title, -1);
                 return true;
             }
 
             // Buy
-            string buyPrefix = PrefixBuy(player);
+            string? buyPrefix = cache.GetResponsePrefix(INTERACT_KEY_PREFIX_BUY);
             if (buyPrefix is not null && text.StartsWith(buyPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                string title = text.Substring(buyPrefix.Length).Trim();
-
                 // Todo, review these async tasks; can we wrap BuyBook in there? It adds to inventory, is the inventory threadsafe?
-                var bookToBuy = GameServer.Database.SelectObject<DBBook>(b => b.IsInLibrary && b.Title == title);
+                var bookToBuy = cache.GetBook(text, buyPrefix);
                 if (bookToBuy == null)
                 {
                     player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.Book.NotFound"),
@@ -255,25 +315,26 @@ namespace DOL.GS.Scripts
                     return true;
                 }
 
-                BuyBook(player, bookToBuy);
+                BuyBook(cache, bookToBuy);
                 return true;
             }
 
             // Clicking on a book title -> preview
+            var originalTitle = cache.GetBookTitleID(text);
             var clicked = GameServer.Database.SelectObject<DBBook>(
-                b => b.IsInLibrary && b.Title == text && b.Author != GUILD_REGISTER_AUTHOR);
+                b => b.IsInLibrary && b.Title == originalTitle && b.Author != GUILD_REGISTER_AUTHOR);
 
             if (clicked != null)
             {
-                ShowBookPreview(player, clicked);
+                ShowBookPreview(cache, clicked);
                 return true;
             }
 
             // "Book <id>" -> preview
-            string legacyPrefix = PrefixLegacy(player);
+            string? legacyPrefix = cache.GetResponseKey(INTERACT_KEY_PREFIX_LEGACYREAD);
             if (legacyPrefix is not null && text.StartsWith(legacyPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                var token = text.Substring(legacyPrefix.Length).Trim();
+                var token = cache.GetBookTitleID(text, legacyPrefix);
                 if (int.TryParse(token, out int bookId))
                 {
                     var legacyById = GameServer.Database.SelectObject<DBBook>(
@@ -281,22 +342,20 @@ namespace DOL.GS.Scripts
 
                     if (legacyById != null)
                     {
-                        ShowBookPreview(player, legacyById);
+                        ShowBookPreview(cache, legacyById);
                         return true;
                     }
                 }
             }
 
-            Task.Run(async () =>
-            {
-                player.Out.SendMessage(await LanguageMgr.Translate(player, "Librarian.ResponseText03"),
-                                       eChatType.CT_System, eChatLoc.CL_PopupWindow);
-            });
+            player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.ResponseText03"),
+                                   eChatType.CT_System, eChatLoc.CL_PopupWindow);
             return true;
         }
 
-        private async Task SendBookList(GamePlayer player)
+        private async Task SendBookList(PlayerCache cache)
         {
+            var player = cache.Player;
             var text1 = LanguageMgr.Translate(player, "Librarian.ResponseText01");
             var books = GameServer.Database
                 .SelectObjects<DBBook>(b => b.IsInLibrary && b.Author != GUILD_REGISTER_AUTHOR)
@@ -317,9 +376,10 @@ namespace DOL.GS.Scripts
                 foreach (var b in books)
                 {
                     string price = Money.GetString(b.CurrentPriceCopper);
+                    string title = await cache.TranslateBookTitle(b);
 
                     sb.Append("\n[")
-                        .Append(b.Title)
+                        .Append(title)
                         .Append("] - ")
                         .Append(b.Author)
                         .Append(" - ")
@@ -346,6 +406,7 @@ namespace DOL.GS.Scripts
             {
                 player.Out.SendMessage(await text1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
+            cache.HasBooks = true;
         }
 
         private void SendGuildRegisterList(GamePlayer player)
@@ -394,44 +455,56 @@ namespace DOL.GS.Scripts
                 player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
-        private void ShowBookPreview(GamePlayer player, DBBook book)
+        private async Task ShowBookPreview(PlayerCache cache, DBBook book)
         {
+            var player = cache.Player;
+            bool isAuthor = (book.PlayerID == player.InternalID);
             string price = Money.GetString(book.CurrentPriceCopper);
-            string preview = GetFirstWords(book.Text, PreviewWordsCount);
 
             var sb = new StringBuilder(1024);
+            var taskTitle = cache.TranslateBookTitle(book);
+            var taskAuthor = LanguageMgr.Translate(player, "Librarian.Preview.Author");
+            var taskPrice = LanguageMgr.Translate(player, "Librarian.Preview.Price");
+            var taskVotes = LanguageMgr.Translate(player, "Librarian.Preview.Votes");
+            var taskVoteSep = LanguageMgr.Translate(player, "Librarian.Preview.VotesSeparator");
+            var taskPreview = LanguageMgr.Translate(player, "Librarian.Preview.PreviewLabel");
+            var taskText = cache.TranslateBookText(book);
+            var taskUpvote = isAuthor ? null : cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_UP);
+            var taskDownvote = isAuthor ? null : cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_DOWN);
+            var taskBuy = isAuthor ? null : cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_BUY);
+            var taskRead = isAuthor ? cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_BUY) : null;
+            string preview = GetFirstWords(await taskText, PreviewWordsCount);
+            string title = await taskTitle;
 
-            sb.Append(book.Title)
+            sb.Append(title)
               .Append("\n")
-              .Append(LanguageMgr.Translate(player, "Librarian.Preview.Author") + " ").Append(book.Author)
+              .Append(await taskAuthor + " ").Append(book.Author)
               .Append("\n")
-              .Append(LanguageMgr.Translate(player, "Librarian.Preview.Price") + " ").Append(price)
+              .Append(await taskPrice + " ").Append(price)
               .Append("\n")
-              .Append(LanguageMgr.Translate(player, "Librarian.Preview.Votes") + " ").Append(book.UpVotes)
-              .Append(LanguageMgr.Translate(player, "Librarian.Preview.VotesSeparator") + " ")
+              .Append(await taskVotes + " ").Append(book.UpVotes)
+              .Append(await taskVoteSep + " ")
               .Append(book.DownVotes)
               .Append("\n\n")
-              .Append(LanguageMgr.Translate(player, "Librarian.Preview.PreviewLabel") + " ")
+              .Append(await taskPreview + " ")
               .Append(preview);
 
             player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
-            bool isAuthor = (book.PlayerID == player.InternalID);
-
             if (!isAuthor)
             {
                 // Vote buttons
-                player.Out.SendMessage($"[{PrefixVotePlus(player)}{book.Title}]  [{PrefixVoteMinus(player)}{book.Title}]",
+                player.Out.SendMessage($"[{await taskUpvote!}{title}]  [{await taskDownvote!}{title}]",
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
                 // Buy button
-                player.Out.SendMessage($"[{PrefixBuy(player)}{book.Title}]",
+                player.Out.SendMessage($"[{await taskBuy!}{title}]",
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
             else
             {
                 // Read button (author only)
-                player.Out.SendMessage($"[{PrefixRead(player)}{book.Title}]",
+                player.Out.SendMessage($"[{await taskRead!}{title}]",
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
         }
@@ -601,8 +674,9 @@ namespace DOL.GS.Scripts
             return Math.Max(floor, priced);
         }
 
-        private void BuyBook(GamePlayer buyer, DBBook book)
+        private void BuyBook(PlayerCache cache, DBBook book)
         {
+            var buyer = cache.Player;
             int priceCopper = book.CurrentPriceCopper;
             if (priceCopper <= 0)
             {
@@ -650,17 +724,31 @@ namespace DOL.GS.Scripts
             book.TotalSold += 1;
             book.Save();
 
-            buyer.Out.SendMessage(LanguageMgr.Translate(buyer, "Librarian.Buy.Success", book.Title, Money.GetString(priceCopper)),
-                eChatType.CT_Merchant, eChatLoc.CL_PopupWindow);
+            Task.Run(async () =>
+            {
+                var taskSuccess = LanguageMgr.Translate(buyer, "Librarian.Buy.Success");
+                var taskUpvote = cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_UP);
+                var taskDownvote = cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_DOWN);
+                var title = await cache.TranslateBookTitle(book);
+                var success = string.Format(await taskSuccess, title, Money.GetString(priceCopper));
 
-            buyer.Out.SendMessage($"[{PrefixVotePlus(buyer)}{book.Title}]  [{PrefixVoteMinus(buyer)}{book.Title}]",
-                eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                buyer.Out.SendMessage(success,
+                                      eChatType.CT_Merchant, eChatLoc.CL_PopupWindow);
+
+                buyer.Out.SendMessage($"[{await taskUpvote}{title}]  [{await taskDownvote}{title}]",
+                                      eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            });
         }
 
-        private void Vote(GamePlayer voter, string title, int voteValue)
+        private void Vote(PlayerCache cache, string? bookID, int voteValue)
         {
-            var book = GameServer.Database.SelectObject<DBBook>(
-                b => b.IsInLibrary && b.Title == title && b.Author != GUILD_REGISTER_AUTHOR);
+            var voter = cache.Player;
+            DBBook? book = null;
+            if (!string.IsNullOrEmpty(bookID))
+            {
+                book = GameServer.Database.SelectObject<DBBook>(
+                    b => b.IsInLibrary && b.Title == bookID && b.Author != GUILD_REGISTER_AUTHOR);
+            }
 
             if (book == null)
             {
@@ -707,7 +795,7 @@ namespace DOL.GS.Scripts
             voter.Out.SendMessage(LanguageMgr.Translate(voter, "Librarian.Vote.Recorded"),
                 eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
-            ShowBookPreview(voter, book);
+            ShowBookPreview(cache, book);
         }
 
         private void UpdateAuthorUniqueItemPrice(DBBook book)

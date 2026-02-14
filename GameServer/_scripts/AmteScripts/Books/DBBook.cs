@@ -81,6 +81,12 @@ namespace DOL.Database
 
         [DataElement(AllowDbNull = true)]
         public DateTime StampDate { get; set; }
+        [DataElement(AllowDbNull = false)]
+        public string Language
+        {
+            get;
+            set;
+        } = string.Empty;
 
         public DBBook()
         {

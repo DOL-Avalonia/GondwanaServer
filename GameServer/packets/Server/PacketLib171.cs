@@ -380,8 +380,8 @@ namespace DOL.GS.PacketHandler
                     // We treat quest texts as "server texts", so sender = null
                     if (receiver != null)
                     {
-                        name = await AutoTranslateManager.Translate(null, receiver, name);
-                        desc = await AutoTranslateManager.Translate(null, receiver, desc);
+                        name = await AutoTranslateManager.Translate(receiver, name);
+                        desc = await AutoTranslateManager.Translate(receiver, desc);
                     }
 
                     if (name.Length > byte.MaxValue)

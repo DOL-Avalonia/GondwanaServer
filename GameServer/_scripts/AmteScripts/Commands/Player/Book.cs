@@ -3,6 +3,7 @@ using System.Reflection;
 using DOL.Database;
 using DOL.GS.Commands;
 using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using log4net;
 using DOL.Language;
 
@@ -91,6 +92,7 @@ namespace DOL.GS.Scripts
                             Name = "[" + player.Name + "] " + ScrollTitle,
                             Title = ScrollTitle,
                             Author = player.Name,
+                            Language = player.Client?.Account?.Language ?? Properties.SERV_LANGUAGE,
                             Text = "",
                             PlayerID = player.InternalID,
                             Ink = "",

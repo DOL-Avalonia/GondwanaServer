@@ -92,7 +92,7 @@ namespace DOL.GS.Quests
             if (personalize)
                 text = BehaviourUtils.GetPersonalizedMessage(text, player);
 
-            return await AutoTranslateManager.Translate(null, player, text);
+            return await AutoTranslateManager.Translate(player, text);
         }
 
         public Task<string> GetNameForPlayer(GamePlayer player)

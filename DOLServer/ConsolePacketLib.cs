@@ -80,7 +80,7 @@ namespace DOLGameServerConsole
                 callback(null, 1);
             }
         }
-        
+
         public void SendCustomDialog(Task<string> msg, CustomDialogResponse callback)
         {
             Task.Run(async () =>
