@@ -24,6 +24,9 @@ Librarian.Read.AuthorOnly:				Only the author may read a book here freely.
 
 Librarian.BookList.VotesPrefixPositive:	Positive: 
 Librarian.BookList.VotesPrefixNegative:	Negative:
+Librarian.BookList.CurrentPage:			Page {0} / {1}
+Librarian.BookList.NextPage:			Next
+Librarian.BookList.PreviousPage:		Previous
 
 Librarian.GuildRegister.None:			I'm sorry, there are no guild registers to consult at the moment.
 Librarian.GuildRegister.Count:			Guild registers available: {0}

@@ -13,8 +13,10 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace DOL.GS.Scripts
@@ -25,7 +27,8 @@ namespace DOL.GS.Scripts
         private int BaseCopperAtMin => Properties.BOOK_BASE_PRICE_COPPER_AT_MIN_WORDS;
         private int VoteStepPercent => Properties.BOOK_RATING_POSITIVE_BONUS_PERCENT;
         private int MaxMultiplierPercent => Properties.BOOK_MAX_RATING_MULTIPLIER_PERCENT;
-        private const int PreviewWordsCount = 15;
+        private const int PREVIEW_WORDS_COUNT = 15;
+        private const int BOOKS_PER_PAGE = 7;
         private const string GUILD_REGISTER_AUTHOR = "Guild Register";
 
         private static bool Eq(string? a, string? b)
@@ -33,12 +36,43 @@ namespace DOL.GS.Scripts
 
         private record class PlayerCache(GamePlayer Player)
         {
+            public record class BookListEntry
+            {
+                public BookListEntry(DBBook book)
+                {
+                    Title = book.Title;
+                    Author = book.Author;
+                    Price = book.CurrentPriceCopper;
+                    Upvotes = book.UpVotes;
+                    Downvotes = book.DownVotes;
+                }
+
+                public string Title { get; } = string.Empty;
+                public string Author { get; } = string.Empty;
+                public string Language { get; } = string.Empty;
+                public int Price { get; } = 0;
+                public int Upvotes { get; } = 0;
+                public int Downvotes { get; } = 0;
+                public float Rating => Upvotes + Downvotes == 0 ? 0 : (float)Upvotes / (Upvotes + Downvotes);
+            }
+
+            public DBBook? CurrentBook { get; set; }
+
             private ConcurrentDictionary<string, string> ResponseToTranslationKey { get; } = new();
             private ConcurrentDictionary<string, string> TranslationKeyToPrefix { get; } = new();
             private ConcurrentDictionary<string, string> ResponseToBookTitle { get; } = new();
             public long LastAccessed { get; set; } = long.MinValue;
-            public bool HasBooks { get; set; } = false;
-            public DBBook? CurrentBook { get; set; }
+            public List<BookListEntry>? BookList { get; set; } = null;
+            public int CurrentListPage { get; set; }
+            public int TotalListPages => BookList == null ? 0 : (int)Math.Ceiling((float)BookList.Count / BOOKS_PER_PAGE);
+            
+            public IEnumerable<BookListEntry> GetBooksForPage(int page)
+            {
+                if (BookList == null)
+                    return Enumerable.Empty<BookListEntry>();
+
+                return BookList.Skip(page * BOOKS_PER_PAGE).Take(BOOKS_PER_PAGE);
+            }
 
             public async Task<string> TranslateResponseKey(string baseKey)
             {
@@ -61,6 +95,21 @@ namespace DOL.GS.Scripts
             }
 
             public async Task<string> TranslateBookTitle(DBBook book)
+            {
+                var lang = book.Language;
+                var title = book.Title;
+                if (string.IsNullOrEmpty(lang))
+                    lang = Properties.SERV_LANGUAGE;
+
+                var translated = await AutoTranslateManager.Translate(lang, Player, title);
+                if (string.IsNullOrEmpty(translated))
+                    return string.Empty;
+
+                ResponseToBookTitle[translated] = title;
+                return translated;
+            }
+
+            public async Task<string> TranslateBookTitle(BookListEntry book)
             {
                 var lang = book.Language;
                 var title = book.Title;
@@ -143,11 +192,18 @@ namespace DOL.GS.Scripts
         private const string INTERACT_KEY_CONSULT_GUILDS = "Librarian.Menu.ConsultGuildRegister";
         private const string INTERACT_KEY_ADD_BOOK = "Librarian.Menu.AddBook";
         private const string INTERACT_KEY_COLLECT_ROYALTIES = "Librarian.Menu.CollectRoyalties";
+        private const string INTERACT_KEY_PREVIOUS_PAGE = "Librarian.BookList.PreviousPage";
+        private const string INTERACT_KEY_NEXT_PAGE = "Librarian.BookList.NextPage";
         private const string INTERACT_KEY_PREFIX_VOTE_UP = "Librarian.Prefix.VotePlus";
         private const string INTERACT_KEY_PREFIX_VOTE_DOWN = "Librarian.Prefix.VoteMinus";
         private const string INTERACT_KEY_PREFIX_BUY = "Librarian.Prefix.Buy";
         private const string INTERACT_KEY_PREFIX_READ = "Librarian.Prefix.Read";
         private const string INTERACT_KEY_PREFIX_LEGACYREAD = "Librarian.Prefix.LegacyBook";
+
+        private static async Task<string> ToResponse(Task<string> task)
+        {
+            return '[' + await task + ']';
+        }
         
         private PlayerCache EnsurePlayerCache(GamePlayer player)
         {
@@ -282,6 +338,14 @@ namespace DOL.GS.Scripts
                     case INTERACT_KEY_COLLECT_ROYALTIES:
                         CollectRoyalties(player);
                         return true;
+                    
+                    case INTERACT_KEY_PREVIOUS_PAGE:
+                        SendBooklistPage(cache, cache.CurrentListPage - 1);
+                        return true;
+                    
+                    case INTERACT_KEY_NEXT_PAGE:
+                        SendBooklistPage(cache, cache.CurrentListPage + 1);
+                        return true;
                 }
             }
 
@@ -296,7 +360,7 @@ namespace DOL.GS.Scripts
                 }
             }
 
-            if (!cache.HasBooks)
+            if (cache.BookList?.Any() != true)
                 return true;
             
             // Author-only full read shortcut: "Read "
@@ -331,7 +395,6 @@ namespace DOL.GS.Scripts
                 Vote(cache, title, +1);
                 return true;
             }
-
             if (voteMinusPrefix is not null && text.StartsWith(voteMinusPrefix, StringComparison.OrdinalIgnoreCase))
             {
                 var title = cache.GetBookTitleID(text, voteMinusPrefix);
@@ -401,56 +464,80 @@ namespace DOL.GS.Scripts
         {
             var player = cache.Player;
             var text1 = LanguageMgr.Translate(player, "Librarian.ResponseText01");
-            var books = GameServer.Database
+            cache.BookList = GameServer.Database
                 .SelectObjects<DBBook>(b => b.IsInLibrary && b.Author != GUILD_REGISTER_AUTHOR)
-                .OrderBy(b => b.Title);
+                .OrderBy(b => b.Title)
+                .Select(dbBook => new PlayerCache.BookListEntry(dbBook)).ToList();
             
-            var sb = new StringBuilder(2048);
-
-            if (books.Any())
+            player.Out.SendMessage(await text1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            
+            if (cache.BookList.Any())
             {
-                var upvoteTask = LanguageMgr.Translate(player, "Librarian.BookList.VotesPrefixPositive");
-                var downvoteTask = LanguageMgr.Translate(player, "Librarian.BookList.VotesPrefixNegative");
-                
-                var upvotes = await upvoteTask;
-                var downvotes = await downvoteTask;
-
-                player.Out.SendMessage(await text1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                
-                foreach (var b in books)
-                {
-                    string price = Money.GetString(b.CurrentPriceCopper);
-                    string title = await cache.TranslateBookTitle(b);
-
-                    sb.Append("\n[")
-                        .Append(title)
-                        .Append("] - ")
-                        .Append(b.Author)
-                        .Append(" - ")
-                        .Append(price)
-                        .Append(" - ")
-                        .Append(upvotes)
-                        .Append(' ')
-                        .Append(b.UpVotes)
-                        .Append(" / ")
-                        .Append(downvotes)
-                        .Append(' ')
-                        .Append(b.DownVotes);
-
-                    if (sb.Length > 1800)
-                    {
-                        player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                        sb.Clear();
-                    }
-                }
-
-                player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                await SendBooklistPage(cache, 0);
             }
             else
             {
-                player.Out.SendMessage(await text1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
-            cache.HasBooks = true;
+        }
+
+        private async Task SendBooklistPage(PlayerCache cache, int page)
+        {
+            var sb = new StringBuilder(2048);
+            var books = cache.GetBooksForPage(page).ToList();
+            if (!books.Any())
+                return;
+
+            var totalPages = Math.Max(1, cache.TotalListPages);
+            page = Math.Clamp(0, page, totalPages - 1);
+            var player = cache.Player;
+            var pageTask = LanguageMgr.Translate(player, "Librarian.BookList.CurrentPage", page + 1, totalPages);
+            var upvoteTask = LanguageMgr.Translate(player, "Librarian.BookList.VotesPrefixPositive");
+            var downvoteTask = LanguageMgr.Translate(player, "Librarian.BookList.VotesPrefixNegative");
+            Task<string>?[] navigationTasks = [ pageTask, null, null ];
+            if (page > 0)
+            {
+                navigationTasks[1] = ToResponse(cache.TranslateResponseKey(INTERACT_KEY_PREVIOUS_PAGE));
+            }
+
+            if (page + 1 < cache.TotalListPages)
+            {
+                navigationTasks[2] = ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
+            }
+                
+            var upvotes = await upvoteTask;
+            var downvotes = await downvoteTask;
+            cache.CurrentListPage = page;
+            foreach (var b in books)
+            {
+                string price = Money.GetString(b.Price);
+                string title = await cache.TranslateBookTitle(b);
+
+                sb.Append("\n[")
+                    .Append(title)
+                    .Append("] - ")
+                    .Append(b.Author)
+                    .Append(" - ")
+                    .Append(price)
+                    .Append(" - ")
+                    .Append(upvotes)
+                    .Append(' ')
+                    .Append(b.Upvotes)
+                    .Append(" / ")
+                    .Append(downvotes)
+                    .Append(' ')
+                    .Append(b.Downvotes);
+
+                if (sb.Length > 1800)
+                {
+                    player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    sb.Clear();
+                }
+            }
+
+            player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+
+            string navText = string.Join(' ', await Task.WhenAll(navigationTasks.Where(t => t != null).Cast<Task<string>>()));
+            player.Out.SendMessage(navText, eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
         private void SendGuildRegisterList(GamePlayer player)
@@ -518,7 +605,7 @@ namespace DOL.GS.Scripts
             var taskDownvote = isAuthor ? null : cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_DOWN);
             var taskBuy = isAuthor ? null : cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_BUY);
             var taskRead = isAuthor ? cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_BUY) : null;
-            string preview = GetFirstWords(await taskText, PreviewWordsCount);
+            string preview = GetFirstWords(await taskText, PREVIEW_WORDS_COUNT);
             string title = await taskTitle;
 
             sb.Append(title)

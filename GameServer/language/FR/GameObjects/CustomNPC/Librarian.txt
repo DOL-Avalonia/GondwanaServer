@@ -22,8 +22,11 @@ Librarian.ResponseText06:				Qu'est-ce donc ? Je n'accepte que des parchemins de
 Librarian.Book.NotFound:				Je ne retrouve pas ce livre dans la bibliothèque.
 Librarian.Read.AuthorOnly:				Seul l'auteur peut lire gratuitement un livre ici.
 
-Librarian.BookList.VotesPrefixPositive:	Positif : 
-Librarian.BookList.VotesPrefixNegative:	Négatif : 
+Librarian.BookList.VotesPrefixPositive:	Positif :
+Librarian.BookList.VotesPrefixNegative:	Négatif :
+Librarian.BookList.CurrentPage:			Page {0} / {1}
+Librarian.BookList.NextPage:			Suivant
+Librarian.BookList.PreviousPage:		Précédent
 
 Librarian.GuildRegister.None:			Désolé… je n'ai aucun registre de guilde à vous montrer pour l'instant.
 Librarian.GuildRegister.Count:			Registres de guildes disponibles : {0}
