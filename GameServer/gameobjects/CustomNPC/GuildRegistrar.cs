@@ -19,25 +19,24 @@
 *
 */
 
+using DOL.Database;
+using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
+using DOL.Language;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
-using DOL.Database;
-using DOL.GS.PacketHandler;
-using DOL.GS.ServerProperties;
-using DOL.GS.Scripts;
-using DOL.Language;
 using System.Threading.Tasks;
+using static DOL.GS.ArtifactMgr;
 
 namespace DOL.GS
 {
     [NPCGuildScript("Guild Registrar")]
     public class GuildRegistrar : AbstractLibrarian
     {
-        private static bool Eq(string a, string b)
-            => string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
-
         private const string INTERACT_KEY_FORM_GUILD = "GuildRegistrar.Keyword.FormGuild";
         private const string INTERACT_KEY_CONSULT_REGISTER = "GuildRegistrar.Keyword.ConsultRegister";
         private const string INTERACT_KEY_PREVIOUS_PAGE = "GuildRegistrar.List.PreviousPage";
@@ -303,7 +302,7 @@ namespace DOL.GS
             book.IsInLibrary = false;
             book.CurrentPriceCopper = 0;
             book.BasePriceCopper = 0;
-            book.IsGuildRegistry = false;
+            book.IsGuildRegistry = true;
             book.IsStamped = false;
             book.StampBy = string.Empty;
             book.StampDate = DateTime.MinValue;
@@ -422,13 +421,17 @@ namespace DOL.GS
                 navigationTasks[2] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
             }
 
+            int i = 0;
             cache.CurrentListPage = page;
             foreach (var b in cache.GetBooksForPage(page).ToList())
             {
+                if (i != 0)
+                    sb.Append('\n');
+                
                 // Clickable title
-                sb.Append("\n[")
+                sb.Append('[')
                     .Append(b.Title) // No translation, this is guild name
-                    .Append("]");
+                    .Append(']');
 
                 // Optional metadata
                 if (!string.IsNullOrWhiteSpace(b.StampedBy) || b.StampDate != DateTime.MinValue)
@@ -447,6 +450,7 @@ namespace DOL.GS
                     player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     sb.Clear();
                 }
+                ++i;
             }
 
             if (sb.Length > 0)
@@ -458,7 +462,56 @@ namespace DOL.GS
 
         private void ShowRegistry(PlayerCache cache, DBBook registry)
         {
-            BooksMgr.ReadBook(cache.Player, registry);
+            var player = cache.Player;
+            string language = string.IsNullOrEmpty(registry.Language) ? Properties.SERV_LANGUAGE : registry.Language;
+            var taskAuthor = LanguageMgr.Translate(player, "GuildRegistrar.Read.Author", registry.Author);
+            var taskLanguage = player.AutoTranslateEnabled ? LanguageMgr.Translate(player, "GuildRegistrar.Read.Language", language) : null;
+            var taskTitle = LanguageMgr.Translate(player, "GuildRegistrar.Read.Title", registry.Title);
+            var taskInk = LanguageMgr.Translate(player, "GuildRegistrar.Read.Ink", registry.Ink);
+
+            Task.Run(async () =>
+            {
+                var sb = new StringBuilder(2048);
+                sb
+                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+                    .Append(await taskAuthor).Append('\n')
+                    .Append(await taskTitle).Append('\n');
+
+                if (taskLanguage is not null)
+                {
+                    sb.Append(await taskLanguage).Append('\n');
+                }
+            
+                sb
+                    .Append(await taskInk).Append('\n')
+                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                sb.Clear();
+
+                var text = await cache.TranslateBookText(registry);
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i + 2 < text.Length)
+                    {
+                        if ((text[i] == '\n') && (text[i + 1] == '\n'))
+                        {
+                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                            sb.Clear();
+                            i++;
+                            i++;
+                            continue;
+                        }
+                        else if (sb.Length > 1900)
+                        {
+                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                            sb.Clear();
+                        }
+                    }
+                    sb.Append(text[i]);
+                }
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+            });
         }
     }
 }

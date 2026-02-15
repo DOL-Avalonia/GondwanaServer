@@ -41,3 +41,8 @@ GuildRegistrar.List.StampedBy:          Stamped by:
 GuildRegistrar.List.CurrentPage:		Page {0} / {1}
 GuildRegistrar.List.PreviousPage:		Previous
 GuildRegistrar.List.NextPage:			Next
+
+GuildRegistrar.Read.Author:				Author: {0}
+GuildRegistrar.Read.Title:				Title: {0}
+GuildRegistrar.Read.Language:			Original language: {0}
+GuildRegistrar.Read.Ink:				Ink used: {0}
