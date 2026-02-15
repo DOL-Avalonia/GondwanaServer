@@ -38,3 +38,6 @@ GuildRegistrar.Success:                 It is done. By register and seal, the gu
 GuildRegistrar.List.None:               No guild registers are currently on file.
 GuildRegistrar.List.Count:              Guild registers on record: {0}
 GuildRegistrar.List.StampedBy:          Stamped by:
+GuildRegistrar.List.CurrentPage:		Page {0} / {1}
+GuildRegistrar.List.PreviousPage:		Previous
+GuildRegistrar.List.NextPage:			Next

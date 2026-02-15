@@ -38,3 +38,6 @@ GuildRegistrar.Success:                 C'est fait. Par registre et sceau, la gu
 GuildRegistrar.List.None:               Aucun registre de guilde n'est actuellement archivé.
 GuildRegistrar.List.Count:              Registres de guilde archivés : {0}
 GuildRegistrar.List.StampedBy:          Tamponné par :
+GuildRegistrar.List.CurrentPage:		Page {0} / {1}
+GuildRegistrar.List.PreviousPage:		Précédent
+GuildRegistrar.List.NextPage:			Suivant

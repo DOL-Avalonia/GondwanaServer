@@ -1,3 +1,5 @@
+#nullable enable
+
 /*
 * DAWN OF LIGHT - The first free open source DAoC server emulator
 * 
@@ -26,36 +28,42 @@ using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.GS.Scripts;
 using DOL.Language;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
     [NPCGuildScript("Guild Registrar")]
-    public class GuildRegistrar : GameNPC
+    public class GuildRegistrar : AbstractLibrarian
     {
-        private const string GUILD_REGISTER_AUTHOR = "Guild Register";
-
-        private static string T(GamePlayer p, string key, params object[] args)
-            => LanguageMgr.GetTranslation(p.Client, key, args);
-
         private static bool Eq(string a, string b)
             => string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 
-        // Dynamic Keyword Helpers
-        private static string KeywordFormGuild(GamePlayer p)
+        private const string INTERACT_KEY_FORM_GUILD = "GuildRegistrar.Keyword.FormGuild";
+        private const string INTERACT_KEY_CONSULT_REGISTER = "GuildRegistrar.Keyword.ConsultRegister";
+        private const string INTERACT_KEY_PREVIOUS_PAGE = "GuildRegistrar.List.PreviousPage";
+        private const string INTERACT_KEY_NEXT_PAGE = "GuildRegistrar.List.NextPage";
+
+        private void SayTo(GamePlayer player, string message)
         {
-            string k = T(p, "GuildRegistrar.Keyword.FormGuild");
-            return (string.IsNullOrWhiteSpace(k) || k.StartsWith("GuildRegistrar.")) ? "form a guild" : k;
+            player?.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
-        private static string KeywordConsultRegister(GamePlayer p)
+        private void SayTo(GamePlayer player, Task<string> message)
         {
-            string k = T(p, "GuildRegistrar.Keyword.ConsultRegister");
-            return (string.IsNullOrWhiteSpace(k) || k.StartsWith("GuildRegistrar.")) ? "consult the guild register" : k;
+            player?.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
-        private void SayTo(GamePlayer player, string msg)
+        private void SayTo(GamePlayer player, string[] messages)
         {
-            player?.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            SayTo(player, string.Join('\n', messages));
+        }
+
+        private void SayTo(GamePlayer player, Task<string>[] messages)
+        {
+            Task.Run(async () =>
+            {
+                SayTo(player, await Task.WhenAll(messages));
+            });
         }
 
         public override bool Interact(GamePlayer player)
@@ -63,21 +71,26 @@ namespace DOL.GS
             if (!base.Interact(player))
                 return false;
 
-            string formKw = KeywordFormGuild(player);
-
-            if (Properties.GUILD_REQUIRE_REGISTER)
+            Task.Run(async () =>
             {
-                string consultKw = KeywordConsultRegister(player);
+                var cache = EnsurePlayerCache(player);
+                var taskForm = cache.TranslateResponseKey(INTERACT_KEY_FORM_GUILD);
+                if (Properties.GUILD_REQUIRE_REGISTER)
+                {
+                    var taskConsult = cache.TranslateResponseKey(INTERACT_KEY_CONSULT_REGISTER);
 
-                SayTo(player,
-                    T(player, "GuildRegistrar.Interact.RegisterMode.Line1") + "\n" +
-                    T(player, "GuildRegistrar.Interact.RegisterMode.Line2", formKw) + "\n\n" +
-                    T(player, "GuildRegistrar.Interact.RegisterMode.Line3", consultKw));
-            }
-            else
-            {
-                SayTo(player, T(player, "GuildRegistrar.Interact.NormalMode", formKw));
-            }
+                    SayTo(player, [
+                            LanguageMgr.Translate(player, "GuildRegistrar.Interact.RegisterMode.Line1"),
+                            LanguageMgr.Translate(player, "GuildRegistrar.Interact.RegisterMode.Line2", await taskForm),
+                            Task.FromResult(string.Empty),
+                            LanguageMgr.Translate(player, "GuildRegistrar.Interact.RegisterMode.Line3", await taskConsult)
+                    ]);
+                }
+                else
+                {
+                    SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Interact.NormalMode", await taskForm));
+                }
+            });
 
             return true;
         }
@@ -89,48 +102,52 @@ namespace DOL.GS
 
             if (source is not GamePlayer player)
                 return true;
+            
+            var cache = GetPlayerCache(player);
+            if (cache is null) // Cache gone or first interaction somehow
+                return Interact(player);
 
-            text = (text ?? string.Empty).Trim();
-
+            var keyword = cache.GetResponseKey(text);
+            switch (keyword)
+            {
+                case INTERACT_KEY_CONSULT_REGISTER when Properties.GUILD_REQUIRE_REGISTER:
+                    SendGuildRegisterList(cache);
+                    return true;
+                
+                case INTERACT_KEY_FORM_GUILD:
+                    if (Properties.GUILD_REQUIRE_REGISTER)
+                    {
+                        // Register mode instructions
+                        var taskConsult = cache.TranslateResponseKey(INTERACT_KEY_CONSULT_REGISTER);
+                        SayTo(player, [
+                            LanguageMgr.Translate(player, "GuildRegistrar.Whisper.Form.Register.Line1"),
+                            LanguageMgr.Translate(player, "GuildRegistrar.Whisper.Form.Register.Line2"),
+                            Task.FromResult(string.Empty),
+                            LanguageMgr.Translate(player, "GuildRegistrar.Whisper.Form.Register.Line3", taskConsult)
+                        ]);
+                    }
+                    else
+                    {
+                        // Normal mode instructions
+                        SayTo(player, [
+                            LanguageMgr.Translate(player, "GuildRegistrar.Whisper.Form.Normal.Line1", Properties.GUILD_NUM),
+                            LanguageMgr.Translate(player, "GuildRegistrar.Whisper.Form.Normal.Line2")
+                        ]);
+                    }
+                    return true;
+            }
+            
             // Click on a register title in the list -> show FULL TEXT (Fix #4)
             if (Properties.GUILD_REQUIRE_REGISTER)
             {
                 var regClicked = GameServer.Database.SelectObject<DBBook>(b =>
-                    b.Title == text && b.Author == GUILD_REGISTER_AUTHOR);
+                    b.Title == text && b.IsGuildRegistry);
 
                 if (regClicked != null)
                 {
-                    // Full read, no preview, no votes, no price
-                    BooksMgr.ReadBook(player, regClicked);
+                    ShowRegistry(cache, regClicked);
                     return true;
                 }
-            }
-
-            if (Properties.GUILD_REQUIRE_REGISTER && Eq(text, KeywordConsultRegister(player)))
-            {
-                SendGuildRegisterList(player);
-                return true;
-            }
-
-            if (Eq(text, KeywordFormGuild(player)))
-            {
-                if (!Properties.GUILD_REQUIRE_REGISTER)
-                {
-                    // Normal mode instructions
-                    SayTo(player,
-                        T(player, "GuildRegistrar.Whisper.Form.Normal.Line1", Properties.GUILD_NUM) + "\n" +
-                        T(player, "GuildRegistrar.Whisper.Form.Normal.Line2"));
-                }
-                else
-                {
-                    // Register mode instructions
-                    string consultKw = KeywordConsultRegister(player);
-                    SayTo(player,
-                        T(player, "GuildRegistrar.Whisper.Form.Register.Line1") + "\n" +
-                        T(player, "GuildRegistrar.Whisper.Form.Register.Line2") + "\n\n" +
-                        T(player, "GuildRegistrar.Whisper.Form.Register.Line3", consultKw));
-                }
-                return true;
             }
 
             return true;
@@ -143,35 +160,35 @@ namespace DOL.GS
 
             if (!Properties.GUILD_REQUIRE_REGISTER)
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NotRequired"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NotRequired"));
                 return true;
             }
 
             long bookId = item.MaxCondition;
             if (bookId <= 0)
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NotBook"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NotBook"));
                 return true;
             }
 
             DBBook book = GameServer.Database.FindObjectByKey<DBBook>(bookId);
             if (book == null)
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NoLedger"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NoLedger"));
                 return true;
             }
 
             // Must be a guild registry
             if (!book.IsGuildRegistry)
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NotRegister"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NotRegister"));
                 return true;
             }
 
             // Must be stamped/legalized
             if (!IsBookStamped(book))
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NotStamped"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NotStamped"));
                 return true;
             }
 
@@ -181,13 +198,13 @@ namespace DOL.GS
                 guildName.Length > Guild.MAX_CREATE_NAME_LENGTH ||
                 !Commands.GuildCommandHandler.IsValidGuildName(guildName))
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.InvalidName"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.InvalidName"));
                 return true;
             }
 
             if (GuildMgr.DoesGuildExist(guildName))
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NameTaken"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NameTaken"));
                 return true;
             }
 
@@ -196,7 +213,7 @@ namespace DOL.GS
 
             if (string.IsNullOrWhiteSpace(founders.leader) || founders.members.Count != required - 1)
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.IncompleteList"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.IncompleteList"));
                 return true;
             }
 
@@ -208,7 +225,7 @@ namespace DOL.GS
             // Any founder can present it (leader OR member)
             if (!founderNames.Any(n => n.Equals(player.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                SayTo(player, T(player, "GuildRegistrar.Receive.NotFounder"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Receive.NotFounder"));
                 return true;
             }
 
@@ -220,13 +237,13 @@ namespace DOL.GS
                 var ch = BookUtils.GetCharacter(fn);
                 if (ch == null)
                 {
-                    SayTo(player, T(player, "GuildRegistrar.Validate.FounderNotFound", fn));
+                    SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Validate.FounderNotFound", fn));
                     return true;
                 }
 
                 if (!BookUtils.IsGuildless(ch))
                 {
-                    SayTo(player, T(player, "GuildRegistrar.Validate.FounderInGuild", fn));
+                    SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Validate.FounderInGuild", fn));
                     return true;
                 }
 
@@ -235,14 +252,14 @@ namespace DOL.GS
 
             if (!BookUtils.AccountsAreUnique(accounts))
             {
-                SayTo(player, T(player, "GuildRegistrar.Validate.SameAccount"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Validate.SameAccount"));
                 return true;
             }
 
             Guild newGuild = GuildMgr.CreateGuild(player.Realm, guildName, player);
             if (newGuild == null)
             {
-                SayTo(player, T(player, "GuildRegistrar.Error.CreateFailed"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Error.CreateFailed"));
                 return true;
             }
 
@@ -257,7 +274,7 @@ namespace DOL.GS
             if (!player.Inventory.RemoveItem(item))
             {
                 GuildMgr.DeleteGuild(newGuild);
-                SayTo(player, T(player, "GuildRegistrar.Error.TakeItemFailed"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Error.TakeItemFailed"));
                 return true;
             }
 
@@ -269,11 +286,11 @@ namespace DOL.GS
             }
             catch
             {
-                SayTo(player, T(player, "GuildRegistrar.Error.BookUpdateFailed"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Error.BookUpdateFailed"));
             }
 
             RefreshGuildAndMembersUI(newGuild);
-            SayTo(player, T(player, "GuildRegistrar.Success", guildName));
+            SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Success", guildName));
             return true;
         }
 
@@ -359,37 +376,67 @@ namespace DOL.GS
             catch { }
         }
 
-        private void SendGuildRegisterList(GamePlayer player)
+        private void SendGuildRegisterList(PlayerCache cache)
         {
+            var player = cache.Player;
             var registers = GameServer.Database
-                .SelectObjects<DBBook>(b => b.Author == GUILD_REGISTER_AUTHOR)
+                .SelectObjects<DBBook>(b => b.IsGuildRegistry)
                 .OrderBy(b => b.Title)
+                .Select(b => new PlayerCache.BookListEntry(b))
                 .ToList();
 
+            cache.BookList = registers;
             if (registers.Count == 0)
             {
-                SayTo(player, T(player, "GuildRegistrar.List.None"));
+                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.List.None"));
                 return;
             }
 
-            SayTo(player, T(player, "GuildRegistrar.List.Count", registers.Count));
-
+            Task.Run(async () =>
+            {
+                var count = await LanguageMgr.Translate(player, "GuildRegistrar.List.Count", registers.Count);
+                SayTo(player, count);
+                await SendGuildRegisterPage(cache, 0);
+            });
+        }
+        private async Task SendGuildRegisterPage(PlayerCache cache, int page)
+        {
             var sb = new StringBuilder(2048);
+            var books = cache.GetBooksForPage(page).ToList();
+            if (!books.Any())
+                return;
 
-            foreach (var b in registers)
+            var totalPages = Math.Max(1, cache.TotalListPages);
+            page = Math.Clamp(0, page, totalPages - 1);
+            var player = cache.Player;
+            var taskStamped = LanguageMgr.Translate(player, "GuildRegistrar.List.StampedBy");
+            var taskPage = LanguageMgr.Translate(player, "GuildRegistrar.List.CurrentPage", page + 1, totalPages);
+            Task<string>?[] navigationTasks = [ taskPage, null, null ];
+            if (page > 0)
+            {
+                navigationTasks[1] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_PREVIOUS_PAGE));
+            }
+
+            if (page + 1 < cache.TotalListPages)
+            {
+                navigationTasks[2] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
+            }
+
+            cache.CurrentListPage = page;
+            foreach (var b in cache.GetBooksForPage(page).ToList())
             {
                 // Clickable title
                 sb.Append("\n[")
-                  .Append(b.Title)
-                  .Append("]");
+                    .Append(b.Title) // No translation, this is guild name
+                    .Append("]");
 
                 // Optional metadata
-                if (!string.IsNullOrWhiteSpace(b.StampBy) || b.StampDate != DateTime.MinValue)
+                if (!string.IsNullOrWhiteSpace(b.StampedBy) || b.StampDate != DateTime.MinValue)
                 {
                     sb.Append(" - ")
-                      .Append(T(player, "GuildRegistrar.List.StampedBy"))
-                      .Append(" ")
-                      .Append(string.IsNullOrWhiteSpace(b.StampBy) ? "?" : b.StampBy);
+                        .Append(await taskStamped)
+                        .Append(" ")
+                        .Append(string.IsNullOrWhiteSpace(b.StampedBy) ? "?" : b.StampedBy);
 
                     if (b.StampDate != DateTime.MinValue)
                         sb.Append(" - ").Append(b.StampDate.ToString("yyyy-MM-dd HH:mm"));
@@ -404,6 +451,14 @@ namespace DOL.GS
 
             if (sb.Length > 0)
                 player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+
+            string navText = string.Join(' ', await Task.WhenAll(navigationTasks.Where(t => t != null).Cast<Task<string>>()));
+            player.Out.SendMessage(navText, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+        }
+
+        private void ShowRegistry(PlayerCache cache, DBBook registry)
+        {
+            BooksMgr.ReadBook(cache.Player, registry);
         }
     }
 }

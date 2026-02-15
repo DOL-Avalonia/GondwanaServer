@@ -17,13 +17,14 @@
  *
  */
 
+using DOL.GS;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using DOL.Language;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
@@ -155,5 +156,21 @@ namespace DOL.GS
         public static void SendSystem(GameClient target, string message) => target?.Out?.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
         public static void SendImportant(GameClient target, string message) => target?.Out?.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         public static void SendScreenCenter(GameClient target, string message) => target?.Out?.SendMessage(message, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+
+        public static string ToResponse(string task)
+        {
+            return '[' + task + ']';
+        }
+
+        public static async Task<string> ToResponse(Task<string> task)
+        {
+            return ToResponse(await task);
+        }
+
+        private static bool ResponseEquals(string? a, string? b)
+            => a != null && b != null && string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+
+        private static bool ResponseStartsWith(string? a, string? b)
+            => a != null && b != null && a.StartsWith(b);
     }
 }

@@ -81,7 +81,7 @@ namespace DOL.Database
 
         [DataElement(AllowDbNull = true)]
         public DateTime StampDate { get; set; }
-        [DataElement(AllowDbNull = false)]
+        [DataElement(AllowDbNull = false, Varchar = 2, DefaultDBValue = "")]
         public string Language
         {
             get;

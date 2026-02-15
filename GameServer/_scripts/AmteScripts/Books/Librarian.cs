@@ -21,172 +21,13 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace DOL.GS.Scripts
 {
-    public class Librarian : AmteMob
+    public class Librarian : AbstractLibrarian
     {
         private int MinWords => Properties.BOOK_MIN_WORDS;
         private int BaseCopperAtMin => Properties.BOOK_BASE_PRICE_COPPER_AT_MIN_WORDS;
         private int VoteStepPercent => Properties.BOOK_RATING_POSITIVE_BONUS_PERCENT;
         private int MaxMultiplierPercent => Properties.BOOK_MAX_RATING_MULTIPLIER_PERCENT;
         private const int PREVIEW_WORDS_COUNT = 15;
-        private const int BOOKS_PER_PAGE = 7;
-        private const string GUILD_REGISTER_AUTHOR = "Guild Register";
-
-        private static bool Eq(string? a, string? b)
-            => a != null && b != null && string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
-
-        private record class PlayerCache(GamePlayer Player)
-        {
-            public record class BookListEntry
-            {
-                public BookListEntry(DBBook book)
-                {
-                    Title = book.Title;
-                    Author = book.Author;
-                    Price = book.CurrentPriceCopper;
-                    Upvotes = book.UpVotes;
-                    Downvotes = book.DownVotes;
-                }
-
-                public string Title { get; } = string.Empty;
-                public string Author { get; } = string.Empty;
-                public string Language { get; } = string.Empty;
-                public int Price { get; } = 0;
-                public int Upvotes { get; } = 0;
-                public int Downvotes { get; } = 0;
-                public float Rating => Upvotes + Downvotes == 0 ? 0 : (float)Upvotes / (Upvotes + Downvotes);
-            }
-
-            public DBBook? CurrentBook { get; set; }
-
-            private ConcurrentDictionary<string, string> ResponseToTranslationKey { get; } = new();
-            private ConcurrentDictionary<string, string> TranslationKeyToPrefix { get; } = new();
-            private ConcurrentDictionary<string, string> ResponseToBookTitle { get; } = new();
-            public long LastAccessed { get; set; } = long.MinValue;
-            public List<BookListEntry>? BookList { get; set; } = null;
-            public int CurrentListPage { get; set; }
-            public int TotalListPages => BookList == null ? 0 : (int)Math.Ceiling((float)BookList.Count / BOOKS_PER_PAGE);
-            
-            public IEnumerable<BookListEntry> GetBooksForPage(int page)
-            {
-                if (BookList == null)
-                    return Enumerable.Empty<BookListEntry>();
-
-                return BookList.Skip(page * BOOKS_PER_PAGE).Take(BOOKS_PER_PAGE);
-            }
-
-            public async Task<string> TranslateResponseKey(string baseKey)
-            {
-                var translated = await LanguageMgr.Translate(Player, baseKey);
-                if (string.IsNullOrEmpty(translated))
-                    return string.Empty;
-
-                ResponseToTranslationKey[translated.ToLowerInvariant()] = baseKey;
-                return translated;
-            }
-
-            public async Task<string> TranslatePrefixKey(string baseKey)
-            {
-                var translated = await LanguageMgr.Translate(Player, baseKey);
-                if (string.IsNullOrEmpty(translated))
-                    return string.Empty;
-
-                TranslationKeyToPrefix[baseKey] = translated;
-                return translated;
-            }
-
-            public async Task<string> TranslateBookTitle(DBBook book)
-            {
-                var lang = book.Language;
-                var title = book.Title;
-                if (string.IsNullOrEmpty(lang))
-                    lang = Properties.SERV_LANGUAGE;
-
-                var translated = await AutoTranslateManager.Translate(lang, Player, title);
-                if (string.IsNullOrEmpty(translated))
-                    return string.Empty;
-
-                ResponseToBookTitle[translated] = title;
-                return translated;
-            }
-
-            public async Task<string> TranslateBookTitle(BookListEntry book)
-            {
-                var lang = book.Language;
-                var title = book.Title;
-                if (string.IsNullOrEmpty(lang))
-                    lang = Properties.SERV_LANGUAGE;
-
-                var translated = await AutoTranslateManager.Translate(lang, Player, title);
-                if (string.IsNullOrEmpty(translated))
-                    return string.Empty;
-
-                ResponseToBookTitle[translated] = title;
-                return translated;
-            }
-
-            public async Task<string> TranslateBookText(DBBook book)
-            {
-                var lang = book.Language;
-                var text = book.Text;
-                if (string.IsNullOrEmpty(lang))
-                    lang = Properties.SERV_LANGUAGE;
-
-                var translated = await AutoTranslateManager.Translate(lang, Player, text);
-                if (string.IsNullOrEmpty(translated))
-                    return string.Empty;
-
-                return translated;
-            }
-
-            public string? GetResponseKey(string translation, string? orElse = null)
-            {
-                return ResponseToTranslationKey.TryGetValue(translation.ToLowerInvariant(), out string? value) ? value : orElse;
-            }
-
-            public string? GetResponsePrefix(string baseKey, string? orElse = null)
-            {
-                if (TranslationKeyToPrefix.TryGetValue(baseKey, out string? translated))
-                {
-                    return translated;
-                }
-                return orElse;
-            }
-
-            public string? GetBookTitleID(string translatedTitle, string? prefix = null, string? orElse = null)
-            {
-                if (prefix is not null)
-                {
-                    translatedTitle = translatedTitle.Substring(prefix.Length).Trim();
-                }
-                if (string.IsNullOrEmpty(translatedTitle))
-                {
-                    return CurrentBook?.Title ?? orElse;
-                }
-
-                return ResponseToBookTitle.TryGetValue(translatedTitle, out string? value) ? value : orElse;
-            }
-
-            public DBBook? GetBook(string translatedtitle, string? prefix = null, bool onlyInLibrary = true)
-            {
-                string? originalTitle = GetBookTitleID(translatedtitle, prefix);
-                if (originalTitle is null)
-                    return null;
-                
-                DBBook? bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.IsInLibrary == onlyInLibrary && b.Title == originalTitle);
-                return bookToRead;
-            }
-        }
-
-        /// <summary>
-        /// How long to keep player cache entries before cleaning them up
-        /// </summary>
-        private const long CACHE_KEEPALIVE_MILLISECONDS = 30 * 60 * 1000;
-        /// <summary>
-        /// How often to check for stale cache entries
-        /// </summary>
-        private const int CACHE_CHECK_INTERVAL_MILLISECONDS = 30 * 1000;
-        private readonly ConcurrentDictionary<string, PlayerCache> _playerCaches = new();
-        private RegionTimer? _cleanupTimer;
 
         private const string INTERACT_KEY_CONSULT_BOOKS = "Librarian.Menu.ConsultBooks";
         private const string INTERACT_KEY_CONSULT_GUILDS = "Librarian.Menu.ConsultGuildRegister";
@@ -199,58 +40,6 @@ namespace DOL.GS.Scripts
         private const string INTERACT_KEY_PREFIX_BUY = "Librarian.Prefix.Buy";
         private const string INTERACT_KEY_PREFIX_READ = "Librarian.Prefix.Read";
         private const string INTERACT_KEY_PREFIX_LEGACYREAD = "Librarian.Prefix.LegacyBook";
-
-        private static async Task<string> ToResponse(Task<string> task)
-        {
-            return '[' + await task + ']';
-        }
-        
-        private PlayerCache EnsurePlayerCache(GamePlayer player)
-        {
-            var cache = _playerCaches.GetOrAdd(player.InternalID + ':' + player.Language, _ => new PlayerCache(player));
-            cache.LastAccessed = Environment.TickCount64;
-            return cache;
-        }
-        
-        private PlayerCache? GetPlayerCache(GamePlayer player)
-        {
-            if (!_playerCaches.TryGetValue(player.InternalID + ':' + player.Language, out PlayerCache cache))
-            {
-                return null;
-            }
-
-            cache.LastAccessed = Environment.TickCount64;
-            return cache;
-        }
-
-        /// <inheritdoc />
-        public override bool AddToWorld()
-        {
-            if (!base.AddToWorld())
-                return false;
-
-            _cleanupTimer = new RegionTimer(this, CleanupTimer);
-            _cleanupTimer.Start(CACHE_CHECK_INTERVAL_MILLISECONDS);
-            return true;
-        }
-
-        /// <inheritdoc />
-        public override bool RemoveFromWorld()
-        {
-            if (!base.RemoveFromWorld())
-                return false;
-
-            _cleanupTimer.Stop();
-            return true;
-        }
-
-        private int CleanupTimer(RegionTimer callingTimer)
-        {
-            var now = Environment.TickCount64;
-            var toRemove = _playerCaches.Where(kv => kv.Value.LastAccessed + CACHE_KEEPALIVE_MILLISECONDS < now).Select(kv => kv.Key).ToList();
-            toRemove.ForEach(key => _playerCaches.TryRemove(key, out _));
-            return CACHE_CHECK_INTERVAL_MILLISECONDS;
-        }
 
         public override bool Interact(GamePlayer player)
         {
@@ -340,11 +129,11 @@ namespace DOL.GS.Scripts
                         return true;
                     
                     case INTERACT_KEY_PREVIOUS_PAGE:
-                        SendBooklistPage(cache, cache.CurrentListPage - 1);
+                        SendBookListPage(cache, cache.CurrentListPage - 1);
                         return true;
                     
                     case INTERACT_KEY_NEXT_PAGE:
-                        SendBooklistPage(cache, cache.CurrentListPage + 1);
+                        SendBookListPage(cache, cache.CurrentListPage + 1);
                         return true;
                 }
             }
@@ -473,14 +262,11 @@ namespace DOL.GS.Scripts
             
             if (cache.BookList.Any())
             {
-                await SendBooklistPage(cache, 0);
-            }
-            else
-            {
+                await SendBookListPage(cache, 0);
             }
         }
 
-        private async Task SendBooklistPage(PlayerCache cache, int page)
+        private async Task SendBookListPage(PlayerCache cache, int page)
         {
             var sb = new StringBuilder(2048);
             var books = cache.GetBooksForPage(page).ToList();
@@ -496,12 +282,12 @@ namespace DOL.GS.Scripts
             Task<string>?[] navigationTasks = [ pageTask, null, null ];
             if (page > 0)
             {
-                navigationTasks[1] = ToResponse(cache.TranslateResponseKey(INTERACT_KEY_PREVIOUS_PAGE));
+                navigationTasks[1] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_PREVIOUS_PAGE));
             }
 
             if (page + 1 < cache.TotalListPages)
             {
-                navigationTasks[2] = ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
+                navigationTasks[2] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
             }
 
             var upvotes = await upvoteTask;
@@ -534,7 +320,8 @@ namespace DOL.GS.Scripts
                 }
             }
 
-            player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            if (sb.Length > 0)
+                player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
             string navText = string.Join(' ', await Task.WhenAll(navigationTasks.Where(t => t != null).Cast<Task<string>>()));
             player.Out.SendMessage(navText, eChatType.CT_System, eChatLoc.CL_PopupWindow);

@@ -72,6 +72,24 @@ namespace DOL.Language
             return lang.ToUpperInvariant();
         }
 
+        private static async Task<object[]> UnrollArgs(object[] args)
+        {
+            return await Task.WhenAll(args.Select(async s =>
+            {
+                if (s is not Task asTask)
+                    return s;
+
+                var type = s.GetType();
+                if (!(type.IsGenericType && type.GetGenericTypeDefinition() != typeof(Task<>)))
+                {
+                    return s;
+                }
+
+                await asTask.ConfigureAwait(false);
+                return type.GetProperty(nameof(Task<object>.Result))!.GetValue(asTask);
+            }));
+        }
+
         public static void LoadTestDouble(LanguageMgr testDouble) { soleInstance = testDouble; }
 
         protected virtual bool TryGetTranslationImpl(out string translation, ref string language, string translationId, ref object[] args)
@@ -704,7 +722,13 @@ namespace DOL.Language
             // Unless this language is already the server language
             if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
             {
-                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, translateFormatted ? args : Array.Empty<object>()))
+                object[] staticArgs = Array.Empty<object>();
+                if (translateFormatted)
+                {
+                    staticArgs = await UnrollArgs(args);
+                }
+
+                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, staticArgs))
                 {
                     if (autoTranslate && !string.IsNullOrEmpty(translation))
                     {
@@ -718,7 +742,7 @@ namespace DOL.Language
                         {
                             try
                             {
-                                translation = string.Format(translation, args);
+                                translation = string.Format(translation, UnrollArgs(args));
                             }
                             catch (Exception ex)
                             {
