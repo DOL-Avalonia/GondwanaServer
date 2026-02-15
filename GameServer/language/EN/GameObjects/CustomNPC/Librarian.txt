@@ -6,10 +6,10 @@ Librarian.Menu.AddBook:					Add a book
 Librarian.Menu.CollectRoyalties:		Collect royalties
 Librarian.Menu.ConsultGuildRegister:	Consult the guild register
 
-Librarian.Prefix.VotePlus:				Vote + 
-Librarian.Prefix.VoteMinus:				Vote - 
-Librarian.Prefix.Buy:					Buy 
-Librarian.Prefix.Read:					Read 
+Librarian.Prefix.VotePlus:				Vote +
+Librarian.Prefix.VoteMinus:				Vote -
+Librarian.Prefix.Buy:					Buy
+Librarian.Prefix.Read:					Read
 Librarian.Prefix.LegacyBook:			Book
 
 Librarian.ResponseText01:				Here are the books currently on our shelves:
@@ -22,7 +22,7 @@ Librarian.ResponseText06:				What is this supposed to be? I only accept book scr
 Librarian.Book.NotFound:				I can't find that book in the library.
 Librarian.Read.AuthorOnly:				Only the author may read a book here freely.
 
-Librarian.BookList.VotesPrefixPositive:	Positive: 
+Librarian.BookList.VotesPrefixPositive:	Positive:
 Librarian.BookList.VotesPrefixNegative:	Negative:
 Librarian.BookList.CurrentPage:			Page {0} / {1}
 Librarian.BookList.NextPage:			Next
@@ -32,11 +32,12 @@ Librarian.GuildRegister.None:			I'm sorry, there are no guild registers to consu
 Librarian.GuildRegister.Count:			Guild registers available: {0}
 Librarian.GuildRegister.StampedBy:		Stamped by
 
-Librarian.Preview.Author:				Author: 
-Librarian.Preview.Price:				Price: 
-Librarian.Preview.Votes:				Votes: Positive: 
-Librarian.Preview.VotesSeparator:		/ Negative: 
-Librarian.Preview.PreviewLabel:			Preview: 
+Librarian.Preview.Author:				Author:
+Librarian.Preview.Price:				Price:
+Librarian.Preview.Votes:				Votes: Positive:
+Librarian.Preview.VotesSeparator:		/ Negative:
+Librarian.Preview.PreviewLabel:			Preview:
+Librarian.Preview.Language:				Original language: {0}
 
 Librarian.RoyalScroll.Dialog:			This book is written on 'Noble Parchment'. Most of the time, such parchments are meant for the Royal Treasury Clerk to legalize a guild register. Are you certain you wish to publish it here in the library?
 Librarian.RoyalScroll.Cancelled:		Very well. If you meant to legalize a guild, take that register to the Royal Treasury Clerk.

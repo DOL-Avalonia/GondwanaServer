@@ -503,7 +503,7 @@ namespace DOL.GS.Scripts
             {
                 navigationTasks[2] = ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
             }
-                
+
             var upvotes = await upvoteTask;
             var downvotes = await downvoteTask;
             cache.CurrentListPage = page;
@@ -591,11 +591,13 @@ namespace DOL.GS.Scripts
             var player = cache.Player;
             bool isAuthor = (book.PlayerID == player.InternalID);
             string price = Money.GetString(book.CurrentPriceCopper);
+            string language = string.IsNullOrEmpty(book.Language) ? Properties.SERV_LANGUAGE : book.Language;
             cache.CurrentBook = book;
 
             var sb = new StringBuilder(1024);
             var taskTitle = cache.TranslateBookTitle(book);
             var taskAuthor = LanguageMgr.Translate(player, "Librarian.Preview.Author");
+            var taskLanguage = player.AutoTranslateEnabled ? LanguageMgr.Translate(player, "Librarian.Preview.Language", language) : null;
             var taskPrice = LanguageMgr.Translate(player, "Librarian.Preview.Price");
             var taskVotes = LanguageMgr.Translate(player, "Librarian.Preview.Votes");
             var taskVoteSep = LanguageMgr.Translate(player, "Librarian.Preview.VotesSeparator");
@@ -609,11 +611,17 @@ namespace DOL.GS.Scripts
             string title = await taskTitle;
 
             sb.Append(title)
-              .Append("\n")
+              .Append('\n')
               .Append(await taskAuthor + " ").Append(book.Author)
-              .Append("\n")
-              .Append(await taskPrice + " ").Append(price)
-              .Append("\n")
+              .Append('\n');
+
+            if (taskLanguage is not null)
+            {
+                sb.Append(await taskLanguage).Append('\n');
+            }
+
+            sb.Append(await taskPrice + " ").Append(price)
+              .Append('\n')
               .Append(await taskVotes + " ").Append(book.UpVotes)
               .Append(await taskVoteSep + " ")
               .Append(book.DownVotes)

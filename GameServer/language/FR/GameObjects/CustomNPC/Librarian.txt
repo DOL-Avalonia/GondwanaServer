@@ -6,10 +6,10 @@ Librarian.Menu.AddBook:					Ajouter un livre
 Librarian.Menu.CollectRoyalties:		Récupérer les redevances
 Librarian.Menu.ConsultGuildRegister:	Voir le registre de guildes
 
-Librarian.Prefix.VotePlus:				Vote + 
-Librarian.Prefix.VoteMinus:				Vote - 
-Librarian.Prefix.Buy:					Acheter 
-Librarian.Prefix.Read:					Lire 
+Librarian.Prefix.VotePlus:				Vote +
+Librarian.Prefix.VoteMinus:				Vote -
+Librarian.Prefix.Buy:					Acheter
+Librarian.Prefix.Read:					Lire
 Librarian.Prefix.LegacyBook:			Livre
 
 Librarian.ResponseText01:				Voici les ouvrages actuellement disponibles sur nos étagères :
@@ -32,11 +32,12 @@ Librarian.GuildRegister.None:			Désolé… je n'ai aucun registre de guilde à 
 Librarian.GuildRegister.Count:			Registres de guildes disponibles : {0}
 Librarian.GuildRegister.StampedBy:		Cacheté par
 
-Librarian.Preview.Author:				Auteur : 
-Librarian.Preview.Price:				Prix : 
-Librarian.Preview.Votes:				Votes : Positifs : 
-Librarian.Preview.VotesSeparator:		/ Négatifs : 
-Librarian.Preview.PreviewLabel:			Aperçu : 
+Librarian.Preview.Author:				Auteur :
+Librarian.Preview.Price:				Prix :
+Librarian.Preview.Votes:				Votes : Positifs :
+Librarian.Preview.VotesSeparator:		/ Négatifs :
+Librarian.Preview.PreviewLabel:			Aperçu :
+Librarian.Preview.Language:				Langage d'origine: {0}
 
 Librarian.RoyalScroll.Dialog:			Ce livre est écrit sur du 'Parchemin Noble'. La plupart du temps, ce type de parchemin est destiné au Commis du Trésor Royal pour légaliser un registre de guilde. Êtes-vous certain de vouloir le publier ici, à la bibliothèque ?
 Librarian.RoyalScroll.Cancelled:		Très bien. Si votre intention est de créer une guilde, apportez ce registre au Commis du Trésor Royal.
