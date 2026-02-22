@@ -56,6 +56,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using static DOL.Database.ArtifactBonus;
 using static DOL.GS.ScriptMgr;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DOL.GS
 {
@@ -4054,30 +4055,24 @@ namespace DOL.GS
         /// </summary>
         /// <param name="target"></param>
         /// <param name="message"></param>
-        public virtual void SayTo(GamePlayer target, string message, bool announce = true, bool translate = true)
+        public virtual async Task SayTo(GamePlayer target, string message, bool announce = true, bool translate = false)
         {
-            SayTo(target, eChatLoc.CL_PopupWindow, message, announce, translate);
+            await SayTo(target, eChatLoc.CL_PopupWindow, message, announce, translate);
         }
 
-        public void SayTo(GamePlayer target, Task<string> message, bool announce = true, bool translate = true)
+        public async Task SayTo(GamePlayer target, Task<string> message, bool announce = true, bool translate = false)
         {
-            Task.Run(async () =>
-            {
-                SayTo(target, eChatLoc.CL_PopupWindow, await message, announce, translate);
-            });
+            await SayTo(target, eChatLoc.CL_PopupWindow, await message, announce, translate);
         }
 
-        public void SayTo(GamePlayer player, string[] messages, bool announce = true, bool translate = true)
+        public async Task SayTo(GamePlayer player, string[] messages, bool announce = true, bool translate = false)
         {
-            SayTo(player, eChatLoc.CL_PopupWindow, string.Join('\n', messages), announce, translate);
+            await SayTo(player, eChatLoc.CL_PopupWindow, string.Join('\n', messages), announce, translate);
         }
 
-        public void SayTo(GamePlayer player, Task<string>[] messages, bool announce = true, bool translate = true)
+        public async Task SayTo(GamePlayer player, Task<string>[] messages, bool announce = true, bool translate = false)
         {
-            Task.Run(async () =>
-            {
-                SayTo(player, await Task.WhenAll(messages), announce, translate);
-            });
+            await SayTo(player, await Task.WhenAll(messages), announce, translate);
         }
 
         /// <summary>
@@ -4086,7 +4081,7 @@ namespace DOL.GS
         /// <param name="target"></param>
         /// <param name="loc">chat location of the message</param>
         /// <param name="message"></param>
-        public virtual void SayTo(GamePlayer target, eChatLoc loc, string message, bool announce = true, bool translate = true)
+        public virtual async Task SayTo(GamePlayer target, eChatLoc loc, string message, bool announce = true, bool translate = true)
         {
             if (target == null)
                 return;
@@ -4103,30 +4098,31 @@ namespace DOL.GS
                 _ => eChatType.CT_System
             };
             TurnTo(target);
-            Task.Run(async () =>
-            {
-                if (translate)
-                    message = await AutoTranslateManager.Translate(target, message);
-
-                if (loc is not eChatLoc.CL_PopupWindow)
-                {
-                    message = await LanguageMgr.Translate(target, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), message);
-                }
-                target.Out.SendMessage(message, type, loc);
-            });
 
             if (announce)
             {
-                var keyTranslator = new KeyTranslator("GameNPC.SayTo.SpeaksTo");
-                foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE).Cast<GamePlayer>().Where(p => p != target))
+                Task.Run(async () =>
                 {
-                    Task.Run(async () =>
+                    var keyTranslator = new KeyTranslator("GameNPC.SayTo.SpeaksTo");
+                    foreach (var player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE).Cast<GamePlayer>().Where(p => p != target))
                     {
                         var resultText = await keyTranslator.Translate(player, player.GetPersonalizedName(this), player.GetPersonalizedName(target));
                         player.MessageFromArea(this, resultText, eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                    });
-                }
+                    }
+                });
             }
+            
+            if (translate)
+            {
+                message = await AutoTranslateManager.Translate(target, message);
+            }
+
+            if (loc is not eChatLoc.CL_PopupWindow)
+            {
+                message = await LanguageMgr.Translate(target, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), message);
+            }
+
+            target.Out.SendMessage(message, type, loc);
         }
         #endregion
 

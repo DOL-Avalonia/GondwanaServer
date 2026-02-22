@@ -411,12 +411,12 @@ namespace DOL.GS
                     if (another != null)
                         cache.AddResponseKey(INTERACT_KEY_STONE, another);
 
-                    SayTo(player, [
+                    await SayTo(player, [
                         await line1Task,
-                        await line2Task
+                        await line2Task,
                     ]);
 
-                    SayTo(player, [
+                    await SayTo(player, [
                         checking,
                         stoneLine
                     ]);

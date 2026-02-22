@@ -747,17 +747,17 @@ namespace DOL.Language
                         {
                             translation = str;
                         }
+                    }
 
-                        if (!translateFormatted && args is { Length: > 0 } && !string.IsNullOrEmpty(translation))
+                    if (!translateFormatted && args is { Length: > 0 } && !string.IsNullOrEmpty(translation))
+                    {
+                        try
                         {
-                            try
-                            {
-                                translation = string.Format(translation, UnrollArgs(args));
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error($"Failed to translate {translationId} to {language} with args [{string.Join(", ", args)}]: {ex}\n\tText: {translation}");
-                            }
+                            translation = string.Format(translation, await UnrollArgs(args));
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error($"Failed to translate {translationId} to {language} with args [{string.Join(", ", args)}]: {ex}\n\tText: {translation}");
                         }
                     }
                 }

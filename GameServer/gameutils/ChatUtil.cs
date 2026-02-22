@@ -213,7 +213,7 @@ namespace DOL.GS
             regex ??= BracketsRegex();
 
             List<PlaceholderMatch> originalResponses = new();
-            regex.Replace(originalText, match =>
+            originalText = regex.Replace(originalText, match =>
             {
                 string originalKey = match.Groups[1].Value.Trim();
                 string placeholder = extractor(originalKey);
