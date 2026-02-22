@@ -42,29 +42,6 @@ namespace DOL.GS
         private const string INTERACT_KEY_PREVIOUS_PAGE = "GuildRegistrar.List.PreviousPage";
         private const string INTERACT_KEY_NEXT_PAGE = "GuildRegistrar.List.NextPage";
 
-        private void SayTo(GamePlayer player, string message)
-        {
-            player?.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-        }
-
-        private void SayTo(GamePlayer player, Task<string> message)
-        {
-            player?.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-        }
-
-        private void SayTo(GamePlayer player, string[] messages)
-        {
-            SayTo(player, string.Join('\n', messages));
-        }
-
-        private void SayTo(GamePlayer player, Task<string>[] messages)
-        {
-            Task.Run(async () =>
-            {
-                SayTo(player, await Task.WhenAll(messages));
-            });
-        }
-
         public override bool Interact(GamePlayer player)
         {
             if (!base.Interact(player))

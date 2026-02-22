@@ -191,14 +191,6 @@ namespace DOL.GS
             }
         }
 
-        [GeneratedRegex(@"\[(.+?)\]")]
-        [return: NotNull]
-        public static partial Regex BracketsRegex();
-
-        [GeneratedRegex(@"\{(.+?)\}")]
-        [return: NotNull]
-        public static partial Regex BracesRegex();
-
         public static async Task<(string translatedText, IDictionary<string, string>? mappings)> TranslatePlaceholderText(GamePlayer player, string originalText, bool translatePlaceholders = true, Regex regex = null)
         {
             if (player == null || string.IsNullOrWhiteSpace(originalText))
@@ -213,34 +205,28 @@ namespace DOL.GS
             if (string.Equals(serverLang, playerLang, StringComparison.OrdinalIgnoreCase))
                 return (translatedText: originalText, null);
             
-            regex = regex ?? BracketsRegex();
+            regex = regex ?? ChatUtil.BracketsRegex();
 
             Dictionary<string, string>? keyMap = null;
-            if (translatePlaceholders)
-            {
-                keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            }
             int index = 0;
 
             // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
             const string placeholderPrefix = "<span translate=\"no\">";
             const string placeholderSuffix = "</span>";
 
-            List<KeyValuePair<string, string>> originalResponses = null;
-            
+            string toTranslate = originalText;
+            IList<ChatUtil.PlaceholderMatch> originalResponses = null;
             if (translatePlaceholders)
-                originalResponses = new List<KeyValuePair<string, string>>();
-            string toTranslate = regex.Replace(originalText, match =>
             {
-                string originalKey = match.Groups[1].Value.Trim();
-
-                // §§0§§, §§1§§, etc.
-                string placeholder = $"{placeholderPrefix}{index++}{placeholderSuffix}";
-
-                if (translatePlaceholders)
-                    originalResponses!.Add(new(placeholder, originalKey));
-                return placeholder;
-            });
+                originalResponses = ChatUtil.ReplaceKeys(ref toTranslate, (_) =>
+                {
+                    return $"{placeholderPrefix}{index++}{placeholderSuffix}";
+                });
+            }
+            else
+            {
+                originalResponses = ChatUtil.ExtractKeys(toTranslate);
+            }
             
             Task<string> translateText = AutoTranslateManager.Translate(serverLang, playerLang, toTranslate);
             Task<KeyValuePair<string, string>[]> translateResponses = null;
@@ -269,13 +255,21 @@ namespace DOL.GS
                 return (originalText, null);
 
             // 3) Replace placeholders with the final [translatedKey] texts
-            var translatedResponses = await translateResponses;
-            foreach (var (kv, i) in translatedResponses.Select((kv, i) => (kv, i)))
+            if (translatePlaceholders)
             {
-                var (placeholder, translated) = kv;
-                translatedFull = translatedFull.Replace(placeholder, '[' + translated + ']');
-                if (translatePlaceholders) // keyMap is not null
-                    keyMap![translated] = originalResponses[i].Value;
+                keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                var translatedResponses = await translateResponses;
+                foreach (var (kv, i) in translatedResponses.Select((kv, i) => (kv, i)))
+                {
+                    var (placeholder, translated) = kv;
+                    translatedFull = translatedFull.Replace(placeholder, '[' + translated + ']');
+                    if (translatePlaceholders) // keyMap is not null
+                        keyMap![translated] = originalResponses[i].OriginalKey;
+                }
+            }
+            else
+            {
+                keyMap = new Dictionary<string, string>(originalResponses.ToKeyValuePairs(), StringComparer.OrdinalIgnoreCase);
             }
             
             if (translatedFull.Contains(placeholderPrefix))

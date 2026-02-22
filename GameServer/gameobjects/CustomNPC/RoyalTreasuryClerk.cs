@@ -1,17 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+#nullable enable
+
 using DOL.Database;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
-using System.Text;
 using DOL.GS.ServerProperties;
 using DOL.Language;
+using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
-    public class RoyalTreasuryClerk : GameNPC
+    public class RoyalTreasuryClerk : AbstractLibrarian
     {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+
         private const string PERSONAL_RECALL_STONE_ID = "Personal_Bind_Recall_Stone";
         private const string WHISPER_CONTINUE = "continue";
 
@@ -31,24 +39,15 @@ namespace DOL.GS
         private const string TAG_STAMPED = "#GuildStamped";
         private const string TAG_LEADER_PREFIX = "#GuildLeader_";
 
-        private static string T(GamePlayer p, string key, params object[] args)
-            => LanguageMgr.GetTranslation(p.Client, key, args);
-
-        private static string GetGuildKeyword(GamePlayer player)
-        {
-            string kw = T(player, "RoyalTreasuryClerk.Keyword.GuildRegister");
-            // Fallback if translation is missing
-            if (string.IsNullOrWhiteSpace(kw) || kw.StartsWith("RoyalTreasuryClerk.", StringComparison.OrdinalIgnoreCase))
-                return "guild register";
-            return kw;
-        }
+        private const string INTERACT_KEY_REGISTER = "RoyalTreasuryClerk.Keyword.GuildRegister";
+        private const string INTERACT_KEY_STONE = "RoyalTreasuryClerk.Other";
 
         private static bool HasRecallStone(GamePlayer player)
         {
             return player.Inventory.CountItemTemplate(PERSONAL_RECALL_STONE_ID, eInventorySlot.Min_Inv, eInventorySlot.Max_Inv) > 0;
         }
 
-        private static bool IsRoyalScrollItem(InventoryItem item)
+        private static bool IsRoyalScrollItem(InventoryItem? item)
         {
             if (item == null)
                 return false;
@@ -65,29 +64,13 @@ namespace DOL.GS
             return false;
         }
 
-        /// <summary>
-        /// Keyword used in "GUILD_REQUIRE_REGISTER = true" mode for stone service.
-        /// </summary>
-        private static string GetStoneKeyword(GamePlayer player)
+        private static bool BookHasTag(DBBook? book, string tag)
         {
-            string kw = T(player, "RoyalTreasuryClerk.Other");
-            if (string.IsNullOrWhiteSpace(kw) || kw.StartsWith("RoyalTreasuryClerk.", StringComparison.OrdinalIgnoreCase))
-                kw = "another";
-            return kw;
+            if (string.IsNullOrEmpty(book?.Text)) return false;
+            return book.Text.Contains(tag, StringComparison.OrdinalIgnoreCase);
         }
 
-        private void SayTo(GamePlayer player, string msg)
-        {
-            player?.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-        }
-
-        private static bool BookHasTag(DBBook book, string tag)
-        {
-            if (book == null || string.IsNullOrEmpty(book.Text)) return false;
-            return book.Text.IndexOf(tag, StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-
-        private static void EnsureProcessingTag(DBBook book)
+        private static void EnsureProcessingTag(DBBook? book)
         {
             if (book == null) return;
             if (string.IsNullOrEmpty(book.Text)) book.Text = string.Empty;
@@ -98,7 +81,7 @@ namespace DOL.GS
             }
         }
 
-        private static void RemoveProcessingTag(DBBook book)
+        private static void RemoveProcessingTag(DBBook? book)
         {
             if (book == null || string.IsNullOrEmpty(book.Text)) return;
             // Remove whole lines that equal "#processing"
@@ -116,7 +99,7 @@ namespace DOL.GS
         /// <summary>
         /// Finds the register item in inventory that points to the given DBBook ID.
         /// </summary>
-        private InventoryItem FindInventoryItemForBook(GamePlayer player, long bookId)
+        private InventoryItem? FindInventoryItemForBook(GamePlayer? player, long bookId)
         {
             if (player == null || bookId <= 0) return null;
 
@@ -136,7 +119,7 @@ namespace DOL.GS
         /// Applies state directly to the *InventoryItem instance*,
         /// because existing inventory items do not automatically inherit template changes.
         /// </summary>
-        private void ApplyUniqueState(GamePlayer player, InventoryItem invItem, string statePrefix, string title, bool pickable, bool dropable, bool tradable)
+        private void ApplyUniqueState(GamePlayer? player, InventoryItem? invItem, string statePrefix, string title, bool pickable, bool dropable, bool tradable)
         {
             if (player == null || invItem == null)
                 return;
@@ -149,32 +132,27 @@ namespace DOL.GS
             invItem.IsTradable = tradable;
 
             GameServer.Database.SaveObject(invItem);
-            player.Out.SendInventoryItemsUpdate(new InventoryItem[] { invItem });
-            player.Out.SendInventorySlotsUpdate(new int[] { invItem.SlotPosition });
+            player.Out.SendInventoryItemsUpdate([invItem]);
+            player.Out.SendInventorySlotsUpdate([invItem.SlotPosition]);
         }
 
-        private bool ValidateInitialBook(GamePlayer player, InventoryItem item, DBBook book, out string failMsg)
+        private Task<string>? ValidateInitialBook(GamePlayer player, InventoryItem? item, DBBook? book)
         {
-            failMsg = string.Empty;
-
             if (item == null || book == null)
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.NotRegister");
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NotRegister");
             }
 
             // Parchment check
             if (!IsRoyalScrollItem(item))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.NotParchment");
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NotParchment");
             }
 
             // Ink check
             if (!string.Equals(book.InkId, "ink_royal", StringComparison.OrdinalIgnoreCase))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.NotInk");
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NotInk");
             }
 
             // Minimum words
@@ -182,28 +160,24 @@ namespace DOL.GS
             int wc = BookUtils.CountWords(book.Text);
             if (wc < minWords)
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.TooShort", minWords, wc);
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.TooShort", minWords, wc);
             }
 
             // Deep nonsense/spam check
             if (Properties.BOOK_ENABLE_PUBLISH_HEURISTICS && BookUtils.LooksLikeGibberish(book.Text))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.Gibberish");
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.Gibberish");
             }
 
             // Prohibited content
             if (BookUtils.ContainsProhibitedTerms(book.Text, out string bad))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.Prohibited", bad);
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.Prohibited", bad);
             }
 
             if (BookUtils.ContainsProhibitedTerms(book.Title, out string badTitle))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.TitleProhibited", badTitle);
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.TitleProhibited", badTitle);
             }
 
             // Title validity
@@ -211,20 +185,28 @@ namespace DOL.GS
                 book.Title.Length > Guild.MAX_CREATE_NAME_LENGTH ||
                 !Commands.GuildCommandHandler.IsValidGuildName(book.Title))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.NameInvalid");
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NameInvalid");
             }
 
             if (GuildMgr.DoesGuildExist(book.Title))
             {
-                failMsg = T(player, "RoyalTreasuryClerk.Validate.NameTaken");
-                return false;
+                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NameTaken");
             }
-
-            return true;
+            return null;
         }
 
-        private InventoryItem FindPlayerRegisterBook(GamePlayer player, out DBBook book)
+        private DBBook? GetRegisterFromItem(InventoryItem item)
+        {
+            if (!IsRoyalScrollItem(item))
+                return null;
+
+            if (item.MaxCondition <= 0)
+                return null;
+
+            return GameServer.Database.FindObjectByKey<DBBook>((long)item.MaxCondition);
+        }
+
+        private InventoryItem? FindPlayerRegisterBook(GamePlayer? player, out DBBook? book)
         {
             book = null;
             if (player == null) return null;
@@ -232,13 +214,9 @@ namespace DOL.GS
             for (var slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
             {
                 var it = player.Inventory.GetItem(slot);
-                if (it == null) continue;
-
-                if (!IsRoyalScrollItem(it)) continue;
-                if (it.MaxCondition <= 0) continue;
-
-                var b = GameServer.Database.FindObjectByKey<DBBook>((long)it.MaxCondition);
-                if (b == null) continue;
+                var b = GetRegisterFromItem(it);
+                if (b is null)
+                    continue;
 
                 // Must be processing for resume
                 if (!BookHasTag(b, TAG_PROCESSING))
@@ -255,11 +233,11 @@ namespace DOL.GS
             return null;
         }
 
-        private bool TryResumeFromInventory(GamePlayer player, out DBBook book)
+        private bool TryResumeFromInventory(GamePlayer player, InventoryItem? invItem, out DBBook? book)
         {
             book = null;
 
-            var invItem = FindPlayerRegisterBook(player, out book);
+            invItem ??= FindPlayerRegisterBook(player, out book);
             if (invItem == null || book == null)
                 return false;
 
@@ -323,24 +301,23 @@ namespace DOL.GS
             catch { }
         }
 
-        private bool EnsureBookStillPresentOrReset(GamePlayer player)
+        private (InventoryItem? book, bool success) EnsureBookStillPresentOrReset(GamePlayer player)
         {
             int bookId = player.TempProperties.getProperty<int>(TP_BOOK_ID, 0);
             int step = player.TempProperties.getProperty<int>(TP_STEP, STEP_NONE);
 
             if (step == STEP_NONE || bookId <= 0)
-                return true;
+                return (null, true);
 
-            bool hasIt = FindInventoryItemForBook(player, bookId) != null;
-
-            if (!hasIt)
+            var book = FindInventoryItemForBook(player, bookId);
+            if (book == null)
             {
                 ResetState(player);
-                SayTo(player, T(player, "RoyalTreasuryClerk.Resume.Lost"));
-                return false;
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
+                return (null, false);
             }
 
-            return true;
+            return (book, true);
         }
 
         private void ShowResumePrompt(GamePlayer player, DBBook book)
@@ -351,23 +328,26 @@ namespace DOL.GS
             int step = player.TempProperties.getProperty<int>(TP_STEP, STEP_NONE);
             if (step == STEP_COLLECT_LEADER)
             {
-                SayTo(player,
-                    T(player, "RoyalTreasuryClerk.Resume.Leader.Line1") + "\n" +
-                    T(player, "RoyalTreasuryClerk.Resume.Leader.Line2") + "\n" +
-                    T(player, "RoyalTreasuryClerk.Resume.Leader.Line3"));
+                SayTo(player, [
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Leader.Line1"),
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Leader.Line2"),
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Leader.Line3")
+                ]);
             }
             else if (step == STEP_COLLECT_MEMBERS)
             {
                 int idx = player.TempProperties.getProperty<int>(TP_MEMBER_INDEX, founders.members.Count + 1);
-                SayTo(player,
-                    T(player, "RoyalTreasuryClerk.Resume.Member.Line1", founders.leader) + "\n" +
-                    T(player, "RoyalTreasuryClerk.Resume.Member.Line2", idx, required - 1));
+                SayTo(player, [
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Member.Line1", founders.leader),
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Member.Line2", idx, required - 1)
+                ]);
             }
             else if (step == STEP_AWAIT_STAMP)
             {
-                SayTo(player,
-                     T(player, "RoyalTreasuryClerk.Resume.Stamp.Line1") + "\n" +
-                     T(player, "RoyalTreasuryClerk.Resume.Stamp.Line2"));
+                SayTo(player, [
+                     LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Stamp.Line1"),
+                     LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Stamp.Line2")
+                ]);
             }
         }
 
@@ -378,48 +358,76 @@ namespace DOL.GS
 
             if (Properties.GUILD_REQUIRE_REGISTER)
             {
-                EnsureBookStillPresentOrReset(player);
+                // TODO: Why does the AI discard the boolean here?
+                //        scratch that, TODO rewrite this with a human brain
+                var (bookItem, _) = EnsureBookStillPresentOrReset(player);
 
                 // Only resume if the book is explicitly in "#processing"
-                if (TryResumeFromInventory(player, out DBBook activeBook))
+                if (TryResumeFromInventory(player, bookItem, out DBBook activeBook))
                 {
                     ShowResumePrompt(player, activeBook);
                     return true;
                 }
 
-                string guildKw = GetGuildKeyword(player);
-                player.Out.SendMessage(
-                    T(player, "RoyalTreasuryClerk.Interact.Intro.Line1") + "\n" +
-                    T(player, "RoyalTreasuryClerk.Interact.Intro.Line2", guildKw),
-                    eChatType.CT_System, eChatLoc.CL_PopupWindow);
-
-                if (GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
+                var hasStone = GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising) ? HasRecallStone(player) : false;
+                Task.Run(async () =>
                 {
-                    string kw = GetStoneKeyword(player);
-                    player.Out.SendMessage(T(player, "RoyalTreasuryClerk.Stone.Checking"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    var cache = EnsurePlayerCache(player);
+                    
+                    // Start them now so they can run in parallel
+                    var guildTask = cache.TranslateResponseKey(INTERACT_KEY_REGISTER);
+                    var line1Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Interact.Intro.Line1");
+                    var line2Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Interact.Intro.Line2", guildTask);
 
-                    if (!HasRecallStone(player))
+                    if (GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
                     {
-                        player.Out.SendMessage(T(player, "RoyalTreasuryClerk.Stone.Missing").Replace("[another]", "[" + kw + "]"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                        var stoneKey = hasStone ? "RoyalTreasuryClerk.Stone.HaveOne" : "RoyalTreasuryClerk.Stone.Missing";
+                        var stoneTask = LanguageMgr.TranslateWithPlaceholders(player, stoneKey);
+                        var anotherKey = LanguageMgr.GetTranslationOrDefaultLang(player, "RoyalTreasuryClerk.Other");
+                        var checkingTask = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stone.Checking");
+
+                        var checking = await checkingTask;
+                        var (stoneLine, keys) = await stoneTask;
+                        if (!keys.TryGetValue(anotherKey, out string another))
+                        {
+                            another = keys.FirstOrDefault().Value;
+                            if (keys.Count != 1)
+                            {
+                                log.WarnFormat("Detected {keys.Count} keywords in {stoneKey} \"{stoneLine}\" for player {player}, will use (\"{another}\")");
+                            }
+                        }
+                        cache.AddResponseKey(INTERACT_KEY_STONE, another);
+
+                        SayTo(player, [
+                            await line1Task,
+                            string.Format(await line2Task, await guildTask)
+                        ]);
+                        
+                        SayTo(player, [
+                            checking,
+                            stoneLine
+                        ]);
                     }
                     else
                     {
-                        player.Out.SendMessage(T(player, "RoyalTreasuryClerk.Stone.HaveOne").Replace("[another]", "[" + kw + "]"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                        SayTo(player, [
+                            await line1Task,
+                            string.Format(await line2Task, await guildTask)
+                        ]);
                     }
-                }
-
+                });
                 return true;
             }
 
             // MODE B: guild register OFF
             if (GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
             {
-                player.Out.SendMessage(T(player, "RoyalTreasuryClerk.Checking"),
+                player.Out.SendMessage(LanguageMgr.Translate(player, "RoyalTreasuryClerk.Checking"),
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
                 if (!HasRecallStone(player))
                 {
-                    player.Out.SendMessage(T(player, "RoyalTreasuryClerk.Nostone"),
+                    player.Out.SendMessage(LanguageMgr.Translate(player, "RoyalTreasuryClerk.Nostone"),
                         eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 }
 
@@ -434,82 +442,70 @@ namespace DOL.GS
             if (!base.WhisperReceive(source, text) || source is not GamePlayer player)
                 return false;
 
-            text = (text ?? "").Trim();
+            bool drEnabled = GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising);
+            bool registerEnabled = Properties.GUILD_REQUIRE_REGISTER;
+            if (!drEnabled && !registerEnabled)
+                return true;
 
-            if (Properties.GUILD_REQUIRE_REGISTER)
+            text = (text ?? "").Trim();
+            if (registerEnabled)
             {
                 int step = player.TempProperties.getProperty<int>(TP_STEP, STEP_NONE);
 
                 if (step == STEP_NONE)
                 {
-                    TryResumeFromInventory(player, out _);
+                    TryResumeFromInventory(player, null, out _);
                     step = player.TempProperties.getProperty<int>(TP_STEP, STEP_NONE);
                 }
 
                 if (text.Equals(WHISPER_CONTINUE, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (TryResumeFromInventory(player, out DBBook activeBook))
+                    if (TryResumeFromInventory(player, null, out DBBook activeBook))
                         ShowResumePrompt(player, activeBook);
                     else
-                        SayTo(player, T(player, "RoyalTreasuryClerk.Resume.NoActive"));
+                        SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.NoActive"));
                     return true;
                 }
 
                 if (step != STEP_NONE)
                 {
-                    if (!EnsureBookStillPresentOrReset(player))
+                    var (_, success) = EnsureBookStillPresentOrReset(player);
+                    if (!success)
                         return true;
 
                     return HandleConversation(player, text);
                 }
+            }
 
+            var cache = GetPlayerCache(player);
+            if (cache is null) // Cache gone or first interaction
+                return Interact(player);
+
+            var keyword = cache.GetResponseKey(text);
+            switch (keyword)
+            {
                 // Start guild legalization flow
-                string guildKw = GetGuildKeyword(player);
-                if (text.Equals(guildKw, StringComparison.OrdinalIgnoreCase))
-                {
-                    SayTo(player,
-                        T(player, "RoyalTreasuryClerk.Whisper.Guild.Line1") + "\n" +
-                        T(player, "RoyalTreasuryClerk.Whisper.Guild.Line2") + "\n" +
-                        T(player, "RoyalTreasuryClerk.Whisper.Guild.Line3"));
-                    return true;
-                }
-
-                // Bind stone service (DR)
-                if (GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
-                {
-                    string newKw = GetStoneKeyword(player);
-                    string oldKw = T(player, "RoyalTreasuryClerk.Other");
-
-                    bool askedStone =
-                        (!string.IsNullOrWhiteSpace(newKw) && text.Equals(newKw, StringComparison.OrdinalIgnoreCase)) ||
-                        (!string.IsNullOrWhiteSpace(oldKw) && text.Equals(oldKw, StringComparison.OrdinalIgnoreCase));
-
-                    if (askedStone && !HasRecallStone(player))
+                case INTERACT_KEY_REGISTER when registerEnabled:
                     {
-                        SayTo(player, T(player, "RoyalTreasuryClerk.Stonegive"));
-                        player.ReceiveItem(this, PERSONAL_RECALL_STONE_ID, eInventoryActionType.Other);
+                        SayTo(player, [
+                            LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line1"),
+                            LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line2"),
+                            LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line3")
+                            ]);
                         return true;
                     }
-                }
 
-                return true;
-            }
-
-            // MODE B: Guild register feature OFF
-            if (GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
-            {
-                string other = T(player, "RoyalTreasuryClerk.Other");
-                if (!string.IsNullOrEmpty(other) && text.Equals(other, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!HasRecallStone(player))
+                // Bind stone service (DR)
+                case INTERACT_KEY_STONE when drEnabled:
                     {
-                        SayTo(player, T(player, "RoyalTreasuryClerk.Stonegive"));
-                        player.ReceiveItem(this, PERSONAL_RECALL_STONE_ID, eInventoryActionType.Other);
+                        if (!HasRecallStone(player))
+                        {
+                            SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stonegive"));
+                            player.ReceiveItem(this, PERSONAL_RECALL_STONE_ID, eInventoryActionType.Other);
+                        }
+                        return true;
                     }
-                    return true;
-                }
             }
-
             return true;
         }
 
@@ -522,20 +518,21 @@ namespace DOL.GS
             if (!Properties.GUILD_REQUIRE_REGISTER)
                 return false;
 
-            EnsureBookStillPresentOrReset(player);
+            // TODO: We have the item, so why do we look it up here again, and also AGAIN at the end?
+            var (bookItem, _) = EnsureBookStillPresentOrReset(player);
 
             bool awaitingStamp = player.TempProperties.getProperty<bool>(TP_AWAIT_STAMP, false);
             if (awaitingStamp)
             {
                 if (!item.Id_nb.Equals("guild_stamp", StringComparison.OrdinalIgnoreCase))
                 {
-                    SayTo(player, T(player, "RoyalTreasuryClerk.Stamp.WrongItem"));
+                    SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.WrongItem"));
                     return true;
                 }
 
                 if (!player.Inventory.RemoveItem(item))
                 {
-                    SayTo(player, T(player, "RoyalTreasuryClerk.Stamp.TakeFail"));
+                    SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.TakeFail"));
                     return true;
                 }
 
@@ -546,21 +543,21 @@ namespace DOL.GS
             long bookId = item.MaxCondition;
             if (bookId <= 0)
             {
-                SayTo(player, T(player, "RoyalTreasuryClerk.Validate.NotRegister"));
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NotRegister"));
                 return true;
             }
 
             DBBook book = GameServer.Database.FindObjectByKey<DBBook>(bookId);
             if (book == null)
             {
-                SayTo(player, T(player, "RoyalTreasuryClerk.Stamp.NoLedger"));
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.NoLedger"));
                 return true;
             }
 
             // If already stamped, clerk does nothing with it
             if (book.IsStamped || BookHasTag(book, TAG_STAMPED))
             {
-                SayTo(player, T(player, "RoyalTreasuryClerk.Stamp.AlreadyDone"));
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.AlreadyDone"));
                 return true;
             }
 
@@ -568,9 +565,10 @@ namespace DOL.GS
             // If book is not yet processing, we validate now and then mark it processing.
             if (!BookHasTag(book, TAG_PROCESSING))
             {
-                if (!ValidateInitialBook(player, item, book, out string failMsg))
+                var failTask = ValidateInitialBook(player, item, book);
+                if (failTask != null)
                 {
-                    SayTo(player, failMsg);
+                    SayTo(player, failTask);
                     return true;
                 }
 
@@ -591,16 +589,17 @@ namespace DOL.GS
                 player.TempProperties.setProperty(TP_AWAIT_STAMP, false);
                 player.TempProperties.setProperty(TP_USED_ACCOUNTS, string.Empty);
 
-                SayTo(player,
-                    T(player, "RoyalTreasuryClerk.Process.Start.Line1") + "\n" +
-                    T(player, "RoyalTreasuryClerk.Process.Start.Line2") + "\n" +
-                    T(player, "RoyalTreasuryClerk.Process.Start.Line3"));
+                SayTo(player, [
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.Start.Line1"),
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.Start.Line2"),
+                    LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.Start.Line3")
+                ]);
                 return true;
             }
 
             // If already processing, resume prompt based on tags
             player.TempProperties.setProperty(TP_BOOK_ID, (int)bookId);
-            TryResumeFromInventory(player, out _);
+            TryResumeFromInventory(player, null, out _);
             ShowResumePrompt(player, book);
             return true;
         }
@@ -614,17 +613,19 @@ namespace DOL.GS
             if (book == null || !BookHasTag(book, TAG_PROCESSING))
             {
                 ResetState(player);
-                SayTo(player, T(player, "RoyalTreasuryClerk.Resume.Lost"));
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
                 return true;
             }
 
             int required = Properties.GUILD_NUM;
+            Task<string>? failMsg;
 
             switch (step)
             {
                 case STEP_COLLECT_LEADER:
                     {
-                        if (!TryValidateFounder(player, text, out var ch, out string failMsg))
+                        failMsg = TryValidateFounder(player, text, out var ch);
+                        if (failMsg != null)
                         {
                             SayTo(player, failMsg);
                             return true;
@@ -639,9 +640,10 @@ namespace DOL.GS
                         player.TempProperties.setProperty(TP_STEP, STEP_COLLECT_MEMBERS);
                         player.TempProperties.setProperty(TP_MEMBER_INDEX, 1);
 
-                        SayTo(player,
-                             T(player, "RoyalTreasuryClerk.Process.LeaderSaved.Line1", ch.Name) + "\n" +
-                             T(player, "RoyalTreasuryClerk.Process.LeaderSaved.Line2", required - 1));
+                        SayTo(player, [
+                             LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.LeaderSaved.Line1", ch.Name),
+                             LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.LeaderSaved.Line2", required - 1)
+                        ]);
                         return true;
                     }
 
@@ -655,7 +657,8 @@ namespace DOL.GS
                             return ConfirmGuildName(player, book);
                         }
 
-                        if (!TryValidateFounder(player, text, out var ch, out string failMsg))
+                        failMsg = TryValidateFounder(player, text, out var ch);
+                        if (failMsg != null)
                         {
                             SayTo(player, failMsg);
                             return true;
@@ -668,7 +671,7 @@ namespace DOL.GS
 
                         if (allNames.Any(n => n.Equals(ch.Name, StringComparison.OrdinalIgnoreCase)))
                         {
-                            SayTo(player, T(player, "RoyalTreasuryClerk.Process.DuplicateMember"));
+                            SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.DuplicateMember"));
                             return true;
                         }
 
@@ -681,7 +684,7 @@ namespace DOL.GS
                         player.TempProperties.setProperty(TP_MEMBER_INDEX, idx);
 
                         if (idx <= required - 1)
-                            SayTo(player, T(player, "RoyalTreasuryClerk.Process.MemberSaved", idx, required - 1));
+                            SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.MemberSaved", idx, required - 1));
                         else
                         {
                             player.TempProperties.setProperty(TP_STEP, STEP_CONFIRM_GUILDNAME);
@@ -698,12 +701,12 @@ namespace DOL.GS
                             newName.Length > Guild.MAX_CREATE_NAME_LENGTH ||
                             !Commands.GuildCommandHandler.IsValidGuildName(newName))
                         {
-                            SayTo(player, T(player, "RoyalTreasuryClerk.Validate.NameInvalid"));
+                            SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NameInvalid"));
                             return true;
                         }
                         if (GuildMgr.DoesGuildExist(newName))
                         {
-                            SayTo(player, T(player, "RoyalTreasuryClerk.Validate.NameTaken"));
+                            SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NameTaken"));
                             return true;
                         }
 
@@ -726,35 +729,43 @@ namespace DOL.GS
                     // If we reach here without a dialog, guide them
                     player.TempProperties.setProperty(TP_STEP, STEP_AWAIT_STAMP);
                     player.TempProperties.setProperty(TP_AWAIT_STAMP, true);
-                    SayTo(player,
-                        T(player, "RoyalTreasuryClerk.Process.AwaitStamp.Line1") + "\n" +
-                        T(player, "RoyalTreasuryClerk.Process.AwaitStamp.Line2"));
+                    SayTo(player, [
+                        LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.AwaitStamp.Line1"),
+                        LanguageMgr.Translate(player, "RoyalTreasuryClerk.Process.AwaitStamp.Line2")
+                    ]);
                     return true;
             }
         }
 
         private bool ConfirmGuildName(GamePlayer player, DBBook book)
         {
-            player.Out.SendCustomDialog(
-                T(player, "RoyalTreasuryClerk.Confirm.Dialog.Line1") +"\n\n" + " " +
-                book.Title + " " + "\n\n" +
-                T(player, "RoyalTreasuryClerk.Confirm.Dialog.Line2"),
-                (ply, resp) =>
-                {
-                    if (resp != 0x01)
+            Task.Run(async () =>
+            {
+                var line1Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Confirm.Dialog.Line1");
+                var line2Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Confirm.Dialog.Line2");
+                player.Out.SendCustomDialog(
+                    await line1Task  +"\n\n" + " " +
+                    book.Title + " " + "\n\n" +
+                    await line2Task ,
+                    (ply, resp) =>
                     {
-                        SayTo(ply, T(ply, "RoyalTreasuryClerk.Confirm.Declined"));
-                        ply.TempProperties.setProperty(TP_STEP, STEP_CONFIRM_GUILDNAME);
-                        return;
-                    }
+                        if (resp != 0x01)
+                        {
+                            SayTo(ply, LanguageMgr.Translate(ply, "RoyalTreasuryClerk.Confirm.Declined"));
+                            ply.TempProperties.setProperty(TP_STEP, STEP_CONFIRM_GUILDNAME);
+                            return;
+                        }
 
-                    ply.TempProperties.setProperty(TP_STEP, STEP_AWAIT_STAMP);
-                    ply.TempProperties.setProperty(TP_AWAIT_STAMP, true);
+                        ply.TempProperties.setProperty(TP_STEP, STEP_AWAIT_STAMP);
+                        ply.TempProperties.setProperty(TP_AWAIT_STAMP, true);
 
-                    SayTo(ply,
-                        T(ply, "RoyalTreasuryClerk.Process.AwaitStamp.Line1") + "\n" +
-                        T(ply, "RoyalTreasuryClerk.Process.AwaitStamp.Line2"));
-                });
+                        SayTo(ply, [
+                              LanguageMgr.Translate(ply, "RoyalTreasuryClerk.Process.AwaitStamp.Line1"),
+                              LanguageMgr.Translate(ply, "RoyalTreasuryClerk.Process.AwaitStamp.Line2")
+                        ]);
+                    });
+                
+            });
 
             return true;
         }
@@ -767,7 +778,7 @@ namespace DOL.GS
             if (book == null || !BookHasTag(book, TAG_PROCESSING))
             {
                 ResetState(player);
-                SayTo(player, T(player, "RoyalTreasuryClerk.Resume.Lost"));
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
                 return false;
             }
 
@@ -775,7 +786,7 @@ namespace DOL.GS
             var founders = BookUtils.ExtractFounders(book.Text, required);
             if (string.IsNullOrWhiteSpace(founders.leader) || founders.members.Count != required - 1)
             {
-                SayTo(player, T(player, "RoyalTreasuryClerk.Stamp.Incomplete"));
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.Incomplete"));
                 return false;
             }
 
@@ -797,54 +808,49 @@ namespace DOL.GS
                 ApplyUniqueState(player, invItem, "[Stamped]", book.Title, false, false, false);
             }
 
-            SayTo(player,
-                T(player, "RoyalTreasuryClerk.Stamp.Success.Line1") + "\n" +
-                T(player, "RoyalTreasuryClerk.Stamp.Success.Line2"));
+            SayTo(player, [
+                LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.Success.Line1"),
+                LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.Success.Line2")
+            ]);
 
             ResetState(player);
             return true;
         }
 
-        private bool TryValidateFounder(GamePlayer requester, string inputName, out DOLCharacters ch, out string failMsg)
+        private Task<string>? TryValidateFounder(GamePlayer requester, string inputName, out DOLCharacters ch)
         {
-            failMsg = string.Empty;
             ch = null;
 
             string name = (inputName ?? "").Trim();
             if (string.IsNullOrWhiteSpace(name))
             {
-                failMsg = T(requester, "RoyalTreasuryClerk.Founder.NoName");
-                return false;
+                return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.NoName");
             }
 
             ch = BookUtils.GetCharacter(name);
             if (ch == null)
             {
-                failMsg = T(requester, "RoyalTreasuryClerk.Founder.NotFound");
-                return false;
+                return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.NotFound");
             }
 
             if (!BookUtils.IsGuildless(ch))
             {
-                failMsg = T(requester, "RoyalTreasuryClerk.Founder.InGuild");
-                return false;
+                return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.InGuild");
             }
 
             string acc = BookUtils.GetAccountName(ch);
             if (string.IsNullOrWhiteSpace(acc))
             {
-                failMsg = T(requester, "RoyalTreasuryClerk.Founder.NoAccount");
-                return false;
+                return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.NoAccount");
             }
 
             var used = GetUsedAccounts(requester);
             if (used.Contains(acc, StringComparer.OrdinalIgnoreCase))
             {
-                failMsg = T(requester, "RoyalTreasuryClerk.Founder.SameAccount");
-                return false;
+                return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.SameAccount");
             }
 
-            return true;
+            return null;
         }
 
         private static HashSet<string> GetUsedAccounts(GamePlayer player)

@@ -20,10 +20,13 @@
 using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DOL.GS
@@ -31,7 +34,7 @@ namespace DOL.GS
     /// <summary>
     /// ChatUtil for Sending Message to Players
     /// </summary>
-    public static class ChatUtil
+    public static partial class ChatUtil
     {
         public static void SendSystemMessage(GamePlayer target, string message)
         {
@@ -172,5 +175,70 @@ namespace DOL.GS
 
         private static bool ResponseStartsWith(string? a, string? b)
             => a != null && b != null && a.StartsWith(b);
+
+        [GeneratedRegex(@"\[(.+?)\]")]
+        [return: NotNull]
+        public static partial Regex BracketsRegex();
+
+        [GeneratedRegex(@"\{(.+?)\}")]
+        [return: NotNull]
+        public static partial Regex BracesRegex();
+
+        public record class PlaceholderMatch(string Placeholder, string OriginalKey)
+        {
+            public static implicit operator KeyValuePair<string, string> (PlaceholderMatch match) => new(match.OriginalKey, match.Placeholder);
+
+            public void Deconstruct(out string placeholder, out string originalKey)
+            {
+                placeholder = Placeholder;
+                originalKey = OriginalKey;
+            }
+
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                return $"[{Placeholder}, {OriginalKey}]";
+            }
+
+            public static class Utils
+            {
+            }
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> ToKeyValuePairs(this IEnumerable<PlaceholderMatch> matches)
+            => matches.Select(m => (KeyValuePair<string, string>)m);
+
+        public static IList<PlaceholderMatch> ReplaceKeys(ref string originalText, Func<string, string?> extractor, Regex? regex = null)
+        {
+            regex ??= BracketsRegex();
+
+            List<PlaceholderMatch> originalResponses = new();
+            regex.Replace(originalText, match =>
+            {
+                string originalKey = match.Groups[1].Value.Trim();
+                string placeholder = extractor(originalKey);
+                
+                if (placeholder != null)
+                    originalResponses.Add(new(placeholder, originalKey));
+                return placeholder;
+            });
+            return originalResponses;
+        }
+
+        public static IList<PlaceholderMatch> ExtractKeys(string originalText, Func<string, string?>? extractor = null, Regex? regex = null)
+        {
+            regex ??= BracketsRegex();
+
+            List<PlaceholderMatch> originalResponses = new();
+            foreach (var match in regex.Matches(originalText).Cast<Match>())
+            {
+                string originalKey = match.Groups[1].Value.Trim();
+                string placeholder = extractor != null ? extractor(originalKey) : originalKey;
+
+                if (placeholder != null)
+                    originalResponses.Add(new(placeholder, originalKey));
+            }
+            return originalResponses;
+        }
     }
 }

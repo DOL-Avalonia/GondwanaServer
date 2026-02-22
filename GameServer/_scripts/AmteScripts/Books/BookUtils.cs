@@ -234,9 +234,9 @@ namespace DOL.GS
             }
 
             var list = new List<string>();
-            for (int i = 1; i <= requiredGuildNum - 1; i++)
+            for (int i = 0; i < requiredGuildNum; i++)
             {
-                if (!members.TryGetValue(i, out var n)) break;
+                if (!members.TryGetValue(1 + i, out var n)) break;
                 list.Add(n);
             }
 
