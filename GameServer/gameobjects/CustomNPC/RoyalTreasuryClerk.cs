@@ -382,42 +382,44 @@ namespace DOL.GS
                     var line1Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Interact.Intro.Line1");
                     var line2Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Interact.Intro.Line2", guildTask);
 
-                    if (GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
+                    if (!GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising))
                     {
-                        var stoneKey = hasStone ? "RoyalTreasuryClerk.Stone.HaveOne" : "RoyalTreasuryClerk.Stone.Missing";
-                        var stoneTask = LanguageMgr.TranslateWithPlaceholders(player, stoneKey);
-                        var anotherKey = LanguageMgr.GetTranslationOrDefaultLang(player, "RoyalTreasuryClerk.Other");
-                        var checkingTask = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stone.Checking");
+                        SayTo(player, [
+                            await line1Task,
+                            await line2Task
+                        ]);
+                        return;
+                    }
 
-                        var checking = await checkingTask;
-                        var (stoneLine, keys) = await stoneTask;
-                        if (!keys.TryGetValue(anotherKey, out string another))
+                    var stoneKey = hasStone ? "RoyalTreasuryClerk.Stone.HaveOne" : "RoyalTreasuryClerk.Stone.Missing";
+                    var stoneTask = LanguageMgr.TranslateWithPlaceholders(player, stoneKey);
+                    var anotherKey = LanguageMgr.GetTranslationOrDefaultLang(player, "RoyalTreasuryClerk.Other");
+                    var checkingTask = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stone.Checking");
+
+                    var checking = await checkingTask;
+                    var (stoneLine, keys) = await stoneTask;
+                    string? another = null;
+                    if (keys != null && !keys.TryGetValue(anotherKey, out another))
+                    {
+                        another = keys.FirstOrDefault().Value;
+                        if (keys.Count != 1)
                         {
-                            another = keys.FirstOrDefault().Value;
-                            if (keys.Count != 1)
-                            {
-                                log.WarnFormat("Detected {keys.Count} keywords in {stoneKey} \"{stoneLine}\" for player {player}, will use (\"{another}\")");
-                            }
+                            log.WarnFormat("Detected {keys.Count} keywords in {stoneKey} \"{stoneLine}\" for player {player}, will use (\"{another}\")");
                         }
+                    }
+
+                    if (another != null)
                         cache.AddResponseKey(INTERACT_KEY_STONE, another);
 
-                        SayTo(player, [
-                            await line1Task,
-                            string.Format(await line2Task, await guildTask)
-                        ]);
-                        
-                        SayTo(player, [
-                            checking,
-                            stoneLine
-                        ]);
-                    }
-                    else
-                    {
-                        SayTo(player, [
-                            await line1Task,
-                            string.Format(await line2Task, await guildTask)
-                        ]);
-                    }
+                    SayTo(player, [
+                        await line1Task,
+                        await line2Task
+                    ]);
+
+                    SayTo(player, [
+                        checking,
+                        stoneLine
+                    ]);
                 });
                 return true;
             }
@@ -450,6 +452,36 @@ namespace DOL.GS
             if (!drEnabled && !registerEnabled)
                 return true;
 
+            var cache = GetPlayerCache(player);
+            if (cache != null)
+            {
+                var keyword = cache.GetResponseKey(text);
+                switch (keyword)
+                {
+                    // Start guild legalization flow
+                    case INTERACT_KEY_REGISTER when registerEnabled:
+                        {
+                            SayTo(player, [
+                                LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line1"),
+                                LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line2"),
+                                LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line3")
+                            ]);
+                            return true;
+                        }
+
+                    // Bind stone service (DR)
+                    case INTERACT_KEY_STONE when drEnabled:
+                        {
+                            if (!HasRecallStone(player))
+                            {
+                                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stonegive"));
+                                player.ReceiveItem(this, PERSONAL_RECALL_STONE_ID, eInventoryActionType.Other);
+                            }
+                            return true;
+                        }
+                }
+            }
+
             text = (text ?? "").Trim();
             if (registerEnabled)
             {
@@ -478,36 +510,6 @@ namespace DOL.GS
 
                     return HandleConversation(player, text);
                 }
-            }
-
-            var cache = GetPlayerCache(player);
-            if (cache is null) // Cache gone or first interaction
-                return Interact(player);
-
-            var keyword = cache.GetResponseKey(text);
-            switch (keyword)
-            {
-                // Start guild legalization flow
-                case INTERACT_KEY_REGISTER when registerEnabled:
-                    {
-                        SayTo(player, [
-                            LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line1"),
-                            LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line2"),
-                            LanguageMgr.Translate(player, "RoyalTreasuryClerk.Whisper.Guild.Line3")
-                            ]);
-                        return true;
-                    }
-
-                // Bind stone service (DR)
-                case INTERACT_KEY_STONE when drEnabled:
-                    {
-                        if (!HasRecallStone(player))
-                        {
-                            SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stonegive"));
-                            player.ReceiveItem(this, PERSONAL_RECALL_STONE_ID, eInventoryActionType.Other);
-                        }
-                        return true;
-                    }
             }
             return true;
         }

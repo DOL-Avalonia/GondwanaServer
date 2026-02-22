@@ -80,7 +80,7 @@ namespace DOL.Language
                     return s;
 
                 var type = s.GetType();
-                if (!(type.IsGenericType && type.GetGenericTypeDefinition() != typeof(Task<>)))
+                if (!(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>)))
                 {
                     return s;
                 }
@@ -723,9 +723,9 @@ namespace DOL.Language
         private static async Task<string> TranslateImpl(string language, string translationId, object[] args, bool autoTranslate, bool translateFormatted)
         {
             string translation;
-            if (TryGetTranslation(out translation, language, translationId, args))
+            if (TryGetTranslation(out translation, language, translationId))
             {
-                return translation;
+                return string.Format(translation, await UnrollArgs(args));
             }
 
             // No translation found in files for this language. Try auto translating from server language

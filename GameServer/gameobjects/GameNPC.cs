@@ -4107,8 +4107,12 @@ namespace DOL.GS
             {
                 if (translate)
                     message = await AutoTranslateManager.Translate(target, message);
-                var resultText = await LanguageMgr.Translate(target, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), message); 
-                target.Out.SendMessage(resultText, type, loc);
+
+                if (loc is not eChatLoc.CL_PopupWindow)
+                {
+                    message = await LanguageMgr.Translate(target, "GameNPC.SayTo.Says", GetName(0, true, target.Client.Account.Language, this), message);
+                }
+                target.Out.SendMessage(message, type, loc);
             });
 
             if (announce)

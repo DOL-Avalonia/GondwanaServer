@@ -207,7 +207,6 @@ namespace DOL.GS
 
             // Validate founders exist and are guildless (DB), and unique accounts
             var accounts = new List<string>(required);
-
             foreach (string fn in founderNames)
             {
                 var ch = BookUtils.GetCharacter(fn);
@@ -226,10 +225,13 @@ namespace DOL.GS
                 accounts.Add(BookUtils.GetAccountName(ch));
             }
 
-            if (!BookUtils.AccountsAreUnique(accounts))
+            if (player.Client.Account.PrivLevel <= 1)
             {
-                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Validate.SameAccount"));
-                return true;
+                if (!BookUtils.AccountsAreUnique(accounts))
+                {
+                    SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.Validate.SameAccount"));
+                    return true;
+                }
             }
 
             Guild newGuild = GuildMgr.CreateGuild(player.Realm, guildName, player);
