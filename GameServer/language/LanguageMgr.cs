@@ -1082,7 +1082,7 @@ namespace DOL.Language
                 return ExtractPlaceholdersFromTranslation(staticTranslation, regex);
             }
 
-            return await AutoTranslateManager.TranslatePlaceholderText(player, staticTranslation, true, regex);
+            return await AutoTranslateManager.TranslatePlaceholderText(player, staticTranslation, translatePlaceholders, regex);
         }
         
         #endregion Auto Translations

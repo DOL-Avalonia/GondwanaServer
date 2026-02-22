@@ -271,11 +271,11 @@ namespace DOL.GS.Scripts
         }
 
         /// <summary>
-        /// Retourne true si player est l'auteur du livre
+        /// Retourne true si player est l'auteur du livre ou un MJ
         /// </summary>
         public bool isAuthor(GamePlayer player, DBBook theScroll)
         {
-            if (theScroll.PlayerID != player.InternalID)
+            if (theScroll.PlayerID != player.InternalID && player.Client.Account.PrivLevel <= 1)
             {
                 player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return false;

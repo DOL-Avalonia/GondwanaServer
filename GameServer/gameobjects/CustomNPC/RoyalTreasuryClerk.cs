@@ -680,7 +680,7 @@ namespace DOL.GS
                             return true;
                         }
 
-                        book.Text += $"\n#GuildMember{idx:00}_{ch.Name}\n";
+                        book.Text += $"\n#GuildMember{idx:00}_{ch.Name}";
                         book.Save();
 
                         AddUsedAccount(player, ch.AccountName);

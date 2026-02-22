@@ -218,17 +218,10 @@ namespace DOL.GS
             // 1) Replace [key] with placeholders and build mapping originalKey -> translatedKey.
             string toTranslate = originalText;
             IList<ChatUtil.PlaceholderMatch> originalResponses = null;
-            if (translatePlaceholders)
+            originalResponses = ChatUtil.ReplaceKeys(ref toTranslate, (string key) =>
             {
-                originalResponses = ChatUtil.ReplaceKeys(ref toTranslate, (string key) =>
-                {
-                    return $"<span id=\"placeholder-{index++}\">{key}</span>";
-                });
-            }
-            else
-            {
-                originalResponses = ChatUtil.ExtractKeys(toTranslate);
-            }
+                return $"<span id=\"placeholder-{index++}\">{key}</span>";
+            });
             
             Task<string> translateText = AutoTranslateManager.Translate(serverLang, playerLang, toTranslate);
             // 2) Translate the full text with placeholders so Google sees full context
@@ -257,10 +250,19 @@ namespace DOL.GS
 
                     if (!int.TryParse(match.Groups[1].Value, out int placeholderIndex))
                         return match.Value;
-
+                    
                     var translated = match.Groups[2].Value;
-                    keyMap![translated] = originalResponses[placeholderIndex].OriginalKey;
-                    return '[' + translated + ']';
+                    var original = originalResponses[placeholderIndex].OriginalKey;
+                    if (translatePlaceholders)
+                    {
+                        keyMap![translated] = original;
+                        return '[' + translated + ']';
+                    }
+                    else
+                    {
+                        keyMap![original] = original;
+                        return '[' + original + ']';
+                    }
                 });
             }
             else
