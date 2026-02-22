@@ -401,7 +401,7 @@ namespace DOL.GS
                     string? another = null;
                     if (keys != null && !keys.TryGetValue(anotherKey, out another))
                     {
-                        another = keys.FirstOrDefault().Value;
+                        another = keys.FirstOrDefault().Key;
                         if (keys.Count != 1)
                         {
                             log.WarnFormat("Detected {keys.Count} keywords in {stoneKey} \"{stoneLine}\" for player {player}, will use (\"{another}\")");
