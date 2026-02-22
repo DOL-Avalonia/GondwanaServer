@@ -155,29 +155,32 @@ namespace DOL.GS
                 return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.NotInk");
             }
 
-            // Minimum words
-            int minWords = Properties.GUILD_REGISTER_MIN_WORDS;
-            int wc = BookUtils.CountWords(book.Text);
-            if (wc < minWords)
+            if (player.Client.Account.PrivLevel <= 1)
             {
-                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.TooShort", minWords, wc);
-            }
+                // Minimum words
+                int minWords = Properties.GUILD_REGISTER_MIN_WORDS;
+                int wc = BookUtils.CountWords(book.Text);
+                if (wc < minWords)
+                {
+                    return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.TooShort", minWords, wc);
+                }
 
-            // Deep nonsense/spam check
-            if (Properties.BOOK_ENABLE_PUBLISH_HEURISTICS && BookUtils.LooksLikeGibberish(book.Text))
-            {
-                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.Gibberish");
-            }
+                // Deep nonsense/spam check
+                if (Properties.BOOK_ENABLE_PUBLISH_HEURISTICS && BookUtils.LooksLikeGibberish(book.Text))
+                {
+                    return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.Gibberish");
+                }
 
-            // Prohibited content
-            if (BookUtils.ContainsProhibitedTerms(book.Text, out string bad))
-            {
-                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.Prohibited", bad);
-            }
+                // Prohibited content
+                if (BookUtils.ContainsProhibitedTerms(book.Text, out string bad))
+                {
+                    return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.Prohibited", bad);
+                }
 
-            if (BookUtils.ContainsProhibitedTerms(book.Title, out string badTitle))
-            {
-                return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.TitleProhibited", badTitle);
+                if (BookUtils.ContainsProhibitedTerms(book.Title, out string badTitle))
+                {
+                    return LanguageMgr.Translate(player, "RoyalTreasuryClerk.Validate.TitleProhibited", badTitle);
+                }
             }
 
             // Title validity
@@ -844,12 +847,15 @@ namespace DOL.GS
                 return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.NoAccount");
             }
 
-            var used = GetUsedAccounts(requester);
-            if (used.Contains(acc, StringComparer.OrdinalIgnoreCase))
+            if (requester.Client.Account.PrivLevel <= 1)
             {
-                return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.SameAccount");
+                // TODO: This doesn't check the accounts of the other founders.
+                var used = GetUsedAccounts(requester);
+                if (used.Contains(acc, StringComparer.OrdinalIgnoreCase))
+                {
+                    return LanguageMgr.Translate(requester, "RoyalTreasuryClerk.Founder.SameAccount");
+                }
             }
-
             return null;
         }
 
