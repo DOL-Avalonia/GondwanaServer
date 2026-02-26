@@ -53,7 +53,7 @@ namespace DOL.AI
         /// <returns></returns>
         public override string ToString()
         {
-            return base.ToString() + ", noPlayersStopCountdown=" + noPlayersStopCountdown.ToString() + " resetTimer=" + m_resetTimer;
+            return base.ToString() + ", noPlayersStopCountdown=" + noPlayersStopCountdown.ToString() + " resetTimer=" + m_resetTimer?.TimeUntilElapsed;
         }
 
         /// <summary>
