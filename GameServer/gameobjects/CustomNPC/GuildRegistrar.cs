@@ -42,6 +42,10 @@ namespace DOL.GS
         private const string INTERACT_KEY_PREVIOUS_PAGE = "GuildRegistrar.List.PreviousPage";
         private const string INTERACT_KEY_NEXT_PAGE = "GuildRegistrar.List.NextPage";
 
+        public const string TAG_PROCESSING = "processing";
+        public const string TAG_STAMPED = "GuildStamped";
+        public const string TAG_LEADER = "GuildLeader";
+
         public override bool Interact(GamePlayer player)
         {
             if (!base.Interact(player))
@@ -185,7 +189,7 @@ namespace DOL.GS
             }
 
             int required = Properties.GUILD_NUM;
-            var founders = BookUtils.ExtractFounders(book.Text, required);
+            var founders = BookUtils.ExtractFounders(book, required);
 
             if (string.IsNullOrWhiteSpace(founders.leader) || founders.members.Count != required - 1)
             {
@@ -441,56 +445,7 @@ namespace DOL.GS
 
         private void ShowRegistry(PlayerCache cache, DBBook registry)
         {
-            var player = cache.Player;
-            string language = string.IsNullOrEmpty(registry.Language) ? Properties.SERV_LANGUAGE : registry.Language;
-            var taskAuthor = LanguageMgr.Translate(player, "GuildRegistrar.Read.Author", registry.Author);
-            var taskLanguage = player.AutoTranslateEnabled ? LanguageMgr.Translate(player, "GuildRegistrar.Read.Language", language) : null;
-            var taskTitle = LanguageMgr.Translate(player, "GuildRegistrar.Read.Title", registry.Title);
-            var taskInk = LanguageMgr.Translate(player, "GuildRegistrar.Read.Ink", registry.Ink);
-
-            Task.Run(async () =>
-            {
-                var sb = new StringBuilder(2048);
-                sb
-                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-                    .Append(await taskAuthor).Append('\n')
-                    .Append(await taskTitle).Append('\n');
-
-                if (taskLanguage is not null)
-                {
-                    sb.Append(await taskLanguage).Append('\n');
-                }
-            
-                sb
-                    .Append(await taskInk).Append('\n')
-                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                sb.Clear();
-
-                var text = await cache.TranslateBookText(registry);
-                for (int i = 0; i < text.Length; i++)
-                {
-                    if (i + 2 < text.Length)
-                    {
-                        if ((text[i] == '\n') && (text[i + 1] == '\n'))
-                        {
-                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                            sb.Clear();
-                            i++;
-                            i++;
-                            continue;
-                        }
-                        else if (sb.Length > 1900)
-                        {
-                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                            sb.Clear();
-                        }
-                    }
-                    sb.Append(text[i]);
-                }
-                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-            });
+            BooksMgr.ReadGuildRegistry(cache.Player, registry);
         }
     }
 }

@@ -722,10 +722,14 @@ namespace DOL.Language
         /// <returns></returns>
         private static async Task<string> TranslateImpl(string language, string translationId, object[] args, bool autoTranslate, bool translateFormatted)
         {
+            bool hasArgs = args is { Length: > 0 };
             string translation;
             if (TryGetTranslation(out translation, language, translationId))
             {
-                return string.Format(translation, await UnrollArgs(args));
+                if (hasArgs)
+                    return string.Format(translation, await UnrollArgs(args));
+                else
+                    return translation;
             }
 
             // No translation found in files for this language. Try auto translating from server language
@@ -733,7 +737,7 @@ namespace DOL.Language
             if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
             {
                 object[] staticArgs = Array.Empty<object>();
-                if (translateFormatted)
+                if (translateFormatted && hasArgs)
                 {
                     staticArgs = await UnrollArgs(args);
                 }
@@ -749,7 +753,7 @@ namespace DOL.Language
                         }
                     }
 
-                    if (!translateFormatted && args is { Length: > 0 } && !string.IsNullOrEmpty(translation))
+                    if (!translateFormatted && hasArgs && !string.IsNullOrEmpty(translation))
                     {
                         try
                         {

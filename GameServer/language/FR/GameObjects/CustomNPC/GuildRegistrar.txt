@@ -46,3 +46,5 @@ GuildRegistrar.Read.Author:				Auteur : {0}
 GuildRegistrar.Read.Title:				Titre : {0}
 GuildRegistrar.Read.Language:			Langage d'origine : {0}
 GuildRegistrar.Read.Ink:				Encre utilisée : {0}
+GuildRegistrar.Read.Leader:				Maître : {0}
+GuildRegistrar.Read.Founder:			Fondateur : {0}

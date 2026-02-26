@@ -46,3 +46,5 @@ GuildRegistrar.Read.Author:				Author: {0}
 GuildRegistrar.Read.Title:				Title: {0}
 GuildRegistrar.Read.Language:			Original language: {0}
 GuildRegistrar.Read.Ink:				Ink used: {0}
+GuildRegistrar.Read.Leader:				Leader: {0}
+GuildRegistrar.Read.Founder:			Founder: {0}

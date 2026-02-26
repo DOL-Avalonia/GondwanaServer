@@ -1,10 +1,14 @@
-using System;
-using System.Text;
-using DOL.GS.PacketHandler;
 using DOL.Database;
 using DOL.Events;
-using System.Reflection;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
+using DOL.Language;
 using log4net;
+using System;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using static DOL.GS.ArtifactMgr;
 
 namespace DOL.GS.Scripts
 {
@@ -37,11 +41,94 @@ namespace DOL.GS.Scripts
                 ReadBook(player, GameServer.Database.FindObjectByKey<DBBook>(item.MaxCondition));
         }
 
+        public static void ReadGuildRegistry(GamePlayer player, DBBook registry)
+        {
+            if (registry == null)
+            {
+                player.Client.Out.SendMessage("~~ Parchemin Vierge ~~", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                return;
+            }
+
+            string language = string.IsNullOrEmpty(registry.Language) ? Properties.SERV_LANGUAGE : registry.Language;
+            var taskAuthor = LanguageMgr.Translate(player, "GuildRegistrar.Read.Author", registry.Author);
+            var taskLanguage = player.AutoTranslateEnabled ? LanguageMgr.Translate(player, "GuildRegistrar.Read.Language", language) : null;
+            var taskTitle = LanguageMgr.Translate(player, "GuildRegistrar.Read.Title", registry.Title);
+            var taskInk = LanguageMgr.Translate(player, "GuildRegistrar.Read.Ink", registry.Ink);
+            var (leader, founders) = BookUtils.ExtractFounders(registry);
+            var taskLeader = LanguageMgr.Translate(player, "GuildRegistrar.Read.Leader");
+            var taskFounder = LanguageMgr.Translate(player, "GuildRegistrar.Read.Founder");
+            var taskText = AutoTranslateManager.Translate(registry.Language, player, registry.Text);
+
+            Task.Run(async () =>
+            {
+                var sb = new StringBuilder(2048);
+                sb
+                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+                    .Append(await taskAuthor).Append('\n')
+                    .Append(await taskTitle).Append('\n');
+
+                if (taskLanguage is not null)
+                {
+                    sb.Append(await taskLanguage).Append('\n');
+                }
+            
+                sb
+                    .Append(await taskInk).Append('\n')
+                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                sb.Clear();
+
+                var text = await taskText;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i + 2 < text.Length)
+                    {
+                        if ((text[i] == '\n') && (text[i + 1] == '\n'))
+                        {
+                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                            sb.Clear();
+                            i++;
+                            i++;
+                            continue;
+                        }
+                        else if (sb.Length > 1900)
+                        {
+                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                            sb.Clear();
+                        }
+                    }
+                    sb.Append(text[i]);
+                }
+
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                sb.Clear();
+
+                if (!string.IsNullOrEmpty(leader))
+                {
+                    var leaderStr = string.Format(await taskLeader, leader);
+                    sb.Append(leaderStr).Append('\n');
+                }
+                foreach (var founder in founders)
+                {
+                    var founderStr = string.Format(await taskFounder, founder);
+                    sb.Append(founderStr).Append('\n');
+                }
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+            });
+        }
+
         public static void ReadBook(GamePlayer player, DBBook dbBook)
         {
             if (dbBook == null)
             {
                 player.Client.Out.SendMessage("~~ Parchemin Vierge ~~", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                return;
+            }
+
+            if (dbBook.IsGuildRegistry)
+            {
+                ReadGuildRegistry(player, dbBook);
                 return;
             }
 

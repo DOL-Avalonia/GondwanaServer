@@ -11,8 +11,8 @@ namespace DOL.GS
 {
     public static class BookUtils
     {
-        private static readonly Regex LeaderRegex = new(@"#GuildLeader_([A-Za-z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex MemberRegex = new(@"#GuildMember(\d{2})_([A-Za-z0-9_\-]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private const string GuildLeaderTag = "GuildLeader";
+        private static readonly Regex MemberRegex = new(@"GuildMember(\d{2})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly Regex WordRegex = new(@"\b[\p{L}\p{N}']+\b", RegexOptions.Compiled);
         private static readonly Regex LetterRegex = new(@"\p{L}", RegexOptions.Compiled);
@@ -219,19 +219,18 @@ namespace DOL.GS
             return false;
         }
 
-        public static (string leader, List<string> members) ExtractFounders(string text, int requiredGuildNum)
+        public static (string leader, List<string> members) ExtractFounders(DBBook book, int requiredGuildNum = -1)
         {
-            string leader = null;
-            var leaderMatch = LeaderRegex.Match(text ?? "");
-            if (leaderMatch.Success)
-                leader = leaderMatch.Groups[1].Value;
-
+            var leader = book.GetTag(GuildLeaderTag);
             var members = new SortedDictionary<int, string>();
-            foreach (Match m in MemberRegex.Matches(text ?? ""))
+            foreach (var (m, value) in book.MatchTags(MemberRegex))
             {
-                if (!int.TryParse(m.Groups[1].Value, out int idx)) continue;
-                members[idx] = m.Groups[2].Value;
+                if (!int.TryParse(m.Groups[1].Value, out int idx) || string.IsNullOrEmpty(value)) continue;
+                members[idx] = value;
             }
+
+            if (requiredGuildNum < 0 || requiredGuildNum >= members.Count)
+                return (leader, members.Values.ToList());
 
             var list = new List<string>();
             for (int i = 0; i < requiredGuildNum; i++)
@@ -252,7 +251,7 @@ namespace DOL.GS
         public static bool IsGuildless(DOLCharacters ch)
         {
             if (ch == null) return false;
-            return string.IsNullOrEmpty(ch.GuildID);
+            return string.IsNullOrEmpty(ch.GuildID) || GuildMgr.GetGuildByGuildID(ch.GuildID) == null;
         }
 
         public static string GetAccountName(DOLCharacters ch)

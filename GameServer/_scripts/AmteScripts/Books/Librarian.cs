@@ -141,10 +141,10 @@ namespace DOL.GS.Scripts
             if (Properties.GUILD_REQUIRE_REGISTER)
             {
                 // Click on a register title -> show FULL TEXT
-                var regClicked = GameServer.Database.SelectObject<DBBook>(b => b.Title == text && b.Author == GUILD_REGISTER_AUTHOR);
+                var regClicked = GameServer.Database.SelectObject<DBBook>(b => b.Title == text && b.IsGuildRegistry);
                 if (regClicked != null)
                 {
-                    BooksMgr.ReadBook(player, regClicked);
+                    BooksMgr.ReadGuildRegistry(cache.Player, regClicked);
                     return true;
                 }
             }
@@ -218,7 +218,7 @@ namespace DOL.GS.Scripts
             // Clicking on a book title -> preview
             var originalTitle = cache.GetBookTitleID(text);
             var clicked = GameServer.Database.SelectObject<DBBook>(
-                b => b.IsInLibrary && b.Title == originalTitle && b.Author != GUILD_REGISTER_AUTHOR);
+                b => b.IsInLibrary && b.Title == originalTitle && !b.IsGuildRegistry);
 
             if (clicked != null)
             {
@@ -234,7 +234,7 @@ namespace DOL.GS.Scripts
                 if (int.TryParse(token, out int bookId))
                 {
                     var legacyById = GameServer.Database.SelectObject<DBBook>(
-                        b => b.ID == bookId && b.IsInLibrary && b.Author != GUILD_REGISTER_AUTHOR);
+                        b => b.ID == bookId && b.IsInLibrary && !b.IsGuildRegistry);
 
                     if (legacyById != null)
                     {

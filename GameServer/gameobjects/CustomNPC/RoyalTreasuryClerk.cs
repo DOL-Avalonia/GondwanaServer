@@ -35,10 +35,6 @@ namespace DOL.GS
         private const int STEP_CONFIRM_GUILDNAME = 3;
         private const int STEP_AWAIT_STAMP = 4;
 
-        private const string TAG_PROCESSING = "#processing";
-        private const string TAG_STAMPED = "#GuildStamped";
-        private const string TAG_LEADER_PREFIX = "#GuildLeader_";
-
         private const string INTERACT_KEY_REGISTER = "RoyalTreasuryClerk.Keyword.GuildRegister";
         private const string INTERACT_KEY_STONE = "RoyalTreasuryClerk.Other";
 
@@ -66,34 +62,21 @@ namespace DOL.GS
 
         private static bool BookHasTag(DBBook? book, string tag)
         {
-            if (string.IsNullOrEmpty(book?.Text)) return false;
-            return book.Text.Contains(tag, StringComparison.OrdinalIgnoreCase);
+            return book.HasTag(tag);
         }
 
         private static void EnsureProcessingTag(DBBook? book)
         {
             if (book == null) return;
-            if (string.IsNullOrEmpty(book.Text)) book.Text = string.Empty;
 
-            if (!BookHasTag(book, TAG_PROCESSING))
-            {
-                book.Text += "\n" + TAG_PROCESSING + "\n";
-            }
+            book.AddTag(GuildRegistrar.TAG_PROCESSING);
         }
 
         private static void RemoveProcessingTag(DBBook? book)
         {
-            if (book == null || string.IsNullOrEmpty(book.Text)) return;
-            // Remove whole lines that equal "#processing"
-            var lines = book.Text.Replace("\r", "").Split('\n');
-            var kept = new List<string>(lines.Length);
-            foreach (var l in lines)
-            {
-                if (l.Trim().Equals(TAG_PROCESSING, StringComparison.OrdinalIgnoreCase))
-                    continue;
-                kept.Add(l);
-            }
-            book.Text = string.Join("\n", kept);
+            if (book == null) return;
+
+            book.RemoveTag(GuildRegistrar.TAG_PROCESSING);
         }
 
         /// <summary>
@@ -222,11 +205,11 @@ namespace DOL.GS
                     continue;
 
                 // Must be processing for resume
-                if (!BookHasTag(b, TAG_PROCESSING))
+                if (!BookHasTag(b, GuildRegistrar.TAG_PROCESSING))
                     continue;
 
                 // If already stamped, not an "in-progress" candidate
-                if (b.IsStamped || BookHasTag(b, TAG_STAMPED))
+                if (b.IsStamped || BookHasTag(b, GuildRegistrar.TAG_STAMPED))
                     continue;
 
                 book = b;
@@ -245,7 +228,7 @@ namespace DOL.GS
                 return false;
 
             int required = Properties.GUILD_NUM;
-            var founders = BookUtils.ExtractFounders(book.Text, required);
+            var founders = BookUtils.ExtractFounders(book, required);
 
             player.TempProperties.setProperty(TP_BOOK_ID, (int)book.ID);
             RebuildUsedAccountsFromFounders(player, founders);
@@ -326,7 +309,7 @@ namespace DOL.GS
         private void ShowResumePrompt(GamePlayer player, DBBook book)
         {
             int required = Properties.GUILD_NUM;
-            var founders = BookUtils.ExtractFounders(book.Text, required);
+            var founders = BookUtils.ExtractFounders(book, required);
 
             int step = player.TempProperties.getProperty<int>(TP_STEP, STEP_NONE);
             if (step == STEP_COLLECT_LEADER)
@@ -482,7 +465,7 @@ namespace DOL.GS
                 }
             }
 
-            text = (text ?? "").Trim();
+            text = (text ?? string.Empty).Trim();
             if (registerEnabled)
             {
                 int step = player.TempProperties.getProperty<int>(TP_STEP, STEP_NONE);
@@ -560,7 +543,7 @@ namespace DOL.GS
             }
 
             // If already stamped, clerk does nothing with it
-            if (book.IsStamped || BookHasTag(book, TAG_STAMPED))
+            if (book.IsStamped || BookHasTag(book, GuildRegistrar.TAG_STAMPED))
             {
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.AlreadyDone"));
                 return true;
@@ -568,7 +551,7 @@ namespace DOL.GS
 
             // Only enter the step-based conversation after FULL validation AND after adding #processing.
             // If book is not yet processing, we validate now and then mark it processing.
-            if (!BookHasTag(book, TAG_PROCESSING))
+            if (!BookHasTag(book, GuildRegistrar.TAG_PROCESSING))
             {
                 var failTask = ValidateInitialBook(player, item, book);
                 if (failTask != null)
@@ -615,7 +598,7 @@ namespace DOL.GS
             int bookId = player.TempProperties.getProperty<int>(TP_BOOK_ID, 0);
             DBBook book = DOLDB<DBBook>.SelectObject(DB.Column(nameof(DBBook.ID)).IsEqualTo((long)bookId));
 
-            if (book == null || !BookHasTag(book, TAG_PROCESSING))
+            if (book == null || !BookHasTag(book, GuildRegistrar.TAG_PROCESSING))
             {
                 ResetState(player);
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
@@ -636,8 +619,7 @@ namespace DOL.GS
                             return true;
                         }
 
-                        book.Text = RemoveTagLines(book.Text, TAG_LEADER_PREFIX);
-                        book.Text += $"\n{TAG_LEADER_PREFIX}{ch.Name}\n";
+                        book.AddTag(GuildRegistrar.TAG_LEADER, ch.Name);
                         book.Save();
 
                         AddUsedAccount(player, ch.AccountName);
@@ -669,7 +651,7 @@ namespace DOL.GS
                             return true;
                         }
 
-                        var founders = BookUtils.ExtractFounders(book.Text, required);
+                        var founders = BookUtils.ExtractFounders(book, required);
                         var allNames = new List<string>();
                         if (!string.IsNullOrWhiteSpace(founders.leader)) allNames.Add(founders.leader);
                         allNames.AddRange(founders.members);
@@ -680,7 +662,7 @@ namespace DOL.GS
                             return true;
                         }
 
-                        book.Text += $"\n#GuildMember{idx:00}_{ch.Name}";
+                        book.AddTag($"GuildMember{idx:00}", ch.Name);
                         book.Save();
 
                         AddUsedAccount(player, ch.AccountName);
@@ -780,7 +762,7 @@ namespace DOL.GS
             int bookId = player.TempProperties.getProperty<int>(TP_BOOK_ID, 0);
             DBBook book = DOLDB<DBBook>.SelectObject(DB.Column(nameof(DBBook.ID)).IsEqualTo((long)bookId));
 
-            if (book == null || !BookHasTag(book, TAG_PROCESSING))
+            if (book == null || !BookHasTag(book, GuildRegistrar.TAG_PROCESSING))
             {
                 ResetState(player);
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
@@ -788,7 +770,7 @@ namespace DOL.GS
             }
 
             int required = Properties.GUILD_NUM;
-            var founders = BookUtils.ExtractFounders(book.Text, required);
+            var founders = BookUtils.ExtractFounders(book, required);
             if (string.IsNullOrWhiteSpace(founders.leader) || founders.members.Count != required - 1)
             {
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.Incomplete"));
@@ -801,8 +783,7 @@ namespace DOL.GS
             book.StampDate = DateTime.Now;
 
             // Mark stamped tag and remove processing tag for clarity
-            if (!BookHasTag(book, TAG_STAMPED))
-                book.Text += "\n" + TAG_STAMPED + "\n";
+            book.AddTag(GuildRegistrar.TAG_STAMPED);
             RemoveProcessingTag(book);
 
             book.Save();
