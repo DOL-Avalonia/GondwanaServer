@@ -397,12 +397,30 @@ namespace DOL.GS
 
                 lock (removeGuild.GetListOfOnlineMembers())
                 {
-                    foreach (GamePlayer ply in removeGuild.GetListOfOnlineMembers())
+                    var guildCharacters = GameServer.Database.SelectObjects<DOLCharacters>(c => c.GuildID == removeGuild.GuildID);
+                    List<DOLCharacters> offlineCharacters = new(guildCharacters.Count);
+                    var onlinePlayers = removeGuild.GetListOfOnlineMembers().ToDictionary(p => p.ObjectId);
+                    foreach (var character in guildCharacters)
                     {
-                        ply.Guild = null;
-                        ply.GuildID = "";
-                        ply.GuildName = "";
-                        ply.GuildRank = null;
+                        if (onlinePlayers.TryGetValue(character.GuildID, out GamePlayer ply))
+                        {
+                            // Character is online
+                            ply.Guild = null;
+                            ply.GuildID = "";
+                            ply.GuildName = "";
+                            ply.GuildRank = null;
+                            ply.SaveIntoDatabase();
+                        }
+                        else
+                        {
+                            offlineCharacters.Add(character);
+                            character.GuildID = string.Empty;
+                        }
+                    }
+                    
+                    if (offlineCharacters.Any())
+                    {
+                        GameServer.Database.SaveObject(offlineCharacters);
                     }
                 }
 

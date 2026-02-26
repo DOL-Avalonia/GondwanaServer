@@ -12421,6 +12421,45 @@ namespace DOL.GS
         #region Add/Move/Remove
 
         /// <summary>
+        /// Called when a player logs into the world
+        /// </summary>
+        public void DoLoginMaintenance()
+        {
+            Guild playerGuild = Guild;
+            //check emblems at world load before any updates
+            if (Inventory != null)
+            {
+                lock (Inventory)
+                {
+                    foreach (InventoryItem myitem in Inventory.AllItems)
+                    {
+                        if (myitem != null && myitem.Emblem != 0)
+                        {
+                            if (playerGuild == null || myitem.Emblem != playerGuild.Emblem)
+                            {
+                                myitem.Emblem = 0;
+                            }
+                            if (Level < 20)
+                            {
+                                if (CraftingPrimarySkill == eCraftingSkill.NoCrafting)
+                                {
+                                    myitem.Emblem = 0;
+                                }
+                                else
+                                {
+                                    if (GetCraftingSkillValue(CraftingPrimarySkill) < 400)
+                                    {
+                                        myitem.Emblem = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Called to create an player in the world and send the other
         /// players around this player an update
         /// </summary>
@@ -15146,11 +15185,16 @@ namespace DOL.GS
 
             #region guild handling
             //TODO: overwork guild handling (VaNaTiC)
+            if (!string.IsNullOrEmpty(DBCharacter.GuildID))
+            {
+                m_guild = GuildMgr.GetGuildByGuildID(DBCharacter.GuildID);
+                if (m_guild == null)
+                {
+                    log.WarnFormat("Could not find guild {0} for Player {1} ({2})", DBCharacter.GuildID, DBCharacter.Name, DBCharacter.ObjectId);
+                    DBCharacter.GuildID = string.Empty;
+                }
+            }
             m_guildId = DBCharacter.GuildID;
-            if (m_guildId != null)
-                m_guild = GuildMgr.GetGuildByGuildID(m_guildId);
-            else
-                m_guild = null;
 
             if (m_guild != null)
             {
@@ -15300,6 +15344,9 @@ namespace DOL.GS
 
             // Ensure TaskXPlayer data is loaded
             TaskXPlayer = TaskManager.EnsureTaskData(this);
+            
+            if (DBCharacter.Dirty)
+                GameServer.Database.SaveObject(DBCharacter);
         }
 
         /// <summary>
@@ -19748,6 +19795,5 @@ namespace DOL.GS
         } = 0;
 
         #endregion
-
     }
 }
