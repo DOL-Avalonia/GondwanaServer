@@ -86,14 +86,37 @@ namespace DOL.GS
                 if (!guildDictionary.TryGetValue(player.InternalID, out _))
                 {
                     GuildMemberDisplay member = new GuildMemberDisplay(player.InternalID,
-                                                                        player.Name,
-                                                                        player.Level.ToString(),
-                                                                        player.CharacterClass.ID.ToString(),
-                                                                        player.GuildRank.RankLevel.ToString(),
-                                                                        player.Group != null ? player.Group.MemberCount.ToString() : "1",
-                                                                        player.CurrentZone.Description,
-                                                                        player.GuildNote);
+                                                                       player.Name,
+                                                                       player.Level.ToString(),
+                                                                       player.CharacterClass.ID.ToString(),
+                                                                       player.GuildRank.RankLevel.ToString(),
+                                                                       player.Group != null ? player.Group.MemberCount.ToString() : "1",
+                                                                       player.CurrentZone.Description,
+                                                                       player.GuildNote);
                     guildDictionary.Add(player.InternalID, member);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add a player to the guild players dictionary list
+        /// </summary>
+        /// <param name="player">Player to add</param>
+        public static void AddPlayerToAllGuildPlayersList(DOLCharacters player)
+        {
+            if (m_guildXAllMembers.TryGetValue(player.GuildID, out var guildDictionary))
+            {
+                if (!guildDictionary.TryGetValue(player.ObjectId, out _))
+                {
+                    GuildMemberDisplay member = new GuildMemberDisplay(player.ObjectId,
+                                                                       player.Name,
+                                                                       player.Level.ToString(),
+                                                                       player.Class.ToString(),
+                                                                       player.GuildRank.ToString(),
+                                                                       "0",
+                                                                       string.Empty,
+                                                                       player.GuildNote);
+                    guildDictionary.Add(player.ObjectId, member);
                 }
             }
         }

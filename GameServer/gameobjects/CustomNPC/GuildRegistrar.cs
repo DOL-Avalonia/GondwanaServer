@@ -246,11 +246,7 @@ namespace DOL.GS
             }
 
             // Add founders (leader rank 0, others rank 5)
-            foreach (string fn in founderNames)
-            {
-                ushort rankId = fn.Equals(founders.leader, StringComparison.OrdinalIgnoreCase) ? (ushort)0 : (ushort)5;
-                AssignFounderToGuild(newGuild, fn, rankId);
-            }
+            AssignFoundersToGuild(newGuild, founders.leader, founderNames);
 
             // Consume the register item
             if (!player.Inventory.RemoveItem(item))
@@ -310,26 +306,50 @@ namespace DOL.GS
             return false;
         }
 
-        private void AssignFounderToGuild(Guild guild, string characterName, ushort rankId)
+        private bool AssignFoundersToGuild(Guild guild, string leader, List<string> founders)
         {
-            var rank = guild.GetRankByID(rankId);
-            var client = WorldMgr.GetClientByPlayerName(characterName, true, false);
-            var gp = client?.Player;
+            var leaderRank = guild.GetRankByID(0);
+            var founderRank = guild.GetRankByID(5);
+            List<GamePlayer> onlinePlayers = new();
+            List<DOLCharacters> offlinePlayers = new();
+            GamePlayer? leaderPlayer = null;
+            DOLCharacters? leaderCharacter = null;
 
-            if (gp != null)
+            foreach (var name in founders)
             {
-                guild.AddPlayer(gp, rank);
-                return;
+                var client = WorldMgr.GetClientByPlayerName(name, true, false);
+                var gp = client?.Player;
+                if (gp != null && string.IsNullOrEmpty(gp.GuildID))
+                {
+                    if (string.Equals(leader, name, StringComparison.InvariantCultureIgnoreCase))
+                        leaderPlayer = gp;
+                    onlinePlayers.Add(gp);
+                    continue;
+                }
+
+                var ch = BookUtils.GetCharacter(name);
+                if (ch != null && string.IsNullOrEmpty(ch.GuildID))
+                {
+                    if (string.Equals(leader, name, StringComparison.InvariantCultureIgnoreCase))
+                        leaderCharacter = ch;
+                    offlinePlayers.Add(ch);
+                }
             }
 
-            var ch = BookUtils.GetCharacter(characterName);
-            if (ch == null)
-                return;
+            if (onlinePlayers.Count == 0 && offlinePlayers.Count == 0)
+                return false; // Players joined another guild or somehow changed name or deleted character
 
-            ch.GuildID = guild.GuildID;
-            ch.GuildRank = rankId;
+            if (leaderPlayer is null && leaderCharacter is null)
+            {
+                leaderPlayer = onlinePlayers.FirstOrDefault();
+                if (leaderPlayer is null)
+                    leaderCharacter = offlinePlayers.FirstOrDefault();
+            }
 
-            GameServer.Database.SaveObject(ch);
+            bool success = false;
+            success = guild.AddPlayers(onlinePlayers.Select(p => new KeyValuePair<GamePlayer, DBRank>(p, p == leaderPlayer ? leaderRank : founderRank))) || success;
+            success = guild.AddOfflinePlayers(offlinePlayers.Select(p => new KeyValuePair<DOLCharacters, DBRank>(p, p == leaderCharacter ? leaderRank : founderRank))) || success;
+            return success;
         }
 
         private static void RefreshGuildAndMembersUI(Guild guild)

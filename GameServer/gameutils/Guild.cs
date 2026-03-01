@@ -17,25 +17,26 @@
  *
  */
 using AmteScripts.Managers;
-using System.Collections;
-using System.Collections.Generic;
-using System;
-using System.Reflection;
 using DOL.Database;
 using DOL.GS.Effects;
-using DOL.Language;
-using DOL.GS.Keeps;
-using log4net;
-using System.Linq;
+using DOL.GS.Finance;
 using DOL.GS.Housing;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
-using DOL.Territories;
-using DOL.GS.Finance;
 using DOL.GS.Spells;
+using DOL.Language;
+using DOL.Territories;
+using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Timers;
+using System.Linq;
 using System.Numerics;
+using System.Reflection;
+using System.Timers;
+using static DOL.GS.Area;
 
 namespace DOL.GS
 {
@@ -1101,22 +1102,33 @@ namespace DOL.GS
         /// </summary>
         /// <param name="player">GamePlayer to be added to the guild</param>
         /// <returns>true if added successfully</returns>
-        public bool AddOnlineMember(GamePlayer player)
+        public bool AddOnlineMembers(IEnumerable<GamePlayer> players)
         {
-            if (player == null) return false;
+            if (players == null)
+                return false;
+
             lock (m_memberListLock)
             {
-                if (!m_onlineGuildPlayers.ContainsKey(player.InternalID))
+                var toAdd = players.Where(p => !m_onlineGuildPlayers.ContainsKey(p.InternalID)).ToList();
+                foreach (var player in toAdd)
                 {
                     if (!player.IsAnonymous)
                         NotifyGuildMembers(player);
 
                     m_onlineGuildPlayers.Add(player.InternalID, player);
-                    return true;
                 }
+                return toAdd.Any();
             }
+        }
 
-            return false;
+        /// <summary>
+        /// Adds a player to the guild
+        /// </summary>
+        /// <param name="player">GamePlayer to be added to the guild</param>
+        /// <returns>true if added successfully</returns>
+        public bool AddOnlineMember(GamePlayer player)
+        {
+            return AddOnlineMembers([player]);
         }
 
         private void NotifyGuildMembers(GamePlayer member)
@@ -1207,27 +1219,40 @@ namespace DOL.GS
                 return false;
             }
 
-            if (log.IsDebugEnabled)
-                log.Debug("Adding player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
+            return AddPlayers([new(addPlayer, rank)]);
+        }
 
+        public bool AddPlayers(IEnumerable<KeyValuePair<GamePlayer, DBRank>> players)
+        {
             try
             {
-                AddOnlineMember(addPlayer);
-                addPlayer.GuildName = Name;
-                addPlayer.GuildID = GuildID;
-                addPlayer.GuildRank = rank;
-                addPlayer.Guild = this;
-                addPlayer.SaveIntoDatabase();
-                GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
-                addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                addPlayer.Client.Out.SendCharResistsUpdate();
-                if (addPlayer.IsInPvP)
-                    PvpManager.Instance.OnMemberJoinGuild(this, addPlayer);
-                if (IsSystemGuild || force || addPlayer.Client.Account.PrivLevel != 1)
-                    return true;
-                m_invite_Players.Add(addPlayer, DateTime.Now);
+                AddOnlineMembers(players.Select(p => p.Key));
+                foreach (var (addPlayer, rank) in players)
+                {
+                    if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                        continue;
+
+                    if (log.IsDebugEnabled)
+                        log.Debug("Adding player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
+
+                    addPlayer.GuildName = Name;
+                    addPlayer.GuildID = GuildID;
+                    addPlayer.GuildRank = rank;
+                    addPlayer.Guild = this;
+                    addPlayer.SaveIntoDatabase();
+                    GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
+                }
+
+                foreach (var (addPlayer, _) in players)
+                {
+                    addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    addPlayer.Client.Out.SendCharResistsUpdate();
+                    if (addPlayer.IsInPvP)
+                        PvpManager.Instance.OnMemberJoinGuild(this, addPlayer);
+                }
+                return true;
             }
             catch (Exception e)
             {
@@ -1235,8 +1260,56 @@ namespace DOL.GS
                     log.Error("AddPlayer", e);
                 return false;
             }
+        }
 
-            return true;
+        /// <summary>
+        /// Add an offline player to a guild with the specified rank
+        /// </summary>
+        /// <param name="addPlayer"></param>
+        /// <param name="rank"></param>
+        /// <returns></returns>
+        public bool AddOfflinePlayers(IEnumerable<KeyValuePair<DOLCharacters, DBRank>> players)
+        {
+            bool any = false;
+            foreach (var (addPlayer, rank) in players)
+            {
+                try
+                {
+                    if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                        continue;
+
+                    if (log.IsDebugEnabled)
+                        log.Debug("Adding offline player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
+
+                    addPlayer.GuildID = GuildID;
+                    addPlayer.GuildRank = rank.RankLevel;
+                
+                    GameServer.Database.SaveObject(addPlayer);
+
+                    GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
+                    SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                }
+                catch (Exception e)
+                {
+                    if (log.IsErrorEnabled)
+                        log.Error("AddPlayer", e);
+                }
+            }
+            return any;
+        }
+
+        /// <summary>
+        /// Add an offline player to a guild with the specified rank
+        /// </summary>
+        /// <param name="addPlayer"></param>
+        /// <param name="rank"></param>
+        /// <returns></returns>
+        public bool AddOfflinePlayer(DOLCharacters addPlayer, DBRank rank, bool force = false)
+        {
+            if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                return false;
+
+            return AddOfflinePlayers([new(addPlayer, rank)]);
         }
 
         /// <summary>
