@@ -244,7 +244,7 @@ namespace DOL.GS.Commands
                                 return;
                             }
 
-                            GameLiving guildLeader = client.Player.TargetObject as GameLiving;
+                            GamePlayer guildLeader = client.Player.TargetObject as GamePlayer;
                             string guildname = String.Join(" ", args, 2, args.Length - 2);
                             guildname = GameServer.Database.Escape(guildname);
                             if (!GuildMgr.DoesGuildExist(guildname))
@@ -269,9 +269,8 @@ namespace DOL.GS.Commands
                                     }
                                     else
                                     {
-                                        newGuild.AddPlayer((GamePlayer)guildLeader);
-                                        ((GamePlayer)guildLeader).GuildRank = ((GamePlayer)guildLeader).Guild.GetRankByID(0);
-                                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.GuildCreated", guildname, ((GamePlayer)guildLeader).Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                        newGuild.AddPlayer(guildLeader, newGuild.GetRankByID(0));
+                                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.GuildCreated", guildname, guildLeader.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     }
                                     return;
                                 }

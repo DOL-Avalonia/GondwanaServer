@@ -106,9 +106,9 @@ namespace DOL.GS
         /// <returns>True if player was removed, else false.</returns>
         public static bool RemovePlayerFromAllGuildPlayersList(GamePlayer player)
         {
-            if (m_guildXAllMembers.ContainsKey(player.GuildID))
+            if (m_guildXAllMembers.TryGetValue(player.GuildID, out Dictionary<string, GuildMemberDisplay> memberdisplay))
             {
-                return m_guildXAllMembers[player.GuildID].Remove(player.InternalID);
+                return memberdisplay.Remove(player.InternalID);
             }
             return false;
         }
@@ -392,17 +392,18 @@ namespace DOL.GS
                 GameServer.Database.DeleteObject(guilds);
 
                 //[StephenxPimentel] We need to delete the guild specific ranks aswell!
+                
                 var ranks = DOLDB<DBRank>.SelectObjects(DB.Column(nameof(DBRank.GuildID)).IsEqualTo(removeGuild.GuildID));
                 GameServer.Database.DeleteObject(ranks);
-
+                Dictionary<string, GamePlayer> onlinePlayers;
                 lock (removeGuild.GetListOfOnlineMembers())
                 {
                     var guildCharacters = GameServer.Database.SelectObjects<DOLCharacters>(c => c.GuildID == removeGuild.GuildID);
                     List<DOLCharacters> offlineCharacters = new(guildCharacters.Count);
-                    var onlinePlayers = removeGuild.GetListOfOnlineMembers().ToDictionary(p => p.ObjectId);
+                    onlinePlayers = removeGuild.GetListOfOnlineMembers().ToDictionary(p => p.ObjectId);
                     foreach (var character in guildCharacters)
                     {
-                        if (onlinePlayers.TryGetValue(character.GuildID, out GamePlayer ply))
+                        if (onlinePlayers.TryGetValue(character.ObjectId, out GamePlayer ply))
                         {
                             // Character is online
                             ply.Guild = null;
@@ -425,7 +426,6 @@ namespace DOL.GS
                 }
 
                 RemoveGuild(removeGuild);
-
                 return true;
             }
             catch (Exception e)

@@ -1200,7 +1200,7 @@ namespace DOL.GS
         /// <returns></returns>
         public bool AddPlayer(GamePlayer addPlayer, DBRank rank, bool force = false)
         {
-            if (addPlayer == null || addPlayer.Guild != null)
+            if (addPlayer is not { Guild: null })
                 return false;
 
             if (!force && !IsSystemGuild && m_leave_Players.ContainsKey(addPlayer) && addPlayer.Client.Account.PrivLevel == 1)
@@ -1254,9 +1254,9 @@ namespace DOL.GS
                 return false;
             
             GameClient remover = WorldMgr.GetClientByPlayerName(removername, false, true);
-            if (!IsSystemGuild && remover is { Account.PrivLevel: < 2 } && m_invite_Players.ContainsKey(member))
+            if (!IsSystemGuild && remover is { Account.PrivLevel: < 2 } && m_invite_Players.TryGetValue(member, out DateTime inviteTime))
             {
-                int time = Properties.RECRUITMENT_TIMER_OPTION - (int)DateTime.Now.Subtract(m_invite_Players[member]).TotalMinutes;
+                int time = Properties.RECRUITMENT_TIMER_OPTION - (int)DateTime.Now.Subtract(inviteTime).TotalMinutes;
                 if (member.Name == removername)
                     member.Client.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "Commands.Players.Guild.NotAbleToLeave", time), eChatType.CT_Advise, eChatLoc.CL_SystemWindow);
                 else
@@ -1280,7 +1280,6 @@ namespace DOL.GS
                 member.Guild = null;
                 member.SaveIntoDatabase();
 
-                member.Out.SendObjectGuildID(member, member.Guild);
                 // Send message to removerClient about successful removal
                 if (removername == member.Name)
                     member.Out.SendMessage("You leave the guild.", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
@@ -1292,11 +1291,12 @@ namespace DOL.GS
                 member.Client.Out.SendCharResistsUpdate();
                 if (member.IsInPvP)
                     PvpManager.Instance.OnMemberLeaveGuild(this, member);
-                if (IsSystemGuild || remover is { Account.PrivLevel: > 1 })
-                    return true;
-                
-                if (!m_leave_Players.ContainsKey(member))
-                    m_leave_Players.Add(member, DateTime.Now);
+
+                if (!IsSystemGuild && remover is not { Account.PrivLevel: > 1 })
+                {
+                    if (!m_leave_Players.ContainsKey(member))
+                        m_leave_Players.Add(member, DateTime.Now);
+                }
             }
             catch (Exception e)
             {
@@ -1483,7 +1483,22 @@ namespace DOL.GS
         /// <returns>ArrayList of members</returns>
         public IList<GamePlayer> GetListOfOnlineMembers()
         {
-            return new List<GamePlayer>(m_onlineGuildPlayers.Values);
+            lock (m_onlineGuildPlayers)
+            {
+                return new List<GamePlayer>(m_onlineGuildPlayers.Values);
+            }
+        }
+        
+        /// <summary>
+        /// Returns a list of all online members.
+        /// </summary>
+        public IEnumerable<GamePlayer> GetOnlineMembers()
+        {
+            lock (m_onlineGuildPlayers)
+            {
+                foreach (var player in m_onlineGuildPlayers.Values)
+                    yield return player;
+            }
         }
 
         /// <summary>

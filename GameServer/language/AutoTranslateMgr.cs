@@ -156,7 +156,7 @@ namespace DOL.GS
             var key = new CacheKey(fromLang, toLang, originalText);
 
             // 2. Check Cache
-            if (false && _cache.TryGetValue(key, out var cached))
+            if (_cache.TryGetValue(key, out var cached))
                 return cached;
 
             // 3. Check/Create Pending Task (The magic deduplication logic)

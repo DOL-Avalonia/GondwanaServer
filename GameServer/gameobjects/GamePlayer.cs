@@ -12864,28 +12864,69 @@ namespace DOL.GS
             get { return m_guild; }
             set
             {
-                if (value == null)
-                {
-                    // remove this player from the online list of their current guild
-                    m_guild.RemoveOnlineMember(this);
-                }
+                SetGuild(value, true);
+            }
+        }
 
-                m_guild = value;
+        public void SetGuild(Guild newGuild, bool sendUpdate = true)
+        {
+            var oldGuild = m_guild;
+            if (oldGuild != null)
+            {
+                // remove this player from the online list of their current guild
+                oldGuild.RemoveOnlineMember(this);
+            }
 
-                //update guild name for all players if client is playing
-                if (ObjectState == eObjectState.Active)
+            m_guild = newGuild;
+
+            if (sendUpdate)
+            {
+                BroadcastUpdate(true);
+                if (newGuild != null)
                 {
-                    Out.SendUpdatePlayer();
-                    foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                    foreach (var player in newGuild.GetListOfOnlineMembers())
                     {
-                        if (player == null) continue;
-                        if (player != this)
+                        if (player.IsVisibleTo(this) && player.IsWithinRadius2D(this, WorldMgr.VISIBILITY_DISTANCE))
                         {
-                            player.Out.SendObjectRemove(this);
-                            player.Out.SendPlayerCreate(this);
-                            player.Out.SendLivingEquipmentUpdate(this);
+                            Out.SendObjectGuildID(player, Guild);
                         }
                     }
+                }
+
+                if (oldGuild != null)
+                {
+                    foreach (var player in oldGuild.GetListOfOnlineMembers())
+                    {
+                        if (player.IsVisibleTo(this) && player.IsWithinRadius2D(this, WorldMgr.VISIBILITY_DISTANCE))
+                        {
+                            Out.SendObjectGuildID(player, Guild);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void BroadcastUpdate(bool full)
+        {
+            if (!full)
+            {
+                base.BroadcastUpdate();
+                return;
+            }
+            
+            if (ObjectState == eObjectState.Active)
+            {
+                Out.SendUpdatePlayer();
+                foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                {
+                    if (player == null) continue;
+                    if (player != this)
+                    {
+                        player.Out.SendObjectRemove(this);
+                        player.Out.SendPlayerCreate(this);
+                        player.Out.SendLivingEquipmentUpdate(this);
+                    }
+                    player.Out.SendObjectGuildID(this, Guild);
                 }
             }
         }

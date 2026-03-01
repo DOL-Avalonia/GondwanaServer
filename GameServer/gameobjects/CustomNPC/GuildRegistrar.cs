@@ -319,14 +319,6 @@ namespace DOL.GS
             if (gp != null)
             {
                 guild.AddPlayer(gp, rank);
-                gp.Guild = guild;
-                gp.GuildID = guild.GuildID;
-                gp.GuildName = guild.Name;
-                gp.GuildRank = rank;
-
-                gp.Out.SendUpdatePlayer();
-                guild.UpdateMember(gp);
-                guild.GetListOfOnlineMembers();
                 return;
             }
 
