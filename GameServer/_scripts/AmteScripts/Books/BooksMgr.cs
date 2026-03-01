@@ -145,23 +145,25 @@ namespace DOL.GS.Scripts
 
             for (int i = 0; i < dbBook.Text.Length; i++)
             {
-                if (i + 2 < dbBook.Text.Length)
-                    if ((dbBook.Text[i] == '\n') && (dbBook.Text[i + 1] == '\n'))
-                    {
-                        player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                        sb.Clear();
-                        i++;
-                        i++;
-                        continue;
-                    }
-                    else if (sb.Length > 1900)
-                    {
-                        player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                        sb.Clear();
-                    }
+                if (i + 2 < dbBook.Text.Length && (dbBook.Text[i] == '\n') && (dbBook.Text[i + 1] == '\n'))
+                {
+                    player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                    sb.Clear();
+                    i++;
+                    i++;
+                    continue;
+                }
+                else if (sb.Length > 1900)
+                {
+                    player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                    sb.Clear();
+                }
+
                 sb.Append(dbBook.Text[i]);
             }
-            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+            
+            if (sb.Length > 0)
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
         }
 
         public static InventoryItem CreateBookItem(DBBook book)

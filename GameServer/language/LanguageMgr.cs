@@ -35,6 +35,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -79,14 +80,13 @@ namespace DOL.Language
                 if (s is not Task asTask)
                     return s;
 
-                var type = s.GetType();
-                if (!(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Task<>)))
-                {
+                Type type = s.GetType();
+                var property = type.GetProperty(nameof(Task<object>.Result));
+                if (property is null) // Task with void result
                     return s;
-                }
 
                 await asTask.ConfigureAwait(false);
-                return type.GetProperty(nameof(Task<object>.Result))!.GetValue(asTask);
+                return property!.GetValue(asTask);
             }));
         }
 
