@@ -46,30 +46,30 @@ namespace DOL.GS
         /// <summary>
         /// ArrayList of all guilds in the game
         /// </summary>
-        static private readonly HybridDictionary m_guilds = new HybridDictionary();
+        static private readonly ReaderWriterDictionary<string, Guild> m_guildsByName = new();
 
         /// <summary>
         /// ArrayList of all GuildIDs to GuildNames
         /// </summary>
-        static private readonly HybridDictionary m_guildids = new HybridDictionary();
+        static private readonly ReaderWriterDictionary<string, Guild> m_guildsById = new();
 
         /// <summary>
         /// Holds all the players combined with their guilds for the social window.
         /// Keys are GuildID and player InternalID
         /// </summary>
         /// <remarks>For each guild stored a dictionary of all players in guikd, unsorted</remarks>
-        private static readonly Dictionary<string, Dictionary<string, GuildMemberDisplay>> m_guildXAllMembers = new Dictionary<string, Dictionary<string, GuildMemberDisplay>>();
+        private static readonly ReaderWriterDictionary<string, ReaderWriterDictionary<string, GuildMemberDisplay>> m_guildXAllMembers = new();
 
         /// <summary>
         /// Gets a copy of a dictionary of all guild members of a given guild, indexed on player InternalID
         /// </summary>
         /// <param name="guildID">The guild id for a player</param>
         /// <returns>Copy of a dictionary of all guild members for the guild or null if guild is not found</returns>
-        public static Dictionary<string, GuildMemberDisplay> GetAllGuildMembers(string guildID)
+        public static IReadOnlyDictionary<string, GuildMemberDisplay> GetAllGuildMembers(string guildID)
         {
-            if (m_guildXAllMembers.ContainsKey(guildID))
+            if (m_guildXAllMembers.TryGetValue(guildID, out var member))
             {
-                return new Dictionary<string, GuildMemberDisplay>(m_guildXAllMembers[guildID]);
+                return new Dictionary<string, GuildMemberDisplay>(member);
             }
 
             return null;
@@ -81,11 +81,10 @@ namespace DOL.GS
         /// <param name="player">Player to add</param>
         public static void AddPlayerToAllGuildPlayersList(GamePlayer player)
         {
-            if (m_guildXAllMembers.ContainsKey(player.GuildID))
+            if (m_guildXAllMembers.TryGetValue(player.GuildID, out var guildDictionary))
             {
-                if (!m_guildXAllMembers[player.GuildID].ContainsKey(player.InternalID))
+                if (!guildDictionary.TryGetValue(player.InternalID, out _))
                 {
-                    Dictionary<string, GuildMemberDisplay> guildMemberList = m_guildXAllMembers[player.GuildID];
                     GuildMemberDisplay member = new GuildMemberDisplay(player.InternalID,
                                                                         player.Name,
                                                                         player.Level.ToString(),
@@ -94,7 +93,7 @@ namespace DOL.GS
                                                                         player.Group != null ? player.Group.MemberCount.ToString() : "1",
                                                                         player.CurrentZone.Description,
                                                                         player.GuildNote);
-                    guildMemberList.Add(player.InternalID, member);
+                    guildDictionary.Add(player.InternalID, member);
                 }
             }
         }
@@ -106,7 +105,7 @@ namespace DOL.GS
         /// <returns>True if player was removed, else false.</returns>
         public static bool RemovePlayerFromAllGuildPlayersList(GamePlayer player)
         {
-            if (m_guildXAllMembers.TryGetValue(player.GuildID, out Dictionary<string, GuildMemberDisplay> memberdisplay))
+            if (m_guildXAllMembers.TryGetValue(player.GuildID, out var memberdisplay))
             {
                 return memberdisplay.Remove(player.InternalID);
             }
@@ -130,17 +129,12 @@ namespace DOL.GS
             if (guild == null)
                 return false;
 
-            lock (m_guilds.SyncRoot)
-            {
-                if (!m_guilds.Contains(guild.Name))
-                {
-                    m_guilds.Add(guild.Name, guild);
-                    m_guildids[guild.GuildID] = guild;
-                    guild.ID = ++m_lastID;
-                    return true;
-                }
-            }
+            if (!m_guildsByName.TryAdd(guild.Name, guild))
+                return false;
 
+            m_guildsById[guild.GuildID] = guild;
+            guild.ID = ++m_lastID;
+            m_guildXAllMembers.AddIfNotExists(guild.GuildID, () => []);
             return false;
         }
 
@@ -155,11 +149,8 @@ namespace DOL.GS
                 return false;
 
             guild.ClearOnlineMemberList();
-            lock (m_guilds.SyncRoot)
-            {
-                m_guilds.Remove(guild.Name);
-                m_guildids.Remove(guild.GuildID);
-            }
+            m_guildsByName.Remove(guild.Name);
+            m_guildsById.Remove(guild.GuildID);
             return true;
         }
 
@@ -173,12 +164,11 @@ namespace DOL.GS
             if (guild == null)
                 return false;
 
-            lock (m_guilds.SyncRoot)
-            {
-                m_guilds.Remove(guild.Name);
-                guild.Name = newName;
-                m_guilds.Add(guild.Name, guild);
-            }
+            if (!m_guildsByName.TryAdd(newName, guild))
+                return false;
+
+            m_guildsByName.Remove(guild.Name);
+            guild.Name = newName;
             return true;
         }
 
@@ -189,10 +179,7 @@ namespace DOL.GS
         /// <returns>true or false</returns>
         public static bool DoesGuildExist(string guildName)
         {
-            lock (m_guilds.SyncRoot)
-            {
-                return m_guilds.Contains(guildName);
-            }
+            return m_guildsByName.ContainsKey(guildName);
         }
 
 
@@ -443,7 +430,7 @@ namespace DOL.GS
         {
             var system_ids = ServerProperties.Properties.SERVER_GUILDS.Split('|');
             var rvr_ids = ServerProperties.Properties.RVR_GUILDS.Split('|');
-            foreach (Guild g in m_guilds.Values)
+            foreach (Guild g in m_guildsByName.Values)
             {
                 if (rvr_ids.Contains(g.GuildID))
                 {
@@ -466,11 +453,10 @@ namespace DOL.GS
         /// <returns>Guild</returns>
         public static Guild GetGuildByName(string guildName)
         {
-            if (guildName == null) return null;
-            lock (m_guilds.SyncRoot)
-            {
-                return (Guild)m_guilds[guildName];
-            }
+            if (string.IsNullOrEmpty(guildName))
+                return null;
+
+            return (Guild)m_guildsByName[guildName];
         }
 
         /// <summary>
@@ -479,25 +465,10 @@ namespace DOL.GS
         /// <returns>Guild</returns>
         public static Guild GetGuildByGuildID(string guildid)
         {
-            if (guildid == null) return null;
+            if (string.IsNullOrEmpty(guildid))
+                return null;
 
-            lock (m_guildids.SyncRoot)
-            {
-                var guild = (Guild?)m_guildids[guildid];
-                return guild;
-            }
-        }
-
-        /// <summary>
-        /// Returns a database ID for a matching guild name.
-        /// </summary>
-        /// <returns>Guild</returns>
-        public static string GuildNameToGuildID(string guildName)
-        {
-            Guild g = GetGuildByName(guildName);
-            if (g == null)
-                return "";
-            return g.GuildID;
+            return m_guildsById[guildid];
         }
 
         /// <summary>
@@ -505,11 +476,20 @@ namespace DOL.GS
         /// </summary>
         public static bool LoadAllGuilds()
         {
-            lock (m_guilds.SyncRoot)
+            //clear guild list before loading!
+            m_guildsByName.FreezeWhile(byName =>
             {
-                m_guilds.Clear(); //clear guild list before loading!
-            }
-            m_lastID = 0;
+                m_guildsById.FreezeWhile(byId =>
+                {
+                    m_guildXAllMembers.FreezeWhile(members =>
+                    {
+                        byName.Clear();
+                        byId.Clear();
+                        members.Clear();
+                        m_lastID = 0;
+                    });
+                });
+            });
 
             //load guilds
             var guildObjs = GameServer.Database.SelectAllObjects<DBGuild>();
@@ -541,7 +521,7 @@ namespace DOL.GS
                 AddGuild(myguild);
 
                 var guildCharacters = DOLDB<DOLCharacters>.SelectObjects(DB.Column(nameof(DOLCharacters.GuildID)).IsEqualTo(myguild.GuildID));
-                var tempList = new Dictionary<string, GuildMemberDisplay>(guildCharacters.Count);
+                var tempList = new ReaderWriterDictionary<string, GuildMemberDisplay>(guildCharacters.Count);
 
                 foreach (DOLCharacters ch in guildCharacters)
                 {
@@ -556,7 +536,7 @@ namespace DOL.GS
                     tempList.Add(ch.ObjectId, member);
                 }
 
-                m_guildXAllMembers.Add(myguild.GuildID, tempList);
+                m_guildXAllMembers[myguild.GuildID] = tempList;
             }
 
             //load alliances
@@ -592,13 +572,13 @@ namespace DOL.GS
                 log.Debug("Saving all guilds...");
             try
             {
-                lock (m_guilds.SyncRoot)
+                m_guildsByName.FreezeWhile(_ =>
                 {
-                    foreach (Guild g in m_guildids.Values)
+                    foreach (var (_, g) in m_guildsById)
                     {
                         g.SaveIntoDatabase();
                     }
-                }
+                });
             }
             catch (Exception e)
             {
@@ -614,13 +594,10 @@ namespace DOL.GS
         /// <returns></returns>
         public static bool IsEmblemUsed(int emblem)
         {
-            lock (m_guilds.SyncRoot)
+            foreach (var (_, guild) in m_guildsById)
             {
-                foreach (Guild guild in m_guilds.Values)
-                {
-                    if (guild.Emblem == emblem)
-                        return true;
-                }
+                if (guild.Emblem == emblem)
+                    return true;
             }
             return false;
         }
@@ -668,17 +645,7 @@ namespace DOL.GS
         /// <returns></returns>
         public static List<Guild> GetAllGuilds()
         {
-            var guilds = new List<Guild>(m_guilds.Count);
-
-            lock (m_guilds.SyncRoot)
-            {
-                foreach (Guild guild in m_guilds.Values)
-                {
-                    guilds.Add(guild);
-                }
-            }
-
-            return guilds;
+            return m_guildsById.Select(kv => kv.Value).ToList();
         }
 
         /// <summary>

@@ -895,8 +895,8 @@ namespace DOL.GS.Commands
                                 if (!(args.Length == 3 && args[2] == "1"))
                                 {
                                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.NotMember"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
                                 }
-                                return;
                             }
 
                             if (typed)
@@ -953,13 +953,14 @@ namespace DOL.GS.Commands
                                             break;
                                     }
 
-                                    if (guildLevel >= 8 && guildLevel <= 15)
+                                    switch (guildLevel)
                                     {
-                                        bonusPercentage *= 1.5;
-                                    }
-                                    else if (guildLevel > 15)
-                                    {
-                                        bonusPercentage *= 2.0;
+                                        case >= 8 and <= 15:
+                                            bonusPercentage *= 1.5;
+                                            break;
+                                        case > 15:
+                                            bonusPercentage *= 2.0;
+                                            break;
                                     }
                                     bonusPercentage += 0;
 
@@ -974,7 +975,7 @@ namespace DOL.GS.Commands
                                 {
                                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuildBuffNone"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 }
-                                    if (client.Player.Guild.HasGuildBanner)
+                                if (client.Player.Guild.HasGuildBanner)
                                 {
                                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoBanner", client.Player.Guild.GuildBannerStatus()), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 }
@@ -1029,8 +1030,12 @@ namespace DOL.GS.Commands
                                 {
                                     case "1": // show guild info
                                         {
+                                            string mes = "I";
                                             if (client.Player.Guild == null)
-                                                return;
+                                            {
+                                                client.Out.SendMessage(mes, eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
+                                                break;
+                                            }
 
                                             int housenum;
                                             if (client.Player.Guild.GuildOwnsHouse)
@@ -1040,7 +1045,6 @@ namespace DOL.GS.Commands
                                             else
                                                 housenum = 0;
 
-                                            string mes = "I";
                                             mes += ',' + client.Player.Guild.GuildLevel.ToString(); // Guild Level
                                             mes += ',' + client.Player.Guild.GetGuildBank().ToString(); // Guild Bank money
                                             mes += ',' + client.Player.Guild.GetGuildDuesPercent().ToString(); // Guild Dues enable/disable
@@ -1066,7 +1070,7 @@ namespace DOL.GS.Commands
                                 }
                             }
 
-                            SendSocialWindowData(client, 1, 1, 2);
+                            Guild.SendSocialWindowData(client, 1, 1, 2);
                             break;
                         }
                     #endregion
@@ -2886,9 +2890,9 @@ namespace DOL.GS.Commands
                                 int page;
 
                                 //Lets get the variables that were sent over
-                                if (Int32.TryParse(args[3], out sortTemp) && Int32.TryParse(args[4], out page) && Byte.TryParse(args[5], out showTemp) && sortTemp >= -7 && sortTemp <= 7)
+                                if (Int32.TryParse(args[3], out sortTemp) && Int32.TryParse(args[4], out page) && Byte.TryParse(args[5], out showTemp) && sortTemp is >= -7 and <= 7)
                                 {
-                                    SendSocialWindowData(client, sortTemp, page, showTemp);
+                                    Guild.SendSocialWindowData(client, sortTemp, page, showTemp);
                                 }
                                 return;
                             }
@@ -4401,163 +4405,6 @@ namespace DOL.GS.Commands
             if (rank != null)
                 GameServer.Database.SaveObject(rank);
             return 1;
-        }
-
-        /// <summary>
-        /// Send social window data to the client
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="sort"></param>
-        /// <param name="page"></param>
-        /// <param name="offline">0 = false, 1 = true, 2 to try and recall last setting used by player</param>
-        private void SendSocialWindowData(GameClient client, int sort, int page, byte offline)
-        {
-            Dictionary<string, GuildMgr.GuildMemberDisplay> allGuildMembers = GuildMgr.GetAllGuildMembers(client.Player.GuildID);
-
-            if (allGuildMembers == null || allGuildMembers.Count == 0)
-            {
-                return;
-            }
-
-            bool showOffline = false;
-
-            if (offline < 2)
-            {
-                showOffline = (offline == 0 ? false : true);
-            }
-            else
-            {
-                // try to recall last setting
-                showOffline = client.Player.TempProperties.getProperty<bool>("SOCIALSHOWOFFLINE", false);
-            }
-
-            client.Player.TempProperties.setProperty("SOCIALSHOWOFFLINE", showOffline);
-
-            //The type of sorting we will be sending
-            GuildMgr.GuildMemberDisplay.eSocialWindowSort sortOrder = (GuildMgr.GuildMemberDisplay.eSocialWindowSort)sort;
-
-            //Let's sort the sorted list - we don't need to sort if sort = name
-            SortedList<string, GuildMgr.GuildMemberDisplay> sortedWindowList = null;
-
-            GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Name;
-
-            #region Determine Sort
-            switch (sortOrder)
-            {
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ClassAsc:
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ClassDesc:
-                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.ClassID;
-                    break;
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.GroupAsc:
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.GroupDesc:
-                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Group;
-                    break;
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.LevelAsc:
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.LevelDesc:
-                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Level;
-                    break;
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.NoteAsc:
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.NoteDesc:
-                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Note;
-                    break;
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.RankAsc:
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.RankDesc:
-                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Rank;
-                    break;
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ZoneOrOnlineAsc:
-                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ZoneOrOnlineDesc:
-                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.ZoneOrOnline;
-                    break;
-            }
-            #endregion
-
-            if (showOffline == false) // show only a sorted list of online players
-            {
-                IList<GamePlayer> onlineGuildPlayers = client.Player.Guild.GetListOfOnlineMembers();
-                sortedWindowList = new SortedList<string, GuildMgr.GuildMemberDisplay>(onlineGuildPlayers.Count);
-
-                foreach (GamePlayer player in onlineGuildPlayers)
-                {
-                    if (allGuildMembers.ContainsKey(player.InternalID))
-                    {
-                        GuildMgr.GuildMemberDisplay memberDisplay = allGuildMembers[player.InternalID];
-                        memberDisplay.UpdateMember(player);
-                        string key = memberDisplay[sortColumn];
-
-                        if (sortedWindowList.ContainsKey(key))
-                            key += sortedWindowList.Count.ToString();
-
-                        sortedWindowList.Add(key, memberDisplay);
-                    }
-                }
-            }
-            else // sort and display entire list
-            {
-                sortedWindowList = new SortedList<string, GuildMgr.GuildMemberDisplay>();
-                int keyIncrement = 0;
-
-                foreach (GuildMgr.GuildMemberDisplay memberDisplay in allGuildMembers.Values)
-                {
-                    GamePlayer p = client.Player.Guild.GetOnlineMemberByID(memberDisplay.InternalID);
-                    if (p != null)
-                    {
-                        //Update to make sure we have the most up to date info
-                        memberDisplay.UpdateMember(p);
-                    }
-                    else
-                    {
-                        //Make sure that since they are offline they get the offline flag!
-                        memberDisplay.GroupSize = "0";
-                    }
-                    //Add based on the new index
-                    string key = memberDisplay[sortColumn];
-
-                    if (sortedWindowList.ContainsKey(key))
-                    {
-                        key += keyIncrement++;
-                    }
-
-                    try
-                    {
-                        sortedWindowList.Add(key, memberDisplay);
-                    }
-                    catch
-                    {
-                        if (log.IsErrorEnabled)
-                            log.Error(string.Format("Sorted List duplicate entry - Key: {0} Member: {1}. Replacing - Member: {2}.  Sorted count: {3}.  Guild ID: {4}", key, memberDisplay.Name, sortedWindowList[key].Name, sortedWindowList.Count, client.Player.GuildID));
-                    }
-                }
-            }
-
-            //Finally lets send the list we made
-
-            IList<GuildMgr.GuildMemberDisplay> finalList = sortedWindowList.Values;
-
-            int i = 0;
-            string[] buffer = new string[10];
-            for (i = 0; i < 10 && finalList.Count > i + (page - 1) * 10; i++)
-            {
-                GuildMgr.GuildMemberDisplay memberDisplay;
-
-                if ((int)sortOrder > 0)
-                {
-                    //They want it normal
-                    memberDisplay = finalList[i + (page - 1) * 10];
-                }
-                else
-                {
-                    //They want it in reverse
-                    memberDisplay = finalList[(finalList.Count - 1) - (i + (page - 1) * 10)];
-                }
-
-                buffer[i] = memberDisplay.ToString((i + 1) + (page - 1) * 10, finalList.Count);
-            }
-
-            client.Out.SendMessage("TE," + page.ToString() + "," + finalList.Count + "," + i.ToString(), eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
-
-            foreach (string member in buffer)
-                client.Player.Out.SendMessage(member, eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
-
         }
 
         public void DisplayEditHelp(GameClient client)

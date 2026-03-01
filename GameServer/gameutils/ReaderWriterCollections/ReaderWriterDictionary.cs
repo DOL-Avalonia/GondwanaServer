@@ -387,6 +387,39 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Add Entry to Dictionary if key doesn't exists.
+        /// </summary>
+        /// <param name="key">Entry's Key.</param>
+        /// <param name="fun">Entry's Supplier.</param>
+        /// <returns>True if Entry was inserted.</returns>
+        public (bool added, TValue value) AddIfNotExists(TKey key, Func<TValue> fun)
+        {
+            m_rwLock.EnterUpgradeableReadLock();
+            bool added = false;
+            try
+            {
+                if (m_dictionary.TryGetValue(key, out TValue present))
+                    return (false, present);
+
+                m_rwLock.EnterWriteLock();
+                try
+                {
+                    TValue val = fun();
+                    m_dictionary.Add(key, val);
+                    return (true, val);
+                }
+                finally
+                {
+                    m_rwLock.ExitWriteLock();
+                }
+            }
+            finally
+            {
+                m_rwLock.ExitUpgradeableReadLock();
+            }
+        }
+
+        /// <summary>
         /// Update Dictionary Entry if Key Exist.
         /// </summary>
         /// <param name="key">Entry's Key.</param>
