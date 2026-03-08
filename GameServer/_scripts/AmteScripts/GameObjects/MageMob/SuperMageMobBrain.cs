@@ -168,8 +168,8 @@ namespace DOL.AI.Brain
             if (Body.IsCasting)
                 return;
 
-            var prevTarget = Body.TargetObject;
             Body.TargetObject = CalculateNextAttackTarget();
+            MoveInRange(Body.TargetObject);
             
             bool hasSquad = GetSquadMembers(Body.Coordinate).Any();
             bool success = false;
@@ -187,11 +187,6 @@ namespace DOL.AI.Brain
             if (hasSquad && !success)
             {
                 success = CheckSpells(eCheckSpellType.Defensive);
-            }
-            
-            if (!success && Body.TargetObject != null)
-            {
-                MoveInRange(Body.TargetObject);
             }
         }
 

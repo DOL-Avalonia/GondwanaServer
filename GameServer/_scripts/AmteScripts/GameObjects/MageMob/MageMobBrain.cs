@@ -74,6 +74,7 @@ namespace DOL.AI.Brain
                 return;
 
             Body.TargetObject = CalculateNextAttackTarget();
+            MoveInRange(Body.TargetObject);
             bool success = false;
             if (Body.TargetObject != null)
             {
@@ -83,11 +84,6 @@ namespace DOL.AI.Brain
             if (!success)
             {
                 success = CheckSpells(eCheckSpellType.Defensive);
-            }
-
-            if (!success && Body.TargetObject != null)
-            {
-                MoveInRange(Body.TargetObject);
             }
         }
 
@@ -120,8 +116,12 @@ namespace DOL.AI.Brain
             
             var walkRange = (int)(shortestRange * 0.9);
             var minWalk = Math.Max(walkRange, SafeDistanceMin);
-            var maxWalk = Math.Min(minWalk, walkRange);
-            Body.Follow(target, minWalk, maxWalk);
+
+
+            if (Body.CurrentFollowTarget == target)
+                return;
+
+            Body.Follow(target, minWalk, WorldMgr.VISIBILITY_DISTANCE);
         }
 
         protected GamePlayer GetClosestPlayerThreat()
