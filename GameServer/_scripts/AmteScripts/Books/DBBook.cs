@@ -21,13 +21,18 @@ namespace DOL.Database
         public const string TAG_PROCESSING = "processing";
         public const string TAG_STAMPED = "GuildStamped";
         public const string TAG_LEADER = "GuildLeader";
-        
+
+        /// <summary>
+        /// Default date from the DB
+        /// </summary>
+        public static readonly DateTime DEFAULT_DATE = new DateTime(2000, 1, 1, 0, 0, 0);
+
         public static readonly Regex MemberRegex = new(@"GuildMember(\d{2})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
-        
-        private Dictionary<string, string> m_metadata = new(StringComparer.OrdinalIgnoreCase);
 
+        private Dictionary<string, string> m_metadata = new(StringComparer.OrdinalIgnoreCase);
+        
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
         {

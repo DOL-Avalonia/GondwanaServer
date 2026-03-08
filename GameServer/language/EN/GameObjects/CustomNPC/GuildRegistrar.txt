@@ -49,3 +49,4 @@ GuildRegistrar.Read.Language:			Original language: {0}
 GuildRegistrar.Read.Ink:				Ink used: {0}
 GuildRegistrar.Read.Leader:				Leader: {0}
 GuildRegistrar.Read.Founder:			Founder: {0}
+GuildRegistrar.Read.StampedBy:			Stamped by:

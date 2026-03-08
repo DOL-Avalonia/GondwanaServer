@@ -4,6 +4,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 using log4net;
+using Microsoft.Win32;
 using System;
 using System.Reflection;
 using System.Text;
@@ -61,9 +62,9 @@ namespace DOL.GS.Scripts
             Task<string>? taskStamped = null;
 
             // Optional metadata
-            if (!string.IsNullOrWhiteSpace(registry.StampBy) || registry.StampDate != DateTime.MinValue)
+            if (!string.IsNullOrWhiteSpace(registry.StampBy) || registry.StampDate > DBBook.DEFAULT_DATE)
             {
-                taskStamped = LanguageMgr.Translate(player, "GuildRegistrar.List.StampedBy");
+                taskStamped = LanguageMgr.Translate(player, "GuildRegistrar.Read.StampedBy");
             }
 
             Task.Run(async () =>
@@ -80,7 +81,6 @@ namespace DOL.GS.Scripts
             
                 sb
                     .Append(await taskInk).Append('\n');
-                    
 
                 if (taskStamped is not null)
                 {
@@ -141,48 +141,78 @@ namespace DOL.GS.Scripts
         {
             if (dbBook == null)
             {
-                player.Client.Out.SendMessage("~~ Parchemin Vierge ~~", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                player.Client.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.Read.Empty"), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 return;
             }
 
-            if (dbBook.IsGuildRegistry)
+            string language = string.IsNullOrEmpty(dbBook.Language) ? Properties.SERV_LANGUAGE : dbBook.Language;
+            var taskAuthor = LanguageMgr.Translate(player, "Librarian.Read.Author", dbBook.Author);
+            var taskLanguage = player.AutoTranslateEnabled ? LanguageMgr.Translate(player, "Librarian.Read.Language", language) : null;
+            var taskTitle = LanguageMgr.Translate(player, "Librarian.Read.Title", AutoTranslateManager.Translate(language, player, dbBook.Title));
+            var taskInk = LanguageMgr.Translate(player, "Librarian.Read.Ink", dbBook.Ink);
+            var taskText = AutoTranslateManager.Translate(dbBook.Language, player, dbBook.Text);
+            Task<string>? taskStamped = null;
+
+            // Optional metadata
+            if (!string.IsNullOrWhiteSpace(dbBook.StampBy) || dbBook.StampDate > DBBook.DEFAULT_DATE)
             {
-                ReadGuildRegistry(player, dbBook);
-                return;
+                taskStamped = LanguageMgr.Translate(player, "Librarian.Read.StampedBy");
             }
 
-            var sb = new StringBuilder(2048);
-            sb
-                .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-                .Append("Auteur: ").Append(dbBook.Author).Append("\n")
-                .Append("Titre: ").Append(dbBook.Title).Append("\n")
-                .Append("Encre utilisée: " + dbBook.Ink + "\n")
-                .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-            sb.Clear();
-
-            for (int i = 0; i < dbBook.Text.Length; i++)
+            Task.Run(async () =>
             {
-                if (i + 2 < dbBook.Text.Length && (dbBook.Text[i] == '\n') && (dbBook.Text[i + 1] == '\n'))
-                {
-                    player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                    sb.Clear();
-                    i++;
-                    i++;
-                    continue;
-                }
-                else if (sb.Length > 1900)
-                {
-                    player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
-                    sb.Clear();
-                }
+                var sb = new StringBuilder(2048);
+                sb.Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+                    .Append(await taskAuthor).Append('\n')
+                    .Append(await taskTitle).Append('\n');
 
-                sb.Append(dbBook.Text[i]);
-            }
+                if (taskLanguage is not null)
+                {
+                    sb.Append(await taskLanguage).Append('\n');
+                }
             
-            if (sb.Length > 0)
+                sb
+                    .Append(await taskInk).Append('\n');
+
+                if (taskStamped is not null)
+                {
+                    sb.Append(await taskStamped)
+                        .Append(' ')
+                        .Append(string.IsNullOrWhiteSpace(dbBook.StampBy) ? "?" : dbBook.StampBy);
+
+                    if (dbBook.StampDate != DateTime.MinValue)
+                        sb.Append(" - ").Append(dbBook.StampDate.ToString("yyyy-MM-dd HH:mm")).Append('\n');
+                }
+                
+                sb.Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
                 player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                sb.Clear();
+
+                var text = await taskText;
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (i + 2 < text.Length)
+                    {
+                        if ((text[i] == '\n') && (text[i + 1] == '\n'))
+                        {
+                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                            sb.Clear();
+                            i++;
+                            i++;
+                            continue;
+                        }
+                        else if (sb.Length > 1900)
+                        {
+                            player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                            sb.Clear();
+                        }
+                    }
+                    sb.Append(text[i]);
+                }
+
+                player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+            });
         }
 
         public static InventoryItem CreateBookItem(DBBook book)

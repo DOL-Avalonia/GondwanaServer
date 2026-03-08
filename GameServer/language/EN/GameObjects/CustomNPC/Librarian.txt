@@ -62,3 +62,10 @@ Librarian.Vote.Recorded:				Your vote is noted. Thank you.
 
 Librarian.Royalties.None:				No royalties are waiting for you today.
 Librarian.Royalties.Collected:			Here you are! {0} in royalties, as promised.
+
+Librarian.Read.Author:					Author: {0}
+Librarian.Read.Title:					Title: {0}
+Librarian.Read.Language:				Original language: {0}
+Librarian.Read.Ink:						Ink used: {0}
+Librarian.Read.Empty:					~~ Empty scroll ~~
+Librarian.Read.StampedBy:				Stamped by:

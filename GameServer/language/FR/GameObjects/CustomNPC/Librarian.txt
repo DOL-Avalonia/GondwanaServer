@@ -62,3 +62,10 @@ Librarian.Vote.Recorded:				Vote enregistré. Merci à vous.
 
 Librarian.Royalties.None:				Aucune redevance ne vous attend aujourd'hui.
 Librarian.Royalties.Collected:			Tenez ! {0} de redevances, comme convenu.
+
+Librarian.Read.Author:					Auteur : {0}
+Librarian.Read.Title:					Titre : {0}
+Librarian.Read.Language:				Langage d'origine : {0}
+Librarian.Read.Ink:						Encre utilisée : {0}
+Librarian.Read.Empty:					~~ Parchemin vierge ~~
+Librarian.Read.StampedBy:				Tamponné par :
