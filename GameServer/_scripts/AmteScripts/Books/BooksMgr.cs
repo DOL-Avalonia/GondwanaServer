@@ -46,7 +46,7 @@ namespace DOL.GS.Scripts
         {
             if (registry == null)
             {
-                player.Client.Out.SendMessage("~~ Parchemin Vierge ~~", eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                player.Client.Out.SendMessage(LanguageMgr.Translate(player, "GuildRegistrar.Read.Empty"), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 return;
             }
 

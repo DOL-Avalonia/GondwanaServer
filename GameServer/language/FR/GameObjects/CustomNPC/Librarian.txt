@@ -67,5 +67,5 @@ Librarian.Read.Author:					Auteur : {0}
 Librarian.Read.Title:					Titre : {0}
 Librarian.Read.Language:				Langage d'origine : {0}
 Librarian.Read.Ink:						Encre utilisée : {0}
-Librarian.Read.Empty:					~~ Parchemin vierge ~~
+Librarian.Read.Empty:					~~ Parchemin Vierge ~~
 Librarian.Read.StampedBy:				Tamponné par :

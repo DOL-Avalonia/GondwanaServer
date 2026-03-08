@@ -67,5 +67,5 @@ Librarian.Read.Author:					Author: {0}
 Librarian.Read.Title:					Title: {0}
 Librarian.Read.Language:				Original language: {0}
 Librarian.Read.Ink:						Ink used: {0}
-Librarian.Read.Empty:					~~ Empty scroll ~~
+Librarian.Read.Empty:					~~ Empty Scroll ~~
 Librarian.Read.StampedBy:				Stamped by:
