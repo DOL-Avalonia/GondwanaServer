@@ -17,20 +17,24 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
     /// <summary>
     /// ChatUtil for Sending Message to Players
     /// </summary>
-    public static class ChatUtil
+    public static partial class ChatUtil
     {
         public static void SendSystemMessage(GamePlayer target, string message)
         {
@@ -155,5 +159,86 @@ namespace DOL.GS
         public static void SendSystem(GameClient target, string message) => target?.Out?.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
         public static void SendImportant(GameClient target, string message) => target?.Out?.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         public static void SendScreenCenter(GameClient target, string message) => target?.Out?.SendMessage(message, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+
+        public static string ToResponse(string task)
+        {
+            return '[' + task + ']';
+        }
+
+        public static async Task<string> ToResponse(Task<string> task)
+        {
+            return ToResponse(await task);
+        }
+
+        private static bool ResponseEquals(string? a, string? b)
+            => a != null && b != null && string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+
+        private static bool ResponseStartsWith(string? a, string? b)
+            => a != null && b != null && a.StartsWith(b);
+
+        [GeneratedRegex(@"\[(.+?)\]")]
+        [return: NotNull]
+        public static partial Regex BracketsRegex();
+
+        [GeneratedRegex(@"\{(.+?)\}")]
+        [return: NotNull]
+        public static partial Regex BracesRegex();
+
+        public record class PlaceholderMatch(string Placeholder, string OriginalKey)
+        {
+            public static implicit operator KeyValuePair<string, string> (PlaceholderMatch match) => new(match.OriginalKey, match.Placeholder);
+
+            public void Deconstruct(out string placeholder, out string originalKey)
+            {
+                placeholder = Placeholder;
+                originalKey = OriginalKey;
+            }
+
+            /// <inheritdoc />
+            public override string ToString()
+            {
+                return $"[{Placeholder}, {OriginalKey}]";
+            }
+
+            public static class Utils
+            {
+            }
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> ToKeyValuePairs(this IEnumerable<PlaceholderMatch> matches)
+            => matches.Select(m => (KeyValuePair<string, string>)m);
+
+        public static IList<PlaceholderMatch> ReplaceKeys(ref string originalText, Func<string, string?> extractor, Regex? regex = null)
+        {
+            regex ??= BracketsRegex();
+
+            List<PlaceholderMatch> originalResponses = new();
+            originalText = regex.Replace(originalText, match =>
+            {
+                string originalKey = match.Groups[1].Value.Trim();
+                string placeholder = extractor(originalKey);
+                
+                if (placeholder != null)
+                    originalResponses.Add(new(placeholder, originalKey));
+                return placeholder;
+            });
+            return originalResponses;
+        }
+
+        public static IList<PlaceholderMatch> ExtractKeys(string originalText, Func<string, string?>? extractor = null, Regex? regex = null)
+        {
+            regex ??= BracketsRegex();
+
+            List<PlaceholderMatch> originalResponses = new();
+            foreach (var match in regex.Matches(originalText).Cast<Match>())
+            {
+                string originalKey = match.Groups[1].Value.Trim();
+                string placeholder = extractor != null ? extractor(originalKey) : originalKey;
+
+                if (placeholder != null)
+                    originalResponses.Add(new(placeholder, originalKey));
+            }
+            return originalResponses;
+        }
     }
 }

@@ -1527,7 +1527,7 @@ namespace DOL.GS.PacketHandler
             if (!string.IsNullOrEmpty(inviteMessage))
             {
                 var player = m_gameClient.Player;
-                inviteMessage = await AutoTranslateManager.Translate(null, player, inviteMessage);
+                inviteMessage = await AutoTranslateManager.Translate(player, inviteMessage);
 
                 pak.WriteString(inviteMessage, inviteMessage.Length);
             }
@@ -1552,7 +1552,7 @@ namespace DOL.GS.PacketHandler
             {
                 var player = m_gameClient.Player;
                 if (player != null)
-                    abortMessage = await AutoTranslateManager.Translate(null, player, abortMessage);
+                    abortMessage = await AutoTranslateManager.Translate(player, abortMessage);
 
                 pak.WriteString(abortMessage, abortMessage.Length);
             }
@@ -4093,8 +4093,8 @@ namespace DOL.GS.PacketHandler
                 // We treat quest texts as "server texts", so sender = null
                 if (receiver != null)
                 {
-                    name = await AutoTranslateManager.Translate(null, receiver, name);
-                    desc = await AutoTranslateManager.Translate(null, receiver, desc);
+                    name = await AutoTranslateManager.Translate(receiver, name);
+                    desc = await AutoTranslateManager.Translate(receiver, desc);
                 }
 
                 // Make sure we don't exceed packet limits after translation
@@ -4241,6 +4241,24 @@ namespace DOL.GS.PacketHandler
                     pak.WriteByte(0);
                 }
             }
+        }
+        
+        public virtual void SendMessage(Task<string> msg, eChatType type, eChatLoc loc)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendMessage(message, type, loc);
+            });
+        }
+        
+        public virtual void SendCustomDialog(Task<string> msg, CustomDialogResponse callback)
+        {
+            Task.Run(async () =>
+            {
+                string message = await msg;
+                SendCustomDialog(message, callback);
+            });
         }
 
         protected virtual void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)

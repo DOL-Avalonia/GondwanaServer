@@ -92,7 +92,7 @@ namespace DOL.GS
                 new("q", text),
                 new("source", source),
                 new("target", target),
-                new("format", "text"),
+                new("format", "html"),
             ];
 
             var req = new HttpRequestMessage(HttpMethod.Post, url);

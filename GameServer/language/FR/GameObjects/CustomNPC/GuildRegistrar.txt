@@ -35,6 +35,18 @@ GuildRegistrar.Error.BookUpdateFailed:  La guilde est formée, mais les archives
 
 GuildRegistrar.Success:                 C'est fait. Par registre et sceau, la guilde "{0}" est désormais reconnue par la Couronne.
 
-GuildRegistrar.List.None:               Aucun registre de guilde n'est actuellement archivé.
-GuildRegistrar.List.Count:              Registres de guilde archivés : {0}
+GuildRegistrar.List.None:               Aucun registre de guilde n'est actuellement enregistré.
+GuildRegistrar.List.Count:              Registres de guilde enregistrés : {0}
 GuildRegistrar.List.StampedBy:          Tamponné par :
+GuildRegistrar.List.CurrentPage:		Page {0} / {1}
+GuildRegistrar.List.PreviousPage:		Précédent
+GuildRegistrar.List.NextPage:			Suivant
+GuildRegistrar.List.Defunct:			Défunt
+
+GuildRegistrar.Read.Author:				Auteur : {0}
+GuildRegistrar.Read.Title:				Titre : {0}
+GuildRegistrar.Read.Language:			Langage d'origine : {0}
+GuildRegistrar.Read.Ink:				Encre utilisée : {0}
+GuildRegistrar.Read.Leader:				Maître : {0}
+GuildRegistrar.Read.Founder:			Fondateur : {0}
+GuildRegistrar.Read.StampedBy:          Tamponné par :

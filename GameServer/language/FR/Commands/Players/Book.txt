@@ -1,26 +1,29 @@
-Commands.Players.Book.Description:		Créer un livre vierge
-Commands.Players.Book.Usage:			/book <titre>
+Commands.Players.Book.Description:				Créer un livre vierge
+Commands.Players.Book.Usage:					/book <titre>
 
-Commands.Players.Book.Description:		Créer un livre vierge
-Commands.Players.Book.Usage:			/book <titre>
-Commands.Players.Book.NotExist:			Le livre "{0}" n'existe pas !
-Commands.Players.Book.NeedBlankScroll:	Vous devez posséder un parchemin vierge dans le dernier emplacement de votre inventaire pour créer un livre.
-Commands.Players.Book.Exists:			Ce livre existe déjà.
-Commands.Players.Book.Created:			Vous créez un livre.
-Commands.Players.Book.Writing:			Vous écrivez quelques lignes sur "{0}".
-Commands.Players.Book.Burned:			Vous brûlez avec peine le dernier exemplaire de l'oeuvre nommée "{0}"...
-Commands.Players.Book.EmptyScroll:		Vous ne pouvez pas effacer un parchemin vide !
-Commands.Players.Book.LastLineErased:	Vous effacez la dernière ligne de "{0}".
-Commands.Players.Book.UnknownInk:		Encre Inconnue
-Commands.Players.Book.NotAuthor:		Vous n'êtes pas l'auteur de "{0}".
-Commands.Players.Book.NeedFeather:		Vous devez posséder une plume d'écrivain pour écrire sur un parchemin.
-Commands.Players.Book.NeedInk:			Vous devez posséder de l'encre ou du sang pour écrire sur un parchemin.
-Commands.Players.Book.NeedCorrector:	Vous devez posséder un correcteur pour effacer les lignes d'un parchemin.
-Commands.Players.Book.NeedRightInk:		Vous devez posséder de l'encre de type "{0}" pour continuer l'écriture de ce parchemin.
-Commands.Players.Book.HelpTitle:		Utilisation du /book :
-Commands.Players.Book.HelpCreate:		- /book create "Titre" : Crée un livre à partir d'un parchemin vierge. (En dernier slot de l'inventaire)
-Commands.Players.Book.HelpWrite:		- /book write "Titre" <Texte à écrire> : Écrit du texte sur un parchemin.
-Commands.Players.Book.HelpWriteNote:	-- (Si vous possédez plusieurs types d'encre, la première de votre inventaire sera utilisée)
-Commands.Players.Book.HelpRemove:		- /book remove "Titre" : Détruire totalement un livre. (Auteur seulement)
-Commands.Players.Book.HelpCorrect:		- /book correct "Titre" : Efface la dernière ligne d'un parchemin.
-Commands.Players.Book.HelpUse:			- /use (Après clic droit sur le livre) : Ouvre une fenêtre de lecture.
+Commands.Players.Book.Description:				Créer un livre vierge
+Commands.Players.Book.Usage:					/book <titre>
+Commands.Players.Book.NotExist:					Le livre "{0}" n'existe pas !
+Commands.Players.Book.NeedBlankScroll:			Vous devez posséder un parchemin vierge dans le dernier emplacement de votre inventaire pour créer un livre.
+Commands.Players.Book.Exists:					Ce livre existe déjà.
+Commands.Players.Book.Created:					Vous créez un livre.
+Commands.Players.Book.Writing:					Vous écrivez quelques lignes sur "{0}".
+Commands.Players.Book.Burned:					Vous brûlez avec peine le dernier exemplaire de l'oeuvre nommée "{0}"...
+Commands.Players.Book.EmptyScroll:				Vous ne pouvez pas effacer un parchemin vide !
+Commands.Players.Book.LastLineErased:			Vous effacez la dernière ligne de "{0}".
+Commands.Players.Book.UnknownInk:				Encre Inconnue
+Commands.Players.Book.NotAuthor:				Vous n'êtes pas l'auteur de "{0}".
+Commands.Players.Book.NeedFeather:				Vous devez posséder une plume d'écrivain pour écrire sur un parchemin.
+Commands.Players.Book.NeedInk:					Vous devez posséder de l'encre ou du sang pour écrire sur un parchemin.
+Commands.Players.Book.NeedCorrector:			Vous devez posséder un correcteur pour effacer les lignes d'un parchemin.
+Commands.Players.Book.NeedRightInk:				Vous devez posséder de l'encre de type "{0}" pour continuer l'écriture de ce parchemin.
+Commands.Players.Book.Stamped:					Vous ne pouvez pas modifier un livre après l'avoir fait cacheter !
+Commands.Players.Book.CantEditRegistry:			Vous ne pouvez pas modifier le registre d'une guilde !
+Commands.Players.Book.CantRemoveRegistry:		Vous ne pouvez pas détruire le registre d'une guilde !
+Commands.Players.Book.HelpTitle:				Utilisation du /book :
+Commands.Players.Book.HelpCreate:				- /book create "Titre" : Crée un livre à partir d'un parchemin vierge. (En dernier slot de l'inventaire)
+Commands.Players.Book.HelpWrite:				- /book write "Titre" <Texte à écrire> : Écrit du texte sur un parchemin.
+Commands.Players.Book.HelpWriteNote:			-- (Si vous possédez plusieurs types d'encre, la première de votre inventaire sera utilisée)
+Commands.Players.Book.HelpRemove:				- /book remove "Titre" : Détruire totalement un livre. (Auteur seulement)
+Commands.Players.Book.HelpCorrect:				- /book correct "Titre" : Efface la dernière ligne d'un parchemin.
+Commands.Players.Book.HelpUse:					- /use (Après clic droit sur le livre) : Ouvre une fenêtre de lecture.

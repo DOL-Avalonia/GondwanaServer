@@ -35,6 +35,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -70,6 +71,23 @@ namespace DOL.Language
             if (sep > 0)
                 lang = lang.Substring(0, sep);
             return lang.ToUpperInvariant();
+        }
+
+        private static async Task<object[]> UnrollArgs(object[] args)
+        {
+            return await Task.WhenAll(args.Select(async s =>
+            {
+                if (s is not Task asTask)
+                    return s;
+
+                Type type = s.GetType();
+                var property = type.GetProperty(nameof(Task<object>.Result));
+                if (property is null) // Task with void result
+                    return s;
+
+                await asTask.ConfigureAwait(false);
+                return property!.GetValue(asTask);
+            }));
         }
 
         public static void LoadTestDouble(LanguageMgr testDouble) { soleInstance = testDouble; }
@@ -653,6 +671,16 @@ namespace DOL.Language
             return translation;
         }
 
+        public static string GetTranslationOrDefaultLang(GamePlayer player, string translationId, params object[] args)
+        {
+            string translation;
+            if (!TryGetTranslation(out translation, player?.Client.Account.Language, translationId, args))
+            {
+                TryGetTranslation(out translation, DefaultLanguage, translationId, args);
+            }
+            return translation;
+        }
+
         public static string GetTranslation(GameClient client, string translationId, params object[] args)
         {
             string translation;
@@ -694,17 +722,27 @@ namespace DOL.Language
         /// <returns></returns>
         private static async Task<string> TranslateImpl(string language, string translationId, object[] args, bool autoTranslate, bool translateFormatted)
         {
+            bool hasArgs = args is { Length: > 0 };
             string translation;
-            if (TryGetTranslation(out translation, language, translationId, args))
+            if (TryGetTranslation(out translation, language, translationId))
             {
-                return translation;
+                if (hasArgs)
+                    return string.Format(translation, await UnrollArgs(args).ConfigureAwait(false));
+                else
+                    return translation;
             }
 
             // No translation found in files for this language. Try auto translating from server language
             // Unless this language is already the server language
             if (!language.Equals(Properties.SERV_LANGUAGE, StringComparison.OrdinalIgnoreCase)) // 
             {
-                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, translateFormatted ? args : Array.Empty<object>()))
+                object[] staticArgs = Array.Empty<object>();
+                if (translateFormatted && hasArgs)
+                {
+                    staticArgs = await UnrollArgs(args).ConfigureAwait(false);
+                }
+
+                if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, staticArgs))
                 {
                     if (autoTranslate && !string.IsNullOrEmpty(translation))
                     {
@@ -713,17 +751,17 @@ namespace DOL.Language
                         {
                             translation = str;
                         }
+                    }
 
-                        if (!translateFormatted && args is { Length: > 0 } && !string.IsNullOrEmpty(translation))
+                    if (!translateFormatted && hasArgs && !string.IsNullOrEmpty(translation))
+                    {
+                        try
                         {
-                            try
-                            {
-                                translation = string.Format(translation, args);
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error($"Failed to translate {translationId} to {language} with args [{string.Join(", ", args)}]: {ex}\n\tText: {translation}");
-                            }
+                            translation = string.Format(translation, await UnrollArgs(args).ConfigureAwait(false));
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error($"Failed to translate {translationId} to {language} with args [{string.Join(", ", args)}]: {ex}\n\tText: {translation}");
                         }
                     }
                 }
@@ -740,7 +778,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> Translate(GamePlayer player, string translationId, params object[] args)
         {
-            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, false);
+            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, false).ConfigureAwait(false);
         }
         
         /// <summary>
@@ -752,7 +790,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> TranslateFormatted(GamePlayer player, string translationId, params object[] args)
         {
-            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, true);
+            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -764,7 +802,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> Translate(GameClient client, string translationId, params object[] args)
         {
-            return await Translate(client?.Player, translationId, args);
+            return await Translate(client?.Player, translationId, args).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -776,7 +814,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> TranslateFormatted(GameClient client, string translationId, params object[] args)
         {
-            return await TranslateFormatted(client?.Player, translationId, args);
+            return await TranslateFormatted(client?.Player, translationId, args).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -788,7 +826,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> Translate(string language, string translationId, params object[] args)
         {
-            return await TranslateImpl(language, translationId, args, true, false);
+            return await TranslateImpl(language, translationId, args, true, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -800,7 +838,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> TranslateFormatted(string language, string translationId, params object[] args)
         {
-            return await TranslateImpl(language, translationId, args, true, true);
+            return await TranslateImpl(language, translationId, args, true, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -911,7 +949,7 @@ namespace DOL.Language
                 {
                     args = getArgs.Invoke(p);
                     if (args is { Length: > 0 })
-                        str = string.Format(str, args);
+                        str = string.Format(str, await UnrollArgs(args));
                 }
                 catch (Exception ex)
                 {
@@ -945,7 +983,7 @@ namespace DOL.Language
                 {
                     args = await getArgs.Invoke(p);
                     if (args is { Length: > 0 })
-                        str = string.Format(str, args);
+                        str = string.Format(str, await UnrollArgs(args));
                 }
                 catch (Exception ex)
                 {
@@ -968,7 +1006,7 @@ namespace DOL.Language
         {
             AutoTranslator msgTranslator = new(lang: inputLang, text: inputText);
             var results = await Task.WhenAll(Translate(receiver, translationId), msgTranslator.Translate(receiver)).ConfigureAwait(false);
-            return string.Format(results[0], formatArgsSupplier(results[1]));
+            return string.Format(results[0], await UnrollArgs(formatArgsSupplier(results[1])));
         }
 
         /// <summary>
@@ -1007,6 +1045,48 @@ namespace DOL.Language
         public static Task<string> TranslatePlayerInput(GamePlayer receiver, GamePlayer sender, string translationId, string inputText)
         {
             return TranslatePlayerInput(receiver, sender?.Client?.Account?.Language ?? DefaultLanguage, translationId, inputText);
+        }
+        
+        private static (string translatedText, IDictionary<string, string> mappings) ExtractPlaceholdersFromTranslation(string text, Regex regex)
+        {
+            var mappings = ChatUtil.ExtractKeys(text, key => key, regex);
+            Dictionary<string, string> keyMap = new(mappings.ToKeyValuePairs(), StringComparer.OrdinalIgnoreCase);
+            return (text, keyMap);
+        }
+
+        public static async Task<(string translatedText, IDictionary<string, string>? mappings)> TranslateWithPlaceholders(GamePlayer player, string translationKey, bool translatePlaceholders = true, Regex regex = null)
+        {
+            string staticTranslation = null;
+
+            if (player == null)
+            {
+                if (!TryGetTranslation(out staticTranslation, DefaultLanguage, translationKey))
+                {
+                    log.ErrorFormat("Could not translate key \"{0}\" with placeholders for player {1} with language \"{2}\", translation not found in server language \"{3}\"",
+                                    translationKey, player, player?.Language, DefaultLanguage);
+                    return (translationKey, null);
+                }
+                return ExtractPlaceholdersFromTranslation(staticTranslation, regex);
+            }
+            
+            if (TryGetTranslation(out staticTranslation, player.Language, translationKey))
+            {
+                return ExtractPlaceholdersFromTranslation(staticTranslation, regex);
+            }
+                
+            if (!TryGetTranslation(out staticTranslation, DefaultLanguage, translationKey))
+            {
+                log.ErrorFormat("Could not translate key \"{0}\" with placeholders for player {1} with language \"{2}\", translation not found in server language \"{3}\"",
+                                translationKey, player, player?.Language, DefaultLanguage);
+                return (translationKey, null);
+            }
+
+            if (!player.AutoTranslateEnabled || !GS.ServerProperties.Properties.AUTOTRANSLATE_ENABLE)
+            {
+                return ExtractPlaceholdersFromTranslation(staticTranslation, regex);
+            }
+
+            return await AutoTranslateManager.TranslatePlaceholderText(player, staticTranslation, translatePlaceholders, regex);
         }
         
         #endregion Auto Translations
@@ -1327,7 +1407,7 @@ namespace DOL.Language
                 }
             }
 
-            if (player == null || player.Client == null || player.Client.Account == null)
+            if (player?.Client?.Account == null)
                 return missing;
 
             string retval;

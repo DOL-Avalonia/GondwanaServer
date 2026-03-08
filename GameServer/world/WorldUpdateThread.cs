@@ -163,6 +163,9 @@ namespace DOL.GS
                 foreach (var objEntry in player.Client.GameObjectUpdateArray.ToArray())
                 {
                     var objKey = objEntry.Key;
+                    if (objKey is null) // Race condition?
+                        continue;
+
                     GameObject obj = WorldMgr.GetRegion(objKey.Item1).GetObject(objKey.Item2);
                     // We have a Player in cache that is not in vincinity
                     // For updating "out of view" we allow a halved refresh time. 

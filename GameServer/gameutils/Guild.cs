@@ -17,25 +17,26 @@
  *
  */
 using AmteScripts.Managers;
-using System.Collections;
-using System.Collections.Generic;
-using System;
-using System.Reflection;
 using DOL.Database;
 using DOL.GS.Effects;
-using DOL.Language;
-using DOL.GS.Keeps;
-using log4net;
-using System.Linq;
+using DOL.GS.Finance;
 using DOL.GS.Housing;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
-using DOL.Territories;
-using DOL.GS.Finance;
 using DOL.GS.Spells;
+using DOL.Language;
+using DOL.Territories;
+using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Timers;
+using System.Linq;
 using System.Numerics;
+using System.Reflection;
+using System.Timers;
+using static DOL.GS.Area;
 
 namespace DOL.GS
 {
@@ -1101,22 +1102,33 @@ namespace DOL.GS
         /// </summary>
         /// <param name="player">GamePlayer to be added to the guild</param>
         /// <returns>true if added successfully</returns>
-        public bool AddOnlineMember(GamePlayer player)
+        public bool AddOnlineMembers(IEnumerable<GamePlayer> players)
         {
-            if (player == null) return false;
+            if (players == null)
+                return false;
+
             lock (m_memberListLock)
             {
-                if (!m_onlineGuildPlayers.ContainsKey(player.InternalID))
+                var toAdd = players.Where(p => !m_onlineGuildPlayers.ContainsKey(p.InternalID)).ToList();
+                foreach (var player in toAdd)
                 {
                     if (!player.IsAnonymous)
                         NotifyGuildMembers(player);
 
                     m_onlineGuildPlayers.Add(player.InternalID, player);
-                    return true;
                 }
+                return toAdd.Any();
             }
+        }
 
-            return false;
+        /// <summary>
+        /// Adds a player to the guild
+        /// </summary>
+        /// <param name="player">GamePlayer to be added to the guild</param>
+        /// <returns>true if added successfully</returns>
+        public bool AddOnlineMember(GamePlayer player)
+        {
+            return AddOnlineMembers([player]);
         }
 
         private void NotifyGuildMembers(GamePlayer member)
@@ -1138,16 +1150,13 @@ namespace DOL.GS
         {
             lock (m_memberListLock)
             {
-                if (m_onlineGuildPlayers.ContainsKey(player.InternalID))
+                if (m_onlineGuildPlayers.Remove(player.InternalID))
                 {
-                    m_onlineGuildPlayers.Remove(player.InternalID);
-
                     // now update the all member list to display lastonline time instead of zone
-                    Dictionary<string, GuildMgr.GuildMemberDisplay> memberList = GuildMgr.GetAllGuildMembers(player.GuildID);
-
-                    if (memberList != null && memberList.ContainsKey(player.InternalID))
+                    var memberList = GuildMgr.GetAllGuildMembers(player.GuildID);
+                    if (memberList != null && memberList.TryGetValue(player.InternalID, out GuildMgr.GuildMemberDisplay value))
                     {
-                        memberList[player.InternalID].ZoneOrOnline = DateTime.Now.ToShortDateString();
+                        value.ZoneOrOnline = DateTime.Now.ToShortDateString();
                     }
 
                     return true;
@@ -1200,7 +1209,7 @@ namespace DOL.GS
         /// <returns></returns>
         public bool AddPlayer(GamePlayer addPlayer, DBRank rank, bool force = false)
         {
-            if (addPlayer == null || addPlayer.Guild != null)
+            if (addPlayer is not { Guild: null })
                 return false;
 
             if (!force && !IsSystemGuild && m_leave_Players.ContainsKey(addPlayer) && addPlayer.Client.Account.PrivLevel == 1)
@@ -1210,27 +1219,40 @@ namespace DOL.GS
                 return false;
             }
 
-            if (log.IsDebugEnabled)
-                log.Debug("Adding player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
+            return AddPlayers([new(addPlayer, rank)]);
+        }
 
+        public bool AddPlayers(IEnumerable<KeyValuePair<GamePlayer, DBRank>> players)
+        {
             try
             {
-                AddOnlineMember(addPlayer);
-                addPlayer.GuildName = Name;
-                addPlayer.GuildID = GuildID;
-                addPlayer.GuildRank = rank;
-                addPlayer.Guild = this;
-                addPlayer.SaveIntoDatabase();
-                GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
-                addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                addPlayer.Client.Out.SendCharResistsUpdate();
-                if (addPlayer.IsInPvP)
-                    PvpManager.Instance.OnMemberJoinGuild(this, addPlayer);
-                if (IsSystemGuild || force || addPlayer.Client.Account.PrivLevel != 1)
-                    return true;
-                m_invite_Players.Add(addPlayer, DateTime.Now);
+                AddOnlineMembers(players.Select(p => p.Key));
+                foreach (var (addPlayer, rank) in players)
+                {
+                    if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                        continue;
+
+                    if (log.IsDebugEnabled)
+                        log.Debug("Adding player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
+
+                    addPlayer.GuildName = Name;
+                    addPlayer.GuildID = GuildID;
+                    addPlayer.GuildRank = rank;
+                    addPlayer.Guild = this;
+                    addPlayer.SaveIntoDatabase();
+                    GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
+                }
+
+                foreach (var (addPlayer, _) in players)
+                {
+                    addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    addPlayer.Client.Out.SendCharResistsUpdate();
+                    if (addPlayer.IsInPvP)
+                        PvpManager.Instance.OnMemberJoinGuild(this, addPlayer);
+                }
+                return true;
             }
             catch (Exception e)
             {
@@ -1238,8 +1260,56 @@ namespace DOL.GS
                     log.Error("AddPlayer", e);
                 return false;
             }
+        }
 
-            return true;
+        /// <summary>
+        /// Add an offline player to a guild with the specified rank
+        /// </summary>
+        /// <param name="addPlayer"></param>
+        /// <param name="rank"></param>
+        /// <returns></returns>
+        public bool AddOfflinePlayers(IEnumerable<KeyValuePair<DOLCharacters, DBRank>> players)
+        {
+            bool any = false;
+            foreach (var (addPlayer, rank) in players)
+            {
+                try
+                {
+                    if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                        continue;
+
+                    if (log.IsDebugEnabled)
+                        log.Debug("Adding offline player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
+
+                    addPlayer.GuildID = GuildID;
+                    addPlayer.GuildRank = rank.RankLevel;
+                
+                    GameServer.Database.SaveObject(addPlayer);
+
+                    GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
+                    SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                }
+                catch (Exception e)
+                {
+                    if (log.IsErrorEnabled)
+                        log.Error("AddPlayer", e);
+                }
+            }
+            return any;
+        }
+
+        /// <summary>
+        /// Add an offline player to a guild with the specified rank
+        /// </summary>
+        /// <param name="addPlayer"></param>
+        /// <param name="rank"></param>
+        /// <returns></returns>
+        public bool AddOfflinePlayer(DOLCharacters addPlayer, DBRank rank, bool force = false)
+        {
+            if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                return false;
+
+            return AddOfflinePlayers([new(addPlayer, rank)]);
         }
 
         /// <summary>
@@ -1254,9 +1324,9 @@ namespace DOL.GS
                 return false;
             
             GameClient remover = WorldMgr.GetClientByPlayerName(removername, false, true);
-            if (!IsSystemGuild && remover is { Account.PrivLevel: < 2 } && m_invite_Players.ContainsKey(member))
+            if (!IsSystemGuild && remover is { Account.PrivLevel: < 2 } && m_invite_Players.TryGetValue(member, out DateTime inviteTime))
             {
-                int time = Properties.RECRUITMENT_TIMER_OPTION - (int)DateTime.Now.Subtract(m_invite_Players[member]).TotalMinutes;
+                int time = Properties.RECRUITMENT_TIMER_OPTION - (int)DateTime.Now.Subtract(inviteTime).TotalMinutes;
                 if (member.Name == removername)
                     member.Client.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "Commands.Players.Guild.NotAbleToLeave", time), eChatType.CT_Advise, eChatLoc.CL_SystemWindow);
                 else
@@ -1280,7 +1350,6 @@ namespace DOL.GS
                 member.Guild = null;
                 member.SaveIntoDatabase();
 
-                member.Out.SendObjectGuildID(member, member.Guild);
                 // Send message to removerClient about successful removal
                 if (removername == member.Name)
                     member.Out.SendMessage("You leave the guild.", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
@@ -1292,11 +1361,12 @@ namespace DOL.GS
                 member.Client.Out.SendCharResistsUpdate();
                 if (member.IsInPvP)
                     PvpManager.Instance.OnMemberLeaveGuild(this, member);
-                if (IsSystemGuild || remover is { Account.PrivLevel: > 1 })
-                    return true;
-                
-                if (!m_leave_Players.ContainsKey(member))
-                    m_leave_Players.Add(member, DateTime.Now);
+
+                if (!IsSystemGuild && remover is not { Account.PrivLevel: > 1 })
+                {
+                    if (!m_leave_Players.ContainsKey(member))
+                        m_leave_Players.Add(member, DateTime.Now);
+                }
             }
             catch (Exception e)
             {
@@ -1483,7 +1553,22 @@ namespace DOL.GS
         /// <returns>ArrayList of members</returns>
         public IList<GamePlayer> GetListOfOnlineMembers()
         {
-            return new List<GamePlayer>(m_onlineGuildPlayers.Values);
+            lock (m_onlineGuildPlayers)
+            {
+                return new List<GamePlayer>(m_onlineGuildPlayers.Values);
+            }
+        }
+        
+        /// <summary>
+        /// Returns a list of all online members.
+        /// </summary>
+        public IEnumerable<GamePlayer> GetOnlineMembers()
+        {
+            lock (m_onlineGuildPlayers)
+            {
+                foreach (var player in m_onlineGuildPlayers.Values)
+                    yield return player;
+            }
         }
 
         /// <summary>
@@ -1820,6 +1905,162 @@ namespace DOL.GS
                     player.Guild.UpdateMember(player);
                 }
             }
+        }
+
+        /// <summary>
+        /// Send social window data to the client
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="sort"></param>
+        /// <param name="page"></param>
+        /// <param name="offline">0 = false, 1 = true, 2 to try and recall last setting used by player</param>
+        public static void SendSocialWindowData(GameClient client, int sort = 1, int page = 1, byte offline = 2)
+        {
+            var allGuildMembers = GuildMgr.GetAllGuildMembers(client.Player.GuildID);
+            if (allGuildMembers == null || allGuildMembers.Count == 0)
+            {
+                client.Out.SendMessage("TE,0,0,0", eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            bool showOffline = false;
+
+            if (offline < 2)
+            {
+                showOffline = (offline != 0);
+            }
+            else
+            {
+                // try to recall last setting
+                showOffline = client.Player.TempProperties.getProperty<bool>("SOCIALSHOWOFFLINE", false);
+            }
+
+            client.Player.TempProperties.setProperty("SOCIALSHOWOFFLINE", showOffline);
+
+            //The type of sorting we will be sending
+            GuildMgr.GuildMemberDisplay.eSocialWindowSort sortOrder = (GuildMgr.GuildMemberDisplay.eSocialWindowSort)sort;
+
+            //Let's sort the sorted list - we don't need to sort if sort = name
+            SortedList<string, GuildMgr.GuildMemberDisplay> sortedWindowList = null;
+
+            GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Name;
+
+            #region Determine Sort
+            switch (sortOrder)
+            {
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ClassAsc:
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ClassDesc:
+                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.ClassID;
+                    break;
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.GroupAsc:
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.GroupDesc:
+                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Group;
+                    break;
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.LevelAsc:
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.LevelDesc:
+                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Level;
+                    break;
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.NoteAsc:
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.NoteDesc:
+                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Note;
+                    break;
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.RankAsc:
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.RankDesc:
+                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.Rank;
+                    break;
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ZoneOrOnlineAsc:
+                case GuildMgr.GuildMemberDisplay.eSocialWindowSort.ZoneOrOnlineDesc:
+                    sortColumn = GuildMgr.GuildMemberDisplay.eSocialWindowSortColumn.ZoneOrOnline;
+                    break;
+            }
+            #endregion
+
+            if (showOffline == false) // show only a sorted list of online players
+            {
+                IList<GamePlayer> onlineGuildPlayers = client.Player.Guild.GetListOfOnlineMembers();
+                sortedWindowList = new SortedList<string, GuildMgr.GuildMemberDisplay>(onlineGuildPlayers.Count);
+
+                foreach (GamePlayer player in onlineGuildPlayers)
+                {
+                    if (allGuildMembers.TryGetValue(player.InternalID, out GuildMgr.GuildMemberDisplay memberDisplay))
+                    {
+                        memberDisplay.UpdateMember(player);
+                        string key = memberDisplay[sortColumn];
+
+                        if (sortedWindowList.ContainsKey(key))
+                            key += sortedWindowList.Count.ToString();
+
+                        sortedWindowList.Add(key, memberDisplay);
+                    }
+                }
+            }
+            else // sort and display entire list
+            {
+                sortedWindowList = new SortedList<string, GuildMgr.GuildMemberDisplay>();
+                int keyIncrement = 0;
+
+                foreach (GuildMgr.GuildMemberDisplay memberDisplay in allGuildMembers.Values)
+                {
+                    GamePlayer p = client.Player.Guild.GetOnlineMemberByID(memberDisplay.InternalID);
+                    if (p != null)
+                    {
+                        //Update to make sure we have the most up to date info
+                        memberDisplay.UpdateMember(p);
+                    }
+                    else
+                    {
+                        //Make sure that since they are offline they get the offline flag!
+                        memberDisplay.GroupSize = "0";
+                    }
+                    //Add based on the new index
+                    string key = memberDisplay[sortColumn];
+
+                    if (sortedWindowList.ContainsKey(key))
+                    {
+                        key += keyIncrement++;
+                    }
+
+                    try
+                    {
+                        sortedWindowList.Add(key, memberDisplay);
+                    }
+                    catch
+                    {
+                        if (log.IsErrorEnabled)
+                            log.Error(string.Format("Sorted List duplicate entry - Key: {0} Member: {1}. Replacing - Member: {2}.  Sorted count: {3}.  Guild ID: {4}", key, memberDisplay.Name, sortedWindowList[key].Name, sortedWindowList.Count, client.Player.GuildID));
+                    }
+                }
+            }
+
+            //Finally lets send the list we made
+
+            IList<GuildMgr.GuildMemberDisplay> finalList = sortedWindowList.Values;
+
+            int i = 0;
+            string[] buffer = new string[10];
+            for (i = 0; i < 10 && finalList.Count > i + (page - 1) * 10; i++)
+            {
+                GuildMgr.GuildMemberDisplay memberDisplay;
+
+                if ((int)sortOrder > 0)
+                {
+                    //They want it normal
+                    memberDisplay = finalList[i + (page - 1) * 10];
+                }
+                else
+                {
+                    //They want it in reverse
+                    memberDisplay = finalList[(finalList.Count - 1) - (i + (page - 1) * 10)];
+                }
+
+                buffer[i] = memberDisplay.ToString((i + 1) + (page - 1) * 10, finalList.Count);
+            }
+
+            client.Out.SendMessage("TE," + page.ToString() + "," + finalList.Count + "," + i.ToString(), eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
+
+            foreach (string member in buffer)
+                client.Player.Out.SendMessage(member, eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
+
         }
     }
 }

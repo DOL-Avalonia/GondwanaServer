@@ -243,8 +243,8 @@ namespace DOL.GS.PacketHandler
 
             // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
             // We treat quest texts as "server texts", so sender = null
-            name = await AutoTranslateManager.Translate(null, receiver, name);
-            desc = await AutoTranslateManager.Translate(null, receiver, desc);
+            name = await AutoTranslateManager.Translate(receiver, name);
+            desc = await AutoTranslateManager.Translate(receiver, desc);
 
             if (name.Length > byte.MaxValue)
                 name = name.Substring(0, 256);
@@ -258,7 +258,7 @@ namespace DOL.GS.PacketHandler
             for (var idx = 0; idx < data.VisibleGoals.Count; ++idx)
             {
                 var goal = data.VisibleGoals[idx];
-                desc = await AutoTranslateManager.Translate(null, receiver, goal.Description);
+                desc = await AutoTranslateManager.Translate(receiver, goal.Description);
                 if (goal.ProgressTotal == 1)
                     desc = $"{desc}\r";
                 else

@@ -3,6 +3,7 @@ using System.Reflection;
 using DOL.Database;
 using DOL.GS.Commands;
 using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using log4net;
 using DOL.Language;
 
@@ -23,7 +24,7 @@ namespace DOL.GS.Scripts
             if (item == null)
                 return false;
 
-            return item.Id_nb == "scroll" || item.Id_nb == "scroll_royal";
+            return item.Id_nb is "scroll" or "scroll_royal";
         }
 
         public void OnCommand(GameClient client, string[] args)
@@ -50,7 +51,7 @@ namespace DOL.GS.Scripts
                         theScroll = GetBookFromTitle(ScrollTitle);
                         if (theScroll == null)
                         {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.NotExist", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.NotExist", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             return;
                         }
 
@@ -64,20 +65,19 @@ namespace DOL.GS.Scripts
                 {
                     #region Création
                     case "create":
-
                         ScrollTitle = String.Join(" ", args, 2, args.Length - 2);
                         var item = player.Inventory.GetItem(eInventorySlot.LastBackpack);
 
                         if (!IsBlankParchment(item))
                         {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.NeedBlankScroll"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.NeedBlankScroll"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             return;
                         }
 
                         var book = GameServer.Database.SelectObject<DBBook>(b => b.Title == ScrollTitle);
                         if (book != null)
                         {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.Exists"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.Exists"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             return;
                         }
 
@@ -91,6 +91,7 @@ namespace DOL.GS.Scripts
                             Name = "[" + player.Name + "] " + ScrollTitle,
                             Title = ScrollTitle,
                             Author = player.Name,
+                            Language = player.Client?.Account?.Language ?? Properties.SERV_LANGUAGE,
                             Text = "",
                             PlayerID = player.InternalID,
                             Ink = "",
@@ -111,13 +112,19 @@ namespace DOL.GS.Scripts
                         };
                         GameServer.Database.AddObject(iu);
                         player.Inventory.AddItem(eInventorySlot.LastBackpack, GameInventoryItem.Create(iu));
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.Created"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.Created"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         break;
                     #endregion
                     #region Ecriture
                     case "write":
                         if (!HaveFeather(player) || !HaveInk(player) || !HaveRightInk(player, theScroll!.InkId))
                             return;
+
+                        if (theScroll.IsGuildRegistry && theScroll.IsInLibrary)
+                        {
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.CantEditRegistry"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
 
                         theScroll.Ink = (theScroll.Ink == "") ? GetInkType(player) : theScroll.Ink;
                         theScroll.InkId = (theScroll.InkId == "") ? GetInkId(player) : theScroll.InkId;
@@ -127,11 +134,19 @@ namespace DOL.GS.Scripts
 
                         DecInk(player, theScroll.InkId);
                         theScroll.Save();
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.Writing", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.Writing", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         break;
+
                     #endregion
                     #region Suppression
                     case "remove":
+                        if (theScroll.IsGuildRegistry && GuildMgr.DoesGuildExist(theScroll.Title))
+                        {
+                            // This is probably redundant from the IsStamped check in isAuthor, but let's make sure
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.CantRemoveRegistry"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
                         long bookDbId = theScroll!.ID;
                         string bookTitle = theScroll.Title;
                         string bookInternalName = theScroll.Name;
@@ -139,7 +154,7 @@ namespace DOL.GS.Scripts
                         foreach (GameClient clientToClean in WorldMgr.GetAllPlayingClients())
                         {
                             GamePlayer targetPlayer = clientToClean.Player;
-                            if (targetPlayer == null || targetPlayer.Inventory == null) continue;
+                            if (targetPlayer?.Inventory == null) continue;
 
                             bool playerInventoryChanged = false;
 
@@ -177,16 +192,23 @@ namespace DOL.GS.Scripts
 
                         GameServer.Database.DeleteObject(theScroll);
 
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.Burned", bookTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.Burned", bookTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         break;
                     #endregion
                     #region Correction
                     case "correct":
-                        if (theScroll!.Text.IndexOf("\n") == -1)
+                        if (theScroll!.Text.IndexOf('\n') == -1)
                         {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.EmptyScroll"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.EmptyScroll"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             return;
                         }
+
+                        if (theScroll.IsGuildRegistry && theScroll.IsInLibrary)
+                        {
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.CantEditRegistry"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
                         if (!HaveAcid(player))
                             return;
 
@@ -194,7 +216,7 @@ namespace DOL.GS.Scripts
                         theScroll.Text = theScroll.Text.Substring(0, theScroll.Text.LastIndexOf('\n') + 1);
 
                         theScroll.Save();
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Book.LastLineErased", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.LastLineErased", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         break;
                         #endregion
                 }
@@ -269,14 +291,49 @@ namespace DOL.GS.Scripts
         }
 
         /// <summary>
-        /// Retourne true si player est l'auteur du livre
+        /// Retourne true si player est l'auteur du livre ou un MJ
         /// </summary>
         public bool isAuthor(GamePlayer player, DBBook theScroll)
         {
-            if (theScroll.PlayerID != player.InternalID)
+            if (player.Client.Account.PrivLevel > 2)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                return false;
+                return true;
+            }
+
+            if (theScroll is { IsGuildRegistry: true })
+            {
+                if (theScroll.IsStamped)
+                {
+                    /* TODO: allow edits of the registry after guild creation?
+                    var guild = GuildMgr.GetGuildByName(theScroll.Title);
+                    if (guild != null && player.Guild != guild || player.GuildRank.RankLevel != 0)
+                    {
+                        player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                     */
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.Stamped"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+                else if (!theScroll.IsGuildFounder(player.InternalID))
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+            else
+            {
+                if (theScroll.PlayerID != player.InternalID)
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            
+                if (theScroll.IsStamped)
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.Stamped"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
             }
             return true;
         }
@@ -291,7 +348,7 @@ namespace DOL.GS.Scripts
                     if (player.Inventory.GetItem(i).Id_nb == "feather" ||
                         player.Inventory.GetItem(i).Id_nb.StartsWith("feather_"))
                         return true;
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.NeedFeather"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NeedFeather"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             return false;
         }
 
@@ -305,7 +362,7 @@ namespace DOL.GS.Scripts
                     if (player.Inventory.GetItem(i).Id_nb.StartsWith("ink_") ||
                         player.Inventory.GetItem(i).Id_nb.StartsWith("blood_"))
                         return true;
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.NeedInk"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NeedInk"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             return false;
         }
 
@@ -318,7 +375,7 @@ namespace DOL.GS.Scripts
                 if (player.Inventory.GetItem(i) != null)
                     if (player.Inventory.GetItem(i).Id_nb == "corrector")
                         return true;
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.NeedCorrector"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NeedCorrector"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             return false;
         }
 
@@ -333,7 +390,7 @@ namespace DOL.GS.Scripts
                 if (player.Inventory.GetItem(i) != null &&
                     player.Inventory.GetItem(i).Id_nb == ink)
                     return true;
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.NeedRightInk", ink), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NeedRightInk", ink), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             return false;
         }
 
@@ -342,13 +399,13 @@ namespace DOL.GS.Scripts
         /// </summary>
         public void Aide(GamePlayer player)
         {
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpTitle"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpCreate"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpWrite"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpWriteNote"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpRemove"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpCorrect"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Book.HelpUse"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpTitle"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpCreate"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpWrite"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpWriteNote"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpRemove"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpCorrect"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.HelpUse"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
     }
 }

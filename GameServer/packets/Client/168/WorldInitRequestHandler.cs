@@ -105,38 +105,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 GamePlayer player = (GamePlayer)m_actionSource;
                 if (player == null) return;
-                //check emblems at world load before any updates
-                if (player.Inventory != null)
-                {
-                    lock (player.Inventory)
-                    {
-                        Guild playerGuild = player.Guild;
-                        foreach (InventoryItem myitem in player.Inventory.AllItems)
-                        {
-                            if (myitem != null && myitem.Emblem != 0)
-                            {
-                                if (playerGuild == null || myitem.Emblem != playerGuild.Emblem)
-                                {
-                                    myitem.Emblem = 0;
-                                }
-                                if (player.Level < 20)
-                                {
-                                    if (player.CraftingPrimarySkill == eCraftingSkill.NoCrafting)
-                                    {
-                                        myitem.Emblem = 0;
-                                    }
-                                    else
-                                    {
-                                        if (player.GetCraftingSkillValue(player.CraftingPrimarySkill) < 400)
-                                        {
-                                            myitem.Emblem = 0;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+
+                player.DoLoginMaintenance();
 
                 player.Client.ClientState = GameClient.eClientState.WorldEnter;
                 // 0x88 - Position
