@@ -33,8 +33,6 @@ namespace DOL.GS.Scripts
         private const string INTERACT_KEY_CONSULT_GUILDS = "Librarian.Menu.ConsultGuildRegister";
         private const string INTERACT_KEY_ADD_BOOK = "Librarian.Menu.AddBook";
         private const string INTERACT_KEY_COLLECT_ROYALTIES = "Librarian.Menu.CollectRoyalties";
-        private const string INTERACT_KEY_PREVIOUS_PAGE = "Librarian.BookList.PreviousPage";
-        private const string INTERACT_KEY_NEXT_PAGE = "Librarian.BookList.NextPage";
         private const string INTERACT_KEY_PREFIX_VOTE_UP = "Librarian.Prefix.VotePlus";
         private const string INTERACT_KEY_PREFIX_VOTE_DOWN = "Librarian.Prefix.VoteMinus";
         private const string INTERACT_KEY_PREFIX_BUY = "Librarian.Prefix.Buy";
@@ -111,7 +109,7 @@ namespace DOL.GS.Scripts
                 {
                     // Consult register list
                     case INTERACT_KEY_CONSULT_GUILDS when Properties.GUILD_REQUIRE_REGISTER:
-                        SendGuildRegisterList(player);
+                        SendGuildRegisterList(cache);
                         return true;
                         
                     // List normal books
@@ -141,7 +139,7 @@ namespace DOL.GS.Scripts
             if (Properties.GUILD_REQUIRE_REGISTER)
             {
                 // Click on a register title -> show FULL TEXT
-                var regClicked = GameServer.Database.SelectObject<DBBook>(b => b.Title == text && b.IsGuildRegistry);
+                var regClicked = GameServer.Database.SelectObject<DBBook>(b => b.IsGuildRegistry && b.Title == text);
                 if (regClicked != null)
                 {
                     BooksMgr.ReadGuildRegistry(cache.Player, regClicked);
@@ -218,7 +216,7 @@ namespace DOL.GS.Scripts
             // Clicking on a book title -> preview
             var originalTitle = cache.GetBookTitleID(text);
             var clicked = GameServer.Database.SelectObject<DBBook>(
-                b => b.IsInLibrary && b.Title == originalTitle && !b.IsGuildRegistry);
+                b => b.IsGuildRegistry == false && b.IsInLibrary && b.Title == originalTitle);
 
             if (clicked != null)
             {
@@ -234,7 +232,7 @@ namespace DOL.GS.Scripts
                 if (int.TryParse(token, out int bookId))
                 {
                     var legacyById = GameServer.Database.SelectObject<DBBook>(
-                        b => b.ID == bookId && b.IsInLibrary && !b.IsGuildRegistry);
+                        b => b.ID == bookId && b.IsInLibrary && b.IsGuildRegistry == false);
 
                     if (legacyById != null)
                     {
@@ -254,7 +252,7 @@ namespace DOL.GS.Scripts
             var player = cache.Player;
             var text1 = LanguageMgr.Translate(player, "Librarian.ResponseText01");
             cache.BookList = GameServer.Database
-                .SelectObjects<DBBook>(b => b.IsInLibrary && b.Author != GUILD_REGISTER_AUTHOR)
+                .SelectObjects<DBBook>(b => b.IsInLibrary && b.IsGuildRegistry == false)
                 .OrderBy(b => b.Title)
                 .Select(dbBook => new PlayerCache.BookListEntry(dbBook)).ToList();
             
@@ -264,113 +262,6 @@ namespace DOL.GS.Scripts
             {
                 await SendBookListPage(cache, 0);
             }
-        }
-
-        private async Task SendBookListPage(PlayerCache cache, int page)
-        {
-            var sb = new StringBuilder(2048);
-            var books = cache.GetBooksForPage(page).ToList();
-            if (!books.Any())
-                return;
-
-            var totalPages = Math.Max(1, cache.TotalListPages);
-            page = Math.Clamp(0, page, totalPages - 1);
-            var player = cache.Player;
-            var pageTask = LanguageMgr.Translate(player, "Librarian.BookList.CurrentPage", page + 1, totalPages);
-            var upvoteTask = LanguageMgr.Translate(player, "Librarian.BookList.VotesPrefixPositive");
-            var downvoteTask = LanguageMgr.Translate(player, "Librarian.BookList.VotesPrefixNegative");
-            Task<string>?[] navigationTasks = [ pageTask, null, null ];
-            if (page > 0)
-            {
-                navigationTasks[1] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_PREVIOUS_PAGE));
-            }
-
-            if (page + 1 < cache.TotalListPages)
-            {
-                navigationTasks[2] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
-            }
-
-            var upvotes = await upvoteTask;
-            var downvotes = await downvoteTask;
-            cache.CurrentListPage = page;
-            foreach (var b in books)
-            {
-                string price = Money.GetString(b.Price);
-                string title = await cache.TranslateBookTitle(b);
-
-                sb.Append("\n[")
-                    .Append(title)
-                    .Append("] - ")
-                    .Append(b.Author)
-                    .Append(" - ")
-                    .Append(price)
-                    .Append(" - ")
-                    .Append(upvotes)
-                    .Append(' ')
-                    .Append(b.Upvotes)
-                    .Append(" / ")
-                    .Append(downvotes)
-                    .Append(' ')
-                    .Append(b.Downvotes);
-
-                if (sb.Length > 1800)
-                {
-                    player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    sb.Clear();
-                }
-            }
-
-            if (sb.Length > 0)
-                player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-
-            string navText = string.Join(' ', await Task.WhenAll(navigationTasks.Where(t => t != null).Cast<Task<string>>()));
-            player.Out.SendMessage(navText, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-        }
-
-        private void SendGuildRegisterList(GamePlayer player)
-        {
-            var registers = GameServer.Database
-                .SelectObjects<DBBook>(b => b.Author == GUILD_REGISTER_AUTHOR)
-                .OrderBy(b => b.Title)
-                .ToList();
-
-            if (registers == null || registers.Count == 0)
-            {
-                player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.GuildRegister.None"),
-                    eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                return;
-            }
-
-            player.Out.SendMessage(LanguageMgr.Translate(player, "Librarian.GuildRegister.Count", registers.Count),
-                eChatType.CT_System, eChatLoc.CL_PopupWindow);
-
-            var sb = new StringBuilder(2048);
-            foreach (var b in registers)
-            {
-                sb.Append("\n[")
-                  .Append(b.Title)
-                  .Append("]");
-
-                if (!string.IsNullOrWhiteSpace(b.StampBy) || b.StampDate != DateTime.MinValue)
-                {
-                    sb.Append(" - ")
-                      .Append(LanguageMgr.Translate(player, "Librarian.GuildRegister.StampedBy"))
-                      .Append(": ")
-                      .Append(string.IsNullOrWhiteSpace(b.StampBy) ? "?" : b.StampBy);
-
-                    if (b.StampDate != DateTime.MinValue)
-                        sb.Append(" - ").Append(b.StampDate.ToString("yyyy-MM-dd HH:mm"));
-                }
-
-                if (sb.Length > 1800)
-                {
-                    player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    sb.Clear();
-                }
-            }
-
-            if (sb.Length > 0)
-                player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
         private async Task ShowBookPreview(PlayerCache cache, DBBook book)
@@ -508,7 +399,7 @@ namespace DOL.GS.Scripts
         private void HandleLibrarianBookHandIn(GamePlayer p, DBBook book)
         {
             // Prevent publishing registers at all (safety)
-            if (book.Author == GUILD_REGISTER_AUTHOR || book.IsGuildRegistry)
+            if (book.IsGuildRegistry)
             {
                 p.Out.SendMessage(LanguageMgr.Translate(p, "Librarian.Publish.RegisterBlocked"),
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
@@ -519,9 +410,6 @@ namespace DOL.GS.Scripts
             {
                 if (!TryPublishBook(p, book))
                     return;
-
-                book.IsInLibrary = true;
-                book.Save();
 
                 UpdateAuthorUniqueItemPrice(book);
 
@@ -567,6 +455,7 @@ namespace DOL.GS.Scripts
             book.BasePriceCopper = ComputeBasePrice(words);
 
             book.CurrentPriceCopper = ApplyRating(book.BasePriceCopper, book.UpVotes, book.DownVotes);
+            book.IsInLibrary = true;
             book.Save();
 
             UpdateAuthorUniqueItemPrice(book);
@@ -675,9 +564,9 @@ namespace DOL.GS.Scripts
             if (!string.IsNullOrEmpty(bookID))
             {
                 book = GameServer.Database.SelectObject<DBBook>(
-                    b => b.IsInLibrary && b.Title == bookID && b.Author != GUILD_REGISTER_AUTHOR);
+                    b => b.IsInLibrary && b.Title == bookID && b.IsGuildRegistry == false);
             }
-
+            
             if (book == null)
             {
                 voter.Out.SendMessage(LanguageMgr.Translate(voter, "Librarian.Book.NotFound"),

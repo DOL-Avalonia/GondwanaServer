@@ -405,6 +405,13 @@ namespace DOL.GS
                 
                 var ranks = DOLDB<DBRank>.SelectObjects(DB.Column(nameof(DBRank.GuildID)).IsEqualTo(removeGuild.GuildID));
                 GameServer.Database.DeleteObject(ranks);
+                
+                // Rename the book...
+                var book = GameServer.Database.SelectObject<DBBook>(b => b.Title == removeGuild.Name && b.IsGuildRegistry == true);
+                book.Name = "[DISBANDED] " + removeGuild.Name;
+                book.IsStamped = false;
+                book.Save();
+                
                 Dictionary<string, GamePlayer> onlinePlayers;
                 lock (removeGuild.GetListOfOnlineMembers())
                 {

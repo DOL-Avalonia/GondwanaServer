@@ -1,26 +1,29 @@
-Commands.Players.Book.Description:		Write a book or scroll
-Commands.Players.Book.Usage:			/book <title>
+Commands.Players.Book.Description:				Write a book or scroll
+Commands.Players.Book.Usage:					/book <title>
 
-Commands.Players.Book.Description:		Create a blank book
-Commands.Players.Book.Usage:			/book <title>
-Commands.Players.Book.NotExist:			The book "{0}" does not exist!
-Commands.Players.Book.NeedBlankScroll:	You must have a blank scroll in the last slot of your inventory to create a book.
-Commands.Players.Book.Exists:			This book already exists.
-Commands.Players.Book.Created:			You create a book.
-Commands.Players.Book.Writing:			You write a few lines on "{0}".
-Commands.Players.Book.Burned:			You painfully burn the last copy of the work named "{0}"...
-Commands.Players.Book.EmptyScroll:		You cannot erase an empty scroll!
-Commands.Players.Book.LastLineErased:	You erase the last line of "{0}".
-Commands.Players.Book.UnknownInk:		Unknown Ink
-Commands.Players.Book.NotAuthor:		You are not the author of "{0}".
-Commands.Players.Book.NeedFeather:		You must have a writer's feather to write on a scroll.
-Commands.Players.Book.NeedInk:			You must have ink or blood to write on a scroll.
-Commands.Players.Book.NeedCorrector:	You must have a corrector to erase lines from a scroll.
-Commands.Players.Book.NeedRightInk:		You must have ink of type "{0}" to continue writing this scroll.
-Commands.Players.Book.HelpTitle:		Usage of /book:
-Commands.Players.Book.HelpCreate:		- /book create "Title": Create a book from a blank scroll. (In the last slot of the inventory)
-Commands.Players.Book.HelpWrite:		- /book write "Title" <Text to write>: Write text on a scroll.
-Commands.Players.Book.HelpWriteNote:	-- (If you have multiple types of ink, the first one in your inventory will be used)
-Commands.Players.Book.HelpRemove:		- /book remove "Title": Completely destroy a book. (Author only)
-Commands.Players.Book.HelpCorrect:		- /book correct "Title": Erase the last line of a scroll.
-Commands.Players.Book.HelpUse:			- /use (After right-clicking on the book): Open a reading window.
+Commands.Players.Book.Description:				Create a blank book
+Commands.Players.Book.Usage:					/book <title>
+Commands.Players.Book.NotExist:					The book "{0}" does not exist!
+Commands.Players.Book.NeedBlankScroll:			You must have a blank scroll in the last slot of your inventory to create a book.
+Commands.Players.Book.Exists:					This book already exists.
+Commands.Players.Book.Created:					You create a book.
+Commands.Players.Book.Writing:					You write a few lines on "{0}".
+Commands.Players.Book.Burned:					You painfully burn the last copy of the work named "{0}"...
+Commands.Players.Book.EmptyScroll:				You cannot erase an empty scroll!
+Commands.Players.Book.LastLineErased:			You erase the last line of "{0}".
+Commands.Players.Book.UnknownInk:				Unknown Ink
+Commands.Players.Book.NotAuthor:				You are not the author of "{0}".
+Commands.Players.Book.NeedFeather:				You must have a writer's feather to write on a scroll.
+Commands.Players.Book.NeedInk:					You must have ink or blood to write on a scroll.
+Commands.Players.Book.NeedCorrector:			You must have a corrector to erase lines from a scroll.
+Commands.Players.Book.NeedRightInk:				You must have ink of type "{0}" to continue writing this scroll.
+Commands.Players.Book.Stamped:					You cannot edit a book after it was stamped!
+Commands.Players.Book.CantEditRegistry:			You cannot edit the registry of an existing guild!
+Commands.Players.Book.CantRemoveRegistry:		You cannot burn the registry of an existing guild!
+Commands.Players.Book.HelpTitle:				Usage of /book:
+Commands.Players.Book.HelpCreate:				- /book create "Title": Create a book from a blank scroll. (In the last slot of the inventory)
+Commands.Players.Book.HelpWrite:				- /book write "Title" <Text to write>: Write text on a scroll.
+Commands.Players.Book.HelpWriteNote:			-- (If you have multiple types of ink, the first one in your inventory will be used)
+Commands.Players.Book.HelpRemove:				- /book remove "Title": Completely destroy a book. (Author only)
+Commands.Players.Book.HelpCorrect:				- /book correct "Title": Erase the last line of a scroll.
+Commands.Players.Book.HelpUse:					- /use (After right-clicking on the book): Open a reading window.

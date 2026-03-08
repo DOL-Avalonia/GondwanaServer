@@ -69,14 +69,14 @@ namespace DOL.GS
         {
             if (book == null) return;
 
-            book.AddTag(GuildRegistrar.TAG_PROCESSING);
+            book.AddTag(DBBook.TAG_PROCESSING);
         }
 
         private static void RemoveProcessingTag(DBBook? book)
         {
             if (book == null) return;
 
-            book.RemoveTag(GuildRegistrar.TAG_PROCESSING);
+            book.RemoveTag(DBBook.TAG_PROCESSING);
         }
 
         /// <summary>
@@ -205,11 +205,11 @@ namespace DOL.GS
                     continue;
 
                 // Must be processing for resume
-                if (!BookHasTag(b, GuildRegistrar.TAG_PROCESSING))
+                if (!BookHasTag(b, DBBook.TAG_PROCESSING))
                     continue;
 
                 // If already stamped, not an "in-progress" candidate
-                if (b.IsStamped || BookHasTag(b, GuildRegistrar.TAG_STAMPED))
+                if (b.IsStamped || BookHasTag(b, DBBook.TAG_STAMPED))
                     continue;
 
                 book = b;
@@ -512,19 +512,7 @@ namespace DOL.GS
             bool awaitingStamp = player.TempProperties.getProperty<bool>(TP_AWAIT_STAMP, false);
             if (awaitingStamp)
             {
-                if (!item.Id_nb.Equals("guild_stamp", StringComparison.OrdinalIgnoreCase))
-                {
-                    SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.WrongItem"));
-                    return true;
-                }
-
-                if (!player.Inventory.RemoveItem(item))
-                {
-                    SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.TakeFail"));
-                    return true;
-                }
-
-                FinalizeStamp(player);
+                FinalizeStamp(bookItem, item, player);
                 return true;
             }
 
@@ -543,7 +531,7 @@ namespace DOL.GS
             }
 
             // If already stamped, clerk does nothing with it
-            if (book.IsStamped || BookHasTag(book, GuildRegistrar.TAG_STAMPED))
+            if (book.IsStamped || BookHasTag(book, DBBook.TAG_STAMPED))
             {
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.AlreadyDone"));
                 return true;
@@ -551,7 +539,7 @@ namespace DOL.GS
 
             // Only enter the step-based conversation after FULL validation AND after adding #processing.
             // If book is not yet processing, we validate now and then mark it processing.
-            if (!BookHasTag(book, GuildRegistrar.TAG_PROCESSING))
+            if (!BookHasTag(book, DBBook.TAG_PROCESSING))
             {
                 var failTask = ValidateInitialBook(player, item, book);
                 if (failTask != null)
@@ -598,7 +586,7 @@ namespace DOL.GS
             int bookId = player.TempProperties.getProperty<int>(TP_BOOK_ID, 0);
             DBBook book = DOLDB<DBBook>.SelectObject(DB.Column(nameof(DBBook.ID)).IsEqualTo((long)bookId));
 
-            if (book == null || !BookHasTag(book, GuildRegistrar.TAG_PROCESSING))
+            if (book == null || !BookHasTag(book, DBBook.TAG_PROCESSING))
             {
                 ResetState(player);
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
@@ -619,7 +607,7 @@ namespace DOL.GS
                             return true;
                         }
 
-                        book.AddTag(GuildRegistrar.TAG_LEADER, ch.Name);
+                        book.AddTag(DBBook.TAG_LEADER, ch.Name);
                         book.Save();
 
                         AddUsedAccount(player, ch.AccountName);
@@ -757,12 +745,18 @@ namespace DOL.GS
             return true;
         }
 
-        private bool FinalizeStamp(GamePlayer player)
+        private bool FinalizeStamp(InventoryItem bookItem, InventoryItem stampItem, GamePlayer player)
         {
+            if (!stampItem.Id_nb.Equals("guild_stamp", StringComparison.OrdinalIgnoreCase))
+            {
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.WrongItem"));
+                return true;
+            }
+
             int bookId = player.TempProperties.getProperty<int>(TP_BOOK_ID, 0);
             DBBook book = DOLDB<DBBook>.SelectObject(DB.Column(nameof(DBBook.ID)).IsEqualTo((long)bookId));
 
-            if (book == null || !BookHasTag(book, GuildRegistrar.TAG_PROCESSING))
+            if (book == null || !BookHasTag(book, DBBook.TAG_PROCESSING))
             {
                 ResetState(player);
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Resume.Lost"));
@@ -776,6 +770,20 @@ namespace DOL.GS
                 SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.Incomplete"));
                 return false;
             }
+            
+            // Re-validate because up to this point players can edit the book's contents
+            var failTask = ValidateInitialBook(player, bookItem, book);
+            if (failTask != null)
+            {
+                SayTo(player, failTask);
+                return false;
+            }
+
+            if (!player.Inventory.RemoveItem(stampItem))
+            {
+                SayTo(player, LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.TakeFail"));
+                return true;
+            }
 
             book.IsGuildRegistry = true;
             book.IsStamped = true;
@@ -783,16 +791,11 @@ namespace DOL.GS
             book.StampDate = DateTime.Now;
 
             // Mark stamped tag and remove processing tag for clarity
-            book.AddTag(GuildRegistrar.TAG_STAMPED);
+            book.AddTag(DBBook.TAG_STAMPED);
             RemoveProcessingTag(book);
 
             book.Save();
-
-            var invItem = FindInventoryItemForBook(player, book.ID);
-            if (invItem != null)
-            {
-                ApplyUniqueState(player, invItem, "[Stamped]", book.Title, false, false, false);
-            }
+            ApplyUniqueState(player, bookItem, "[Stamped]", book.Title, false, false, false);
 
             SayTo(player, [
                 LanguageMgr.Translate(player, "RoyalTreasuryClerk.Stamp.Success.Line1"),

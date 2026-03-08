@@ -42,10 +42,6 @@ namespace DOL.GS
         private const string INTERACT_KEY_PREVIOUS_PAGE = "GuildRegistrar.List.PreviousPage";
         private const string INTERACT_KEY_NEXT_PAGE = "GuildRegistrar.List.NextPage";
 
-        public const string TAG_PROCESSING = "processing";
-        public const string TAG_STAMPED = "GuildStamped";
-        public const string TAG_LEADER = "GuildLeader";
-
         public override bool Interact(GamePlayer player)
         {
             if (!base.Interact(player))
@@ -256,7 +252,7 @@ namespace DOL.GS
                 return true;
             }
 
-            UpdateBookAfterGuildCreation(book, guildName);
+            UpdateBookAfterGuildCreation(book, newGuild);
 
             try
             {
@@ -272,19 +268,14 @@ namespace DOL.GS
             return true;
         }
 
-        private static void UpdateBookAfterGuildCreation(DBBook book, string guildName)
+        private static void UpdateBookAfterGuildCreation(DBBook book, Guild guild)
         {
-            book.Author = GUILD_REGISTER_AUTHOR;
-            book.Title = guildName;
-            book.Name = $"[REGISTER] {guildName}";
-            book.PlayerID = string.Empty;
-            book.IsInLibrary = false;
+            book.Title = guild.Name;
+            book.Name = $"[REGISTER] {guild.Name}";
+            book.IsInLibrary = true;
             book.CurrentPriceCopper = 0;
             book.BasePriceCopper = 0;
             book.IsGuildRegistry = true;
-            book.IsStamped = false;
-            book.StampBy = string.Empty;
-            book.StampDate = DateTime.MinValue;
         }
 
         private static bool IsBookStamped(DBBook book)
@@ -296,11 +287,6 @@ namespace DOL.GS
                 return true;
 
             if (book.StampDate != DateTime.MinValue)
-                return true;
-
-            string text = book.Text ?? string.Empty;
-            if (text.IndexOf("#stamped", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                text.IndexOf("#guildstamped", StringComparison.OrdinalIgnoreCase) >= 0)
                 return true;
 
             return false;
@@ -368,91 +354,6 @@ namespace DOL.GS
                 guild.GetListOfOnlineMembers();
             }
             catch { }
-        }
-
-        private void SendGuildRegisterList(PlayerCache cache)
-        {
-            var player = cache.Player;
-            var registers = GameServer.Database
-                .SelectObjects<DBBook>(b => b.IsGuildRegistry)
-                .OrderBy(b => b.Title)
-                .Select(b => new PlayerCache.BookListEntry(b))
-                .ToList();
-
-            cache.BookList = registers;
-            if (registers.Count == 0)
-            {
-                SayTo(player, LanguageMgr.Translate(player, "GuildRegistrar.List.None"));
-                return;
-            }
-
-            Task.Run(async () =>
-            {
-                var count = await LanguageMgr.Translate(player, "GuildRegistrar.List.Count", registers.Count);
-                SayTo(player, count);
-                await SendGuildRegisterPage(cache, 0);
-            });
-        }
-        private async Task SendGuildRegisterPage(PlayerCache cache, int page)
-        {
-            var sb = new StringBuilder(2048);
-            var books = cache.GetBooksForPage(page).ToList();
-            if (!books.Any())
-                return;
-
-            var totalPages = Math.Max(1, cache.TotalListPages);
-            page = Math.Clamp(0, page, totalPages - 1);
-            var player = cache.Player;
-            var taskStamped = LanguageMgr.Translate(player, "GuildRegistrar.List.StampedBy");
-            var taskPage = LanguageMgr.Translate(player, "GuildRegistrar.List.CurrentPage", page + 1, totalPages);
-            Task<string>?[] navigationTasks = [ taskPage, null, null ];
-            if (page > 0)
-            {
-                navigationTasks[1] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_PREVIOUS_PAGE));
-            }
-
-            if (page + 1 < cache.TotalListPages)
-            {
-                navigationTasks[2] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
-            }
-
-            int i = 0;
-            cache.CurrentListPage = page;
-            foreach (var b in cache.GetBooksForPage(page).ToList())
-            {
-                if (i != 0)
-                    sb.Append('\n');
-                
-                // Clickable title
-                sb.Append('[')
-                    .Append(b.Title) // No translation, this is guild name
-                    .Append(']');
-
-                // Optional metadata
-                if (!string.IsNullOrWhiteSpace(b.StampedBy) || b.StampDate != DateTime.MinValue)
-                {
-                    sb.Append(" - ")
-                        .Append(await taskStamped)
-                        .Append(" ")
-                        .Append(string.IsNullOrWhiteSpace(b.StampedBy) ? "?" : b.StampedBy);
-
-                    if (b.StampDate != DateTime.MinValue)
-                        sb.Append(" - ").Append(b.StampDate.ToString("yyyy-MM-dd HH:mm"));
-                }
-
-                if (sb.Length > 1800)
-                {
-                    player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    sb.Clear();
-                }
-                ++i;
-            }
-
-            if (sb.Length > 0)
-                player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
-
-            string navText = string.Join(' ', await Task.WhenAll(navigationTasks.Where(t => t != null).Cast<Task<string>>()));
-            player.Out.SendMessage(navText, eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
         private void ShowRegistry(PlayerCache cache, DBBook registry)

@@ -11,9 +11,6 @@ namespace DOL.GS
 {
     public static class BookUtils
     {
-        private const string GuildLeaderTag = "GuildLeader";
-        private static readonly Regex MemberRegex = new(@"GuildMember(\d{2})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
         private static readonly Regex WordRegex = new(@"\b[\p{L}\p{N}']+\b", RegexOptions.Compiled);
         private static readonly Regex LetterRegex = new(@"\p{L}", RegexOptions.Compiled);
 
@@ -221,9 +218,9 @@ namespace DOL.GS
 
         public static (string leader, List<string> members) ExtractFounders(DBBook book, int requiredGuildNum = -1)
         {
-            var leader = book.GetTag(GuildLeaderTag);
+            var leader = book.GetTag(DBBook.TAG_LEADER);
             var members = new SortedDictionary<int, string>();
-            foreach (var (m, value) in book.MatchTags(MemberRegex))
+            foreach (var (m, value) in book.MatchTags(DBBook.MemberRegex))
             {
                 if (!int.TryParse(m.Groups[1].Value, out int idx) || string.IsNullOrEmpty(value)) continue;
                 members[idx] = value;

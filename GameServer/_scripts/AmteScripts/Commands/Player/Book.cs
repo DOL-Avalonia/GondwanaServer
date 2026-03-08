@@ -65,7 +65,6 @@ namespace DOL.GS.Scripts
                 {
                     #region Création
                     case "create":
-
                         ScrollTitle = String.Join(" ", args, 2, args.Length - 2);
                         var item = player.Inventory.GetItem(eInventorySlot.LastBackpack);
 
@@ -121,6 +120,12 @@ namespace DOL.GS.Scripts
                         if (!HaveFeather(player) || !HaveInk(player) || !HaveRightInk(player, theScroll!.InkId))
                             return;
 
+                        if (theScroll.IsGuildRegistry && theScroll.IsInLibrary)
+                        {
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.CantEditRegistry"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
                         theScroll.Ink = (theScroll.Ink == "") ? GetInkType(player) : theScroll.Ink;
                         theScroll.InkId = (theScroll.InkId == "") ? GetInkId(player) : theScroll.InkId;
 
@@ -131,9 +136,17 @@ namespace DOL.GS.Scripts
                         theScroll.Save();
                         player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.Writing", ScrollTitle), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         break;
+
                     #endregion
                     #region Suppression
                     case "remove":
+                        if (theScroll.IsGuildRegistry && GuildMgr.DoesGuildExist(theScroll.Title))
+                        {
+                            // This is probably redundant from the IsStamped check in isAuthor, but let's make sure
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.CantRemoveRegistry"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
                         long bookDbId = theScroll!.ID;
                         string bookTitle = theScroll.Title;
                         string bookInternalName = theScroll.Name;
@@ -141,7 +154,7 @@ namespace DOL.GS.Scripts
                         foreach (GameClient clientToClean in WorldMgr.GetAllPlayingClients())
                         {
                             GamePlayer targetPlayer = clientToClean.Player;
-                            if (targetPlayer == null || targetPlayer.Inventory == null) continue;
+                            if (targetPlayer?.Inventory == null) continue;
 
                             bool playerInventoryChanged = false;
 
@@ -184,11 +197,18 @@ namespace DOL.GS.Scripts
                     #endregion
                     #region Correction
                     case "correct":
-                        if (theScroll!.Text.IndexOf("\n") == -1)
+                        if (theScroll!.Text.IndexOf('\n') == -1)
                         {
                             player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.EmptyScroll"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             return;
                         }
+
+                        if (theScroll.IsGuildRegistry && theScroll.IsInLibrary)
+                        {
+                            player.Out.SendMessage(LanguageMgr.Translate(client, "Commands.Players.Book.CantEditRegistry"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
                         if (!HaveAcid(player))
                             return;
 
@@ -275,10 +295,45 @@ namespace DOL.GS.Scripts
         /// </summary>
         public bool isAuthor(GamePlayer player, DBBook theScroll)
         {
-            if (theScroll.PlayerID != player.InternalID && player.Client.Account.PrivLevel <= 1)
+            if (player.Client.Account.PrivLevel > 2)
             {
-                player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                return false;
+                return true;
+            }
+
+            if (theScroll is { IsGuildRegistry: true })
+            {
+                if (theScroll.IsStamped)
+                {
+                    /* TODO: allow edits of the registry after guild creation?
+                    var guild = GuildMgr.GetGuildByName(theScroll.Title);
+                    if (guild != null && player.Guild != guild || player.GuildRank.RankLevel != 0)
+                    {
+                        player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                     */
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.Stamped"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+                else if (!theScroll.IsGuildFounder(player.InternalID))
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+            else
+            {
+                if (theScroll.PlayerID != player.InternalID)
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.NotAuthor", theScroll.Title), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            
+                if (theScroll.IsStamped)
+                {
+                    player.Out.SendMessage(LanguageMgr.Translate(player.Client, "Commands.Players.Book.Stamped"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
             }
             return true;
         }

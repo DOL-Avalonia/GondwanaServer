@@ -2866,6 +2866,9 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("guild", "guild_require_register", "If true, guilds must be formed via a stamped guild register book.", true)]
         public static bool GUILD_REQUIRE_REGISTER = true;
 
+        [ServerProperty("guild", "guild_keep_register_on_disband", "If true, guild registers will be kept in database & displayed in the registrar after guild disband.", true)]
+        public static bool GUILD_KEEP_REGISTER_ON_DISBAND = true;
+
         [ServerProperty("guild", "guild_register_min_words", "Minimum word count required for a guild register story.", 50)]
         public static int GUILD_REGISTER_MIN_WORDS = 50;
         #endregion

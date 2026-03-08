@@ -18,6 +18,12 @@ namespace DOL.Database
     [DataTable(TableName = "Book")]
     public class DBBook : DataObject
     {
+        public const string TAG_PROCESSING = "processing";
+        public const string TAG_STAMPED = "GuildStamped";
+        public const string TAG_LEADER = "GuildLeader";
+        
+        public static readonly Regex MemberRegex = new(@"GuildMember(\d{2})", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         
         private Dictionary<string, string> m_metadata = new(StringComparer.OrdinalIgnoreCase);
@@ -121,7 +127,17 @@ namespace DOL.Database
         
         public bool HasTag(string key, object? value)
         {
-            return m_metadata.TryGetValue(key, out string? v) && v == (value?.ToString() ?? string.Empty);
+            return m_metadata.TryGetValue(key, out string? v) && v == value?.ToString();
+        }
+
+        public bool IsGuildLeader(string playerID)
+        {
+            return HasTag(TAG_LEADER, playerID);
+        }
+
+        public bool IsGuildFounder(string playerID)
+        {
+            return PlayerID == playerID || IsGuildLeader(playerID) || MatchTags(MemberRegex).Any(kv => kv.Value == playerID);
         }
 
         [DataElement(AllowDbNull = false, Index = true)]
@@ -147,11 +163,18 @@ namespace DOL.Database
 
         [DataElement(AllowDbNull = false)]
         public long TotalSold { get; set; }
-
+        
+        /// <summary>
+        /// Four states for a guild registry:
+        /// 1. !IsStamped && !IsInLibrary: book is being prepared, can be edited by guild founder only
+        /// 2. IsStamped && !IsInLibrary: book is finished and stamped, waiting to be submitted, can't be edited
+        /// 3. IsStamped && IsInLibrary: book is in library, guild exists, can't be edited
+        /// 4. !IsStamped && IsInLibrary: book is in library, guild has been deleted, can be removed by founders
+        /// </summary>
         [DataElement(AllowDbNull = false, Index = true)]
         public bool IsGuildRegistry { get; set; }
 
-        [DataElement(AllowDbNull = false, Index = true)]
+        [DataElement(AllowDbNull = false)]
         public bool IsStamped { get; set; }
 
         [DataElement(AllowDbNull = false)]

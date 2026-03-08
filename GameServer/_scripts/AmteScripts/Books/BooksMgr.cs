@@ -58,12 +58,18 @@ namespace DOL.GS.Scripts
             var taskLeader = LanguageMgr.Translate(player, "GuildRegistrar.Read.Leader");
             var taskFounder = LanguageMgr.Translate(player, "GuildRegistrar.Read.Founder");
             var taskText = AutoTranslateManager.Translate(registry.Language, player, registry.Text);
+            Task<string>? taskStamped = null;
+
+            // Optional metadata
+            if (!string.IsNullOrWhiteSpace(registry.StampBy) || registry.StampDate != DateTime.MinValue)
+            {
+                taskStamped = LanguageMgr.Translate(player, "GuildRegistrar.List.StampedBy");
+            }
 
             Task.Run(async () =>
             {
                 var sb = new StringBuilder(2048);
-                sb
-                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+                sb.Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
                     .Append(await taskAuthor).Append('\n')
                     .Append(await taskTitle).Append('\n');
 
@@ -73,8 +79,20 @@ namespace DOL.GS.Scripts
                 }
             
                 sb
-                    .Append(await taskInk).Append('\n')
-                    .Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+                    .Append(await taskInk).Append('\n');
+                    
+
+                if (taskStamped is not null)
+                {
+                    sb.Append(await taskStamped)
+                        .Append(' ')
+                        .Append(string.IsNullOrWhiteSpace(registry.StampBy) ? "?" : registry.StampBy);
+
+                    if (registry.StampDate != DateTime.MinValue)
+                        sb.Append(" - ").Append(registry.StampDate.ToString("yyyy-MM-dd HH:mm")).Append('\n');
+                }
+                
+                sb.Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
                 player.Client.Out.SendMessage(sb.ToString(), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
                 sb.Clear();
@@ -109,6 +127,7 @@ namespace DOL.GS.Scripts
                     var leaderStr = string.Format(await taskLeader, leader);
                     sb.Append(leaderStr).Append('\n');
                 }
+
                 foreach (var founder in founders)
                 {
                     var founderStr = string.Format(await taskFounder, founder);
