@@ -727,7 +727,7 @@ namespace DOL.Language
             if (TryGetTranslation(out translation, language, translationId))
             {
                 if (hasArgs)
-                    return string.Format(translation, await UnrollArgs(args));
+                    return string.Format(translation, await UnrollArgs(args).ConfigureAwait(false));
                 else
                     return translation;
             }
@@ -739,7 +739,7 @@ namespace DOL.Language
                 object[] staticArgs = Array.Empty<object>();
                 if (translateFormatted && hasArgs)
                 {
-                    staticArgs = await UnrollArgs(args);
+                    staticArgs = await UnrollArgs(args).ConfigureAwait(false);
                 }
 
                 if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, staticArgs))
@@ -757,7 +757,7 @@ namespace DOL.Language
                     {
                         try
                         {
-                            translation = string.Format(translation, await UnrollArgs(args));
+                            translation = string.Format(translation, await UnrollArgs(args).ConfigureAwait(false));
                         }
                         catch (Exception ex)
                         {
@@ -778,7 +778,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> Translate(GamePlayer player, string translationId, params object[] args)
         {
-            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, false);
+            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, false).ConfigureAwait(false);
         }
         
         /// <summary>
@@ -790,7 +790,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> TranslateFormatted(GamePlayer player, string translationId, params object[] args)
         {
-            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, true);
+            return await TranslateImpl(player.Client?.Account?.Language ?? DefaultLanguage, translationId, args, player.AutoTranslateEnabled, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -802,7 +802,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> Translate(GameClient client, string translationId, params object[] args)
         {
-            return await Translate(client?.Player, translationId, args);
+            return await Translate(client?.Player, translationId, args).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -814,7 +814,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> TranslateFormatted(GameClient client, string translationId, params object[] args)
         {
-            return await TranslateFormatted(client?.Player, translationId, args);
+            return await TranslateFormatted(client?.Player, translationId, args).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -826,7 +826,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> Translate(string language, string translationId, params object[] args)
         {
-            return await TranslateImpl(language, translationId, args, true, false);
+            return await TranslateImpl(language, translationId, args, true, false).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -838,7 +838,7 @@ namespace DOL.Language
         /// <returns></returns>
         public static async Task<string> TranslateFormatted(string language, string translationId, params object[] args)
         {
-            return await TranslateImpl(language, translationId, args, true, true);
+            return await TranslateImpl(language, translationId, args, true, true).ConfigureAwait(false);
         }
 
         /// <summary>

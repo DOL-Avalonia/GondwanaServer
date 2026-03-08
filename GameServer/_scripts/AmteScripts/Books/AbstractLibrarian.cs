@@ -179,7 +179,7 @@ namespace DOL.GS.Scripts
                     }
                     else
                     {
-                        bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.IsInLibrary && b.Title == originalTitle && !b.IsGuildRegistry);
+                        bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.IsInLibrary && b.Title == originalTitle && b.IsGuildRegistry == false);
                     }
                 }
                 else if (includeRegistry)
@@ -188,7 +188,7 @@ namespace DOL.GS.Scripts
                 }
                 else
                 {
-                    bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.Title == originalTitle && !b.IsGuildRegistry);
+                    bookToRead = GameServer.Database.SelectObject<DBBook>(b => b.Title == originalTitle && b.IsGuildRegistry == false);
                 }
                 return bookToRead;
             }
@@ -325,24 +325,13 @@ namespace DOL.GS.Scripts
         {
             var player = cache.Player;
             List<PlayerCache.BookListEntry>? registers = null;
-
-            if (Properties.GUILD_KEEP_REGISTER_ON_DISBAND)
-            {
-                registers = GameServer.Database
-                    .SelectObjects<DBBook>(b => b.IsGuildRegistry && b.IsInLibrary)
-                    .OrderByDescending(b => b.IsStamped)
-                    .ThenBy(b => b.Title)
-                    .Select(b => new PlayerCache.BookListEntry(b))
-                    .ToList();
-            }
-            else
-            {
-                registers = GameServer.Database
-                    .SelectObjects<DBBook>(b => b.IsGuildRegistry && b.IsInLibrary && b.IsStamped)
-                    .OrderBy(b => b.Title)
-                    .Select(b => new PlayerCache.BookListEntry(b))
-                    .ToList();
-            }
+            
+            registers = GameServer.Database
+                .SelectObjects<DBBook>(b => b.IsGuildRegistry && b.IsInLibrary)
+                .OrderByDescending(b => b.IsStamped)
+                .ThenBy(b => b.Title)
+                .Select(b => new PlayerCache.BookListEntry(b))
+                .ToList();
 
             cache.BookList = registers;
             if (registers.Count == 0)
@@ -383,27 +372,24 @@ namespace DOL.GS.Scripts
                 navigationTasks[2] = ChatUtil.ToResponse(cache.TranslateResponseKey(INTERACT_KEY_NEXT_PAGE));
             }
 
-            bool wasStamped = true;
             int i = 0;
             cache.CurrentListPage = page;
             async Task AddBookDetails(PlayerCache.BookListEntry b)
             {
                 if (i != 0)
                     sb.Append('\n');
-
-                if (wasStamped && !b.IsStamped)
-                {
-                    if (i != 0)
-                        sb.Append('\n');
-                    sb.Append(await taskDefunct);
-                    sb.Append('\n');
-                    wasStamped = false;
-                }
                 
                 // Clickable title
                 sb.Append('[')
                     .Append(b.Title) // No translation, this is guild name
                     .Append(']');
+
+                if (!b.IsStamped)
+                {
+                    if (i != 0)
+                        sb.Append(" - ");
+                    sb.Append(await taskDefunct);
+                }
 
                 // Optional metadata
                 if (!string.IsNullOrWhiteSpace(b.StampedBy) || b.StampDate != DateTime.MinValue)
