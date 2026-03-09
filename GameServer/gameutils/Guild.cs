@@ -1226,38 +1226,57 @@ namespace DOL.GS
         {
             try
             {
-                AddOnlineMembers(players.Select(p => p.Key));
-                foreach (var (addPlayer, rank) in players)
-                {
-                    if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
-                        continue;
+                var validPlayers = players.Where(p => p.Key != null && (string.IsNullOrEmpty(p.Key.GuildID) || p.Key.GuildID == this.GuildID)).ToList();
+                AddOnlineMembers(validPlayers.Select(p => p.Key));
 
+                foreach (var (addPlayer, rank) in validPlayers)
+                {
                     if (log.IsDebugEnabled)
                         log.Debug("Adding player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
 
+                    var actualRank = rank;
+
+                    // If returning from System Guild (PvP/RvR), restore original rank
+                    string origGuildID = addPlayer.TempProperties.getProperty<string>("OriginalGuildID", null);
+                    if (origGuildID == this.GuildID)
+                    {
+                        int origRank = addPlayer.TempProperties.getProperty<int>("OriginalGuildRank", 9);
+                        if (actualRank == null || actualRank.RankLevel == 9)
+                        {
+                            actualRank = GetRankByID(origRank);
+                        }
+
+                        // Clean up
+                        addPlayer.TempProperties.removeProperty("OriginalGuildID");
+                        addPlayer.TempProperties.removeProperty("OriginalGuildRank");
+                    }
+
+                    actualRank ??= GetRankByID(9) ?? new DBRank { Title = "Rank 9", RankLevel = 9 };
+
                     addPlayer.GuildName = Name;
                     addPlayer.GuildID = GuildID;
-                    addPlayer.GuildRank = rank;
+                    addPlayer.GuildRank = actualRank;
                     addPlayer.Guild = this;
                     addPlayer.SaveIntoDatabase();
                     GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
                 }
 
-                foreach (var (addPlayer, _) in players)
+                foreach (var (addPlayer, _) in validPlayers)
                 {
                     addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                    addPlayer.Out.SendMessage("Your current rank is " + addPlayer.GuildRank.Title + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    string rankTitle = addPlayer.GuildRank?.Title ?? "Rank 9";
+                    addPlayer.Out.SendMessage("Your current rank is " + rankTitle + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
                     SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
                     addPlayer.Client.Out.SendCharResistsUpdate();
                     if (addPlayer.IsInPvP)
                         PvpManager.Instance.OnMemberJoinGuild(this, addPlayer);
                 }
-                return true;
+                return validPlayers.Any();
             }
             catch (Exception e)
             {
                 if (log.IsErrorEnabled)
-                    log.Error("AddPlayer", e);
+                    log.Error("AddPlayers", e);
                 return false;
             }
         }
@@ -1275,19 +1294,22 @@ namespace DOL.GS
             {
                 try
                 {
-                    if (addPlayer is null || !string.IsNullOrEmpty(addPlayer.GuildID))
+                    if (addPlayer is null || (!string.IsNullOrEmpty(addPlayer.GuildID) && addPlayer.GuildID != this.GuildID))
                         continue;
 
                     if (log.IsDebugEnabled)
                         log.Debug("Adding offline player to the guild, guild name=\"" + Name + "\"; player name=" + addPlayer.Name);
 
+                    var actualRank = rank ?? GetRankByID(9) ?? new DBRank { RankLevel = 9 };
+
                     addPlayer.GuildID = GuildID;
-                    addPlayer.GuildRank = rank.RankLevel;
-                
+                    addPlayer.GuildRank = actualRank.RankLevel;
+
                     GameServer.Database.SaveObject(addPlayer);
 
                     GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
                     SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    any = true;
                 }
                 catch (Exception e)
                 {
@@ -1322,7 +1344,7 @@ namespace DOL.GS
         {
             if (member?.Guild != this)
                 return false;
-            
+
             GameClient remover = WorldMgr.GetClientByPlayerName(removername, false, true);
             if (!IsSystemGuild && remover is { Account.PrivLevel: < 2 } && m_invite_Players.TryGetValue(member, out DateTime inviteTime))
             {
@@ -1341,6 +1363,14 @@ namespace DOL.GS
                 {
                     banner.Drop();
                 }
+
+                // Safely stash the original guild info before removal so we can restore it if they return from RvR/PvP
+                if (!this.IsSystemGuild && !string.IsNullOrEmpty(member.GuildID) && member.GuildRank != null)
+                {
+                    member.TempProperties.setProperty("OriginalGuildID", member.GuildID);
+                    member.TempProperties.setProperty("OriginalGuildRank", member.GuildRank.RankLevel);
+                }
+
                 GuildMgr.RemovePlayerFromAllGuildPlayersList(member);
                 RemoveOnlineMember(member);
                 member.GuildName = "";
@@ -1352,11 +1382,11 @@ namespace DOL.GS
 
                 // Send message to removerClient about successful removal
                 if (removername == member.Name)
-                    member.Out.SendMessage("You leave the guild.", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage("You leave the guild.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 else if (!string.IsNullOrEmpty(removername))
-                    member.Out.SendMessage(removername + " removed you from " + this.Name + '.', PacketHandler.eChatType.CT_System, PacketHandler.eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage(removername + " removed you from " + this.Name + '.', eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 else
-                    member.Out.SendMessage("You have been removed from " + this.Name + '.', PacketHandler.eChatType.CT_System, PacketHandler.eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage("You have been removed from " + this.Name + '.', eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 member.Client.Out.SendCharResistsUpdate();
                 if (member.IsInPvP)

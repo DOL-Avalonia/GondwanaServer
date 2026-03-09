@@ -386,8 +386,7 @@ namespace DOL.GS.Scripts
 
                 if (!b.IsStamped)
                 {
-                    if (i != 0)
-                        sb.Append(" - ");
+                    sb.Append(" - ");
                     sb.Append(await taskDefunct);
                 }
 

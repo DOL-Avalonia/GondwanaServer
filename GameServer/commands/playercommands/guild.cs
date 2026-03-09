@@ -385,6 +385,7 @@ namespace DOL.GS.Commands
                                 ply.GuildName = newguildname;
                                 ply.Client.SendTranslation("Commands.Players.Guild.Renamed", eChatType.CT_Guild, eChatLoc.CL_SystemWindow, oldguildname, newguildname);
                                 ply.Out.SendUpdatePlayer();
+                                ply.BroadcastUpdate(true);
                             }
                             client.Player.Guild?.UpdateGuildWindow();
                             myguild.SaveIntoDatabase();

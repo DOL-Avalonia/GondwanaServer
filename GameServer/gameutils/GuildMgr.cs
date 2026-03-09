@@ -174,6 +174,7 @@ namespace DOL.GS
             guild.ClearOnlineMemberList();
             m_guildsByName.Remove(guild.Name);
             m_guildsById.Remove(guild.GuildID);
+            m_guildXAllMembers.Remove(guild.GuildID);
             return true;
         }
 
@@ -408,10 +409,14 @@ namespace DOL.GS
                 
                 // Rename the book...
                 var book = GameServer.Database.SelectObject<DBBook>(b => b.Title == removeGuild.Name && b.IsGuildRegistry == true);
-                book.Name = "[DISBANDED] " + removeGuild.Name;
-                book.IsStamped = false;
-                book.Save();
-                
+
+                if (book != null)
+                {
+                    book.Name = "[DISBANDED] " + removeGuild.Name;
+                    book.IsStamped = false;
+                    book.Save();
+                }
+
                 Dictionary<string, GamePlayer> onlinePlayers;
                 lock (removeGuild.GetListOfOnlineMembers())
                 {
@@ -428,6 +433,11 @@ namespace DOL.GS
                             ply.GuildName = "";
                             ply.GuildRank = null;
                             ply.SaveIntoDatabase();
+                            ply.Out.SendUpdatePlayer();
+
+                            Guild.SendSocialWindowData(ply.Client, 1, 1, 2);
+                            ply.Out.SendMessage("I", eChatType.CT_SocialInterface, eChatLoc.CL_SystemWindow);
+                            ply.Client.Out.SendCharResistsUpdate();
                         }
                         else
                         {
@@ -486,7 +496,10 @@ namespace DOL.GS
             if (string.IsNullOrEmpty(guildName))
                 return null;
 
-            return (Guild)m_guildsByName[guildName];
+            if (m_guildsByName.TryGetValue(guildName, out Guild guild))
+                return guild;
+
+            return null;
         }
 
         /// <summary>
@@ -498,7 +511,10 @@ namespace DOL.GS
             if (string.IsNullOrEmpty(guildid))
                 return null;
 
-            return m_guildsById[guildid];
+            if (m_guildsById.TryGetValue(guildid, out Guild guild))
+                return guild;
+
+            return null;
         }
 
         /// <summary>
