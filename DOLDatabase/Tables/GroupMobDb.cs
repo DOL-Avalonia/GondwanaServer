@@ -18,6 +18,11 @@ namespace DOLDatabase.Tables
         private string m_visibleSlot;
         private string m_race;
         private string m_model;
+        private int m_spellABS;
+        private int m_meleeABS;
+        private int m_dotABS;
+        private int m_maxHealth;
+        private int m_effectiveness;
         private string m_effect;
         private string m_InteractGroupId;
         private string m_groupMobInteractId;
@@ -28,12 +33,20 @@ namespace DOLDatabase.Tables
         private ushort m_completedQuestNPCSize;
         private ushort m_completedQuestAggro;
         private ushort m_completedQuestRange;
+        private int m_completedQuestSpellABS;
+        private int m_completedQuestMeleeABS;
+        private int m_completedQuestDotABS;
+        private int m_completedQuestMaxHealth;
+        private int m_completedQuestEffectiveness;
         private ushort m_completedStepQuestID;
         private int m_completedQuestId;
         private int m_completedQuestCount;
         private string m_switchFamily;
         private int m_assistRange;
         private bool m_respawnTogether = false;
+        private string m_equippedItem;
+        private string m_playerOnEffectType;
+        private ushort m_equippedItemClientEffect;
 
         [DataElement(AllowDbNull = false, Varchar = 255, Unique = true)]
         public string GroupId
@@ -88,6 +101,41 @@ namespace DOLDatabase.Tables
             set { Dirty = true; m_model = value; }
         }
 
+        [DataElement(AllowDbNull = false)]
+        public int SpellABS
+        {
+            get => m_spellABS;
+            set { Dirty = true; m_spellABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MeleeABS
+        {
+            get => m_meleeABS;
+            set { Dirty = true; m_meleeABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int DotABS
+        {
+            get => m_dotABS;
+            set { Dirty = true; m_dotABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MaxHealth
+        {
+            get => m_maxHealth;
+            set { Dirty = true; m_maxHealth = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int Effectiveness
+        {
+            get => m_effectiveness;
+            set { Dirty = true; m_effectiveness = value; }
+        }
+
         [DataElement(AllowDbNull = true, Varchar = 255)]
         public string Effect
         {
@@ -135,6 +183,40 @@ namespace DOLDatabase.Tables
             set { Dirty = true; m_completedQuestRange = value; }
         }
 
+        [DataElement(AllowDbNull = false)]
+        public int CompletedQuestSpellABS
+        {
+            get => m_completedQuestSpellABS;
+            set { Dirty = true; m_completedQuestSpellABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int CompletedQuestMeleeABS
+        {
+            get => m_completedQuestMeleeABS;
+            set { Dirty = true; m_completedQuestMeleeABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int CompletedQuestDotABS
+        {
+            get => m_completedQuestDotABS;
+            set { Dirty = true; m_completedQuestDotABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int CompletedQuestMaxHealth
+        {
+            get => m_completedQuestMaxHealth;
+            set { Dirty = true; m_completedQuestMaxHealth = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int CompletedQuestEffectiveness
+        {
+            get => m_completedQuestEffectiveness;
+            set { Dirty = true; m_completedQuestEffectiveness = value; }
+        }
 
         [DataElement(AllowDbNull = false)]
         public ushort CompletedStepQuestID
@@ -155,6 +237,27 @@ namespace DOLDatabase.Tables
         {
             get => m_completedQuestCount;
             set { Dirty = true; m_completedQuestCount = value; }
+        }
+
+        [DataElement(AllowDbNull = true, Varchar = 255)]
+        public string EquippedItem
+        {
+            get => m_equippedItem;
+            set { Dirty = true; m_equippedItem = value; }
+        }
+
+        [DataElement(AllowDbNull = true, Varchar = 255)]
+        public string PlayerOnEffectType
+        {
+            get => m_playerOnEffectType;
+            set { Dirty = true; m_playerOnEffectType = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public ushort EquippedItemClientEffect
+        {
+            get => m_equippedItemClientEffect;
+            set { Dirty = true; m_equippedItemClientEffect = value; }
         }
 
         [DataElement(AllowDbNull = true, Varchar = 255)]

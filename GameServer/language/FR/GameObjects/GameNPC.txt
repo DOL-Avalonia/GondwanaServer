@@ -2,7 +2,7 @@
 GameNPC.DropLoot.AdditionalMoney:				Vous ramassez {0} grâce aux forts controlés par votre royaume !
 GameNPC.DropLoot.ItemAdditionalMoney:			Vous ramassez {0} grâce à votre bonus d'équipement "Butin Mythique" !
 GameNPC.DropLoot.GuildBuffMoney:				Vous ramassez {0} grâce à votre bonus de Guilde "Butin" !
-GameNPC.DropLoot.Drops:						    {0} laisse {1}.
+GameNPC.DropLoot.Drops:							{0} laisse {1}.
 GameNPC.GetAggroLevelString.Aggressive1:		agressif
 GameNPC.GetAggroLevelString.Aggressive2:		Agressive
 GameNPC.GetAggroLevelString.Friendly1:			amical
@@ -18,4 +18,10 @@ GameNPC.Interact.DirtyLook:						{0} vous jette un regard étrange.
 GameNPC.Interact.IsFull:						Ce {0} est plein.
 GameNPC.SayTo.Says:								{0} dit, "{1}"
 GameNPC.SayTo.SpeaksTo:							{0} parle avec {1}
-GameNPC.Interact.NotRenaissance:                Désolé, je ne parle qu'avec ceux qui ont fait leur renaissance.
+
+GameNPC.Interact.NotRenaissance:				Désolé, je ne parle qu'avec ceux qui ont accompli leur renaissance.
+
+GameNPC.BossAblative.ErodibleAbsorb:		Le bouclier ablatif de votre cible absorbe {0} dégâts ! ({1}% restants)
+GameNPC.BossAblative.ErodibleShatter:		Vous avez détruit le bouclier ablatif de votre cible !
+GameNPC.BossAblative.MassivePierce:			Vous frappez assez fort pour percer l'armure ablative de votre cible !
+GameNPC.BossAblative.MassiveDeflect:		L'armure ablative de votre cible dévie {0} dégâts !

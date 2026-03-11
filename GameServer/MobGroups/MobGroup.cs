@@ -1,6 +1,7 @@
 ﻿using DOL.Database;
 using DOL.GS;
 using DOL.GS.Commands;
+using DOL.GS.Effects;
 using DOL.GS.Quests;
 using DOLDatabase.Tables;
 using log4net;
@@ -18,7 +19,7 @@ namespace DOL.MobGroups
 {
     public class MobGroup
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
         
         private MobGroupInfo originalGroupInfo;
         private bool isLoadedFromScript;
@@ -51,9 +52,17 @@ namespace DOL.MobGroups
             this.CompletedQuestNPCSize = db.CompletedQuestNPCSize;
             this.CompletedQuestAggro = db.CompletedQuestAggro;
             this.CompletedQuestRange = db.CompletedQuestRange;
+            this.CompletedQuestSpellABS = db.CompletedQuestSpellABS;
+            this.CompletedQuestMeleeABS = db.CompletedQuestMeleeABS;
+            this.CompletedQuestDotABS = db.CompletedQuestDotABS;
+            this.CompletedQuestMaxHealth = db.CompletedQuestMaxHealth;
+            this.CompletedQuestEffectiveness = db.CompletedQuestEffectiveness;
             this.CompletedStepQuestID = db.CompletedStepQuestID;
             this.CompletedQuestID = db.CompletedQuestID;
             this.CompletedQuestCount = db.CompletedQuestCount;
+            this.EquippedItem = db.EquippedItem;
+            this.PlayerOnEffectType = db.PlayerOnEffectType;
+            this.EquippedItemClientEffect = db.EquippedItemClientEffect;
             this.GroupInfos = new MobGroupInfo()
             {
                 Effect = db.Effect != null ? int.TryParse(db.Effect, out int effect) ? effect : (int?)null : (int?)null,
@@ -61,7 +70,12 @@ namespace DOL.MobGroups
                 IsInvincible = db.IsInvincible != null ? bool.TryParse(db.IsInvincible, out bool dbInv) ? dbInv : (bool?)null : (bool?)null,
                 Model = db.Model != null ? int.TryParse(db.Model, out int model) ? model : (int?)null : (int?)null,
                 Race = db.Race != null ? Enum.TryParse(db.Race, out eRace race) ? race : (eRace?)null : (eRace?)null,
-                VisibleSlot = db.VisibleSlot != null ? byte.TryParse(db.VisibleSlot, out byte slot) ? slot : (byte?)null : (byte?)null
+                VisibleSlot = db.VisibleSlot != null ? byte.TryParse(db.VisibleSlot, out byte slot) ? slot : (byte?)null : (byte?)null,
+                SpellABS = db.SpellABS,
+                MeleeABS = db.MeleeABS,
+                DotABS = db.DotABS,
+                MaxHealth = db.MaxHealth,
+                Effectiveness = db.Effectiveness
             };
 
             this.mobGroupOriginFk = originalStatus?.GroupStatusId;
@@ -71,6 +85,11 @@ namespace DOL.MobGroups
             this.SwitchFamily = db.SwitchFamily;
             this.AssistRange = db.AssistRange;
             this.RespawnTogether = db.RespawnTogether;
+        }
+
+        public bool HasConditionsConfigured()
+        {
+            return CompletedQuestID > 0 || !string.IsNullOrEmpty(EquippedItem) || !string.IsNullOrEmpty(PlayerOnEffectType);
         }
 
         /// <summary>
@@ -123,7 +142,7 @@ namespace DOL.MobGroups
 
             bool hasObjectives = false;
             bool hasUnsatisfiedObjectives = false;
-            foreach (MobGroup group in npc.MobGroups.Where(g => g.CompletedQuestID >= 0 && !g.IsQuestConditionFriendly))
+            foreach (MobGroup group in npc.MobGroups.Where(g => g.HasConditionsConfigured() && g.IsQuestConditionFriendly))
             {
                 hasObjectives = true;
                 if (!group.HasPlayerCompletedQuests(player))
@@ -145,7 +164,12 @@ namespace DOL.MobGroups
                 IsInvincible = source.SetInvincible != null ? bool.TryParse(source.SetInvincible, out bool inv) ? inv : (bool?)null : (bool?)null,
                 Model = source.Model != null ? int.TryParse(source.Model, out int grModel) ? grModel : (int?)null : (int?)null,
                 Race = source.Race != null ? Enum.TryParse(source.Race, out eRace grRace) ? grRace : (eRace?)null : (eRace?)null,
-                VisibleSlot = source.VisibleSlot != null ? byte.TryParse(source.VisibleSlot, out byte grSlot) ? grSlot : (byte?)null : (byte?)null
+                VisibleSlot = source.VisibleSlot != null ? byte.TryParse(source.VisibleSlot, out byte grSlot) ? grSlot : (byte?)null : (byte?)null,
+                SpellABS = source.SpellABS,
+                MeleeABS = source.MeleeABS,
+                DotABS = source.DotABS,
+                MaxHealth = source.MaxHealth,
+                Effectiveness = source.Effectiveness
             };
         }
 
@@ -159,7 +183,12 @@ namespace DOL.MobGroups
                 IsInvincible = copy.IsInvincible,
                 Model = copy.Model,
                 Race = copy.Race,
-                VisibleSlot = copy.VisibleSlot
+                VisibleSlot = copy.VisibleSlot,
+                SpellABS = copy.SpellABS,
+                MeleeABS = copy.MeleeABS,
+                DotABS = copy.DotABS,
+                MaxHealth = copy.MaxHealth,
+                Effectiveness = copy.Effectiveness
             };
         }
 
@@ -200,6 +229,31 @@ namespace DOL.MobGroups
                 return false;
             }
 
+            if (this.GroupInfos.SpellABS != this.originalGroupInfo.SpellABS)
+            {
+                return false;
+            }
+
+            if (this.GroupInfos.MeleeABS != this.originalGroupInfo.MeleeABS)
+            {
+                return false;
+            }
+
+            if (this.GroupInfos.DotABS != this.originalGroupInfo.DotABS)
+            {
+                return false;
+            }
+
+            if (this.GroupInfos.MaxHealth != this.originalGroupInfo.MaxHealth)
+            {
+                return false;
+            }
+
+            if (this.GroupInfos.Effectiveness != this.originalGroupInfo.Effectiveness)
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -213,29 +267,78 @@ namespace DOL.MobGroups
 
         public bool HasPlayerCompletedQuests(GamePlayer player)
         {
-            if (CompletedQuestID <= 0)
+            if (!HasConditionsConfigured())
                 return false;
 
-            if (CompletedQuestCount > 0)
+            if (!string.IsNullOrEmpty(EquippedItem))
             {
-                var finishedCount = player.QuestListFinished.Where(q => q.QuestId == CompletedQuestID).Count();
-                if (finishedCount < CompletedQuestCount)
+                var requiredItems = EquippedItem.Split('|');
+                // Slots from 10 to 37 (MinEquipable to MaxEquipable)
+                for (int i = 10; i <= 37; i++)
                 {
-                    return false;
+                    InventoryItem item = player.Inventory.GetItem((eInventorySlot)i);
+                    if (item != null && !string.IsNullOrEmpty(item.Id_nb))
+                    {
+                        foreach (string reqItem in requiredItems)
+                        {
+                            if (item.Id_nb.Equals(reqItem, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
 
-            if (CompletedStepQuestID > 0)
+            if (!string.IsNullOrEmpty(PlayerOnEffectType))
             {
-
-                var currentQuest = player.QuestList.Where(q => q.QuestId == CompletedQuestID).Select(q => q.Goals).OfType<GenericDataQuestGoal>().Any(jgoal => jgoal.Goal.GoalId == CompletedStepQuestID && jgoal.Status == eQuestGoalStatus.Active);
-
-                if (currentQuest == null)
+                var requiredEffects = PlayerOnEffectType.Split('|');
+                lock (player.EffectList)
                 {
-                    return false;
+                    foreach (var effect in player.EffectList)
+                    {
+                        if (effect is GameSpellEffect spellEffect && spellEffect.SpellHandler?.Spell != null)
+                        {
+                            string currentEffectType = spellEffect.SpellHandler.Spell.SpellType;
+                            foreach (string reqEffect in requiredEffects)
+                            {
+                                if (currentEffectType.Equals(reqEffect, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            return true;
+
+            if (CompletedQuestID > 0)
+            {
+                bool questMet = true;
+
+                if (CompletedQuestCount > 0)
+                {
+                    var finishedCount = player.QuestListFinished.Where(q => q.QuestId == CompletedQuestID).Count();
+                    if (finishedCount < CompletedQuestCount)
+                    {
+                        questMet = false;
+                    }
+                }
+
+                if (questMet && CompletedStepQuestID > 0)
+                {
+                    var currentQuest = player.QuestList.Where(q => q.QuestId == CompletedQuestID).SelectMany(q => q.Goals).OfType<GenericDataQuestGoal>().Any(jgoal => jgoal.Goal.GoalId == CompletedStepQuestID && jgoal.Status == eQuestGoalStatus.Active);
+                    if (!currentQuest)
+                    {
+                        questMet = false;
+                    }
+                }
+
+                if (questMet) return true; // Met!
+            }
+
+            // If we had conditions configured but NONE were met, return false.
+            return false;
         }
 
         public string mobGroupInterfactFk
@@ -299,6 +402,31 @@ namespace DOL.MobGroups
             get;
             set;
         }
+        public int CompletedQuestSpellABS
+        {
+            get;
+            set;
+        }
+        public int CompletedQuestMeleeABS
+        {
+            get;
+            set;
+        }
+        public int CompletedQuestDotABS
+        {
+            get;
+            set;
+        }
+        public int CompletedQuestMaxHealth
+        {
+            get;
+            set;
+        }
+        public int CompletedQuestEffectiveness
+        {
+            get;
+            set;
+        }
         public ushort CompletedStepQuestID
         {
             get;
@@ -312,6 +440,24 @@ namespace DOL.MobGroups
         }
 
         public int CompletedQuestCount
+        {
+            get;
+            set;
+        }
+
+        public string EquippedItem
+        {
+            get;
+            set;
+        }
+
+        public string PlayerOnEffectType
+        {
+            get;
+            set;
+        }
+
+        public ushort EquippedItemClientEffect
         {
             get;
             set;
@@ -491,6 +637,14 @@ namespace DOL.MobGroups
                 }
             }
 
+            npc.GroupMobSpellABS = this.GroupInfos.SpellABS;
+            npc.GroupMobMeleeABS = this.GroupInfos.MeleeABS;
+            npc.GroupMobDotABS = this.GroupInfos.DotABS;
+            npc.GroupMobMaxHealthMod = this.GroupInfos.MaxHealth;
+            npc.GroupMobEffectivenessMod = this.GroupInfos.Effectiveness;
+
+            if (npc.IsAlive) npc.UpdateMaxHealth();
+
             if (this.GroupInfos.Effect.HasValue)
             {
                 var spell = GameServer.Database.SelectObjects<Database.DBSpell>(DB.Column("SpellID").IsEqualTo(this.GroupInfos.Effect.Value))?.FirstOrDefault();
@@ -552,6 +706,13 @@ namespace DOL.MobGroups
             this.CompletedQuestNPCSize = 0;
             this.CompletedQuestAggro = 0;
             this.CompletedQuestRange = 0;
+            this.CompletedQuestSpellABS = 0;
+            this.CompletedQuestMeleeABS = 0;
+            this.CompletedQuestDotABS = 0;
+            this.CompletedQuestMaxHealth = 0;
+            this.CompletedQuestEffectiveness = 0;
+            this.EquippedItem = null;
+            this.PlayerOnEffectType = null;
             this.ApplyGroupInfos();
             this.SaveToDabatase();
 
@@ -593,16 +754,24 @@ namespace DOL.MobGroups
         public void SaveToDabatase()
         {
             GroupMobDb db = null;
-            bool isNew = this.InternalId == null;
+            bool isNew = false;
 
             if (this.InternalId == null)
             {
-                db = new GroupMobDb();
+                db = GameServer.Database.SelectObjects<GroupMobDb>(DB.Column("GroupId").IsEqualTo(this.GroupId))?.FirstOrDefault();
+                if (db == null)
+                {
+                    db = new GroupMobDb();
+                    isNew = true;
+                }
+                else
+                {
+                    this.InternalId = db.ObjectId;
+                }
             }
             else
             {
                 db = GameServer.Database.FindObjectByKey<GroupMobDb>(this.InternalId);
-
                 if (db == null)
                 {
                     db = new GroupMobDb();
@@ -615,6 +784,11 @@ namespace DOL.MobGroups
             db.VisibleSlot = this.GroupInfos.VisibleSlot?.ToString();
             db.Effect = this.GroupInfos.Effect?.ToString();
             db.Model = this.GroupInfos.Model?.ToString();
+            db.SpellABS = this.GroupInfos.SpellABS;
+            db.MeleeABS = this.GroupInfos.MeleeABS;
+            db.DotABS = this.GroupInfos.DotABS;
+            db.MaxHealth = this.GroupInfos.MaxHealth;
+            db.Effectiveness = this.GroupInfos.Effectiveness;
             db.GroupId = this.GroupId;
             db.SlaveGroupId = this.SlaveGroupId;
             db.IsInvincible = this.GroupInfos.IsInvincible?.ToString();
@@ -629,9 +803,18 @@ namespace DOL.MobGroups
             db.CompletedQuestNPCSize = this.CompletedQuestNPCSize;
             db.CompletedQuestAggro = this.CompletedQuestAggro;
             db.CompletedQuestRange = this.CompletedQuestRange;
+            db.CompletedQuestSpellABS = this.CompletedQuestSpellABS;
+            db.CompletedQuestMeleeABS = this.CompletedQuestMeleeABS;
+            db.CompletedQuestDotABS = this.CompletedQuestDotABS;
+            db.CompletedQuestMaxHealth = this.CompletedQuestMaxHealth;
+            db.CompletedQuestEffectiveness = this.CompletedQuestEffectiveness;
             db.CompletedQuestNPCFlags = this.CompletedQuestNPCFlags;
             db.SwitchFamily = this.SwitchFamily;
             db.AssistRange = this.AssistRange;
+            db.EquippedItem = this.EquippedItem;
+            db.PlayerOnEffectType = this.PlayerOnEffectType;
+            db.EquippedItemClientEffect = this.EquippedItemClientEffect;
+            db.PlayerOnEffectType = this.PlayerOnEffectType;
 
             if (isNew)
             {

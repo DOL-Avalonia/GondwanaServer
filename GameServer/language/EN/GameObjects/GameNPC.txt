@@ -1,3 +1,4 @@
+# GAMENPC
 GameNPC.DropLoot.AdditionalMoney:			You find an additional {0} thanks to your realm owning outposts!
 GameNPC.DropLoot.ItemAdditionalMoney:		You get an additional {0} thanks to your Mythical Coin bonus from your equipment!
 GameNPC.DropLoot.GuildBuffMoney:			You get an additional {0} thanks to your Guild Coin buff!
@@ -18,3 +19,9 @@ GameNPC.Interact.IsFull:					This {0} is full.
 GameNPC.SayTo.Says:							{0} says, "{1}"
 GameNPC.SayTo.SpeaksTo:						{0} speaks to {1}
 
+GameNPC.Interact.NotRenaissance:			Apologies, but I only speak with those who have achieved their Rebirth.
+
+GameNPC.BossAblative.ErodibleAbsorb:		Your target's ablative shield absorbs {0} damage! ({1}% remaining)
+GameNPC.BossAblative.ErodibleShatter:		You have shattered your target's ablative shield!
+GameNPC.BossAblative.MassivePierce:			You strike hard enough to pierce your target's ablative armor!
+GameNPC.BossAblative.MassiveDeflect:		Your target's ablative armor deflects {0} damage!

@@ -144,14 +144,26 @@ namespace DOL.GS.Spells
 
             string targetName = m_caster.GetPersonalizedName(ad.Target);
 
+            // Boss/GroupMob Absorption factor
+            int absPercent = m_caster.TempProperties.getProperty<int>($"AbsPercent_{ad.Target.InternalID}", 0);
+            m_caster.TempProperties.removeProperty($"AbsPercent_{ad.Target.InternalID}");
+            string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation(PlayerReceivingMessages?.Client, "SpellHandler.Absorbed", absPercent) : "";
+
+            string hitMsg = "";
+
             if (Spell.Name.StartsWith("Proc"))
             {
-                MessageToCaster(string.Format(LanguageMgr.GetTranslation(PlayerReceivingMessages.Client, "DoTSpellHandler.SendDamageMessages.YouHitFor", targetName, ad.Damage)), eChatType.CT_YouHit);
+                hitMsg = string.Format(LanguageMgr.GetTranslation(PlayerReceivingMessages!.Client, "DoTSpellHandler.SendDamageMessages.YouHitFor", targetName, ad.Damage));
             }
             else
             {
-                MessageToCaster(string.Format(LanguageMgr.GetTranslation(PlayerReceivingMessages.Client, "DoTSpellHandler.SendDamageMessages.YourHitsFor", Spell.Name, targetName, ad.Damage)), eChatType.CT_YouHit);
+                hitMsg = string.Format(LanguageMgr.GetTranslation(PlayerReceivingMessages!.Client, "DoTSpellHandler.SendDamageMessages.YourHitsFor", Spell.Name, targetName, ad.Damage));
             }
+
+            if (!string.IsNullOrEmpty(absMsg))
+                hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+
+            MessageToCaster(hitMsg, eChatType.CT_YouHit);
 
             if (ad.CriticalDamage > 0)
                 MessageToCaster(string.Format(LanguageMgr.GetTranslation(PlayerReceivingMessages.Client, "DoTSpellHandler.SendDamageMessages.YourCriticallyHits", Spell.Name, targetName, ad.CriticalDamage)), eChatType.CT_YouHit);
@@ -297,7 +309,14 @@ namespace DOL.GS.Spells
             // Attacked living may modify the attack data.
             ad.Target.ModifyAttack(ad);
 
+            int originalDmg = ad.Damage + ad.CriticalDamage;
             DamageTarget(ad, false);
+
+            int afterDmg = ad.Damage + ad.CriticalDamage;
+            int totalAbsorbed = originalDmg - afterDmg;
+            int absPercent = originalDmg > 0 ? (int)Math.Round((double)totalAbsorbed / originalDmg * 100) : 0;
+            m_caster.TempProperties.setProperty($"AbsPercent_{ad.Target.InternalID}", absPercent);
+
             SendDamageMessages(ad);
             return true;
         }

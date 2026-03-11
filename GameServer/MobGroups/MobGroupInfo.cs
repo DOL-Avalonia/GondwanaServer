@@ -40,6 +40,36 @@ namespace DOL.MobGroups
             set;
         }
 
+        public int SpellABS
+        {
+            get;
+            set;
+        }
+
+        public int MeleeABS
+        {
+            get;
+            set;
+        }
+
+        public int DotABS
+        {
+            get;
+            set;
+        }
+
+        public int MaxHealth
+        {
+            get;
+            set;
+        }
+
+        public int Effectiveness
+        {
+            get;
+            set;
+        }
+
         public int? Effect
         {
             get;

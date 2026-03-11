@@ -87,9 +87,24 @@ namespace DOL.GS.Spells
             ad.SpellHandler = this;
             ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
 
+            int originalDmg = ad.Damage + ad.CriticalDamage;
+
+            target.OnAttackedByEnemy(ad);
+            attacker.DealDamage(ad);
+
+            // Boss/GroupMob Absorption factor
+            int afterDmg = ad.Damage + ad.CriticalDamage;
+            int totalAbsorbed = originalDmg - afterDmg;
+            int absPercent = originalDmg > 0 ? (int)Math.Round((double)totalAbsorbed / originalDmg * 100) : 0;
+
+            string hitMsg = "";
+
             if (ad.Attacker is GameNPC && ad.Attacker.GetController() is GamePlayer owner)
             {
-                MessageToLiving(owner, String.Format(LanguageMgr.GetTranslation(owner.Client, "DamageAddAndShield.EventHandlerDA.YourHitFor"), owner.GetPersonalizedName(ad.Attacker), target.GetName(0, false), ad.Damage), eChatType.CT_Spell);
+                string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation(owner.Client, "SpellHandler.Absorbed", absPercent) : "";
+                hitMsg = String.Format(LanguageMgr.GetTranslation(owner.Client, "DamageAddAndShield.EventHandlerDA.YourHitFor"), owner.GetPersonalizedName(ad.Attacker), target.GetName(0, false), ad.Damage);
+                if (!string.IsNullOrEmpty(absMsg)) hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+                MessageToLiving(owner, hitMsg, eChatType.CT_Spell);
             }
             else
             {
@@ -98,7 +113,10 @@ namespace DOL.GS.Spells
 
                 if (attackerClient != null)
                 {
-                    MessageToLiving(attacker, String.Format(LanguageMgr.GetTranslation(attackerClient, "DamageAddAndShield.EventHandlerDA.YouHitExtra"), attackerClient.Player.GetPersonalizedName(target), ad.Damage), eChatType.CT_Spell);
+                    string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation(attackerClient, "SpellHandler.Absorbed", absPercent) : "";
+                    hitMsg = String.Format(LanguageMgr.GetTranslation(attackerClient, "DamageAddAndShield.EventHandlerDA.YouHitExtra"), attackerClient.Player.GetPersonalizedName(target), ad.Damage);
+                    if (!string.IsNullOrEmpty(absMsg)) hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+                    MessageToLiving(attacker, hitMsg, eChatType.CT_Spell);
                 }
             }
 
@@ -109,9 +127,6 @@ namespace DOL.GS.Spells
             {
                 MessageToLiving(target, String.Format(LanguageMgr.GetTranslation(targetClient, "DamageAddAndShield.EventHandlerDA.DamageToYou"), targetClient.Player.GetPersonalizedName(attacker), ad.Damage), eChatType.CT_Spell);
             }
-
-            target.OnAttackedByEnemy(ad);
-            attacker.DealDamage(ad);
 
             foreach (GamePlayer player in ad.Attacker.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
@@ -180,17 +195,34 @@ namespace DOL.GS.Spells
             ad.SpellHandler = this;
             ad.AttackType = AttackData.eAttackType.Spell;
             ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
-            
+
+            int originalDmg = ad.Damage + ad.CriticalDamage;
+
+            target.OnAttackedByEnemy(ad);
+            attacker.DealDamage(ad);
+
+            // Boss/GroupMob Absorption factor
+            int afterDmg = ad.Damage + ad.CriticalDamage;
+            int totalAbsorbed = originalDmg - afterDmg;
+            int absPercent = originalDmg > 0 ? (int)Math.Round((double)totalAbsorbed / originalDmg * 100) : 0;
+
+            string hitMsg = "";
             GameClient attackerClient = null;
             if (attacker is GamePlayer) attackerClient = ((GamePlayer)attacker).Client;
 
-            if (ad.Attacker is GameNPC && ad.Attacker.GetPlayerOwner() is {} ownerPlayer)
+            if (ad.Attacker is GameNPC && ad.Attacker.GetPlayerOwner() is { } ownerPlayer)
             {
-                MessageToLiving(ownerPlayer, String.Format(LanguageMgr.GetTranslation(ownerPlayer.Client, "DamageAddAndShield.EventHandlerDS.YourHitFor"), ownerPlayer.GetPersonalizedName(ad.Attacker), target.GetName(0, false), ad.Damage), eChatType.CT_Spell);
+                string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation(ownerPlayer.Client, "SpellHandler.Absorbed", absPercent) : "";
+                hitMsg = String.Format(LanguageMgr.GetTranslation(ownerPlayer.Client, "DamageAddAndShield.EventHandlerDS.YourHitFor"), ownerPlayer.GetPersonalizedName(ad.Attacker), target.GetName(0, false), ad.Damage);
+                if (!string.IsNullOrEmpty(absMsg)) hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+                MessageToLiving(ownerPlayer, hitMsg, eChatType.CT_Spell);
             }
             else if (attackerClient != null)
             {
-                MessageToLiving(attacker, String.Format(LanguageMgr.GetTranslation(attackerClient, "DamageAddAndShield.EventHandlerDS.YouHitFor"), attackerClient.Player.GetPersonalizedName(target), ad.Damage), eChatType.CT_Spell);
+                string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation(attackerClient, "SpellHandler.Absorbed", absPercent) : "";
+                hitMsg = String.Format(LanguageMgr.GetTranslation(attackerClient, "DamageAddAndShield.EventHandlerDS.YouHitFor"), attackerClient.Player.GetPersonalizedName(target), ad.Damage);
+                if (!string.IsNullOrEmpty(absMsg)) hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+                MessageToLiving(attacker, hitMsg, eChatType.CT_Spell);
             }
 
             GameClient targetClient = null;
@@ -199,8 +231,6 @@ namespace DOL.GS.Spells
             if (targetClient != null)
                 MessageToLiving(target, String.Format(LanguageMgr.GetTranslation(targetClient, "DamageAddAndShield.EventHandlerDS.DamageToYou"), targetClient.Player.GetPersonalizedName(attacker), ad.Damage), eChatType.CT_Spell);
 
-            target.OnAttackedByEnemy(ad);
-            attacker.DealDamage(ad);
             foreach (GamePlayer player in attacker.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 if (player == null)

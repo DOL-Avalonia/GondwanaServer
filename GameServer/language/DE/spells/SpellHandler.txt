@@ -72,11 +72,14 @@ SpellHandler.CheckLOSPlayerToTarget.LoSInterrupt:	Sichtlinienunterbrechung in Ch
 SpellHandler.CheckLOSPlayerToTarget.CantSeeTarget:	Sie können Ihr Ziel von hier aus nicht sehen!
 SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Sichtlinienunterbrechung in CheckLOSNPCToTarget
 
-SpellHandler.HitTarget:			Sie treffen {0} für {1}{2} Schaden!
+SpellHandler.HitTarget:				Sie treffen {0} für {1}{2} Schaden!
 SpellHandler.NPCHitTarget:			Ihr {0} trifft {1} für {2}{3} Schaden!
 SpellHandler.CriticalHit:			Sie fügen einen kritischen Treffer zu und verursachen {0} zusätzlichen Schaden!
+SpellHandler.NoEffect:				Dein Zauber hat keine Wirkung auf {0}.
+SpellHandler.NPCNoEffect:			Der Zauber von deinem {0} hat keine Wirkung auf {1}.
 SpellHandler.TargetPronoun.Your:		Ihr
 SpellHandler.TargetPronoun.Targets:		Das Ziel
+SpellHandler.Absorbed:				({0}% absorbiert)
 
 SpellHandler.MustBeStealthedBow:		Sie müssen getarnt sein und einen Bogen führen, um diese Fähigkeit zu benutzen!
 SpellHandler.MustWieldBow:			Sie müssen einen Bogen führen, um diese Fähigkeit zu benutzen!

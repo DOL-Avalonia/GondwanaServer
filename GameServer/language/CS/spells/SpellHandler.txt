@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Přerušení linie dohledu v Chec
 SpellHandler.HitTarget:			Zasahujete {0} za {1}{2} poškození!
 SpellHandler.NPCHitTarget:			Váš {0} zasahuje {1} za {2}{3} poškození!
 SpellHandler.CriticalHit:			Udělíte kritický zásah a způsobíte o {0} více poškození!
+SpellHandler.NoEffect:				Tvé kouzlo na {0} nepůsobí.
+SpellHandler.NPCNoEffect:			Kouzlo tvého {0} nepůsobí na {1}.
 SpellHandler.TargetPronoun.Your:		Váš
 SpellHandler.TargetPronoun.Targets:		Cíl
+SpellHandler.Absorbed:				(absorbováno {0} %)
 
 SpellHandler.MustBeStealthedBow:		Musíte být ve skrytu a mít luk, abyste mohli tuto schopnost použít!
 SpellHandler.MustWieldBow:			Pro použití této schopnosti musíte mít luk!

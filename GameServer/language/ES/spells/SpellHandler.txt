@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Interrupción de línea de visió
 SpellHandler.HitTarget:			Golpeas a {0} por {1}{2} de daño.
 SpellHandler.NPCHitTarget:			Tu {0} golpea a {1} por {2}{3} de daño.
 SpellHandler.CriticalHit:			Asestas un golpe crítico e infliges {0} de daño adicional.
+SpellHandler.NoEffect:				Tu hechizo no afecta a {0}.
+SpellHandler.NPCNoEffect:			El hechizo de tu {0} no afecta a {1}.
 SpellHandler.TargetPronoun.Your:		Tu
 SpellHandler.TargetPronoun.Targets:		El objetivo
+SpellHandler.Absorbed:				({0}% absorbido)
 
 SpellHandler.MustBeStealthedBow:		Debes estar en sigilo y portar un arco para usar esta habilidad.
 SpellHandler.MustWieldBow:			Debes portar un arco para usar esta habilidad.

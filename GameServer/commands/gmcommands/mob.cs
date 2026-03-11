@@ -356,6 +356,7 @@ namespace DOL.GS.Commands
                 else
                 {
                     targetMob.IsBoss = isBoss;
+                    targetMob.SaveIntoDatabase();
                     client.Out.SendMessage(targetMob.Name + " is now IsEpicBoss: " + isBoss, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
@@ -2858,6 +2859,20 @@ namespace DOL.GS.Commands
             mob.OwnerID = targetMob.OwnerID;
             mob.IsRenaissance = targetMob.IsRenaissance;
             mob.IsBoss = targetMob.IsBoss;
+
+            if (mob.IsBoss)
+            {
+                mob.BossSpellABS = targetMob.BossSpellABS;
+                mob.BossMeleeABS = targetMob.BossMeleeABS;
+                mob.BossDotABS = targetMob.BossDotABS;
+                mob.BossMaxHealthMod = targetMob.BossMaxHealthMod;
+                mob.BossEffectivenessMod = targetMob.BossEffectivenessMod;
+                mob.BossDifficulty = targetMob.BossDifficulty;
+                mob.BossAblativeShieldMult = targetMob.BossAblativeShieldMult;
+                mob.BossAblativeShieldCurrent = targetMob.BossAblativeShieldCurrent;
+                mob.BossAblativeErodible = targetMob.BossAblativeErodible;
+                mob.BossPlayerInRadiusEnhancement = targetMob.BossPlayerInRadiusEnhancement;
+            }
 
             mob.CustomCopy(targetMob);
 

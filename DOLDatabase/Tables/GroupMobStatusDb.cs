@@ -17,6 +17,11 @@ namespace DOLDatabase.Tables
         private string m_visibleSlot;
         private string m_race;
         private string m_model;
+        private int m_spellABS;
+        private int m_meleeABS;
+        private int m_dotABS;
+        private int m_maxHealth;
+        private int m_effectiveness;
         private string m_effect;
         private string m_statusId;
 
@@ -60,6 +65,41 @@ namespace DOLDatabase.Tables
         {
             get => m_model;
             set { Dirty = true; m_model = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int SpellABS
+        {
+            get => m_spellABS;
+            set { Dirty = true; m_spellABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MeleeABS
+        {
+            get => m_meleeABS;
+            set { Dirty = true; m_meleeABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int DotABS
+        {
+            get => m_dotABS;
+            set { Dirty = true; m_dotABS = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MaxHealth
+        {
+            get => m_maxHealth;
+            set { Dirty = true; m_maxHealth = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int Effectiveness
+        {
+            get => m_effectiveness;
+            set { Dirty = true; m_effectiveness = value; }
         }
 
         [DataElement(AllowDbNull = true, Varchar = 255)]

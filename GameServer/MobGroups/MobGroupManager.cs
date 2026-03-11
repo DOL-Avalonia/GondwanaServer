@@ -16,7 +16,7 @@ namespace DOL.MobGroups
 {
     public class MobGroupManager
     {
-        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         private static MobGroupManager instance;
 
         public static MobGroupManager Instance => instance ?? (instance = new MobGroupManager());
@@ -289,12 +289,13 @@ namespace DOL.MobGroups
 
                 if (!isLoadedFromScript)
                 {
-                    bool exists = GameServer.Database.SelectObject<GroupMobDb>(g => g.GroupId == groupId) != null;
-                    if (!exists)
+                    var dbGroup = GameServer.Database.SelectObjects<GroupMobDb>(DB.Column("GroupId").IsEqualTo(groupId))?.FirstOrDefault();
+                    if (dbGroup == null)
                     {
-                        var newGroup = new GroupMobDb() { GroupId = groupId }; // TODO: add a proper SaveIntoDatabase method
-                        GameServer.Database.AddObject(newGroup);
+                        dbGroup = new GroupMobDb() { GroupId = groupId };
+                        GameServer.Database.AddObject(dbGroup);
                     }
+                    mobGroup.InternalId = dbGroup.ObjectId;
                 }
             }
             else if (mobGroup.NPCs.Contains(npc))

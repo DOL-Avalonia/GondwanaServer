@@ -25,7 +25,7 @@ namespace DOL.GS
     public class Spawner
         : AmteMob
     {
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static readonly string DEFAULT_INACTIVE_ADDS_STATUS = "Spawner_inactive_adds";
         private static readonly string DEFAULT_ACTIVE_ADDS_STATUS = "Spawner_active_adds";
@@ -87,7 +87,7 @@ namespace DOL.GS
         private static readonly int MILLISECONDS_BEFORE_RESET_ADDS = 20 * 60 * 1000; // 20 minutes
 
         /// <summary>
-        /// If > 0, the spawner will spawn (percentageOfPlayersInRadius% of players in a radius of 1000) mobs randomly picked between the valid templates
+        /// If > 0, the spawner will spawn (percentageOfPlayersInRadius% of players in a radius of 2000) mobs randomly picked between the valid templates
         /// If <= 0, up to 6 mobs will be spawned, each for every valid template
         /// </summary>
         private int percentageOfPlayersInRadius;
@@ -393,7 +393,7 @@ namespace DOL.GS
             }
             else
             {
-                int npcCount = (int)(GetPlayersInRadius(1000).Cast<GamePlayer>().Count(p => GameServer.ServerRules.IsAllowedToAttack(p, this, true)) / 100.0 * percentageOfPlayersInRadius + 0.5);
+                int npcCount = (int)(GetPlayersInRadius(2000).Cast<GamePlayer>().Count(p => GameServer.ServerRules.IsAllowedToAttack(p, this, true)) / 100.0 * percentageOfPlayersInRadius + 0.5);
                 List<NpcTemplate> validTemplates = templates.Where(t => t != null).ToList();
                 if (npcCount <= 0 || !validTemplates.Any())
                 {

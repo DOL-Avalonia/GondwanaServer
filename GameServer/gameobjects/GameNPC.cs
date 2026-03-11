@@ -281,6 +281,37 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// GroupMob Parameters
+        /// </summary>
+        public int GroupMobSpellABS { get; set; }
+        public int GroupMobMeleeABS { get; set; }
+        public int GroupMobDotABS { get; set; }
+        public int GroupMobMaxHealthMod { get; set; }
+        public int GroupMobEffectivenessMod { get; set; }
+
+        /// <summary>
+        /// IsBoss Parameters
+        /// </summary>
+        public int BossSpellABS { get; set; }
+        public int BossMeleeABS { get; set; }
+        public int BossDotABS { get; set; }
+        public int BossMaxHealthMod { get; set; }
+        public int BossEffectivenessMod { get; set; }
+        public int BossDifficulty { get; set; }
+        public double BossAblativeShieldMult { get; set; }
+        public int BossAblativeShieldCurrent { get; set; }
+        public bool BossAblativeErodible { get; set; }
+        public double BossPlayerInRadiusEnhancement { get; set; }
+        protected long m_lastAblativeHitTime = 0;
+        protected double m_lastPlayerEnhancementMultiplier = 1.0;
+        protected RegionTimer m_bossDynamicStatsTimer = null;
+
+        /// <summary>
+        /// Safely exposes the cached enhancement multiplier for external scripts like SpellHandler.
+        /// </summary>
+        public double ActivePlayerEnhancementMultiplier => m_lastPlayerEnhancementMultiplier;
+
+        /// <summary>
         /// If this mob is a Member of GroupMob
         /// </summary>
         public ImmutableList<MobGroup> MobGroups
@@ -2253,6 +2284,28 @@ namespace DOL.GS
             EventID = dbMob.EventID;
             IsBoss = dbMob.IsBoss;
 
+            if (IsBoss && !string.IsNullOrEmpty(InternalID))
+            {
+                var bossParams = GameServer.Database.SelectObjects<DBBossParameters>(DB.Column("BossID").IsEqualTo(InternalID)).FirstOrDefault();
+                if (bossParams != null)
+                {
+                    BossSpellABS = bossParams.SpellmagicABS;
+                    BossMeleeABS = bossParams.MeleeABS;
+                    BossDotABS = bossParams.DotABS;
+                    BossMaxHealthMod = bossParams.Maxhealth;
+                    BossEffectivenessMod = bossParams.Effectiveness;
+                    BossDifficulty = bossParams.BossDifficulty;
+                    BossAblativeShieldMult = bossParams.AblativeShield;
+                    BossAblativeErodible = bossParams.ErodibleAblative > 0;
+                    BossPlayerInRadiusEnhancement = bossParams.PlayerInRadiusEnhancement;
+
+                    if (BossAblativeErodible && BossAblativeShieldMult > 0 && BossAblativeShieldCurrent <= 0)
+                    {
+                        BossAblativeShieldCurrent = (int)(MaxHealth * (BossAblativeShieldMult * GetPlayerInRadiusEnhancementMultiplier())); // UPDATE THIS
+                    }
+                }
+            }
+
             ModelDb = dbMob.Model;
             RaceDb = dbMob.Race;
             VisibleWeaponsDb = dbMob.VisibleWeaponSlots;
@@ -2382,6 +2435,13 @@ namespace DOL.GS
             if (InternalID != null)
             {
                 GameServer.Database.DeleteObject(GameServer.Database.SelectObjects<GroupMobXMobs>(DB.Column("MobID").IsEqualTo(InternalID)));
+
+                var bossParams = GameServer.Database.SelectObjects<DBBossParameters>(DB.Column("BossID").IsEqualTo(InternalID)).FirstOrDefault();
+                if (bossParams != null)
+                {
+                    GameServer.Database.DeleteObject(bossParams);
+                }
+
                 Mob mob = GameServer.Database.FindObjectByKey<Mob>(InternalID);
                 if (mob != null)
                     GameServer.Database.DeleteObject(mob);
@@ -2530,6 +2590,32 @@ namespace DOL.GS
             else
             {
                 GameServer.Database.SaveObject(mob);
+            }
+
+            if (IsBoss && InternalID != null)
+            {
+                var bossParams = GameServer.Database.SelectObjects<DBBossParameters>(DB.Column("BossID").IsEqualTo(InternalID)).FirstOrDefault();
+                bool isNew = false;
+
+                if (bossParams == null)
+                {
+                    bossParams = new DBBossParameters();
+                    bossParams.BossID = InternalID;
+                    isNew = true;
+                }
+
+                bossParams.SpellmagicABS = BossSpellABS;
+                bossParams.MeleeABS = BossMeleeABS;
+                bossParams.DotABS = BossDotABS;
+                bossParams.Maxhealth = BossMaxHealthMod;
+                bossParams.Effectiveness = BossEffectivenessMod;
+                bossParams.BossDifficulty = BossDifficulty;
+                bossParams.AblativeShield = BossAblativeShieldMult;
+                bossParams.ErodibleAblative = BossAblativeErodible ? 1 : 0;
+                bossParams.PlayerInRadiusEnhancement = BossPlayerInRadiusEnhancement;
+
+                if (isNew) GameServer.Database.AddObject(bossParams);
+                else GameServer.Database.SaveObject(bossParams);
             }
         }
 
@@ -3324,6 +3410,15 @@ namespace DOL.GS
 
             Reset();
 
+            if (IsBoss && BossPlayerInRadiusEnhancement > 0)
+            {
+                if (m_bossDynamicStatsTimer == null)
+                {
+                    m_bossDynamicStatsTimer = new RegionTimer(this, new RegionTimerCallback(BossDynamicStatsCallback));
+                    m_bossDynamicStatsTimer.Start(1500);
+                }
+            }
+
             return true;
         }
 
@@ -3342,12 +3437,28 @@ namespace DOL.GS
 
             if (IsAlive || ObjectState == eObjectState.Active) return false;
 
+            if (IsBoss && BossPlayerInRadiusEnhancement > 0)
+            {
+                m_lastPlayerEnhancementMultiplier = GetPlayerInRadiusEnhancementMultiplier();
+            }
+            else
+            {
+                m_lastPlayerEnhancementMultiplier = 1.0;
+            }
+
             Health = MaxHealth;
             Mana = MaxMana;
             Endurance = MaxEndurance;
             Position = Home;
             Tension = 0;
             ambientXNbUse = new Dictionary<MobXAmbientBehaviour, short>();
+
+            if (IsBoss && BossAblativeErodible && BossAblativeShieldMult > 0)
+            {
+                double currentAblativeMult = BossAblativeShieldMult * m_lastPlayerEnhancementMultiplier;
+                BossAblativeShieldCurrent = (int)(MaxHealth * currentAblativeMult);
+                m_lastAblativeHitTime = 0;
+            }
 
             return AddToWorld();
         }
@@ -3438,6 +3549,12 @@ namespace DOL.GS
         /// <returns>true if the npc has been successfully removed</returns>
         public override bool RemoveFromWorld()
         {
+            if (m_bossDynamicStatsTimer != null)
+            {
+                m_bossDynamicStatsTimer.Stop();
+                m_bossDynamicStatsTimer = null;
+            }
+
             if (IsMovingOnPath)
                 StopMovingOnPath();
             if (MAX_PASSENGERS > 0)
@@ -4165,14 +4282,14 @@ namespace DOL.GS
 
             long lastTick = this.TempProperties.getProperty<long>(LAST_LOS_TICK_PROPERTY);
 
-            if (ServerProperties.Properties.ALWAYS_CHECK_PET_LOS &&
+            if (Properties.ALWAYS_CHECK_PET_LOS &&
                 Brain is IControlledBrain &&
                 (target as GameLiving)?.GetController() is GamePlayer targetPlayer)
             {
                 GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(LAST_LOS_TARGET_PROPERTY, null);
                 if (lastTarget != null && lastTarget == target)
                 {
-                    if (lastTick != 0 && CurrentRegion.Time - lastTick < ServerProperties.Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
+                    if (lastTick != 0 && CurrentRegion.Time - lastTick < Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
                         return;
                 }
 
@@ -4185,7 +4302,7 @@ namespace DOL.GS
                         log.DebugFormat("{0} LOS count check exceeds 10, aborting LOS check!", Name);
 
                         // Now do a safety check.  If it's been a while since we sent any check we should clear count
-                        if (lastTick == 0 || CurrentRegion.Time - lastTick > ServerProperties.Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
+                        if (lastTick == 0 || CurrentRegion.Time - lastTick > Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
                         {
                             log.Debug("LOS count reset!");
                             TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, 0);
@@ -4283,7 +4400,7 @@ namespace DOL.GS
         {
             base.RangedAttackFinished();
 
-            if (ServerProperties.Properties.ALWAYS_CHECK_PET_LOS &&
+            if (Properties.ALWAYS_CHECK_PET_LOS &&
                 Brain is IControlledBrain &&
                 (TargetObject is GamePlayer || (TargetObject is GameNPC && (TargetObject as GameNPC)!.Brain != null && (TargetObject as GameNPC)!.Brain is IControlledBrain)))
             {
@@ -4304,7 +4421,7 @@ namespace DOL.GS
                 if (player != null)
                 {
                     player.Out.SendCheckLOS(this, TargetObject, new CheckLOSResponse(NPCStopRangedAttackCheckLOS));
-                    if (ServerProperties.Properties.ENABLE_DEBUG)
+                    if (Properties.ENABLE_DEBUG)
                     {
                         log.Debug(Name + " sent LOS check to player " + player.Name);
                     }
@@ -4323,7 +4440,7 @@ namespace DOL.GS
         {
             if ((response & 0x100) != 0x100)
             {
-                if (ServerProperties.Properties.ENABLE_DEBUG)
+                if (Properties.ENABLE_DEBUG)
                 {
                     log.Debug(Name + " FAILED stop ranged attack LOS check to player " + player.Name);
                 }
@@ -4366,15 +4483,15 @@ namespace DOL.GS
                 switch (this)
                 {
                     case Keeps.GameKeepGuard guard:
-                        if (ServerProperties.Properties.GUARD_2H_BONUS_DAMAGE)
+                        if (Properties.GUARD_2H_BONUS_DAMAGE)
                             damage *= (100 + m_blockChance) / 100.00;
                         break;
                     case GamePet pet:
-                        if (ServerProperties.Properties.PET_2H_BONUS_DAMAGE)
+                        if (Properties.PET_2H_BONUS_DAMAGE)
                             damage *= (100 + m_blockChance) / 100.00;
                         break;
                     default:
-                        if (ServerProperties.Properties.MOB_2H_BONUS_DAMAGE)
+                        if (Properties.MOB_2H_BONUS_DAMAGE)
                             damage *= (100 + m_blockChance) / 100.00;
                         break;
                 }
@@ -4418,8 +4535,253 @@ namespace DOL.GS
             return 1000;
         }
 
+        /// <summary>
+        /// Calculates the dynamic multiplier based on players around the boss.
+        /// e.g. 5% parameter with 10 players returns 1.50
+        /// </summary>
+        public double GetPlayerInRadiusEnhancementMultiplier()
+        {
+            if (!IsBoss || BossPlayerInRadiusEnhancement <= 0)
+                return 1.0;
+
+            int playerCount = GetPlayersInRadius(3000).Cast<GamePlayer>().Count(p => GameServer.ServerRules.IsAllowedToAttack(p, this, true));
+
+            if (playerCount == 0)
+                return 1.0;
+
+            return 1.0 + ((BossPlayerInRadiusEnhancement * playerCount) / 100.0);
+        }
+
+        /// <summary>
+        /// Heartbeat timer that dynamically scales current Health when players enter/leave
+        /// </summary>
+        protected virtual int BossDynamicStatsCallback(RegionTimer timer)
+        {
+            if (!IsAlive || ObjectState != eObjectState.Active)
+                return 0;
+
+            double newMult = GetPlayerInRadiusEnhancementMultiplier();
+
+            if (Math.Abs(newMult - m_lastPlayerEnhancementMultiplier) > 0.001)
+            {
+                double ratio = newMult / m_lastPlayerEnhancementMultiplier;
+                m_lastPlayerEnhancementMultiplier = newMult;
+
+                int newHealth = (int)(this.Health * ratio);
+                this.Health = Math.Min(newHealth, this.MaxHealth);
+
+                if (BossAblativeErodible && BossAblativeShieldMult > 0 && BossAblativeShieldCurrent > 0)
+                {
+                    BossAblativeShieldCurrent = (int)(BossAblativeShieldCurrent * ratio);
+                }
+
+                BroadcastUpdate();
+            }
+
+            return 1500;
+        }
+
+        /// <summary>
+        /// Calculates MaxHealth including GroupMob modifiers.
+        /// Note: This is the global physical health.
+        /// Instanced "Reduced Health" for quests is handled via Damage Scaling in TakeDamage.
+        /// </summary>
+        public override int MaxHealth
+        {
+            get
+            {
+                int val = base.MaxHealth;
+                int bossMaxHealth = BossMaxHealthMod;
+
+                if (IsBoss && BossPlayerInRadiusEnhancement > 0 && bossMaxHealth > 0)
+                {
+                    bossMaxHealth = (int)(bossMaxHealth * m_lastPlayerEnhancementMultiplier);
+                }
+
+                int totalMaxHealthMod = GroupMobMaxHealthMod + bossMaxHealth;
+
+                if (totalMaxHealthMod > 0)
+                {
+                    val += (int)((long)val * totalMaxHealthMod / 100);
+                }
+                return val;
+            }
+        }
+
+        public void UpdateMaxHealth()
+        {
+            if (Health > MaxHealth) Health = MaxHealth;
+        }
+
+        /// <summary>
+        /// Override outgoing attack creation to apply Effectiveness modifications
+        /// </summary>
+        protected override AttackData MakeAttack(GameObject target, InventoryItem weapon, Style style, double effectiveness, int interruptDuration, bool dualWield, bool ignoreLOS, bool isCounterAttack)
+        {
+            double bossEffMod = BossEffectivenessMod;
+            if (IsBoss && BossPlayerInRadiusEnhancement > 0 && bossEffMod > 0)
+            {
+                bossEffMod *= GetPlayerInRadiusEnhancementMultiplier();
+            }
+
+            double totalEffectivenessMod = GroupMobEffectivenessMod + bossEffMod;
+            if (totalEffectivenessMod > 0)
+            {
+                effectiveness += (effectiveness * (totalEffectivenessMod / 100.0));
+            }
+
+            if (target is GamePlayer player && MobGroups != null)
+            {
+                foreach (var group in MobGroups)
+                {
+                    if (group.CompletedQuestEffectiveness > 0 && group.HasPlayerCompletedQuests(player))
+                    {
+                        effectiveness *= (group.CompletedQuestEffectiveness / 100.0);
+                    }
+                }
+            }
+
+            return base.MakeAttack(target, weapon, style, effectiveness, interruptDuration, dualWield, ignoreLOS, isCounterAttack);
+        }
+
         public override void TakeDamage(AttackData ad)
         {
+            // Ablative Shield Interception
+            if (IsBoss && BossAblativeShieldMult > 0 && ad.Damage > 0)
+            {
+                double currentAblativeMult = BossAblativeShieldMult * m_lastPlayerEnhancementMultiplier;
+                int maxAblative = (int)(MaxHealth * currentAblativeMult);
+
+                if (BossAblativeErodible && BossAblativeShieldCurrent < maxAblative)
+                {
+                    if (m_lastAblativeHitTime == 0 || CurrentRegion.Time - m_lastAblativeHitTime > 120000)
+                    {
+                        BossAblativeShieldCurrent = maxAblative;
+                    }
+                }
+
+                m_lastAblativeHitTime = CurrentRegion.Time;
+
+                if (BossAblativeErodible)
+                {
+                    // ERODIBLE SHIELD: Absorbs damage continuously until the pool is depleted
+                    if (BossAblativeShieldCurrent > 0)
+                    {
+                        int damageToAbsorb = ad.Damage + ad.CriticalDamage;
+                        if (damageToAbsorb > BossAblativeShieldCurrent)
+                            damageToAbsorb = BossAblativeShieldCurrent;
+
+                        BossAblativeShieldCurrent -= damageToAbsorb;
+
+                        double absorbRatio = (double)damageToAbsorb / (ad.Damage + ad.CriticalDamage);
+                        int absCrit = (int)(ad.CriticalDamage * absorbRatio);
+                        int absNorm = damageToAbsorb - absCrit;
+
+                        ad.Damage -= absNorm;
+                        ad.CriticalDamage -= absCrit;
+
+                        if (ad.Attacker is GamePlayer playerAttacker)
+                        {
+                            int percentRemaining = (int)(((double)BossAblativeShieldCurrent / maxAblative) * 100);
+                            if (BossAblativeShieldCurrent > 0)
+                            {
+                                playerAttacker.SendTranslatedMessage("GameNPC.BossAblative.ErodibleAbsorb", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, damageToAbsorb, percentRemaining);
+                            }
+                            else
+                            {
+                                playerAttacker.SendTranslatedMessage("GameNPC.BossAblative.ErodibleShatter", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // NON-ERODIBLE SHIELD: Massive flat reduction per hit, BUT ONLY active while Health is full!
+                    if (Health == MaxHealth)
+                    {
+                        int damageToAbsorb = ad.Damage + ad.CriticalDamage;
+                        if (damageToAbsorb > maxAblative)
+                            damageToAbsorb = maxAblative;
+
+                        double absorbRatio = (double)damageToAbsorb / (ad.Damage + ad.CriticalDamage);
+                        int absCrit = (int)(ad.CriticalDamage * absorbRatio);
+                        int absNorm = damageToAbsorb - absCrit;
+
+                        ad.Damage -= absNorm;
+                        ad.CriticalDamage -= absCrit;
+
+                        if (ad.Attacker is GamePlayer playerAttacker && damageToAbsorb > 0)
+                        {
+                            if (ad.Damage > 0)
+                            {
+                                playerAttacker.SendTranslatedMessage("GameNPC.BossAblative.MassivePierce", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            }
+                            else
+                            {
+                                playerAttacker.SendTranslatedMessage("GameNPC.BossAblative.MassiveDeflect", eChatType.CT_Spell, eChatLoc.CL_SystemWindow, damageToAbsorb);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Global and Instanced Resistances (ABS)
+            int globalSpellAbs = GroupMobSpellABS + BossSpellABS;
+            int globalDotAbs = GroupMobDotABS + BossDotABS;
+            int globalMeleeAbs = GroupMobMeleeABS + BossMeleeABS;
+
+            int instancedSpellAbsMod = 0;
+            int instancedDotAbsMod = 0;
+            int instancedMeleeAbsMod = 0;
+            int maxHealthSimulationPercent = 100;
+
+            if (ad.Attacker is GamePlayer player && MobGroups != null)
+            {
+                foreach (var group in MobGroups)
+                {
+                    if (group.HasPlayerCompletedQuests(player))
+                    {
+                        instancedSpellAbsMod += group.CompletedQuestSpellABS;
+                        instancedDotAbsMod += group.CompletedQuestDotABS;
+                        instancedMeleeAbsMod += group.CompletedQuestMeleeABS;
+
+                        if (group.CompletedQuestMaxHealth > 0)
+                        {
+                            if (maxHealthSimulationPercent == 100 || group.CompletedQuestMaxHealth < maxHealthSimulationPercent)
+                                maxHealthSimulationPercent = group.CompletedQuestMaxHealth;
+                        }
+                    }
+                }
+            }
+
+            // Calculate the final combined ABS for this specific attack
+            int finalAbs = 0;
+            if (ad.AttackType == AttackData.eAttackType.Spell)
+                finalAbs = globalSpellAbs + instancedSpellAbsMod;
+            else if (ad.AttackType == AttackData.eAttackType.DoT)
+                finalAbs = globalDotAbs + instancedDotAbsMod;
+            else if (ad.IsMeleeAttack || ad.AttackType == AttackData.eAttackType.Ranged)
+                finalAbs = globalMeleeAbs + instancedMeleeAbsMod;
+
+            // Cap maximum absorption at 100%
+            if (finalAbs > 100) finalAbs = 100;
+
+            if (finalAbs != 0)
+            {
+                double factor = (100.0 - finalAbs) / 100.0;
+                ad.Damage = (int)(ad.Damage * factor);
+                ad.CriticalDamage = (int)(ad.CriticalDamage * factor);
+            }
+
+            // Instanced Max Health
+            if (maxHealthSimulationPercent > 0 && maxHealthSimulationPercent != 100)
+            {
+                double factor = 100.0 / maxHealthSimulationPercent;
+                ad.Damage = (int)(ad.Damage * factor);
+                ad.CriticalDamage = (int)(ad.CriticalDamage * factor);
+            }
+
+            // Ambient Texts / Immunity System
             GamePlayer gamePlayer = ad.Attacker as GamePlayer;
             GamePet pet = ad.Attacker as GamePet;
             if ((gamePlayer != null || (pet != null && pet.Owner is GamePlayer)) && (ad.AttackType != AttackData.eAttackType.MeleeDualWield && ad.AttackType != AttackData.eAttackType.MeleeOneHand && ad.AttackType != AttackData.eAttackType.MeleeTwoHand))
@@ -4456,6 +4818,7 @@ namespace DOL.GS
                 }
             }
 
+            // Boss Hunt in PVPManager
             if (IsBoss && PvpManager.Instance.CurrentSessionType == PvpManager.eSessionTypes.BossHunt)
             {
                 GamePlayer attackerPlayer = ad.Attacker as GamePlayer;
@@ -4471,6 +4834,28 @@ namespace DOL.GS
             }
 
             base.TakeDamage(ad);
+        }
+
+        public override eAttackResult CalculateEnemyAttackResult(AttackData ad, InventoryItem weapon)
+        {
+            eAttackResult result = base.CalculateEnemyAttackResult(ad, weapon);
+
+            if (IsBoss && BossDifficulty > 0 && ad.Attacker is GamePlayer)
+            {
+                if (result == eAttackResult.HitStyle || result == eAttackResult.HitUnstyled)
+                {
+                    // BossDifficulty directly increases the chance to miss. 
+                    // e.g., 100 = 100% chance to force a miss on a successful hit.
+                    if (Util.Chance(BossDifficulty))
+                    {
+                        ad.Damage = 0;
+                        ad.CriticalDamage = 0;
+                        return eAttackResult.Missed;
+                    }
+                }
+            }
+
+            return result;
         }
 
         protected int m_counterAttackChance = 0;
@@ -4630,6 +5015,12 @@ namespace DOL.GS
         /// </summary>
         public override void Die(GameObject killer)
         {
+            if (m_bossDynamicStatsTimer != null)
+            {
+                m_bossDynamicStatsTimer.Stop();
+                m_bossDynamicStatsTimer = null;
+            }
+
             FireAmbientSentence(eAmbientTrigger.dieing, killer as GameLiving);
 
             if (ControlledBrain != null)

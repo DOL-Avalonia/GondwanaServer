@@ -3629,6 +3629,10 @@ namespace DOL.GS.Spells
         /// <param name="effect"></param>
         public virtual void OnEffectAdd(GameSpellEffect effect)
         {
+            if (effect.Owner is GamePlayer player && effect.SpellHandler?.Spell != null)
+            {
+                player.CheckGroupMobEffectVisuals(effect.SpellHandler.Spell.SpellType);
+            }
         }
 
         /// <summary>
@@ -3671,6 +3675,11 @@ namespace DOL.GS.Spells
                         effect.Owner.EffectList.CommitChanges();
                     }
                 }
+            }
+
+            if (effect.Owner is GamePlayer player && effect.SpellHandler?.Spell != null)
+            {
+                player.CheckGroupMobEffectVisuals(effect.SpellHandler.Spell.SpellType);
             }
         }
 
@@ -4786,12 +4795,128 @@ namespace DOL.GS.Spells
                 modmessage = " (+" + ad.Modifier + ")";
             if (ad.Modifier < 0)
                 modmessage = " (" + ad.Modifier + ")";
-            if (Caster is GamePlayer or NecromancerPet)
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HitTarget", Caster.GetPersonalizedName(ad.Target), ad.Damage, modmessage), eChatType.CT_YouHit);
-            else if (Caster is GameNPC)
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NPCHitTarget", Caster.Name, ad.Target.GetName(0, false), ad.Damage, modmessage), eChatType.CT_YouHit);
-            if (ad.CriticalDamage > 0)
-                MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.CriticalHit", ad.CriticalDamage), eChatType.CT_YouHit);
+
+            // Boss/GroupMob Absorption factor
+            int simDmg = ad.Damage;
+            int simCrit = ad.CriticalDamage;
+            int originalTotal = simDmg + simCrit;
+            int totalAbsorbed = 0;
+
+            if (ad.Target is GameNPC absNpc)
+            {
+                if (absNpc.IsBoss && absNpc.BossAblativeShieldMult > 0 && simDmg > 0)
+                {
+                    double currentAblativeMult = absNpc.BossAblativeShieldMult * absNpc.ActivePlayerEnhancementMultiplier;
+                    int maxAblative = (int)(absNpc.MaxHealth * currentAblativeMult);
+                    int currentAblative = absNpc.BossAblativeShieldCurrent;
+
+                    if (!absNpc.BossAblativeErodible)
+                        currentAblative = (absNpc.Health == absNpc.MaxHealth) ? maxAblative : 0;
+
+                    if (currentAblative > 0)
+                    {
+                        int damageToAbsorb = simDmg + simCrit;
+                        if (damageToAbsorb > currentAblative)
+                            damageToAbsorb = currentAblative;
+
+                        double absorbRatio = (double)damageToAbsorb / (simDmg + simCrit);
+                        int absCrit = (int)(simCrit * absorbRatio);
+                        int absNorm = damageToAbsorb - absCrit;
+
+                        simDmg -= absNorm;
+                        simCrit -= absCrit;
+                        totalAbsorbed += damageToAbsorb;
+                    }
+                }
+
+                int globalAbs = 0;
+                if (ad.AttackType == AttackData.eAttackType.Spell) globalAbs = absNpc.GroupMobSpellABS + absNpc.BossSpellABS;
+                else if (ad.AttackType == AttackData.eAttackType.DoT) globalAbs = absNpc.GroupMobDotABS + absNpc.BossDotABS;
+                else if (ad.IsMeleeAttack || ad.AttackType == AttackData.eAttackType.Ranged) globalAbs = absNpc.GroupMobMeleeABS + absNpc.BossMeleeABS;
+
+                int instancedAbsMod = 0;
+                int maxHealthSimulationPercent = 100;
+
+                if (ad.Attacker is GamePlayer player && absNpc.MobGroups != null)
+                {
+                    foreach (var group in absNpc.MobGroups)
+                    {
+                        if (group.HasPlayerCompletedQuests(player))
+                        {
+                            if (ad.AttackType == AttackData.eAttackType.Spell) instancedAbsMod += group.CompletedQuestSpellABS;
+                            else if (ad.AttackType == AttackData.eAttackType.DoT) instancedAbsMod += group.CompletedQuestDotABS;
+                            else if (ad.IsMeleeAttack || ad.AttackType == AttackData.eAttackType.Ranged) instancedAbsMod += group.CompletedQuestMeleeABS;
+
+                            if (group.CompletedQuestMaxHealth > 0)
+                            {
+                                if (maxHealthSimulationPercent == 100 || group.CompletedQuestMaxHealth < maxHealthSimulationPercent)
+                                    maxHealthSimulationPercent = group.CompletedQuestMaxHealth;
+                            }
+                        }
+                    }
+                }
+
+                int finalAbs = globalAbs + instancedAbsMod;
+                if (finalAbs > 100) finalAbs = 100;
+
+                if (finalAbs != 0 && (simDmg > 0 || simCrit > 0))
+                {
+                    double factor = (100.0 - finalAbs) / 100.0;
+
+                    int newDmg = (int)(simDmg * factor);
+                    int newCrit = (int)(simCrit * factor);
+
+                    if (finalAbs > 0)
+                    {
+                        totalAbsorbed += (simDmg - newDmg) + (simCrit - newCrit);
+                    }
+
+                    simDmg = newDmg;
+                    simCrit = newCrit;
+                }
+
+                if (maxHealthSimulationPercent > 0 && maxHealthSimulationPercent != 100)
+                {
+                    double factor = 100.0 / maxHealthSimulationPercent;
+                    simDmg = (int)(simDmg * factor);
+                    simCrit = (int)(simCrit * factor);
+                }
+            }
+
+            int absPercent = originalTotal > 0 ? (int)Math.Round((double)totalAbsorbed / originalTotal * 100) : 0;
+            string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.Absorbed", absPercent) : "";
+
+            string targetName = Caster.GetPersonalizedName(ad.Target);
+            string hitMsg = "";
+
+            if (simDmg == 0)
+            {
+                if (Caster is GamePlayer or NecromancerPet)
+                    hitMsg = LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoEffect", targetName);
+                else if (Caster is GameNPC)
+                    hitMsg = LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NPCNoEffect", Caster.Name, ad.Target.GetName(0, false));
+            }
+            else
+            {
+                if (Caster is GamePlayer or NecromancerPet)
+                    hitMsg = LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.HitTarget", targetName, simDmg, modmessage);
+                else if (Caster is GameNPC)
+                    hitMsg = LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NPCHitTarget", Caster.Name, ad.Target.GetName(0, false), simDmg, modmessage);
+            }
+
+            if (!string.IsNullOrEmpty(hitMsg))
+            {
+                if (!string.IsNullOrEmpty(absMsg))
+                    hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+
+                MessageToCaster(hitMsg, eChatType.CT_YouHit);
+            }
+
+            if (simCrit > 0)
+            {
+                string critMsg = LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.CriticalHit", simCrit);
+                MessageToCaster(critMsg, eChatType.CT_YouHit);
+            }
         }
 
         /// <summary>

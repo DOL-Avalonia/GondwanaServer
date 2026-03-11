@@ -48,7 +48,7 @@ ServerRules.AbstractServerRules.PvpDefenderEntering:				{0} entre en jeu et est 
 ServerRules.AbstractServerRules.PvpAttackerImmune:					Vous ne pouvez pas attaquer les joueurs tant que votre invulnérabilité PvP est active !
 ServerRules.AbstractServerRules.PvpDefenderImmuneName:				{0} est temporairement immunisé(e) contre les attaques PvP !
 ServerRules.AbstractServerRules.PvpAttackerImmuneAny:				Vous ne pouvez pas attaquer tant que votre invulnérabilité PvP est active !
-ServerRules.AbstractServerRules.SafeAreaAttackForbidden:			Vous ne pouvez pas attaquer quelqu'un dans une zone sécurisée !
+ServerRules.AbstractServerRules.CantAttackInSafeArea:				Vous ne pouvez pas attaquer quelqu'un dans une zone sécurisée !
 ServerRules.AbstractServerRules.CannotAttackShadowedNecro:			Vous ne pouvez pas attaquer un nécromancien sous forme d'Ombre !
 ServerRules.AbstractServerRules.NpcNoXPCharmed:						Ce monstre a été charmé récemment et ne rapporte aucune expérience.
 ServerRules.AbstractServerRules.DebugRewardsEnabled:				Les récompenses sont activées car le serveur est en mode DEBUG.

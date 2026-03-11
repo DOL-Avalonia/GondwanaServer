@@ -1,22 +1,36 @@
-Commands.GM.GroupMob.Description:	GroupMob related commands:
-Commands.GM.GroupMob.Usage.Add:		'/GroupMob add <GroupId>' Add the targeted mob to a GroupMob <GroupId> (creates the GroupMob if the ID doesn't exist already)
-Commands.GM.GroupMob.Usage.Add.Spawner:		'/GroupMob add <GroupId> spawner' Add the GroupMob <GroupId> to the targeted MobSpawner (creates the SpawnerTemplate if it doesn't exist already)
+Commands.GM.GroupMob.Description:		GroupMob related commands:
+Commands.GM.GroupMob.Usage.Add:			'/GroupMob add <GroupId>' Add the targeted mob to a GroupMob <GroupId> (creates the GroupMob if the ID doesn't exist already)
+Commands.GM.GroupMob.Usage.Add.Spawner:	'/GroupMob add <GroupId> spawner' Add the GroupMob <GroupId> to the targeted MobSpawner (creates the SpawnerTemplate if it doesn't exist already)
 Commands.GM.GroupMob.Usage.Remove:		'/GroupMob remove <GroupId>' Removes the targeted mob from its GroupMob <GroupId>
 Commands.GM.GroupMob.Usage.Group:		'/GroupMob group remove <GroupId>' Delete the GroupMob <GroupId> and all its related Mob links
 Commands.GM.GroupMob.Usage.Info:		'/GroupMob info <GroupId>' Displays all informations related to a GroupMob <GroupId>
 Commands.GM.GroupMob.Usage.Status:		'/GroupMob status <GroupId> set <GroupStatusId> <SlaveGroupId> Applies a GroupMobStatus <GroupStatusId> to define a specific action/behavior from a Master group <GroupId> towards a Slave group <SlaveGroupId>'
-Commands.GM.GroupMob.Usage.Status.Origin:		'/GroupMob status origin set <GroupStatusId> <GroupId>' Applies a base status/behavior to a GroupMob by defining its <GroupdId> and the wanted <GroupStatusId>
-Commands.GM.GroupMob.Usage.Status.Create:		'/GroupMob status create <SpellId|null>(Effect) <FlagsValue|null>(Flags) <true|false|null>(IsInvicible) <id|null>(Model) <value|null>(VisibleWeapon) <id|null>(Race)' - Creates a GroupStatus and save it in the Database with a new ID <GroupStatusId>
-Commands.GM.GroupMob.Usage.Status.Quest:		'/GroupMob quest <GroupId> <QuestId> <Count> <true|false> <queststepID>' To associate a specific behavior friendly/agressive of a GroupMob (WillbeFriendly <true|false>) in relation with a quest and its count, queststepID is optional
+Commands.GM.GroupMob.Usage.Status.Origin:			'/GroupMob status origin set <GroupStatusId> <GroupId>' Applies a base status/behavior to a GroupMob by defining its <GroupdId> and the wanted <GroupStatusId>
+Commands.GM.GroupMob.Usage.Status.Create:			'/GroupMob status create <SpellId|null>(Effect) <FlagsValue|null>(Flags) <true|false|null>(IsInvicible) <id|null>(Model) <value|null>(VisibleWeapon) <id|null>(Race)' - Creates a GroupStatus and save it in the Database with a new ID <GroupStatusId>
+Commands.GM.GroupMob.Usage.Status.SpellABS:			'/GroupMob status <GroupId> spellabs <value>' Changes the Spell Absorption modifier (%) of the GroupMob
+Commands.GM.GroupMob.Usage.Status.MeleeABS:			'/GroupMob status <GroupId> meleeabs <value>' Changes the Melee Absorption modifier (%) of the GroupMob
+Commands.GM.GroupMob.Usage.Status.DotABS:			'/GroupMob status <GroupId> dotabs <value>' Changes the DoT Absorption modifier (%) of the GroupMob
+Commands.GM.GroupMob.Usage.Status.MaxHealth:		'/GroupMob status <GroupId> maxhealth <value>' Changes the Max Health modifier (%) of the GroupMob
+Commands.GM.GroupMob.Usage.Status.Effectiveness:	'/GroupMob status <GroupId> effectiveness <value>' Changes the Effectiveness modifier (%) of the GroupMob
+Commands.GM.GroupMob.Usage.Status.IsFriendly:		'/GroupMob status <GroupId> isfriendly <true|false>' Changes the friendly condition of the GroupMob
+Commands.GM.GroupMob.Usage.Status.Quest:			'/GroupMob quest <GroupId> <QuestId> <Count> <true|false> <queststepID>' To associate a specific behavior friendly/agressive of a GroupMob (WillbeFriendly <true|false>) in relation with a quest and its count, queststepID is optional
 Commands.GM.GroupMob.Usage.Status.Quest.Flag:		'/GroupMob quest flag <GroupId> <New Flag>' To add a new flag for groupmob after completing a quest
 Commands.GM.GroupMob.Usage.Status.Quest.Model:		'/GroupMob quest model <GroupId> <New Model>' To add a new model for groupmob after completing a quest
 Commands.GM.GroupMob.Usage.Status.Quest.Size:		'/GroupMob quest size <GroupId> <New Size>' To add a new size for groupmob after completing a quest
 Commands.GM.GroupMob.Usage.Status.Quest.Aggro:		'/GroupMob quest aggro <GroupId> <New Aggro>' To add a new aggro for groupmob after completing a quest
 Commands.GM.GroupMob.Usage.Status.Quest.Range:		'/GroupMob quest range <GroupId> <New Range>' To add a new range for groupmob after completing a quest
-Commands.GM.GroupMob.Usage.Status.Reset:		'/GroupMob status reset <GroupId> <GroupId>'  Reset the GroupMob Status as well as its interactions
-Commands.GM.GroupMob.Usage.Assist:              '/GroupMob assist <GroupID> <range>' Changes the range at which members of the MobGroup will assist each other if attacked
+Commands.GM.GroupMob.Usage.Status.Quest.SpellABS:	'/GroupMob quest spellabs <GroupId> <value>' Changes the Spell Absorption (%) of the GroupMob after completing a quest
+Commands.GM.GroupMob.Usage.Status.Quest.MeleeABS:	'/GroupMob quest meleeabs <GroupId> <value>' Changes the Melee Absorption (%) of the GroupMob after completing a quest
+Commands.GM.GroupMob.Usage.Status.Quest.DotABS:		'/GroupMob quest dotabs <GroupId> <value>' Changes the DoT Absorption (%) of the GroupMob after completing a quest
+Commands.GM.GroupMob.Usage.Status.Quest.MaxHealth:	'/GroupMob quest maxhealth <GroupId> <value>' Changes the Max Health (%) of the GroupMob after completing a quest
+Commands.GM.GroupMob.Usage.Status.Quest.Effectiveness:	'/GroupMob quest effectiveness <GroupId> <value>' Changes the Effectiveness (%) of the GroupMob after completing a quest
+Commands.GM.GroupMob.Usage.Status.Quest.Item:			'/GroupMob quest item <GroupId> <ItemId>' Sets a required equipped item condition to trigger the GroupMob's behavior
+Commands.GM.GroupMob.Usage.Status.Quest.SpellEffect:	'/GroupMob quest spelleffect <GroupId> <SpellType>' Sets a required spell effect type condition to trigger the GroupMob's behavior
+Commands.GM.GroupMob.Usage.Status.Quest.ItemEffect:		'/GroupMob quest itemeffect <GroupId> <EffectId>' Sets a visual client effect to play when the required item condition is met
+Commands.GM.GroupMob.Usage.Status.Reset:			'/GroupMob status reset <GroupId> <GroupId>'  Reset the GroupMob Status as well as its interactions
+Commands.GM.GroupMob.Usage.Assist:					'/GroupMob assist <GroupID> <range>' Changes the range at which members of the MobGroup will assist each other if attacked
 
-Commands.GM.GroupMob.BadID:                            No MobGroup with ID {0} was found
-Commands.GM.GroupMob.Assist.VisibilityDistance:        MobGroup {0} will now assist any member being attacked
-Commands.GM.GroupMob.Assist.RangeSet:                  MobGroup {0} will now assist any member within {1} units of distance
-Commands.GM.GroupMob.Assist.Never:                     MobGroup {0} will not assist members
+Commands.GM.GroupMob.BadID:							No MobGroup with ID {0} was found
+Commands.GM.GroupMob.Assist.VisibilityDistance:		MobGroup {0} will now assist any member being attacked
+Commands.GM.GroupMob.Assist.RangeSet:				MobGroup {0} will now assist any member within {1} units of distance
+Commands.GM.GroupMob.Assist.Never:					MobGroup {0} will not assist members

@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	LoS Interrupt in CheckLOSNPCToTar
 SpellHandler.HitTarget:				You hit {0} for {1}{2} damage(s)!
 SpellHandler.NPCHitTarget:			Your {0} hits {1} for {2}{3} damage(s)!
 SpellHandler.CriticalHit:			You critically hit for an additional {0} damage(s)!
+SpellHandler.NoEffect:				Your spell does not affect {0}.
+SpellHandler.NPCNoEffect:			The spell of your {0} does not affect {1}.
 SpellHandler.TargetPronoun.Your:		Your
 SpellHandler.TargetPronoun.Targets:		The target's
+SpellHandler.Absorbed:				 ({0}% absorbed)
 
 SpellHandler.MustBeStealthedBow:		You must be stealthed and wielding a bow to use this ability!
 SpellHandler.MustWieldBow:			You must be wielding a bow to use this ability!

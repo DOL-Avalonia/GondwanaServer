@@ -14002,6 +14002,10 @@ namespace DOL.GS
                 Out.SendUpdatePlayerSkills();
                 UpdatePlayerStatus();
 
+                if (!string.IsNullOrEmpty(item.Id_nb))
+                {
+                    CheckGroupMobItemVisuals(item.Id_nb);
+                }
 
                 if (IsAlive)
                 {
@@ -14173,6 +14177,11 @@ namespace DOL.GS
                 Out.SendEncumberance();
                 Out.SendUpdatePlayerSkills();
                 UpdatePlayerStatus();
+
+                if (!string.IsNullOrEmpty(item.Id_nb))
+                {
+                    CheckGroupMobItemVisuals(item.Id_nb);
+                }
 
                 if (IsAlive)
                 {
@@ -14359,6 +14368,103 @@ namespace DOL.GS
 
                     if (Endurance < MaxEndurance) StartEnduranceRegeneration();
                     else if (Endurance > MaxEndurance) Endurance = MaxEndurance;
+                }
+            }
+        }
+
+        /// Analyzes if an equipped or unequipped item is relevant to any nearby GroupMobs.
+        /// </summary>
+        /// <param name="itemId">The Id_nb of the item.</param>
+        public virtual void CheckGroupMobItemVisuals(string itemId)
+        {
+            if (string.IsNullOrEmpty(itemId)) return;
+
+            bool needsUpdate = false;
+            foreach (GameNPC npc in GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                if (npc.MobGroups == null || npc.MobGroups.Count == 0) continue;
+
+                if (npc.MobGroups.Any(g => !string.IsNullOrEmpty(g.EquippedItem) &&
+                    g.EquippedItem.Split('|').Any(req => req.Equals(itemId, StringComparison.OrdinalIgnoreCase))))
+                {
+                    needsUpdate = true;
+                    break;
+                }
+            }
+
+            if (needsUpdate)
+            {
+                UpdateGroupMobVisuals();
+            }
+        }
+
+        /// <summary>
+        /// Analyzes if an applied or removed spell effect type is relevant to any nearby GroupMobs.
+        /// </summary>
+        /// <param name="effectType">The SpellType of the effect.</param>
+        public virtual void CheckGroupMobEffectVisuals(string effectType)
+        {
+            if (string.IsNullOrEmpty(effectType)) return;
+
+            bool needsUpdate = false;
+            foreach (GameNPC npc in GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                if (npc.MobGroups == null || npc.MobGroups.Count == 0) continue;
+
+                if (npc.MobGroups.Any(g => !string.IsNullOrEmpty(g.PlayerOnEffectType) &&
+                    g.PlayerOnEffectType.Split('|').Any(req => req.Equals(effectType, StringComparison.OrdinalIgnoreCase))))
+                {
+                    needsUpdate = true;
+                    break;
+                }
+            }
+
+            if (needsUpdate)
+            {
+                UpdateGroupMobVisuals();
+            }
+        }
+
+        /// <summary>
+        /// Checks visible GroupMobs to see if their appearance needs to update based on 
+        /// the player's new equipment state.
+        /// </summary>
+        protected virtual void UpdateGroupMobVisuals()
+        {
+            foreach (GameNPC npc in GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                if (npc.MobGroups == null || npc.MobGroups.Count == 0)
+                    continue;
+
+                bool isDependentOnEquipmentOrEffect = npc.MobGroups.Any(g =>
+                    !string.IsNullOrEmpty(g.EquippedItem) || !string.IsNullOrEmpty(g.PlayerOnEffectType));
+
+                if (isDependentOnEquipmentOrEffect)
+                {
+                    Out.SendObjectRemove(npc);
+                    Out.SendNPCCreate(npc);
+
+                    if (npc.Inventory != null)
+                        Out.SendLivingEquipmentUpdate(npc);
+
+                    foreach (var group in npc.MobGroups)
+                    {
+                        if (group.EquippedItemClientEffect > 0)
+                        {
+                            ushort effectId = group.EquippedItemClientEffect;
+                            GamePlayer player = this;
+                            GameNPC targetNpc = npc;
+
+                            new RegionTimer(targetNpc, t =>
+                            {
+                                if (player.ObjectState == GameObject.eObjectState.Active && targetNpc.ObjectState == GameObject.eObjectState.Active)
+                                {
+                                    player.Out.SendSpellEffectAnimation(targetNpc, targetNpc, effectId, 0, false, 1);
+                                }
+                                return 0;
+                            }).Start(250);
+                        }
+                    }
                 }
             }
         }

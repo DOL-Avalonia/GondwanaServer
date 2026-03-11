@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Întrerupere a liniei vizuale în
 SpellHandler.HitTarget:			Îl lovești pe {0} pentru {1}{2} daune!
 SpellHandler.NPCHitTarget:			{0}-ul tău îl lovește pe {1} pentru {2}{3} daune!
 SpellHandler.CriticalHit:			Acordezi o lovitură critică și provoci {0} daune suplimentare!
+SpellHandler.NoEffect:				Vraja ta nu afectează {0}.
+SpellHandler.NPCNoEffect:			Vraja lui {0} al tău nu afectează {1}.
 SpellHandler.TargetPronoun.Your:		Al tău
 SpellHandler.TargetPronoun.Targets:		Ținta
+SpellHandler.Absorbed:				({0}% absorbit)
 
 SpellHandler.MustBeStealthedBow:		Trebuie să fii camuflat și să folosești un arc pentru a utiliza această abilitate!
 SpellHandler.MustWieldBow:			Trebuie să folosești un arc pentru a utiliza această abilitate!

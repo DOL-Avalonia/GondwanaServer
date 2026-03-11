@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Interruption de la ligne de vue d
 SpellHandler.HitTarget:				Vous frappez {0} pour {1}{2} dommages !
 SpellHandler.NPCHitTarget:			Votre {0} frappe {1} pour {2}{3} dommages !
 SpellHandler.CriticalHit:			Vous infligez un coup critique pour {0} dommages supplémentaires !
+SpellHandler.NoEffect:				Votre sort n'affecte pas {0}.
+SpellHandler.NPCNoEffect:			Le sort de votre {0} n'affecte pas {1}.
 SpellHandler.TargetPronoun.Your:		Votre
 SpellHandler.TargetPronoun.Targets:		La cible
+SpellHandler.Absorbed:				({0}% absorbés)
 
 SpellHandler.MustBeStealthedBow:		Vous devez être en mode furtif et équipé d'un arc pour utiliser cette compétence !
 SpellHandler.MustWieldBow:			Vous devez être équipé d'un arc pour utiliser cette compétence !

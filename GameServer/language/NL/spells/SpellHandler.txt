@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Onderbreking van zichtlijn in Che
 SpellHandler.HitTarget:			Je raakt {0} voor {1}{2} schade!
 SpellHandler.NPCHitTarget:			Je {0} raakt {1} voor {2}{3} schade!
 SpellHandler.CriticalHit:			Je veroorzaakt een kritieke treffer en doet {0} extra schade!
+SpellHandler.NoEffect:				Jouw spreuk heeft geen effect op {0}.
+SpellHandler.NPCNoEffect:			De spreuk van jouw {0} heeft geen effect op {1}.
 SpellHandler.TargetPronoun.Your:		Je
 SpellHandler.TargetPronoun.Targets:		Het doel
+SpellHandler.Absorbed:				({0}% geabsorbeerd)
 
 SpellHandler.MustBeStealthedBow:		Je moet verborgen zijn en een boog dragen om deze vaardigheid te gebruiken!
 SpellHandler.MustWieldBow:			Je moet een boog dragen om deze vaardigheid te gebruiken!

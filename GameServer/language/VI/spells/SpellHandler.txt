@@ -75,8 +75,11 @@ SpellHandler.CheckLOSNPCToTarget.LoSInterrupt:	Gián đoạn đường ngắm tr
 SpellHandler.HitTarget:			Bạn đánh trúng {0} gây {1}{2} sát thương!
 SpellHandler.NPCHitTarget:			{0} của bạn đánh trúng {1} gây {2}{3} sát thương!
 SpellHandler.CriticalHit:			Bạn gây chí mạng và thêm {0} sát thương!
+SpellHandler.NoEffect:				Phép thuật của bạn không có tác dụng với {0}.
+SpellHandler.NPCNoEffect:			Phép thuật từ {0} của bạn không có tác dụng với {1}.
 SpellHandler.TargetPronoun.Your:		Của bạn
 SpellHandler.TargetPronoun.Targets:		Mục tiêu
+SpellHandler.Absorbed:				(Hấp thụ {0}%)
 
 SpellHandler.MustBeStealthedBow:		Bạn phải đang tàng hình và trang bị cung để dùng kỹ năng này!
 SpellHandler.MustWieldBow:			Bạn phải trang bị cung để dùng kỹ năng này!

@@ -27,14 +27,29 @@ namespace DOL.commands.gmcommands
           "Commands.GM.GroupMob.Usage.Status",
           "Commands.GM.GroupMob.Usage.Status.Origin",
           "Commands.GM.GroupMob.Usage.Status.Create",
+          "Commands.GM.GroupMob.Usage.Status.SpellABS",
+          "Commands.GM.GroupMob.Usage.Status.MeleeABS",
+          "Commands.GM.GroupMob.Usage.Status.DotABS",
+          "Commands.GM.GroupMob.Usage.Status.MaxHealth",
+          "Commands.GM.GroupMob.Usage.Status.Effectiveness",
+          "Commands.GM.GroupMob.Usage.Status.IsFriendly",
           "Commands.GM.GroupMob.Usage.Status.Quest",
           "Commands.GM.GroupMob.Usage.Status.Quest.Flag",
           "Commands.GM.GroupMob.Usage.Status.Quest.Model",
           "Commands.GM.GroupMob.Usage.Status.Quest.Size",
           "Commands.GM.GroupMob.Usage.Status.Quest.Aggro",
           "Commands.GM.GroupMob.Usage.Status.Quest.Range",
+          "Commands.GM.GroupMob.Usage.Status.Quest.SpellABS",
+          "Commands.GM.GroupMob.Usage.Status.Quest.MeleeABS",
+          "Commands.GM.GroupMob.Usage.Status.Quest.DotABS",
+          "Commands.GM.GroupMob.Usage.Status.Quest.MaxHealth",
+          "Commands.GM.GroupMob.Usage.Status.Quest.Effectiveness",
+          "Commands.GM.GroupMob.Usage.Status.Quest.Item",
+          "Commands.GM.GroupMob.Usage.Status.Quest.SpellEffect",
+          "Commands.GM.GroupMob.Usage.Status.Quest.ItemEffect",
           "Commands.GM.GroupMob.Usage.Status.Reset",
-          "Commands.GM.GroupMob.Usage.Assist")]
+          "Commands.GM.GroupMob.Usage.Assist",
+          "Commands.GM.GroupMob.Usage.Save")]
 
     public class GroupMob
           : AbstractCommandHandler, ICommandHandler
@@ -54,16 +69,16 @@ namespace DOL.commands.gmcommands
 
                     if (allRemoved)
                     {
-                        client.Out.SendMessage($"le groupe {groupId} a été supprimé et les mobs liés à celui-ci enlevés.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage($"le groupe {groupId} a été supprimé et les mobs liés à celui-ci enlevés.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                     }
                     else
                     {
-                        client.Out.SendMessage($"Impossible de supprimer le groupe {groupId}", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage($"Impossible de supprimer le groupe {groupId}", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                     }
                 }
                 else
                 {
-                    client.Out.SendMessage("La target doit etre un mob", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                    client.Out.SendMessage("La target doit etre un mob", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                     this.DisplaySyntax(client);
                 }
 
@@ -93,11 +108,11 @@ namespace DOL.commands.gmcommands
                         bool added = MobGroupManager.Instance.AddMobToGroup(target, groupId) != null;
                         if (added)
                         {
-                            client.Out.SendMessage($"le mob {target.Name} a été ajouté au groupe {groupId}", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                            client.Out.SendMessage($"le mob {target.Name} a été ajouté au groupe {groupId}", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                         }
                         else
                         {
-                            client.Out.SendMessage($"Impossible d'ajouter {target.Name} au groupe {groupId}", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                            client.Out.SendMessage($"Impossible d'ajouter {target.Name} au groupe {groupId}", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                         }
 
                     }
@@ -107,13 +122,13 @@ namespace DOL.commands.gmcommands
 
                         if (!MobGroupManager.Instance.Groups.ContainsKey(groupId))
                         {
-                            client.Out.SendMessage($"Le groupe {groupId} n'existe pas.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                            client.Out.SendMessage($"Le groupe {groupId} n'existe pas.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                             return;
                         }
 
                         if (string.IsNullOrEmpty(spawnerId))
                         {
-                            client.Out.SendMessage($"Le SpawnderId doit etre défini.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                            client.Out.SendMessage($"Le SpawnderId doit etre défini.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                             return;
                         }
                         var spawner = GameServer.Database.SelectObjects<SpawnerTemplate>(DB.Column("MobID").IsEqualTo(spawnerId)).FirstOrDefault();
@@ -150,11 +165,11 @@ namespace DOL.commands.gmcommands
                         if (!MobGroupManager.Instance.Groups.TryGetValue(spawnKey, out group))
                         {
                             group = MobGroupManager.Instance.AddMobToGroup(target, spawnKey, false);
-                            client.Out.SendMessage($"Le MobGroup du Spawner a été créé avec le GroupId {spawnKey}", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                            client.Out.SendMessage($"Le MobGroup du Spawner a été créé avec le GroupId {spawnKey}", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                         }
 
                         //Add to world will remove mobs from the world (see spawner class)
-                        group.NPCs.ForEach(n =>
+                        group!.NPCs.ForEach(n =>
                         {
                             if (n.InternalID.Equals(spawner.MobID))
                             {
@@ -166,7 +181,7 @@ namespace DOL.commands.gmcommands
                                     n.LoadFromDatabase(mob);
                                     n.AddToWorld();
                                 }
-                                client.Out.SendMessage($"Le SpawnerTemplate {spawner.MobID} a été correctement sauvegardé", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                                client.Out.SendMessage($"Le SpawnerTemplate {spawner.MobID} a été correctement sauvegardé", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                             }
                         });
                     }
@@ -176,14 +191,14 @@ namespace DOL.commands.gmcommands
 
                 case "remove":
 
-                    bool removed = MobGroups.MobGroupManager.Instance.RemoveMobFromGroup(target, groupId);
+                    bool removed = MobGroupManager.Instance.RemoveMobFromGroup(target, groupId);
                     if (removed)
                     {
-                        client.Out.SendMessage($"le mob {target.Name} a été supprimé du groupe {groupId}", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage($"le mob {target!.Name} a été supprimé du groupe {groupId}", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                     }
                     else
                     {
-                        client.Out.SendMessage($"Impossible de supprimer {target.Name} du groupe {groupId}", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage($"Impossible de supprimer {target!.Name} du groupe {groupId}", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                     }
                     break;
 
@@ -192,7 +207,7 @@ namespace DOL.commands.gmcommands
 
                     if (!MobGroupManager.Instance.Groups.ContainsKey(groupId))
                     {
-                        client.Out.SendMessage($"Le groupe {groupId} n'existe pas.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage($"Le groupe {groupId} n'existe pas.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                         return;
                     }
 
@@ -230,13 +245,13 @@ namespace DOL.commands.gmcommands
 
                             if (status == null)
                             {
-                                client.Out.SendMessage("Le GroupStatusId: " + groupStatusId + " n'existe pas.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                                client.Out.SendMessage("Le GroupStatusId: " + groupStatusId + " n'existe pas.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                                 return;
                             }
 
                             MobGroupManager.Instance.Groups[groupId].SetGroupInfo(status, isOriginalStatus: true);
                             MobGroupManager.Instance.Groups[groupId].SaveToDabatase();
-                            client.Out.SendMessage("Le GroupStatus: " + groupStatusId + " a été attribué au MobGroup " + groupId, GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                            client.Out.SendMessage("Le GroupStatus: " + groupStatusId + " a été attribué au MobGroup " + groupId, eChatType.CT_System, eChatLoc.CL_ChatWindow);
                             return;
                         }
                         else
@@ -248,7 +263,7 @@ namespace DOL.commands.gmcommands
 
                             if (!MobGroupManager.Instance.Groups.ContainsKey(slaveGroupId))
                             {
-                                client.Out.SendMessage("Le SlaveGroupId : " + slaveGroupId + " n'existe pas.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                                client.Out.SendMessage("Le SlaveGroupId : " + slaveGroupId + " n'existe pas.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                                 return;
                             }
 
@@ -256,7 +271,7 @@ namespace DOL.commands.gmcommands
 
                             if (groupInteract == null)
                             {
-                                client.Out.SendMessage("Le GroupStatusId: " + groupStatusId + " n'existe pas.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                                client.Out.SendMessage("Le GroupStatusId: " + groupStatusId + " n'existe pas.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                                 return;
                             }
 
@@ -302,7 +317,7 @@ namespace DOL.commands.gmcommands
                             GameServer.Database.AddObject(groupStatus);
                         }
 
-                        client.Out.SendMessage("Le GroupStatus a été créé avec le GroupStatusId: " + groupStatus.GroupStatusId, GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage("Le GroupStatus a été créé avec le GroupStatusId: " + groupStatus.GroupStatusId, eChatType.CT_System, eChatLoc.CL_ChatWindow);
                         return;
                     }
                     else if (args[2].ToLowerInvariant() == "reset")
@@ -322,41 +337,132 @@ namespace DOL.commands.gmcommands
 
                         MobGroupManager.Instance.Groups[groupId].ClearGroupInfosAndInterractions();
                         string slave = MobGroupManager.Instance.Groups[groupId].SlaveGroupId != null ? string.Format(" ainsi que son Group Slave: {0}", MobGroupManager.Instance.Groups[groupId].SlaveGroupId) : ".";
-                        client.Out.SendMessage(string.Format("Le Group: {0} a été reset{1}", groupId, slave), GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                        client.Out.SendMessage(string.Format("Le Group: {0} a été reset{1}", groupId, slave), eChatType.CT_System, eChatLoc.CL_ChatWindow);
                         return;
                     }
 
+                    if (args.Length >= 4)
+                    {
+                        if (!this.isGroupIdAvailable(groupId, client)) return;
+
+                        if (int.TryParse(args[3], out int value))
+                        {
+                            string property = args[3].ToLowerInvariant();
+                            string valStr = args[4];
+
+                            switch (property)
+                            {
+                                case "spellabs":
+                                    MobGroupManager.Instance.Groups[groupId].GroupInfos.SpellABS = value;
+                                    client.Out.SendMessage($"Group {groupId} Status SpellABS set to {value}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    break;
+                                case "meleeabs":
+                                    MobGroupManager.Instance.Groups[groupId].GroupInfos.MeleeABS = value;
+                                    client.Out.SendMessage($"Group {groupId} Status MeleeABS set to {value}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    break;
+                                case "dotabs":
+                                    MobGroupManager.Instance.Groups[groupId].GroupInfos.DotABS = value;
+                                    client.Out.SendMessage($"Group {groupId} Status DotABS set to {value}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    break;
+                                case "maxhealth":
+                                    MobGroupManager.Instance.Groups[groupId].GroupInfos.MaxHealth = value;
+                                    client.Out.SendMessage($"Group {groupId} Status MaxHealth modifier set to {value}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    break;
+                                case "effectiveness":
+                                    MobGroupManager.Instance.Groups[groupId].GroupInfos.Effectiveness = value;
+                                    client.Out.SendMessage($"Group {groupId} Status Effectiveness modifier set to {value}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    break;
+                                case "isfriendly":
+                                    if (bool.TryParse(valStr, out bool isFriendly))
+                                    {
+                                        MobGroupManager.Instance.Groups[groupId].IsQuestConditionFriendly = isFriendly;
+                                        client.Out.SendMessage($"Group {groupId} IsQuestConditionFriendly set to {isFriendly}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                            MobGroupManager.Instance.Groups[groupId].ApplyGroupInfos();
+                            MobGroupManager.Instance.Groups[groupId].SaveToDabatase();
+                        }
+                    }
                     break;
 
                 case "quest":
                     if (args.Length == 5)
                     {
+                        string action = args[2].ToLowerInvariant();
                         groupId = args[3];
+                        string paramValue = args[4];
+
                         if (!this.isGroupIdAvailable(groupId, client))
                         {
                             break;
                         }
-                        if (!ushort.TryParse(args[4], out ushort id))
+
+                        ushort id = 0;
+                        int val = 0;
+                        bool isNumber = ushort.TryParse(paramValue, out id) && int.TryParse(paramValue, out val);
+
+                        switch (action)
                         {
-                            DisplayMessage(client, "id non correct");
-                            break;
-                        }
-                        switch (args[2].ToLowerInvariant())
-                        {
+                            case "item":
+                                MobGroupManager.Instance.Groups[groupId].EquippedItem = paramValue;
+                                client.Out.SendMessage($"Group {groupId} condition item(s) set to: {paramValue}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            case "spelleffect":
+                                MobGroupManager.Instance.Groups[groupId].PlayerOnEffectType = paramValue;
+                                client.Out.SendMessage($"Group {groupId} condition effect(s) set to: {paramValue}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
                             case "flag":
-                                MobGroupManager.Instance.Groups[groupId].CompletedQuestNPCFlags = id.ToString();
+                                MobGroupManager.Instance.Groups[groupId].CompletedQuestNPCFlags = paramValue;
+                                client.Out.SendMessage($"Group {groupId} condition flag set to: {paramValue}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 break;
                             case "model":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
                                 MobGroupManager.Instance.Groups[groupId].CompletedQuestNPCModel = id;
                                 break;
                             case "size":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
                                 MobGroupManager.Instance.Groups[groupId].CompletedQuestNPCSize = id;
                                 break;
                             case "aggro":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
                                 MobGroupManager.Instance.Groups[groupId].CompletedQuestAggro = id;
                                 break;
                             case "range":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
                                 MobGroupManager.Instance.Groups[groupId].CompletedQuestRange = id;
+                                break;
+                            case "itemeffect":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
+                                MobGroupManager.Instance.Groups[groupId].EquippedItemClientEffect = id;
+                                client.Out.SendMessage($"Client Effect when item equipped set to {id}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            case "spellabs":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
+                                MobGroupManager.Instance.Groups[groupId].CompletedQuestSpellABS = val;
+                                client.Out.SendMessage($"Set SpellABS reduction to {val}% for Quest on Group {groupId}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            case "meleeabs":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
+                                MobGroupManager.Instance.Groups[groupId].CompletedQuestMeleeABS = val;
+                                client.Out.SendMessage($"Set MeleeABS reduction to {val}% for Quest on Group {groupId}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            case "dotabs":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
+                                MobGroupManager.Instance.Groups[groupId].CompletedQuestDotABS = val;
+                                client.Out.SendMessage($"Set DotABS reduction to {val}% for Quest on Group {groupId}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            case "maxhealth":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
+                                MobGroupManager.Instance.Groups[groupId].CompletedQuestMaxHealth = val;
+                                client.Out.SendMessage($"Set MaxHealth reduction target to {val}% for Quest on Group {groupId}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                break;
+                            case "effectiveness":
+                                if (!isNumber) { DisplayMessage(client, "Value must be a number"); break; }
+                                MobGroupManager.Instance.Groups[groupId].CompletedQuestEffectiveness = val;
+                                client.Out.SendMessage($"Set Effectiveness reduction target to {val}% for Quest on Group {groupId}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 break;
 
                             default:
@@ -453,8 +559,14 @@ namespace DOL.commands.gmcommands
                         }
                     }
                     break;
-                    
-                
+
+                case "save":
+                    if (!this.isGroupIdAvailable(groupId, client)) return;
+
+                    MobGroupManager.Instance.Groups[groupId].SaveToDabatase();
+                    client.Out.SendMessage($"GroupMob '{groupId}' has been manually saved to the database.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    break;
+
                 default:
                     DisplaySyntax(client);
                     break;
@@ -465,7 +577,7 @@ namespace DOL.commands.gmcommands
         {
             if (!MobGroupManager.Instance.Groups.ContainsKey(groupId))
             {
-                client.Out.SendMessage("Le GroupId: " + groupId + " n'existe pas.", GS.PacketHandler.eChatType.CT_System, GS.PacketHandler.eChatLoc.CL_ChatWindow);
+                client.Out.SendMessage("Le GroupId: " + groupId + " n'existe pas.", eChatType.CT_System, eChatLoc.CL_ChatWindow);
                 return false;
             }
 

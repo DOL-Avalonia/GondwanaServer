@@ -182,7 +182,22 @@ namespace DOL.GS.RealmAbilities
                 if (mez != null)
                     mez.Cancel(false);
 
-                mob.TakeDamage(caster, eDamageType.Spirit, dmgValue, 0);
+                AttackData ad = new AttackData();
+                ad.Attacker = caster;
+                ad.Target = mob;
+                ad.Damage = dmgValue;
+                ad.CriticalDamage = 0;
+                ad.DamageType = eDamageType.Spirit;
+                ad.AttackType = AttackData.eAttackType.Spell;
+                ad.AttackResult = GameLiving.eAttackResult.HitUnstyled;
+
+                int originalDmg = ad.Damage;
+                mob.TakeDamage(ad);
+
+                int afterDmg = ad.Damage + ad.CriticalDamage;
+                int totalAbsorbed = originalDmg - afterDmg;
+                int absPercent = originalDmg > 0 ? (int)Math.Round((double)totalAbsorbed / originalDmg * 100) : 0;
+                string absMsg = absPercent > 0 ? LanguageMgr.GetTranslation(caster.Client, "SpellHandler.Absorbed", absPercent) : "";
 
                 if (mob.EffectList.GetOfType<ChargeEffect>() == null && mob.EffectList.GetOfType<SpeedOfSoundEffect>() == null)
                 {
@@ -192,7 +207,10 @@ namespace DOL.GS.RealmAbilities
                     SendUpdates(mob);
                 }
 
-                caster.Out.SendMessage(LanguageMgr.GetTranslation(caster.Client, "SpellHandler.IchorOfTheDeep.HitMob", mob.Name, dmgValue), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                string hitMsg = LanguageMgr.GetTranslation(caster.Client, "SpellHandler.IchorOfTheDeep.HitMob", mob.Name, afterDmg);
+                if (!string.IsNullOrEmpty(absMsg)) hitMsg = hitMsg.TrimEnd('!', '.') + "." + absMsg;
+
+                caster.Out.SendMessage(hitMsg, eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
                 foreach (GamePlayer player2 in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
