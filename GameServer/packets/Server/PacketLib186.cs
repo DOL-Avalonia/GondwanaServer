@@ -30,7 +30,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.86 clients
@@ -101,6 +101,17 @@ namespace DOL.GS.PacketHandler
 
                 pak.WriteByte(targetHealthPercent);
                 pak.WriteByte(0);//unk
+                SendTCP(pak);
+            }
+        }
+
+        public override void SendMinotaurRelicRealm(byte id, byte realm)
+        {
+            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MinotaurRelicRealm)))
+            {
+                pak.WriteByte(id);
+                pak.WriteByte(realm);
+                pak.WriteShort(0);
                 SendTCP(pak);
             }
         }

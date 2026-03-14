@@ -1,52 +1,112 @@
 
-PvPManager.PvPNotOpen:				Le PvP n'est pas ouvert pour le moment !
-PvPManager.GroupSessionRequired:	Vous devez faire partie d'un groupe pour accéder à cette session PvP !
-PvPManager.NoGroup:					Vous n'avez pas de groupe !
-PvPManager.GroupTooLarge:			Votre groupe est plus grand que permis : {0}
-PvPManager.CannotCreatePvPGuild:	Impossible de créer une guilde PvP !
-PvPManager.PvPTreasureRemoved:		Tous vos objets de Trésor PvP ({0}) ont été retirés de votre inventaire puisque vous avez quitté le PvP !
-PvPManager.LeftPvP:					Vous avez quitté la session PvP !
-PvPManager.CannotFindSpawn:			Impossible de trouver un lieu d'apparition !
-PvPManager.JoinedPvP:				Vous avez rejoint la session PvP : {0}
-PvPManager.GroupJoinedPvP:			Votre groupe entier a rejoint la session PvP : {0}
-PvPManager.AlreadyInSoloQueue:		Vous êtes déjà dans la file d'attente solo !
-PvPManager.JoinedSoloQueue:			Vous avez rejoint la file d'attente solo pour la prochaine session de groupe.
-PvPManager.CouldNotCreatePvPGuild:	Impossible de créer une guilde PvP...
-PvPManager.LeftGroupQueue:			Vous avez quitté la file d'attente de groupe PvP.
-PvPManager.BroughtToSafety:			Vous avez réussi à mettre {0} en sécurité ! (+{1} pts)
-PvPManager.NoSpawn:                 Impossible de rejoindre le PvP : aucun spawn disponible.
-PvPManager.MaxGroup:                Votre groupe a déjà le nombre maximal de joueurs pour cette session PvP.
-PvPManager.GroupTooBig:             Cette session PvP n'authorise jusqu'à {0} joueurs.
+PvPManager.PvPNotOpen:						Le PvP n'est pas ouvert pour le moment !
+PvPManager.GroupSessionRequired:			Vous devez faire partie d'un groupe pour accéder à cette session PvP !
+PvPManager.NoGroup:							Vous n'avez pas de groupe !
+PvPManager.GroupTooLarge:					Votre groupe est plus grand que permis : {0}
+PvPManager.CannotCreatePvPGuild:			Impossible de créer une guilde PvP !
+PvPManager.PvPTreasureRemoved:				Tous vos objets de Trésor PvP ({0}) ont été retirés de votre inventaire puisque vous avez quitté le PvP !
+PvPManager.LeftPvP:							Vous avez quitté la session PvP !
+PvPManager.CannotFindSpawn:					Impossible de trouver un lieu d'apparition !
+PvPManager.JoinedPvP:						Vous avez rejoint la session PvP : {0}
+PvPManager.GroupJoinedPvP:					Votre groupe entier a rejoint la session PvP : {0}
+PvPManager.AlreadyInSoloQueue:				Vous êtes déjà dans la file d'attente solo !
+PvPManager.JoinedSoloQueue:					Vous avez rejoint la file d'attente solo pour la prochaine session de groupe.
+PvPManager.CouldNotCreatePvPGuild:			Impossible de créer une guilde PvP...
+PvPManager.LeftGroupQueue:					Vous avez quitté la file d'attente de groupe PvP.
+PvPManager.BroughtToSafety:					Vous avez réussi à mettre {0} en sécurité ! (+{1} pts)
+PvPManager.NoSpawn:							Impossible de rejoindre le PvP : aucun spawn disponible.
+PvPManager.MaxGroup:						Votre groupe a déjà le nombre maximal de joueurs pour cette session PvP.
+PvPManager.GroupTooBig:						Cette session PvP autorise un maximum de {0} joueurs en groupe.
+PvPManager.KickedFromPvP:					Vous avez été expulsé du groupe PvP.
+PvPManager.WelcomeBack:						Bon retour ! Votre progression PvP a été préservée.
 
-PvPManager.Score.Points:                            {0} points
-PvPManager.Score.Pts:                               {0} pts
+PvPManager.BossHunt.ScoredPoints:			Vous avez marqué {0} points sur {1} !
+PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} a terrassé {2} pour {3} points !
+PvPManager.Solo:							(Solo)
+PvPManager.Group:							(Groupe)
 
-PvP.Score.PvPSoloKills:                             Kills solo
-PvP.Score.PvPGrpKills:                              Kills en groupe
-PvP.Score.FlagPvPSoloKills:                         Kills solo
-PvP.Score.FlagPvPGrpKills:                          Kills en groupe
-PvP.Score.FlagPvPFlagCarrierKillBonus:              Kills de porteur de drapeau
-PvP.Score.FlagPvPFlagsCaptured:                     Captures de drapeau
-PvP.Score.FlagPvPOwnership:                         Porte de drapeau
-PvP.Score.TreasurePvPSoloKills:                     Kills solo
-PvP.Score.TreasurePvPGrpKills:                      Kills en groupe
-PvP.Score.TreasurePvPTreasurePoints:                Trésors trouvés
-PvP.Score.TreasurePvPStolenItemPenalty:             Objets volés
-PvP.Score.FriendsPvPSoloKills:                      Kills solo
-PvP.Score.FriendsPvPGrpKills:                       Kills en groupe
-PvP.Score.FriendsPvPBroughtFriends:                 Amis rapatriés
-PvP.Score.FriendsPvPFamilyBonus:                    Famille rapatriée
-PvP.Score.FriendsPvPLostFriends:                    Amis perdus
-PvP.Score.FriendsPvPKilledOthersFriends:            Amis d'enemis tués
-PvP.Score.CTTPvPSoloKills:                          Kills solo
-PvP.Score.CTTPvPGrpKills:                           Kills en groupe
-PvP.Score.CTTPvPTerritoryCaptures:                  Captures de territoire
-PvP.Score.CTTPvPOwnership:                          Règnes sur territoires
-PvP.Score.BossPvPSoloBossKills:                     Kills de boss en solo
-PvP.Score.BossPvPGroupBossKills:                    Kills de boss en groupe
-PvP.Score.BossPvPBossHits:                          Participations sur boss
-PvP.Score.BossPvPBossKills:                         Boss tués
-PvP.Score.Total:                                    Total
+PvPManager.CoreRun.Begins:					La Course au Coeur commence ! FEU VERT - PARTEZ !
+PvPManager.CoreRun.CastMovement:			Lancer des sorts non-instantanés implique du mouvement !
+PvPManager.CoreRun.AttackMovement:			Mouvement d'attaque détecté !
+PvPManager.CoreRun.RedLight:				FEU ROUGE ! NE BOUGEZ PLUS !
+PvPManager.CoreRun.GreenLight:				FEU VERT ! PARTEZ !
+PvPManager.CoreRun.RedLightViolation:		Violation du Feu Rouge détectée !
+PvPManager.CoreRun.ReachedCore:				Vous avez atteint le Coeur ! Trouvons la Batterie du Coeur !
+PvPManager.CoreRun.EnteredRedLight:			Vous êtes entré pendant le Feu Rouge !
+PvPManager.CoreRun.RunComplete:				Course Terminée ! Coeur livré.
+PvPManager.CoreRun.LeftWithoutCore:			Vous avez quitté la zone sans Coeur ! Retournez à l'intérieur !
+PvPManager.CoreRun.CoreDestabilizing:		Le Coeur d'Énergie se déstabilise ! Dépêchez-vous !
+
+PvPManager.Biohazard.NewSamples:			De nouveaux échantillons toxiques se sont matérialisés dans les Zones Radioactives !
+PvPManager.Biohazard.FleshRots:				Votre chair morte-vivante pourrit rapidement en dehors de la zone radioactive !
+PvPManager.Biohazard.SampleLeaks:			L'échantillon toxique s'infiltre dans vos veines...
+
+PvPManager.Rules.Title:						=== Règles de la session PvP ===
+PvPManager.Rules.Deathmatch:				Bienvenue dans l'Arène. Les règles sont simples : tuer ou être tué. Traquez vos ennemis pour gagner des points.
+PvPManager.Rules.CaptureTheFlag:			Capture de drapeau ! Une bannière sacrée s'est matérialisée dans la région. Localisez-la et sécurisez-la dans votre avant-poste. Intercepter et vaincre un porteur ennemi le forcera à lâcher le drapeau, saisissez-le avant qu'ils ne le récupèrent ! Une attaque audacieuse contre une base ennemie peut aussi libérer les bannières qu'ils détiennent. Restez vigilant : tout drapeau tombé au sol et laissé sans surveillance finira par se dissiper pour réapparaître à son point d'origine.
+PvPManager.Rules.TreasureHunt:				Chasse au Trésor ! Fouillez la zone à la recherche de trésors cachés et ramenez-les à votre avant-poste. Attention, les ennemis tenteront de voler votre butin durement gagné !
+PvPManager.Rules.BringAFriend:				Ramenez un ami ! Guidez vos compagnons perdus en toute sécurité jusqu'à votre avant-poste. Protégez-les des forces hostiles et éliminez les amis de vos ennemis pour entraver leur progression !
+PvPManager.Rules.TerritoryCapture:			Capture de Territoire ! Battez-vous pour le contrôle de territoires stratégiques. Commercez avec les seigneurs, revendiquez les terres pour votre faction et défendez-les pour dominer le champ de bataille.
+PvPManager.Rules.BossHunt:					Chasse au Boss ! Des monstruosités épiques ont envahi la zone. Vous devez frapper le boss pour gagner des points. Porter le coup de grâce accorde un énorme bonus. La coopération est vivement conseillée !
+PvPManager.Rules.KingOfTheHill:				Roi de la Colline ! Une colline a été désignée. Tenez votre position dans la zone marquée pour appliquer la pression. Surpassez l'ennemi pour capturer la colline et gagner des points continuellement !
+PvPManager.Rules.CoreRun:					Course au Coeur ! Naviguez dans la zone dangereuse et récupérez le Coeur d'Énergie au centre. Ne bougez qu'au Feu Vert ! Si vous bougez pendant un Feu Rouge, vous serez éliminé. Ramenez le Coeur en sécurité !
+PvPManager.Rules.Biohazard:					Danger Biologique ! Des échantillons toxiques sont apparus dans la zone. Collectez-les et ramenez-les au Chercheur. Attention aux radiations, et ne succombez pas à la peste, ou vous deviendrez un zombie décérébré !
+PvPManager.Rules.GroupRules:				=== Règles de Groupe ===
+PvPManager.Rules.SoloOnly:					Cette session est strictement Solo. Vous devez vous battre seul.
+PvPManager.Rules.GroupRequired:				Cette session requiert un Groupe. Restez unis avec vos alliés (Taille max du groupe : {0}).
+PvPManager.Rules.SoloOrGroup:				Vous pouvez vous battre en Solo ou former un Groupe (Taille max du groupe : {0}).
+PvPManager.Rules.GroupAllowed:				Le groupage (inviter/quitter) est autorisé dans cette session.
+PvPManager.Rules.GroupNotAllowed:			Le groupage (inviter/quitter) n'est pas autorisé dans cette session.
+PvPManager.Rules.BannerAllowed:				L'invocation d'une bannière de guilde/groupe est autorisée.
+PvPManager.Rules.BannerNotAllowed:			L'invocation d'une bannière de guilde/groupe n'est pas autorisée.
+PvPManager.Rules.ExtraCommands:				=== Commandes Supplémentaires ===
+PvPManager.Rules.RenameCommand:				Utilisez '/gc rename <nom>' si vous êtes le chef de groupe pour renommer votre groupe/guilde.
+PvPManager.Rules.TerritoriesCommand:		Utilisez '/gc territories' ou '/gc subterritories' pour voir les objectifs, les options de capture, les propriétaires et les timers.
+
+PvPManager.Journal.CTFName:					[PvP] Tuez le porteur du drapeau en mouvement !
+PvPManager.Journal.CTFDesc:					Le porteur du drapeau ennemi est à découvert. Traquez-le !
+PvPManager.Journal.KotHName:				[PvP] Prenez le contrôle de la Colline et défendez-la !
+PvPManager.Journal.KotHDesc:				Déplacez-vous vers le lieu indiqué et sécurisez la zone pour votre équipe !
+
+PvPManager.Score.Points:					{0} points
+PvPManager.Score.Pts:						{0} pts
+
+PvP.Score.PvPSoloKills:						Kills solo
+PvP.Score.PvPGrpKills:						Kills en groupe
+PvP.Score.FlagPvPSoloKills:					Kills solo
+PvP.Score.FlagPvPGrpKills:					Kills en groupe
+PvP.Score.FlagPvPFlagCarrierKillBonus:		Kills de porteur de drapeau
+PvP.Score.FlagPvPFlagsCaptured:				Captures de drapeau
+PvP.Score.FlagPvPOwnership:					Possession de drapeau
+PvP.Score.TreasurePvPSoloKills:				Kills solo
+PvP.Score.TreasurePvPGrpKills:				Kills en groupe
+PvP.Score.TreasurePvPTreasurePoints:		Trésors trouvés
+PvP.Score.TreasurePvPStolenItemPenalty:		Objets volés
+PvP.Score.FriendsPvPSoloKills:				Kills solo
+PvP.Score.FriendsPvPGrpKills:				Kills en groupe
+PvP.Score.FriendsPvPBroughtFriends:			Amis rapatriés
+PvP.Score.FriendsPvPFamilyBonus:			Famille rapatriée
+PvP.Score.FriendsPvPLostFriends:			Amis perdus
+PvP.Score.FriendsPvPKilledOthersFriends:	Amis d'enemis tués
+PvP.Score.CTTPvPSoloKills:					Kills solo
+PvP.Score.CTTPvPGrpKills:					Kills en groupe
+PvP.Score.CTTPvPTerritoryCaptures:			Captures de territoire
+PvP.Score.CTTPvPOwnership:					Règnes sur territoires
+PvP.Score.BossPvPSoloBossKills:				Kills de boss en solo
+PvP.Score.BossPvPGroupBossKills:			Kills de boss en groupe
+PvP.Score.BossPvPBossHits:					Participations sur boss
+PvP.Score.BossPvPBossKills:					Boss tués
+PvP.Score.KotHTimeHeld:						Temps tenu
+PvP.Score.KotHPressure:						Pression appliquée
+PvP.Score.KotHCaptures:						Collines capturées
+PvP.Score.CoreRunCores:						Coeurs livrés
+PvP.Score.CoreRunCenter:					Centre atteint
+PvP.Score.CoreRunEliminations:				Éliminations
+PvP.Score.BioSamples:						Échantillons rapportés
+PvP.Score.BioInfections:					Infections
+PvP.Score.BioZombieKills:					Zombies tués
+PvP.Score.BioZombieDeaths:					Morts en zombie
+PvP.Score.Total:							Total
 
 PvP.Score.PvPSoloKills.Short:                       SoloKills
 PvP.Score.PvPGrpKills.Short:                        GroupKills
@@ -73,4 +133,14 @@ PvP.Score.BossPvPSoloBossKills.Short:               SoloBossKills
 PvP.Score.BossPvPGroupBossKills.Short:              GroupBossKills
 PvP.Score.BossPvPBossHits.Short:                    Participation
 PvP.Score.BossPvPBossKills.Short:                   BossKills
+PvP.Score.KotHTimeHeld.Short:						Tenu
+PvP.Score.KotHPressure.Short:						Pression
+PvP.Score.KotHCaptures.Short:						Captures
+PvP.Score.CoreRunCores.Short:						Coeurs
+PvP.Score.CoreRunCenter.Short:						Centre
+PvP.Score.CoreRunEliminations.Short:				Élims
+PvP.Score.BioSamples.Short:							Échantillons
+PvP.Score.BioInfections.Short:						Infectés
+PvP.Score.BioZombieKills.Short:						KillsZombie
+PvP.Score.BioZombieDeaths.Short:					MortsZombie
 PvP.Score.Total.Short:                              Total

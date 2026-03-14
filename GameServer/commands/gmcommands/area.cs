@@ -44,6 +44,8 @@ namespace DOL.GS.Commands
         "Commands.GM.Area.Usage.SpellEvent",
         "Commands.GM.Area.Usage.StormLevel",
         "Commands.GM.Area.Usage.StormSize",
+        "Commands.GM.Area.Usage.StormFaction",
+        "Commands.GM.Area.Usage.StormImmuneNPC",
         "Commands.GM.Area.Usage.EventList",
         "Commands.GM.Area.Usage.IsRadioactive",
         "Commands.GM.Area.Usage.Remove")]
@@ -479,6 +481,50 @@ namespace DOL.GS.Commands
                             GameServer.Database.SaveObject(currentArea.DbArea);
                             client.Out.SendMessage($"Event Spell ID set to {spellID}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
+                        break;
+                    }
+
+                case "stormfaction":
+                    {
+                        if (args.Length < 4 || args[2].ToLower() != "set")
+                        {
+                            client.Out.SendMessage("Usage: /area stormfaction set <factionID>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                        var currentArea = client.Player.CurrentAreas.OfType<AbstractArea>().FirstOrDefault(a => a.DbArea != null);
+                        if (currentArea == null) return;
+
+                        if (int.TryParse(args[3], out int factionId))
+                        {
+                            currentArea.DbArea.StormFaction = factionId;
+                            GameServer.Database.SaveObject(currentArea.DbArea);
+                            client.Out.SendMessage($"Storm Faction set to {factionId}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        break;
+                    }
+
+                case "stormimmunenpc":
+                    {
+                        if (args.Length < 3)
+                        {
+                            client.Out.SendMessage("Usage: /area stormimmunenpc <true/false>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        var currentArea = client.Player.CurrentAreas.OfType<AbstractArea>().FirstOrDefault(a => a.DbArea != null);
+
+                        if (currentArea == null)
+                        {
+                            client.Out.SendMessage("You are not standing in a valid database area.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        string valStr = args[2].ToLower();
+                        bool enable = (valStr == "true" || valStr == "on" || valStr == "yes" || valStr == "1");
+
+                        currentArea.DbArea.NPCImmunToStorm = enable;
+                        GameServer.Database.SaveObject(currentArea.DbArea);
+                        client.Out.SendMessage($"Area '{currentArea.Description}' NPCImmunToStorm set to: {enable}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         break;
                     }
 

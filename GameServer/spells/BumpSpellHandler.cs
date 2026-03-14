@@ -23,7 +23,7 @@ namespace DOL.GS.Spells
     [SpellHandler("BumpSpell")]
     public class BumpSpellHandler : SpellHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public class BumpTrajectory
         {
@@ -613,14 +613,14 @@ namespace DOL.GS.Spells
         public override IList<GameLiving> SelectTargets(GameObject castTarget, bool force = false)
         {
             var targets = new List<GameLiving>();
-            if (Spell.Target == "enemy")
+            if (Spell.Target == "enemy" && Spell.Radius == 0)
             {
                 if (castTarget is GameLiving livingTarget && livingTarget.IsAlive && livingTarget != Caster)
                 {
                     targets.Add(livingTarget);
                 }
             }
-            else if (Spell.Target == "cone" || Spell.Target == "area")
+            else if (Spell.Target == "cone" || Spell.Target == "area" || (Spell.Target == "enemy" && Spell.Radius > 0))
             {
                 targets.AddRange(GetTargetsInArea());
             }

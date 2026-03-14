@@ -192,6 +192,16 @@ namespace AmteScripts.PvP
         [DefaultValue(0)]
         public int CoreRun_Eliminations { get; set; } // Times died to Red Light
 
+        // --- For session type #9: Biohazard ---
+        [DefaultValue(0)]
+        public int Biohazard_SamplesReturned { get; set; }
+        [DefaultValue(0)]
+        public int Biohazard_Infections { get; set; }
+        [DefaultValue(0)]
+        public int Biohazard_ZombieKill { get; set; }
+        [DefaultValue(0)]
+        public int Biohazard_ZombieDeath { get; set; }
+
         public virtual void TakeItems(PvPScore rhs, bool copy = false)
         {
             Treasure_BroughtTreasuresPoints += rhs.Treasure_BroughtTreasuresPoints;
@@ -254,6 +264,10 @@ namespace AmteScripts.PvP
             CoreRun_CoresDelivered += rhs.CoreRun_CoresDelivered;
             CoreRun_CenterReached += rhs.CoreRun_CenterReached;
             CoreRun_Eliminations += rhs.CoreRun_Eliminations;
+            Biohazard_SamplesReturned += rhs.Biohazard_SamplesReturned;
+            Biohazard_Infections += rhs.Biohazard_Infections;
+            Biohazard_ZombieKill += rhs.Biohazard_ZombieKill;
+            Biohazard_ZombieDeath += rhs.Biohazard_ZombieDeath;
             return this;
         }
 
@@ -304,8 +318,17 @@ namespace AmteScripts.PvP
                         KotH_PressurePoints;
 
                 case eSessionTypes.CoreRun: // Core Run
-                    return PvP_SoloKillsPoints + PvP_GroupKillsPoints + 
-                        (CoreRun_CoresDelivered * 20) + (CoreRun_CenterReached * 10) - (CoreRun_Eliminations * 3);
+                    return PvP_SoloKillsPoints + PvP_GroupKillsPoints +
+                        CoreRun_CoresDelivered + 
+                        (CoreRun_CenterReached * 12) -
+                        (CoreRun_Eliminations * 2);
+
+                case eSessionTypes.Biohazard: // Biohazard
+                    return PvP_SoloKillsPoints + PvP_GroupKillsPoints +
+                           Biohazard_SamplesReturned +
+                           (Biohazard_Infections * 2) +
+                           (Biohazard_ZombieKill * 3) -
+                           (Biohazard_ZombieDeath * 3);
 
                 default:
                     return 0;

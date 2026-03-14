@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DOL.GS.Spells;
+using AmteScripts.Managers;
 
 namespace DOL.GS
 {
@@ -456,6 +457,29 @@ namespace DOL.GS
         {
             if (DbArea == null || Region == null) return 0;
 
+            if (this.IsPvP)
+            {
+                var pvpMgr = PvpManager.Instance;
+
+                if (pvpMgr == null || !pvpMgr.IsOpen)
+                {
+                    return Math.Max(1000, DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 5000);
+                }
+
+                var sessionType = pvpMgr.CurrentSessionType;
+
+                if (sessionType != PvpManager.eSessionTypes.CoreRun &&
+                    sessionType != PvpManager.eSessionTypes.Biohazard)
+                {
+                    return Math.Max(1000, DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 5000);
+                }
+
+                if (this.IsRadioactive && sessionType != PvpManager.eSessionTypes.Biohazard)
+                {
+                    return Math.Max(1000, DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 5000);
+                }
+            }
+
             bool currentEventState = IsEventActive();
             if (currentEventState != m_lastEventState)
             {
@@ -488,6 +512,9 @@ namespace DOL.GS
                 Coordinate randomPoint = GetRandomPointInside();
                 if (randomPoint.Equals(Coordinate.Nowhere)) continue;
 
+                if (Region.GetZone(randomPoint) == null)
+                    continue;
+
                 GameNPC stormPoint = new GameNPC();
                 stormPoint.Model = 667;
                 stormPoint.Name = "Storm";
@@ -495,6 +522,15 @@ namespace DOL.GS
                 stormPoint.Position = Position.Create(Region.ID, randomPoint.X, randomPoint.Y, randomPoint.Z, 0);
                 stormPoint.Level = (byte)actualLevel;
                 stormPoint.Size = DbArea.StormSize > 0 ? DbArea.StormSize : (byte)50;
+                if (DbArea.StormFaction > 0)
+                {
+                    stormPoint.Faction = FactionMgr.GetFactionByID(DbArea.StormFaction);
+                }
+
+                if (DbArea.NPCImmunToStorm)
+                {
+                    stormPoint.TempProperties.setProperty("NPCImmunToStorm", true);
+                }
                 stormPoint.AddToWorld();
 
                 new RegionTimer(stormPoint, (t) =>

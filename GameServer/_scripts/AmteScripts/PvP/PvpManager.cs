@@ -35,6 +35,7 @@ using AmteScripts.PvP.KotH;
 using Zone = DOL.GS.Zone;
 using DOL.GS.Spells;
 using DOL.GameEvents;
+using AmteScripts.PvP.CoreRun;
 
 namespace AmteScripts.Managers
 {
@@ -53,6 +54,7 @@ namespace AmteScripts.Managers
             BossHunt = 6,
             KingOfTheHill = 7,
             CoreRun = 8,
+            Biohazard = 9,
         }
 
         // Time window, e.g. 14:00..22:00
@@ -63,7 +65,8 @@ namespace AmteScripts.Managers
         private static RegionTimer _timer;
         private RegionTimer _saveTimer;
         private DateTime _startedTime = DateTime.Now;
-        
+        private RegionTimer _ctfMapUpdateTimer;
+
         private static readonly int[] _randomEmblems = { 5061, 6645, 84471, 6272, 55302, 64792, 111402, 39859, 21509, 123019 };
 
         public ImmutableArray<int> DefaultEmblems => _randomEmblems.ToImmutableArray();
@@ -97,7 +100,11 @@ namespace AmteScripts.Managers
 
         private const int _defaultGuildRank = 9;
 
-        // King of the Hill Variables
+        // Boss Hunt Variables
+        private List<GameNPC> _activeBosses = new List<GameNPC>();
+        private RegionTimer _bossHuntMapTimer;
+
+        // King of the Hill Variables & Constants
         private KotHBanner _activeHill;
         private RegionTimer _kothGameLoop;
         private List<Spawn> _kothPotentialSpawns = new List<Spawn>();
@@ -105,19 +112,43 @@ namespace AmteScripts.Managers
         private const int KOTH_TICK_RATE = 8000;
         private long _kothNextMoveTick;
         private long _kothOwnershipStartTick;
-        private const int MAP_MARKER_ID = 9999;
+        private const int KOTH_MARKER_ID = 40;
 
-        // --- Core Run Variables ---
+        // Core Run Variables & Constants
         private RegionTimer _coreRunCycleTimer;
         private RegionTimer _coreRunMovementTimer;
+        private RegionTimer _coreRunDecayTimer;
         private GameNPC _coreRunAnchorNPC;
         private bool _isCoreRunRedLight = false;
-        private Area.Tore _coreRunToreArea;
+        private CoreRunTore _coreRunToreArea;
         private Area.Circle _coreRunCenterSafeZone;
-        private Dictionary<string, Coordinate> _coreRunPlayerSnapshots = new Dictionary<string, Coordinate>();
+        private struct CoreRunSnapshot
+        {
+            public Coordinate Coord;
+            public ushort Heading;
+        }
+
+        private Dictionary<string, CoreRunSnapshot> _coreRunPlayerSnapshots = new Dictionary<string, CoreRunSnapshot>();
+        private const string PROP_CORE_RUN_STATE = "CoreRunState";
         private const string EVENT_ID_REDLIGHT = "EVT_REDLIGHT";
         private const int CORE_RUN_MOVEMENT_TOLERANCE = 50;
+        private const int CORE_RUN_ROTATION_TOLERANCE = 300;
         private const int CORE_RUN_SAFE_RADIUS = 1200;
+        private const int MODEL_GREEN_LIGHT = 3496;
+        private const int MODEL_RED_LIGHT = 3498;
+        private const int SPELL_GREEN_LIGHT = 25318;
+        private const int SPELL_RED_LIGHT = 25317;
+        private const int CORE_RUN_EFFECT_AMOUNT = 200;
+        private const int CORE_RUN_EFFECT_FREQ = 500;
+        private const int CORE_RUN_STORM_LEVEL = 60;
+        private const int CORE_RUN_STORM_SIZE = 80;
+        private const int CORE_RUN_EFFECT_VARIANCE = 20;
+
+        // Biohazard Variables
+        private RegionTimer _biohazardTimer;
+        private int _biohazardTicks;
+        private List<GameNPC> _biohazardSpawns = new List<GameNPC>();
+        private List<BiohazardChest> _activeBiohazardChests = new List<BiohazardChest>();
 
         /// <summary>
         /// "Group" as it pertains to PvP sessions.
@@ -358,6 +389,7 @@ namespace AmteScripts.Managers
             }
             
             GameEventMgr.AddHandler(GamePlayerEvent.GameEntered, Instance.OnPlayerLogin);
+            GameEventMgr.AddHandler(GamePlayerEvent.RegionChanged, Instance.OnPlayerRegionChanged);
         }
 
         [ScriptUnloadedEvent]
@@ -367,6 +399,7 @@ namespace AmteScripts.Managers
             _timer?.Stop();
 
             GameEventMgr.RemoveHandler(GamePlayerEvent.GameEntered, Instance.OnPlayerLogin);
+            GameEventMgr.RemoveHandler(GamePlayerEvent.RegionChanged, Instance.OnPlayerRegionChanged);
         }
 
         private void OnPlayerLogin(DOLEvent e, object sender, EventArgs args)
@@ -498,6 +531,23 @@ namespace AmteScripts.Managers
             }
         }
 
+        private void OnPlayerRegionChanged(DOLEvent e, object sender, EventArgs args)
+        {
+            var player = sender as GamePlayer;
+            if (player != null && player.IsInPvP)
+            {
+                new RegionTimer(player, t =>
+                {
+                    if (CurrentSessionType == eSessionTypes.TerritoryCapture)
+                        UpdateAllTerritoryMarkers(player);
+
+                    SendPvPRules(player);
+
+                    return 0;
+                }).Start(2000);
+            }
+        }
+
         public void SaveScores()
         {
             if (IsOpen && !_saveTimer.IsAlive)
@@ -548,7 +598,7 @@ namespace AmteScripts.Managers
             var groupLeader = group.Leader;
             if (groupLeader is null)
             {
-                groupLeader.Out.SendMessage(LanguageMgr.GetTranslation(groupLeader.Client.Account.Language, "PvPManager.CannotCreatePvPGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                groupLeader!.Out.SendMessage(LanguageMgr.GetTranslation(groupLeader.Client.Account.Language, "PvPManager.CannotCreatePvPGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return null;
             }
             
@@ -891,7 +941,7 @@ namespace AmteScripts.Managers
 
                     if (player.Client.Account.PrivLevel < 2) // Unless this is a GM doing some work?
                     {
-                        player.Out.SendMessage("You have been kicked from the PvP group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.KickedFromPvP"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                     }
                 }
@@ -915,7 +965,7 @@ namespace AmteScripts.Managers
             {
                 if (!AllowsSolo && player.Guild  == null)
                 {
-                    player.Out.SendMessage("You have been kicked from the PvP group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.KickedFromPvP"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
 
@@ -939,11 +989,21 @@ namespace AmteScripts.Managers
             {
                 // Move player to safe place
                 RemoveItemsFromPlayer(player); // But remove any special items first
+                bool changingRegion = player.CurrentRegionID != spawn.Position.RegionID;
                 player.MoveTo(spawn.Position);
+
+                if (!changingRegion)
+                {
+                    ScheduleRulesPopup(player);
+                }
             }
-            
+            else
+            {
+                ScheduleRulesPopup(player);
+            }
+
             player.IsInPvP = true;
-            player.Out.SendMessage("Welcome back! Your PvP state has been preserved.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.WelcomeBack"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return true;
         }
 
@@ -1217,6 +1277,14 @@ namespace AmteScripts.Managers
                 // For Flag Capture sessions (SessionType == 2), create a flag pad at each PADSPAWN npc's position.
                 if (CurrentSessionType is eSessionTypes.CaptureTheFlag)
                 {
+                    var timerRegion = WorldMgr.GetRegion(1);
+                    if (timerRegion != null)
+                    {
+                        _ctfMapUpdateTimer = new RegionTimer(timerRegion.TimeManager);
+                        _ctfMapUpdateTimer.Callback = CTFMapUpdateCallback;
+                        _ctfMapUpdateTimer.Start(2000);
+                    }
+
                     foreach (var padSpawnNPC in padSpawnNpcsGlobal)
                     {
                         var basePad = new GameFlagBasePad
@@ -1257,6 +1325,26 @@ namespace AmteScripts.Managers
                     }
                 }
 
+                if (CurrentSessionType == eSessionTypes.BossHunt)
+                {
+                    _activeBosses.Clear();
+                    foreach (var zone in _zones)
+                    {
+                        var bosses = WorldMgr.GetNPCsFromRegion(zone.ZoneRegion.ID)
+                            .Where(n => n.CurrentZone == zone && n.IsBoss)
+                            .ToList();
+                        _activeBosses.AddRange(bosses);
+                    }
+
+                    var timerRegion = WorldMgr.GetRegion(1);
+                    if (timerRegion != null)
+                    {
+                        _bossHuntMapTimer = new RegionTimer(timerRegion.TimeManager);
+                        _bossHuntMapTimer.Callback = BossHuntMapUpdateCallback;
+                        _bossHuntMapTimer.Start(3000);
+                    }
+                }
+
                 if (CurrentSessionType == eSessionTypes.KingOfTheHill)
                 {
                     _kothPotentialSpawns.Clear();
@@ -1286,12 +1374,21 @@ namespace AmteScripts.Managers
                     RefillKotHRotation();
                     SpawnNextHill();
 
-                    // Fix: Create timer bound to the Hill object
                     if (_activeHill != null)
                     {
                         _kothGameLoop = new RegionTimer(_activeHill, KotHLoopCallback);
                         _kothGameLoop.Start(KOTH_TICK_RATE);
                     }
+                }
+
+                if (CurrentSessionType == eSessionTypes.CoreRun)
+                {
+                    StartCoreRun();
+                }
+
+                if (CurrentSessionType == eSessionTypes.Biohazard)
+                {
+                    StartBiohazard();
                 }
             }
             return true;
@@ -1353,6 +1450,8 @@ namespace AmteScripts.Managers
                 if (!_isOpen)
                     return false;
 
+                eSessionTypes closingSessionType = (eSessionTypes)(_activeSession?.SessionType ?? 0);
+
                 _isOpen = false;
                 _isForcedOpen = false;
 
@@ -1393,7 +1492,6 @@ namespace AmteScripts.Managers
                 }
                 _soloAreas.Clear();
 
-                // remove all group areas
                 foreach (var kv in _groupAreas)
                 {
                     var area = kv.Value;
@@ -1403,6 +1501,23 @@ namespace AmteScripts.Managers
                     }
                 }
                 _groupAreas.Clear();
+
+                if (CurrentSessionType == eSessionTypes.CaptureTheFlag)
+                {
+                    if (_ctfMapUpdateTimer != null)
+                    {
+                        _ctfMapUpdateTimer.Stop();
+                        _ctfMapUpdateTimer = null;
+                    }
+
+                    foreach (var client in WorldMgr.GetAllPlayingClients())
+                    {
+                        if (client.Player != null)
+                        {
+                            client.Player.Out.ClearMapObjective(40);
+                        }
+                    }
+                }
 
                 if (CurrentSessionType is eSessionTypes.BringAFriend)
                 {
@@ -1431,6 +1546,34 @@ namespace AmteScripts.Managers
                 if (CurrentSessionType is eSessionTypes.TerritoryCapture)
                 {
                     TerritoryManager.Instance.ReleaseSubTerritoriesInZones(CurrentZones);
+
+                    foreach (var client in WorldMgr.GetAllPlayingClients())
+                    {
+                        if (client.Player != null)
+                        {
+                            for (byte i = 1; i <= 20; i++)
+                                client.Player.Out.SendMinotaurRelicMapRemove(i);
+                        }
+                    }
+                }
+
+                if (_bossHuntMapTimer != null)
+                {
+                    _bossHuntMapTimer.Stop();
+                    _bossHuntMapTimer = null;
+                }
+                _activeBosses.Clear();
+
+                if (CurrentSessionType == eSessionTypes.BossHunt)
+                {
+                    foreach (var client in WorldMgr.GetAllPlayingClients())
+                    {
+                        if (client.Player != null)
+                        {
+                            for (byte i = 1; i < 50; i++)
+                                client.Player.Out.SendMinotaurRelicMapRemove(i);
+                        }
+                    }
                 }
 
                 if (_kothGameLoop != null)
@@ -1447,6 +1590,16 @@ namespace AmteScripts.Managers
                 if (CurrentSessionType == eSessionTypes.KingOfTheHill)
                 {
                     ClearKothMarker();
+                }
+
+                if (closingSessionType == eSessionTypes.CoreRun)
+                {
+                    StopCoreRun();
+                }
+
+                if (closingSessionType == eSessionTypes.Biohazard)
+                {
+                    StopBiohazard();
                 }
 
                 ResetScores();
@@ -1733,6 +1886,7 @@ namespace AmteScripts.Managers
                 case eSessionTypes.Deathmatch:
                 case eSessionTypes.KingOfTheHill:
                 case eSessionTypes.CoreRun:
+                case eSessionTypes.Biohazard:
                     points = isSolo ? 10 : 5;
                     if (rr5bonus) points = (int)(points * 1.30);
                     break;
@@ -2121,6 +2275,8 @@ namespace AmteScripts.Managers
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CannotFindSpawn"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
+
+            bool changingRegion = player.CurrentRegionID != spawnPos.Position.RegionID;
             _playerSpawns[player.InternalID] = spawnPos;
 
             // Store old info, remove guild
@@ -2133,7 +2289,7 @@ namespace AmteScripts.Managers
 
             if (CurrentSessionType == eSessionTypes.KingOfTheHill && _activeHill != null)
             {
-                player.Out.SendMapObjective(MAP_MARKER_ID, _activeHill.Position);
+                player.Out.SendMapObjective(KOTH_MARKER_ID, _activeHill.Position);
             }
 
             // if session says create area + randomlock => do it
@@ -2143,6 +2299,16 @@ namespace AmteScripts.Managers
             }
 
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.JoinedPvP", _activeSession.SessionID), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            if (!changingRegion)
+            {
+                ScheduleRulesPopup(player);
+            }
+
+            if (CurrentSessionType == eSessionTypes.TerritoryCapture)
+            {
+                UpdateAllTerritoryMarkers(player);
+            }
             return true;
         }
 
@@ -2170,7 +2336,7 @@ namespace AmteScripts.Managers
             {
                 foreach (var member in group.GetPlayersInTheGroup())
                 {
-                    member.Out.SendMapObjective(MAP_MARKER_ID, _activeHill.Position);
+                    member.Out.SendMapObjective(KOTH_MARKER_ID, _activeHill.Position);
                 }
             }
 
@@ -2206,13 +2372,20 @@ namespace AmteScripts.Managers
                     float sin = (float)Math.Sin(baseAngle + i * increment);
                     pos = spawnPos.Position.With(null, pos.X + (int)(Math.Round(cos * distance)), pos.Y + (int)(Math.Round(sin * distance)));
                 }
-                
+
+                bool changingRegion = member.CurrentRegionID != pos.RegionID;
+
                 if (!member.IsInPvP)
                     member.IsInPvP = true;
 
                 member.MoveTo(pos);
                 member.Bind(true);
                 member.SaveIntoDatabase();
+
+                if (!changingRegion)
+                {
+                    ScheduleRulesPopup(member);
+                }
                 ++i;
             }
 
@@ -2223,7 +2396,99 @@ namespace AmteScripts.Managers
             }
 
             leader.Out.SendMessage(LanguageMgr.GetTranslation(leader.Client.Account.Language, "PvPManager.GroupJoinedPvP", _activeSession.SessionID), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            if (CurrentSessionType == eSessionTypes.TerritoryCapture)
+            {
+                foreach (var member in group.GetPlayersInTheGroup())
+                {
+                    UpdateAllTerritoryMarkers(member);
+                }
+            }
             return true;
+        }
+
+        private void ScheduleRulesPopup(GamePlayer player, int delay = 2000)
+        {
+            if (player == null) return;
+            new RegionTimer(player, t =>
+            {
+                SendPvPRules(player);
+                return 0;
+            }).Start(delay);
+        }
+
+        /// <summary>
+        /// Sends a popup window to the player explaining the rules of the current PvP session.
+        /// </summary>
+        public void SendPvPRules(GamePlayer player)
+        {
+            if (!IsOpen || _activeSession == null) return;
+            string lang = player.Client.Account.Language;
+
+            string title = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.Title") + "\n\n";
+            string rules = "";
+
+            switch (CurrentSessionType)
+            {
+                case eSessionTypes.Deathmatch: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.Deathmatch"); break;
+                case eSessionTypes.CaptureTheFlag: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.CaptureTheFlag"); break;
+                case eSessionTypes.TreasureHunt: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.TreasureHunt"); break;
+                case eSessionTypes.BringAFriend: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.BringAFriend"); break;
+                case eSessionTypes.TerritoryCapture: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.TerritoryCapture"); break;
+                case eSessionTypes.BossHunt: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.BossHunt"); break;
+                case eSessionTypes.KingOfTheHill: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.KingOfTheHill"); break;
+                case eSessionTypes.CoreRun: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.CoreRun"); break;
+                case eSessionTypes.Biohazard: rules = LanguageMgr.GetTranslation(lang, "PvPManager.Rules.Biohazard"); break;
+                default: return;
+            }
+
+            string compoStr = "\n\n" + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.GroupRules") + "\n\n";
+            if (_activeSession.GroupCompoOption == 1)
+            {
+                compoStr += LanguageMgr.GetTranslation(lang, "PvPManager.Rules.SoloOnly");
+            }
+            else if (_activeSession.GroupCompoOption == 2)
+            {
+                compoStr += LanguageMgr.GetTranslation(lang, "PvPManager.Rules.GroupRequired", _activeSession.GroupMaxSize);
+            }
+            else // 3 = Both
+            {
+                compoStr += LanguageMgr.GetTranslation(lang, "PvPManager.Rules.SoloOrGroup", _activeSession.GroupMaxSize);
+            }
+
+            bool isGroupAllowed = _activeSession.GroupCompoOption != 1 && _activeSession.GroupMaxSize > 1;
+
+            if (isGroupAllowed)
+            {
+                if (_activeSession.AllowGroupDisbandCreate)
+                    compoStr += "\n- " + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.GroupAllowed");
+                else
+                    compoStr += "\n- " + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.GroupNotAllowed");
+
+                if (_activeSession.AllowSummonBanner)
+                    compoStr += "\n- " + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.BannerAllowed");
+                else
+                    compoStr += "\n- " + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.BannerNotAllowed");
+            }
+
+            string extraCommands = "";
+            bool isTerritoryCapture = CurrentSessionType == eSessionTypes.TerritoryCapture;
+
+            if (isGroupAllowed || isTerritoryCapture)
+            {
+                extraCommands += "\n\n" + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.ExtraCommands") + "\n\n";
+
+                if (isGroupAllowed)
+                {
+                    extraCommands += "- " + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.RenameCommand") + "\n";
+                }
+                if (isTerritoryCapture)
+                {
+                    extraCommands += "- " + LanguageMgr.GetTranslation(lang, "PvPManager.Rules.TerritoriesCommand") + "\n";
+                }
+            }
+
+            player.Out.SendMessage(title + rules + compoStr + extraCommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
         private bool _isUniqueSpawns(string spawnOption = null)
@@ -2632,6 +2897,7 @@ namespace AmteScripts.Managers
         #endregion
 
         #region CaptureTerritories Methods
+
         private int AwardTerritoryOwnershipPoints(RegionTimer timer)
         {
             // 1) Make sure session is open, type=5
@@ -2694,12 +2960,52 @@ namespace AmteScripts.Managers
             doAdd(EnsureTotalScore(player));
         }
 
+        public void UpdateAllTerritoryMarkers(GamePlayer specificPlayer = null)
+        {
+            if (!IsOpen || CurrentSessionType != eSessionTypes.TerritoryCapture) return;
+
+            var zoneIDs = CurrentZones.Select(z => z.ID).ToList();
+            var activeTerritories = TerritoryManager.Instance.Territories
+                .Where(t => t.Type == Territory.eType.Subterritory && t.Zone != null && zoneIDs.Contains(t.Zone.ID))
+                .ToList();
+
+            var clients = specificPlayer != null ? new[] { specificPlayer.Client } : WorldMgr.GetAllPlayingClients();
+
+            foreach (var client in clients)
+            {
+                var p = client?.Player;
+                if (p == null || !p.IsInPvP) continue;
+
+                byte markerId = 1;
+
+                foreach (var territory in activeTerritories)
+                {
+                    if (territory.Boss == null) continue;
+
+                    if (territory.IsNeutral())
+                    {
+                        p.Out.SendMinotaurRelicMapRemove(markerId);
+                    }
+                    else
+                    {
+                        // Friendly = 3 (Green/Hibernia), Enemy = 1 (Red/Albion)
+                        byte realmColor = territory.IsOwnedBy(p) ? (byte)3 : (byte)1;
+
+                        p.Out.SendMinotaurRelicMapUpdate(markerId, territory.Boss.Position);
+                        p.Out.SendMinotaurRelicRealm(markerId, realmColor);
+                    }
+                    markerId++;
+                }
+            }
+        }
+
         private bool IsTerritoryInSessionZones(Territory territory, IEnumerable<ushort> zoneIDs)
         {
             if (territory.Zone == null)
                 return false;
             return zoneIDs.Contains(territory.Zone.ID);
         }
+
         #endregion
 
         #region BossHunt Methods
@@ -2707,7 +3013,6 @@ namespace AmteScripts.Managers
         {
             if (!IsOpen || player == null || boss == null) return;
 
-            // Accumulate damage key (PlayerID_BossID) to handle multiple bosses
             string key = $"{player.InternalID}_{boss.InternalID}";
 
             if (!_bossDamageAccumulator.ContainsKey(key))
@@ -2726,8 +3031,17 @@ namespace AmteScripts.Managers
                 bool isSolo = IsSolo(player);
                 double pointValue = pointsEarned;
 
-                // Scale by Boss Level (Higher level boss = points are worth more, or threshold is lower)
+                // Scale by Boss Level (Higher level boss = points are worth more)
                 if (boss.Level >= 55) pointValue *= 1.6;
+
+                // Scale exponentially by Boss Difficulty
+                if (boss.BossDifficulty > 0)
+                {
+                    double diff = boss.BossDifficulty;
+                    double diffMultiplier = 1.0 + (diff / 100.0) + Math.Pow(diff / 55.0, 2.0);
+                    pointValue *= diffMultiplier;
+                }
+
                 if (isSolo) pointValue *= 1.3;
 
                 int finalPoints = (int)Math.Max(1, Math.Round(pointValue));
@@ -2738,7 +3052,7 @@ namespace AmteScripts.Managers
                     score.Boss_BossHitsPoints += finalPoints;
                 }, isSolo);
 
-                player.Out.SendMessage($"You scored {finalPoints} points on {boss.Name}!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.BossHunt.ScoredPoints", finalPoints, boss.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -2759,11 +3073,14 @@ namespace AmteScripts.Managers
 
             int finalPoints = (int)Math.Round(points);
 
-            string msg = $"[PvP] {killer.Name} {(isSolo ? "(Solo)" : "(Group)")} slew the {boss.Name} for {finalPoints} points!";
             foreach (var client in WorldMgr.GetAllPlayingClients())
             {
                 if (client.Player != null && client.Player.IsInPvP)
+                {
+                    string modeStr = isSolo ? LanguageMgr.GetTranslation(client.Account.Language, "PvPManager.Solo") : LanguageMgr.GetTranslation(client.Account.Language, "PvPManager.Group");
+                    string msg = LanguageMgr.GetTranslation(client.Account.Language, "PvPManager.BossHunt.SlewBoss", killer.Name, modeStr, boss.Name, finalPoints);
                     client.Player.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
             }
 
             AwardScore(killer, (score) =>
@@ -2774,6 +3091,48 @@ namespace AmteScripts.Managers
 
             SaveScores();
         }
+
+        private int BossHuntMapUpdateCallback(RegionTimer timer)
+        {
+            if (!IsOpen || CurrentSessionType != eSessionTypes.BossHunt)
+                return 0;
+
+            _activeBosses.RemoveAll(b => b == null || !b.IsAlive || b.ObjectState != GameObject.eObjectState.Active);
+
+            var playingClients = WorldMgr.GetAllPlayingClients().Where(c => c.Player != null && c.Player.IsInPvP).ToList();
+
+            for (int i = 0; i < _activeBosses.Count; i++)
+            {
+                var boss = _activeBosses[i];
+                byte markerId = (byte)(1 + i);
+
+                bool isUnderAttack = boss.InCombat;
+                bool hasPlayersNearby = false;
+
+                if (!isUnderAttack)
+                {
+                    hasPlayersNearby = boss.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>().Any(p => p.IsInPvP);
+                }
+
+                bool showMarker = isUnderAttack || hasPlayersNearby;
+
+                foreach (var client in playingClients)
+                {
+                    if (showMarker)
+                    {
+                        client.Player.Out.SendMinotaurRelicMapUpdate(markerId, boss.Position);
+                        client.Player.Out.SendMinotaurRelicRealm(markerId, 1);
+                    }
+                    else
+                    {
+                        client.Player.Out.SendMinotaurRelicMapRemove(markerId);
+                    }
+                }
+            }
+
+            return 3000;
+        }
+
         #endregion
 
         #region King of the Hill Methods
@@ -2837,6 +3196,7 @@ namespace AmteScripts.Managers
             }
 
             ProcessHillOwnership();
+            UpdateKothHillMarker();
             return KOTH_TICK_RATE;
         }
 
@@ -3046,6 +3406,7 @@ namespace AmteScripts.Managers
             _kothOwnershipStartTick = _activeHill.CurrentRegion.Time;
 
             AwardCapturePoints(faction, pointsToAward);
+            UpdateKothHillMarker();
 
             foreach (GamePlayer p in _activeHill.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>())
             {
@@ -3141,11 +3502,20 @@ namespace AmteScripts.Managers
         {
             if (_activeHill == null) return;
 
+            bool isClaimed = _activeHill.OwningGuild != null || _activeHill.OwningSolo != null;
+
             foreach (var client in WorldMgr.GetAllPlayingClients())
             {
                 if (client.Player != null && client.Player.IsInPvP)
                 {
-                    client.Player.Out.SendMapObjective(MAP_MARKER_ID, _activeHill.Position);
+                    if (isClaimed)
+                    {
+                        client.Player.Out.SendMapObjective(KOTH_MARKER_ID, _activeHill.Position);
+                    }
+                    else
+                    {
+                        client.Player.Out.ClearMapObjective(KOTH_MARKER_ID);
+                    }
                 }
             }
         }
@@ -3158,192 +3528,212 @@ namespace AmteScripts.Managers
             {
                 if (client.Player != null)
                 {
-                    client.Player.Out.SendMapObjective(MAP_MARKER_ID, nullPos);
+                    client.Player.Out.ClearMapObjective(KOTH_MARKER_ID);
                 }
             }
         }
         #endregion
 
-        #region Core Run (Squid Game) Logic
+        #region Core Run (Squid Game) Section
 
         private void StartCoreRun()
         {
-            log.Info("Starting Core Run Logic...");
+            log.Info("[CoreRun] Starting Scripted Session Logic...");
             _coreRunToreArea = null;
             _coreRunAnchorNPC = null;
 
-            if (_zones.Count == 0)
-            {
-                log.Error("Core Run: No zones in session!");
-                return;
-            }
+            if (_zones.Count == 0) return;
 
-            // 1. Find the Tore Area
             foreach (var zone in _zones)
             {
-                var region = WorldMgr.GetRegion(zone.ZoneRegion.ID);
-                if (region == null) continue;
-
-                // Look for the Generator NPC to act as our logic anchor (Timer Owner)
-                // We search for class type CoreGeneratorNPC or name "Core Generator"
-                foreach (var obj in region.Objects)
+                foreach (var npc in zone.GetNPCsOfZone(eRealm.None))
                 {
-                    if (obj is CoreGeneratorNPC gen)
+                    if (npc.Name.Equals("CoreRunEventController", StringComparison.OrdinalIgnoreCase))
                     {
-                        _coreRunAnchorNPC = gen;
+                        _coreRunAnchorNPC = npc;
                         break;
                     }
                 }
-
-                // Look for the Tore Area in this region
-                foreach (var kvp in region.Areas)
-                {
-                    if (kvp.Value is Area.Tore tore)
-                    {
-                        _coreRunToreArea = tore;
-                        break;
-                    }
-                }
-
-                if (_coreRunToreArea != null && _coreRunAnchorNPC != null) break;
-            }
-
-            if (_coreRunToreArea == null)
-            {
-                log.Error("Core Run: Could not find 'Tore' Area in session zones.");
-                return;
+                if (_coreRunAnchorNPC != null) break;
             }
 
             if (_coreRunAnchorNPC == null)
             {
-                // Fallback: If we can't find the generator, try to find ANY npc in the region to hold the timer
-                log.Warn("Core Run: Could not find CoreGeneratorNPC. Finding fallback anchor.");
-                var region = WorldMgr.GetRegion(_coreRunToreArea.Region.ID);
-                if (region != null && region.Objects.Length > 0)
-                {
-                    _coreRunAnchorNPC = region.Objects.OfType<GameNPC>().FirstOrDefault();
-                }
-            }
-
-            if (_coreRunAnchorNPC == null)
-            {
-                log.Error("Core Run: No NPC found to anchor the timers!");
+                log.Error("[CoreRun] CRITICAL: Could not find NPC 'CoreRunEventController'.");
                 return;
             }
 
-            // 2. Create the "Safe Center" Area programmatically
-            // This fills the hole of the torus so we get Enter events when players reach the goal.
-            _coreRunCenterSafeZone = new Area.Circle("Core Safe Zone", _coreRunToreArea.Coordinate, CORE_RUN_SAFE_RADIUS);
-            _coreRunToreArea.Region.AddArea(_coreRunCenterSafeZone);
-            log.Info($"Core Run: Created Safe Zone at {_coreRunCenterSafeZone.Coordinate} radius {CORE_RUN_SAFE_RADIUS}");
+            int innerRadius = _activeSession!.TempAreaRadius > 0 ? _activeSession.TempAreaRadius : 1200;
+            int outerRadius = innerRadius * 14;
 
-            // 3. Start the Cycle
+            _coreRunToreArea = new CoreRunTore(
+                "Core Run Danger Zone",
+                _coreRunAnchorNPC.Coordinate,
+                innerRadius,
+                outerRadius,
+                MODEL_GREEN_LIGHT,
+                MODEL_RED_LIGHT,
+                SPELL_GREEN_LIGHT,
+                SPELL_RED_LIGHT,
+                CORE_RUN_EFFECT_AMOUNT,
+                CORE_RUN_EFFECT_FREQ,
+                CORE_RUN_STORM_LEVEL,
+                CORE_RUN_STORM_SIZE,
+                CORE_RUN_EFFECT_VARIANCE,
+                _coreRunAnchorNPC.CurrentRegion
+            );
+            _coreRunAnchorNPC.CurrentRegion.AddArea(_coreRunToreArea);
+            _coreRunToreArea.StartEffectLoop();
+
+            DBArea safeDbInfo = new DBArea
+            {
+                Description = "Core Run Safe Zone",
+                X = _coreRunAnchorNPC.Coordinate.X,
+                Y = _coreRunAnchorNPC.Coordinate.Y,
+                Z = _coreRunAnchorNPC.Coordinate.Z,
+                Radius = innerRadius,
+                SafeArea = true,
+                IsPvP = false
+            };
+            _coreRunCenterSafeZone = new Area.Circle();
+            _coreRunCenterSafeZone.LoadFromDatabase(safeDbInfo);
+            _coreRunCenterSafeZone.Region = _coreRunAnchorNPC.CurrentRegion;
+            _coreRunAnchorNPC.CurrentRegion.AddArea(_coreRunCenterSafeZone);
+
             _isCoreRunRedLight = false;
-            BroadcastCoreRunMessage("The Core Run begins! GREEN LIGHT - GO!", eChatType.CT_ScreenCenter);
+            BroadcastCoreRunMessage("PvPManager.CoreRun.Begins", eChatType.CT_ScreenCenter);
+            _coreRunToreArea.UpdateVisuals(false);
 
-            // Timer runs on the anchor NPC
             _coreRunCycleTimer = new RegionTimer(_coreRunAnchorNPC, CoreRunCycleCallback);
             _coreRunCycleTimer.Start(10000);
+            _coreRunDecayTimer = new RegionTimer(_coreRunAnchorNPC, CoreRunDecayCallback);
+            _coreRunDecayTimer.Start(5200);
 
             GameEventMgr.AddHandler(AreaEvent.PlayerEnter, new DOLEventHandler(OnCoreRunAreaEnter));
+            GameEventMgr.AddHandler(GameLivingEvent.CastStarting, new DOLEventHandler(OnCoreRunPlayerCast));
+            GameEventMgr.AddHandler(GameLivingEvent.AttackStarted, new DOLEventHandler(OnCoreRunPlayerAttack));
         }
 
         private void StopCoreRun()
         {
             if (_coreRunCycleTimer != null) { _coreRunCycleTimer.Stop(); _coreRunCycleTimer = null; }
             if (_coreRunMovementTimer != null) { _coreRunMovementTimer.Stop(); _coreRunMovementTimer = null; }
+            if (_coreRunDecayTimer != null) { _coreRunDecayTimer.Stop(); _coreRunDecayTimer = null; }
 
-            if (_coreRunCenterSafeZone != null && _coreRunToreArea != null)
+            if (_coreRunToreArea != null)
             {
-                _coreRunToreArea.Region.RemoveArea(_coreRunCenterSafeZone);
+                _coreRunToreArea.StopEffectLoop();
+                _coreRunToreArea.ClearBoundary();
+                if (_coreRunToreArea.Region != null)
+                    _coreRunToreArea.Region.RemoveArea(_coreRunToreArea);
+                _coreRunToreArea = null;
+            }
+
+            if (_coreRunCenterSafeZone != null)
+            {
+                if (_coreRunCenterSafeZone.Region != null)
+                    _coreRunCenterSafeZone.Region.RemoveArea(_coreRunCenterSafeZone);
                 _coreRunCenterSafeZone = null;
             }
 
-            ToggleFakeRedLightEvent(false);
+            _coreRunAnchorNPC = null;
 
             GameEventMgr.RemoveHandler(AreaEvent.PlayerEnter, new DOLEventHandler(OnCoreRunAreaEnter));
+            GameEventMgr.AddHandler(AreaEvent.PlayerLeave, new DOLEventHandler(OnCoreRunAreaLeave));
+            GameEventMgr.RemoveHandler(GameLivingEvent.CastStarting, new DOLEventHandler(OnCoreRunPlayerCast));
+            GameEventMgr.RemoveHandler(GameLivingEvent.AttackStarted, new DOLEventHandler(OnCoreRunPlayerAttack));
+        }
+
+        private InventoryItem GetCoreItem(GamePlayer player)
+        {
+            for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+            {
+                InventoryItem item = player.Inventory.GetItem(slot);
+                if (item != null && item is PvPTreasure && item.Id_nb.IndexOf("core", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        private void OnCoreRunPlayerCast(DOLEvent e, object sender, EventArgs args)
+        {
+            if (!_isCoreRunRedLight || sender is not GamePlayer player) return;
+            if (!player.IsInPvP) return;
+
+            CastingEventArgs castArgs = args as CastingEventArgs;
+            if (castArgs == null || castArgs.SpellHandler == null) return;
+
+            if (_coreRunToreArea != null && _coreRunToreArea.IsContaining(player.Coordinate))
+            {
+                if (castArgs.SpellHandler.Spell.CastTime > 0 || !castArgs.SpellHandler.Spell.SpellType.Equals("Bump", StringComparison.OrdinalIgnoreCase))
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.CastMovement"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    castArgs.SpellHandler.InterruptCasting();
+                    CheckRedLightViolation(player);
+                }
+            }
+        }
+
+        private void OnCoreRunPlayerAttack(DOLEvent e, object sender, EventArgs args)
+        {
+            if (!_isCoreRunRedLight || sender is not GamePlayer player) return;
+            if (!player.IsInPvP) return;
+
+            if (_coreRunToreArea != null && _coreRunToreArea.IsContaining(player.Coordinate))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.AttackMovement"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                player.StopAttack();
+                CheckRedLightViolation(player);
+            }
         }
 
         private int CoreRunCycleCallback(RegionTimer timer)
         {
-            if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun) return 0;
+            if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun || _coreRunToreArea == null) return 0;
 
             _isCoreRunRedLight = !_isCoreRunRedLight;
+            _coreRunToreArea.UpdateVisuals(_isCoreRunRedLight);
 
             if (_isCoreRunRedLight)
             {
-                // === SWITCH TO RED LIGHT ===
-                BroadcastCoreRunMessage("RED LIGHT! FREEZE!", eChatType.CT_ScreenCenter);
-                BroadcastCoreRunMessage("PvP Disabled. Movement is fatal.", eChatType.CT_Important);
-
-                ToggleFakeRedLightEvent(true);
-                ApplyCoreRunImmunity(true);
+                // RED LIGHT
+                BroadcastCoreRunDangerMessage("PvPManager.CoreRun.RedLight", eChatType.CT_ScreenCenter);
                 SnapshotTorePlayers();
 
                 _coreRunMovementTimer = new RegionTimer(_coreRunAnchorNPC, CoreRunMovementCheckCallback);
-                _coreRunMovementTimer.Start(800);
+                _coreRunMovementTimer.Start(500);
 
-                return Util.Random(4000, 7000);
+                return Util.Random(4500, 8000);
             }
             else
             {
-                // === SWITCH TO GREEN LIGHT ===
-                BroadcastCoreRunMessage("GREEN LIGHT! GO!", eChatType.CT_ScreenCenter);
-                BroadcastCoreRunMessage("PvP Enabled.", eChatType.CT_System);
+                // GREEN LIGHT
+                BroadcastCoreRunDangerMessage("PvPManager.CoreRun.GreenLight", eChatType.CT_ScreenCenter);
+                BroadcastCoreRunDangerMessage("PvPManager.CoreRun.GreenLight", eChatType.CT_System);
 
-                ToggleFakeRedLightEvent(false);
-                ApplyCoreRunImmunity(false);
-
-                if (_coreRunMovementTimer != null) _coreRunMovementTimer.Stop();
+                if (_coreRunMovementTimer != null) { _coreRunMovementTimer.Stop(); _coreRunMovementTimer = null; }
 
                 return Util.Random(6000, 12000);
-            }
-        }
-
-        private void ToggleFakeRedLightEvent(bool active)
-        {
-            var ev = GameEventManager.Instance.GetEventByID(EVENT_ID_REDLIGHT);
-
-            if (ev == null)
-            {
-                log.Warn($"Core Run: Event {EVENT_ID_REDLIGHT} not found in EventManager!");
-                return;
-            }
-
-            if (active)
-            {
-                if (!ev.IsRunning) GameEventManager.Instance.StartEvent(ev);
-            }
-            else
-            {
-                if (ev.IsRunning) GameEventManager.Instance.StopEvent(ev, EndingConditionType.Timer, null);
-            }
-
-            if (_coreRunToreArea != null)
-            {
-                _coreRunToreArea.SpawnBoundary();
-
-                if (_coreRunAnchorNPC != null)
-                {
-                    new RegionTimer(_coreRunAnchorNPC, (t) => {
-                        _coreRunToreArea.SpawnBoundary();
-                        return 0;
-                    }).Start(500);
-                }
             }
         }
 
         private void SnapshotTorePlayers()
         {
             _coreRunPlayerSnapshots.Clear();
+            if (_coreRunToreArea == null) return;
+
             foreach (var client in WorldMgr.GetAllPlayingClients())
             {
                 GamePlayer p = client.Player;
                 if (p == null || !p.IsInPvP || !p.IsAlive) continue;
 
+                if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate)) continue;
+
                 if (_coreRunToreArea.IsContaining(p.Coordinate))
                 {
-                    _coreRunPlayerSnapshots[p.InternalID] = p.Coordinate;
+                    _coreRunPlayerSnapshots[p.InternalID] = new CoreRunSnapshot { Coord = p.Coordinate, Heading = p.Heading };
                 }
             }
         }
@@ -3352,7 +3742,7 @@ namespace AmteScripts.Managers
         {
             if (!IsOpen || !_isCoreRunRedLight) return 0;
 
-            List<GamePlayer> toEliminate = new List<GamePlayer>();
+            List<GamePlayer> violators = new List<GamePlayer>();
 
             foreach (var kvp in _coreRunPlayerSnapshots)
             {
@@ -3361,57 +3751,81 @@ namespace AmteScripts.Managers
 
                 if (p == null || !p.IsAlive || !p.IsInPvP) continue;
 
-                if (!_coreRunToreArea.IsContaining(p.Coordinate)) continue;
+                if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate)) continue;
 
-                if (p.Coordinate.DistanceTo(kvp.Value) > CORE_RUN_MOVEMENT_TOLERANCE)
+                if (_coreRunToreArea.IsContaining(p.Coordinate))
                 {
-                    toEliminate.Add(p);
+                    // 1. Check Distance (Movement)
+                    bool moved = p.Coordinate.DistanceTo(kvp.Value.Coord) > CORE_RUN_MOVEMENT_TOLERANCE;
+
+                    // 2. Check Rotation (Heading is 0-4095)
+                    int diff = Math.Abs(p.Heading - kvp.Value.Heading);
+                    if (diff > 2048) diff = 4096 - diff;
+
+                    bool turned = diff > CORE_RUN_ROTATION_TOLERANCE;
+
+                    if (moved || turned)
+                    {
+                        violators.Add(p);
+                    }
                 }
             }
 
-            foreach (var p in toEliminate)
+            foreach (var p in violators)
             {
-                p.Out.SendMessage("You moved during Red Light!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                p.Out.SendSpellEffectAnimation(p, p, 5002, 0, false, 1);
-
-                AwardScore(p, (s) => s.CoreRun_Eliminations++);
-
-                p.Health = 0;
-                p.Die(null);
+                CheckRedLightViolation(p);
+                _coreRunPlayerSnapshots.Remove(p.InternalID);
             }
 
-            return 0;
+            return 500;
         }
 
-        private void ApplyCoreRunImmunity(bool active)
+        private void CheckRedLightViolation(GamePlayer p)
         {
-            foreach (var client in WorldMgr.GetAllPlayingClients())
-            {
-                GamePlayer p = client.Player;
-                if (p == null || !p.IsInPvP) continue;
+            if (!p.IsAlive) return;
 
-                if (_coreRunToreArea != null && _coreRunToreArea.IsContaining(p.Coordinate))
-                {
-                    if (active)
-                    {
-                        p.TempProperties.setProperty("SQUID_IMMUNE", true);
-                        p.Out.SendMessage("Protective Field Active.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                    else
-                    {
-                        p.TempProperties.removeProperty("SQUID_IMMUNE");
-                        p.Out.SendMessage("Protective Field Fading...", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                }
-            }
+            p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.CoreRun.RedLightViolation"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            p.Out.SendSpellEffectAnimation(p, p, 7504, 0, false, 1);
+            p.Out.SendSpellEffectAnimation(p, p, 13108, 0, false, 1);
+
+            AwardScore(p, (s) => s.CoreRun_Eliminations++);
+
+            GameNPC executioner = new GameNPC();
+            executioner.Name = "Red Light";
+            executioner.Realm = eRealm.Albion;
+
+            p.Die(executioner);
         }
 
-        private void BroadcastCoreRunMessage(string msg, eChatType type)
+        private void BroadcastCoreRunMessage(string langKey, eChatType type)
         {
             foreach (var client in WorldMgr.GetAllPlayingClients())
             {
                 if (client.Player != null && client.Player.IsInPvP)
-                    client.Player.Out.SendMessage(msg, type, eChatLoc.CL_SystemWindow);
+                {
+                    string localizedMsg = LanguageMgr.GetTranslation(client.Account.Language, langKey);
+                    client.Player.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
+                }
+            }
+        }
+
+        private void BroadcastCoreRunDangerMessage(string langKey, eChatType type)
+        {
+            if (_coreRunToreArea == null) return;
+
+            foreach (var client in WorldMgr.GetAllPlayingClients())
+            {
+                GamePlayer p = client?.Player;
+                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+
+                if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate))
+                    continue;
+
+                if (_coreRunToreArea.IsContaining(p.Coordinate))
+                {
+                    string localizedMsg = LanguageMgr.GetTranslation(client!.Account.Language, langKey);
+                    p.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
+                }
             }
         }
 
@@ -3422,47 +3836,382 @@ namespace AmteScripts.Managers
             AreaEventArgs areaArgs = args as AreaEventArgs;
             if (areaArgs == null || !(areaArgs.GameObject is GamePlayer player)) return;
 
-            if (areaArgs.Area == _coreRunCenterSafeZone)
+            if (_coreRunCenterSafeZone != null && areaArgs.Area == _coreRunCenterSafeZone)
             {
-                player.Out.SendMessage("You reached the Core Safe Zone! Bind point updated.", eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
-                AwardScore(player, (s) => s.CoreRun_CenterReached++);
-                player.Bind(true);
+                int currentState = player.TempProperties.getProperty<int>(PROP_CORE_RUN_STATE, 0);
 
-                player.Out.SendSpellEffectAnimation(player, player, 106, 0, false, 1);
+                if (currentState == 0)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.ReachedCore"), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                    AwardScore(player, (s) => s.CoreRun_CenterReached++);
+
+                    player.TempProperties.setProperty(PROP_CORE_RUN_STATE, 1);
+
+                    player.BindPosition = Position.Create(
+                        _coreRunCenterSafeZone.Region.ID,
+                        _coreRunCenterSafeZone.Coordinate.X,
+                        _coreRunCenterSafeZone.Coordinate.Y,
+                        _coreRunCenterSafeZone.Coordinate.Z,
+                        0
+                    );
+                    player.Out.SendSpellEffectAnimation(player, player, 106, 0, false, 1);
+                }
                 return;
             }
 
-            if (_coreRunToreArea != null)
+            if (_coreRunToreArea != null && areaArgs.Area == _coreRunToreArea)
             {
-                double dist = player.Coordinate.DistanceTo(_coreRunToreArea.Coordinate);
-
-                if (dist > _coreRunToreArea.Radius + (_coreRunToreArea.Radius * 2))
+                if (_isCoreRunRedLight)
                 {
-                    double bindDist = player.BindPosition.Coordinate.DistanceTo(_coreRunToreArea.Coordinate);
-                    if (bindDist < _coreRunToreArea.Radius)
-                    {
-                        Spawn? spawn = null;
-                        if (player.Group != null && _groupSpawns.ContainsKey(player.Guild))
-                            spawn = _groupSpawns[player.Guild];
-                        else if (_playerSpawns.ContainsKey(player.InternalID))
-                            spawn = _playerSpawns[player.InternalID];
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.EnteredRedLight"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    CheckRedLightViolation(player);
+                    return;
+                }
+            }
+        }
 
-                        if (spawn != null)
+        private void OnCoreRunAreaLeave(DOLEvent e, object sender, EventArgs args)
+        {
+            if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun) return;
+            AreaEventArgs areaArgs = args as AreaEventArgs;
+            if (areaArgs == null || !(areaArgs.GameObject is GamePlayer player)) return;
+
+            if (_coreRunToreArea != null && areaArgs.Area == _coreRunToreArea)
+            {
+                if (_coreRunCenterSafeZone == null) return;
+
+                double distToCenter = player.Coordinate.DistanceTo(_coreRunCenterSafeZone.Coordinate);
+
+                if (distToCenter >= _coreRunToreArea.MaxRadius)
+                {
+                    int currentState = player.TempProperties.getProperty<int>(PROP_CORE_RUN_STATE, 0);
+
+                    if (currentState == 1)
+                    {
+                        InventoryItem core = GetCoreItem(player);
+                        if (core != null)
                         {
-                            player.Bind(spawn.Position);
-                            player.Out.SendMessage("You reached the Outer Rim! Bind point reset to Spawn.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.RunComplete"), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+
+                            HandleCoreDelivery(player, 1);
+                        }
+                        else
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.LeftWithoutCore"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
                     }
                 }
             }
         }
 
+        private int CoreRunDecayCallback(RegionTimer timer)
+        {
+            if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun || _coreRunToreArea == null)
+                return 0;
+
+            foreach (var client in WorldMgr.GetAllPlayingClients())
+            {
+                GamePlayer p = client?.Player;
+                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+
+                if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate))
+                    continue;
+
+                if (_coreRunToreArea.IsContaining(p.Coordinate))
+                {
+                    bool itemDecayed = false;
+
+                    for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+                    {
+                        InventoryItem item = p.Inventory.GetItem(slot);
+                        if (item != null && item is PvPTreasure && item.Id_nb.IndexOf("core", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            if (item.Condition > 80)
+                            {
+                                item.Condition -= 1;
+                                item.Dirty = true;
+                                p.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
+                                itemDecayed = true;
+                            }
+                        }
+                    }
+
+                    if (itemDecayed)
+                    {
+                        p.Out.SendSpellEffectAnimation(p, p, 14326, 0, false, 1);
+                        p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.CoreRun.CoreDestabilizing"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                    }
+                }
+            }
+
+            return 5200;
+        }
+
         public void HandleCoreDelivery(GamePlayer player, int points)
         {
             AwardScore(player, (s) =>
             {
-                s.CoreRun_CoresDelivered++;
-                s.PvP_SoloKillsPoints += points;
+                s.CoreRun_CoresDelivered += points;
+            });
+            SaveScores();
+
+            player.TempProperties.removeProperty(PROP_CORE_RUN_STATE);
+
+            Spawn? spawn = null;
+            if (player.Group != null && _groupSpawns.ContainsKey(player.Guild))
+                spawn = _groupSpawns[player.Guild];
+            else if (_playerSpawns.ContainsKey(player.InternalID))
+                spawn = _playerSpawns[player.InternalID];
+
+            if (spawn != null)
+            {
+                player.Bind(spawn.Position);
+            }
+        }
+
+        #endregion
+
+        #region Biohazard Section
+
+        private void StartBiohazard()
+        {
+            log.Info("[Biohazard] Starting Scripted Session Logic...");
+            _biohazardTicks = 0;
+            _biohazardSpawns.Clear();
+            foreach (var zone in _zones)
+            {
+                var spawnPoints = WorldMgr.GetNPCsByGuild("PVP", eRealm.None)
+                    .Where(n => n.CurrentZone == zone && n.Name.IndexOf("SAMPLE_SPAWN", StringComparison.OrdinalIgnoreCase) >= 0)
+                    .ToList();
+                _biohazardSpawns.AddRange(spawnPoints);
+            }
+
+            if (_biohazardSpawns.Count == 0)
+            {
+                log.Warn("[Biohazard] No 'SAMPLE_SPAWN' NPCs found in the session's zones!");
+            }
+
+            RotateBiohazardChests();
+
+            var timerRegion = WorldMgr.GetRegion(1);
+            if (timerRegion != null)
+            {
+                _biohazardTimer = new RegionTimer(timerRegion.TimeManager);
+                _biohazardTimer.Callback = BiohazardTimerCallback;
+                _biohazardTimer.Start(4000);
+            }
+        }
+
+        private void StopBiohazard()
+        {
+            if (_biohazardTimer != null)
+            {
+                _biohazardTimer.Stop();
+                _biohazardTimer = null;
+            }
+
+            foreach (var chest in _activeBiohazardChests)
+            {
+                chest.Delete();
+            }
+            _activeBiohazardChests.Clear();
+            _biohazardSpawns.Clear();
+        }
+
+        private bool IsSpawnPointOccupied(GameNPC spawnPoint)
+        {
+            _activeBiohazardChests.RemoveAll(c => c.ObjectState != GameObject.eObjectState.Active);
+
+            foreach (var chest in _activeBiohazardChests)
+            {
+                if (chest.CurrentRegionID == spawnPoint.CurrentRegionID &&
+                    chest.Coordinate.DistanceTo(spawnPoint.Coordinate) < 150)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void SpawnNewBiohazardChestAt(GameNPC spawn)
+        {
+            bool isPure = Util.Chance(30); // 30% chance for a pure sample, 70% for raw
+
+            BiohazardChest chest = new BiohazardChest();
+            chest.Name = "Toxic Sample";
+            chest.Model = isPure ? (ushort)4170 : (ushort)4171;
+            chest.CurrentRegionID = spawn.CurrentRegionID;
+            chest.Position = spawn.Position;
+            chest.ItemChance = 100;
+            chest.CoffreOpeningInterval = 0;
+            chest.IsOpenableOnce = false;
+            chest.RespawnInterval = 0;
+            chest.HasPickableAnim = true;
+            chest.Items.Add(new GameCoffre.CoffreItem(isPure ? "pvp_pure_toxic_sample" : "pvp_raw_toxic_sample", 100));
+
+            if (chest.AddToWorld())
+            {
+                _activeBiohazardChests.Add(chest);
+                log.Info($"[Biohazard] Spawned {(isPure ? "Pure" : "Raw")} chest at {spawn.Name}");
+            }
+        }
+
+        public void RespawnSingleBiohazardChest(BiohazardChest oldChest)
+        {
+            try
+            {
+                if (_activeBiohazardChests.Contains(oldChest))
+                {
+                    _activeBiohazardChests.Remove(oldChest);
+                }
+
+                if (!IsOpen || CurrentSessionType != eSessionTypes.Biohazard) return;
+
+                var availableSpawns = _biohazardSpawns.Where(s => !IsSpawnPointOccupied(s) && s.Position.Coordinate.DistanceTo(oldChest.Position) > 150).ToList();
+
+                if (availableSpawns.Count == 0)
+                {
+                    availableSpawns = _biohazardSpawns.Where(s => !IsSpawnPointOccupied(s)).ToList();
+                }
+                if (availableSpawns.Count == 0)
+                {
+                    log.Warn("[Biohazard] No empty spawn points available for respawn!");
+                    return;
+                }
+
+                var spawn = availableSpawns[Util.Random(availableSpawns.Count - 1)];
+                SpawnNewBiohazardChestAt(spawn);
+            }
+            catch (Exception ex)
+            {
+                log.Error("[Biohazard] Error respawning single chest", ex);
+            }
+        }
+
+        private void RotateBiohazardChests()
+        {
+            try
+            {
+                foreach (var chest in _activeBiohazardChests)
+                {
+                    chest.Delete();
+                }
+                _activeBiohazardChests.Clear();
+
+                if (_biohazardSpawns.Count == 0) return;
+                var shuffledSpawns = _biohazardSpawns.OrderBy(x => Util.Random(1000)).ToList();
+                int chestsToSpawn = (int)Math.Ceiling(shuffledSpawns.Count / 3.0);
+
+                if (chestsToSpawn > shuffledSpawns.Count)
+                    chestsToSpawn = shuffledSpawns.Count;
+
+                if (chestsToSpawn < 1 && shuffledSpawns.Count > 0)
+                    chestsToSpawn = 1;
+
+                for (int i = 0; i < chestsToSpawn; i++)
+                {
+                    SpawnNewBiohazardChestAt(shuffledSpawns[i]);
+                }
+
+                BroadcastBiohazardMessage("PvPManager.Biohazard.NewSamples", eChatType.CT_Important);
+            }
+            catch (Exception ex)
+            {
+                log.Error("[Biohazard] Error rotating chests", ex);
+            }
+        }
+
+        private void BroadcastBiohazardMessage(string langKey, eChatType type)
+        {
+            foreach (var client in WorldMgr.GetAllPlayingClients())
+            {
+                if (client.Player != null && client.Player.IsInPvP)
+                {
+                    string localizedMsg = LanguageMgr.GetTranslation(client.Account.Language, langKey);
+                    client.Player.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
+                }
+            }
+        }
+
+        private int BiohazardTimerCallback(RegionTimer timer)
+        {
+            try
+            {
+                if (!IsOpen || CurrentSessionType != eSessionTypes.Biohazard)
+                    return 0;
+
+                _biohazardTicks++;
+                bool applyDisease = (_biohazardTicks % 2 == 0);
+                bool rotateChests = (_biohazardTicks % 45 == 0);
+
+                if (rotateChests)
+                {
+                    RotateBiohazardChests();
+                }
+
+                foreach (var client in WorldMgr.GetAllPlayingClients())
+                {
+                    GamePlayer p = client?.Player;
+                    if (p == null || !p.IsInPvP || !p.IsAlive || p.CurrentRegion == null) continue;
+
+                    // Zombie outside Radioactive Zone logic (Damage decay)
+                    if (p.IsDamned && !p.IsRadioactiveAreaActive)
+                    {
+                        p.TakeDamage(null, eDamageType.Natural, (int)(p.MaxHealth * 0.10), 0);
+                        if (p.IsAlive)
+                        {
+                            p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.Biohazard.FleshRots"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                            p.Out.SendSpellEffectAnimation(p, p, 13153, 0, false, 1);
+                        }
+                    }
+
+                    bool hasSample = false;
+                    for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+                    {
+                        InventoryItem item = p.Inventory.GetItem(slot);
+                        if (item is PvPTreasure treasure && !string.IsNullOrEmpty(treasure.Id_nb) && treasure.Id_nb.IndexOf("toxic_sample", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            hasSample = true;
+                            if (treasure.Condition > 80)
+                            {
+                                treasure.Condition -= 1;
+                                treasure.Dirty = true;
+                                p.Out.SendInventoryItemsUpdate(new InventoryItem[] { treasure });
+                            }
+                        }
+                    }
+
+                    if (hasSample)
+                    {
+                        p.Out.SendSpellEffectAnimation(p, p, 14326, 0, false, 1);
+
+                        if (applyDisease)
+                        {
+                            Spell disease = SkillBase.GetSpellByID(25320);
+                            if (disease != null)
+                            {
+                                SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
+                                ISpellHandler handler = ScriptMgr.CreateSpellHandler(p, disease, line);
+                                handler.StartSpell(p);
+                                p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.Biohazard.SampleLeaks"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("[Biohazard] Error in Timer Callback", ex);
+            }
+
+            return 4000;
+        }
+
+        public void HandleBiohazardDelivery(GamePlayer player, int points)
+        {
+            AwardScore(player, (s) =>
+            {
+                s.Biohazard_SamplesReturned += points;
             });
             SaveScores();
         }
@@ -3470,6 +4219,56 @@ namespace AmteScripts.Managers
         #endregion
 
         #region CTF methods
+
+        private int CTFMapUpdateCallback(RegionTimer timer)
+        {
+            if (!IsOpen || CurrentSessionType != eSessionTypes.CaptureTheFlag)
+                return 0;
+
+            Position? flagPos = null;
+            GamePlayer flagCarrier = null;
+
+            foreach (var client in WorldMgr.GetAllPlayingClients())
+            {
+                var p = client.Player;
+                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+
+                bool isCarryingFlag = false;
+                for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+                {
+                    var item = p.Inventory.GetItem(slot);
+                    if (item != null && item is FlagInventoryItem)
+                    {
+                        isCarryingFlag = true;
+                        break;
+                    }
+                }
+
+                if (isCarryingFlag)
+                {
+                    flagPos = p.Position;
+                    flagCarrier = p;
+                    break;
+                }
+            }
+
+            foreach (var client in WorldMgr.GetAllPlayingClients())
+            {
+                var p = client.Player;
+                if (p == null || !p.IsInPvP) continue;
+
+                if (flagPos.HasValue && p != flagCarrier)
+                {
+                    p.Out.SendMapObjective(40, flagPos.Value);
+                }
+                else
+                {
+                    p.Out.ClearMapObjective(40);
+                }
+            }
+
+            return 2000;
+        }
 
         public void AwardCTFOwnershipPoints(GamePlayer player, int points)
         {
@@ -3669,24 +4468,34 @@ namespace AmteScripts.Managers
                     break;
 
                 case eSessionTypes.BossHunt:
-                    scoreLines.Add(new ScoreLine("PvP.Score.BossPvPSoloBossKills", new Score(ps.PvP_SoloKillsPoints, ps.PvP_SoloKills)));
-                    scoreLines.Add(new ScoreLine("PvP.Score.BossPvPGroupBossKills", new Score(ps.PvP_GroupKillsPoints, ps.PvP_GroupKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPSoloKills", new Score(ps.PvP_SoloKillsPoints, ps.PvP_SoloKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPGrpKills", new Score(ps.PvP_GroupKillsPoints, ps.PvP_GroupKills)));
                     scoreLines.Add(new ScoreLine("PvP.Score.BossPvPBossHits", new Score(ps.Boss_BossHitsPoints, ps.Boss_BossHitsCount)));
                     scoreLines.Add(new ScoreLine("PvP.Score.BossPvPBossKills", new Score(ps.Boss_BossKillsPoints, ps.Boss_BossKillsCount)));
                     break;
 
                 case eSessionTypes.KingOfTheHill:
-                    scoreLines.Add(new ScoreLine("PvP.Score.KotHKills", new Score(ps.PvP_SoloKillsPoints + ps.PvP_GroupKillsPoints, ps.PvP_SoloKills + ps.PvP_GroupKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPSoloKills", new Score(ps.PvP_SoloKillsPoints, ps.PvP_SoloKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPGrpKills", new Score(ps.PvP_GroupKillsPoints, ps.PvP_GroupKills)));
                     scoreLines.Add(new ScoreLine("PvP.Score.KotHTimeHeld", new Score(ps.KotH_Points, ps.KotH_Ticks, ScoreType.BonusPoints)));
                     scoreLines.Add(new ScoreLine("PvP.Score.KotHPressure", new Score(ps.KotH_PressurePoints, 0, ScoreType.BonusPoints)));
                     scoreLines.Add(new ScoreLine("PvP.Score.KotHCaptures", new Score(ps.KotH_CapturePoints, ps.KotH_Captures)));
                     break;
 
                 case eSessionTypes.CoreRun:
-                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunKills", new Score(ps.PvP_SoloKillsPoints + ps.PvP_GroupKillsPoints, ps.PvP_SoloKills + ps.PvP_GroupKills)));
-                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunCores", new Score(ps.CoreRun_CoresDelivered * 20, ps.CoreRun_CoresDelivered, ScoreType.Bonus)));
-                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunCenter", new Score(ps.CoreRun_CenterReached * 10, ps.CoreRun_CenterReached, ScoreType.Bonus)));
-                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunEliminations", new Score(ps.CoreRun_Eliminations * 3, ps.CoreRun_Eliminations, ScoreType.Malus)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPSoloKills", new Score(ps.PvP_SoloKillsPoints, ps.PvP_SoloKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPGrpKills", new Score(ps.PvP_GroupKillsPoints, ps.PvP_GroupKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunCores", new Score(ps.CoreRun_CoresDelivered, ps.CoreRun_CoresDelivered, ScoreType.Bonus)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunCenter", new Score(ps.CoreRun_CenterReached * 12, ps.CoreRun_CenterReached, ScoreType.Bonus)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.CoreRunEliminations", new Score(ps.CoreRun_Eliminations * 2, ps.CoreRun_Eliminations, ScoreType.Malus)));
+                    break;
+                case eSessionTypes.Biohazard:
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPSoloKills", new Score(ps.PvP_SoloKillsPoints, ps.PvP_SoloKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.PvPGrpKills", new Score(ps.PvP_GroupKillsPoints, ps.PvP_GroupKills)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.BioSamples", new Score(ps.Biohazard_SamplesReturned, 0, ScoreType.BonusPoints)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.BioInfections", new Score(ps.Biohazard_Infections * 2, ps.Biohazard_Infections, ScoreType.Bonus)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.BioZombieKills", new Score(ps.Biohazard_ZombieKill * 3, ps.Biohazard_ZombieKill, ScoreType.Bonus)));
+                    scoreLines.Add(new ScoreLine("PvP.Score.BioZombieDeaths", new Score(ps.Biohazard_ZombieDeath * 3, ps.Biohazard_ZombieDeath, ScoreType.Malus)));
                     break;
                 default:
                     break;
@@ -3802,6 +4611,9 @@ namespace AmteScripts.Managers
                         break;
                     case eSessionTypes.CoreRun:
                         sessionTypeString = "Run to the Core";
+                        break;
+                    case eSessionTypes.Biohazard:
+                        sessionTypeString = "Biohazard";
                         break;
                     default:
                         sessionTypeString = "Unknown";

@@ -18,3 +18,5 @@ Commands.GM.Area.Usage.StormSize:	'/area stormsize set <0-255>' - Définit la ta
 Commands.GM.Area.Usage.EventList:	'/area eventlist <add|remove|set> <eventName>' - Gère les événements de zone.
 Commands.GM.Area.Usage.IsRadioactive:	'/area radioactive <on|off>' - Active ou désactive les dégâts radioactifs.
 Commands.GM.Area.Usage.Remove:		'/area remove' - Supprime la zone dans laquelle vous vous trouvez.
+Commands.GM.Area.Usage.StormFaction:	'/area stormfaction set <factionID>' - Définit la faction de la tempête pour éviter qu'elle n'affecte certains monstres selon leur faction.
+Commands.GM.Area.Usage.StormImmuneNPC:	'/area stormimmunenpc <true/false>' - Détermine si la tempête ignore les monstres/PNJ pour ne cibler que les joueurs et leurs familiers.

@@ -61,6 +61,14 @@ namespace DOL.GS.Commands
             {
                 return false;
             }
+
+            // Check against prohibited words using InvalidNamesManager
+            var invalidNamesMgr = GameServer.Instance?.PlayerManager?.InvalidNames;
+            if (invalidNamesMgr != null && invalidNamesMgr[guildName])
+            {
+                return false;
+            }
+
             return true;
         }
         private static bool IsNearRegistrar(GamePlayer player)
@@ -338,6 +346,13 @@ namespace DOL.GS.Commands
 
                                 oldguildname = String.Join(" ", args, 2, i - 2);
                                 newguildname = String.Join(" ", args, i + 1, args.Length - i - 1);
+
+                                if (!IsValidGuildName(newguildname))
+                                {
+                                    client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InvalidLetters"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+
                                 myguild = GuildMgr.GetGuildByName(oldguildname);
                                 if (!GuildMgr.DoesGuildExist(oldguildname))
                                 {
@@ -375,6 +390,13 @@ namespace DOL.GS.Commands
                                 }
 
                                 newguildname = args[2]!;
+
+                                if (!IsValidGuildName(newguildname))
+                                {
+                                    client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InvalidLetters"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+
                                 if (myguild.IsPvPGuild)
                                     newguildname = "[PVP] " + newguildname;
                             }
@@ -3807,6 +3829,27 @@ namespace DOL.GS.Commands
 
                     #region territories
                     case "territories":
+                        if (client.Player.IsInPvP)
+                        {
+                            if (client.Account.PrivLevel == 1)
+                            {
+                                if (client.Player.Guild == null)
+                                {
+                                    client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.Subterritories.TerritoryBeGuilded"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+                                if (PvpManager.Instance.CurrentSessionType is not PvpManager.eSessionTypes.TerritoryCapture)
+                                {
+                                    client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.CmdCannotUseHere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+                            }
+
+                            IList<string> subInfos = TerritoryManager.Instance.GetSubterritoriesInformations(client.Player);
+                            client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.Subterritories.WindowTitle"), subInfos);
+                            return;
+                        }
+
                         if (client.Account.PrivLevel == 1)
                         {
                             if (client.Player.Guild == null)

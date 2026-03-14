@@ -1,0 +1,9 @@
+PvpNPC.CoreRunNotActive:                            La 'Course au Coeur' n'est pas active.
+PvpNPC.CoreAccepted:                                Coeur accepté ! Vous marquez {0} points !
+PvpNPC.OnlyPowerCores:                              Je n'accepte que les Coeur d'Énergie.
+PvpNPC.BiohazardNotActive:                          La session 'Danger Biologique' n'est pas active.
+PvpNPC.StayAwayMonster:                             Éloignez-vous de moi, monstre irradié ! Vous devez être purifié par la mort avant que je ne vous parle.
+PvpNPC.SamplePure:                                  pur
+PvpNPC.SampleRaw:                                   brut
+PvpNPC.SampleSecured:                               Échantillon {0} sécurisé ! Vous obtenez {1} points dans votre score PvP !
+PvpNPC.OnlyToxicSamples:                            Je n'accepte que les Échantillons Toxiques.

@@ -706,30 +706,69 @@ namespace DOL.GS.PacketHandler
         {
             using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry)))
             {
-                pak.WriteByte((byte)(3));
+                pak.WriteByte((byte)id);
+                string name = " ";
+                string desc = " ";
+                string lang = m_gameClient.Account.Language;
 
-                pak.WriteByte(0); // name length
+                {
+                    if (AmteScripts.Managers.PvpManager.Instance.CurrentSessionType == AmteScripts.Managers.PvpManager.eSessionTypes.CaptureTheFlag)
+                    {
+                        name = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.CTFName");
+                        desc = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.CTFDesc");
+                    }
+                    else if (AmteScripts.Managers.PvpManager.Instance.CurrentSessionType == AmteScripts.Managers.PvpManager.eSessionTypes.KingOfTheHill)
+                    {
+                        name = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.KotHName");
+                        desc = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.KotHDesc");
+                    }
+                }
+
+                pak.WriteByte((byte)name.Length);
                 pak.WriteShort(0); // unknown
-                pak.WriteByte(1); // goals
-                pak.WriteByte(1); // min level
-                // name
-                pak.WritePascalString(string.Empty); // quest description
+                pak.WriteByte(1); // 1 goal
+                pak.WriteByte(1); // min level 1
+                pak.WriteStringBytes(name);
+                pak.WritePascalString(desc);
                 pak.WriteShortLowEndian(0); // goal desc length
-                // desc
-                // pak.WriteShortLowEndian(goal.PointB.ZoneId);
-                // pak.WriteShortLowEndian(goal.PointB.X);
-                // pak.WriteShortLowEndian(goal.PointB.Y);;
+
                 pak.Fill(0, 6);
-                pak.WriteShortLowEndian(0); // unknown
+                pak.WriteShortLowEndian(0x00);
                 pak.WriteShortLowEndian((ushort)eQuestGoalType.Unknown);
-                pak.WriteShortLowEndian(0); // unknown
-                var pt = new QuestZonePoint(where.Region.GetZone(where.Coordinate), where.Coordinate);
-                pak.WriteShortLowEndian(pt.ZoneId);
-                pak.WriteShortLowEndian((ushort)pt.X);
-                pak.WriteShortLowEndian((ushort)pt.Y);
-                pak.WriteByte(0x01); // status
-                pak.WriteByte(0x00);
-                
+                pak.WriteShortLowEndian(0x00);
+
+                Region region = WorldMgr.GetRegion(where.RegionID);
+                Zone zone = region?.GetZone(where.Coordinate);
+
+                if (zone != null)
+                {
+                    pak.WriteShortLowEndian(zone.ZoneSkinID);
+                    pak.WriteShortLowEndian((ushort)(where.X - zone.Offset.X));
+                    pak.WriteShortLowEndian((ushort)(where.Y - zone.Offset.Y));
+                }
+                else
+                {
+                    pak.WriteShortLowEndian(0);
+                    pak.WriteShortLowEndian(0);
+                    pak.WriteShortLowEndian(0);
+                }
+
+                pak.WriteByte(0x00); // 0x00 = Active Map Marker
+                pak.WriteByte(0x00); // no item
+
+                SendTCP(pak);
+            }
+        }
+
+        public override void ClearMapObjective(int id)
+        {
+            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry)))
+            {
+                pak.WriteByte((byte)id);
+                pak.WriteByte(0);
+                pak.WriteShort(0);
+                pak.WriteByte(0);
+                pak.WriteByte(0);
                 SendTCP(pak);
             }
         }

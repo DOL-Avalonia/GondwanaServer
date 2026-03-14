@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using AmteScripts.Managers;
+using Discord;
 using DOL.Database;
 using DOL.GameEvents;
 using DOL.gameobjects.CustomNPC;
@@ -30,7 +31,7 @@ namespace DOL.Territories
 {
     public class Territory
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         private string guild_id;
 
         public Territory(Zone zone, List<IArea> areas, GameNPC boss, TerritoryDb db)
@@ -467,6 +468,8 @@ namespace DOL.Territories
 
             if (saveChange)
                 SaveIntoDatabaseUnsafe();
+
+            PvpManager.Instance?.UpdateAllTerritoryMarkers();
         }
 
         private void StartExpireTimer()
@@ -753,6 +756,7 @@ namespace DOL.Territories
             NumMercenaries = 0;
             Boss.RestoreOriginalGuildName();
             SaveIntoDatabaseUnsafe();
+            PvpManager.Instance?.UpdateAllTerritoryMarkers();
         }
 
         private void RefreshEmblem(GameNPC mob)

@@ -194,7 +194,7 @@ Commands.Players.Guild.InfoGuildBuffNone:		Guild Buff: None
 Commands.Players.Guild.InfoGuildBuffAvailable:		Available buffs:
 Commands.Players.Guild.InfoBanner:				Banner: {0}
 Commands.Players.Guild.InfoEmail:               Email: {0}
-Commands.Players.Guild.InvalidLetters:			Characters used are invalid.
+Commands.Players.Guild.InvalidLetters:			Invalid guild name. Please avoid using restricted or offensive words.
 Commands.Players.Guild.InvalidRank:			    This is not a valid rank.
 Commands.Players.Guild.InviteDead:				You cannot invite a dead player to join the guild.
 Commands.Players.Guild.InviteNoSelected:		You must select a player.

@@ -1,0 +1,9 @@
+PvpNPC.CoreRunNotActive:                            The 'Core Run' is not active.
+PvpNPC.CoreAccepted:                                Core accepted! You score {0} points!
+PvpNPC.OnlyPowerCores:                              I only accept Power Cores.
+PvpNPC.BiohazardNotActive:                          The 'Biohazard' session is not active.
+PvpNPC.StayAwayMonster:                             Stay away from me, you irradiated monster! You must be cleansed in death before I speak to you.
+PvpNPC.SamplePure:                                  Pure
+PvpNPC.SampleRaw:                                   Raw
+PvpNPC.SampleSecured:                               {0} Sample secured! You score {1} points!
+PvpNPC.OnlyToxicSamples:                            I only accept Toxic Samples.

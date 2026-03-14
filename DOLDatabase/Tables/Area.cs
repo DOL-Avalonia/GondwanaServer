@@ -36,6 +36,8 @@ namespace DOL.Database
         private double m_effectVariance;
         private string m_eventList;
         private bool m_isRadioactive;
+        private int m_stormFaction = 0;
+        private bool m_npcImmunToStorm = false;
 
         public DBArea()
         {
@@ -346,6 +348,20 @@ namespace DOL.Database
         {
             get => m_effectVariance;
             set { Dirty = true; m_effectVariance = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int StormFaction
+        {
+            get => m_stormFaction;
+            set { Dirty = true; m_stormFaction = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public bool NPCImmunToStorm
+        {
+            get => m_npcImmunToStorm;
+            set { Dirty = true; m_npcImmunToStorm = value; }
         }
 
         [DataElement(AllowDbNull = true)]

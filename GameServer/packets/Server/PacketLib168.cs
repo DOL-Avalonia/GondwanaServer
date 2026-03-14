@@ -1681,6 +1681,10 @@ namespace DOL.GS.PacketHandler
         {
         }
 
+        public virtual void ClearMapObjective(int id)
+        {
+        }
+
         public virtual async Task SendQuestListUpdate()
         {
             int questIndex = 0;
@@ -3998,6 +4002,10 @@ namespace DOL.GS.PacketHandler
 
                 SendTCP(pak);
             }
+        }
+
+        public virtual void SendMinotaurRelicRealm(byte id, byte realm)
+        {
         }
 
         public virtual void SendMinotaurRelicMapRemove(byte id)

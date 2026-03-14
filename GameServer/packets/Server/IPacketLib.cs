@@ -751,6 +751,7 @@ namespace DOL.GS.PacketHandler
         Task SendQuestListUpdate();
         Task SendQuestUpdate(IQuestPlayerData quest);
         void SendMapObjective(int id, Position where);
+        void ClearMapObjective(int id);
         void SendConcentrationList();
         void SendUpdateCraftingSkills();
         void SendChangeTarget(GameObject newTarget);
@@ -820,6 +821,7 @@ namespace DOL.GS.PacketHandler
         void SendRegionColorScheme(byte color);
         void SendVampireEffect(GameLiving living, bool show);
         void SendXFireInfo(byte flag);
+        void SendMinotaurRelicRealm(byte id, byte realm);
         void SendMinotaurRelicMapRemove(byte id);
         [Obsolete("Use .SendMinotaurRelicMapUpdate(byte, Position) instead!")]
         void SendMinotaurRelicMapUpdate(byte id, ushort region, int x, int y, int z);

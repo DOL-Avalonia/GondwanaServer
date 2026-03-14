@@ -56,7 +56,7 @@ namespace DOL.GS.Commands
             if (client.Player.TargetObject != null && client.Player.TargetObject is ChiefMerchant)
                 targetMob = (GameNPC)client.Player.TargetObject;
 
-            switch (args.GetValue(1).ToString().ToLower())
+            switch (args.GetValue(1)!.ToString()!.ToLower())
             {
                 #region Open
                 case "open":
@@ -178,9 +178,23 @@ namespace DOL.GS.Commands
                 case "name":
                     {
                         if (args.Length < 3)
+                        {
                             DisplaySyntax(client);
+                        }
                         else if (client.Player.TemporaryConsignmentMerchant != null)
-                            client.Player.TemporaryConsignmentMerchant.Name = args[2];
+                        {
+                            string newName = args[2];
+
+                            // Check against prohibited words using InvalidNamesManager
+                            var invalidNamesMgr = GameServer.Instance?.PlayerManager?.InvalidNames;
+                            if (invalidNamesMgr != null && invalidNamesMgr[newName])
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.InvalidName"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                break;
+                            }
+
+                            client.Player.TemporaryConsignmentMerchant.Name = newName;
+                        }
                         break;
                     }
                 #endregion Name

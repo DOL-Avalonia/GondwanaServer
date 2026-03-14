@@ -197,6 +197,7 @@ namespace DOLGameServerConsole
         public Task SendQuestListUpdate() { return Task.CompletedTask; }
         public Task SendQuestUpdate(IQuestPlayerData quest) { return Task.CompletedTask; }
         public void SendMapObjective(int id, Position where) { }
+        public void ClearMapObjective(int id) { }
         public void SendConcentrationList() { }
         public void SendUpdateCraftingSkills() { }
         public void SendChangeTarget(GameObject newTarget) { }
@@ -265,6 +266,7 @@ namespace DOLGameServerConsole
         public void SendMarketExplorerWindow() { }
         public void SendMarketExplorerWindow(IList<InventoryItem> items, byte page, byte maxpage) { }
         public void SendConsignmentMerchantMoney(long money) { }
+        public void SendMinotaurRelicRealm(byte id, byte realm) { }
         public void SendMinotaurRelicMapRemove(byte id) { }
         public void SendMinotaurRelicMapUpdate(byte id, ushort region, int x, int y, int z) { }
         public void SendMinotaurRelicMapUpdate(byte id, Position position) { }

@@ -18,3 +18,5 @@ Commands.GM.Area.Usage.StormSize:	'/area stormsize set <0-255>' - Sets the storm
 Commands.GM.Area.Usage.EventList:	'/area eventlist <add|remove|set> <eventName>' - Manages area event conditions.
 Commands.GM.Area.Usage.IsRadioactive:	'/area radioactive <on|off>' - Toggles radioactive damage.
 Commands.GM.Area.Usage.Remove:		'/area remove' - Deletes the area you are standing in.
+Commands.GM.Area.Usage.StormFaction:	'/area stormfaction set <factionID>' - Sets the storm's faction to prevent storms from affecting specific monsters because of their faction.
+Commands.GM.Area.Usage.StormImmuneNPC:	'/area stormimmunenpc <true/false>' - Sets the storm to not affect any monster/npc, only players and their pets.

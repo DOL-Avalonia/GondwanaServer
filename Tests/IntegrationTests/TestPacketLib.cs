@@ -430,6 +430,11 @@ namespace DOL.Tests
         {
             if (SendGroupMembersUpdateMethod != null) SendGroupMembersUpdateMethod(this, updateIcons, true);
         }
+        public Action<TestPacketLib, byte, byte> SendMinotaurRelicRealmMethod { get; set; }
+        public void SendMinotaurRelicRealm(byte id, byte realm)
+        {
+            if (SendMinotaurRelicRealmMethod != null) SendMinotaurRelicRealmMethod(this, id, realm);
+        }
         public Action<TestPacketLib, ICollection<InventoryItem>> SendInventoryItemsUpdateMethod { get; set; }
         public void SendInventoryItemsUpdate(ICollection<InventoryItem> itemsToUpdate)
         {
@@ -640,6 +645,11 @@ namespace DOL.Tests
         public void SendMapObjective(int id, Position pos)
         {
             if (SendMapObjectiveMethod != null) SendMapObjectiveMethod(this, id, pos);
+        }
+        public Action<TestPacketLib, int> ClearMapObjectiveMethod { get; set; }
+        public void ClearMapObjective(int id)
+        {
+            if (ClearMapObjectiveMethod != null) ClearMapObjectiveMethod(this, id);
         }
         public Action<TestPacketLib> SendConcentrationListMethod { get; set; }
         public void SendConcentrationList()

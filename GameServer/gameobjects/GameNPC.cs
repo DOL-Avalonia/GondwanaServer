@@ -7272,6 +7272,8 @@ namespace DOL.GS
         /// <returns></returns>
         public bool IsFriend(GameNPC npc)
         {
+            if (this.TempProperties.getProperty<bool>("NPCImmunToStorm", false) || npc.TempProperties.getProperty<bool>("NPCImmunToStorm", false))
+                return true;
             if (npc.Brain is IControlledBrain)
                 return GameServer.ServerRules.IsSameRealm(this, npc, true);
             if (Faction == null && npc.Faction == null)

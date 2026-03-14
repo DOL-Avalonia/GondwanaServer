@@ -194,7 +194,7 @@ Commands.Players.Guild.InfoGuildBuffNone:		Buff de guilde : Aucun
 Commands.Players.Guild.InfoGuildBuffAvailable:		Buffs disponibles :
 Commands.Players.Guild.InfoBanner:				Bannière : {0}
 Commands.Players.Guild.InfoEmail:               Email : {0}
-Commands.Players.Guild.InvalidLetters:			Les lettres écrites sont invalides.
+Commands.Players.Guild.InvalidLetters:			Nom de guilde invalide. Veuillez éviter les termes offensants ou restreints.
 Commands.Players.Guild.InvalidRank:			    Ce n'est pas un rang valide.
 Commands.Players.Guild.InviteDead:				Vous ne pouvez pas inviter un joueur mort à rejoindre la guilde.
 Commands.Players.Guild.InviteNoSelected:		Vous devez sélectionner un joueur.

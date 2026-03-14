@@ -1,52 +1,112 @@
 
-PvPManager.PvPNotOpen:				PvP is not open right now!
-PvPManager.GroupSessionRequired:	This session requires a group to join!
-PvPManager.NoGroup:					You have no group!
-PvPManager.GroupTooLarge:			Your group is bigger than allowed: {0}
-PvPManager.CannotCreatePvPGuild:	Could not create PvP guild!
-PvPManager.PvPTreasureRemoved:		All your {0} PvPTreasure item(s) have been forcibly removed since you left PvP!
-PvPManager.LeftPvP:					You have left the PvP session!
-PvPManager.CannotFindSpawn:			Could not find spawn location!
-PvPManager.JoinedPvP:				You have joined the PvP session: {0}
-PvPManager.GroupJoinedPvP:			Your entire group has joined the PvP session: {0}
-PvPManager.AlreadyInSoloQueue:		You are already in the solo queue!
-PvPManager.JoinedSoloQueue:			You have joined the solo queue for the next group session.
-PvPManager.CouldNotCreatePvPGuild:	Could not create PvP guild...
-PvPManager.LeftGroupQueue:			You have left the PvP group queue.
-PvPManager.BroughtToSafety:			You have successfully brought {0} to safety! (+{1} pts)
-PvPManager.NoSpawn:                 Could not enter PvP at this time: no available spawn location.
-PvPManager.MaxGroup:                Your group is already at the maximum size for this PvP session.
-PvPManager.GroupTooBig:             This PvP session only allows groups of up to {0} players.
+PvPManager.PvPNotOpen:						PvP is not open right now!
+PvPManager.GroupSessionRequired:			This session requires a group to join!
+PvPManager.NoGroup:							You have no group!
+PvPManager.GroupTooLarge:					Your group is bigger than allowed: {0}
+PvPManager.CannotCreatePvPGuild:			Could not create PvP guild!
+PvPManager.PvPTreasureRemoved:				All your {0} PvPTreasure item(s) have been forcibly removed since you left PvP!
+PvPManager.LeftPvP:							You have left the PvP session!
+PvPManager.CannotFindSpawn:					Could not find spawn location!
+PvPManager.JoinedPvP:						You have joined the PvP session: {0}
+PvPManager.GroupJoinedPvP:					Your entire group has joined the PvP session: {0}
+PvPManager.AlreadyInSoloQueue:				You are already in the solo queue!
+PvPManager.JoinedSoloQueue:					You have joined the solo queue for the next group session.
+PvPManager.CouldNotCreatePvPGuild:			Could not create PvP guild...
+PvPManager.LeftGroupQueue:					You have left the PvP group queue.
+PvPManager.BroughtToSafety:					You have successfully brought {0} to safety! (+{1} pts)
+PvPManager.NoSpawn:							Could not enter PvP at this time: no available spawn location.
+PvPManager.MaxGroup:						Your group is already at the maximum size for this PvP session.
+PvPManager.GroupTooBig:						This PvP session only allows groups of up to {0} players.
+PvPManager.KickedFromPvP:					You have been kicked from the PvP group.
+PvPManager.WelcomeBack:						Welcome back! Your PvP state has been preserved.
 
-PvPManager.Score.Points:            {0} points
-PvPManager.Score.Pts:               {0} pts
+PvPManager.BossHunt.ScoredPoints:			You scored {0} points on {1}!
+PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} slew the {2} for {3} points!
+PvPManager.Solo:							(Solo)
+PvPManager.Group:							(Group)
 
-PvP.Score.PvPSoloKills:                             Solo kills
-PvP.Score.PvPGrpKills:                              Group kills
-PvP.Score.FlagPvPSoloKills:                         Solo kills
-PvP.Score.FlagPvPGrpKills:                          Group kills
-PvP.Score.FlagPvPFlagCarrierKillBonus:              Flag carrier kills
-PvP.Score.FlagPvPFlagsCaptured:                     Flags captured
-PvP.Score.FlagPvPOwnership:                         Flags held
-PvP.Score.TreasurePvPSoloKills:                     Solo kills
-PvP.Score.TreasurePvPGrpKills:                      Group kills
-PvP.Score.TreasurePvPTreasurePoints:                Treasures found
-PvP.Score.TreasurePvPStolenItemPenalty:             Items stolen
-PvP.Score.FriendsPvPSoloKills:                      Solo kills
-PvP.Score.FriendsPvPGrpKills:                       Group kills
-PvP.Score.FriendsPvPBroughtFriends:                 Friends rallied
-PvP.Score.FriendsPvPFamilyBonus:                    Family rallied
-PvP.Score.FriendsPvPLostFriends:                    Friends lost
-PvP.Score.FriendsPvPKilledOthersFriends:            Enemy's friends killed
-PvP.Score.CTTPvPSoloKills:                          Solo kills
-PvP.Score.CTTPvPGrpKills:                           Group kills
-PvP.Score.CTTPvPTerritoryCaptures:                  Territory captures
-PvP.Score.CTTPvPOwnership:                          Territory ownership
-PvP.Score.BossPvPSoloBossKills:                     Kills de boss en solo
-PvP.Score.BossPvPGroupBossKills:                    Kills de boss en groupe
-PvP.Score.BossPvPBossHits:                          Boss participation
-PvP.Score.BossPvPBossKills:                         Bosses killed
-PvP.Score.Total:                                    Total
+PvPManager.CoreRun.Begins:					The Core Run begins! GREEN LIGHT - GO!
+PvPManager.CoreRun.CastMovement:			Casting non-instant spells implies movement!
+PvPManager.CoreRun.AttackMovement:			Attack movement detected!
+PvPManager.CoreRun.RedLight:				RED LIGHT! FREEZE!
+PvPManager.CoreRun.GreenLight:				GREEN LIGHT! GO!
+PvPManager.CoreRun.RedLightViolation:		Red Light Violation Detected!
+PvPManager.CoreRun.ReachedCore:				You reached the Core! Let's find the Core Battery!
+PvPManager.CoreRun.EnteredRedLight:			You entered during Red Light!
+PvPManager.CoreRun.RunComplete:				Run Complete! Core Delivered.
+PvPManager.CoreRun.LeftWithoutCore:			You left the zone without a Core! Go back inside!
+PvPManager.CoreRun.CoreDestabilizing:		The Energy Core is destabilizing! Hurry!
+
+PvPManager.Biohazard.NewSamples:			New Toxic Samples have materialized in the Radioactive Zones!
+PvPManager.Biohazard.FleshRots:				Your undead flesh rots rapidly outside the radioactive zone!
+PvPManager.Biohazard.SampleLeaks:			The toxic sample leaks into your veins...
+
+PvPManager.Rules.Title:						=== PvP Session Rules ===
+PvPManager.Rules.Deathmatch:				Welcome to the Arena. The rules are simple: kill or be killed. Hunt down your enemies to earn points.
+PvPManager.Rules.CaptureTheFlag:			Capture the Flag! A sacred banner has materialized in the region. Locate the prize and secure it within your outpost's walls. Intercepting and defeating an enemy carrier will force them to drop the flag, grab it before the enemy recovers! A bold strike against an enemy base can also liberate the banners they currently hold. Stay vigilant: any dropped flag left unattended will eventually dissipate and reset to its original spawning ground.
+PvPManager.Rules.TreasureHunt:				Treasure Hunt! Scour the area for hidden treasures and bring them back to your outpost. Beware, enemies will try to steal your hard-earned loot!
+PvPManager.Rules.BringAFriend:				Bring a Friend! Guide the lost companions safely to your outpost. Protect them from hostile forces, and eliminate the enemies' friends to hinder their progress!
+PvPManager.Rules.TerritoryCapture:			Territory Capture! Fight for control over strategic territories. Trade with the territory lords, claim the land for your faction, and defend it to dominate the battlefield.
+PvPManager.Rules.BossHunt:					Boss Hunt! Epic monstrosities have invaded the area. You must hit the boss to earn points. Securing the killing blow grants a massive bonus. Cooperation is highly advised!
+PvPManager.Rules.KingOfTheHill:				King of the Hill! A designated hill has appeared. Stand your ground within the marked area to apply pressure. Overpower the enemy to capture the hill and earn steady points!
+PvPManager.Rules.CoreRun:					Core Run! Navigate the treacherous zone and retrieve the Energy Core from the center. Move only on Green Light! If you move during a Red Light, you will be eliminated. Bring the Core back safely!
+PvPManager.Rules.Biohazard:					Biohazard! Toxic samples have spawned across the area. Collect them and bring them to the Researcher. Beware the radiation, and do not succumb to the plague, or you will become a mindless zombie!
+PvPManager.Rules.GroupRules:				=== Group Rules ===
+PvPManager.Rules.SoloOnly:					This session is strictly Solo. You must fight alone.
+PvPManager.Rules.GroupRequired:				This session requires a Group. Stand together with your allies (Max group size: {0}).
+PvPManager.Rules.SoloOrGroup:				You may fight Solo or form a Group (Max group size: {0}).
+PvPManager.Rules.GroupAllowed:				Grouping (invite/disband) is allowed in this session.
+PvPManager.Rules.GroupNotAllowed:			Grouping (invite/disband) is not allowed in this session.
+PvPManager.Rules.BannerAllowed:				Summoning a guild/group banner is allowed.
+PvPManager.Rules.BannerNotAllowed:			Summoning a guild/group banner is not allowed.
+PvPManager.Rules.ExtraCommands:				=== Extra Commands ===
+PvPManager.Rules.RenameCommand:				Use '/gc rename <name>' if you are the group leader to rename your group/guild.
+PvPManager.Rules.TerritoriesCommand:		Use '/gc territories' or '/gc subterritories' to see map objectives, capture options, owners, and timers.
+
+PvPManager.Journal.CTFName:					[PvP] Kill the flag carrier on the move!
+PvPManager.Journal.CTFDesc:					The enemy flag carrier is currently exposed. Hunt them down!
+PvPManager.Journal.KotHName:				[PvP] Get control of the Hill and defend it!
+PvPManager.Journal.KotHDesc:				Move to the marked location and secure the area for your team!
+
+PvPManager.Score.Points:					{0} points
+PvPManager.Score.Pts:						{0} pts
+
+PvP.Score.PvPSoloKills:						Solo kills
+PvP.Score.PvPGrpKills:						Group kills
+PvP.Score.FlagPvPSoloKills:					Solo kills
+PvP.Score.FlagPvPGrpKills:					Group kills
+PvP.Score.FlagPvPFlagCarrierKillBonus:		Flag carrier kills
+PvP.Score.FlagPvPFlagsCaptured:				Flags captured
+PvP.Score.FlagPvPOwnership:					Flag ownership
+PvP.Score.TreasurePvPSoloKills:				Solo kills
+PvP.Score.TreasurePvPGrpKills:				Group kills
+PvP.Score.TreasurePvPTreasurePoints:		Treasures found
+PvP.Score.TreasurePvPStolenItemPenalty:		Treasures stolen
+PvP.Score.FriendsPvPSoloKills:				Solo kills
+PvP.Score.FriendsPvPGrpKills:				Group kills
+PvP.Score.FriendsPvPBroughtFriends:			Friends rallied
+PvP.Score.FriendsPvPFamilyBonus:			Family rallied
+PvP.Score.FriendsPvPLostFriends:			Friends lost
+PvP.Score.FriendsPvPKilledOthersFriends:	Enemy's friends killed
+PvP.Score.CTTPvPSoloKills:					Solo kills
+PvP.Score.CTTPvPGrpKills:					Group kills
+PvP.Score.CTTPvPTerritoryCaptures:			Territory captures
+PvP.Score.CTTPvPOwnership:					Territory ownership
+PvP.Score.BossPvPSoloBossKills:				Solo boss kills
+PvP.Score.BossPvPGroupBossKills:			Group boss kills
+PvP.Score.BossPvPBossHits:					Boss participation
+PvP.Score.BossPvPBossKills:					Bosses killed
+PvP.Score.KotHTimeHeld:						Time Held
+PvP.Score.KotHPressure:						Pressure Applied
+PvP.Score.KotHCaptures:						Hills Captured
+PvP.Score.CoreRunCores:						Cores Delivered
+PvP.Score.CoreRunCenter:					Center Reached
+PvP.Score.CoreRunEliminations:				Eliminations
+PvP.Score.BioSamples:						Samples Returned
+PvP.Score.BioInfections:					Infections
+PvP.Score.BioZombieKills:					Zombies Killed
+PvP.Score.BioZombieDeaths:					Zombie Deaths
+PvP.Score.Total:							Total
 
 PvP.Score.PvPSoloKills.Short:                       SoloKills
 PvP.Score.PvPGrpKills.Short:                        GroupKills
@@ -73,5 +133,15 @@ PvP.Score.BossPvPSoloBossKills.Short:               SoloBossKills
 PvP.Score.BossPvPGroupBossKills.Short:              GroupBossKills
 PvP.Score.BossPvPBossHits.Short:                    BossHits
 PvP.Score.BossPvPBossKills.Short:                   BossKills
+PvP.Score.KotHTimeHeld.Short:						Held
+PvP.Score.KotHPressure.Short:						Pressure
+PvP.Score.KotHCaptures.Short:						Captures
+PvP.Score.CoreRunCores.Short:						Cores
+PvP.Score.CoreRunCenter.Short:						Center
+PvP.Score.CoreRunEliminations.Short:				Elims
+PvP.Score.BioSamples.Short:							Samples
+PvP.Score.BioInfections.Short:						Infected
+PvP.Score.BioZombieKills.Short:						ZombieKills
+PvP.Score.BioZombieDeaths.Short:					ZombieDeaths
 PvP.Score.Total.Short:                              Total
 
