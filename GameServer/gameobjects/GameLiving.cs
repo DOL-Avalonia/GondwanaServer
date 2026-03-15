@@ -1915,6 +1915,7 @@ namespace DOL.GS
                     armorToHit = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
 
                 double damageMod = weaponStats.SkillFactor / armorStats.ArmorMod;
+                double uniMod = 1.0;
                 damageMod *= 1.0 + RelicMgr.GetRelicBonusModifier(Realm, eRelicType.Strength);
 
                 var playerOwner = GetController() as GamePlayer;
@@ -1922,13 +1923,16 @@ namespace DOL.GS
                 {
                     if (target is GamePlayer)
                     {
-                        damageMod += Properties.PVP_MELEE_DAMAGE;
+                        uniMod *= Properties.PVP_MELEE_DAMAGE;
                     }
                     else if (target is GameNPC)
                     {
-                        damageMod += Properties.PVE_MELEE_DAMAGE;
+                        uniMod *= Properties.PVE_MELEE_DAMAGE;
                     }
                 }
+
+                damageMod *= uniMod;
+                weaponDamageCap *= uniMod;
 
                 double baseDamage = damageMod * weaponDamage * effectiveness;
                 double damage;
