@@ -1203,6 +1203,15 @@ namespace DOL.GS
         /// <param name="weapon">the weapon used for attack</param>
         public virtual double WeaponDamage(InventoryItem weapon)
         {
+            return WeaponDamageBase(weapon);
+        }
+
+        /// <summary>
+        /// Gets the weapondamage of currently used weapon
+        /// </summary>
+        /// <param name="weapon">the weapon used for attack</param>
+        public virtual double WeaponDamageBase(InventoryItem weapon)
+        {
             return 2.0;
         }
 
@@ -1959,7 +1968,7 @@ namespace DOL.GS
                 {
                     ad.DebugInfo.baseDamageCap = weaponDamageCap;
                     ad.DebugInfo.attackDamage = weaponDamage;
-                    ad.DebugInfo.weaponDamage = WeaponDamage(weapon);
+                    ad.DebugInfo.weaponDamage = WeaponDamageBase(weapon);
                     ad.DebugInfo.enemyResist = Math.Round(resist, 3);
                     ad.DebugInfo.dmgMod = Math.Round(damageMod, 3);
                     ad.DebugInfo.dmgStat = GetWeaponStat(weapon);
