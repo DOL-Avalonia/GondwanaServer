@@ -900,9 +900,9 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">attack weapon</param>
         /// <returns></returns>
-        public virtual double UnstyledDamageCap(InventoryItem weapon)
+        public virtual double UnstyledDamageCap(double baseDamage, InventoryItem weapon = null)
         {
-            return AttackDamage(weapon) * (2.82 + 0.00009 * AttackSpeed(weapon));
+            return baseDamage * (2.82 + 0.00009 * AttackSpeed(weapon));
         }
 
         /// <summary>
@@ -1900,7 +1900,7 @@ namespace DOL.GS
             {
                 var player = this as GamePlayer;
                 double weaponDamage = AttackDamage(weapon, style) * effectiveness;
-                double weaponDamageCap = UnstyledDamageCap(weapon) * effectiveness;
+                double weaponDamageCap = UnstyledDamageCap(weaponDamage, weapon) * effectiveness;
 
                 if (ad.IsOffHand)
                 {
@@ -1909,37 +1909,6 @@ namespace DOL.GS
                 
                 var weaponStats = CalculateWeaponStats(ad.Target, weapon);
                 var armorStats = CalculateTargetArmor(ad.Target, (eArmorSlot)ad.ArmorHitLocation);
-
-                /*
-                double weaponSkillFactor = player != null ? player.CharacterClass.WeaponSkillFactor((eObjectType)weapon!.Object_Type) : 20;
-                double dmgStat = GetWeaponStat(weapon);
-                double myEffectiveLevel = Level;
-                if (this is GameNPC)
-                {
-                    if (Level == 0)
-                        myEffectiveLevel = 1;
-                    else if (Level == 1)
-                        myEffectiveLevel = 1.1;
-                }
-                double weaponSpecLevel = player != null ? GetModifiedSpecLevel(player.GetWeaponSpec(weapon)) : myEffectiveLevel * 1.2;
-                double enemyArmorFactor = ad.Target.GetArmorAF(ad.ArmorHitLocation);
-                double enemyArmorAbsorb = ad.Target.GetArmorAbsorb(ad.ArmorHitLocation);
-                if (ad.Attacker.EffectList.GetOfType<BadgeOfValorEffect>() != null)
-                    enemyArmorFactor = enemyArmorFactor / (1 + enemyArmorAbsorb);
-                else
-                    enemyArmorFactor = enemyArmorFactor / (1 - enemyArmorAbsorb);
-
-                // calculate variance we start with 0 to 49 and tend to 19 to 29 (with 65 in spec)
-                int minVariance = WeaponSpecLevel(weaponTypeToUse).Clamp(0, 70) * 49 / 166; // x*0.6*49/100 => x * 49 / 166
-                int maxVariance = 49 - minVariance;
-
-                double damageMod = myEffectiveLevel
-                    * weaponSkillFactor / 10.0
-                    * (1 + 0.01 * dmgStat)
-                    * (0.75 + 0.5 * Math.Min(ad.Target.Level + 1.0, weaponSpecLevel) / (ad.Target.Level + 1.0) + 0.01 * Util.Random(minVariance, maxVariance))
-                    / Math.Max(1, enemyArmorFactor);
-                damageMod = damageMod.Clamp(0.01, 3);
-                */
 
                 InventoryItem armorToHit = null;
                 if (ad.Target.Inventory != null)
@@ -1982,9 +1951,11 @@ namespace DOL.GS
 
                 ad.Modifier = -(int)(preResistDamage - damage);
 
-                if (Properties.ENABLE_DEBUG)
+                if (Properties.ENABLE_DEBUG || this is GamePlayer { CombatInfo: true })
                 {
-                    ad.DebugInfo.weaponDamage = weaponDamage;
+                    ad.DebugInfo.baseDamageCap = weaponDamageCap;
+                    ad.DebugInfo.attackDamage = weaponDamage;
+                    ad.DebugInfo.weaponDamage = WeaponDamage(weapon);
                     ad.DebugInfo.enemyResist = Math.Round(resist, 3);
                     ad.DebugInfo.dmgMod = Math.Round(damageMod, 3);
                     ad.DebugInfo.dmgStat = GetWeaponStat(weapon);

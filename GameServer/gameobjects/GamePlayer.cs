@@ -8216,10 +8216,10 @@ namespace DOL.GS
         private void SendAttackDetails(AttackData ad)
         {
             Client.Out.SendMessage($"---- Attack ({ad.AttackType}) {ad.Attacker?.Name} => {ad.Target?.Name} ----", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Damage {ad.Damage} {ad.DamageType} (uncapped {ad.UncappedDamage}) - Critical {ad.CriticalDamage} ({ad.criticalChance}%)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Damage {ad.Damage} {ad.DamageType} ({ad.UncappedDamage}/{(int)ad.DebugInfo.baseDamageCap}) - Critical {ad.CriticalDamage} ({ad.criticalChance}%)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Miss {(ad.MissChance ?? ad.Target?.ChanceToBeMissed ?? 0) * 100:0.}% - Parry {(ad.ParryChance ?? 0) * 100:0.}% - Evade {(ad.EvadeChance ?? 0) * 100:0.}% - Block {(ad.BlockChance ?? 0) * 100:0.}% - Fumble {(ad.FumbleChance ?? ad.Attacker!.ChanceToFumble) * 100:0.}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Wep Skill {ad.DebugInfo.Weapon.SkillFactor:0.##} (Base {ad.DebugInfo.Weapon.BaseWeaponSkill:0.##}) - Spec Mod {ad.DebugInfo.Weapon.SpecModifier:0.##} ({ad.DebugInfo.Weapon.VarianceMin:0.##}-{ad.DebugInfo.Weapon.VarianceMax:0.##})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Wep Damage {ad.DebugInfo.weaponDamage:0.##} - Wep Stat {ad.DebugInfo.dmgStat:0.##} - Style damage {ad.StyleDamage}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Wep Damage {ad.DebugInfo.weaponDamage:0.##} - Base Damage {ad.DebugInfo.attackDamage:0.##} - Wep Stat {ad.DebugInfo.dmgStat:0.##} - Style damage {ad.StyleDamage}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Armor mod {ad.DebugInfo.Armor.ArmorMod:0.##} - AF {ad.DebugInfo.Armor.ArmorFactor:0.##} ABS {ad.DebugInfo.Armor.ArmorAbsorb:0.##} Res {ad.DebugInfo.enemyResist:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: DamageMod (WepSkill/ArmorMod) = {ad.DebugInfo.dmgMod:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Tension rate {ad.TensionRate:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -8794,76 +8794,6 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Max. Damage possible without style
-        /// </summary>
-        /// <param name="weapon">attack weapon</param>
-        public override double UnstyledDamageCap(InventoryItem weapon)
-        {
-            if (weapon != null)
-            {
-                int DPS = weapon.DPS_AF;
-                int cap = 12 + 3 * Level;
-                if (RealmLevel > 39)
-                    cap += 3;
-                if (DPS > cap)
-                    DPS = cap;
-
-                double result = DPS * (1 + GetModified(eProperty.DPS) * 0.01) * weapon.SPD_ABS * 0.03 * (0.94 + 0.003 * weapon.SPD_ABS);
-                
-                double effectiveness = 1.0;
-                if (weapon.Hand == 1) //2h
-                {
-                    effectiveness += 1.1 + (WeaponSpecLevel(weapon) - 1) * 0.005;
-                    if (weapon.Item_Type == Slot.RANGED)
-                    {
-                        // http://home.comcast.net/~shadowspawn3/bowdmg.html
-                        //ammo damage bonus
-                        if (RangeAttackAmmo != null)
-                        {
-                            switch ((RangeAttackAmmo.SPD_ABS) & 0x3)
-                            {
-                                case 0: effectiveness += -0.15; break;  //Blunt       (light) -15%
-                                case 1: break;     //Bodkin     (medium)   0%
-                                case 2: effectiveness += 0.15; break;  //doesn't exist on live
-                                case 3: effectiveness += 0.25; break;  //Broadhead (X-heavy) +25%
-                            }
-                        }
-                    }
-                }
-
-                if (weapon.Item_Type == Slot.RANGED && (weapon.Object_Type == (int)eObjectType.Longbow || weapon.Object_Type == (int)eObjectType.RecurvedBow || weapon.Object_Type == (int)eObjectType.CompositeBow))
-                {
-                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
-                    {
-                        effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
-                    }
-                    else if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == false)
-                    {
-                        effectiveness += GetModified(eProperty.SpellDamage) * 0.01;
-                        effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
-                    }
-                }
-                else if (weapon.Item_Type == Slot.RANGED)
-                {
-                    //Ranged damage buff,debuff,Relic,RA
-                    effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
-                }
-                else if (weapon.Item_Type == Slot.RIGHTHAND || weapon.Item_Type == Slot.LEFTHAND || weapon.Item_Type == Slot.TWOHAND)
-                {
-                    effectiveness += GetModified(eProperty.MeleeDamage) * 0.01;
-                }
-
-                return effectiveness * result;
-            }
-            else
-            { // TODO: whats the damage cap without weapon?
-                return
-                    (AttackDamage(weapon) * 3 * (1 + (AttackSpeed(weapon) * 0.001 - 2) * .03))
-                    * (1 + GetModified(eProperty.DPS) * 0.01);
-            }
-        }
-
-        /// <summary>
         /// Can this player cast the given spell while in combat?
         /// </summary>
         /// <param name="spell"></param>
@@ -9138,7 +9068,7 @@ namespace DOL.GS
                 //Melee damage buff,debuff,Relic,RA
                 effectiveness += GetModified(eProperty.MeleeDamage) * 0.01;
             }
-                
+
             if (style != null)
             {
                 if (CharacterClass is ClassSavage && string.Equals(style.Spec, "Hand to Hand"))

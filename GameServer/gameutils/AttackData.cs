@@ -80,6 +80,7 @@ namespace DOL.GS
 
         public class DebugStats
         {
+            public double attackDamage = 0;
             public double weaponDamage = 0;
             public double baseDamageCap = 0;
             public int dmgStat = 0;
