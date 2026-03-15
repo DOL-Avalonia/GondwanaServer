@@ -329,6 +329,9 @@ namespace DOL.GS
                 foreach (var objEntry in player.Client.GameObjectUpdateArray.ToArray())
                 {
                     var objKey = objEntry.Key;
+                    if (objKey is null)
+                        continue;
+
                     GameObject obj = WorldMgr.GetRegion(objKey.Item1).GetObject(objKey.Item2);
                     // We have a Door in cache that is not in vincinity
                     if (obj is IDoor && !doors.Contains(obj) && (nowTicks - objEntry.Value) >= GetPlayerItemUpdateInterval)

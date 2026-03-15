@@ -623,24 +623,20 @@ namespace DOL.GS
                 int spacing = GetBoundarySpacing(DbArea);
                 int count = (int)Math.Round(perimeter / spacing);
                 count = Math.Max(6, Math.Min(128, count));
+                var t = (2.0 * Math.PI / count);
+                var center = Coordinate.Create(DbArea.X, DbArea.Y, DbArea.Z);
 
                 for (int i = 0; i < count; i++)
                 {
-                    double t = (2.0 * Math.PI * i) / count;
+                    double angle = t * i;
 
-                    int offX = (int)(a * Math.Cos(t));
-                    int offY = (int)(b * Math.Sin(t));
-
-                    double normalX = b * Math.Cos(t);
-                    double normalY = a * Math.Sin(t);
-
-                    float headAngle = (float)Math.Atan2(normalX, normalY);
+                    var offset = Vector.Create((int)(a * Math.Cos(angle)), (int)(b * Math.Sin(angle)));
 
                     var mini = new GameStaticItem
                     {
                         Model = (ushort)model,
                         Name = "Ellipse Boundary",
-                        Position = Position.Create(Region.ID, DbArea.X + offX, DbArea.Y + offY, DbArea.Z, Angle.Radians(headAngle).InHeading)
+                        Position = Position.Create(Region.ID, center + offset, Angle.Radians(angle + 3 * Math.PI / 2))
                     };
                     mini.AddToWorld();
                     m_boundaryObjects.Add(mini);

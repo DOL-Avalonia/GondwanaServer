@@ -30,6 +30,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DOL.GS.Spells;
 using AmteScripts.Managers;
+using System.Transactions;
 
 namespace DOL.GS
 {
@@ -403,18 +404,20 @@ namespace DOL.GS
             double k = spacing / (2.0 * Math.PI * 1000.0);
             int count = (int)Math.Round((2.0 * Math.PI * radius) * k);
             count = Math.Max(6, Math.Min(128, count));
+            var center = Coordinate.Create(DbArea.X, DbArea.Y, DbArea.Z);
+            var t = (2.0 * Math.PI / count);
 
             for (int i = 0; i < count; i++)
             {
-                double t = (2.0 * Math.PI * i) / count;
-                Angle outward = Angle.Radians(t);
+                double angle = t * i;
+                Angle outward = Angle.Radians(angle);
                 Vector offset = Vector.Create(outward, radius);
 
                 var mini = new GameStaticItem
                 {
                     Model = (ushort)model,
                     Name = "Boundary",
-                    Position = Position.Create(Region.ID, DbArea.X + offset.X, DbArea.Y + offset.Y, DbArea.Z, outward.InHeading)
+                    Position = Position.Create(Region.ID, center + offset, outward)
                 };
                 mini.AddToWorld();
                 m_boundaryObjects.Add(mini);
