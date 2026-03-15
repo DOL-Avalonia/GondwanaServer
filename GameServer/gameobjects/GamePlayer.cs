@@ -4884,7 +4884,14 @@ namespace DOL.GS
             }
 
             amount += territoryBonus;
-            
+            long lowPopBonusAmount = 0;
+            int lowPopBonusPercent = 0;
+            long realmLowPopBonusAmount = 0;
+            int realmLowPopBonusPercent = 0;
+            var yearlyEvent = GameEventManager.Instance.GetActiveYearlyEvent();
+            int yearlyEventPercent = Properties.YEARLY_EVENT_RP_BONUS_PERCENT;
+            long yearlyEventBonusAmount = 0;
+
             if (modify)
             {
                 //Zone Bonus Support
@@ -4924,6 +4931,67 @@ namespace DOL.GS
                 {
                     amount += (amount * rpBonus) / 100;
                 }
+
+                // RVR POPULATION BONUSES
+                if (this.IsInRvR)
+                {
+                    int rvrPop = 0;
+                    int albPop = 0;
+                    int midPop = 0;
+                    int hibPop = 0;
+
+                    foreach (GameClient client in WorldMgr.GetAllPlayingClients())
+                    {
+                        if (client.Player != null && client.Player.IsInRvR)
+                        {
+                            rvrPop++;
+                            switch (client.Player.Realm)
+                            {
+                                case eRealm.Albion: albPop++; break;
+                                case eRealm.Midgard: midPop++; break;
+                                case eRealm.Hibernia: hibPop++; break;
+                            }
+                        }
+                    }
+                    if (rvrPop >= 0 && rvrPop < 21)
+                    {
+                        if (rvrPop <= 5) lowPopBonusPercent = 15;
+                        else lowPopBonusPercent = 21 - rvrPop;
+
+                        lowPopBonusAmount = (long)Math.Round(amount * (lowPopBonusPercent / 100.0));
+                        amount += lowPopBonusAmount;
+                    }
+                    else if (rvrPop >= 21)
+                    {
+                        int maxPop = Math.Max(albPop, Math.Max(midPop, hibPop));
+                        int myPop = 0;
+
+                        switch (this.Realm)
+                        {
+                            case eRealm.Albion: myPop = albPop; break;
+                            case eRealm.Midgard: myPop = midPop; break;
+                            case eRealm.Hibernia: myPop = hibPop; break;
+                        }
+
+                        double diffPercent = ((double)(maxPop - myPop) / rvrPop) * 100.0;
+
+                        if (diffPercent >= 15.0) realmLowPopBonusPercent = 15;
+                        else if (diffPercent >= 10.0) realmLowPopBonusPercent = 10;
+                        else if (diffPercent >= 5.0) realmLowPopBonusPercent = 5;
+
+                        if (realmLowPopBonusPercent > 0)
+                        {
+                            realmLowPopBonusAmount = (long)Math.Round(amount * (realmLowPopBonusPercent / 100.0));
+                            amount += realmLowPopBonusAmount;
+                        }
+                    }
+                    // YEARLY EVENT RvR RP BONUS
+                    if (yearlyEvent != null && yearlyEventPercent > 0)
+                    {
+                        yearlyEventBonusAmount = (long)Math.Round(amount * (yearlyEventPercent / 100.0));
+                        amount += yearlyEventBonusAmount;
+                    }
+                }
             }
 
             if (notify)
@@ -4948,7 +5016,18 @@ namespace DOL.GS
             }
 
             if (sendMessage == true && amount > 0)
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.YouGet", amount.ToString()), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            {
+                string msg = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.YouGet", amount.ToString());
+
+                if (lowPopBonusAmount > 0)
+                    msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.LowPopBonus", lowPopBonusAmount.ToString(), lowPopBonusPercent);
+                if (realmLowPopBonusAmount > 0)
+                    msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus", realmLowPopBonusAmount.ToString(), realmLowPopBonusPercent);
+                if (yearlyEventBonusAmount > 0 && yearlyEvent != null)
+                    msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus", yearlyEventBonusAmount.ToString(), yearlyEvent.EventName);
+
+                Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            }
 
             while (RealmPoints >= CalculateRPsFromRealmLevel(RealmLevel + 1) && RealmLevel < (REALMPOINTS_FOR_LEVEL.Length - 1))
             {
@@ -4993,7 +5072,7 @@ namespace DOL.GS
         {
             double factor = 1.0d;
 
-            if (enableZone && ServerProperties.Properties.ENABLE_ZONE_BONUSES && CurrentZone != null)
+            if (enableZone && Properties.ENABLE_ZONE_BONUSES && CurrentZone != null)
             {
                 factor *= 1.0d + (ZoneBonus.GetRPBonus(this) / 100.0d);
             }
@@ -5010,10 +5089,73 @@ namespace DOL.GS
                 factor *= 1.0d + areapoints;
             }
 
-            factor *= ServerProperties.Properties.RP_RATE;
+            factor *= Properties.RP_RATE;
 
             var toaBonus = GetModified(eProperty.RealmPoints);
             factor *= toaBonus != 0 ? 1.0d + toaBonus / 100.0d : 1.0d;
+
+            if (this.IsInRvR)
+            {
+                int rvrPop = 0;
+                int albPop = 0;
+                int midPop = 0;
+                int hibPop = 0;
+
+                foreach (GameClient client in WorldMgr.GetAllPlayingClients())
+                {
+                    if (client.Player != null && client.Player.IsInRvR)
+                    {
+                        rvrPop++;
+                        switch (client.Player.Realm)
+                        {
+                            case eRealm.Albion: albPop++; break;
+                            case eRealm.Midgard: midPop++; break;
+                            case eRealm.Hibernia: hibPop++; break;
+                        }
+                    }
+                }
+
+                if (rvrPop >= 0 && rvrPop < 21)
+                {
+                    int lowPopBonusPercent = (rvrPop <= 5) ? 15 : 21 - rvrPop;
+                    factor *= 1.0d + (lowPopBonusPercent / 100.0d);
+                }
+                else if (rvrPop >= 21)
+                {
+                    int maxPop = Math.Max(albPop, Math.Max(midPop, hibPop));
+                    int myPop = 0;
+
+                    switch (this.Realm)
+                    {
+                        case eRealm.Albion: myPop = albPop; break;
+                        case eRealm.Midgard: myPop = midPop; break;
+                        case eRealm.Hibernia: myPop = hibPop; break;
+                    }
+
+                    double diffPercent = ((double)(maxPop - myPop) / rvrPop) * 100.0;
+                    int realmLowPopBonusPercent = 0;
+
+                    if (diffPercent >= 15.0) realmLowPopBonusPercent = 15;
+                    else if (diffPercent >= 10.0) realmLowPopBonusPercent = 10;
+                    else if (diffPercent >= 5.0) realmLowPopBonusPercent = 5;
+
+                    if (realmLowPopBonusPercent > 0)
+                    {
+                        factor *= 1.0d + (realmLowPopBonusPercent / 100.0d);
+                    }
+                }
+
+                // YEARLY EVENT RvR RP BONUS
+                var yearlyEvent = GameEventManager.Instance.GetActiveYearlyEvent();
+                if (yearlyEvent != null)
+                {
+                    int yearlyEventBonusPercent = Properties.YEARLY_EVENT_RP_BONUS_PERCENT;
+                    if (yearlyEventBonusPercent > 0)
+                    {
+                        factor *= 1.0d + (yearlyEventBonusPercent / 100.0d);
+                    }
+                }
+            }
 
             return factor;
         }
@@ -5061,19 +5203,19 @@ namespace DOL.GS
             if (modify)
             {
                 //bp rate modifier
-                double modifier = ServerProperties.Properties.BP_RATE;
+                double modifier = Properties.BP_RATE;
                 if (modifier != -1)
                     amount = (long)(amount * modifier);
 
                 //[StephenxPimente]: Zone Bonus Support
-                if (ServerProperties.Properties.ENABLE_ZONE_BONUSES)
+                if (Properties.ENABLE_ZONE_BONUSES)
                 {
                     int zoneBonus = (((int)amount * ZoneBonus.GetBPBonus(this)) / 100);
                     if (zoneBonus > 0)
                     {
-                        Out.SendMessage(ZoneBonus.GetBonusMessage(this, (int)(zoneBonus * ServerProperties.Properties.BP_RATE), ZoneBonus.eZoneBonusType.BP),
+                        Out.SendMessage(ZoneBonus.GetBonusMessage(this, (int)(zoneBonus * Properties.BP_RATE), ZoneBonus.eZoneBonusType.BP),
                                         eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                        GainBountyPoints((long)(zoneBonus * ServerProperties.Properties.BP_RATE), false, false, false);
+                        GainBountyPoints((long)(zoneBonus * Properties.BP_RATE), false, false, false);
                     }
                 }
 
@@ -5661,22 +5803,22 @@ namespace DOL.GS
                 expTotal -= expOutpostBonus;
 
                 //[StephenxPimentel] - Zone Bonus XP Support
-                if (ServerProperties.Properties.ENABLE_ZONE_BONUSES)
+                if (Properties.ENABLE_ZONE_BONUSES)
                 {
                     long zoneBonus = (long)Math.Round(expTotal * (ZoneBonus.GetXPBonus(this) / 100.0d));
                     if (zoneBonus > 0)
                     {
-                        Out.SendMessage(ZoneBonus.GetBonusMessage(this, (long)(zoneBonus * ServerProperties.Properties.XP_RATE), ZoneBonus.eZoneBonusType.XP),
+                        Out.SendMessage(ZoneBonus.GetBonusMessage(this, (long)(zoneBonus * Properties.XP_RATE), ZoneBonus.eZoneBonusType.XP),
                                         eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                        GainExperience(eXPSource.Other, (long)(zoneBonus * ServerProperties.Properties.XP_RATE), 0, 0, 0, false, false, false, 1);
+                        GainExperience(eXPSource.Other, (long)(zoneBonus * Properties.XP_RATE), 0, 0, 0, false, false, false, 1);
                     }
                 }
 
 
                 if (this.CurrentRegion.IsRvR)
-                    expTotal = (long)(expTotal * ServerProperties.Properties.RvR_XP_RATE);
+                    expTotal = (long)(expTotal * Properties.RvR_XP_RATE);
                 else
-                    expTotal = (long)(expTotal * ServerProperties.Properties.XP_RATE);
+                    expTotal = (long)(expTotal * Properties.XP_RATE);
 
                 // [Freya] Nidel: ToA Xp Bonus
                 long xpBonus = GetModified(eProperty.XpPoints);
@@ -5685,7 +5827,7 @@ namespace DOL.GS
                     expTotal += (expTotal * xpBonus) / 100;
                 }
 
-                long hardXPCap = (long)(GameServer.ServerRules.GetExperienceForLiving(Level) * ServerProperties.Properties.XP_HARDCAP_PERCENT / 100);
+                long hardXPCap = (long)(GameServer.ServerRules.GetExperienceForLiving(Level) * Properties.XP_HARDCAP_PERCENT / 100);
 
                 if (expTotal > hardXPCap)
                     expTotal = hardXPCap;
@@ -5727,6 +5869,30 @@ namespace DOL.GS
                 expTotal += territoryExp;
             }
 
+            // Low population bonus calc. - 20 players = 1 %, 19 = 2 %, etc.
+            long lowPopBonusExp = 0;
+            int lowPopBonusPercent = 0;
+
+            if (xpSource == eXPSource.NPC || xpSource == eXPSource.EventNPC)
+            {
+                int playerCount = WorldMgr.GetAllClients().Count;
+
+                if (playerCount <= 5)
+                {
+                    lowPopBonusPercent = 15;
+                }
+                else if (playerCount < 21)
+                {
+                    lowPopBonusPercent = 21 - playerCount;
+                }
+
+                if (lowPopBonusPercent > 0)
+                {
+                    lowPopBonusExp = (long)Math.Round(expTotal * (lowPopBonusPercent / 100.0));
+                    expTotal += lowPopBonusExp;
+                }
+            }
+
             // Get Champion Experience too
             GainChampionExperience(expTotal);
 
@@ -5744,7 +5910,7 @@ namespace DOL.GS
                     {
                         //we don't want to allow catacombs classes to use free levels and
                         //have a 50% bonus
-                        if (!ServerProperties.Properties.ALLOW_CATA_SLASH_LEVEL && CanUseSlashLevel && Level < 20)
+                        if (!Properties.ALLOW_CATA_SLASH_LEVEL && CanUseSlashLevel && Level < 20)
                         {
                             expTotal = (long)Math.Round(expTotal * 1.5);
                         }
@@ -5843,12 +6009,12 @@ namespace DOL.GS
         {
             double factor = 1.0d;
             
-            if (enableZone && ServerProperties.Properties.ENABLE_ZONE_BONUSES && CurrentZone != null)
+            if (enableZone && Properties.ENABLE_ZONE_BONUSES && CurrentZone != null)
             {
                 factor += (ZoneBonus.GetXPBonus(this) / 100.0d);
             }
             
-            factor *= IsInRvR ? ServerProperties.Properties.RvR_XP_RATE : ServerProperties.Properties.XP_RATE;
+            factor *= IsInRvR ? Properties.RvR_XP_RATE : Properties.XP_RATE;
             
 
             var toaBonus = GetModified(eProperty.XpPoints);
@@ -5878,7 +6044,7 @@ namespace DOL.GS
                     {
                         //we don't want to allow catacombs classes to use free levels and
                         //have a 50% bonus
-                        if (!ServerProperties.Properties.ALLOW_CATA_SLASH_LEVEL && CanUseSlashLevel && Level < 20)
+                        if (!Properties.ALLOW_CATA_SLASH_LEVEL && CanUseSlashLevel && Level < 20)
                         {
                             factor *= 1.5;
                         }

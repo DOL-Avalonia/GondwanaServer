@@ -72,6 +72,7 @@ namespace AmteScripts.Managers
         private static DateTime _startTime = DateTime.Today.AddHours(20D); //20H00
         private static DateTime _endTime = _startTime.Add(TimeSpan.FromHours(4)).Add(TimeSpan.FromMinutes(5)); //4H00 + 5
         private const int _checkInterval = 30 * 1000; // 30 seconds
+        private DateTime _lastRpTick = DateTime.Now;
         private static readonly Position _stuckSpawn = Position.Create(51, 434303, 493165, 3088, 1069);
         private Dictionary<ushort, IList<string>> RvrStats = new Dictionary<ushort, IList<string>>();
         private Dictionary<eRealm, int> Scores = new Dictionary<eRealm, int>();
@@ -364,6 +365,9 @@ namespace AmteScripts.Managers
             {
                 // Count the number of player in RvR
                 int countPlayer = 0;
+                int albPop = 0;
+                int midPop = 0;
+                int hibPop = 0;
 
                 foreach (var id in _regions)
                 {
@@ -420,6 +424,73 @@ namespace AmteScripts.Managers
                 }
 
                 checkScore = (checkScore + 1) % 2;
+
+                if ((currentTime - _lastRpTick).TotalMilliseconds >= Properties.RVR_TICK_INTERVAL_MS)
+                {
+                    _lastRpTick = currentTime;
+
+                    double popFactor = 1.0;
+                    if (countPlayer >= 0 && countPlayer < 21)
+                    {
+                        int lowPopBonusPercent = (countPlayer <= 5) ? 15 : 21 - countPlayer;
+                        popFactor = 1.0 + (lowPopBonusPercent / 100.0);
+                    }
+                    else if (countPlayer >= 40)
+                    {
+                        int penaltyPercent = ((countPlayer - 40) / 10) * 5;
+                        if (penaltyPercent > 0)
+                            popFactor = Math.Max(0.1, 1.0 - (penaltyPercent / 100.0));
+                    }
+
+                    int maxPop = Math.Max(albPop, Math.Max(midPop, hibPop));
+                    double rpRate = Properties.RP_RATE != -1 ? Properties.RP_RATE : 1.0;
+
+                    foreach (var id in _regions)
+                    {
+                        foreach (var cl in WorldMgr.GetClientsOfRegion(id))
+                        {
+                            if (cl.Player != null && cl.Player.IsInRvR && cl.Player.IsAlive)
+                            {
+                                double mapFactor = cl.Player.Level switch
+                                {
+                                    >= 20 and < 29 => 0.25,
+                                    >= 29 and < 38 => 0.50,
+                                    >= 38 and < 46 => 0.75,
+                                    >= 46 => 1.0,
+                                    _ => 0.0
+                                };
+
+                                if (mapFactor > 0)
+                                {
+                                    double realmBalanceFactor = 1.0;
+                                    if (countPlayer >= 21)
+                                    {
+                                        int myPop = 0;
+                                        switch (cl.Player.Realm)
+                                        {
+                                            case eRealm.Albion: myPop = albPop; break;
+                                            case eRealm.Midgard: myPop = midPop; break;
+                                            case eRealm.Hibernia: myPop = hibPop; break;
+                                        }
+
+                                        double diffPercent = ((double)(maxPop - myPop) / countPlayer) * 100.0;
+                                        int realmLowPopBonusPercent = 0;
+
+                                        if (diffPercent >= 15.0) realmLowPopBonusPercent = 15;
+                                        else if (diffPercent >= 10.0) realmLowPopBonusPercent = 10;
+                                        else if (diffPercent >= 5.0) realmLowPopBonusPercent = 5;
+
+                                        if (realmLowPopBonusPercent > 0)
+                                            realmBalanceFactor = 1.0 + (realmLowPopBonusPercent / 100.0);
+                                    }
+
+                                    long tickAmount = (long)Math.Max(1, Math.Round(Properties.RVR_TICK_BASE_RP * mapFactor * popFactor * realmBalanceFactor * rpRate));
+                                    cl.Player.GainRealmPoints(tickAmount, false, false, true);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             if (currentTime.Date > RvRBonusDate)
@@ -905,7 +976,109 @@ namespace AmteScripts.Managers
                 return statList;
             }
 
-            // Scores at the top
+            // RVR Bonuses: RP/Tick, Population bonuses && Yearly events RvR RP Bonus
+            int rvrPop = 0;
+            int albPop = 0;
+            int midPop = 0;
+            int hibPop = 0;
+            var yearlyEvent = DOL.GameEvents.GameEventManager.Instance.GetActiveYearlyEvent();
+            int yearlyEventBonusPercent = Properties.YEARLY_EVENT_RP_BONUS_PERCENT;
+            bool hasyearlyEvent = yearlyEvent != null && yearlyEventBonusPercent > 0;
+
+            foreach (GameClient client in WorldMgr.GetAllPlayingClients())
+            {
+                if (client.Player != null && client.Player.IsInRvR)
+                {
+                    rvrPop++;
+                    switch (client.Player.Realm)
+                    {
+                        case eRealm.Albion: albPop++; break;
+                        case eRealm.Midgard: midPop++; break;
+                        case eRealm.Hibernia: hibPop++; break;
+                    }
+                }
+            }
+
+            double mapFactor = player.Level switch
+            {
+                >= 20 and < 29 => 0.25,
+                >= 29 and < 38 => 0.50,
+                >= 38 and < 46 => 0.75,
+                >= 46 => 1.0,
+                _ => 0.0
+            };
+
+            double popFactor = 1.0;
+            if (rvrPop >= 0 && rvrPop < 21)
+            {
+                int lowPopBonusPercent = (rvrPop <= 5) ? 15 : 21 - rvrPop;
+                popFactor = 1.0 + (lowPopBonusPercent / 100.0);
+            }
+            else if (rvrPop >= 40)
+            {
+                int penaltyPercent = ((rvrPop - 40) / 10) * 5;
+                if (penaltyPercent > 0)
+                    popFactor = Math.Max(0.1, 1.0 - (penaltyPercent / 100.0));
+            }
+
+            double realmBalanceFactor = 1.0;
+            int myPop = 0;
+            string realmName = "";
+            int maxPop = Math.Max(albPop, Math.Max(midPop, hibPop));
+
+            switch (player.Realm)
+            {
+                case eRealm.Albion: myPop = albPop; realmName = "Albion"; break;
+                case eRealm.Midgard: myPop = midPop; realmName = "Midgard"; break;
+                case eRealm.Hibernia: myPop = hibPop; realmName = "Hibernia"; break;
+            }
+
+            if (rvrPop >= 21 && !string.IsNullOrEmpty(realmName))
+            {
+                double diffPercent = ((double)(maxPop - myPop) / rvrPop) * 100.0;
+                int realmLowPopBonusPercent = 0;
+
+                if (diffPercent >= 15.0) realmLowPopBonusPercent = 15;
+                else if (diffPercent >= 10.0) realmLowPopBonusPercent = 10;
+                else if (diffPercent >= 5.0) realmLowPopBonusPercent = 5;
+
+                if (realmLowPopBonusPercent > 0)
+                    realmBalanceFactor = 1.0 + (realmLowPopBonusPercent / 100.0);
+            }
+
+            statList.Add(LanguageMgr.GetTranslation(language, "RvRManager.RPBonusesDisplay"));
+
+            // 1. Tick Display
+            if (mapFactor > 0)
+            {
+                double rpRate = Properties.RP_RATE != -1 ? Properties.RP_RATE : 1.0;
+                long estimatedTickRp = (long)Math.Max(1, Math.Round(Properties.RVR_TICK_BASE_RP * mapFactor * popFactor * realmBalanceFactor * rpRate));
+                statList.Add($"  {LanguageMgr.GetTranslation(language, "RvRManager.TickBonus", estimatedTickRp)}");
+            }
+
+            // 2. Global Pop (Display only the bonus, hidden penalty)
+            if (rvrPop >= 0 && rvrPop < 21)
+            {
+                int lowPopBonusPercent = (rvrPop <= 5) ? 15 : 21 - rvrPop;
+                statList.Add($"  {LanguageMgr.GetTranslation(language, "RvRManager.LowPopBonus", lowPopBonusPercent)}");
+            }
+
+            // 3. Realm Balance
+            if (rvrPop >= 21 && realmBalanceFactor > 1.0)
+            {
+                int realmLowPopBonusPercent = (int)Math.Round((realmBalanceFactor - 1.0) * 100.0);
+                statList.Add($"  {LanguageMgr.GetTranslation(language, "RvRManager.RealmLowPopBonus", realmName, realmLowPopBonusPercent)}");
+            }
+
+            // 4. Yearly Event
+            if (hasyearlyEvent)
+            {
+                statList.Add($"  {LanguageMgr.GetTranslation(language, "RvRManager.YearlyEventBonus", yearlyEvent!.EventName, yearlyEventBonusPercent)}");
+            }
+
+            statList.Add("");
+
+            // RvR Scores
             statList.Add(LanguageMgr.GetTranslation(language, "RvRManager.TotalScores"));
             foreach (var realm in _RvRRealms)
             {
@@ -915,7 +1088,7 @@ namespace AmteScripts.Managers
 
             // Current Champion
             statList.Add("--------------------------------------------------------------");
-            statList.Add(LanguageMgr.GetTranslation(language, "RvRManager.CurrentChampion") + GetCurrentChampion(language));
+            statList.Add(LanguageMgr.GetTranslation(language, "RvRManager.CurrentChampion") + " " + GetCurrentChampion(language));
             statList.Add("--------------------------------------------------------------");
             statList.Add("");
 
@@ -965,7 +1138,7 @@ namespace AmteScripts.Managers
 
                         ++playerCounts[index];
 
-                        if (client.Player.Guild != null)
+                        if (client.Player!.Guild != null)
                             guildPoints[index] = client.Player.Guild.RealmPoints; // This is weird, but currently we don't have a list for it, so...
                     }
 

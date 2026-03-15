@@ -138,7 +138,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:			({0} camp bonus)
 GameObjects.GamePlayer.GainExperience.CannotRaise:			You cannot raise to the 6th level until you join an advanced guild!		
 GameObjects.GamePlayer.GainExperience.GroupBonus:			({0} group bonus)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:			({0} outpost bonus)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus:       You gain a bonus of {0} due to underpopulated realm!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:			(+{0} from {1}% Low Population bonus)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:		Talk to your trainer for more information.			
 GameObjects.GamePlayer.GainExperience.YouGet:				You get {0} experience points.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:     including {0} Renaissance xp bonus points
@@ -153,6 +153,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:		Your new realm title is {
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:			You reached realm rank {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:		{0} reached realm rank {1:#L#} in {2}!		
 GameObjects.GamePlayer.GainRealmPoints.YouGet:				You get {0} realm points!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:			(+{0} RP from {1}% Low Population bonus)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:	(+{0} RP from {1}% Under Populated Realm bonus)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:	(+{0} RP from {1} event bonus)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:			You gain {0} realm points from area bonuses!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:	You gain {0} realm points for defending your territory!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:	You gain {0} realm points for healing a member of your realm!

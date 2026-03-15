@@ -137,7 +137,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:              ({0} bonus accampa
 GameObjects.GamePlayer.GainExperience.CannotRaise:            Non puoi raggiungere il livello 6 prima di scegliere una specializzazione.
 GameObjects.GamePlayer.GainExperience.GroupBonus:             ({0} bonus gruppo)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:           ({0} bonus avamposto)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus: Ricevi un bonus di {0} per regni sotto-popolati!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} dal {1}% di bonus Popolazione Bassa)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Parla con il tuo allenatore per maggiori informazioni.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Ottieni {0} punti esperienza.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       di cui {0} punti bonus da Rinascita
@@ -152,6 +152,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:         Il tuo nuovo titol
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:           Hai raggiunto il rango reame {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:       {0} ha raggiunto il rango reame {1:#L#} in {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:                Ottieni {0} punti reame!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP dal {1}% di bonus Popolazione Bassa)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP dal {1}% di bonus Regno Sottopopolato)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP dal bonus evento {1})
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Ottieni {0} punti reame bonus grazie ai bonus di area!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Ottieni {0} punti reame per la difesa del tuo territorio!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Ottieni {0} punti reame per aver curato un membro del tuo reame!

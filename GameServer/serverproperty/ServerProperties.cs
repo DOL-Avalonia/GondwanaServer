@@ -1806,6 +1806,24 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("pvp", "koth_duration_seconds", "Duration in seconds for the King of the Hill objective before it moves", 900)]
         public static int KOTH_DURATION_SECONDS;
 
+        /// <summary>
+        /// The percentage RP bonus for the active yearly event. Set to 0 to disable.
+        /// </summary>
+        [ServerProperty("rvr", "yearly_event_rp_bonus_percent", "The percentage RP bonus for the active yearly event. 0 to disable.", 15)]
+        public static int YEARLY_EVENT_RP_BONUS_PERCENT;
+
+        /// <summary>
+        /// The interval in milliseconds for RvR participation RP ticks (Default 120000 = 2 minutes).
+        /// </summary>
+        [ServerProperty("rvr", "rvr_tick_interval_ms", "The interval in milliseconds for RvR participation RP ticks.", 120000)]
+        public static int RVR_TICK_INTERVAL_MS;
+
+        /// <summary>
+        /// The base Realm Points awarded per RvR tick (Default 30).
+        /// </summary>
+        [ServerProperty("rvr", "rvr_tick_base_rp", "The base Realm Points awarded per RvR tick.", 20)]
+        public static int RVR_TICK_BASE_RP;
+
         #endregion
 
         #region KEEPS

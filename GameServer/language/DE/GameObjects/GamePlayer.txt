@@ -138,7 +138,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:	({0} Lagerbonus)
 GameObjects.GamePlayer.GainExperience.CannotRaise:	Ihr könnt nicht zur Stufe 6 aufsteigen, bevor Ihr nicht einen Beruf gewählt habt!
 GameObjects.GamePlayer.GainExperience.GroupBonus:	({0} Gruppenbonus)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:	({0} Außenpostenbonus)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus:	Du erhältst einen Bonus von {0} für unterbevölkerte Reiche!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:	(+{0} durch {1}% Bonus für niedrige Bevölkerung)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:	Sprecht mit Eurem Ausbilder für mehr Informationen.
 GameObjects.GamePlayer.GainExperience.YouGet:	Ihr erhaltet {0} Erfahrungspunkte.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:	darunter {0} Bonuspunkte aus Wiedergeburt
@@ -153,6 +153,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:	Euer neuer Reichstitel lau
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:	You reached realm rank {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:	{0} erreicht Reichsrang {1:#L#} in {2} !
 GameObjects.GamePlayer.GainRealmPoints.YouGet:	Ihr erhaltet {0} Reichspunkte!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:			(+{0} RP durch {1}% Bonus für niedrige Bevölkerung)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:	(+{0} RP durch {1}% Bonus für unterbevölkertes Reich)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:	(+{0} RP durch {1} Event-Bonus)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:	Du erhältst {0} Reichspunkte Bonus dank Gebiets‑Boni!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:	Du erhältst {0} Reichspunkte für die Verteidigung deines Territoriums!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:	Du erhältst {0} Reichspunkte für das Heilen eines Mitglieds deines Reiches!

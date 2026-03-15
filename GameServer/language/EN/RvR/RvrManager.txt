@@ -4,6 +4,11 @@ RvrManager.Score.Winner:	Winner
 
 RvRManager.GMNotAllowed:			Go away, stupid Game Master!
 RvRManager.LowLevel:				Come back when you get more experience!
+RvRManager.RPBonusesDisplay:		- RvR RP bonuses:
+RvRManager.TickBonus:				RP bonus per tick for participating in RvR: {0}
+RvRManager.LowPopBonus:				Low Population RP bonus: {0}%
+RvRManager.RealmLowPopBonus:		Under-populated realm RP bonus ({0}): {1}%
+RvRManager.YearlyEventBonus:		Yearly Event RP bonus ({0}): {1}%
 RvRManager.WinnerBonuses:			Your realm has won the last RvR session and now benefit from these bonuses:
 RvRManager.BonusGold:				- Bonus in gold when killing monsters: 5%
 RvRManager.BonusExperience:			- Experience bonus when killing monsters: 10%

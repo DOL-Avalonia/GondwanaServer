@@ -108,6 +108,18 @@ namespace DOL.GameEvents
             {
                 if (ev.StartTriggerTime.HasValue && now >= ev.StartTriggerTime.Value)
                 {
+                    if (ev.IsGlobalYearlyEvent && ev.EndTime.HasValue && now >= ev.EndTime.Value)
+                    {
+                        while (now >= ev.EndTime.Value)
+                        {
+                            ev.StartTriggerTime = ev.StartTriggerTime.Value.AddYears(1);
+                            ev.EndTime = ev.EndTime.Value.AddYears(1);
+                        }
+                        ev.SaveToDatabase();
+                        log.Info($"Yearly event '{ev.EventName}' auto-advanced schedule to year {ev.StartTriggerTime.Value.Year}.");
+                        continue;
+                    }
+
                     await ev.Start();
                 }
             }
@@ -119,9 +131,20 @@ namespace DOL.GameEvents
             foreach (GameEvent ev in events)
             {
                 // Do we really want to do this here?
-                if (ev.EndTime.HasValue && now >= ev.EndTime)
+                if (ev.EndTime.HasValue && now >= ev.EndTime.Value)
                 {
                     await ev.Stop(EndingConditionType.Timer);
+
+                    if (ev.IsGlobalYearlyEvent && ev.StartTriggerTime.HasValue)
+                    {
+                        while (now >= ev.EndTime.Value)
+                        {
+                            ev.StartTriggerTime = ev.StartTriggerTime.Value.AddYears(1);
+                            ev.EndTime = ev.EndTime.Value.AddYears(1);
+                        }
+                        ev.SaveToDatabase();
+                        log.Info($"Yearly event '{ev.EventName}' finished its cycle and auto-advanced to year {ev.StartTriggerTime.Value.Year}.");
+                    }
                 }
             }
             
@@ -459,6 +482,17 @@ namespace DOL.GameEvents
             Instance.PreloadedMobs.Clear();
         }
 
+        /// <summary>
+        /// Returns the first currently running event that is marked as Global/Everywhere.
+        /// </summary>
+        public GameEvent GetActiveYearlyEvent()
+        {
+            return RunningEvents.FirstOrDefault(ev =>
+                (ev.EventAreas != null && ev.EventAreas.Any(a => a.Equals("Everywhere", StringComparison.OrdinalIgnoreCase) || a.Equals("All", StringComparison.OrdinalIgnoreCase))) ||
+                (ev.EventZones != null && ev.EventZones.Any(z => z.Equals("Everywhere", StringComparison.OrdinalIgnoreCase) || z.Equals("All", StringComparison.OrdinalIgnoreCase)))
+            );
+        }
+
         internal IList<string> GetEventsLightInfos()
         {
             List<string> infos = new List<string>();
@@ -637,7 +671,7 @@ namespace DOL.GameEvents
                     continue;
                 }
 
-                if (ev.TimerType == TimerType.DateType && ev.EndingConditionTypes.Contains(EndingConditionType.Timer) && ev.EndingConditionTypes.Count() == 1)
+                if (!ev.IsGlobalYearlyEvent && ev.TimerType == TimerType.DateType && ev.EndingConditionTypes.Contains(EndingConditionType.Timer) && ev.EndingConditionTypes.Count() == 1)
                 {
                     log.Error(string.Format("Cannot Reset Event {0}, Name: {1} with DateType with only Timer as Ending condition", ev.ID, ev.EventName));
                 }

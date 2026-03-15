@@ -138,7 +138,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:                    ({0} bonus d
 GameObjects.GamePlayer.GainExperience.CannotRaise:		            Vous ne pouvez pas atteindre le niveau 6 tant que vous n'avez pas choisi une spécialisation. 
 GameObjects.GamePlayer.GainExperience.GroupBonus:                   ({0} bonus de groupe)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:                 ({0} bonus de forts)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus:       Vous gagnez un bonus de {0} de royaume sous-peuplé !
+GameObjects.GamePlayer.GainExperience.LowPopBonus:					(+{0} grâce au bonus Faible Population de {1}%)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:	            Parlez à votre entraîneur pour plus d'informations.
 GameObjects.GamePlayer.GainExperience.YouGet:			            Vous obtenez {0} points d'expérience.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:             dont {0} points bonus de Renaissance
@@ -153,6 +153,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:	            Votre nouveau 
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:		            Vous venez d'atteindre le Rang de Royaume {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:		        {0} a atteint le rang de royaume {1:#L#} dans {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:			            Vous gagnez {0} points de royaume !
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:					(+{0} PR grâce au bonus Faible Population de {1}%)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:			(+{0} PR grâce au bonus Royaume Sous-Peuplé de {1}%)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:			(+{0} PR grâce au bonus d'évènement {1})
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:					Vous obtenez {0} points de royaume de bonus grâce aux bonus d'area !
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:			Vous obtenez {0} points de royaume pour avoir défendu votre territoire !
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:			Vous gagnez {0} points de royaume pour avoir soigné un membre de votre royaume !

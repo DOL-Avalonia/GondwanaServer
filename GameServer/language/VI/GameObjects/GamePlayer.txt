@@ -137,7 +137,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:              (Thưởng trại 
 GameObjects.GamePlayer.GainExperience.CannotRaise:            Bạn không thể đạt cấp 6 trước khi chọn chuyên môn.
 GameObjects.GamePlayer.GainExperience.GroupBonus:             (Thưởng tổ đội {0})
 GameObjects.GamePlayer.GainExperience.OutpostBonus:           (Thưởng tiền đồn {0})
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus: Bạn nhận thêm {0} nhờ vương quốc ít dân!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} từ {1}% thưởng Dân số thấp)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Hãy nói chuyện với huấn luyện viên của bạn để biết thêm.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Bạn nhận {0} điểm kinh nghiệm.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       trong đó {0} điểm thưởng từ Tái Sinh
@@ -152,6 +152,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:         Danh hiệu vươn
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:           Bạn đạt cấp bậc vương quốc {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:       {0} đã đạt cấp bậc vương quốc {1:#L#} trong {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:                Bạn nhận {0} điểm vương quốc!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP từ {1}% thưởng Dân số thấp)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP từ {1}% thưởng Vương quốc thiếu dân)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP từ {1} thưởng sự kiện)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Bạn nhận thêm {0} điểm vương quốc nhờ bonus khu vực!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Bạn nhận {0} điểm vương quốc khi phòng thủ lãnh thổ!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Bạn nhận {0} điểm vương quốc vì đã hồi máu cho đồng minh!

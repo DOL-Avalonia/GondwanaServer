@@ -137,7 +137,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:              ({0} táborový bo
 GameObjects.GamePlayer.GainExperience.CannotRaise:            Nemůžeš dosáhnout úrovně 6, dokud si nevybereš specializaci.
 GameObjects.GamePlayer.GainExperience.GroupBonus:             ({0} skupinový bonus)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:           ({0} bonus za opěrný bod)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus: Získáváš bonus {0} za podpopulované říše!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:			(+{0} z {1}% bonusu za nízkou populaci)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Pro více informací promluv se svým trenérem.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Získáváš {0} zkušenostních bodů.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       z toho {0} bonusových bodů z Znovuzrození
@@ -152,6 +152,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:         Tvůj nový titul 
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:           Dosáhl/a jsi hodnosti říše {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:       {0} dosáhl/a hodnosti říše {1:#L#} v {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:                Získáváš {0} bodů říše!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:			(+{0} RP z {1}% bonusu za nízkou populaci)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:	(+{0} RP z {1}% bonusu za málo osídlenou říši)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:	(+{0} RP z {1} bonusu události)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Získáváš {0} bodů říše navíc díky oblastním bonusům!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Získáváš {0} bodů říše za obranu svého území!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Získáváš {0} bodů říše za vyléčení člena své říše!

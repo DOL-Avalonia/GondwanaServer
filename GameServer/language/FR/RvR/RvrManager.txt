@@ -4,6 +4,11 @@ RvrManager.Score.Winner:	Vainqueur
 
 RvRManager.GMNotAllowed:			Casse-toi connard de GM !
 RvRManager.LowLevel:				Reviens quand tu auras plus d'expérience !
+RvRManager.RPBonusesDisplay:		- Bonus PR pour le RvR :
+RvRManager.TickBonus:				Bonus de PR par tick pour votre participation au RvR : {0}
+RvRManager.LowPopBonus:				Bonus PR de faible population : {0}%
+RvRManager.RealmLowPopBonus:		Bonus PR de royaume sous-peuplé ({0}) : {1}%
+RvRManager.YearlyEventBonus:		Bonus PR d'évènement annuel ({0}) : {1}%
 RvRManager.WinnerBonuses:			Votre royaume a remporté la dernière session RvR et bénéficie maintenant de ces bonus :
 RvRManager.BonusGold:				- Bonus en or lorsque vous tuez des monstres : 5%
 RvRManager.BonusExperience:			- Bonus d'expérience lorsque vous tuez des monstres : 10%

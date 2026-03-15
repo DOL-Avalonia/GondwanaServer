@@ -137,7 +137,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:              ({0} bono de campa
 GameObjects.GamePlayer.GainExperience.CannotRaise:            No puedes alcanzar el nivel 6 antes de elegir una especialización.
 GameObjects.GamePlayer.GainExperience.GroupBonus:             ({0} bono de grupo)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:           ({0} bono de puesto avanzado)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus: ¡Recibes un bono de {0} por reinos con baja población!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} del {1}% de bonificación por baja población)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Habla con tu entrenador para más información.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Obtienes {0} puntos de experiencia.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       de los cuales {0} puntos de bono por Renacimiento
@@ -152,6 +152,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:         Tu nuevo título d
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:           ¡Has alcanzado el rango de reino {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:       ¡{0} ha alcanzado el rango de reino {1:#L#} en {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:                ¡Obtienes {0} puntos de reino!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP del {1}% de bonificación por baja población)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP del {1}% de bonificación por reino despoblado)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP de la bonificación de evento {1})
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           ¡Obtienes {0} puntos de reino extra gracias a bonos de zona!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      ¡Obtienes {0} puntos de reino por defender tu territorio!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     ¡Obtienes {0} puntos de reino por curar a un miembro de tu reino!

@@ -80,7 +80,7 @@ namespace DOL.GameEvents
             StartActionStopEventID = ev.StartActionStopEventID;
             StartTriggerTime = ev.StartTriggerTime;
             TimerType = ev.TimerType;
-            EndTime = (DateTimeOffset?)null;
+            EndTime = (ev.TimerType == TimerType.DateType && ev.IsGlobalYearlyEvent) ? ev.EndTime : (DateTimeOffset?)null;
             ChronoTime = ev.ChronoTime;
             KillStartingGroupMobId = ev.KillStartingGroupMobId;
             ResetEventId = ev.ResetEventId;
@@ -315,7 +315,8 @@ namespace DOL.GameEvents
             try
             {
                 StartedTime = (DateTimeOffset?)null;
-                EndTime = (DateTimeOffset?)null;
+                if (!(TimerType == TimerType.DateType && IsGlobalYearlyEvent))
+                    EndTime = (DateTimeOffset?)null;
                 WantedMobsCount = 0;
                 EventFamily.ForEach(c => c.Active = false);
                 _Cleanup();
@@ -428,6 +429,11 @@ namespace DOL.GameEvents
             }
             Status = EventStatus.Idle;
             log.DebugFormat("Finished reset of event {0}", this);
+
+            if (IsGlobalYearlyEvent)
+            {
+                GameNpcInventoryTemplate.RefreshEventEquipment();
+            }
 
             if (IsInstanceMaster && AreaConditions != null)
             {
@@ -579,6 +585,12 @@ namespace DOL.GameEvents
                         
                         log.DebugFormat("Event {0} started by {1}", this, triggerPlayer == null ? "server" : triggerPlayer);
                         SaveToDatabase();
+
+                        if (IsGlobalYearlyEvent)
+                        {
+                            GameNpcInventoryTemplate.RefreshEventEquipment();
+                        }
+
                         return true;
                     }
                 }
@@ -1152,7 +1164,8 @@ namespace DOL.GameEvents
             {
                 // Disable mob respawns
                 this.Mobs.ForEach(npc => npc.StopRespawn());
-                EndTime = DateTimeOffset.UtcNow;
+                if (!(TimerType == TimerType.DateType && IsGlobalYearlyEvent))
+                    EndTime = DateTimeOffset.UtcNow;
                 var (endText, endSound) = GetEndingTextAndSound(end);
 
                 if (!silent)
@@ -1265,8 +1278,14 @@ namespace DOL.GameEvents
                 {
                     Status = EventStatus.Idle;
                     StartedTime = null;
-                    EndTime = null;
+                    if (!(TimerType == TimerType.DateType && IsGlobalYearlyEvent))
+                        EndTime = null;
                     ChanceLastTimeChecked = (DateTimeOffset?)null;
+                }
+
+                if (IsGlobalYearlyEvent)
+                {
+                    GameNpcInventoryTemplate.RefreshEventEquipment();
                 }
             }
             log.DebugFormat("Finished event {0}", this);
@@ -1545,7 +1564,7 @@ namespace DOL.GameEvents
             EndTextB = !string.IsNullOrEmpty(db.EndTextB) ? db.EndTextB : null;
             EndEventSoundA = db.EndEventSoundA;
             EndEventSoundB = db.EndEventSoundB;
-            StartedTime = (DateTimeOffset?)null;
+            StartedTime = db.StartedTime > 0 && db.StartedTime < long.MaxValue ? DateTimeOffset.FromUnixTimeSeconds(db.StartedTime) : (DateTimeOffset?)null;
             EndingConditionTypes = db.EndingConditionTypes.Split(new char[] { '|' }).Select(c => Enum.TryParse(c, out EndingConditionType end) ? end : GameEvents.EndingConditionType.Timer);
             RandomText = !string.IsNullOrEmpty(db.RandomText) ? db.RandomText.Split(new char[] { '|' }) : null;
             RandTextInterval = db.RandTextInterval > 0 && db.RandTextInterval < long.MaxValue ? TimeSpan.FromMinutes(db.RandTextInterval) : (TimeSpan?)null;
@@ -1558,7 +1577,7 @@ namespace DOL.GameEvents
             StartActionStopEventID = !string.IsNullOrEmpty(db.StartActionStopEventID) ? db.StartActionStopEventID : null;
             StartTriggerTime = db.StartTriggerTime > 0 && db.StartTriggerTime < long.MaxValue ? DateTimeOffset.FromUnixTimeSeconds(db.StartTriggerTime) : (DateTimeOffset?)null;
             TimerType = Enum.TryParse(db.TimerType.ToString(), out TimerType timer) ? timer : TimerType.DateType;
-            EndTime = (DateTimeOffset?)null;
+            EndTime = db.EndTime > 0 && db.EndTime < long.MaxValue ? DateTimeOffset.FromUnixTimeSeconds(db.EndTime) : (DateTimeOffset?)null;
             ChronoTime = db.ChronoTime;
             KillStartingGroupMobId = !string.IsNullOrEmpty(db.KillStartingGroupMobId) ? db.KillStartingGroupMobId : null;
             ResetEventId = !string.IsNullOrEmpty(db.ResetEventId) ? db.ResetEventId : null;
@@ -1767,6 +1786,14 @@ namespace DOL.GameEvents
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            bool isGlobal = (this.EventAreas != null && this.EventAreas.Any(a => a.Equals("Everywhere", StringComparison.OrdinalIgnoreCase) || a.Equals("All", StringComparison.OrdinalIgnoreCase))) ||
+                            (eventZones != null && eventZones.Any(z => z.Equals("Everywhere", StringComparison.OrdinalIgnoreCase) || z.Equals("All", StringComparison.OrdinalIgnoreCase)));
+
+            if (isGlobal || eventZones == null || !eventZones.Any())
+            {
+                return enumerable;
+            }
+
             return enumerable
                 .Where(p => eventZones.Contains(p.CurrentZone.ID.ToString()));
         }
@@ -2122,6 +2149,13 @@ namespace DOL.GameEvents
         {
             get;
         }
+
+        /// <summary>
+        /// Checks if this event is configured to run globally (Yearly Events)
+        /// </summary>
+        public bool IsGlobalYearlyEvent =>
+            (EventAreas != null && EventAreas.Any(a => a.Equals("Everywhere", StringComparison.OrdinalIgnoreCase) || a.Equals("All", StringComparison.OrdinalIgnoreCase))) ||
+            (EventZones != null && EventZones.Any(z => z.Equals("Everywhere", StringComparison.OrdinalIgnoreCase) || z.Equals("All", StringComparison.OrdinalIgnoreCase)));
 
         public enum EventLaunchType
         {

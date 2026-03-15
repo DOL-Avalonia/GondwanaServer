@@ -16,14 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using DOL.Database;
+using DOL.GameEvents;
+using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using DOL.Database;
-using log4net;
 
 namespace DOL.GS
 {
@@ -32,7 +33,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Holds inventory item instances already used in inventory templates
@@ -83,6 +84,82 @@ namespace DOL.GS
                 if (visibleSlot == slot)
                     return slot;
             return eInventorySlot.Invalid;
+        }
+
+        private static int GetActiveModel(NPCEquipment equip)
+        {
+            int baseModel = equip.Model;
+
+            if (string.IsNullOrEmpty(equip.EventID) || string.IsNullOrEmpty(equip.EventModel))
+                return baseModel;
+
+            var activeEvent = GameEventManager.Instance.GetActiveYearlyEvent();
+            if (activeEvent == null)
+                return baseModel;
+
+            string[] eventIds = equip.EventID.Split('|');
+            string[] eventModels = equip.EventModel.Split('|');
+
+            for (int i = 0; i < eventIds.Length; i++)
+            {
+                if (eventIds[i].Equals(activeEvent.ID, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i < eventModels.Length && int.TryParse(eventModels[i], out int activeModel))
+                    {
+                        return activeModel;
+                    }
+                }
+            }
+
+            return baseModel;
+        }
+
+        public static void RefreshEventEquipment()
+        {
+            HashSet<string> eventTemplates = new HashSet<string>();
+
+            if (m_npcEquipmentCache != null)
+            {
+                foreach (var kvp in m_npcEquipmentCache)
+                {
+                    foreach (NPCEquipment equip in kvp.Value)
+                    {
+                        if (!string.IsNullOrEmpty(equip.EventID) && !string.IsNullOrEmpty(equip.EventModel))
+                        {
+                            eventTemplates.Add(kvp.Key);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (eventTemplates.Count == 0)
+                return;
+
+            if (log.IsInfoEnabled)
+                log.Info($"Refreshing NPC equipments for Global Event... Found {eventTemplates.Count} event-linked templates.");
+
+            foreach (Region region in WorldMgr.GetAllRegions())
+            {
+                GameObject[] objects = region.Objects;
+                if (objects == null) continue;
+
+                for (int i = 0; i < objects.Length; i++)
+                {
+                    if (objects[i] is GameNPC npc && !string.IsNullOrEmpty(npc.EquipmentTemplateID))
+                    {
+                        if (eventTemplates.Contains(npc.EquipmentTemplateID))
+                        {
+                            GameNpcInventoryTemplate newInv = new GameNpcInventoryTemplate();
+                            if (newInv.LoadFromDatabase(npc.EquipmentTemplateID))
+                            {
+                                npc.Inventory = newInv.CloseTemplate();
+                                npc.BroadcastLivingEquipmentUpdate();
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #region AddNPCEquipment/RemoveNPCEquipment/CloseTemplate/CloneTemplate
@@ -313,10 +390,12 @@ namespace DOL.GS
 
                 foreach (NPCEquipment npcItem in npcEquip)
                 {
-                    if (!AddNPCEquipment((eInventorySlot)npcItem.Slot, npcItem.Model, npcItem.Color, npcItem.Effect, npcItem.Extension, npcItem.Emblem))
+                    int activeModel = GetActiveModel(npcItem);
+
+                    if (!AddNPCEquipment((eInventorySlot)npcItem.Slot, activeModel, npcItem.Color, npcItem.Effect, npcItem.Extension, npcItem.Emblem))
                     {
                         if (log.IsWarnEnabled)
-                            log.Warn("Error adding NPC equipment for templateID " + templateID + ", ModelID=" + npcItem.Model + ", slot=" + npcItem.Slot);
+                            log.Warn("Error adding NPC equipment for templateID " + templateID + ", ModelID=" + activeModel + ", slot=" + npcItem.Slot);
                     }
                 }
             }

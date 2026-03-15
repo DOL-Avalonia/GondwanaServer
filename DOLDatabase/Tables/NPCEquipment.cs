@@ -23,7 +23,7 @@ using DOL.Database.Attributes;
 namespace DOL.Database
 {
     /// <summary>
-    /// The NPCEqupment table holds standard equipment
+    /// The NPCEquipment table holds standard equipment
     /// templates that npcs may wear!
     /// </summary>
     [DataTable(TableName = "NPCEquipment")]
@@ -57,6 +57,14 @@ namespace DOL.Database
         /// The Item Emblem
         /// </summary>
         protected int m_emblem;
+        /// <summary>
+        /// The temporary models to display during events
+        /// </summary>
+        protected string m_eventModel;
+        /// <summary>
+        /// The Event IDs associated with temporary models
+        /// </summary>
+        protected string m_eventID;
 
         /// <summary>
         /// The Constructor
@@ -65,9 +73,6 @@ namespace DOL.Database
         {
         }
 
-        /// <summary>
-        /// Template ID
-        /// </summary>
         [DataElement(AllowDbNull = false, Index = true)]
         public string TemplateID
         {
@@ -82,9 +87,6 @@ namespace DOL.Database
             }
         }
 
-        /// <summary>
-        /// Slot
-        /// </summary>
         [DataElement(AllowDbNull = false)]
         public int Slot
         {
@@ -99,9 +101,6 @@ namespace DOL.Database
             }
         }
 
-        /// <summary>
-        /// Model
-        /// </summary>
         [DataElement(AllowDbNull = false)]
         public int Model
         {
@@ -116,9 +115,6 @@ namespace DOL.Database
             }
         }
 
-        /// <summary>
-        /// Color
-        /// </summary>
         [DataElement(AllowDbNull = false)]
         public int Color
         {
@@ -133,9 +129,6 @@ namespace DOL.Database
             }
         }
 
-        /// <summary>
-        /// Effect
-        /// </summary>
         [DataElement(AllowDbNull = false)]
         public int Effect
         {
@@ -150,9 +143,6 @@ namespace DOL.Database
             }
         }
 
-        /// <summary>
-        /// Extension
-        /// </summary>
         [DataElement(AllowDbNull = false)]
         public int Extension
         {
@@ -167,9 +157,6 @@ namespace DOL.Database
             }
         }
 
-        /// <summary>
-        /// Emblem
-        /// </summary>
         [DataElement(AllowDbNull = false)]
         public int Emblem
         {
@@ -181,6 +168,28 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_emblem = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = true, Varchar = 255)]
+        public string EventModel
+        {
+            get { return m_eventModel; }
+            set
+            {
+                Dirty = true;
+                m_eventModel = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = true, Varchar = 255)]
+        public string EventID
+        {
+            get { return m_eventID; }
+            set
+            {
+                Dirty = true;
+                m_eventID = value;
             }
         }
     }

@@ -137,7 +137,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:              ({0} kampbonus)
 GameObjects.GamePlayer.GainExperience.CannotRaise:            Je kunt niveau 6 niet bereiken voordat je een specialisatie hebt gekozen.
 GameObjects.GamePlayer.GainExperience.GroupBonus:             ({0} groepsbonus)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:           ({0} buitenpostbonus)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus: Je ontvangt een bonus van {0} voor onderbevolkte rijken!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} van {1}% Lage Populatie-bonus)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Praat met je trainer voor meer informatie.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Je ontvangt {0} ervaringspunt(en).
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       waarvan {0} bonuspunten uit Wedergeboorte
@@ -152,6 +152,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:         Je nieuwe rijkstit
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:           Je hebt rijkrang {0}L0 bereikt!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:       {0} heeft rijkrang {1:#L#} bereikt in {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:                Je ontvangt {0} rijkspunten!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP van {1}% Lage Populatie-bonus)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP van {1}% Onderbevolkt Rijk-bonus)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP van {1} evenementbonus)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Je ontvangt {0} extra rijkspunten dankzij gebiedsbonussen!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Je ontvangt {0} rijkspunten voor de verdediging van je territorium!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Je ontvangt {0} rijkspunten voor het genezen van een lid van je rijk!

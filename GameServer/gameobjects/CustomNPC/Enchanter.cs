@@ -161,7 +161,24 @@ namespace DOL.GS
 
         public long CalculEnchantPrice(InventoryItem item)
         {
-            double basePrice = item.Price / 5.0;
+            GetBaselinePrice(item.Level, out double minBase, out double maxBase);
+
+            double currentPrice = item.Price;
+            double minAllowedPrice = minBase * 0.40;
+            double maxAllowedPrice = maxBase * 1.60;
+
+            double effectivePrice = currentPrice;
+
+            if (currentPrice < minAllowedPrice)
+            {
+                effectivePrice = minAllowedPrice;
+            }
+            else if (currentPrice > maxAllowedPrice)
+            {
+                effectivePrice = maxAllowedPrice;
+            }
+
+            double basePrice = effectivePrice / 5.0;
             double levelDiscountPercent;
 
             if (item.Level >= 51)
@@ -178,28 +195,26 @@ namespace DOL.GS
             }
 
             double priceAfterLevel = basePrice * (1.0 - (levelDiscountPercent / 100.0));
-
-            GetBaselinePrice(item.Level, out double minBase, out double maxBase);
-
             double baselineModifier = 1.0;
-            double currentPrice = item.Price;
 
-            if (currentPrice < minBase)
+            if (effectivePrice < minBase)
             {
-                double percentBelow = (minBase - currentPrice) / minBase;
+                double percentBelow = (minBase - effectivePrice) / minBase;
                 double penalty = percentBelow * 0.50;
                 baselineModifier = 1.0 + penalty;
             }
-            else if (currentPrice > maxBase)
+            else if (effectivePrice > maxBase)
             {
-                double percentAbove = (currentPrice - maxBase) / maxBase;
-                double extraDiscount = Math.Min(0.15, percentAbove * 0.20);
+                double percentAbove = (effectivePrice - maxBase) / maxBase;
+                double extraDiscount = percentAbove * 0.20;
+
+                extraDiscount = Math.Min(0.15, extraDiscount);
                 baselineModifier = 1.0 - extraDiscount;
             }
 
             double priceAfterBaseline = priceAfterLevel * baselineModifier;
-            double qualityFactor = Math.Min(100.0, Math.Max(1.0, item.Quality)) / 100.0;
 
+            double qualityFactor = Math.Min(100.0, Math.Max(1.0, item.Quality)) / 100.0;
             double finalPrice = priceAfterBaseline * qualityFactor;
 
             return (long)finalPrice;

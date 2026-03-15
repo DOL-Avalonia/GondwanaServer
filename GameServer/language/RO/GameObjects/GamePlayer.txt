@@ -137,7 +137,7 @@ GameObjects.GamePlayer.GainExperience.CampBonus:              ({0} bonus de tab�
 GameObjects.GamePlayer.GainExperience.CannotRaise:            Nu poți atinge nivelul 6 înainte de a alege o specializare.
 GameObjects.GamePlayer.GainExperience.GroupBonus:             ({0} bonus de grup)
 GameObjects.GamePlayer.GainExperience.OutpostBonus:           ({0} bonus de avanpost)
-GameObjects.GamePlayer.GainExperience.RoyaumesouspeupleBonus: Primești un bonus de {0} pentru regatele subpopulate!
+GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} din {1}% bonus de populație scăzută)
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Vorbește cu instructorul tău pentru mai multe informații.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Primești {0} puncte de experiență.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       dintre care {0} puncte bonus din Renaștere
@@ -152,6 +152,9 @@ GameObjects.GamePlayer.GainRealmPoints.NewRealmTitle:         Noul tău titlu de
 GameObjects.GamePlayer.GainRealmPoints.ReachedRank:           Ai atins rangul de regat {0}L0!
 GameObjects.GamePlayer.GainRealmPoints.ReachedRankNews:       {0} a atins rangul de regat {1:#L#} în {2}!
 GameObjects.GamePlayer.GainRealmPoints.YouGet:                Primești {0} puncte de regat!
+GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP din {1}% bonus de populație scăzută)
+GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP din {1}% bonus de tărâm subpopulat)
+GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP din bonusul de eveniment {1})
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Primești {0} puncte de regat în plus datorită bonusurilor de zonă!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Primești {0} puncte de regat pentru apărarea teritoriului tău!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Primești {0} puncte de regat pentru vindecarea unui membru al regatului tău!

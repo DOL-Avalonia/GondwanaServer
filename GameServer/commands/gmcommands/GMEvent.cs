@@ -609,7 +609,7 @@ namespace DOL.GS.Commands
                 }
             }
 
-            var scr = ScriptMgr.Scripts.FirstOrDefault(s => s.FullName.Contains("GameServerScripts"));
+            var scr = ScriptMgr.Scripts.FirstOrDefault(s => s.FullName!.Contains("GameServerScripts"));
 
             if (scr != null)
             {
@@ -846,7 +846,7 @@ namespace DOL.GS.Commands
                     break;
                 }
 
-                if (ev.TimerType == TimerType.DateType && ev.EndingConditionTypes.Contains(EndingConditionType.Timer) && ev.EndingConditionTypes.Count() == 1)
+                if (!ev.IsGlobalYearlyEvent && ev.TimerType == TimerType.DateType && ev.EndingConditionTypes.Contains(EndingConditionType.Timer) && ev.EndingConditionTypes.Count() == 1)
                 {
                     client.Out.SendMessage(string.Format("Impossible de reset Event ID: {0}, Name: {1}, car il n'a qu'un seul Ending de type Timer de type DateType.", ev.ID, ev.EventName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     break;
