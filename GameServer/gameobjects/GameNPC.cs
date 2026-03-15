@@ -1685,8 +1685,9 @@ namespace DOL.GS
             if (speed <= 0)
                 return false;
 
-            Motion = Geometry.Motion.Create(Position, destination, speed);
-            if ((int)Motion.RemainingDistance == 0)
+            var currentPosition = Position;
+            Motion = Geometry.Motion.Create(currentPosition, destination, speed);
+            if ((int)destination.DistanceTo(currentPosition, ignoreZ: false) == 0)
             {
                 goToNextNodeCallback(this);
                 return true;
@@ -4475,7 +4476,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">the weapon used for attack</param>
         /// <returns></returns>
-        public override double AttackDamage(InventoryItem weapon)
+        public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
             double damage = base.AttackDamage(weapon);
 
@@ -4495,6 +4496,15 @@ namespace DOL.GS
                             damage *= (100 + m_blockChance) / 100.00;
                         break;
                 }
+                
+            if ((ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL == 0 || Level > ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL) &&
+                ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL > 0 &&
+                damage > 0 &&
+                Brain is not IControlledBrain || GetPlayerOwner() == null)
+            {
+                double modifiedDamage = ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL * (Level - ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL);
+                damage += modifiedDamage;
+            }
 
             return damage;
         }

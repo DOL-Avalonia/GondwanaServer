@@ -31,6 +31,7 @@ using DOL.gameobjects.CustomNPC;
 using System.Threading.Tasks;
 using DOL.GS.Geometry;
 using DOL.GS.Spells;
+using DOL.GS.Styles;
 
 namespace DOL.GS
 {
@@ -151,7 +152,7 @@ namespace DOL.GS
             }
         }
 
-        public override double AttackDamage(InventoryItem weapon)
+        public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
             return base.AttackDamage(weapon) * 1.0 * DragonDifficulty / 100;
         }

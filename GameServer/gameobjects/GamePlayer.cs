@@ -7504,7 +7504,7 @@ namespace DOL.GS
             AttackData ad = base.MakeAttack(target, weapon, style, effectiveness, interruptDuration, dualWield, ignoreLOS, isCounterAttack);
 
             if (CombatInfo)
-                Out.SendMessage($"CombatInfo: result:{ad.AttackResult} dmg={ad.Damage} crits={ad.CriticalDamage} style dmg={ad.StyleDamage} uncap dmg={ad.UncappedDamage} weapon dmg={ad.weaponDamage:F1} mod={ad.dmgMod:F1}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Out.SendMessage($"CombatInfo: result:{ad.AttackResult} dmg={ad.Damage} crits={ad.CriticalDamage} style dmg={ad.StyleDamage} uncap dmg={ad.UncappedDamage} weapon dmg={ad.DebugInfo.weaponDamage:F1} mod={ad.DebugInfo.dmgMod:F1}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
             //Clear the styles for the next round!
             NextCombatStyle = null;
@@ -8218,8 +8218,10 @@ namespace DOL.GS
             Client.Out.SendMessage($"---- Attack ({ad.AttackType}) {ad.Attacker?.Name} => {ad.Target?.Name} ----", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Damage {ad.Damage} {ad.DamageType} (uncapped {ad.UncappedDamage}) - Critical {ad.CriticalDamage} ({ad.criticalChance}%)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Miss {(ad.MissChance ?? ad.Target?.ChanceToBeMissed ?? 0) * 100:0.}% - Parry {(ad.ParryChance ?? 0) * 100:0.}% - Evade {(ad.EvadeChance ?? 0) * 100:0.}% - Block {(ad.BlockChance ?? 0) * 100:0.}% - Fumble {(ad.FumbleChance ?? ad.Attacker!.ChanceToFumble) * 100:0.}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Weapon damage {ad.weaponDamage} - Style damage {ad.StyleDamage}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Wep stat {ad.weaponStat} Wep skill {ad.weaponSkillFactor} AF {ad.enemyAF:0.##} ABS {ad.enemyABS:0.##} Res {ad.enemyResist:0.##} => Damage * {ad.dmgMod}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Wep Skill {ad.DebugInfo.Weapon.SkillFactor:0.##} (Base {ad.DebugInfo.Weapon.BaseWeaponSkill:0.##}) - Spec Mod {ad.DebugInfo.Weapon.SpecModifier:0.##} ({ad.DebugInfo.Weapon.VarianceMin:0.##}-{ad.DebugInfo.Weapon.VarianceMax:0.##})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Wep Damage {ad.DebugInfo.weaponDamage:0.##} - Wep Stat {ad.DebugInfo.dmgStat:0.##} - Style damage {ad.StyleDamage}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Armor mod {ad.DebugInfo.Armor.ArmorMod:0.##} - AF {ad.DebugInfo.Armor.ArmorFactor:0.##} ABS {ad.DebugInfo.Armor.ArmorAbsorb:0.##} Res {ad.DebugInfo.enemyResist:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: DamageMod (WepSkill/ArmorMod) = {ad.DebugInfo.dmgMod:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Tension rate {ad.TensionRate:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
@@ -9100,7 +9102,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">the weapon used for attack</param>
         /// <returns>the weapon damage</returns>
-        public override double AttackDamage(InventoryItem weapon)
+        public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
             if (weapon == null)
                 return 0;
@@ -9136,6 +9138,15 @@ namespace DOL.GS
                 //Melee damage buff,debuff,Relic,RA
                 effectiveness += GetModified(eProperty.MeleeDamage) * 0.01;
             }
+                
+            if (style != null)
+            {
+                if (CharacterClass is ClassSavage && string.Equals(style.Spec, "Hand to Hand"))
+                    effectiveness *= Properties.HANDTOHAND_RESOLVE_DAMAGES;
+                else if (CharacterClass is ClassHunter or ClassValkyrie && style.Spec.Equals("Spear"))
+                    effectiveness *= Properties.SPEARS_RESOLVE_DAMAGES;
+            }
+
             damage *= effectiveness;
             return damage;
         }

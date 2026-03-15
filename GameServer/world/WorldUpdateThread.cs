@@ -269,6 +269,8 @@ namespace DOL.GS
                 foreach (var objEntry in player.Client.GameObjectUpdateArray.ToArray())
                 {
                     var objKey = objEntry.Key;
+                    if (objKey is null)
+                        continue;
                     GameObject obj = WorldMgr.GetRegion(objKey.Item1).GetObject(objKey.Item2);
                     // We have a Static Item in cache that is not in vincinity
                     if (obj is GameStaticItem item && (!objs.Contains(item) || !item.IsVisibleTo(player)) && (nowTicks - objEntry.Value) >= GetPlayerItemUpdateInterval)
