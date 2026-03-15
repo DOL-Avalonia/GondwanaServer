@@ -36,6 +36,26 @@ namespace DOL.GS
         private const string ENCHANT_ITEM_WEAK = "enchanting item";
         private int[] BONUS_TABLE = new int[] { 5, 5, 10, 15, 20, 25, 30, 30 };
 
+        private static readonly double[] MIN_BASELINE = new double[]
+        {
+            0, // Level 0
+            200, 500, 1000, 2000, 3500, 5500, 8000, 10500, 13500, 17000, // Levels 1-10
+            22000, 30000, 40000, 52000, 66000, 82000, 100000, 120000, 144000, 170000, // Levels 11-20
+            210000, 260000, 310000, 370000, 430000, 490000, 560000, 630000, 710000, 800000, // Levels 21-30
+            900000, 1000000, 1100000, 1210000, 1330000, 1450000, 1580000, 1710000, 1850000, 2000000, // Levels 31-40
+            2090000, 2180000, 2270000, 2360000, 2450000, 2540000, 2630000, 2720000, 2810000, 2900000, 3000000 // Levels 41-51
+        };
+
+        private static readonly double[] MAX_BASELINE = new double[]
+        {
+            0, // Level 0
+            300, 700, 1500, 2800, 4500, 7000, 10000, 14000, 18500, 24000, // Levels 1-10
+            32000, 43000, 56000, 72000, 90000, 110000, 135000, 160000, 185000, 210000, // Levels 11-20
+            280000, 370000, 480000, 610000, 760000, 930000, 1110000, 1300000, 1500000, 1700000, // Levels 21-30
+            1810000, 1930000, 2060000, 2200000, 2350000, 2510000, 2680000, 2860000, 3050000, 3000000, // Levels 31-40
+            3300000, 3600000, 3900000, 4200000, 4500000, 4800000, 5100000, 5400000, 5700000, 6000000, 6000000 // Levels 41-51
+        };
+
         /// <summary>
         /// Adds messages to ArrayList which are sent when object is targeted
         /// </summary>
@@ -141,7 +161,59 @@ namespace DOL.GS
 
         public long CalculEnchantPrice(InventoryItem item)
         {
-            return (item.Price / 5);
+            double basePrice = item.Price / 5.0;
+            double levelDiscountPercent;
+
+            if (item.Level >= 51)
+            {
+                levelDiscountPercent = 20.0;
+            }
+            else if (item.Level <= 20)
+            {
+                levelDiscountPercent = 35.0;
+            }
+            else
+            {
+                levelDiscountPercent = 35.0 - ((item.Level - 20.0) * (15.0 / 31.0));
+            }
+
+            double priceAfterLevel = basePrice * (1.0 - (levelDiscountPercent / 100.0));
+
+            GetBaselinePrice(item.Level, out double minBase, out double maxBase);
+
+            double baselineModifier = 1.0;
+            double currentPrice = item.Price;
+
+            if (currentPrice < minBase)
+            {
+                double percentBelow = (minBase - currentPrice) / minBase;
+                double penalty = percentBelow * 0.50;
+                baselineModifier = 1.0 + penalty;
+            }
+            else if (currentPrice > maxBase)
+            {
+                double percentAbove = (currentPrice - maxBase) / maxBase;
+                double extraDiscount = Math.Min(0.15, percentAbove * 0.20);
+                baselineModifier = 1.0 - extraDiscount;
+            }
+
+            double priceAfterBaseline = priceAfterLevel * baselineModifier;
+            double qualityFactor = Math.Min(100.0, Math.Max(1.0, item.Quality)) / 100.0;
+
+            double finalPrice = priceAfterBaseline * qualityFactor;
+
+            return (long)finalPrice;
+        }
+
+        /// <summary>
+        /// Fetches the expected copper price ranges based on the pre-calculated item level array.
+        /// </summary>
+        private void GetBaselinePrice(int level, out double minPrice, out double maxPrice)
+        {
+            int safeLevel = Math.Max(1, Math.Min(51, level));
+
+            minPrice = MIN_BASELINE[safeLevel];
+            maxPrice = MAX_BASELINE[safeLevel];
         }
     }
 }

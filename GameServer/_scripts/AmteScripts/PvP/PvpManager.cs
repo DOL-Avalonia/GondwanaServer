@@ -3667,11 +3667,20 @@ namespace AmteScripts.Managers
 
             if (_coreRunToreArea != null && _coreRunToreArea.IsContaining(player.Coordinate))
             {
-                if (castArgs.SpellHandler.Spell.CastTime > 0 || !castArgs.SpellHandler.Spell.SpellType.Equals("Bump", StringComparison.OrdinalIgnoreCase))
+                if (castArgs.SpellHandler.Spell.CastTime > 0 || !castArgs.SpellHandler.Spell.SpellType.Equals("BumpSpell", StringComparison.OrdinalIgnoreCase))
                 {
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.CoreRun.CastMovement"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     castArgs.SpellHandler.InterruptCasting();
                     CheckRedLightViolation(player);
+                }
+                else
+                {
+                    if (_coreRunPlayerSnapshots.ContainsKey(player.InternalID))
+                    {
+                        var snap = _coreRunPlayerSnapshots[player.InternalID];
+                        snap.Heading = player.Heading;
+                        _coreRunPlayerSnapshots[player.InternalID] = snap;
+                    }
                 }
             }
         }

@@ -18,3 +18,36 @@ GameUtils.GamePlayerInventory.CannotPutItemFromThisRealm:					Vous ne pouvez pas
 GameUtils.GamePlayerInventory.PotionVialFull:								Cette fiole est déjà pleine !
 GameUtils.GamePlayerInventory.CombinePotions:								Vous combinez les potions ({0}/{1}).
 GameUtils.GamePlayerInventory.RefillPotion:									Vous remplissez la potion ({0}/{1}).
+GameUtils.GamePlayerInventory.PatternRemovalInvalid:						Le Suppresseur d'empreinte d'objet ne peut pas être utilisé sur cet objet.
+GameUtils.GamePlayerInventory.InventoryFull:								Votre inventaire est plein.
+GameUtils.GamePlayerInventory.PatternCreated:								Vous avez créé {0}.
+GameUtils.GamePlayerInventory.PatternCorrupted:								Cette empreinte d'objet semble être corrompue.
+GameUtils.GamePlayerInventory.ItemAlreadyPatterned:							Cet objet est déjà 'imprimé'. Utilisez d'abord un Suppresseur d'empreinte d'objet.
+GameUtils.GamePlayerInventory.PatternApplied:								Empreinte d'objet appliquée sur {0}.
+GameUtils.GamePlayerInventory.PatternWeaponOnly:							Cette empreinte d'objet ne fonctionne que sur les armes.
+GameUtils.GamePlayerInventory.PatternInstrumentOnly:						Une empreinte d'instrument ne peut être appliquée qu'aux instruments.
+GameUtils.GamePlayerInventory.PatternInstrumentMatch:						Vous ne pouvez appliquer des empreinte d'objets qu'au même type d'instrument (Tambour, Luth, etc).
+GameUtils.GamePlayerInventory.PatternWeaponNotInstrument:					Vous ne pouvez pas appliquer une empreinte d'arme sur un instrument.
+GameUtils.GamePlayerInventory.PatternMixHands:								Vous ne pouvez pas mélanger les empreintes d'armes à une ou deux mains.
+GameUtils.GamePlayerInventory.PatternMatchDamage:							Vous devez respecter le type de dégâts de l'arme (Tranchant, Contondant, Perçant, etc).
+GameUtils.GamePlayerInventory.PatternShieldOnly:							Cette empreinte d'objet ne fonctionne que sur les boucliers.
+GameUtils.GamePlayerInventory.PatternShieldMatchSize:						Vous ne pouvez appliquer des empreintes d'objet que sur des boucliers de même taille (Petit, Moyen, Grand).
+GameUtils.GamePlayerInventory.PatternClothCloakOnly:						Cette empreinte d'objet ne fonctionne que sur les Armures en Tissu ou les Capes.
+GameUtils.GamePlayerInventory.PatternMaskNeededCloth:						Vous ne pouvez pas appliquer une empreinte d'armure en Tissu standard sur un Masque. Il vous faut une empreinte de Masque.
+GameUtils.GamePlayerInventory.PatternNoMixClothCloak:						Vous ne pouvez pas mélanger les empreintes d'armure en Tissu et les Capes.
+GameUtils.GamePlayerInventory.PatternMatchSlot:								Les empreintes d'objet doivent être appliquées sur le même emplacement d'armure (Bottes sur Bottes, etc).
+GameUtils.GamePlayerInventory.PatternArmorOnly:								Cette empreinte d'objet ne fonctionne que sur les Armures (Cuir, Clouté, Mailles, Plaques, Écailles).
+GameUtils.GamePlayerInventory.PatternMaskNeededArmor:						Vous ne pouvez pas appliquer une empreinte d'Armure standard sur un Masque. Il vous faut une empreinte de Masque.
+GameUtils.GamePlayerInventory.PatternMatchArmorType:						Vous devez appliquer l'empreinte d'objet sur le même type d'armure (Cuir, Clouté, Mailles, Plaques, Écailles).
+GameUtils.GamePlayerInventory.PatternHeadOnly:								Cette empreinte d'objet ne fonctionne que sur l'équipement de Tête.
+GameUtils.GamePlayerInventory.PatternMaskValidNeeded:						Vous ne pouvez créer une empreinte de Masque qu'à partir d'un Masque valide.
+GameUtils.GamePlayerInventory.PatternOriginalStateUnknown:					Impossible de déterminer l'état d'origine de l'objet.
+GameUtils.GamePlayerInventory.PatternOriginalDataMissing:					Les données du modèle d'origine de l'objet sont manquantes.
+GameUtils.GamePlayerInventory.PatternRemoved:								Empreinte d'objet retirée de {0}.
+GameUtils.GamePlayerInventory.PatternTemplateNotFound:						Erreur : Impossible de trouver le modèle '{0}'.
+GameUtils.GamePlayerInventory.PatternScrubbed:								Vous avez nettoyé l'objet de son empreinte.
+GameUtils.GamePlayerInventory.PatternNoMask:								Vous ne pouvez pas appliquer cette empreinte d'objet sur un Masque.
+GameUtils.GamePlayerInventory.PatternArmorWeaponOnly:						Cette empreinte d'objet ne peut être appliqué que sur des Armures ou des Armes.
+GameUtils.GamePlayerInventory.PatternNotRecognized:							Cette empreinte d'objet n'est pas reconnue par le système.
+GameUtils.GamePlayerInventory.PatternInvalidForType:						Cette empreinte d'objet ne peut pas être appliquée sur ce type spécifique d'objet.
+GameUtils.GamePlayerInventory.PatternSmartApplied:							Vous avez appliqué {0} sur {1}.

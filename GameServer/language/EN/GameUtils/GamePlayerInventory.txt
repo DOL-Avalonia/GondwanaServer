@@ -18,3 +18,36 @@ GameUtils.GamePlayerInventory.CannotPutItemFromThisRealm:				You cannot put an i
 GameUtils.GamePlayerInventory.PotionVialFull:							This potion vial is already full!
 GameUtils.GamePlayerInventory.CombinePotions:							You combine the potions ({0}/{1}).
 GameUtils.GamePlayerInventory.RefillPotion:								You refill the potion ({0}/{1}).
+GameUtils.GamePlayerInventory.PatternRemovalInvalid:					The removal pattern cannot be used on this item.
+GameUtils.GamePlayerInventory.InventoryFull:							Your inventory is full.
+GameUtils.GamePlayerInventory.PatternCreated:							You have created {0}.
+GameUtils.GamePlayerInventory.PatternCorrupted:							This pattern appears to be corrupted.
+GameUtils.GamePlayerInventory.ItemAlreadyPatterned:						This item is already patterned. Use a 'Removal Pattern' first.
+GameUtils.GamePlayerInventory.PatternApplied:							Pattern applied to {0}.
+GameUtils.GamePlayerInventory.PatternWeaponOnly:						This pattern only works on weapons.
+GameUtils.GamePlayerInventory.PatternInstrumentOnly:					An instrument pattern can only be applied to instruments.
+GameUtils.GamePlayerInventory.PatternInstrumentMatch:					You can only apply patterns to the same type of instrument (Drum, Lute, etc).
+GameUtils.GamePlayerInventory.PatternWeaponNotInstrument:				You cannot apply a weapon pattern to an instrument.
+GameUtils.GamePlayerInventory.PatternMixHands:							You cannot mix One-Handed and Two-Handed weapon looks.
+GameUtils.GamePlayerInventory.PatternMatchDamage:						You must match the weapon damage type (Slash, Crush, Pierce, etc).
+GameUtils.GamePlayerInventory.PatternShieldOnly:						This pattern only works on shields.
+GameUtils.GamePlayerInventory.PatternShieldMatchSize:					You can only apply patterns to shields of the same size (Small, Medium, Large).
+GameUtils.GamePlayerInventory.PatternClothCloakOnly:					This pattern only works on Cloth Armor or Cloaks.
+GameUtils.GamePlayerInventory.PatternMaskNeededCloth:					You cannot apply a standard Cloth Pattern to a Mask. You need a Mask Pattern.
+GameUtils.GamePlayerInventory.PatternNoMixClothCloak:					You cannot mix Cloth Armor and Cloaks.
+GameUtils.GamePlayerInventory.PatternMatchSlot:							Patterns must be applied to the same armor slot (Boots to Boots, etc).
+GameUtils.GamePlayerInventory.PatternArmorOnly:							This pattern only works on Armor (Leather, Studded, Chain, Plate, Scale).
+GameUtils.GamePlayerInventory.PatternMaskNeededArmor:					You cannot apply a standard Armor Pattern to a Mask. You need a Mask Pattern.
+GameUtils.GamePlayerInventory.PatternMatchArmorType:					You must apply the pattern to the same armor type (Leather, Studded, Chain, Plate, Scale).
+GameUtils.GamePlayerInventory.PatternHeadOnly:							This pattern only works on Head slot equipments.
+GameUtils.GamePlayerInventory.PatternMaskValidNeeded:					You can only create a Mask Pattern from a valid Mask item.
+GameUtils.GamePlayerInventory.PatternOriginalStateUnknown:				Could not determine original item state.
+GameUtils.GamePlayerInventory.PatternOriginalDataMissing:				Original item template data is missing.
+GameUtils.GamePlayerInventory.PatternRemoved:							Pattern removed from {0}.
+GameUtils.GamePlayerInventory.PatternTemplateNotFound:					Error: Could not find template '{0}'.
+GameUtils.GamePlayerInventory.PatternScrubbed:							You have scrubbed the pattern clean.
+GameUtils.GamePlayerInventory.PatternNoMask:							You cannot apply this pattern to a Mask.
+GameUtils.GamePlayerInventory.PatternArmorWeaponOnly:					This pattern can only be applied to Armor or Weapons.
+GameUtils.GamePlayerInventory.PatternNotRecognized:						This pattern is not recognized by the system.
+GameUtils.GamePlayerInventory.PatternInvalidForType:					This pattern cannot be applied to this specific item type.
+GameUtils.GamePlayerInventory.PatternSmartApplied:						You have applied the {0} to {1}.

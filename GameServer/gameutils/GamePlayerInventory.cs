@@ -16,14 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DOL.GS
 {
@@ -34,7 +34,7 @@ namespace DOL.GS
     /// </summary>
     public class GamePlayerInventory : GameLivingInventory
     {
-        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region Constructor/Declaration/LoadDatabase/SaveDatabase
 
@@ -1280,12 +1280,26 @@ namespace DOL.GS
             }
 
             // DYE LOGIC
-            // Check if the item has one of the Dye Flags (11, 12, 13, 14)
+            // Check if the item has one of the Dye Flags (11, 12, 13, 14, 15)
             int flag = fromItem.Template.Flags;
 
-            if (flag >= 11 && flag <= 14)
+            if (flag >= 11 && flag <= 15)
             {
                 return DyeItem(fromItem, toItem);
+            }
+
+            // PATTERN LOGIC
+            // 16-20: Blank/Filled Patterns - 21: Removal Pattern
+            if (flag >= 16 && flag <= 21)
+            {
+                return PatternItem(fromItem, toItem);
+            }
+
+            // SMART ARMOR/WEAPON PATTERNS
+            // Uses the predefined list in ArmorPatternMgr
+            if (flag == 22)
+            {
+                return ApplySmartPattern(fromItem, toItem);
             }
 
             return false;
@@ -1566,6 +1580,9 @@ namespace DOL.GS
                         canApply = true;
                     }
                     break;
+                case 15: // Omnidyes
+                    canApply = true;
+                    break;
             }
 
             if (canApply)
@@ -1577,6 +1594,543 @@ namespace DOL.GS
             }
 
             return canApply;
+        }
+
+        #endregion
+
+        #region Patterns
+
+        /// <summary>
+        /// Main entry point for Pattern logic.
+        /// </summary>
+        protected virtual bool PatternItem(InventoryItem pattern, InventoryItem targetItem)
+        {
+            if (pattern.Template.Flags == 21)
+            {
+                if (targetItem.Template.Flags == 5)
+                {
+                    return RemovePatternFromItem(pattern, targetItem);
+                }
+                else if (targetItem.Template.Flags >= 16 && targetItem.Template.Flags <= 20 && !string.IsNullOrEmpty(targetItem.PackageID))
+                {
+                    return ClearFilledPattern(pattern, targetItem);
+                }
+                else
+                {
+                    m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternRemovalInvalid"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
+            if (string.IsNullOrEmpty(pattern.PackageID))
+            {
+                return ImprintPattern(pattern, targetItem);
+            }
+            else
+            {
+                return ApplyPattern(pattern, targetItem);
+            }
+        }
+
+        /// <summary>
+        /// Scans source item to create a Filled Pattern.
+        /// </summary>
+        protected virtual bool ImprintPattern(InventoryItem blankPattern, InventoryItem sourceItem)
+        {
+            if (!CheckPatternCompatibility(blankPattern.Template.Flags, sourceItem, null))
+            {
+                return false;
+            }
+
+            eInventorySlot targetSlot = eInventorySlot.Invalid;
+            if (blankPattern.Count == 1)
+                targetSlot = (eInventorySlot)blankPattern.SlotPosition;
+            else
+                targetSlot = FindFirstEmptySlot(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
+
+            if (targetSlot == eInventorySlot.Invalid)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.InventoryFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            // Create Filled Pattern
+            ItemUnique filledPatternTemplate = new ItemUnique(blankPattern.Template);
+            filledPatternTemplate.Name = "Pattern: " + sourceItem.Name;
+
+            // Store Info: Model|ObjType|ItemType|Hand|Effect|Color|Type_Damage|DPS_AF
+            filledPatternTemplate.PackageID = $"{sourceItem.Model}|{sourceItem.Object_Type}|{sourceItem.Item_Type}|{sourceItem.Hand}|{sourceItem.Effect}|{sourceItem.Color}|{sourceItem.Type_Damage}|{sourceItem.DPS_AF}";
+
+            GameServer.Database.AddObject(filledPatternTemplate);
+            InventoryItem filledPattern = GameInventoryItem.Create(filledPatternTemplate);
+
+            if (RemoveCountFromStack(blankPattern, 1))
+            {
+                if (!AddItem(targetSlot, filledPattern))
+                {
+                    AddCountToStack(blankPattern, 1);
+                    return false;
+                }
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternCreated", filledPattern.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Applies a Filled Pattern to a target item.
+        /// </summary>
+        protected virtual bool ApplyPattern(InventoryItem filledPattern, InventoryItem targetItem)
+        {
+            string[] info = filledPattern.PackageID.Split('|');
+            if (info.Length < 8)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternCorrupted"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            InventoryItem patternDataMock = new InventoryItem();
+
+            if (!int.TryParse(info[0], out int pModel) ||
+                !int.TryParse(info[1], out int pObjType) ||
+                !int.TryParse(info[2], out int pItemType) ||
+                !int.TryParse(info[3], out int pHand) ||
+                !int.TryParse(info[4], out int pEffect) ||
+                !int.TryParse(info[5], out int pColor) ||
+                !int.TryParse(info[6], out int pTypeDamage) ||
+                !int.TryParse(info[7], out int pDpsAf))
+            {
+                return false;
+            }
+
+            patternDataMock.Object_Type = pObjType;
+            patternDataMock.Item_Type = pItemType;
+            patternDataMock.Hand = pHand;
+            patternDataMock.Type_Damage = pTypeDamage;
+            patternDataMock.DPS_AF = pDpsAf;
+
+            if (!CheckPatternCompatibility(filledPattern.Template.Flags, targetItem, patternDataMock))
+            {
+                return false;
+            }
+
+            if (targetItem.Template.Flags == 5)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemAlreadyPatterned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            bool wasOriginallyUnique = (targetItem.Template is ItemUnique);
+            string originalIdRef = targetItem.Template.Id_nb;
+
+            if (!wasOriginallyUnique)
+            {
+                ItemUnique newUnique = new ItemUnique(targetItem.Template);
+                GameServer.Database.AddObject(newUnique);
+                targetItem.Template = newUnique;
+                targetItem.Id_nb = newUnique.Id_nb;
+            }
+
+            // Format: "ORIG_MODEL:x|ORIG_EFFECT:x|ORIG_COLOR:x|ORIG_ID:x|WAS_UNIQUE:x"
+            string wasUniqueFlag = wasOriginallyUnique ? "1" : "0";
+            targetItem.PackageID = $"ORIG_MODEL:{targetItem.Model}|ORIG_EFFECT:{targetItem.Effect}|ORIG_COLOR:{targetItem.Color}|ORIG_ID:{originalIdRef}|WAS_UNIQUE:{wasUniqueFlag}";
+
+            targetItem.Model = pModel;
+            targetItem.Effect = pEffect;
+            targetItem.Color = pColor;
+            targetItem.Template.Flags = 5; // Flag 5 = Patterned
+
+            if (targetItem.Template is ItemUnique uT) GameServer.Database.SaveObject(uT);
+            GameServer.Database.SaveObject(targetItem);
+
+            RemoveCountFromStack(filledPattern, 1);
+            m_player.Out.SendInventoryItemsUpdate(new InventoryItem[] { targetItem });
+            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternApplied", targetItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            if (IsEquippedSlot((eInventorySlot)targetItem.SlotPosition))
+                m_player.UpdateEquipmentAppearance();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Centralized logic to check if a pattern source/data is compatible with a target item.
+        /// </summary>
+        /// <param name="flag">Pattern Item Flag (16-20)</param>
+        /// <param name="target">The item being imprinted or applied to</param>
+        /// <param name="patternData">If applying, the data from the pattern. If imprinting, pass null.</param>
+        private bool CheckPatternCompatibility(int flag, InventoryItem target, InventoryItem patternData)
+        {
+            int tObj = target.Object_Type;
+            int tItem = target.Item_Type;
+
+            switch (flag)
+            {
+                case 16: // Weapon
+                    if (!((tObj >= 1 && tObj <= 26) || tObj == 45))
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternWeaponOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
+                    if (patternData != null)
+                    {
+                        if (patternData.Object_Type == 45) // Instrument Pattern
+                        {
+                            if (tObj != 45)
+                            {
+                                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternInstrumentOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+                            if (target.DPS_AF != patternData.DPS_AF)
+                            {
+                                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternInstrumentMatch"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+                        }
+                        else // Regular Weapon Pattern
+                        {
+                            if (tObj == 45)
+                            {
+                                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternWeaponNotInstrument"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+                            bool targetIsTwoHand = (target.Hand == 1);
+                            bool patternIsTwoHand = (patternData.Hand == 1);
+                            if (targetIsTwoHand != patternIsTwoHand)
+                            {
+                                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMixHands"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+                            if (target.Type_Damage != patternData.Type_Damage)
+                            {
+                                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMatchDamage"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+                        }
+                    }
+                    break;
+
+                case 17: // Shield
+                    if (tObj != 42)
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternShieldOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                    if (patternData != null)
+                    {
+                        if (target.Type_Damage != patternData.Type_Damage)
+                        {
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternShieldMatchSize"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 18: // Cloth
+                    bool isCloth = (tObj == 32);
+                    bool isCloak = (tObj == 41 && tItem == 26);
+                    if (!isCloth && !isCloak)
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternClothCloakOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                    if (isCloth && tItem == 21 && IsMaskModel(target.Model))
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMaskNeededCloth"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                    if (patternData != null)
+                    {
+                        if ((tObj == 32 && patternData.Object_Type == 41) || (tObj == 41 && patternData.Object_Type == 32))
+                        {
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternNoMixClothCloak"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                        if (target.Item_Type != patternData.Item_Type)
+                        {
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMatchSlot"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 19: // Armor
+                    if (tObj < 33 || tObj > 38)
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternArmorOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                    if (tItem == 21 && IsMaskModel(target.Model))
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMaskNeededArmor"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                    if (patternData != null)
+                    {
+                        if (target.Object_Type != patternData.Object_Type)
+                        {
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMatchArmorType"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                        if (target.Item_Type != patternData.Item_Type)
+                        {
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMatchSlot"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 20: // Mask
+                    if (tObj < 32 || tObj > 38 || tItem != 21)
+                    {
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternHeadOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                    if (patternData == null)
+                    {
+                        if (!IsMaskModel(target.Model))
+                        {
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMaskValidNeeded"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (target.Item_Type != patternData.Item_Type) return false;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool IsMaskModel(int model)
+        {
+            if (model >= 4653 && model <= 4688) return true;
+            if (model >= 4779 && model <= 4794) return true;
+            if (model >= 4809 && model <= 4820) return true;
+            if (model >= 4829 && model <= 4834) return true;
+            if (model >= 4837 && model <= 4842) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Removes a pattern from an item.
+        /// Reverts Standard items to Template. Reverts Unique items to Original Stats.
+        /// </summary>
+        protected virtual bool RemovePatternFromItem(InventoryItem remover, InventoryItem targetItem)
+        {
+            int origModel = -1;
+            int origEffect = 0;
+            int origColor = 0;
+            string origId = "";
+            bool wasUnique = false;
+            bool dataFound = false;
+
+            // Parse PackageID: "ORIG_MODEL:x|ORIG_EFFECT:x|ORIG_COLOR:x|ORIG_ID:x|WAS_UNIQUE:x"
+            if (!string.IsNullOrEmpty(targetItem.PackageID))
+            {
+                foreach (string data in targetItem.PackageID.Split('|'))
+                {
+                    string[] pair = data.Split(':');
+                    if (pair.Length != 2) continue;
+
+                    if (pair[0] == "ORIG_MODEL") int.TryParse(pair[1], out origModel);
+                    if (pair[0] == "ORIG_EFFECT") int.TryParse(pair[1], out origEffect);
+                    if (pair[0] == "ORIG_COLOR") int.TryParse(pair[1], out origColor);
+                    if (pair[0] == "ORIG_ID") origId = pair[1];
+                    if (pair[0] == "WAS_UNIQUE") wasUnique = (pair[1] == "1");
+                }
+                if (origModel != -1 && !string.IsNullOrEmpty(origId)) dataFound = true;
+            }
+
+            if (!dataFound)
+            {
+                string cleanId = targetItem.Id_nb;
+                if (cleanId.Contains("#")) cleanId = cleanId.Split('#')[0];
+
+                ItemTemplate t = GameServer.Database.FindObjectByKey<ItemTemplate>(cleanId);
+                if (t != null)
+                {
+                    origModel = t.Model;
+                    origEffect = t.Effect;
+                    origColor = t.Color;
+                    origId = t.Id_nb;
+                    wasUnique = false;
+                }
+                else
+                {
+                    m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternOriginalStateUnknown"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
+            if (!wasUnique)
+            {
+                ItemTemplate standardTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(origId);
+                if (standardTemplate == null)
+                {
+                    m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternOriginalDataMissing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+
+                ItemUnique uniqueToDelete = targetItem.Template as ItemUnique;
+
+                targetItem.Template = standardTemplate;
+                targetItem.Id_nb = standardTemplate.Id_nb;
+                targetItem.Model = standardTemplate.Model;
+                targetItem.Effect = standardTemplate.Effect;
+                targetItem.Color = standardTemplate.Color;
+                targetItem.PackageID = "";
+
+                GameServer.Database.SaveObject(targetItem);
+
+                if (uniqueToDelete != null)
+                {
+                    GameServer.Database.DeleteObject(uniqueToDelete);
+                }
+            }
+            else
+            {
+                targetItem.Model = origModel;
+                targetItem.Effect = origEffect;
+                targetItem.Color = origColor;
+                targetItem.Template.Flags = 0;
+                targetItem.PackageID = "";
+
+                if (targetItem.Template is ItemUnique uT)
+                {
+                    uT.Flags = 0;
+                    GameServer.Database.SaveObject(uT);
+                }
+                GameServer.Database.SaveObject(targetItem);
+            }
+
+            RemoveCountFromStack(remover, 1);
+            m_player.Out.SendInventoryItemsUpdate(new InventoryItem[] { targetItem });
+            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternRemoved", targetItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            if (IsEquippedSlot((eInventorySlot)targetItem.SlotPosition))
+                m_player.UpdateEquipmentAppearance();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Reverts a "Filled" Pattern back to a "Blank" Pattern.
+        /// </summary>
+        protected virtual bool ClearFilledPattern(InventoryItem remover, InventoryItem filledPattern)
+        {
+            string blankTemplateId = "";
+            switch (filledPattern.Template.Flags)
+            {
+                case 16: blankTemplateId = "Blank_Weapon_pattern"; break;
+                case 17: blankTemplateId = "Blank_Shield_pattern"; break;
+                case 18: blankTemplateId = "Blank_Cloth_pattern"; break;
+                case 19: blankTemplateId = "Blank_Armor_pattern"; break;
+                case 20: blankTemplateId = "Blank_Mask_pattern"; break;
+                default: return false;
+            }
+
+            ItemTemplate blankTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(blankTemplateId);
+            if (blankTemplate == null)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternTemplateNotFound", blankTemplateId), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            ItemUnique uniqueToDelete = filledPattern.Template as ItemUnique;
+
+            filledPattern.Template = blankTemplate;
+            filledPattern.Id_nb = blankTemplate.Id_nb;
+            filledPattern.Name = blankTemplate.Name;
+            filledPattern.PackageID = "";
+
+            GameServer.Database.SaveObject(filledPattern);
+
+            if (uniqueToDelete != null)
+            {
+                GameServer.Database.DeleteObject(uniqueToDelete);
+            }
+
+            RemoveCountFromStack(remover, 1);
+            m_player.Out.SendInventoryItemsUpdate(new InventoryItem[] { filledPattern });
+            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternScrubbed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Applies a "Smart" Pattern (Flag 22) based on internal lookup tables (ArmorPatternMgr).
+        /// </summary>
+        protected virtual bool ApplySmartPattern(InventoryItem pattern, InventoryItem targetItem)
+        {
+            if (targetItem.Item_Type == 21 && IsMaskModel(targetItem.Model))
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternNoMask"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            // 32-38 = Armor, 42=Shield. Weapons=1-26,45.
+            if (!GlobalConstants.IsArmor(targetItem.Object_Type) && !GlobalConstants.IsWeapon(targetItem.Object_Type))
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternArmorWeaponOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (targetItem.Template.Flags == 5)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemAlreadyPatterned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            var patternType = ArmorPatternMgr.GetPatternType(pattern.Id_nb);
+            if (patternType == ArmorPatternMgr.PatternType.None)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternNotRecognized"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            int newModel = ArmorPatternMgr.GetModel(patternType, targetItem);
+
+            if (newModel <= 0)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternInvalidForType"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            bool wasOriginallyUnique = (targetItem.Template is ItemUnique);
+            string originalIdRef = targetItem.Template.Id_nb;
+
+            if (!wasOriginallyUnique)
+            {
+                ItemUnique newUnique = new ItemUnique(targetItem.Template);
+                GameServer.Database.AddObject(newUnique);
+                targetItem.Template = newUnique;
+                targetItem.Id_nb = newUnique.Id_nb;
+            }
+
+            string wasUniqueFlag = wasOriginallyUnique ? "1" : "0";
+
+            targetItem.PackageID = $"ORIG_MODEL:{targetItem.Model}|ORIG_EFFECT:{targetItem.Effect}|ORIG_COLOR:{targetItem.Color}|ORIG_ID:{originalIdRef}|WAS_UNIQUE:{wasUniqueFlag}";
+            targetItem.Model = newModel;
+            targetItem.Template.Flags = 5;
+
+            if (targetItem.Template is ItemUnique uT) GameServer.Database.SaveObject(uT);
+            GameServer.Database.SaveObject(targetItem);
+
+            RemoveCountFromStack(pattern, 1);
+            m_player.Out.SendInventoryItemsUpdate(new InventoryItem[] { targetItem });
+            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternSmartApplied", pattern.Name, targetItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            if (IsEquippedSlot((eInventorySlot)targetItem.SlotPosition))
+                m_player.UpdateEquipmentAppearance();
+
+            return true;
         }
 
         #endregion
