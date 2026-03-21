@@ -8762,6 +8762,7 @@ namespace DOL.GS
             if (RealmLevel > 39)
                 cap += 0.3;
             dps = dps.Clamp(0.1, cap);
+            dps = dps * 1.0 + (GetModified(eProperty.DPS) * 0.01);
             return dps;
         }
 
@@ -8786,9 +8787,7 @@ namespace DOL.GS
 
             var weapon_dps = dps * weapon.SPD_ABS * 0.1
                 * (0.94 + weapon.SPD_ABS * 0.1 * 0.03)
-                * twohand_bonus
-                * 1.0 + (GetModified(eProperty.DPS) * 0.01)
-                * (1 + 0.01 * GetModified(eProperty.MeleeDamage));
+                * twohand_bonus;
             return weapon_dps;
         }
 
