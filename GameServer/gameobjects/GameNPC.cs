@@ -6077,7 +6077,7 @@ namespace DOL.GS
 
         public override double GetArmorAF(eArmorSlot slot)
         {
-            return Math.Min(5, (int)Level) + ArmorFactor + GetModified(eProperty.ArmorFactor) / 5;
+            return Math.Max(0, GetModified(eProperty.ArmorFactor) / 5.0);
         }
 
         private double GetLevelAbsorb()

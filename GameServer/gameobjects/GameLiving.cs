@@ -1750,8 +1750,6 @@ namespace DOL.GS
 
             armorStats.ArmorFactor = target.GetArmorAF(armorSlot);
 
-            /* TODO: VERIFY WHETHER THIS IS NEEDED ON GONDWANA - we have different AF calculations
-             
             // Give an extra 0.4–20 armor factor to players.
             // This matches the formula on https://camelotherald.fandom.com/wiki/Melee_Damage.
             // The formula seems to work when compared against a couple of old combat logs,
@@ -1762,7 +1760,6 @@ namespace DOL.GS
 
             if (target is GamePlayer or GameTrainingDummy)
                 armorStats.ArmorFactor += target.Level * PLAYER_EXTRA_AF_PER_LEVEL;
-            */
 
             armorStats.ArmorAbsorbFactor = target.CalculateArmorAbsorbFactor(armorSlot);
             armorStats.ArmorAbsorb = 1 - armorStats.ArmorAbsorbFactor;
