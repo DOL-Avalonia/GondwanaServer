@@ -6079,9 +6079,26 @@ namespace DOL.GS
         {
             return Math.Min(5, (int)Level) + ArmorFactor + GetModified(eProperty.ArmorFactor) / 5;
         }
+
+        private double GetLevelAbsorb()
+        {
+            const double NECRO_ABSORB_PER_LEVEL = 0.0068; // 34% at lvl 50
+            const double NPC_ABSORB_PER_LEVEL = 0.0054;   // 27% at lvl 50
+
+            // Use owner level for necromancer pets.
+            if (this is NecromancerPet necromancerPet)
+                return necromancerPet.Owner.Level * NECRO_ABSORB_PER_LEVEL;
+
+            return Level * NPC_ABSORB_PER_LEVEL;
+        }
+
         public override double GetArmorAbsorb(eArmorSlot slot)
         {
-            return ArmorAbsorb / 100.0 + GetModified(eProperty.ArmorAbsorption) * 0.01;
+            var levelAbsorb = GetLevelAbsorb();
+            var dbAbsorb = ArmorAbsorb / 100.0;
+            var bonusAbsorb = GetModified(eProperty.ArmorAbsorption) * 0.01;
+            var total = levelAbsorb + dbAbsorb + bonusAbsorb;
+            return Math.Min(total, 1.0);
         }
         #endregion
 
