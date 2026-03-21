@@ -58,34 +58,38 @@ namespace DOL.GS.PropertyCalc
         private double GetValue(IMultiplicativeProperties indexer, eProperty property)
         {
             double value = indexer.Get((int)property);
+            double typeValue = 0;
             
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillMeleeWeapon))
-                value *= indexer.Get((int)eProperty.AllMeleeWeaponSkills);
+                typeValue *= indexer.Get((int)eProperty.AllMeleeWeaponSkills) * indexer.Get((int)eProperty.WeaponSkill);
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillMagical))
-                value *= indexer.Get((int)eProperty.AllMagicSkills);
+                typeValue *= indexer.Get((int)eProperty.AllMagicSkills);
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillDualWield))
-                value *= indexer.Get((int)eProperty.AllDualWieldingSkills);
+                typeValue *= indexer.Get((int)eProperty.AllDualWieldingSkills) * indexer.Get((int)eProperty.WeaponSkill);
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillArchery))
-                value *= indexer.Get((int)eProperty.AllArcherySkills);
+                typeValue *= indexer.Get((int)eProperty.AllArcherySkills) * indexer.Get((int)eProperty.WeaponSkill);
 
-            value *= indexer.Get((int)eProperty.AllSkills);
+            double allValue = indexer.Get((int)eProperty.AllSkills);
+            value = value * typeValue * allValue;
             return value;
         }
 
         private int GetValue(IPropertyIndexer indexer, eProperty property)
         {
             int value = indexer[property];
+            int typeValue = 0;
 
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillMeleeWeapon))
-                value += indexer[eProperty.AllMeleeWeaponSkills];
+                typeValue = indexer[eProperty.AllMeleeWeaponSkills] + indexer[eProperty.WeaponSkill];
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillMagical))
-                value += indexer[eProperty.AllMagicSkills];
+                typeValue = indexer[eProperty.AllMagicSkills];
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillDualWield))
-                value += indexer[eProperty.AllDualWieldingSkills];
+                typeValue = indexer[eProperty.AllDualWieldingSkills] + indexer[eProperty.WeaponSkill];
             if (SkillBase.CheckPropertyType(property, ePropertyType.SkillArchery))
-                value += indexer[eProperty.AllArcherySkills];
+                typeValue = indexer[eProperty.AllArcherySkills] + indexer[eProperty.WeaponSkill];
 
-            value += indexer[eProperty.AllSkills];
+            int allValue = indexer[eProperty.AllSkills];
+            value = value + typeValue + allValue;
             return value;
         }
 
