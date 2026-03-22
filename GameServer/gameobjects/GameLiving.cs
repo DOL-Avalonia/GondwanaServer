@@ -1681,7 +1681,6 @@ namespace DOL.GS
                 weaponTypeToUse = new InventoryItem();
                 weaponTypeToUse.Object_Type = weapon.Object_Type;
                 weaponTypeToUse.SlotPosition = weapon.SlotPosition;
-
                 if ((this is GamePlayer) && Realm == eRealm.Albion
                     && (GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.TwoHandedWeapon)
                         || GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.PolearmWeapon))
@@ -1937,6 +1936,7 @@ namespace DOL.GS
                     armorToHit = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
 
                 double damageMod = weaponStats.SkillFactor / armorStats.ArmorMod;
+                double combatMod = damageMod;
                 double uniMod = 1.0;
                 damageMod *= 1.0 + RelicMgr.GetRelicBonusModifier(Realm, eRelicType.Strength);
 
@@ -1983,7 +1983,7 @@ namespace DOL.GS
                     ad.DebugInfo.attackDamage = weaponDamage;
                     ad.DebugInfo.weaponDamage = WeaponDamageBase(weapon);
                     ad.DebugInfo.enemyResist = Math.Round(resist, 3);
-                    ad.DebugInfo.dmgMod = Math.Round(damageMod, 3);
+                    ad.DebugInfo.dmgMod = Math.Round(combatMod, 3);
                     ad.DebugInfo.dmgStat = GetWeaponStat(weapon);
                     ad.DebugInfo.Weapon = weaponStats;
                     ad.DebugInfo.Armor = armorStats;
