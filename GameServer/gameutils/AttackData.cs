@@ -134,6 +134,12 @@ namespace DOL.GS
             set;
         } = 1.0;
 
+        public double AvoidanceFactor
+        {
+            get;
+            set;
+        } = 1.0;
+
         public bool IsPVE => (Target.GetController() is GamePlayer) ^ (Attacker.GetController() is GamePlayer);
         
         public bool IsPVP => (Target.GetController() is GamePlayer) && (Attacker.GetController() is GamePlayer);

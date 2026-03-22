@@ -1667,7 +1667,13 @@ namespace DOL.GS
             set { }
         }
         
-        public int CalculateWeaponSpecLevel(GameLiving target, InventoryItem weapon)
+        /// <summary>
+        /// Gets the effective spec level for a weapon for damage calculations.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="weapon"></param>
+        /// <returns></returns>
+        public int CalculateWeaponSpecLevelForDamage(GameLiving target, InventoryItem weapon)
         {
             InventoryItem weaponTypeToUse = null;
             if (weapon != null)
@@ -1727,13 +1733,22 @@ namespace DOL.GS
         {
             AttackData.WeaponStats stats = new AttackData.WeaponStats();
 
-            stats.SpecLevel = CalculateWeaponSpecLevel(target, weapon);
+            stats.SpecLevel = CalculateWeaponSpecLevelForDamage(target, weapon);
             stats.SpecModifier = CalculateWeaponSpecModifier(target, stats.SpecLevel, out (double low, double high) specVariance);
             stats.VarianceMin = specVariance.low;
             stats.VarianceMax = specVariance.high;
             stats.BaseWeaponSkill = GetWeaponSkill(weapon);
             stats.SkillFactor = stats.BaseWeaponSkill * stats.SpecModifier;
             return stats;
+        }
+        
+        public double CalculateAvoidancePenetration(int targetLevel, InventoryItem weapon, AttackData.WeaponStats? stats = null)
+        {
+            var weaponSkill = stats?.BaseWeaponSkill ?? GetWeaponSkill(weapon);
+            var specLevel = this is GamePlayer pl ? pl.WeaponSpecLevel(weapon) : Level;
+            int levelDifference = specLevel - targetLevel;
+            double specModifier = 1 + levelDifference * 0.01;
+            return (weaponSkill * specModifier) * 0.08 / 100;
         }
 
         public double CalculateArmorAbsorbFactor(eArmorSlot slot)
@@ -1798,6 +1813,7 @@ namespace DOL.GS
             ad.Weapon = weapon;
             ad.IsOffHand = weapon == null ? false : weapon.Hand == 2;
             ad.IsCounterAttack = isCounterAttack;
+            ad.AvoidanceFactor = Math.Max(0, 1 - CalculateAvoidancePenetration(target.Level, weapon));
             effectiveness *= Effectiveness;
 
             if (dualWield)
