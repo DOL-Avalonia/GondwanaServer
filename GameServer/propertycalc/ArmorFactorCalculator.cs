@@ -33,43 +33,71 @@ namespace DOL.GS.PropertyCalc
     /// ItemBonus is used for players TOA bonuse, living.Level cap
     /// </summary>
     [PropertyCalculator(eProperty.ArmorFactor)]
+    [PropertyCalculator(eProperty.ArmorFactor)]
     public class ArmorFactorCalculator : PropertyCalculator
     {
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            if (living is GamePlayer)
+            switch (living)
             {
-                int af;
-
-                // 1.5*1.25 spec line buff cap
-                af = Math.Min((int)(living.Level * 1.875), living.SpecBuffBonusCategory[(int)property]);
-                // debuff
-                af -= Math.Abs(living.DebuffCategory[(int)property]);
-                // TrialsOfAtlantis af bonus
-                af += Math.Min(living.Level, living.ItemBonus[(int)property]);
-                // uncapped category
-                af += living.OtherBuffBonus[(int)property];
-
-                return af;
+                case GamePlayer:
+                case GameTrainingDummy:
+                    return CalculatePlayerArmorFactor(living, property);
+                case GameKeepDoor:
+                case GameKeepComponent:
+                    return CalculateKeepComponentArmorFactor(living);
+                case GameBossNPC:
+                    return CalculateLivingArmorFactor(living, property, 12.5 /* * epicNpc.ArmorFactorScalingFactor */, 50);
+                case NecromancerPet:
+                    return CalculateLivingArmorFactor(living, property, 12.5, 121);
+                case GamePet:
+                    return CalculateLivingArmorFactor(living, property, 12.5, 175);
+                case GuardLord:
+                    return CalculateLivingArmorFactor(living, property, 12.5, 134);
+                default:
+                    return CalculateLivingArmorFactor(living, property, 12.5, 200);
             }
-            else if (living is GameKeepDoor || living is GameKeepComponent)
+
+            static int CalculatePlayerArmorFactor(GameLiving living, eProperty property)
+            {
+                // Base AF buffs are calculated in the item's armor calc since they have the same cap.
+                int armorFactor = Math.Min((int) (living.Level * 1.875), living.SpecBuffBonusCategory[property]);
+                armorFactor -= Math.Abs(living.DebuffCategory[property]);
+                armorFactor += Math.Min(living.Level, living.ItemBonus[property]);
+                armorFactor += living.OtherBuffBonus[property];
+                return armorFactor;
+            }
+
+            static int CalculateLivingArmorFactor(GameLiving living, eProperty property, double factor, double divisor)
+            {
+                int armorFactor = (int) ((1 + living.Level / divisor) * (living.Level * factor));
+
+                if (living is GameNPC npc)
+                    armorFactor += npc.ArmorFactor;
+
+                // Some source state either base AF or spec AF isn't supposed to work on NPCs.
+                // In any case, having some buffs not doing anything feels pretty bad. Some pets also have a self spec AF buff.
+                armorFactor += living.BaseBuffBonusCategory[property] + living.SpecBuffBonusCategory[property];
+                armorFactor -= Math.Abs(living.DebuffCategory[property]);
+                armorFactor += living.OtherBuffBonus[property];
+                return armorFactor;
+            }
+
+            static int CalculateKeepComponentArmorFactor(GameLiving living)
             {
                 GameKeepComponent component = null;
-                if (living is GameKeepDoor)
-                    component = (living as GameKeepDoor).Component;
-                if (living is GameKeepComponent)
+
+                if (living is GameKeepDoor keepDoor)
+                    component = keepDoor.Component;
+                else if (living is GameKeepComponent)
                     component = living as GameKeepComponent;
 
-                int amount = component.Keep.BaseLevel;
-                if (component.Keep is GameKeep)
-                    return amount;
-                else return amount / 2;
-            }
-            else
-            {
-                return living.SpecBuffBonusCategory[(int)property]
-                - Math.Abs(living.DebuffCategory[(int)property])
-                + living.OtherBuffBonus[(int)property];
+                if (component == null)
+                    return 0;
+
+                double keepLevelMod = 1 + component.Keep.Level * 0.1;
+                int typeMod = component.Keep is GameKeep ? 24 : 12;
+                return (int) (component.Keep.BaseLevel * keepLevelMod * typeMod);
             }
         }
     }

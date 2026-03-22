@@ -420,7 +420,7 @@ namespace DOL.GS.Styles
                     double absorbRatio = 0;
                     if (weapon == null)
                         return false;
-                    if (weapon.DPS_AF >= 15) absorbRatio = attackData.Damage / living.UnstyledDamageCap(weapon);
+                    if (weapon.DPS_AF >= 15) absorbRatio = attackData.Damage / living.UnstyledDamageCap(living.AttackDamage(weapon), weapon);
                     double effectiveWeaponSpeed = living.AttackSpeed(weapon) * 0.001;
                     double styleDamageBonus = living.GetModified(eProperty.StyleDamage) * 0.01 - 1;
                     if (attackData.Style.OpeningRequirementType == Style.eOpening.Defensive)

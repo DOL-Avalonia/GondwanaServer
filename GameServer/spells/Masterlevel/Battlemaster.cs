@@ -706,7 +706,7 @@ namespace DOL.GS.Spells
                 ad.Modifier += resist;
                 ad.Damage = (int)damage;
                 ad.UncappedDamage = ad.Damage;
-                ad.Damage = Math.Min(ad.Damage, (int)(player.UnstyledDamageCap(weapon) * effectiveness));
+                ad.Damage = Math.Min(ad.Damage, (int)(player.UnstyledDamageCap(ad.Damage, weapon)));
                 ad.Damage = (int)((double)ad.Damage * ServerProperties.Properties.PVP_MELEE_DAMAGE);
                 if (ad.Damage == 0)
                 {

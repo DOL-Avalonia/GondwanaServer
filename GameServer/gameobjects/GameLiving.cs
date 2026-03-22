@@ -864,7 +864,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">the weapon used for attack</param>
         /// <returns></returns>
-        public virtual double AttackDamage(InventoryItem weapon)
+        public virtual double AttackDamage(InventoryItem weapon, Style style = null)
         {
             double effectiveness = 1.00;
             //double effectiveness = Effectiveness;
@@ -900,9 +900,9 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">attack weapon</param>
         /// <returns></returns>
-        public virtual double UnstyledDamageCap(InventoryItem weapon)
+        public virtual double UnstyledDamageCap(double baseDamage, InventoryItem weapon = null)
         {
-            return AttackDamage(weapon) * (2.82 + 0.00009 * AttackSpeed(weapon));
+            return baseDamage * (2.82 + 0.00009 * AttackSpeed(weapon));
         }
 
         /// <summary>
@@ -1069,7 +1069,8 @@ namespace DOL.GS
         /// </summary>
         public virtual double GetWeaponSkill(InventoryItem weapon)
         {
-            return (Level + 1) * 22 * 200 / 500 * (100 + GetWeaponStat(weapon) / 100.0) * ((100 + Level / 5) / 100.0);
+            double weaponSkill = Math.Max(1, (int) Level) * 2.5 * (1 + 0.01 * (GetWeaponStat(weapon) + 30) / 2);
+            return Math.Max(1, weaponSkill * GetModified(eProperty.WeaponSkill) * 0.01);
         }
 
         /// <summary>
@@ -1201,6 +1202,15 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">the weapon used for attack</param>
         public virtual double WeaponDamage(InventoryItem weapon)
+        {
+            return WeaponDamageBase(weapon);
+        }
+
+        /// <summary>
+        /// Gets the weapondamage of currently used weapon
+        /// </summary>
+        /// <param name="weapon">the weapon used for attack</param>
+        public virtual double WeaponDamageBase(InventoryItem weapon)
         {
             return 2.0;
         }
@@ -1656,6 +1666,120 @@ namespace DOL.GS
             get { return true; }
             set { }
         }
+        
+        /// <summary>
+        /// Gets the effective spec level for a weapon for damage calculations.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="weapon"></param>
+        /// <returns></returns>
+        public int CalculateWeaponSpecLevelForDamage(GameLiving target, InventoryItem weapon)
+        {
+            InventoryItem weaponTypeToUse = null;
+            if (weapon != null)
+            {
+                weaponTypeToUse = new InventoryItem();
+                weaponTypeToUse.Object_Type = weapon.Object_Type;
+                weaponTypeToUse.SlotPosition = weapon.SlotPosition;
+                if ((this is GamePlayer) && Realm == eRealm.Albion
+                    && (GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.TwoHandedWeapon)
+                        || GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.PolearmWeapon))
+                    && ServerProperties.Properties.ENABLE_ALBION_ADVANCED_WEAPON_SPEC)
+                {
+                    // Albion dual spec penalty, which sets minimum damage to the base damage spec
+                    if (weapon.Type_Damage == (int)eDamageType.Crush)
+                    {
+                        weaponTypeToUse.Object_Type = (int)eObjectType.CrushingWeapon;
+                    }
+                    else if (weapon.Type_Damage == (int)eDamageType.Slash)
+                    {
+                        weaponTypeToUse.Object_Type = (int)eObjectType.SlashingWeapon;
+                    }
+                    else
+                    {
+                        weaponTypeToUse.Object_Type = (int)eObjectType.ThrustWeapon;
+                    }
+                }
+            }
+
+            return WeaponSpecLevel(weaponTypeToUse);
+        }
+        
+        public (double low, double high) CalculateWeaponSpecVariance(GameLiving target, int specLevel)
+        {
+            (double low, double high) varianceRange;
+
+            if (this is GamePlayer player)
+            {
+                double specRatio = Math.Min((specLevel - 1) / ((double) target.Level + 1), 1.0);
+                double minVariance = 0.75 + 0.5 * specRatio;
+                varianceRange = (minVariance, minVariance + 0.5);
+            }
+            else
+                varianceRange = (0.9, 1.1);
+
+            return varianceRange;
+        }
+
+        public double CalculateWeaponSpecModifier(GameLiving target, int specLevel, out (double low, double high) damageVariance)
+        {
+            damageVariance = CalculateWeaponSpecVariance(target, specLevel);
+            double diff = damageVariance.high - damageVariance.low;
+            return Util.RandomDouble() * diff + damageVariance.low;
+        }
+
+        public AttackData.WeaponStats CalculateWeaponStats(GameLiving target, InventoryItem weapon)
+        {
+            AttackData.WeaponStats stats = new AttackData.WeaponStats();
+
+            stats.SpecLevel = CalculateWeaponSpecLevelForDamage(target, weapon);
+            stats.SpecModifier = CalculateWeaponSpecModifier(target, stats.SpecLevel, out (double low, double high) specVariance);
+            stats.VarianceMin = specVariance.low;
+            stats.VarianceMax = specVariance.high;
+            stats.BaseWeaponSkill = GetWeaponSkill(weapon);
+            stats.SkillFactor = stats.BaseWeaponSkill * stats.SpecModifier;
+            return stats;
+        }
+        
+        public double CalculateAvoidancePenetration(int targetLevel, InventoryItem weapon, AttackData.WeaponStats? stats = null)
+        {
+            var weaponSkill = stats?.BaseWeaponSkill ?? GetWeaponSkill(weapon);
+            var specLevel = this is GamePlayer pl ? pl.WeaponSpecLevel(weapon) : Level;
+            int levelDifference = specLevel - targetLevel;
+            double specModifier = 1 + levelDifference * 0.01;
+            return (weaponSkill * specModifier) * 0.08 / 100;
+        }
+
+        public double CalculateArmorAbsorbFactor(eArmorSlot slot)
+        {
+            double armorAbsorb = GetArmorAbsorb(slot);
+            // Badge of Valor check should go here.
+            double physicalAbsorb = GetModified(eProperty.ArmorAbsorption) * 0.01;
+            return (1 - armorAbsorb) * (1 - physicalAbsorb);
+        }
+
+        public AttackData.ArmorStats CalculateTargetArmor(GameLiving target, eArmorSlot armorSlot)
+        {
+            AttackData.ArmorStats armorStats = new AttackData.ArmorStats();
+
+            armorStats.ArmorFactor = target.GetArmorAF(armorSlot);
+
+            // Give an extra 0.4–20 armor factor to players.
+            // This matches the formula on https://camelotherald.fandom.com/wiki/Melee_Damage.
+            // The formula seems to work when compared against a couple of old combat logs,
+            // but not on Live servers, hinting that it was either increased at some point,
+            // or that the variance min and max modifiers were lowered (while preserving the spread, since it still matches).
+            // On Phoenix, it was increased to 45 at level 50 (0.9 per level), which is still lower than what Live appears to be using (Jan 2026).
+            const double PLAYER_EXTRA_AF_PER_LEVEL = 0.4;
+
+            if (target is GamePlayer or GameTrainingDummy)
+                armorStats.ArmorFactor += target.Level * PLAYER_EXTRA_AF_PER_LEVEL;
+
+            armorStats.ArmorAbsorbFactor = target.CalculateArmorAbsorbFactor(armorSlot);
+            armorStats.ArmorAbsorb = 1 - armorStats.ArmorAbsorbFactor;
+            armorStats.ArmorMod = armorStats.ArmorAbsorb >= 1 ? double.MaxValue : Math.Max(1, armorStats.ArmorFactor / armorStats.ArmorAbsorbFactor);
+            return armorStats;
+        }
 
         /// <summary>
         /// This method is called to make an attack, it is called from the
@@ -1676,6 +1800,7 @@ namespace DOL.GS
 
         protected virtual AttackData MakeAttack(GameObject target, InventoryItem weapon, Style style, double effectiveness, int interruptDuration, bool dualWield, bool ignoreLOS, bool isCounterAttack)
         {
+            bool saveDetails = Properties.ENABLE_DEBUG || this is GamePlayer { CombatInfo: true };
             AttackData ad = new AttackData();
             ad.Attacker = this;
             ad.Target = target as GameLiving;
@@ -1688,6 +1813,7 @@ namespace DOL.GS
             ad.Weapon = weapon;
             ad.IsOffHand = weapon == null ? false : weapon.Hand == 2;
             ad.IsCounterAttack = isCounterAttack;
+            ad.AvoidanceFactor = Math.Max(0, 1 - CalculateAvoidancePenetration(target.Level, weapon));
             effectiveness *= Effectiveness;
 
             if (dualWield)
@@ -1794,144 +1920,80 @@ namespace DOL.GS
             if (ad.AttackResult == eAttackResult.HitUnstyled
                 || ad.AttackResult == eAttackResult.HitStyle)
             {
-                InventoryItem armor = null;
-
-                if (ad.Target.Inventory != null)
-                    armor = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
-
-                InventoryItem weaponTypeToUse = null;
-
-                if (weapon != null)
-                {
-                    weaponTypeToUse = new InventoryItem();
-                    weaponTypeToUse.Object_Type = weapon.Object_Type;
-                    weaponTypeToUse.SlotPosition = weapon.SlotPosition;
-
-                    if ((this is GamePlayer) && Realm == eRealm.Albion
-                        && (GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.TwoHandedWeapon)
-                        || GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.PolearmWeapon))
-                        && ServerProperties.Properties.ENABLE_ALBION_ADVANCED_WEAPON_SPEC)
-                    {
-                        // Albion dual spec penalty, which sets minimum damage to the base damage spec
-                        if (weapon.Type_Damage == (int)eDamageType.Crush)
-                        {
-                            weaponTypeToUse.Object_Type = (int)eObjectType.CrushingWeapon;
-                        }
-                        else if (weapon.Type_Damage == (int)eDamageType.Slash)
-                        {
-                            weaponTypeToUse.Object_Type = (int)eObjectType.SlashingWeapon;
-                        }
-                        else
-                        {
-                            weaponTypeToUse.Object_Type = (int)eObjectType.ThrustWeapon;
-                        }
-                    }
-                }
-
                 var player = this as GamePlayer;
-                double weaponSkillFactor = player != null ? player.CharacterClass.WeaponSkillFactor((eObjectType)weapon!.Object_Type) : 20;
-                double dmgStat = GetWeaponStat(weapon);
-                double myEffectiveLevel = Level;
-                if (this is GameNPC)
-                {
-                    if (Level == 0)
-                        myEffectiveLevel = 1;
-                    else if (Level == 1)
-                        myEffectiveLevel = 1.1;
-                }
-                double weaponSpecLevel = player != null ? GetModifiedSpecLevel(player.GetWeaponSpec(weapon)) : myEffectiveLevel * 1.2;
-                double enemyArmorFactor = ad.Target.GetArmorAF(ad.ArmorHitLocation);
-                double enemyArmorAbsorb = ad.Target.GetArmorAbsorb(ad.ArmorHitLocation);
-                if (ad.Attacker.EffectList.GetOfType<BadgeOfValorEffect>() != null)
-                    enemyArmorFactor = enemyArmorFactor / (1 + enemyArmorAbsorb);
-                else
-                    enemyArmorFactor = enemyArmorFactor / (1 - enemyArmorAbsorb);
-
-                // calculate variance we start with 0 to 49 and tend to 19 to 29 (with 65 in spec)
-                int minVariance = WeaponSpecLevel(weaponTypeToUse).Clamp(0, 70) * 49 / 166; // x*0.6*49/100 => x * 49 / 166
-                int maxVariance = 49 - minVariance;
-
-                double damageMod = myEffectiveLevel
-                    * weaponSkillFactor / 10.0
-                    * (1 + 0.01 * dmgStat)
-                    * (0.75 + 0.5 * Math.Min(ad.Target.Level + 1.0, weaponSpecLevel) / (ad.Target.Level + 1.0) + 0.01 * Util.Random(minVariance, maxVariance))
-                    / Math.Max(1, enemyArmorFactor);
-                damageMod = damageMod.Clamp(0.01, 3);
-
-
-                double weaponDamage;
-                if (style != null && player != null)
-                {
-                    if (player.CharacterClass is ClassSavage && string.Equals(style.Spec, "Hand to Hand"))
-                        weaponDamage = AttackDamage(weapon) * Properties.HANDTOHAND_RESOLVE_DAMAGES;
-                    else if (player.CharacterClass is ClassHunter or ClassValkyrie && style.Spec.Equals("Spear"))
-                        weaponDamage = AttackDamage(weapon) * Properties.SPEARS_RESOLVE_DAMAGES;
-                    else
-                        weaponDamage = WeaponDamage(weapon);
-                }
-                else
-                    weaponDamage = WeaponDamage(weapon);
+                double weaponDamage = AttackDamage(weapon, style) * effectiveness;
+                double weaponDamageCap = UnstyledDamageCap(weaponDamage, weapon) * effectiveness;
 
                 if (ad.IsOffHand)
                 {
                     weaponDamage *= 1 + GetModified(eProperty.OffhandDamageBonus) * 0.01;
                 }
                 
-                double damage;
-                double baseDamage = damageMod * weaponDamage;
-                double unstyledCap = UnstyledDamageCap(weapon) * effectiveness;
+                var weaponStats = CalculateWeaponStats(ad.Target, weapon);
+                var armorStats = CalculateTargetArmor(ad.Target, (eArmorSlot)ad.ArmorHitLocation);
 
-                if (this is GamePlayer or GameNPC { Realm: not 0, Brain: IControlledBrain })
+                InventoryItem armorToHit = null;
+                if (ad.Target.Inventory != null)
+                    armorToHit = ad.Target.Inventory.GetItem((eInventorySlot)ad.ArmorHitLocation);
+
+                double damageMod = weaponStats.SkillFactor / armorStats.ArmorMod;
+                double combatMod = damageMod;
+                double uniMod = 1.0;
+                damageMod *= 1.0 + RelicMgr.GetRelicBonusModifier(Realm, eRelicType.Strength);
+
+                var playerOwner = GetController() as GamePlayer;
+                if (playerOwner != null)
                 {
                     if (target is GamePlayer)
                     {
-                        baseDamage *= Properties.PVP_MELEE_DAMAGE;
-                        unstyledCap *= Properties.PVP_MELEE_DAMAGE;
+                        uniMod *= Properties.PVP_MELEE_DAMAGE;
                     }
                     else if (target is GameNPC)
                     {
-                        baseDamage *= Properties.PVE_MELEE_DAMAGE;
-                        unstyledCap *= Properties.PVE_MELEE_DAMAGE;
+                        uniMod *= Properties.PVE_MELEE_DAMAGE;
                     }
                 }
 
+                damageMod *= uniMod;
+                weaponDamageCap *= uniMod;
+
+                double baseDamage = damageMod * weaponDamage * effectiveness;
+                double damage;
+                double preResistDamage = baseDamage;
+
                 var resistProperty = ad.Target.GetResistTypeForDamage(ad.DamageType);
-                int enemyBaseResistStat = (ad.Target.GetResist(ad.DamageType) + SkillBase.GetArmorResist(armor, ad.DamageType));
+                int enemyBaseResistStat = (ad.Target.GetResist(ad.DamageType) + SkillBase.GetArmorResist(armorToHit, ad.DamageType));
                 int enemySecondaryResistStat = ad.Target.SpecBuffBonusCategory[resistProperty];
                 int enemyTotalResistStat = enemyBaseResistStat + enemySecondaryResistStat;
+                double resist = 0;
                 if (enemyTotalResistStat >= 100)
                     damage = 0;
                 else if (enemyTotalResistStat == 0)
-                    damage = baseDamage * effectiveness;
+                    damage = baseDamage;
                 else
                 {
-                    double resist = (double)enemyTotalResistStat / 100;
-                    damage = (1f - resist) * baseDamage * effectiveness;
-                    ad.enemyResist = Math.Round(resist, 3);
+                    resist = (double)enemyTotalResistStat / 100;
+                    damage = (1f - resist) * baseDamage;
                 }
 
-                ad.weaponDamage = weaponDamage;
+                ad.Modifier = -(int)(preResistDamage - damage);
 
-                // DEBUG
-                ad.dmgMod = Math.Round(damageMod, 3);
-                ad.enemyAF = Math.Round(enemyArmorFactor, 3);
-                ad.enemyABS = Math.Round(enemyArmorAbsorb, 3);
-                ad.weaponSkillFactor = Math.Round(weaponSkillFactor, 3);
-                ad.weaponStat = Math.Round(dmgStat, 3);
-
-
-                if ((ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL == 0 || Level > ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL) &&
-                    ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL > 0 &&
-                    damage > 0 &&
-                    this is GameNPC && (this as GameNPC)!.Brain is IControlledBrain == false)
+                if (saveDetails)
                 {
-                    double modifiedDamage = ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL * (Level - ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL);
-                    damage += (modifiedDamage * effectiveness);
+                    ad.DebugInfo = new();
+                    ad.DebugInfo.baseDamageCap = weaponDamageCap;
+                    ad.DebugInfo.attackDamage = weaponDamage;
+                    ad.DebugInfo.weaponDamage = WeaponDamageBase(weapon);
+                    ad.DebugInfo.enemyResist = Math.Round(resist, 3);
+                    ad.DebugInfo.dmgMod = Math.Round(combatMod, 3);
+                    ad.DebugInfo.dmgStat = GetWeaponStat(weapon);
+                    ad.DebugInfo.Weapon = weaponStats;
+                    ad.DebugInfo.Armor = armorStats;
                 }
 
                 // apply total damage cap
                 ad.UncappedDamage = (int)damage;
-                ad.Damage = Math.Min(ad.UncappedDamage, (int)unstyledCap);
+                ad.Damage = Math.Min(ad.UncappedDamage, (int)weaponDamageCap);
 
                 //Eden - Conversion Bonus (Crocodile Ring)  - tolakram - critical damage is always 0 here, needs to be moved
                 if (ad.Target is GamePlayer && ad.Target.GetModified(eProperty.Conversion) > 0)
@@ -1948,8 +2010,6 @@ namespace DOL.GS
                     ad.Target.Endurance += enduconversion; if (ad.Target.Endurance > ad.Target.MaxEndurance) ad.Target.Endurance = ad.Target.MaxEndurance;
                     ad.Target.Mana += manaconversion; if (ad.Target.Mana > ad.Target.MaxMana) ad.Target.Mana = ad.Target.MaxMana;
                 }
-
-                ad.Modifier = -(int)(baseDamage - ad.Damage);
 
                 // Tolakram - let's go ahead and make it 1 damage rather than spamming a possible error
                 /*if (ad.Damage == 0)

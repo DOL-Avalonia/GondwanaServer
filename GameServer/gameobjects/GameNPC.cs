@@ -1685,8 +1685,9 @@ namespace DOL.GS
             if (speed <= 0)
                 return false;
 
-            Motion = Geometry.Motion.Create(Position, destination, speed);
-            if ((int)Motion.RemainingDistance == 0)
+            var currentPosition = Position;
+            Motion = Geometry.Motion.Create(currentPosition, destination, speed);
+            if ((int)destination.DistanceTo(currentPosition, ignoreZ: false) == 0)
             {
                 goToNextNodeCallback(this);
                 return true;
@@ -4475,9 +4476,9 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">the weapon used for attack</param>
         /// <returns></returns>
-        public override double AttackDamage(InventoryItem weapon)
+        public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
-            double damage = base.AttackDamage(weapon);
+            double damage = base.AttackDamage(weapon, style);
 
             if (ActiveWeaponSlot == eActiveWeaponSlot.TwoHanded && m_blockChance > 0)
                 switch (this)
@@ -4495,6 +4496,15 @@ namespace DOL.GS
                             damage *= (100 + m_blockChance) / 100.00;
                         break;
                 }
+                
+            if ((ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL == 0 || Level > ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL) &&
+                ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL > 0 &&
+                damage > 0 &&
+                Brain is not IControlledBrain || GetPlayerOwner() == null)
+            {
+                double modifiedDamage = ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL * (Level - ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL);
+                damage += modifiedDamage;
+            }
 
             return damage;
         }
@@ -6067,11 +6077,28 @@ namespace DOL.GS
 
         public override double GetArmorAF(eArmorSlot slot)
         {
-            return Math.Min(5, (int)Level) + ArmorFactor + GetModified(eProperty.ArmorFactor) / 5;
+            return Math.Max(0, GetModified(eProperty.ArmorFactor) / 5.0);
         }
+
+        private double GetLevelAbsorb()
+        {
+            const double NECRO_ABSORB_PER_LEVEL = 0.0068; // 34% at lvl 50
+            const double NPC_ABSORB_PER_LEVEL = 0.0054;   // 27% at lvl 50
+
+            // Use owner level for necromancer pets.
+            if (this is NecromancerPet necromancerPet)
+                return necromancerPet.Owner.Level * NECRO_ABSORB_PER_LEVEL;
+
+            return Level * NPC_ABSORB_PER_LEVEL;
+        }
+
         public override double GetArmorAbsorb(eArmorSlot slot)
         {
-            return ArmorAbsorb / 100.0 + GetModified(eProperty.ArmorAbsorption) * 0.01;
+            var levelAbsorb = GetLevelAbsorb();
+            var dbAbsorb = ArmorAbsorb / 100.0;
+            var bonusAbsorb = GetModified(eProperty.ArmorAbsorption) * 0.01;
+            var total = levelAbsorb + dbAbsorb + bonusAbsorb;
+            return Math.Min(total, 1.0);
         }
         #endregion
 

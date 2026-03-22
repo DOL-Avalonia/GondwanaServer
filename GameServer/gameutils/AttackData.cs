@@ -30,6 +30,32 @@ namespace DOL.GS
     /// </summary>
     public class AttackData
     {
+        public record struct WeaponStats
+        {
+            public double SkillFactor { get; set; }
+            
+            public double BaseWeaponSkill { get; set; }
+            
+            public int SpecLevel { get; set; }
+            
+            public double SpecModifier { get; set; }
+            
+            public double VarianceMin { get; set; }
+            
+            public double VarianceMax { get; set; }
+        }
+
+        public record struct ArmorStats
+        {
+            public double ArmorFactor { get; set; }
+            
+            public double ArmorAbsorb { get; set; }
+            
+            public double ArmorAbsorbFactor { get; set; }
+            
+            public double ArmorMod { get; set; }
+        }
+        
         private GameLiving m_attacker = null;
         private GameLiving m_target = null;
         private eArmorSlot m_hitArmorSlot = eArmorSlot.NOTSET;
@@ -50,15 +76,26 @@ namespace DOL.GS
         private InventoryItem m_weapon;
         private bool m_isSpellResisted = false;
         private bool m_causesCombat = true;
-
-        public double weaponDamage = 0;
-        public double dmgMod = 0;
-        public double enemyAF = 0;
-        public double enemyABS = 0;
-        public double enemyResist = 0;
-        public double weaponStat = 0;
         public int criticalChance = 0;
-        public double weaponSkillFactor = 0;
+
+        public class DebugStats
+        {
+            public double attackDamage = 0;
+            public double weaponDamage = 0;
+            public double baseDamageCap = 0;
+            public int dmgStat = 0;
+            public double dmgMod = 0;
+            public double enemyResist = 0;
+
+            public WeaponStats Weapon { get; set; }
+            public ArmorStats Armor { get; set; }
+        }
+
+        public DebugStats DebugInfo
+        {
+            get;
+            set;
+        }
 
         // attack fail chances
         public double? FumbleChance
@@ -92,6 +129,12 @@ namespace DOL.GS
         }
 
         public double TensionRate
+        {
+            get;
+            set;
+        } = 1.0;
+
+        public double AvoidanceFactor
         {
             get;
             set;

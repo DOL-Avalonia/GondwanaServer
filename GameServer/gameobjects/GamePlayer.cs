@@ -7504,7 +7504,7 @@ namespace DOL.GS
             AttackData ad = base.MakeAttack(target, weapon, style, effectiveness, interruptDuration, dualWield, ignoreLOS, isCounterAttack);
 
             if (CombatInfo)
-                Out.SendMessage($"CombatInfo: result:{ad.AttackResult} dmg={ad.Damage} crits={ad.CriticalDamage} style dmg={ad.StyleDamage} uncap dmg={ad.UncappedDamage} weapon dmg={ad.weaponDamage:F1} mod={ad.dmgMod:F1}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Out.SendMessage($"CombatInfo: result:{ad.AttackResult} dmg={ad.Damage} crits={ad.CriticalDamage} style dmg={ad.StyleDamage} uncap dmg={ad.UncappedDamage} weapon dmg={ad.DebugInfo.weaponDamage:F2} mod={ad.DebugInfo.dmgMod:F2}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
             //Clear the styles for the next round!
             NextCombatStyle = null;
@@ -8216,13 +8216,14 @@ namespace DOL.GS
         private void SendAttackDetails(AttackData ad)
         {
             Client.Out.SendMessage($"---- Attack ({ad.AttackType}) {ad.Attacker?.Name} => {ad.Target?.Name} ----", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Damage {ad.Damage} {ad.DamageType} (uncapped {ad.UncappedDamage}) - Critical {ad.CriticalDamage} ({ad.criticalChance}%)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Miss {(ad.MissChance ?? ad.Target?.ChanceToBeMissed ?? 0) * 100:0.}% - Parry {(ad.ParryChance ?? 0) * 100:0.}% - Evade {(ad.EvadeChance ?? 0) * 100:0.}% - Block {(ad.BlockChance ?? 0) * 100:0.}% - Fumble {(ad.FumbleChance ?? ad.Attacker!.ChanceToFumble) * 100:0.}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Weapon damage {ad.weaponDamage} - Style damage {ad.StyleDamage}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            Client.Out.SendMessage($"DEBUG: Wep stat {ad.weaponStat} Wep skill {ad.weaponSkillFactor} AF {ad.enemyAF:0.##} ABS {ad.enemyABS:0.##} Res {ad.enemyResist:0.##} => Damage * {ad.dmgMod}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Damage {ad.Damage} {ad.DamageType} - Critical {ad.CriticalDamage} ({ad.criticalChance}%)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Miss {(ad.MissChance ?? ad.Target?.ChanceToBeMissed ?? 0) * 100:0.}% - Parry {(ad.ParryChance ?? 0) * 100:0.}% - Evade {(ad.EvadeChance ?? 0) * 100:0.}% - Block {(ad.BlockChance ?? 0) * 100:0.}% - Fumble {(ad.FumbleChance ?? ad.Attacker!.ChanceToFumble) * 100:0.}% - Penetration {(1.00 - ad.AvoidanceFactor) * 100:0.}%", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Weap DPS {ad.DebugInfo.weaponDamage:0.##} - Base Damage {ad.DebugInfo.attackDamage:0.##} - Wep Stat {ad.DebugInfo.dmgStat:0.##} - Style damage {ad.StyleDamage}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Weap Skill {ad.DebugInfo.Weapon.SkillFactor:0.##} - Base {ad.DebugInfo.Weapon.BaseWeaponSkill:0.##} * Variance {ad.DebugInfo.Weapon.SpecModifier:0.##} ({ad.DebugInfo.Weapon.VarianceMin:0.##}-{ad.DebugInfo.Weapon.VarianceMax:0.##})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: Armor mod {ad.DebugInfo.Armor.ArmorMod:0.##} - AF {ad.DebugInfo.Armor.ArmorFactor:0.##} ABS {ad.DebugInfo.Armor.ArmorAbsorb:0.##} Res {ad.DebugInfo.enemyResist:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            Client.Out.SendMessage($"DEBUG: DamageMod {ad.DebugInfo.dmgMod:0.##} => Uncapped {ad.UncappedDamage} - Cap {(int)ad.DebugInfo.baseDamageCap}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Client.Out.SendMessage($"DEBUG: Tension rate {ad.TensionRate:0.##}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
-
 
         /// <summary>
         /// Launch any reactive effect on an item
@@ -8646,19 +8647,11 @@ namespace DOL.GS
         public override double GetWeaponSkill(InventoryItem weapon)
         {
             if (weapon == null)
-            {
                 return 0;
-            }
-            double classbase =
-                (weapon.SlotPosition == (int)eInventorySlot.DistanceWeapon
-                 ? CharacterClass.WeaponSkillRangedBase
-                 : CharacterClass.WeaponSkillBase);
 
-            //added for WS Poisons
-            double preBuff = ((Level * classbase * 0.02 * (1 + (GetWeaponStat(weapon) - 50) * 0.005)) * Effectiveness);
-
-            //return ((Level * classbase * 0.02 * (1 + (GetWeaponStat(weapon) - 50) * 0.005)) * PlayerEffectiveness);
-            return Math.Max(0, preBuff * GetModified(eProperty.WeaponSkill) * 0.01);
+            int classBaseWeaponSkill = (eInventorySlot) weapon.SlotPosition is eInventorySlot.DistanceWeapon ? CharacterClass.WeaponSkillRangedBase : CharacterClass.WeaponSkillBase;
+            double weaponSkill = Level * classBaseWeaponSkill / 200.0 * (1 + 0.01 * GetWeaponStat(weapon) / 2) * Effectiveness;
+            return Math.Max(1, weaponSkill * GetModified(eProperty.WeaponSkill) * 0.01);
         }
 
         /// <summary>
@@ -8758,6 +8751,21 @@ namespace DOL.GS
             }
         }
 
+        /// <inheritdoc />
+        public override double WeaponDamageBase(InventoryItem weapon)
+        {
+            if (weapon == null)
+                return 1.0;
+
+            var dps = weapon.DPS_AF * 0.1;
+            var cap = 1.2 + 0.3 * Level;
+            if (RealmLevel > 39)
+                cap += 0.3;
+            dps = dps.Clamp(0.1, cap);
+            dps = dps * 1.0 + (GetModified(eProperty.DPS) * 0.01);
+            return dps;
+        }
+
         /// <summary>
         /// Gets the weapondamage of currently used weapon
         /// Used to display weapon damage in stats, 16.5dps = 1650
@@ -8768,14 +8776,7 @@ namespace DOL.GS
             if (weapon == null)
                 return 1.0;
 
-            var dps = weapon.DPS_AF * 0.1;
-            var cap = 1.2 + 0.3 * Level;
-            if (RealmLevel > 39)
-                cap += 0.3;
-            dps = dps.Clamp(0.1, cap);
-            dps *= 1.0 + (GetModified(eProperty.DPS) * 0.01);
-            // beware to use always ConditionPercent, because Condition is abolute value
-            dps *= weapon.Quality * 0.01 * weapon.ConditionPercent * 0.01;
+            var dps = WeaponDamageBase(weapon);
 
             var twohand_bonus = 1.0;
             if (weapon.Item_Type == Slot.TWOHAND)
@@ -8783,82 +8784,11 @@ namespace DOL.GS
                 var wp_spec = GetModifiedSpecLevel(GetWeaponSpec(weapon));
                 twohand_bonus = 1.1 + 0.005 * wp_spec;
             }
+
             var weapon_dps = dps * weapon.SPD_ABS * 0.1
                 * (0.94 + weapon.SPD_ABS * 0.1 * 0.03)
-                * twohand_bonus
-                * (1 + 0.01 * GetModified(eProperty.MeleeDamage));
-
+                * twohand_bonus;
             return weapon_dps;
-        }
-
-        /// <summary>
-        /// Max. Damage possible without style
-        /// </summary>
-        /// <param name="weapon">attack weapon</param>
-        public override double UnstyledDamageCap(InventoryItem weapon)
-        {
-            if (weapon != null)
-            {
-                int DPS = weapon.DPS_AF;
-                int cap = 12 + 3 * Level;
-                if (RealmLevel > 39)
-                    cap += 3;
-                if (DPS > cap)
-                    DPS = cap;
-
-                double result = DPS * (1 + GetModified(eProperty.DPS) * 0.01) * weapon.SPD_ABS * 0.03 * (0.94 + 0.003 * weapon.SPD_ABS);
-                
-                double effectiveness = 1.0;
-                if (weapon.Hand == 1) //2h
-                {
-                    effectiveness += 1.1 + (WeaponSpecLevel(weapon) - 1) * 0.005;
-                    if (weapon.Item_Type == Slot.RANGED)
-                    {
-                        // http://home.comcast.net/~shadowspawn3/bowdmg.html
-                        //ammo damage bonus
-                        if (RangeAttackAmmo != null)
-                        {
-                            switch ((RangeAttackAmmo.SPD_ABS) & 0x3)
-                            {
-                                case 0: effectiveness += -0.15; break;  //Blunt       (light) -15%
-                                case 1: break;     //Bodkin     (medium)   0%
-                                case 2: effectiveness += 0.15; break;  //doesn't exist on live
-                                case 3: effectiveness += 0.25; break;  //Broadhead (X-heavy) +25%
-                            }
-                        }
-                    }
-                }
-
-                if (weapon.Item_Type == Slot.RANGED && (weapon.Object_Type == (int)eObjectType.Longbow || weapon.Object_Type == (int)eObjectType.RecurvedBow || weapon.Object_Type == (int)eObjectType.CompositeBow))
-                {
-                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
-                    {
-                        effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
-                    }
-                    else if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == false)
-                    {
-                        effectiveness += GetModified(eProperty.SpellDamage) * 0.01;
-                        effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
-                    }
-                }
-                else if (weapon.Item_Type == Slot.RANGED)
-                {
-                    //Ranged damage buff,debuff,Relic,RA
-                    effectiveness += GetModified(eProperty.RangedDamage) * 0.01;
-                }
-                else if (weapon.Item_Type == Slot.RIGHTHAND || weapon.Item_Type == Slot.LEFTHAND || weapon.Item_Type == Slot.TWOHAND)
-                {
-                    effectiveness += GetModified(eProperty.MeleeDamage) * 0.01;
-                }
-
-                return effectiveness * result;
-            }
-            else
-            { // TODO: whats the damage cap without weapon?
-                return
-                    (AttackDamage(weapon) * 3 * (1 + (AttackSpeed(weapon) * 0.001 - 2) * .03))
-                    * (1 + GetModified(eProperty.DPS) * 0.01);
-            }
         }
 
         /// <summary>
@@ -9100,13 +9030,13 @@ namespace DOL.GS
         /// </summary>
         /// <param name="weapon">the weapon used for attack</param>
         /// <returns>the weapon damage</returns>
-        public override double AttackDamage(InventoryItem weapon)
+        public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
             if (weapon == null)
                 return 0;
 
             double effectiveness = 1.00;
-            double damage = WeaponDamage(weapon) * weapon.SPD_ABS * 0.1;
+            double damage = WeaponDamageBase(weapon) * weapon.SPD_ABS * 0.1;
 
             if (weapon.Hand == 1) // two-hand
             {
@@ -9136,6 +9066,15 @@ namespace DOL.GS
                 //Melee damage buff,debuff,Relic,RA
                 effectiveness += GetModified(eProperty.MeleeDamage) * 0.01;
             }
+
+            if (style != null)
+            {
+                if (CharacterClass is ClassSavage && string.Equals(style.Spec, "Hand to Hand"))
+                    effectiveness *= Properties.HANDTOHAND_RESOLVE_DAMAGES;
+                else if (CharacterClass is ClassHunter or ClassValkyrie && style.Spec.Equals("Spear"))
+                    effectiveness *= Properties.SPEARS_RESOLVE_DAMAGES;
+            }
+
             damage *= effectiveness;
             return damage;
         }
