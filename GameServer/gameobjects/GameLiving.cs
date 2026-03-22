@@ -1800,6 +1800,7 @@ namespace DOL.GS
 
         protected virtual AttackData MakeAttack(GameObject target, InventoryItem weapon, Style style, double effectiveness, int interruptDuration, bool dualWield, bool ignoreLOS, bool isCounterAttack)
         {
+            bool saveDetails = Properties.ENABLE_DEBUG || this is GamePlayer { CombatInfo: true };
             AttackData ad = new AttackData();
             ad.Attacker = this;
             ad.Target = target as GameLiving;
@@ -1977,8 +1978,9 @@ namespace DOL.GS
 
                 ad.Modifier = -(int)(preResistDamage - damage);
 
-                if (Properties.ENABLE_DEBUG || this is GamePlayer { CombatInfo: true })
+                if (saveDetails)
                 {
+                    ad.DebugInfo = new();
                     ad.DebugInfo.baseDamageCap = weaponDamageCap;
                     ad.DebugInfo.attackDamage = weaponDamage;
                     ad.DebugInfo.weaponDamage = WeaponDamageBase(weapon);

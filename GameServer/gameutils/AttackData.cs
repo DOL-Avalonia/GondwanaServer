@@ -154,9 +154,6 @@ namespace DOL.GS
         public AttackData()
         {
             m_styleEffects = new List<ISpellHandler>();
-
-            if (ServerProperties.Properties.ENABLE_DEBUG)
-                DebugInfo = new();
         }
 
         /// <summary>

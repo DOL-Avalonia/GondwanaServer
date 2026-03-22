@@ -7504,7 +7504,7 @@ namespace DOL.GS
             AttackData ad = base.MakeAttack(target, weapon, style, effectiveness, interruptDuration, dualWield, ignoreLOS, isCounterAttack);
 
             if (CombatInfo)
-                Out.SendMessage($"CombatInfo: result:{ad.AttackResult} dmg={ad.Damage} crits={ad.CriticalDamage} style dmg={ad.StyleDamage} uncap dmg={ad.UncappedDamage} weapon dmg={ad.DebugInfo.weaponDamage:F1} mod={ad.DebugInfo.dmgMod:F1}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Out.SendMessage($"CombatInfo: result:{ad.AttackResult} dmg={ad.Damage} crits={ad.CriticalDamage} style dmg={ad.StyleDamage} uncap dmg={ad.UncappedDamage} weapon dmg={ad.DebugInfo.weaponDamage:F2} mod={ad.DebugInfo.dmgMod:F2}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
             //Clear the styles for the next round!
             NextCombatStyle = null;
