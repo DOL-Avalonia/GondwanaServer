@@ -154,7 +154,7 @@ namespace DOL.GS
 
         public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
-            return base.AttackDamage(weapon) * 1.0 * DragonDifficulty / 100;
+            return base.AttackDamage(weapon, style) * 1.0 * DragonDifficulty / 100;
         }
 
         public override short MaxSpeedBase

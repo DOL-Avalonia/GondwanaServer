@@ -4478,7 +4478,7 @@ namespace DOL.GS
         /// <returns></returns>
         public override double AttackDamage(InventoryItem weapon, Style style = null)
         {
-            double damage = base.AttackDamage(weapon);
+            double damage = base.AttackDamage(weapon, style);
 
             if (ActiveWeaponSlot == eActiveWeaponSlot.TwoHanded && m_blockChance > 0)
                 switch (this)
