@@ -66,6 +66,7 @@ namespace AmteScripts.Managers
         private RegionTimer _saveTimer;
         private DateTime _startedTime = DateTime.Now;
         private RegionTimer _ctfMapUpdateTimer;
+        private int _playersInPvP = 0;
 
         private static readonly int[] _randomEmblems = { 5061, 6645, 84471, 6272, 55302, 64792, 111402, 39859, 21509, 123019 };
 
@@ -1103,7 +1104,7 @@ namespace AmteScripts.Managers
 
         #region Public Properties
         public bool IsOpen => _isOpen;
-        public PvpSession CurrentSession => _activeSession;
+        public PvpSession? CurrentSession => _activeSession;
         [NotNull] public IReadOnlyList<Zone> CurrentZones => _zones.AsReadOnly();
         public string CurrentSessionId => string.IsNullOrEmpty(CurrentSession?.SessionID) ? "(none)" : CurrentSession.SessionID;
         public bool AllowsGroups => CurrentSession?.GroupCompoOption is 2 or 3;
@@ -1844,10 +1845,75 @@ namespace AmteScripts.Managers
             */
         }
 
-        private void AwardScore(GamePlayer pl, Action<PvPScore> fun, bool forceSolo = false)
+        private string? GetGlobalScoreErrorTranslation()
         {
+            if (CurrentSession == null)
+                return string.Empty;
+            if (_playersInPvP < (CurrentSession?.MinPlayersForScore ?? int.MaxValue))
+                return "PvPManager.NotEnoughPlayers";
+            return null;
+        }
+
+        private string? GetPlayerScoreErrorTranslation()
+        {
+            // TODO reasons why a single player wouldn't be able to score
+            return null;
+        }
+
+        public bool CanScore(GamePlayer pl, bool quiet = false)
+        {
+            string? error = GetGlobalScoreErrorTranslation();
+            if (error != null)
+            {
+                if (!quiet && error != string.Empty)
+                    pl.SendTranslatedMessage(error);
+                return false;
+            }
+            return true;
+        }
+
+        public bool CanScore(Guild guild, bool quiet = false)
+        {
+            string? error = GetGlobalScoreErrorTranslation();
+            if (error != null)
+            {
+                if (!quiet && error != string.Empty)
+                    guild.GetListOfOnlineMembers().Where(p => p.IsInPvP).ForEach(p => p.SendTranslatedMessage(error));
+                return false;
+            }
+            return true;
+        }
+
+        private bool AwardScore(Guild? guild, Action<PvPScore> fun, bool quiet = false)
+        {
+            if (guild is null || !CanScore(guild, quiet))
+                return false;
+
+            var groupScore = EnsureGroupScore(guild);
+            fun(groupScore.Totals);
+            foreach (var player in guild.GetListOfOnlineMembers())
+            {
+                string? error = GetPlayerScoreErrorTranslation();
+                if (error != null)
+                {
+                    if (!quiet)
+                        player.SendTranslatedMessage(error);
+                    continue;
+                }
+
+                fun(groupScore.GetOrCreateScore(player));
+                var score = EnsureTotalScore(player);
+                fun(score);
+            }
+            return true;
+        }
+
+        private bool AwardScore(GamePlayer pl, Action<PvPScore> fun, bool quiet = false, bool forceSolo = false)
+        {
+            if (!CanScore(pl, quiet))
+                return false;
+
             var score = EnsureTotalScore(pl);
-            
             fun(score);
             var (groupScore, playerEntry) = EnsureGroupScoreEntry(pl);
             if (groupScore != null)
@@ -1860,6 +1926,7 @@ namespace AmteScripts.Managers
                 score = EnsureSoloScore(pl);
                 fun(score);
             }
+            return true;
         }
         
         public void AwardCTFCarrierKill(GamePlayer killerPlayer, GamePlayer carrier)
@@ -1912,12 +1979,11 @@ namespace AmteScripts.Managers
             }
             else
             {
-                score = EnsureTotalScore(killer);
-                score.PvP_SoloKills += 1;
-                score.PvP_SoloKillsPoints += points;
-                score = EnsureSoloScore(killer);
-                score.PvP_SoloKills += 1;
-                score.PvP_SoloKillsPoints += points;
+                AwardScore(killer, (PvPScore score) =>
+                {
+                    score.PvP_SoloKills += 1;
+                    score.PvP_SoloKillsPoints += points;
+                });
             }
             
             SaveScores();
@@ -1961,10 +2027,11 @@ namespace AmteScripts.Managers
                 _cleanupPlayer(player);
                 return false;
             }
+
             player.Bind(true);
             player.SaveIntoDatabase();
             SaveScores();
-
+            ++_playersInPvP;
             return true;
         }
 
@@ -2060,6 +2127,7 @@ namespace AmteScripts.Managers
             }
 
             DequeueSolo(player);
+            --_playersInPvP;
             _cleanupArea(player);
             _freeSpawn(player);
             if (pvpGuild != null)
@@ -2769,21 +2837,8 @@ namespace AmteScripts.Managers
                 score.Friends_BroughtFriendsPoints += basePoints;
                 score.Friends_BroughtFamilyBonus += bonus;
             };
-            if (owner.Guild is { GuildType: Guild.eGuildType.PvPGuild })
-            {
-                var groupScore = EnsureGroupScore(owner.Guild);
 
-                doAdd(groupScore.Totals);
-                foreach (var member in owner.Guild.GetListOfOnlineMembers())
-                {
-                    doAdd(groupScore.GetOrCreateScore(member));
-                }
-            }
-            else
-            {
-                doAdd(EnsureSoloScore(owner));
-            }
-            doAdd(playerRecord);
+            AwardScore(owner, doAdd);
 
             owner.Out.SendMessage(LanguageMgr.GetTranslation(owner.Client.Account.Language, "PvPManager.BroughtToSafety", friendMob.Name, basePoints), eChatType.CT_SpellExpires, eChatLoc.CL_SystemWindow);
         }
@@ -2847,24 +2902,13 @@ namespace AmteScripts.Managers
             
             if (followedPlayer != null && IsInActivePvpZone(followedPlayer))
             {
-                var followedScore = EnsureTotalScore(followedPlayer);
-                var groupScore = EnsureGroupScore(followedPlayer.Guild);
-                var playerGroupScore = groupScore?.GetOrCreateScore(followedPlayer);
                 var doAdd = (PvPScore score) =>
                 {
                     score.Friends_FriendKilledCount++;
                     score.Friends_FriendKilledPoints += 2; // penalty
                 };
-                doAdd(followedScore);
-                if (groupScore != null)
-                {
-                    doAdd(groupScore.Totals);
-                    doAdd(playerGroupScore);
-                }
-                else
-                {
-                    doAdd(EnsureSoloScore(followedPlayer));
-                }
+
+                AwardScore(killerPlayer, doAdd);
             }
 
             // 2) If the *killer* is a player, and the mob was following someone => killer gets +2
@@ -2872,25 +2916,13 @@ namespace AmteScripts.Managers
             {
                 if (killerPlayer != friendMob.PlayerFollow)
                 {
-                    var killerScore = EnsureTotalScore(killerPlayer);
-                    var groupScore = EnsureGroupScore(killerPlayer.Guild);
-                    var playerGroupScore = groupScore?.GetOrCreateScore(killerPlayer);
                     var doAdd = (PvPScore score) =>
                     {
                         score.Friends_KillEnemyFriendCount++;
                         score.Friends_KillEnemyFriendPoints += 2;
                     };
 
-                    doAdd(killerScore);
-                    if (groupScore != null)
-                    {
-                        doAdd(groupScore.Totals);
-                        doAdd(playerGroupScore);
-                    }
-                    else
-                    {
-                        doAdd(EnsureSoloScore(killerPlayer));
-                    }
+                    AwardScore(killerPlayer, doAdd);
                 }
             }
         }
@@ -2951,13 +2983,7 @@ namespace AmteScripts.Managers
                 score.Terr_TerritoriesCapturedPoints += 20;
                 score.Terr_TerritoriesCapturedCount++;
             };
-            if (player.Guild != null)
-            {
-                var groupScores = EnsureGroupScore(player.Guild);
-                doAdd(groupScores.Totals);
-                doAdd(groupScores.GetOrCreateScore(player));
-            }
-            doAdd(EnsureTotalScore(player));
+            AwardScore(player, doAdd);
         }
 
         public void UpdateAllTerritoryMarkers(GamePlayer specificPlayer = null)
@@ -3445,7 +3471,6 @@ namespace AmteScripts.Managers
         private void AwardCapturePoints(object faction, int amount)
         {
             if (faction == null) return;
-
             if (faction is Guild guild)
             {
                 var groupScore = EnsureGroupScore(guild);
@@ -4288,18 +4313,7 @@ namespace AmteScripts.Managers
             {
                 score.Flag_OwnershipPoints += points;
             };
-            
-            if (player.Guild != null)
-            {
-                var groupScores = EnsureGroupScore(player.Guild); 
-                doAdd(groupScores.Totals);
-                doAdd(groupScores.GetOrCreateScore(player));
-            }
-            else
-            {
-                doAdd(EnsureSoloScore(player));
-            }
-            doAdd(EnsureTotalScore(player));
+            AwardScore(player, doAdd);
         }
 
         public void AwardCTFOwnershipPoints(Guild guild, int points)
@@ -4311,17 +4325,7 @@ namespace AmteScripts.Managers
             {
                 score.Flag_OwnershipPoints += points;
             };
-            
-            if (guild != null)
-            {
-                var groupScores = EnsureGroupScore(guild); 
-                doAdd(groupScores.Totals);
-                foreach (var player in guild.GetListOfOnlineMembers())
-                {
-                    doAdd(groupScores.GetOrCreateScore(player));
-                    doAdd(EnsureTotalScore(player));
-                }
-            }
+            AwardScore(guild, doAdd);
         }
 
         public void AwardCTFCapturePoints(GamePlayer player)
@@ -4334,18 +4338,8 @@ namespace AmteScripts.Managers
                 score.Flag_FlagReturnsCount += 1;
                 score.Flag_FlagReturnsPoints += 20;
             };
-            
-            if (player.Guild != null)
-            {
-                var groupScores = EnsureGroupScore(player.Guild); 
-                doAdd(groupScores.Totals);
-                doAdd(groupScores.GetOrCreateScore(player));
-            }
-            else
-            {
-                doAdd(EnsureSoloScore(player));
-            }
-            doAdd(EnsureTotalScore(player));
+
+            AwardScore(player, doAdd);
         }
         
         #endregion

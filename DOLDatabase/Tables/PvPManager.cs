@@ -23,6 +23,7 @@ namespace DOL.Database
         private bool _allowSummonBanner;
         private bool _createCustomArea;
         private int _tempAreaRadius;
+        private int _minPlayersForScore;
 
         [PrimaryKey] // we assume SessionID is unique
         public string SessionID
@@ -99,6 +100,13 @@ namespace DOL.Database
         {
             get { return _tempAreaRadius; }
             set { Dirty = true; _tempAreaRadius = value; }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int MinPlayersForScore
+        {
+            get { return _minPlayersForScore; }
+            set { Dirty = true; _minPlayersForScore = value; }
         }
     }
 }

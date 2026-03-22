@@ -15815,7 +15815,7 @@ namespace DOL.GS
             => Out.SendMessage(message, chatType, chatLocation);
 
         public override void SendTranslatedMessage(string key, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow, params object[] args)
-            => Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, key, args), chatType, chatLocation);
+            => Out.SendMessage(LanguageMgr.Translate(Client.Account.Language, key, args), chatType, chatLocation);
         #endregion
 
         #region Stealth / Wireframe

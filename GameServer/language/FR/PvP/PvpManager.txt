@@ -19,11 +19,12 @@ PvPManager.MaxGroup:						Votre groupe a déjà le nombre maximal de joueurs pou
 PvPManager.GroupTooBig:						Cette session PvP autorise un maximum de {0} joueurs en groupe.
 PvPManager.KickedFromPvP:					Vous avez été expulsé du groupe PvP.
 PvPManager.WelcomeBack:						Bon retour ! Votre progression PvP a été préservée.
+PvPManager.Solo:							(Solo)
+PvPManager.Group:							(Groupe)
+PvPManager.NotEnoughPlayers:				Vous n'avez pas gagné de points car il n'y a pas assez de joueurs dans cette session PvP.
 
 PvPManager.BossHunt.ScoredPoints:			Vous avez marqué {0} points sur {1} !
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} a terrassé {2} pour {3} points !
-PvPManager.Solo:							(Solo)
-PvPManager.Group:							(Groupe)
 
 PvPManager.CoreRun.Begins:					La Course au Coeur commence ! FEU VERT - PARTEZ !
 PvPManager.CoreRun.CastMovement:			Lancer des sorts non-instantanés implique du mouvement !
