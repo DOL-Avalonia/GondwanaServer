@@ -1795,54 +1795,12 @@ namespace AmteScripts.Managers
         public void HandleGroupKill(GamePlayer killer, GamePlayer victim, int points)
         {
             bool doSoloScores = Properties.PVPSESSION_GROUPKILLS_SOLOSCORES;
-            PvPScore score = EnsureTotalScore(killer);
-            score.PvP_GroupKills += 1;
-            score.PvP_GroupKillsPoints += points;
-                
-            if (doSoloScores)
+
+            AwardScore(killer, score =>
             {
-                score = EnsureSoloScore(killer);
                 score.PvP_GroupKills += 1;
                 score.PvP_GroupKillsPoints += points;
-            }
-
-            var (groupScore, entry) = EnsureGroupScoreEntry(killer);
-            if (groupScore != null)
-            {
-                groupScore.Totals.PvP_GroupKills += 1;
-                groupScore.Totals.PvP_GroupKillsPoints += points;
-                entry.PvP_GroupKills += 1;
-                entry.PvP_GroupKillsPoints += points;
-            }
-            
-            /*
-            foreach (var member in killer.Group.GetMembersInTheGroup().OfType<GamePlayer>())
-            {
-                if (member == killer)
-                    continue;
-                    
-                if (member.IsWithinRadius(victim, WorldMgr.MAX_EXPFORKILL_DISTANCE))
-                {
-                    score = EnsureTotalScore(member);
-                    score.PvP_GroupKills += 1;
-                    score.PvP_GroupKillsPoints += points;
-                        
-                    if (doSoloScores)
-                    {
-                        score = EnsureSoloScore(member);
-                        score.PvP_GroupKills += 1;
-                        score.PvP_GroupKillsPoints += points;
-                    }
-
-                    if (groupScore != null)
-                    {
-                        entry = groupScore.GetOrCreateScore(member);
-                        entry.PvP_GroupKills += 1;
-                        entry.PvP_GroupKillsPoints += points;
-                    }
-                }
-            }
-            */
+            }, doSoloScores);
         }
 
         private string? GetGlobalScoreErrorTranslation()
@@ -2951,17 +2909,10 @@ namespace AmteScripts.Managers
                 if (owningGuild == null)
                     continue;
 
-                var groupScore = EnsureGroupScore(owningGuild);
-                groupScore.Totals.Terr_TerritoriesOwnershipPoints++;
-                foreach (var member in owningGuild.GetListOfOnlineMembers())
+                AwardScore(owningGuild, score =>
                 {
-                    if (member.IsInPvP && member.Client != null && member.CurrentRegion != null && PvpManager.Instance.IsInActivePvpZone(member))
-                    {
-                        groupScore.GetOrCreateScore(member).Terr_TerritoriesOwnershipPoints++;
-                        var score = EnsureTotalScore(member);
-                        score.Terr_TerritoriesOwnershipPoints += 1;
-                    }
-                }
+                    score.Terr_TerritoriesOwnershipPoints++;
+                });
             }
 
             return 30000;
@@ -3448,22 +3399,24 @@ namespace AmteScripts.Managers
 
             if (faction is Guild guild)
             {
-                var groupScore = EnsureGroupScore(guild);
-                groupScore.Totals.KotH_PressurePoints += amount;
+                AwardScore(guild, score =>
+                {
+                    score.KotH_PressurePoints += amount;
+                });
 
                 foreach (var member in guild.GetListOfOnlineMembers().Where(m => m.IsInPvP))
                 {
-                    var pScore = EnsureTotalScore(member);
-                    pScore.KotH_PressurePoints += amount;
                     member.Out.SendMessage($"Pressuring the Hill... (+{amount} pressure)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
             else if (faction is GamePlayer solo)
             {
-                var pScore = EnsureTotalScore(solo);
-                var sScore = EnsureSoloScore(solo);
-                pScore.KotH_PressurePoints += amount;
-                sScore.KotH_PressurePoints += amount;
+                amount *= 2;
+                AwardScore(solo, score =>
+                {
+                    score.KotH_PressurePoints += amount;
+                });
+
                 solo.Out.SendMessage($"Pressuring the Hill... (+{amount} pressure)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
@@ -3471,26 +3424,29 @@ namespace AmteScripts.Managers
         private void AwardCapturePoints(object faction, int amount)
         {
             if (faction == null) return;
+
             if (faction is Guild guild)
             {
-                var groupScore = EnsureGroupScore(guild);
-                groupScore.Totals.KotH_CapturePoints += amount;
-                groupScore.Totals.KotH_Captures++;
+                AwardScore(guild, score =>
+                {
+                    score.KotH_CapturePoints += amount;
+                    score.KotH_Captures++;
+                });
 
                 foreach (var member in guild.GetListOfOnlineMembers().Where(m => m.IsInPvP))
                 {
-                    var pScore = EnsureTotalScore(member);
-                    pScore.KotH_CapturePoints += amount;
-                    pScore.KotH_Captures++;
                     member.Out.SendMessage($"You captured the Hill!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
             }
             else if (faction is GamePlayer solo)
             {
-                var pScore = EnsureTotalScore(solo);
-                var sScore = EnsureSoloScore(solo);
-                pScore.KotH_CapturePoints += amount; sScore.KotH_CapturePoints += amount;
-                pScore.KotH_Captures++; sScore.KotH_Captures++;
+                amount *= 2;
+                AwardScore(solo, score =>
+                {
+                    score.KotH_CapturePoints += amount * 2;
+                    score.KotH_Captures++;
+                });
+
                 solo.Out.SendMessage($"You captured the Hill!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
         }
@@ -3501,24 +3457,26 @@ namespace AmteScripts.Managers
 
             if (faction is Guild guild)
             {
-                var groupScore = EnsureGroupScore(guild);
-                groupScore.Totals.KotH_Points += amount;
-                groupScore.Totals.KotH_Ticks++;
+                AwardScore(guild, score =>
+                {
+                    score.KotH_Points += amount;
+                    score.KotH_Ticks++;
+                });
 
                 foreach (var member in guild.GetListOfOnlineMembers().Where(m => m.IsInPvP))
                 {
-                    var pScore = EnsureTotalScore(member);
-                    pScore.KotH_Points += amount;
-                    pScore.KotH_Ticks++;
                     member.Out.SendMessage($"Holding Hill... (+{amount})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
             else if (faction is GamePlayer solo)
             {
-                var pScore = EnsureTotalScore(solo);
-                var sScore = EnsureSoloScore(solo);
-                pScore.KotH_Points += amount; sScore.KotH_Points += amount;
-                pScore.KotH_Ticks++; sScore.KotH_Ticks++;
+                amount *= 2;
+                AwardScore(solo, score =>
+                {
+                    score.KotH_Points += amount;
+                    score.KotH_Ticks++;
+                });
+
                 solo.Out.SendMessage($"Holding Hill... (+{amount})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
