@@ -1377,6 +1377,7 @@ namespace AmteScripts.Managers
 
                     if (_activeHill != null)
                     {
+                        _kothGameLoop?.Stop();
                         _kothGameLoop = new RegionTimer(_activeHill, KotHLoopCallback);
                         _kothGameLoop.Start(KOTH_TICK_RATE);
                     }
@@ -3157,7 +3158,8 @@ namespace AmteScripts.Managers
                 if (client.Player != null && client.Player.IsInPvP)
                     client.Player.Out.SendMessage(msg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
             }
-
+            
+            _kothGameLoop?.Stop();
             _kothGameLoop = new RegionTimer(_activeHill, KotHLoopCallback);
             _kothGameLoop.Start(KOTH_TICK_RATE);
         }
