@@ -36,6 +36,8 @@ using Zone = DOL.GS.Zone;
 using DOL.GS.Spells;
 using DOL.GameEvents;
 using AmteScripts.PvP.CoreRun;
+using Discord.Webhook;
+using System.Threading.Tasks;
 
 namespace AmteScripts.Managers
 {
@@ -609,7 +611,7 @@ namespace AmteScripts.Managers
                 groupLeader.Out.SendMessage(LanguageMgr.GetTranslation(groupLeader.Client.Account.Language, "PvPManager.CannotCreatePvPGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return null;
             }
-
+            
             _allGuilds.Add(pvpGuild);
             _groupGuilds[group] = pvpGuild;
             _guildGroups[pvpGuild] = group;
@@ -630,9 +632,9 @@ namespace AmteScripts.Managers
             {
                 var rank = pvpGuild.GetRankByID(member == groupLeader ? 0 : _defaultGuildRank);
                 pvpGuild.AddPlayer(member, rank);
-
                 member.IsInPvP = true;
                 member.SaveIntoDatabase();
+                _playerLastGuilds[member.InternalID] = pvpGuild;
                 
                 // Merge/transfer scores where it makes sense
                 if (Properties.PVPSESSION_TREASURE_TRANSFER_ITEMS && CurrentSessionType is eSessionTypes.TreasureHunt)
@@ -675,6 +677,7 @@ namespace AmteScripts.Managers
                     return; // Nothing to do
                 
                 guild.AddPlayer(player, guild.GetRankByID(_defaultGuildRank), true);
+                _playerLastGuilds[player.InternalID] = guild;
                 if (_groupSpawns.TryGetValue(guild, out Spawn spawn))
                 {
                     _freeSpawn(player); // Remove player solo spawn
@@ -1450,6 +1453,98 @@ namespace AmteScripts.Managers
             return WorldMgr.GetAllPlayingClients().Select(c => c.Player).Where(p => p is { IsInPvP: true });
         }
 
+        private async Task DoAnnouncements(IList<IGrouping<int, HighScore>> scores)
+        {
+            if (scores.Count <= 0)
+                return;
+
+            const int BROADCAST_MAX_RANK = 2;
+            var sessionTranslator = new KeyTranslator("PvPManager.Session." + CurrentSessionType);
+            var toBroadcast = scores
+                .Where(group => group.Key > 0)
+                .Select((group, i) => (group, i))
+                .Take(BROADCAST_MAX_RANK);
+            foreach (var (scoreGroup, i) in toBroadcast)
+            {
+                int total = scoreGroup.Key;
+                var iString = (i + 1).ToString();
+                var playerKey = new KeyTranslator("PvPManager.Score.Announce.Player." + iString);
+                var guildKey = new KeyTranslator("PvPManager.Score.Announce.Guild." + iString);
+                await Task.WhenAll(scoreGroup.Select(score =>
+                {
+                    var key = score.IsGroup ? guildKey : playerKey;
+                    object[] args = [score.Score.PlayerName, sessionTranslator, total];
+                    return Task.WhenAll([
+                        NewsMgr.CreateNews(key, eRealm.None, eNewsType.RvRGlobal, false, args),
+                        Task.Run(async () =>
+                        {
+                            if (DOL.GS.ServerProperties.Properties.DISCORD_ACTIVE)
+                            {
+                                DolWebHook hook = new DolWebHook(DOL.GS.ServerProperties.Properties.DISCORD_WEBHOOK_ID);
+                                hook.SendMessage(await key.Translate(Properties.SERV_LANGUAGE, Properties.AUTOTRANSLATE_ENABLE, args));
+                            }
+                        }),
+                        Task.WhenAll(GetPlayersInPvP().Select(async p =>
+                        {
+                            p.Out.SendMessage(await key.Translate(p, args), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }))
+                    ]);
+                }));
+            }
+        }
+
+        public void RewardPlayers()
+        {
+            var scores = GetHighScores().ToList();
+            if (scores.Count == 0)
+                return;
+
+            DoAnnouncements(scores);
+        }
+
+        private void Stop()
+        {
+            if (_activeSession != null && CurrentSessionType is eSessionTypes.TreasureHunt && _territoryOwnershipTimer != null)
+            {
+                _territoryOwnershipTimer.Stop();
+                _territoryOwnershipTimer = null;
+            }
+
+            if (_ctfMapUpdateTimer != null)
+            {
+                _ctfMapUpdateTimer.Stop();
+                _ctfMapUpdateTimer = null;
+            }
+
+            if (_bossHuntMapTimer != null)
+            {
+                _bossHuntMapTimer.Stop();
+                _bossHuntMapTimer = null;
+            }
+            _activeBosses.Clear();
+
+            if (_kothGameLoop != null)
+            {
+                _kothGameLoop.Stop();
+                _kothGameLoop = null;
+            }
+            if (_activeHill != null)
+            {
+                _activeHill.Delete();
+                _activeHill = null;
+            }
+
+            if (CurrentSessionType == eSessionTypes.CoreRun)
+            {
+                StopCoreRun();
+            }
+
+            if (CurrentSessionType == eSessionTypes.Biohazard)
+            {
+                StopBiohazard();
+            }
+        }
+
         public bool Close()
         {
             lock (_sessionLock)
@@ -1464,13 +1559,10 @@ namespace AmteScripts.Managers
 
                 log.InfoFormat("PvpManager: Closing session [{0}].", _activeSession?.SessionID);
 
-                if (_activeSession != null && CurrentSessionType is eSessionTypes.TreasureHunt && _territoryOwnershipTimer != null)
-                {
-                    _territoryOwnershipTimer.Stop();
-                    _territoryOwnershipTimer = null;
-                }
+                Stop();
+                RewardPlayers();
 
-                switch (CurrentSessionType)
+                switch (closingSessionType)
                 {
                     case eSessionTypes.CaptureTheFlag:
                         {
@@ -1534,40 +1626,6 @@ namespace AmteScripts.Managers
                             ClearKothMarker();
                             break;
                         }
-                }
-
-                if (_ctfMapUpdateTimer != null)
-                {
-                    _ctfMapUpdateTimer.Stop();
-                    _ctfMapUpdateTimer = null;
-                }
-
-                if (_bossHuntMapTimer != null)
-                {
-                    _bossHuntMapTimer.Stop();
-                    _bossHuntMapTimer = null;
-                }
-                _activeBosses.Clear();
-
-                if (_kothGameLoop != null)
-                {
-                    _kothGameLoop.Stop();
-                    _kothGameLoop = null;
-                }
-                if (_activeHill != null)
-                {
-                    _activeHill.Delete();
-                    _activeHill = null;
-                }
-
-                if (closingSessionType == eSessionTypes.CoreRun)
-                {
-                    StopCoreRun();
-                }
-
-                if (closingSessionType == eSessionTypes.Biohazard)
-                {
-                    StopBiohazard();
                 }
 
                 // Force remove all players still flagged IsInPvP
@@ -1981,7 +2039,8 @@ namespace AmteScripts.Managers
             //     player.Out.SendMessage("GM not allowed in PvP!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             //     return false;
             // }
-
+            
+            ++_playersInPvP;
             if (!TeleportSoloPlayer(player))
             {
                 _cleanupPlayer(player);
@@ -1991,7 +2050,6 @@ namespace AmteScripts.Managers
             player.Bind(true);
             player.SaveIntoDatabase();
             SaveScores();
-            ++_playersInPvP;
             return true;
         }
 
@@ -2015,6 +2073,7 @@ namespace AmteScripts.Managers
                 return false;
             }
 
+            _playersInPvP += group.MemberCount;
             if (!TeleportEntireGroup(groupLeader))
             {
                 _cleanupGroup(group, false);
@@ -4481,46 +4540,88 @@ namespace AmteScripts.Managers
             }
         }
 
-        [return: NotNull]
-        private IEnumerable<PvPScore> GetGroupScore(GamePlayer viewer)
+        record class HighScore(string OwnerId, bool IsGroup, int TotalPoints, PvPScore Score)
         {
-            IEnumerable<PvPScore> list = Enumerable.Empty<PvPScore>();
+            public List<HighScore> Children
+            {
+                get;
+            } = new();
+        }
+
+        private IOrderedEnumerable<IGrouping<int, HighScore>> GetHighScores()
+        {
+            Dictionary<string, HighScore> scores = new();
+            foreach (var (guild, score) in _groupScores)
+            {
+                scores[guild.GuildID] = new HighScore(guild.GuildID, true, score.GetTotalPoints(CurrentSessionType), score);
+            }
+
+            foreach (var (playerId, score) in _soloScores)
+            {
+                PvPScore highest = null;
+                int total = score.GetTotalPoints(CurrentSessionType);
+                var highScore = new HighScore(playerId, false, total, score);
+
+                // Check if the player was recently in a guild
+                Guild? guild = _playerLastGuilds.GetValueOrDefault(playerId);
+                if (guild != null)
+                {
+                    // We want to protect players against griefing by kicking at the last second,
+                    // by taking the highest of guild score or solo score.
+                    // But if the player is in the guild, we just force that score.
+                    HighScore? guildScore = scores.GetValueOrDefault(guild.GuildID);
+                    if (guildScore.TotalPoints > total)
+                    {
+                        guildScore.Children.Add(highScore);
+                        continue; 
+                    }
+
+                    // Guild score is lower than solo score, check if the player is still in the guild
+                    string? currentGuild;
+                    GameClient? client = WorldMgr.GetClientByPlayerID(playerId, true, false);
+                    if (client?.Player != null)
+                    {
+                        currentGuild = client.Player.GuildID;
+                    }
+                    else
+                    {
+                        // If client is offline, we get the guild from DB. This should be very rare...
+                        DOLCharacters character = GameServer.Database.SelectObject<DOLCharacters>(c => c.ObjectId == playerId);
+                        currentGuild = character?.GuildID;
+                    }
+
+                    if (currentGuild == guild.GuildID)
+                    {
+                        // Player is still in that guild, force using the guild score
+                        guildScore.Children.Add(highScore);
+                        continue; 
+                    }
+                    // Else, player left AND has a better solo score, fallback to using solo score.
+                }
+
+                scores[playerId] = highScore;
+            }
+            return scores.Values.GroupBy(s => s.TotalPoints).OrderByDescending(s => s.Key);
+        }
+
+        private PvPGroupScore? GetGroupScore(GamePlayer viewer)
+        {
             Guild g = viewer.Guild;
             if (g == null)
                 g = _playerLastGuilds.GetValueOrDefault(viewer.InternalID);
             
             if (_activeSession != null && g != null)
             {
-                /*if (_groupScores.TryGetValue(viewer.Guild, out GroupScore groupScore))
+                if (_groupScores.TryGetValue(g, out PvPGroupScore groupScore))
                 {
-                    list = viewer.Guild.GetListOfOnlineMembers()
-                        .Select(p => groupScore.Scores.GetValueOrDefault(p.InternalID)?.PlayerScore ?? new PlayerScore()
-                        {
-                            PlayerID = p.InternalID,
-                            PlayerName = p.Name
-                        })
-                        .OrderBy(s => s.GetTotalPoints(_activeSession.SessionType))
-                        .Prepend(groupScore.Totals);
+                    return groupScore;
                 }
                 else
                 {
-                    list = viewer.Guild.GetListOfOnlineMembers()
-                        .Select(p => new PlayerScore()
-                        {
-                            PlayerID = p.InternalID,
-                            PlayerName = p.Name
-                        });
-                }*/
-                if (_groupScores.TryGetValue(viewer.Guild, out PvPGroupScore groupScore))
-                {
-                    list = [groupScore];
-                }
-                else
-                {
-                    list = [new PvPScore(viewer.Guild)];
+                    return new PvPGroupScore(g);
                 }
             }
-            return list;
+            return null;
         }
 
         private void AddLines(List<string> lines, ScoreboardEntry entry, string language, bool shortStats)
@@ -4675,8 +4776,8 @@ namespace AmteScripts.Managers
 
                     lines.Add("Current Scoreboard:");
                     scoreLines = scores
-                        .OrderByDescending(s => s.GetTotalPoints(sessionType))
                         .Select(MakeScoreboardEntry)
+                        .OrderByDescending(ps => ps.Total)
                         .ToList();
 
                     foreach (var ps in scoreLines)
@@ -4689,21 +4790,17 @@ namespace AmteScripts.Managers
                 }
                 else if (viewer.IsInPvP)
                 {
-                    var ourScores = Enumerable.Empty<PvPScore>();
+                    PvPGroupScore? ourScores = null;
                     bool hasGroup = false;
                     if (CurrentSession.GroupCompoOption == 2 || CurrentSession.GroupCompoOption == 3)
                     {
                         ourScores = GetGroupScore(viewer);
                     }
 
-                    if (ourScores.Any())
+                    if (ourScores != null)
                     {
-                        hasGroup = true;
-                        lines.Add($"Current Scoreboard for {viewer.Guild?.Name ?? viewer.Name}:");
-                        foreach (var ps in ourScores.Select(MakeScoreboardEntry))
-                        {
-                            AddLines(lines, ps, language, shortStats);
-                        }
+                        lines.Add($"Current Scoreboard for {ourScores.PlayerName}:");
+                        AddLines(lines, MakeScoreboardEntry(ourScores), language, shortStats);
                     }
                     
                     var myScores = _soloScores.GetValueOrDefault(viewer.InternalID) ?? new PvPScore(viewer, true);

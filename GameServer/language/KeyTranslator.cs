@@ -1,4 +1,5 @@
-﻿using DOL.Language;
+﻿using DOL.GS.ServerProperties;
+using DOL.Language;
 using log4net;
 using System;
 using System.Collections.Concurrent;
@@ -74,25 +75,14 @@ namespace DOL.GS
             return translation;
         }
 
-        public async Task<string> Translate(string langTo, params object[] args)
+        public async Task<string> Translate(string langTo, bool autoTranslate, params object[] args)
         {
-            var str = await TranslateImpl(langTo, true);
+            var str = await TranslateImpl(langTo, autoTranslate);
 
             if (string.IsNullOrEmpty(str))
                 return str;
-                
-            if (args is { Length: > 0 })
-            {
-                try
-                {
-                    str = string.Format(str, args);
-                }
-                catch (Exception ex)
-                {
-                    log.Error($"Failed to translate {TranslationKey} to {langTo} with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
-                }
-            }
-            return str;
+
+            return await LanguageMgr.Format(str, langTo, autoTranslate, args);
         }
 
         /// <summary>
@@ -142,19 +132,8 @@ namespace DOL.GS
 
             if (string.IsNullOrEmpty(str))
                 return str;
-                
-            if (args is { Length: > 0 })
-            {
-                try
-                {
-                    str = string.Format(str, args);
-                }
-                catch (Exception ex)
-                {
-                    log.Error($"Failed to translate {TranslationKey} to {langTo} with args [{string.Join(", ", args)}]: {ex}\n\tText: {str}");
-                }
-            }
-            return str;
+
+            return await LanguageMgr.Format(str, langTo, receiver.AutoTranslateEnabled, args);
         }
 
         public IEnumerable<Task<KeyValuePair<GamePlayer, string>>> Translate(IEnumerable<GamePlayer> receivers, params object[] args)

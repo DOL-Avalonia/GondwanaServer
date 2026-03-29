@@ -42,6 +42,15 @@ PvPManager.Biohazard.NewSamples:			New Toxic Samples have materialized in the Ra
 PvPManager.Biohazard.FleshRots:				Your undead flesh rots rapidly outside the radioactive zone!
 PvPManager.Biohazard.SampleLeaks:			The toxic sample leaks into your veins...
 
+PvPManager.Session.CaptureTheFlag:			Capture the Flag
+PvPManager.Session.TreasureHunt:			Treasure Hunt
+PvPManager.Session.BringAFriend:			Bring a Friend
+PvPManager.Session.TerritoryCapture:		Territory Capture
+PvPManager.Session.BossHunt:				Boss Hunt
+PvPManager.Session.KingOfTheHill:			King of the Hill
+PvPManager.Session.CoreRun:					Core Run
+PvPManager.Session.Biohazard:				Biohazard
+
 PvPManager.Rules.Title:						=== PvP Session Rules ===
 PvPManager.Rules.Deathmatch:				Welcome to the Arena. The rules are simple: kill or be killed. Hunt down your enemies to earn points.
 PvPManager.Rules.CaptureTheFlag:			Capture the Flag! A sacred banner has materialized in the region. Locate the prize and secure it within your outpost's walls. Intercepting and defeating an enemy carrier will force them to drop the flag, grab it before the enemy recovers! A bold strike against an enemy base can also liberate the banners they currently hold. Stay vigilant: any dropped flag left unattended will eventually dissipate and reset to its original spawning ground.
@@ -71,6 +80,12 @@ PvPManager.Journal.KotHDesc:				Move to the marked location and secure the area 
 
 PvPManager.Score.Points:					{0} points
 PvPManager.Score.Pts:						{0} pts
+PvPManager.Score.Announce.Guild.1:			[PvP] The guild {0} has won first place in {1} with {2} points!
+PvPManager.Score.Announce.Guild.2:			[PvP] The guild {0} has won second place in {1} with {2} points!
+PvPManager.Score.Announce.Guild.3:			[PvP] The guild {0} has won third place in {1} with {2} points!
+PvPManager.Score.Announce.Player.1:			[PvP] Player {0} has won first place in {1} with {2} points!
+PvPManager.Score.Announce.Player.2:			[PvP] Player {0} has won second place in {1} with {2} points!
+PvPManager.Score.Announce.Player.3:			[PvP] Player {0} has won third place in {1} with {2} points!
 
 PvP.Score.PvPSoloKills:						Solo kills
 PvP.Score.PvPGrpKills:						Group kills

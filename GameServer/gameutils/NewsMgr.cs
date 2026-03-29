@@ -25,6 +25,7 @@ using DOL.Events;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
+using System.Threading.Tasks;
 
 namespace DOL.GS
 {
@@ -45,7 +46,6 @@ namespace DOL.GS
                 {
                     if (client.Player == null)
                         continue;
-
 
                     if (client.Account.PrivLevel <= 1 && realm != eRealm.None && client.Player.Realm != realm && !Properties.SERVER_IS_CROSS_REALM)
                         continue;
@@ -78,6 +78,48 @@ namespace DOL.GS
                 GameServer.Database.AddObject(news);
                 GameEventMgr.Notify(DatabaseEvent.NewsCreated, new NewsEventArgs(news));
             }
+        }
+
+        public static Task CreateNews(KeyTranslator translator, eRealm realm, eNewsType type, bool sendMessage, params object[] args)
+        {
+            List<Task> allTasks = new();
+            if (sendMessage)
+            {
+                allTasks.AddRange(WorldMgr.GetAllClients().Select(async client =>
+                {
+                    if (client.Player == null)
+                        return;
+
+                    if (client.Account.PrivLevel <= 1 && realm != eRealm.None && client.Player.Realm != realm && !Properties.SERVER_IS_CROSS_REALM)
+                        return;
+
+                    var translated = await translator.Translate(client.Player, args);
+
+                    if (!string.IsNullOrEmpty(translated))
+                        client.Out.SendMessage(translated, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }));
+            }
+
+            if (ServerProperties.Properties.RECORD_NEWS)
+            {
+                allTasks.Add(Task.Run(async () =>
+                {
+                    DBNews news = new DBNews();
+                    news.Type = (byte)type;
+                    news.Realm = (byte)realm;
+                    string str;
+                    str = await translator.Translate(LanguageMgr.ENGLISH, Properties.AUTOTRANSLATE_ENABLE, args);
+                    if (!string.IsNullOrEmpty(str))
+                        news.Text = str;
+                    str = await translator.Translate(LanguageMgr.FRENCH, Properties.AUTOTRANSLATE_ENABLE, args);
+                    if (!string.IsNullOrEmpty(str))
+                        news.TextFR = str;
+                    GameServer.Database.AddObject(news);
+                    GameEventMgr.Notify(DatabaseEvent.NewsCreated, new NewsEventArgs(news));
+                }));
+            }
+
+            return Task.WhenAll(allTasks);
         }
         
         public static void CreateNews(string message, eRealm realm, eNewsType type, bool sendMessage, bool translate = false, params object[] args)

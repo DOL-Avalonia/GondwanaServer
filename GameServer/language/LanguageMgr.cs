@@ -73,20 +73,36 @@ namespace DOL.Language
             return lang.ToUpperInvariant();
         }
 
-        private static async Task<object[]> UnrollArgs(object[] args)
+        private static async Task<object[]> UnrollArgs(object[] args, string language, bool autoTranslate)
         {
             return await Task.WhenAll(args.Select(async s =>
             {
-                if (s is not Task asTask)
-                    return s;
+                switch (s)
+                {
+                    case Task asTask:
+                        {
+                            Type type = s.GetType();
+                            var property = type.GetProperty(nameof(Task<object>.Result));
+                            if (property is null) // Task with void result
+                                return s;
 
-                Type type = s.GetType();
-                var property = type.GetProperty(nameof(Task<object>.Result));
-                if (property is null) // Task with void result
-                    return s;
+                            await asTask.ConfigureAwait(false);
+                            return property!.GetValue(asTask);
+                        }
 
-                await asTask.ConfigureAwait(false);
-                return property!.GetValue(asTask);
+                    case KeyTranslator keyTranslator:
+                        {
+                            return await keyTranslator.Translate(language, autoTranslate);
+                        }
+
+                    case AutoTranslator autoTranslator:
+                        {
+                            return autoTranslate ? await autoTranslator.Translate(language) : autoTranslator.OriginalText;
+                        }
+
+                    default:
+                        return s;
+                }
             }));
         }
 
@@ -710,6 +726,10 @@ namespace DOL.Language
         #endregion GetTranslation
 
         #region Auto Translations
+        public static async Task<string> Format(string str, string langTo, bool autoTranslate, params object[] args)
+        {
+            return args.Length > 0 ? string.Format(str, await UnrollArgs(args, langTo, autoTranslate).ConfigureAwait(false)) : str;
+        }
 
         /// <summary>
         /// Implementation of translation retrieval & auto-translation.
@@ -727,7 +747,7 @@ namespace DOL.Language
             if (TryGetTranslation(out translation, language, translationId))
             {
                 if (hasArgs)
-                    return string.Format(translation, await UnrollArgs(args).ConfigureAwait(false));
+                    return string.Format(translation, await UnrollArgs(args, language, autoTranslate).ConfigureAwait(false));
                 else
                     return translation;
             }
@@ -739,7 +759,7 @@ namespace DOL.Language
                 object[] staticArgs = Array.Empty<object>();
                 if (translateFormatted && hasArgs)
                 {
-                    staticArgs = await UnrollArgs(args).ConfigureAwait(false);
+                    staticArgs = await UnrollArgs(args, language, autoTranslate).ConfigureAwait(false);
                 }
 
                 if (TryGetTranslation(out translation, Properties.SERV_LANGUAGE, translationId, staticArgs))
@@ -757,7 +777,7 @@ namespace DOL.Language
                     {
                         try
                         {
-                            translation = string.Format(translation, await UnrollArgs(args).ConfigureAwait(false));
+                            translation = string.Format(translation, await UnrollArgs(args, language, autoTranslate).ConfigureAwait(false));
                         }
                         catch (Exception ex)
                         {
@@ -948,8 +968,7 @@ namespace DOL.Language
                 try
                 {
                     args = getArgs.Invoke(p);
-                    if (args is { Length: > 0 })
-                        str = string.Format(str, await UnrollArgs(args));
+                    str = await Format(str, p.Client.Account.Language, p.AutoTranslateEnabled, args);
                 }
                 catch (Exception ex)
                 {
@@ -982,8 +1001,7 @@ namespace DOL.Language
                 try
                 {
                     args = await getArgs.Invoke(p);
-                    if (args is { Length: > 0 })
-                        str = string.Format(str, await UnrollArgs(args));
+                    str = await Format(str, p.Client.Account.Language, p.AutoTranslateEnabled, args);
                 }
                 catch (Exception ex)
                 {
@@ -1006,7 +1024,9 @@ namespace DOL.Language
         {
             AutoTranslator msgTranslator = new(lang: inputLang, text: inputText);
             var results = await Task.WhenAll(Translate(receiver, translationId), msgTranslator.Translate(receiver)).ConfigureAwait(false);
-            return string.Format(results[0], await UnrollArgs(formatArgsSupplier(results[1])));
+            string str = results[0];
+            str = await Format(str, receiver.Client.Account.Language, receiver.AutoTranslateEnabled, formatArgsSupplier(results[1]));
+            return str;
         }
 
         /// <summary>
