@@ -1445,6 +1445,11 @@ namespace AmteScripts.Managers
             return sessionID;
         }
 
+        private IEnumerable<GamePlayer> GetPlayersInPvP()
+        {
+            return WorldMgr.GetAllPlayingClients().Select(c => c.Player).Where(p => p is { IsInPvP: true });
+        }
+
         public bool Close()
         {
             lock (_sessionLock)
@@ -1465,14 +1470,110 @@ namespace AmteScripts.Managers
                     _territoryOwnershipTimer = null;
                 }
 
-                // Force remove all players still flagged IsInPvP
-                foreach (var client in WorldMgr.GetAllPlayingClients())
+                switch (CurrentSessionType)
                 {
-                    var plr = client?.Player;
-                    if (plr != null && plr.IsInPvP)
-                    {
-                        KickPlayer(plr, false);
-                    }
+                    case eSessionTypes.CaptureTheFlag:
+                        {
+
+                            foreach (var player in GetPlayersInPvP())
+                            {
+                                player.Out.ClearMapObjective(40);
+                            }
+                            break;
+                        }
+
+                    case eSessionTypes.BringAFriend:
+                        {
+                            GameEventMgr.RemoveHandler(GameLivingEvent.Dying, new DOLEventHandler(OnLivingDying_BringAFriend));
+                            GameEventMgr.RemoveHandler(GameLivingEvent.BringAFriend, new DOLEventHandler(OnBringAFriend));
+
+                            // For each zone in this session, find all FollowingFriendMob and Reset them
+                            var zones = _activeSession.ZoneList.Split(',');
+                            foreach (var zStr in zones)
+                            {
+                                if (!ushort.TryParse(zStr, out ushort zoneId)) continue;
+                                var z = WorldMgr.GetZone(zoneId);
+                                if (z == null) continue;
+
+                                var allNpcs = WorldMgr.GetNPCsFromRegion(z.ZoneRegion.ID).Where(n => n.CurrentZone == z);
+                                foreach (var npc in allNpcs)
+                                {
+                                    if (npc is FollowingFriendMob ff)
+                                    {
+                                        ff.ResetFollow();
+                                    }
+                                }
+                            }
+                            break;
+                        }
+
+                    case eSessionTypes.TerritoryCapture:
+                        {
+                            TerritoryManager.Instance.ReleaseSubTerritoriesInZones(CurrentZones);
+
+                            foreach (var player in GetPlayersInPvP())
+                            {
+                                for (byte i = 1; i <= 20; i++)
+                                    player.Out.SendMinotaurRelicMapRemove(i);
+                            }
+                            break;
+                        }
+
+                    case eSessionTypes.BossHunt:
+                        {
+                            foreach (var player in GetPlayersInPvP())
+                            {
+                                for (byte i = 1; i < 50; i++)
+                                    player.Out.SendMinotaurRelicMapRemove(i);
+                            }
+                            break;
+                        }
+
+                    case eSessionTypes.KingOfTheHill:
+                        {
+                            ClearKothMarker();
+                            break;
+                        }
+                }
+
+                if (_ctfMapUpdateTimer != null)
+                {
+                    _ctfMapUpdateTimer.Stop();
+                    _ctfMapUpdateTimer = null;
+                }
+
+                if (_bossHuntMapTimer != null)
+                {
+                    _bossHuntMapTimer.Stop();
+                    _bossHuntMapTimer = null;
+                }
+                _activeBosses.Clear();
+
+                if (_kothGameLoop != null)
+                {
+                    _kothGameLoop.Stop();
+                    _kothGameLoop = null;
+                }
+                if (_activeHill != null)
+                {
+                    _activeHill.Delete();
+                    _activeHill = null;
+                }
+
+                if (closingSessionType == eSessionTypes.CoreRun)
+                {
+                    StopCoreRun();
+                }
+
+                if (closingSessionType == eSessionTypes.Biohazard)
+                {
+                    StopBiohazard();
+                }
+
+                // Force remove all players still flagged IsInPvP
+                foreach (var player in GetPlayersInPvP())
+                {
+                    KickPlayer(player, false);
                 }
 
                 foreach (var pad in _allBasePads)
@@ -1503,106 +1604,6 @@ namespace AmteScripts.Managers
                     }
                 }
                 _groupAreas.Clear();
-
-                if (CurrentSessionType == eSessionTypes.CaptureTheFlag)
-                {
-                    if (_ctfMapUpdateTimer != null)
-                    {
-                        _ctfMapUpdateTimer.Stop();
-                        _ctfMapUpdateTimer = null;
-                    }
-
-                    foreach (var client in WorldMgr.GetAllPlayingClients())
-                    {
-                        if (client.Player != null)
-                        {
-                            client.Player.Out.ClearMapObjective(40);
-                        }
-                    }
-                }
-
-                if (CurrentSessionType is eSessionTypes.BringAFriend)
-                {
-                    GameEventMgr.RemoveHandler(GameLivingEvent.Dying, new DOLEventHandler(OnLivingDying_BringAFriend));
-                    GameEventMgr.RemoveHandler(GameLivingEvent.BringAFriend, new DOLEventHandler(OnBringAFriend));
-
-                    // For each zone in this session, find all FollowingFriendMob and Reset them
-                    var zones = _activeSession.ZoneList.Split(',');
-                    foreach (var zStr in zones)
-                    {
-                        if (!ushort.TryParse(zStr, out ushort zoneId)) continue;
-                        var z = WorldMgr.GetZone(zoneId);
-                        if (z == null) continue;
-
-                        var allNpcs = WorldMgr.GetNPCsFromRegion(z.ZoneRegion.ID).Where(n => n.CurrentZone == z);
-                        foreach (var npc in allNpcs)
-                        {
-                            if (npc is FollowingFriendMob ff)
-                            {
-                                ff.ResetFollow();
-                            }
-                        }
-                    }
-                }
-
-                if (CurrentSessionType is eSessionTypes.TerritoryCapture)
-                {
-                    TerritoryManager.Instance.ReleaseSubTerritoriesInZones(CurrentZones);
-
-                    foreach (var client in WorldMgr.GetAllPlayingClients())
-                    {
-                        if (client.Player != null)
-                        {
-                            for (byte i = 1; i <= 20; i++)
-                                client.Player.Out.SendMinotaurRelicMapRemove(i);
-                        }
-                    }
-                }
-
-                if (_bossHuntMapTimer != null)
-                {
-                    _bossHuntMapTimer.Stop();
-                    _bossHuntMapTimer = null;
-                }
-                _activeBosses.Clear();
-
-                if (CurrentSessionType == eSessionTypes.BossHunt)
-                {
-                    foreach (var client in WorldMgr.GetAllPlayingClients())
-                    {
-                        if (client.Player != null)
-                        {
-                            for (byte i = 1; i < 50; i++)
-                                client.Player.Out.SendMinotaurRelicMapRemove(i);
-                        }
-                    }
-                }
-
-                if (_kothGameLoop != null)
-                {
-                    _kothGameLoop.Stop();
-                    _kothGameLoop = null;
-                }
-                if (_activeHill != null)
-                {
-                    _activeHill.Delete();
-                    _activeHill = null;
-                }
-
-                if (CurrentSessionType == eSessionTypes.KingOfTheHill)
-                {
-                    ClearKothMarker();
-                }
-
-                if (closingSessionType == eSessionTypes.CoreRun)
-                {
-                    StopCoreRun();
-                }
-
-                if (closingSessionType == eSessionTypes.Biohazard)
-                {
-                    StopBiohazard();
-                }
 
                 ResetScores();
                 try
@@ -3507,14 +3508,9 @@ namespace AmteScripts.Managers
 
         private void ClearKothMarker()
         {
-            Position nullPos = Position.Create(0, 0, 0, 0);
-
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var player in GetPlayersInPvP())
             {
-                if (client.Player != null)
-                {
-                    client.Player.Out.ClearMapObjective(KOTH_MARKER_ID);
-                }
+                player.Out.ClearMapObjective(KOTH_MARKER_ID);
             }
         }
         #endregion
