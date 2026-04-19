@@ -69,8 +69,18 @@ PvPManager.Journal.CTFDesc:					Le porteur du drapeau ennemi est à découvert. 
 PvPManager.Journal.KotHName:				[PvP] Prenez le contrôle de la Colline et défendez-la !
 PvPManager.Journal.KotHDesc:				Déplacez-vous vers le lieu indiqué et sécurisez la zone pour votre équipe !
 
+PvP.Predator.Prey:							Proie: {0}
+PvP.Predator.PreyAssigned:					Vous avez une nouvelle proie: {0}
+PvP.Predator.PreyLost:						Vous avez perdu votre proie... Une nouvelle proie vous sera bientôt assignée.
+
 PvPManager.Score.Points:					{0} points
 PvPManager.Score.Pts:						{0} pts
+PvPManager.Score.Announce.Guild.1:			[PvP] La guilde {0} a gagné la première place dans {1} avec {2} points!
+PvPManager.Score.Announce.Guild.2:			[PvP] La guilde {0} a gagné la deuxième place dans {1} avec {2} points!
+PvPManager.Score.Announce.Guild.3:			[PvP] La guilde {0} a gagné la troisième place dans {1} avec {2} points!
+PvPManager.Score.Announce.Player.1:			[PvP] Le joueur {0} a gagné la première place dans {1} avec {2} points!
+PvPManager.Score.Announce.Player.2:			[PvP] Le joueur {0} a gagné la deuxième place dans {1} avec {2} points!
+PvPManager.Score.Announce.Player.3:			[PvP] Le joueur {0} a gagné la troisième place dans {1} avec {2} points!
 
 PvP.Score.PvPSoloKills:						Kills solo
 PvP.Score.PvPGrpKills:						Kills en groupe

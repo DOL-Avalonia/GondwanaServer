@@ -78,6 +78,10 @@ PvPManager.Journal.CTFDesc:					The enemy flag carrier is currently exposed. Hun
 PvPManager.Journal.KotHName:				[PvP] Get control of the Hill and defend it!
 PvPManager.Journal.KotHDesc:				Move to the marked location and secure the area for your team!
 
+PvP.Predator.Prey:							Prey: {0}
+PvP.Predator.PreyAssigned:					You have been assigned the prey: {0}
+PvP.Predator.PreyLost:						You have lost your prey... Another will be assigned to you soon.
+
 PvPManager.Score.Points:					{0} points
 PvPManager.Score.Pts:						{0} pts
 PvPManager.Score.Announce.Guild.1:			[PvP] The guild {0} has won first place in {1} with {2} points!

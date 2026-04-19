@@ -15814,8 +15814,11 @@ namespace DOL.GS
         public override void SendMessage(string message, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow)
             => Out.SendMessage(message, chatType, chatLocation);
 
-        public override void SendTranslatedMessage(string key, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow, params object[] args)
-            => Out.SendMessage(LanguageMgr.Translate(Client.Account.Language, key, args), chatType, chatLocation);
+        public void SendMessage(System.Threading.Tasks.Task<string> message, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow)
+            => Out.SendMessage(message, chatType, chatLocation);
+
+        public override System.Threading.Tasks.Task SendTranslatedMessage(string key, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow, params object[] args)
+            => Out.SendMessage(LanguageMgr.Translate(this, key, args), chatType, chatLocation);
         #endregion
 
         #region Stealth / Wireframe
@@ -16360,9 +16363,14 @@ namespace DOL.GS
         /// <returns></returns>
         public bool RemoveQuest(PlayerQuest quest)
         {
+            bool ret;
             lock (m_questList)
-                return m_questList.Remove(quest);
+            {
+                if (!m_questList.Remove(quest))
+                    return false;
+            }
             Out.SendQuestListUpdate();
+            return true;
         }
 
         /// <summary>

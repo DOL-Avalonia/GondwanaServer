@@ -3265,7 +3265,7 @@ namespace DOL.GS
         public virtual void SendMessage(string message, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow)
             => Owner?.SendMessage(message, chatType, chatLocation);
 
-        public virtual void SendTranslatedMessage(string key, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow, params object[] args)
+        public virtual System.Threading.Tasks.Task SendTranslatedMessage(string key, eChatType chatType = eChatType.CT_System, eChatLoc chatLocation = eChatLoc.CL_SystemWindow, params object[] args)
             => Owner?.SendTranslatedMessage(key, chatType, chatLocation);
 
         /// <summary>

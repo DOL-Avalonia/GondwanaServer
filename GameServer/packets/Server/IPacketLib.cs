@@ -659,7 +659,7 @@ namespace DOL.GS.PacketHandler
         void SendUDPInitReply();
         void SendTime();
         void SendMessage(string msg, eChatType type, eChatLoc loc);
-        void SendMessage(Task<string> msg, eChatType type, eChatLoc loc);
+        Task SendMessage(Task<string> msg, eChatType type, eChatLoc loc);
         void SendPlayerCreate(GamePlayer playerToCreate);
         void SendObjectGuildID(GameObject obj, Guild guild);
         void SendPlayerQuit(bool totalOut);
@@ -696,7 +696,7 @@ namespace DOL.GS.PacketHandler
                            bool autoWrapText, string message);
         
         void SendCustomDialog(string msg, CustomDialogResponse callback);
-        void SendCustomDialog(Task<string> msg, CustomDialogResponse callback);
+        Task SendCustomDialog(Task<string> msg, CustomDialogResponse callback);
         void SendCheckLOS(GameObject Checker, GameObject Target, CheckLOSResponse callback);
         void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback);
         void SendGuildLeaveCommand(GamePlayer invitingPlayer, string inviteMessage);

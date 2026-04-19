@@ -218,7 +218,7 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Gets the number of millisecounds elapsed since the GameServer started.
+        /// Gets the number of milliseconds elapsed since the GameServer started.
         /// </summary>
         public uint TickCount
         {

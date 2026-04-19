@@ -3,6 +3,9 @@ using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS;
 using DOL.GS.PacketHandler;
+using System;
+using System.Drawing;
+using Region = DOL.GS.Region;
 
 namespace DOL.UnitTests.Gameserver
 {
@@ -20,17 +23,19 @@ namespace DOL.UnitTests.Gameserver
         public int LastDamageDealt { get; private set; } = -1;
         public FakeRegion fakeRegion = new FakeRegion();
 
-        public FakePlayer() : base(null, null)
+        public FakePlayer(string name = "") : base(null, null)
         {
+            this.InternalID = Guid.NewGuid().ToString();
             this.ObjectState = eObjectState.Active;
             this.m_invulnerabilityTick = -1;
+            this.m_name = name;
         }
 
         public override ICharacterClass CharacterClass { get { return fakeCharacterClass; } }
         public override byte Level { get; set; }
         public override Region CurrentRegion { get { return fakeRegion; } set { } }
-        public override IPacketLib Out => new FakePacketLib();
-        public override GameClient Client => new GameClient(GameServer.Instance) { Account = new Account() };
+        public override GameClient Client => new FakeGameClient(GameServer.Instance) { Account = new Account(), Player = this };
+        public override IPacketLib Out => Client.Out;
         public override int GetBaseStat(eStat stat) => baseStat;
         public override int GetModifiedSpecLevel(string keyName) => modifiedSpecLevel;
 

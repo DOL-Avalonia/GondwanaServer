@@ -14,7 +14,7 @@ namespace DOL.UnitTests.Gameserver
     {
         public FakeGameClient(BaseServer srvr) : base(srvr)
         {
-            Out = new FakePacketLib();
+            Out = new FakePacketLib(this);
         }
 
         public override void OnConnect() { }
@@ -24,7 +24,7 @@ namespace DOL.UnitTests.Gameserver
 
     public class FakePacketLib : PacketLib1124
     {
-        public FakePacketLib() : base(null) { }
+        public FakePacketLib(GameClient client = null) : base(client) { }
 
 #pragma warning disable CS0672
         [Obsolete]
