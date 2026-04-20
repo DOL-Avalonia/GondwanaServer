@@ -80,6 +80,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Je speelt al een melodie
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Je kunt geen spreuken uitspreken terwijl je gehypnotiseerd bent.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Je kunt geen spreuken uitspreken terwijl je bedwelmd bent.
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Je kunt deze spreuk niet uitspreken terwijl je rijdt!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:		Je kunt geen spreuken gebruiken terwijl je een territoriumrelikwie draagt.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Je bezwering mislukt; je kunt je spreuk niet uitspreken!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Je kunt deze spreuk niet rechtstreeks uitspreken!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Je hebt een {0} als vervolgspreuk voorbereid!
@@ -141,6 +142,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} van {1}% Lage Popula
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Praat met je trainer voor meer informatie.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Je ontvangt {0} ervaringspunt(en).
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       waarvan {0} bonuspunten uit Wedergeboorte
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:			inclusief een Wedergeboorte boete van: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:         waarvan {0} bonuspunten uit Territoria
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:         waarvan {0} bonuspunten uit Evenementen
 
@@ -155,6 +157,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:                Je ontvangt {0} ri
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP van {1}% Lage Populatie-bonus)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP van {1}% Onderbevolkt Rijk-bonus)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP van {1} evenementbonus)
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:			(+{0} RP van je territoriumrelikwieën.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Je ontvangt {0} extra rijkspunten dankzij gebiedsbonussen!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Je ontvangt {0} rijkspunten voor de verdediging van je territorium!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Je ontvangt {0} rijkspunten voor het genezen van een lid van je rijk!
@@ -403,6 +406,7 @@ GameObjects.GamePlayer.StartAttack.CantDisarmed:           Je bent ontwapend en 
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:          Je bent ontwapend en kunt deze spreuk niet uitspreken!
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:        Je kunt geen gevecht beginnen in schaduwmodus!
 GameObjects.GamePlayer.StartAttack.CantUseQuiver:          Je kunt deze pijlkoker niet met je huidige wapen selecteren.
+GameObjects.GamePlayer.StartAttack.CantTerRelic:		    Je kunt niet vechten terwijl je een territoriumrelikwie draagt.
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:         Je gaat het gevecht in, maar hebt geen doel.
 GameObjects.GamePlayer.StartAttack.CombatTarget:           Je gaat het gevecht in en focust op [{0}]
 GameObjects.GamePlayer.StartAttack.SelectQuiver:           Je moet een pijlkoker selecteren.
@@ -542,6 +546,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                    Je bent te ver weggelopen
 GameObjects.GamePlayer.RvR.Capture.Timer:              Fortoverneming
 GameObjects.GamePlayer.RvR.Capture.Start:              {0} begint de controle over het fort over te nemen!
 GameObjects.GamePlayer.PvP.DieDropItem:                Je dood heeft {0} van je schatten verspreid!
+GameObjects.GamePlayer.PvP.DropTerRelic:				Je territoriumrelikwie is op de grond gevallen!
+GameObjects.GamePlayer.PvP.DropFlag:					De vlag die je vasthield is op de grond gevallen!
 
 GameObjects.GamePlayer.Champion.LevelUp:               Je hebt een extra Kampioensniveau ontvangen!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:      Je moet Kampioen zijn om deze inventaris te gebruiken.

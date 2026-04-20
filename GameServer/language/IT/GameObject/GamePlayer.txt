@@ -80,6 +80,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Stai già suonando una m
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Non puoi lanciare incantesimi mentre sei ipnotizzato.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Non puoi lanciare incantesimi mentre sei stordito.
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Non puoi lanciare questo incantesimo mentre sei a cavallo!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:		Non puoi lanciare incantesimi mentre trasporti una reliquia del territorio.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: La tua invocazione fallisce e non puoi lanciare il tuo incantesimo!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Non puoi lanciare direttamente questo incantesimo!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Hai preparato un {0} come incantesimo di seguito!
@@ -141,6 +142,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} dal {1}% di bonus Po
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Parla con il tuo allenatore per maggiori informazioni.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Ottieni {0} punti esperienza.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       di cui {0} punti bonus da Rinascita
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:			inclusa una penalità di Rinascita di: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:         di cui {0} punti bonus da Territori
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:         di cui {0} punti bonus da Eventi
 
@@ -155,6 +157,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:                Ottieni {0} punti 
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP dal {1}% di bonus Popolazione Bassa)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP dal {1}% di bonus Regno Sottopopolato)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP dal bonus evento {1})
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:			(+{0} RP dalle reliquie del tuo territorio.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Ottieni {0} punti reame bonus grazie ai bonus di area!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Ottieni {0} punti reame per la difesa del tuo territorio!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Ottieni {0} punti reame per aver curato un membro del tuo reame!
@@ -403,6 +406,7 @@ GameObjects.GamePlayer.StartAttack.CantDisarmed:           Sei disarmato e non p
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:          Sei disarmato e non puoi lanciare questo incantesimo!
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:        Non puoi iniziare un combattimento in modalità Ombra!
 GameObjects.GamePlayer.StartAttack.CantUseQuiver:          Non puoi selezionare questa faretra con l'arma attuale.
+GameObjects.GamePlayer.StartAttack.CantTerRelic:			Non puoi ingaggiare combattimento mentre trasporti una reliquia del territorio.
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:         Entri in combattimento, ma non hai un bersaglio.
 GameObjects.GamePlayer.StartAttack.CombatTarget:           Entri in combattimento e metti a fuoco [{0}]
 GameObjects.GamePlayer.StartAttack.SelectQuiver:           Devi selezionare una faretra.
@@ -542,6 +546,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                    Ti sei allontanato troppo
 GameObjects.GamePlayer.RvR.Capture.Timer:              Conquista del forte
 GameObjects.GamePlayer.RvR.Capture.Start:              {0} inizia a prendere il controllo del forte!
 GameObjects.GamePlayer.PvP.DieDropItem:                La tua morte ha disperso {0} dei tuoi tesori!
+GameObjects.GamePlayer.PvP.DropTerRelic:				La tua reliquia del territorio è caduta a terra!
+GameObjects.GamePlayer.PvP.DropFlag:					La bandiera che tenevi è caduta a terra!
 
 GameObjects.GamePlayer.Champion.LevelUp:               Hai ricevuto un livello Campione aggiuntivo!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:      Devi essere Campione per usare questo inventario.

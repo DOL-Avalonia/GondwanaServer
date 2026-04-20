@@ -547,7 +547,7 @@ namespace DOL.GS.ServerRules
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.QuestsCompleted") + ": " + player.TaskXPlayer.QuestsCompletedStats.ToString("F0"));
                     stat.Add(" ");
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsMiscellaneous"));
-                    //stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PlayersAssassinated") + ": " + player.TaskXPlayer.AssassinationKillsStats.ToString("F0"));
+                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PlayersAssassinated") + ": " + player.TaskXPlayer.AssassinationKillsStats.ToString("F0"));
                     long totalLifetimeDeaths = player.DBCharacter.DeathCount + player.DBCharacter.DeathsPvP;
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.TotalDeathCount") + ": " + totalLifetimeDeaths.ToString("F0"));
                 }

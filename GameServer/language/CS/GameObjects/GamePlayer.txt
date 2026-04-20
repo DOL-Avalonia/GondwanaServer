@@ -80,6 +80,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Už hraješ skladbu.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Nemůžeš kouzlit, když jsi zhypnotizován/a.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Nemůžeš kouzlit, když jsi omráčen/a.
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Nemůžeš sesílat toto kouzlo při jízdě!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:		Nemůžeš sesílat kouzla, když neseš relikvii teritoria.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Tvé zaklínání selhává; kouzlo nemůžeš seslat!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Toto kouzlo nemůžeš seslat přímo!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Připravil/a jsi {0} jako navazující kouzlo!
@@ -141,6 +142,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:			(+{0} z {1}% bonusu za níz
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Pro více informací promluv se svým trenérem.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Získáváš {0} zkušenostních bodů.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       z toho {0} bonusových bodů z Znovuzrození
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:			včetně postihu za znovuzrození: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:         z toho {0} bonusových bodů z Území
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:         z toho {0} bonusových bodů z Událostí
 
@@ -155,6 +157,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:                Získáváš {0} b
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:			(+{0} RP z {1}% bonusu za nízkou populaci)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:	(+{0} RP z {1}% bonusu za málo osídlenou říši)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:	(+{0} RP z {1} bonusu události)
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:		(+{0} RP z tvých relikvií teritoria.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Získáváš {0} bodů říše navíc díky oblastním bonusům!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Získáváš {0} bodů říše za obranu svého území!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Získáváš {0} bodů říše za vyléčení člena své říše!
@@ -403,6 +406,7 @@ GameObjects.GamePlayer.StartAttack.CantDisarmed:           Jsi odzbrojen/a a nem
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:          Jsi odzbrojen/a a nemůžeš seslat toto kouzlo!
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:        V režimu stínů nemůžeš začít boj!
 GameObjects.GamePlayer.StartAttack.CantUseQuiver:          Tento toulec s aktuální zbraní vybrat nemůžeš.
+GameObjects.GamePlayer.StartAttack.CantTerRelic:		    Nemůžeš zahájit boj, když neseš relikvii teritoria.
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:         Vstupuješ do boje, ale nemáš cíl.
 GameObjects.GamePlayer.StartAttack.CombatTarget:           Vstupuješ do boje a zaměřuješ [{0}]
 GameObjects.GamePlayer.StartAttack.SelectQuiver:           Musíš vybrat toulec.
@@ -542,6 +546,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                    Příliš ses vzdálil/a.
 GameObjects.GamePlayer.RvR.Capture.Timer:              Převzetí pevnosti
 GameObjects.GamePlayer.RvR.Capture.Start:              {0} začíná přebírat kontrolu nad pevností!
 GameObjects.GamePlayer.PvP.DieDropItem:                Tvá smrt rozprášila {0} tvých pokladů!
+GameObjects.GamePlayer.PvP.DropTerRelic:				Tvá relikvie teritoria spadla na zem!
+GameObjects.GamePlayer.PvP.DropFlag:					Vlajka, kterou jsi držel, spadla na zem!
 
 GameObjects.GamePlayer.Champion.LevelUp:               Získal/a jsi dodatečnou úroveň Šampióna!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:      Pro použití tohoto inventáře musíš být Šampión.

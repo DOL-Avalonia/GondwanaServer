@@ -1040,6 +1040,7 @@ namespace DOL.GS
         /// </summary>
         protected virtual void CleanupOnDisconnect()
         {
+            DropTerritoryRelicsOnDeath(null);
             StopAttack();
             // remove all stealth handlers
             Stealth(false);
@@ -4888,6 +4889,7 @@ namespace DOL.GS
             int lowPopBonusPercent = 0;
             long realmLowPopBonusAmount = 0;
             int realmLowPopBonusPercent = 0;
+            long territoryRelicRPBonusAmount = 0;
             var yearlyEvent = GameEventManager.Instance.GetActiveYearlyEvent();
             int yearlyEventPercent = Properties.YEARLY_EVENT_RP_BONUS_PERCENT;
             long yearlyEventBonusAmount = 0;
@@ -4992,6 +4994,12 @@ namespace DOL.GS
                         amount += yearlyEventBonusAmount;
                     }
                 }
+
+                if (Guild != null && Guild.TerritoryBonusRealmPointsFactor > 0)
+                {
+                    territoryRelicRPBonusAmount = (long)Math.Round(amount * Guild.TerritoryBonusRealmPointsFactor);
+                    amount += territoryRelicRPBonusAmount;
+                }
             }
 
             if (notify)
@@ -5023,6 +5031,8 @@ namespace DOL.GS
                     msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.LowPopBonus", lowPopBonusAmount.ToString(), lowPopBonusPercent);
                 if (realmLowPopBonusAmount > 0)
                     msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus", realmLowPopBonusAmount.ToString(), realmLowPopBonusPercent);
+                if (territoryRelicRPBonusAmount > 0)
+                    msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus", territoryRelicRPBonusAmount);
                 if (yearlyEventBonusAmount > 0 && yearlyEvent != null)
                     msg += " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus", yearlyEventBonusAmount.ToString(), yearlyEvent.EventName);
 
@@ -6883,7 +6893,14 @@ namespace DOL.GS
 
             if (IsDisarmed)
             {
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.StartAttack.CantDisarmed"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                if (HasTerritoryRelic())
+                {
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.StartAttack.CantTerRelic"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+                else
+                {
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.StartAttack.CantDisarmed"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                }
                 return;
             }
 
@@ -9648,9 +9665,37 @@ namespace DOL.GS
                     TaskManager.UpdateTaskProgress(killerPlayer, "OutlawPlayersSentToJail", 1);
                 }
 
-                if ((this.CurrentRegion.IsRvR || IsInPvPArea()) && canAwardTaskPoints)
+                // Check if the dying player is near a territory relic
+                bool nearRelicCarrier = TerritoryRelicManager.ActiveRelics.Values
+                    .Any(r => r.CurrentCarrier != null
+                           && r.CurrentCarrier.CurrentRegionID == this.CurrentRegionID
+                           && r.CurrentCarrier.Coordinate.DistanceTo(this.Coordinate) <= 3000);
+
+                bool nearPhysicalRelic = TerritoryRelicManager.ActiveRelics.Values
+                    .Any(r => r.CurrentCarrier == null
+                           && r.ObjectState == GameObject.eObjectState.Active
+                           && r.CurrentRegionID == this.CurrentRegionID
+                           && r.Coordinate.DistanceTo(this.Coordinate) <= 2500);
+
+                bool isNearRelic = nearRelicCarrier || nearPhysicalRelic;
+                bool isAssassination = !this.CurrentRegion.IsRvR && !IsInPvPArea() && !this.IsInPvP && !isNearRelic && !deathWasDuel;
+
+                if (isAssassination && canAwardTaskPoints && Reputation >= 0)
                 {
-                    UpdateKillTaskProgress();
+                    var taskData = killerPlayer.TaskXPlayer ?? TaskManager.EnsureTaskData(killerPlayer);
+                    if (taskData != null)
+                    {
+                        taskData.AssassinationKillsStats++;
+                        GameServer.Database.SaveObject(taskData);
+                    }
+                }
+
+                if ((this.CurrentRegion.IsRvR || IsInPvPArea() || isNearRelic) && canAwardTaskPoints)
+                {
+                    if (!this.IsInPvP)
+                    {
+                        UpdateKillTaskProgress();
+                    }
                 }
 
                 if (this.IsInPvP && canAwardTaskPoints)
@@ -9883,7 +9928,7 @@ namespace DOL.GS
                             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.DeadRVR"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
                             xpLossPercent = 0;
                             m_deathtype = eDeathType.PvP;
-                            if (ServerProperties.Properties.PVP_DEATH_CON_LOSS && CheckIfLostConstitution(killer))
+                            if (Properties.PVP_DEATH_CON_LOSS && CheckIfLostConstitution(killer))
                             {
                                 conpenalty = 3;
                                 TempProperties.setProperty(DEATH_CONSTITUTION_LOSS_PROPERTY, conpenalty);
@@ -9894,7 +9939,7 @@ namespace DOL.GS
                 }
                 else
                 {
-                    if (Level >= ServerProperties.Properties.PVE_EXP_LOSS_LEVEL)
+                    if (Level >= Properties.PVE_EXP_LOSS_LEVEL)
                     {
                         Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.LoseExperience"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
                         // if this is the first death in level, you lose only half the penalty
@@ -9914,7 +9959,7 @@ namespace DOL.GS
                         m_deathtype = eDeathType.PvE;
                     }
 
-                    if (Level >= ServerProperties.Properties.PVE_CON_LOSS_LEVEL && CheckIfLostConstitution(killer))
+                    if (Level >= Properties.PVE_CON_LOSS_LEVEL && CheckIfLostConstitution(killer))
                     {
                         int conLoss = DeathCount;
                         if (conLoss > 3)
@@ -9999,6 +10044,7 @@ namespace DOL.GS
 
             DropPvPTreasuresOnDeath(killer);
             DropFlagsOnDeath((GameLiving)killer);
+            DropTerritoryRelicsOnDeath((GameLiving)killer);
 
             DuelStop((killer as GameLiving)?.GetController() as GamePlayer);
         }
@@ -10082,7 +10128,37 @@ namespace DOL.GS
             }
         }
 
-        private void DropFlagsOnDeath(GameObject killer)
+        public bool HasTerritoryRelic()
+        {
+            for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+            {
+                if (Inventory.GetItem(slot) is TerritoryRelicInventoryItem)
+                    return true;
+            }
+            return false;
+        }
+
+        public virtual void DropTerritoryRelicsOnDeath(GameObject killer)
+        {
+            var toRemove = new List<TerritoryRelicInventoryItem>();
+            for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+            {
+                if (Inventory.GetItem(slot) is TerritoryRelicInventoryItem relicItem)
+                    toRemove.Add(relicItem);
+            }
+
+            foreach (var relicItem in toRemove)
+            {
+                relicItem.IsRemovalExpected = true;
+                if (Inventory.RemoveItem(relicItem))
+                {
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PvP.DropTerRelic"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    relicItem.RelicReference?.DropOnGround((int)Position.X, (int)Position.Y, (int)Position.Z, Heading, CurrentRegion);
+                }
+            }
+        }
+
+        public virtual void DropFlagsOnDeath(GameObject killer)
         {
             GameLiving livingKiller = killer as GameLiving;
             if (livingKiller == null)
@@ -10105,6 +10181,7 @@ namespace DOL.GS
 
             foreach (var flagItem in toRemove)
             {
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PvP.DropFlag"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 flagItem.DropFlagOnGround(this, livingKiller);
             }
         }
@@ -10522,7 +10599,14 @@ namespace DOL.GS
 
                     if (IsSilenced)
                     {
-                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CantCastFumblingWords"), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        if (HasTerritoryRelic())
+                        {
+                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CantCastTerRelic"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+                        else
+                        {
+                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.CantCastFumblingWords"), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                        }
                         return false;
                     }
 

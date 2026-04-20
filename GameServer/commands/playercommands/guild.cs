@@ -1230,6 +1230,12 @@ namespace DOL.GS.Commands
                                 return;
                             }
 
+                            if (client.Player.HasTerritoryRelic())
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.BannerSummonTerRelic"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
                             if (client.Account.PrivLevel <= 1 && client.Player.Guild.GuildType != Guild.eGuildType.RvRGuild && client.Player.Guild.GuildType != Guild.eGuildType.PvPGuild)
                             {
                                 if (client.Player.Guild.IsSystemGuild)
@@ -1959,6 +1965,28 @@ namespace DOL.GS.Commands
                                 return;
                             }
 
+                            // Check if the current territory is within the guild's allowed limit
+                            int normalCount = 0;
+                            bool isWithinLimit = false;
+                            foreach (var t in client.Player.Guild.Territories)
+                            {
+                                if (t.Type == Territory.eType.Normal)
+                                {
+                                    normalCount++;
+                                    if (t == territory)
+                                    {
+                                        isWithinLimit = (normalCount <= client.Player.Guild.MaxTerritories);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!isWithinLimit)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.TerritoryBanner.NotInExtraTerritory"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
                             if (client.Player.GuildRank.RankLevel > 2 && client.Account.PrivLevel == 1)
                             {
                                 client.SendTranslation("Commands.Players.Guild.TerritoryBanner.Denied");
@@ -2122,6 +2150,27 @@ namespace DOL.GS.Commands
                             if (territory?.IsOwnedBy(player) != true)
                             {
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.BuyDefender.NotInTerritory"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
+                            int normalCount = 0;
+                            bool isWithinLimit = false;
+                            foreach (var t in client.Player.Guild.Territories)
+                            {
+                                if (t.Type == Territory.eType.Normal)
+                                {
+                                    normalCount++;
+                                    if (t == territory)
+                                    {
+                                        isWithinLimit = (normalCount <= client.Player.Guild.MaxTerritories);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!isWithinLimit)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.BuyDefender.NotInExtraTerritory"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                                 return;
                             }
 
@@ -3914,7 +3963,7 @@ namespace DOL.GS.Commands
                         }
 
                         IList<string> infos = TerritoryManager.Instance.GetTerritoriesInformations(client.Player);
-                        client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.Territories.WindowTitle"), infos);
+                        client.Out.SendCustomTextWindow(GetGvGWindowTitle(client.Account.Language, "Commands.Players.Guild.Territories.WindowTitle"), infos);
                         break;
                     #endregion
 
@@ -4118,13 +4167,31 @@ namespace DOL.GS.Commands
                 var session = PvpManager.Instance.CurrentSession;
                 if (session != null && !session.AllowSummonBanner)
                 {
-                    player.Out.SendMessage(
-                        "Guild banners are not allowed in this zone.",
-                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Guild.TerritoryBanner.NotAllowedZone"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
             }
             return true;
+        }
+
+        private string GetGvGWindowTitle(string language, string baseKey)
+        {
+            if (GvGManager.IsOpen)
+            {
+                return LanguageMgr.GetTranslation(language, baseKey + "Open");
+            }
+
+            DateTime parisTime = GvGManager.GetParisTime();
+            DateTime nextOpen = new DateTime(parisTime.Year, parisTime.Month, parisTime.Day, 10, 0, 0);
+
+            if (parisTime.Hour >= 10)
+            {
+                nextOpen = nextOpen.AddDays(1);
+            }
+
+            int minutesRemaining = (int)Math.Max(0, (nextOpen - parisTime).TotalMinutes);
+
+            return LanguageMgr.GetTranslation(language, baseKey + "Closed", minutesRemaining);
         }
 
         public void DisplayHelp(GameClient client)

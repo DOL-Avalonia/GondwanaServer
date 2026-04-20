@@ -1,4 +1,5 @@
-﻿using DOL.Database;
+﻿using AmteScripts.Managers;
+using DOL.Database;
 using DOL.Events;
 using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
@@ -64,6 +65,17 @@ namespace DOL.GS.Commands
         {
             int itemType = item.Template?.Item_Type ?? 0;
             return StealPriorityItemTypes.Contains(itemType);
+        }
+
+        public static TerritoryRelicInventoryItem GetTerritoryRelic(GamePlayer player)
+        {
+            if (player == null) return null;
+            for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+            {
+                if (player.Inventory.GetItem(slot) is TerritoryRelicInventoryItem relic)
+                    return relic;
+            }
+            return null;
         }
 
         public static void EventPlayerMove(DOLEvent d, object sender, EventArgs e)
@@ -173,6 +185,14 @@ namespace DOL.GS.Commands
                 if (rand.Next(1, 101) > chance)
                 {
                     result.Status = StealResultStatus.FAILED;
+                    return result;
+                }
+
+                var targetRelic = GetTerritoryRelic(target);
+                if (targetRelic != null)
+                {
+                    result.Status = StealResultStatus.SUSSCES_ITEM;
+                    result.RelicToSteal = targetRelic;
                     return result;
                 }
 
@@ -303,8 +323,7 @@ namespace DOL.GS.Commands
             GamePlayer Target = Player.TargetObject as GamePlayer;
             if (Target == null && args.Length >= 2)
             {
-                Target = WorldMgr.GetClientByPlayerName(args[1],
-                                                        false, true).Player;
+                Target = WorldMgr.GetClientByPlayerName(args[1], false, true)?.Player;
             }
 
             if (Player.TargetObject is PVPChest chestTarget)
@@ -362,6 +381,13 @@ namespace DOL.GS.Commands
             }
             else if (Target != null)
             {
+                // Verify Relic Steal Conflict (Stealer cannot already carry a relic to steal another one)
+                if (GetTerritoryRelic(Target) != null && GetTerritoryRelic(Player) != null)
+                {
+                    Player.Out.SendMessage(LanguageMgr.GetTranslation(Player.Client.Account.Language, "Commands.Players.Vol.CarryRelic"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+
                 // Check the player-specific disable timer
                 long playerDisableTick = Player.TempProperties.getProperty<long>(VolAbilityHandler.DISABLE_PROPERTY, 0L);
                 long playerChangeTime = Player.CurrentRegion.Time - playerDisableTick;
@@ -443,12 +469,17 @@ namespace DOL.GS.Commands
                 PerformVolAction(stealer, target, result);
             }
 
-            Random newRand = new Random(DateTime.UtcNow.Millisecond);
-            if (newRand.Next() > 30)
+            bool bypassedRepLoss = (result.Status == StealResultStatus.SUSSCES_ITEM && result.RelicToSteal != null);
+
+            if (!bypassedRepLoss)
             {
-                stealer.Reputation--;
-                stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.LostRep"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
-                stealer.SaveIntoDatabase();
+                Random newRand = new Random(DateTime.UtcNow.Millisecond);
+                if (newRand.Next() > 30)
+                {
+                    stealer.Reputation--;
+                    stealer.Out.SendMessage(LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.LostRep"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
+                    stealer.SaveIntoDatabase();
+                }
             }
 
             CancelVol(stealer, Timer);
@@ -581,46 +612,69 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            var tier1 = new List<InventoryItem>();
-            var tier2 = new List<InventoryItem>();
-            var tier3 = new List<InventoryItem>();
+            InventoryItem stolenItem = null;
 
-            foreach (var it in target.Inventory.AllItems)
+            // Process Relic Steal First
+            if (vol.RelicToSteal != null)
             {
-                if (it == null)
-                    continue;
+                stolenItem = vol.RelicToSteal;
+                vol.RelicToSteal.IsRemovalExpected = true;
+                target.Inventory.RemoveItem(stolenItem);
+                vol.RelicToSteal.IsRemovalExpected = false;
+                stealer.Inventory.AddItem(freeSlot, stolenItem);
 
-                if (!IsBackpackSlot(it))
-                    continue;
-
-                if (!it.IsDropable || !it.IsTradable)
-                    continue;
-
-                if (IsPvPTreasure(it))
-                    tier1.Add(it);
-                else if (IsPriorityItemType(it))
-                    tier2.Add(it);
-                else
-                    tier3.Add(it);
+                // Instantly update the Relic Reference tracking to follow the new stealer!
+                if (vol.RelicToSteal.RelicReference != null)
+                {
+                    vol.RelicToSteal.RelicReference.CurrentCarrier = stealer;
+                    TerritoryRelicManager.UpdateMapPins();
+                }
             }
-
-            List<InventoryItem> pickFrom =
-                tier1.Count > 0 ? tier1 :
-                tier2.Count > 0 ? tier2 :
-                tier3;
-
-            if (pickFrom.Count < 1)
+            else
             {
-                stealer.Out.SendMessage(
-                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.NothingToSteal"),
-                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                return;
-            }
+                // NORMAL ITEM STEAL
+                var tier1 = new List<InventoryItem>();
+                var tier2 = new List<InventoryItem>();
+                var tier3 = new List<InventoryItem>();
 
-            int idx = Util.Random(0, pickFrom.Count - 1);
-            InventoryItem stolenItem = pickFrom[idx];
-            target.Inventory.RemoveItem(stolenItem);
-            stealer.Inventory.AddItem(freeSlot, stolenItem);
+                foreach (var it in target.Inventory.AllItems)
+                {
+                    if (it == null)
+                        continue;
+
+                    if (!IsBackpackSlot(it))
+                        continue;
+
+                    if (!it.IsDropable || !it.IsTradable)
+                        continue;
+
+                    if (IsPvPTreasure(it))
+                        tier1.Add(it);
+                    else if (IsPriorityItemType(it))
+                        tier2.Add(it);
+                    else
+                        tier3.Add(it);
+                }
+
+                List<InventoryItem> pickFrom =
+                    tier1.Count > 0 ? tier1 :
+                    tier2.Count > 0 ? tier2 :
+                    tier3;
+
+                if (pickFrom.Count < 1)
+                {
+                    stealer.Out.SendMessage(
+                        LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.NothingToSteal"),
+                        eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+
+                int idx = Util.Random(0, pickFrom.Count - 1);
+                stolenItem = pickFrom[idx];
+
+                target.Inventory.RemoveItem(stolenItem);
+                stealer.Inventory.AddItem(freeSlot, stolenItem);
+            }
 
             stealer.Out.SendMessage(
                 LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealItem", stolenItem.Name, stealer.GetPersonalizedName(target)),
@@ -647,8 +701,8 @@ namespace DOL.GS.Commands
     public class StealResult
     {
         public StealResultStatus Status { get; set; }
-
         public long Money { get; set; }
+        public TerritoryRelicInventoryItem RelicToSteal { get; set; }
 
     }
 

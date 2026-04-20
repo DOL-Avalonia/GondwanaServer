@@ -41,6 +41,7 @@ Commands.Players.Guild.BannerSummonDamned:			You cannot summon your guild banner
 Commands.Players.Guild.BannerSummonPetrified:		You cannot summon your guild banner while beeing petrified!
 Commands.Players.Guild.BannerSummonMorphed:			You cannot summon your guild banner while beeing under a "{0}" enchantment.
 Commands.Players.Guild.BannerSummonJailed:			You cannot summon your guild banner while beeing imprisoned.
+Commands.Players.Guild.BannerSummonTerRelic:		You cannot summon a guild banner while carrying a territory relic.
 Commands.Players.Guild.BannerUnsummoned.You:		You have put away your guild banner.
 Commands.Players.Guild.BannerUnsummoned:			{0} has put away the guild banner.
 Commands.Players.Guild.BannerUnsummoned.You.Forced:	{0} has removed your guild banner.
@@ -302,11 +303,13 @@ Commands.Players.Guild.JailRelease.NotEnoughMoney:		Your guild bank do not have 
 Commands.Players.Guild.JailRelease.Released:			{0} was released from jail by {1}.
 
 Commands.Players.Guild.TerritoryBanner.NotInTerritory:	You cannot summon your guild banners outside of a territory owned by your guild.
+Commands.Players.Guild.TerritoryBanner.NotInExtraTerritory:		This territory exceeds your guild's maximum territory limit. You cannot set your guild banner here and improve its defenses.
 Commands.Players.Guild.TerritoryBanner.Denied:			You must be rank 2 or lower in your guild to summon territory banners.
 Commands.Players.Guild.TerritoryBanner.ConfirmCost:		Summoning your guild banners in this territory will cost {0} merit points. Confirm?
 Commands.Players.Guild.TerritoryBanner.NotEnoughMerit:	Your guild must have {0} merit points to summon territory banners.
 Commands.Players.Guild.TerritoryBanner.Summoned:		{0} has summoned the guild banners in {1}!
 Commands.Players.Guild.TerritoryBanner.AlreadySummoned:	This territory already has the guild banners.
+Commands.Players.Guild.TerritoryBanner.NotAllowedZone:	Guild banners are not allowed in this zone.
 
 Commands.Players.Guild.TerritoryPortal.NoGuild:			You must be in a guild to summon a guild portal.
 Commands.Players.Guild.TerritoryPortal.Denied:			You must be rank 4 or lower in your guild to summon a guild portal.
@@ -324,6 +327,7 @@ Commands.Players.Guild.BuyDefender.NoGuild:				You must be in a guild to buy a d
 Commands.Players.Guild.BuyDefender.AvailableDefenders:	You can currently buy {0} additional guards.
 Commands.Players.Guild.BuyDefender.DefenderLimit:		Your guild level currently does not permit you to purchase an additional defender for this territory.
 Commands.Players.Guild.BuyDefender.NotInTerritory:		You cannot buy a territory defender outside of a territory belonging to your guild.
+Commands.Players.Guild.BuyDefender.NotInExtraTerritory:	This territory exceeds your guild's maximum territory limit. You cannot recruit any defender here to improve its defenses!
 Commands.Players.Guild.BuyDefender.UnsupportedType:		The territory '{0}' does not offer this type of defender.
 Commands.Players.Guild.BuyDefender.NoMoney:				You must have {0} gold coins in your guild bank account to buy a territory defender!
 Commands.Players.Guild.BuyDefender.ConfirmCost:			Buying a defender for '{0}' will cost {1} gold coins to your guild. Confirm?

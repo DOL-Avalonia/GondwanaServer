@@ -4,4 +4,4 @@ TrashBinNPC.ConfirmDestroy:		Voulez-vous vraiment détruire {0} ?
 TrashBinNPC.WillNotDestroy:		Très bien, je ne détruirai pas cet objet.
 TrashBinNPC.ItemNotFound:		L'objet ne peut pas être trouvé.
 TrashBinNPC.ItemDestroyed:		L'objet {0} a été détruit.
-TrashBinNPC.UnableToDestroy:		Impossible de détruire l'objet.
+TrashBinNPC.UnableToDestroy:	Je ne peux pas détruire cet objet.

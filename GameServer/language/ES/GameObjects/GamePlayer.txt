@@ -80,6 +80,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Ya estás tocando una me
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        No puedes lanzar hechizos mientras estás hipnotizado.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       No puedes lanzar hechizos mientras estás aturdido.
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:		¡No puedes lanzar este hechizo mientras montas!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:		No puedes lanzar hechizos mientras llevas una reliquia de territorio.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: ¡Tu invocación falla y no puedes lanzar tu hechizo!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     ¡No puedes lanzar este hechizo directamente!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           ¡Has preparado un {0} como hechizo de seguimiento!
@@ -141,6 +142,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} del {1}% de bonifica
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Habla con tu entrenador para más información.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Obtienes {0} puntos de experiencia.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       de los cuales {0} puntos de bono por Renacimiento
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:			incluyendo una penalización de Renacimiento de: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:         de los cuales {0} puntos de bono por Territorios
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:         de los cuales {0} puntos de bono por Eventos
 
@@ -155,6 +157,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:                ¡Obtienes {0} pun
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP del {1}% de bonificación por baja población)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP del {1}% de bonificación por reino despoblado)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP de la bonificación de evento {1})
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:			(+{0} RP de tus reliquias de territorio.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           ¡Obtienes {0} puntos de reino extra gracias a bonos de zona!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      ¡Obtienes {0} puntos de reino por defender tu territorio!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     ¡Obtienes {0} puntos de reino por curar a un miembro de tu reino!
@@ -403,6 +406,7 @@ GameObjects.GamePlayer.StartAttack.CantDisarmed:           ¡Estás desarmado y 
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:          ¡Estás desarmado y no puedes lanzar este hechizo!
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:        ¡No puedes iniciar combate en modo Sombra!
 GameObjects.GamePlayer.StartAttack.CantUseQuiver:          No puedes seleccionar este carcaj con tu arma actual.
+GameObjects.GamePlayer.StartAttack.CantTerRelic:			No puedes entrar en combate mientras llevas una reliquia de territorio.
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:         Entras en combate, pero no tienes objetivo.
 GameObjects.GamePlayer.StartAttack.CombatTarget:           Entras en combate y fijas el foco en [{0}]
 GameObjects.GamePlayer.StartAttack.SelectQuiver:           Debes seleccionar un carcaj.
@@ -542,6 +546,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                    Te has alejado demasiado.
 GameObjects.GamePlayer.RvR.Capture.Timer:              Toma del fuerte
 GameObjects.GamePlayer.RvR.Capture.Start:              ¡{0} comienza a tomar el control del fuerte!
 GameObjects.GamePlayer.PvP.DieDropItem:                ¡Tu muerte ha dispersado {0} de tus tesoros!
+GameObjects.GamePlayer.PvP.DropTerRelic:				¡Tu reliquia de territorio ha caído al suelo!
+GameObjects.GamePlayer.PvP.DropFlag:					¡La bandera que sostenías ha caído al suelo!
 
 GameObjects.GamePlayer.Champion.LevelUp:               ¡Has recibido un nivel de Campeón adicional!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:      Debes ser Campeón para usar este inventario.

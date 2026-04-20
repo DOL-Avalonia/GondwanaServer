@@ -27,8 +27,7 @@ namespace DOL.GS.Scripts
 
             if (item is StorageBagItem)
             {
-                // Refuse to accept StorageBagItems
-                SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.CannotDestroyObject"));
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.CannotDestroyObject"));
                 return false;
             }
 
@@ -46,7 +45,7 @@ namespace DOL.GS.Scripts
 
             if (response != 0x01) // Player did not confirm
             {
-                SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.WillNotDestroy"));
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.WillNotDestroy"));
                 return;
             }
 
@@ -56,9 +55,14 @@ namespace DOL.GS.Scripts
                 return;
             }
 
+            if (item is AmteScripts.Managers.TerritoryRelicInventoryItem)
+            {
+                player.DropTerritoryRelicsOnDeath(player);
+            }
+
             if (player.Inventory.RemoveItem(item))
             {
-                SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.ItemDestroyed", item.Name));
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.ItemDestroyed", item.Name));
                 InventoryLogging.LogInventoryAction(player, "", "(TrashBinNPC destroy)", eInventoryActionType.Other, item, item.Count);
             }
             else

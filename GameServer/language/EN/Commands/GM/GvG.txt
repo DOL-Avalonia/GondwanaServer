@@ -1,5 +1,6 @@
-GvG.Manager.CaptureRestricted:	Territories can only be captured between 11:00 and 00:00.
+GvG.Manager.CaptureRestricted:	Territories can only be captured between 10:00 and 00:00.
 
-GvG.Command.Status:		Current GvG Force Open Status: {0}
+GvG.Command.Status:			Current GvG Force Open Status: {0}
 GvG.Command.ForcedOpen:		GvG is now FORCED OPEN (ignoring time restrictions).
 GvG.Command.TimeSchedule:	GvG is now following the TIME SCHEDULE.
+GvG.Command.ResetRelics:	GvG territory relics have been forcefully reset.

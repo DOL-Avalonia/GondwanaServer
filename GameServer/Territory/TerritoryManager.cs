@@ -336,9 +336,9 @@ namespace DOL.Territories
             // ---- Guild Territories Info ----
             infos.Add(string.Empty);
             infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.GuildInfo"));
-            infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.MaxTerritories", player.Guild?.MaxTerritories ?? 0, player.Guild?.TerritoryCount ?? 0));
-            infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.DailyRent", CalculateGuildTerritoryTax(player.Guild)));
-            infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.DailyMeritPoints", ownedTerritories.Count * Properties.DAILY_MERIT_POINTS));
+            infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.MaxTerritories", player.Guild?.MaxTerritories ?? 0, player.Guild?.TerritoryCount ?? 0));
+            infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.DailyRent", CalculateGuildTerritoryTax(player.Guild)));
+            infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.DailyMeritPoints", ownedTerritories.Count * Properties.DAILY_MERIT_POINTS));
             string timeBeforeRent;
             if (ownedTerritories.Count == 0)
             {
@@ -352,13 +352,13 @@ namespace DOL.Territories
                 var hours = nextPayment / 3600;
                 timeBeforeRent = LanguageMgr.TranslateTimeShort(player, (int)hours, (int)minutes, (int)seconds);
             }
-            infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.TimeBeforeRent", timeBeforeRent));
-            infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.TotalXPBonus", ownedTerritories.Count == 0 ? 0 : player.Guild.TerritoryBonusExperienceFactor * 100));
+            infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.TimeBeforeRent", timeBeforeRent));
+            infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.TotalXPBonus", ownedTerritories.Count == 0 ? 0 : player.Guild!.TerritoryBonusExperienceFactor * 100));
 
             int guildBP = 0;
             if (ownedTerritories.Count > 0)
             {
-                guildBP = player.Guild.CalcBPOnKill(65);
+                guildBP = player.Guild!.CalcBPOnKill(65);
                 if (Properties.BP_RATE >= 0)
                     guildBP = (int)(guildBP * Properties.BP_RATE);
                 var playerBPBonus = player.GetModified(eProperty.BountyPoints);
@@ -366,7 +366,12 @@ namespace DOL.Territories
                     guildBP += (int)(playerBPBonus * 0.01 * guildBP);
             }
             
-            infos.Add(LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.TotalBPBonus", guildBP));
+            infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.TotalBPBonus", guildBP));
+
+            if (player.Guild!.TerritoryBonusRealmPointsFactor > 0)
+            {
+                infos.Add("-- " + LanguageMgr.GetTranslation(language, "Commands.Players.Guild.Territories.RelicRPBonus", (player.Guild.TerritoryBonusRealmPointsFactor * 100).ToString("0")));
+            }
 
             // ---- Territory Bonuses ----
             infos.Add(string.Empty);

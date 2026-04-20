@@ -81,6 +81,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:	Ihr spielt bereits ein Lied!
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:	Ihr könnt nichts machen, wenn Ihr hypnotisiert seid!
 GameObjects.GamePlayer.CastSpell.CantCastStunned:	Ihr könnt nichts machen, wenn Ihr betäubt seid!
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:	Ihr könnt diesen Zauber nicht wirken, während Ihr reitet!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:	Du kannst keine Zauber wirken, während du ein Territoriumsrelikt trägst.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords:	Ihr könnt nicht zaubern, da Ihr die Worte nur noch stammelt!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:	Ihr könnt diesen Zauberspruch nicht direkt anwenden!
 GameObjects.GamePlayer.CastSpell.FollowSpell:	Ihr bereitet {0} als Folgespruch vor!
@@ -142,6 +143,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:	(+{0} durch {1}% Bonus für n
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:	Sprecht mit Eurem Ausbilder für mehr Informationen.
 GameObjects.GamePlayer.GainExperience.YouGet:	Ihr erhaltet {0} Erfahrungspunkte.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:	darunter {0} Bonuspunkte aus Wiedergeburt
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:	inklusive einer Wiedergeburtsstrafe von: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:	darunter {0} Bonuspunkte aus Territorien
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:	darunter {0} Bonuspunkte aus Ereignissen
 
@@ -156,6 +158,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:	Ihr erhaltet {0} Reichspunkte!
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:			(+{0} RP durch {1}% Bonus für niedrige Bevölkerung)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:	(+{0} RP durch {1}% Bonus für unterbevölkertes Reich)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:	(+{0} RP durch {1} Event-Bonus)
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:		(+{0} RP durch deine Territoriumsrelikte.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:	Du erhältst {0} Reichspunkte Bonus dank Gebiets‑Boni!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:	Du erhältst {0} Reichspunkte für die Verteidigung deines Territoriums!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:	Du erhältst {0} Reichspunkte für das Heilen eines Mitglieds deines Reiches!
@@ -407,6 +410,7 @@ GameObjects.GamePlayer.StartAttack.CantUseQuiver:	Ihr könnt den ausgewählten K
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:	Ihr macht Euch kampfbereit, aber Ihr habt kein Ziel ausgewählt!
 GameObjects.GamePlayer.StartAttack.CombatTarget:	Ihr macht Euch kampfbereit. Euer Ziel ist [{0}].
 GameObjects.GamePlayer.StartAttack.SelectQuiver:	Ihr müsst einen Köcherslot auswählen, aus dem Ihr ziehen wollt!
+GameObjects.GamePlayer.StartAttack.CantTerRelic:	Du kannst keinen Kampf beginnen, während du ein Territoriumsrelikt trägst.
 GameObjects.GamePlayer.StartAttack.SpellCancelled:	Euer Zauberspruch wurde abgebrochen!
 GameObjects.GamePlayer.StartAttack.TargetInRange:	, Ziel ist in Reichweite.
 GameObjects.GamePlayer.StartAttack.TargetOutOfRange:	, Ziel ist nicht in Reichweite.
@@ -542,7 +546,9 @@ GameObjects.GamePlayer.RvR.Interrupt:	Du wurdest unterbrochen.
 GameObjects.GamePlayer.RvR.Too.Far:	Du hast dich zu weit entfernt.
 GameObjects.GamePlayer.RvR.Capture.Timer:	Fortübernahme
 GameObjects.GamePlayer.RvR.Capture.Start:	{0} beginnt, die Kontrolle über das Fort zu übernehmen!
-GameObjects.GamePlayer.PvP.DieDropItem:	Dein Tod hat {0} deiner Schätze verstreut!
+GameObjects.GamePlayer.PvP.DieDropItem:		Dein Tod hat {0} deiner Schätze verstreut!
+GameObjects.GamePlayer.PvP.DropTerRelic:	Dein Territoriumsrelikt ist auf den Boden gefallen!
+GameObjects.GamePlayer.PvP.DropFlag:		Die Flagge, die du gehalten hast, ist auf den Boden gefallen!
 
 GameObjects.GamePlayer.Champion.LevelUp:	Du hast eine zusätzliche Champion‑Stufe erhalten!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:	Du musst Champion sein, um dieses Inventar zu verwenden.

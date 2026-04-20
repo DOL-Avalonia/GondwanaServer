@@ -1,0 +1,23 @@
+
+TerritoryRelics.Pad.WrongGuild:					You can only place this relic in a territory owned by your guild.
+TerritoryRelics.Pad.Secured:					You successfully secured {0}!
+TerritoryRelics.Manager.Recalled:				[Territories] The relic '{0}' has been recalled by its protectors.
+TerritoryRelics.Manager.Manifested:				[Territories] Rumors say that the mighty '{0}' has manifested in this plane. Grab it to bring its power to your cause!
+TerritoryRelics.Manager.Dissipated:				[Territories] The relic '{0}' has dissipated in another plane.
+TerritoryRelics.Static.Unlocked:				{0} is no longer protected and can be claimed!
+TerritoryRelics.Static.Truce:					A truce holds dominion over the land. The relics cannot be claimed until the guild wars reignite.
+TerritoryRelics.Static.Protected:				The relic is magically bound to its living protectors. Defeat them all to shatter the seal.
+TerritoryRelics.Static.CannotPickupDead:		You can't pick up a territory relic while dead.
+TerritoryRelics.Static.CannotPickupStealthed:	You can't pick up a territory relic while stealthed!
+TerritoryRelics.Static.CannotPickupMounted:		You can't pick up a territory relic while mounted!
+TerritoryRelics.Static.CannotPickupCombat:		You can't pick up a territory relic in combat!
+TerritoryRelics.Static.CannotPickupAFK:			You can't pick up a territory relic while AFK!
+TerritoryRelics.Static.CannotPickupDuel:		You can't pick up a territory relic while beeing engaged in a duel!
+TerritoryRelics.Static.CannotPickupGuildBanner:	You can't pick up a territory relic while carrying a guild banner.
+TerritoryRelics.Static.CannotPickupDamned:		You can't pick up a territory relic while damned.
+TerritoryRelics.Static.CannotPickupPtrified:	You can't pick up a territory relic while petrified.
+TerritoryRelics.Static.CannotPickupFrog:		You can't pick a territory relic while under 'frog' enchantment.
+TerritoryRelics.Static.NeedTerritory:			Your guild must own at least one territory to carry a territory relic.
+TerritoryRelics.Static.OnlyOne:					You can only carry one territory relic at a time.
+TerritoryRelics.Static.AlreadySecured:			Your guild already secured this relic.
+TerritoryRelics.Static.PickedUp:				You picked up {0}!

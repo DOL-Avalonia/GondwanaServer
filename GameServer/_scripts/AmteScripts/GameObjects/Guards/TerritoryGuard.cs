@@ -48,26 +48,51 @@ namespace DOL.GS.Scripts
                 var guild = GuildMgr.GetGuildByName(GuildName);
                 if (guild == null)
                     return;
-                var name = "un inconnu";
-                if (!string.IsNullOrEmpty(plKiller.GuildName))
-                    name = string.Format("un membre de la guilde {0}", plKiller.GuildName);
 
+                foreach (GamePlayer member in guild.GetListOfOnlineMembers())
+                {
+                    string killerPersoName = member.GetPersonalizedName(plKiller);
+                    string killerText;
 
-                guild.SendMessageToGuildMembers(
-                    string.Format("un garde vient d'être tué par {0}.", name),
-                    eChatType.CT_Guild,
-                    eChatLoc.CL_ChatWindow
-                );
+                    if (!string.IsNullOrEmpty(plKiller.GuildName))
+                    {
+                        killerText = LanguageMgr.GetTranslation(member.Client.Account.Language, "TerritoryGuard.Die.GuildMember", killerPersoName, plKiller.GuildName);
+                    }
+                    else
+                    {
+                        killerText = killerPersoName;
+                    }
+
+                    string broadcastMsg = LanguageMgr.GetTranslation(member.Client.Account.Language, "TerritoryGuard.Die.Broadcast", killerText);
+                    member.Out.SendMessage(broadcastMsg, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+                }
 
                 if (guild.alliance != null)
+                {
                     foreach (Guild guildAlly in guild.alliance.Guilds)
                     {
-                        guildAlly.SendMessageToGuildMembers(
-                         string.Format("un garde vient d'être tué par {0}.", name),
-                         eChatType.CT_Guild,
-                         eChatLoc.CL_ChatWindow
-                        );
+                        // Skip the main guild to avoid double messaging them
+                        if (guildAlly == guild) continue;
+
+                        foreach (GamePlayer member in guildAlly.GetListOfOnlineMembers())
+                        {
+                            string killerPersoName = member.GetPersonalizedName(plKiller);
+                            string killerText;
+
+                            if (!string.IsNullOrEmpty(plKiller.GuildName))
+                            {
+                                killerText = LanguageMgr.GetTranslation(member.Client.Account.Language, "TerritoryGuard.Die.GuildMember", killerPersoName, plKiller.GuildName);
+                            }
+                            else
+                            {
+                                killerText = killerPersoName;
+                            }
+
+                            string broadcastMsg = LanguageMgr.GetTranslation(member.Client.Account.Language, "TerritoryGuard.Die.Broadcast", killerText);
+                            member.Out.SendMessage(broadcastMsg, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+                        }
                     }
+                }
             }
         }
 

@@ -30,3 +30,4 @@ Commands.GM.TeleportNPC.Usage.AreaPulse.CastTicks:			/teleportnpc areapulsecastt
 Commands.GM.TeleportNPC.Usage.AreaPulse.ClientEffect:		/teleportnpc areapulseclienteffect <id>' Effet visuel joué sur le PNJ lui-même.
 Commands.GM.TeleportNPC.Usage.AreaPulse.CastEffect:			/teleportnpc areapulsecasteffect <id>' ID de l'animation de lancement de sort.
 Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect:		/teleportnpc areapulseplayereffect <id>' Effet visuel joué sur les joueurs à portée.
+Commands.GM.TeleportNPC.Usage.Conditions.BlockRelic:		/teleportnpc blockrelic - Interdit au joueur de se téléporter à une destination spécifique s'il porte un relique.

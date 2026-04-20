@@ -81,12 +81,6 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            if (item is FlagInventoryItem)
-            {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "DestroyItemRequestHandler.CantDestroyPvPFlag"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return;
-            }
-
             player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Destroy.ConfirmDestroy", item.Name), new CustomDialogResponse(DestroyItemResponse));
             player.TempProperties.setProperty("DestroyItemSlot", slot);
         }
@@ -119,6 +113,16 @@ namespace DOL.GS.Commands
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Destroy.OnlyBackpackItems"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
+            }
+
+            if (item is AmteScripts.Managers.TerritoryRelicInventoryItem)
+            {
+                player.DropTerritoryRelicsOnDeath(player);
+            }
+
+            if (item is FlagInventoryItem)
+            {
+                player.DropFlagsOnDeath(player);
             }
 
             if (player.Inventory.RemoveItem(item))

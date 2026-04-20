@@ -758,6 +758,16 @@ namespace DOL.GS.ServerRules
             if (player != null && GameRelic.IsPlayerCarryingRelic(player))
                 return "GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier";
 
+            if (player != null)
+            {
+                for (int i = (int)eInventorySlot.FirstBackpack; i <= (int)eInventorySlot.LastBackpack; i++)
+                {
+                    var item = player.Inventory.GetItem((eInventorySlot)i);
+                    if (item is TerritoryRelicInventoryItem)
+                        return "GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier";
+                }
+            }
+
             // zones checks:
             // white list: always allows
             string currentRegion = living.CurrentRegion.ID.ToString();
@@ -865,7 +875,7 @@ namespace DOL.GS.ServerRules
                 return true;
 
             // on some servers we may wish for dropped items to be used by all realms regardless of what is set in the db
-            if (!ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+            if (!Properties.ALLOW_CROSS_REALM_ITEMS)
             {
                 if (item.Realm != 0 && item.Realm != (int)living.Realm)
                     return false;
@@ -883,7 +893,7 @@ namespace DOL.GS.ServerRules
             {
                 int armorAbility = -1;
 
-                if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && item.Item_Type != (int)eEquipmentItems.HEAD)
+                if (Properties.ALLOW_CROSS_REALM_ITEMS && item.Item_Type != (int)eEquipmentItems.HEAD)
                 {
                     switch (player!.Realm) // Choose based on player rather than item region
                     {
@@ -938,7 +948,7 @@ namespace DOL.GS.ServerRules
 
                 //alb
                 case eObjectType.CrushingWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
@@ -949,7 +959,7 @@ namespace DOL.GS.ServerRules
                     else abilityCheck = Abilities.Weapon_Crushing;
                     break;
                 case eObjectType.SlashingWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
@@ -960,18 +970,18 @@ namespace DOL.GS.ServerRules
                     else abilityCheck = Abilities.Weapon_Slashing;
                     break;
                 case eObjectType.ThrustWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
                         abilityCheck = Abilities.Weapon_Piercing;
                     else
                         abilityCheck = Abilities.Weapon_Thrusting;
                     break;
                 case eObjectType.TwoHandedWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Hibernia)
                         abilityCheck = Abilities.Weapon_LargeWeapons;
                     else abilityCheck = Abilities.Weapon_TwoHanded;
                     break;
                 case eObjectType.PolearmWeapon:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
@@ -990,7 +1000,7 @@ namespace DOL.GS.ServerRules
 
                 //mid
                 case eObjectType.Sword:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
@@ -1001,7 +1011,7 @@ namespace DOL.GS.ServerRules
                     else abilityCheck = Abilities.Weapon_Swords;
                     break;
                 case eObjectType.Hammer:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
@@ -1013,7 +1023,7 @@ namespace DOL.GS.ServerRules
                     break;
                 case eObjectType.LeftAxe:
                 case eObjectType.Axe:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
@@ -1024,7 +1034,7 @@ namespace DOL.GS.ServerRules
                     else abilityCheck = Abilities.Weapon_Axes;
                     break;
                 case eObjectType.Spear:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
@@ -1045,7 +1055,7 @@ namespace DOL.GS.ServerRules
                     otherCheck = new string[] { Abilities.Weapon_RecurvedBows, Abilities.Weapon_Archery };
                     break;
                 case eObjectType.Blades:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Slashing; break;
@@ -1056,7 +1066,7 @@ namespace DOL.GS.ServerRules
                     else abilityCheck = Abilities.Weapon_Blades;
                     break;
                 case eObjectType.Blunt:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Crushing; break;
@@ -1067,16 +1077,16 @@ namespace DOL.GS.ServerRules
                     else abilityCheck = Abilities.Weapon_Blunt;
                     break;
                 case eObjectType.Piercing:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
                         abilityCheck = Abilities.Weapon_Thrusting;
                     else abilityCheck = Abilities.Weapon_Piercing;
                     break;
                 case eObjectType.LargeWeapons:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS && living.Realm == eRealm.Albion)
                         abilityCheck = Abilities.Weapon_TwoHanded;
                     else abilityCheck = Abilities.Weapon_LargeWeapons; break;
                 case eObjectType.CelticSpear:
-                    if (ServerProperties.Properties.ALLOW_CROSS_REALM_ITEMS)
+                    if (Properties.ALLOW_CROSS_REALM_ITEMS)
                         switch (living.Realm)
                         {
                             case eRealm.Albion: abilityCheck = Abilities.Weapon_Polearms; break;
@@ -1426,18 +1436,18 @@ namespace DOL.GS.ServerRules
                 and it will also let higher level players (the 35-50s who tend to hit this clamp more often) to gain experience faster.
                  */
                 long expCap = (long)(GameServer.ServerRules.GetExperienceForLiving(living.Level) *
-                    ServerProperties.Properties.XP_CAP_PERCENT / 100);
+                    Properties.XP_CAP_PERCENT / 100);
 
                 if (player != null)
                 {
                     expCap = (long)(GameServer.ServerRules.GetExperienceForLiving(player.Level) *
-                        ServerProperties.Properties.XP_CAP_PERCENT / 100);
+                        Properties.XP_CAP_PERCENT / 100);
 
                     if (player.Group != null && isGroupInRange)
                     {
                         // Optional group cap can be set different from standard player cap
                         expCap = (long)(GameServer.ServerRules.GetExperienceForLiving(player.Level) *
-                            ServerProperties.Properties.XP_GROUP_CAP_PERCENT / 100);
+                            Properties.XP_GROUP_CAP_PERCENT / 100);
                     }
                 }
                 #region Challenge Code
@@ -1754,12 +1764,12 @@ namespace DOL.GS.ServerRules
 
 
             long playerExpValue = killedPlayer.ExperienceValue;
-            playerExpValue = (long)(playerExpValue * ServerProperties.Properties.XP_RATE);
+            playerExpValue = (long)(playerExpValue * Properties.XP_RATE);
             int playerRPValue = killedPlayer.RealmPointsValue;
             int playerBPValue = 0;
 
             bool BG = false;
-            if (!ServerProperties.Properties.ALLOW_BPS_IN_BGS)
+            if (!Properties.ALLOW_BPS_IN_BGS)
             {
                 foreach (AbstractGameKeep keep in GameServer.KeepManager.GetKeepsOfRegion(killedPlayer.CurrentRegionID))
                 {
@@ -1866,7 +1876,7 @@ namespace DOL.GS.ServerRules
                 // TODO: pets take 25% and owner gets 75%
                 long xpReward = (long)(playerExpValue * damagePercent); // exp for damage percent
 
-                long expCap = (long)(living.ExperienceValue * ServerProperties.Properties.XP_PVP_CAP_PERCENT / 100);
+                long expCap = (long)(living.ExperienceValue * Properties.XP_PVP_CAP_PERCENT / 100);
                 if (xpReward > expCap)
                     xpReward = expCap;
 
@@ -2046,7 +2056,7 @@ namespace DOL.GS.ServerRules
         /// <returns>The guild name of the target</returns>
         public virtual string GetPlayerGuildName(GamePlayer source, GamePlayer target)
         {
-            if (DOL.GS.ServerProperties.Properties.HIDE_PLAYER_NAME &&
+            if (Properties.HIDE_PLAYER_NAME &&
                 !source.SerializedAskNameList.Contains(target.Name))
                 return string.Empty;
             return target.GuildName;
@@ -2168,7 +2178,7 @@ namespace DOL.GS.ServerRules
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.QuestsCompleted") + ": " + player.TaskXPlayer.QuestsCompletedStats.ToString("F0"));
                     stat.Add(" ");
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsMiscellaneous"));
-                    //stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PlayersAssassinated") + ": " + player.TaskXPlayer.AssassinationKillsStats.ToString("F0"));
+                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PlayersAssassinated") + ": " + player.TaskXPlayer.AssassinationKillsStats.ToString("F0"));
                     long totalLifetimeDeaths = player.DBCharacter.DeathCount + player.DBCharacter.DeathsPvP;
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.TotalDeathCount") + ": " + totalLifetimeDeaths.ToString("F0"));
                 }
@@ -2439,7 +2449,7 @@ namespace DOL.GS.ServerRules
                 case eProperty.SpellPowerCost:
                 case eProperty.NegativeReduction:
                 case eProperty.PieceAblative:
-                    return ServerProperties.Properties.ENABLE_LIVE_PVEONLY_BONUSES_PVP;
+                    return Properties.ENABLE_LIVE_PVEONLY_BONUSES_PVP;
             }
             return true;
         }

@@ -10,3 +10,5 @@ TeleporterRvR.Leave:					Leave
 TeleporterRvR.Ready:					Ready
 TeleporterRvR.DamnationRefusal1:		Stay back, {0}!
 TeleporterRvR.DamnationRefusal2:		I cannot risk the safety of others by assisting someone under such a dark curse.
+TeleporterRvR.RelicRefusal1:			The great relic you carry tethers your soul to this realm, traveler.
+TeleporterRvR.RelicRefusal2:			I cannot stabilize a portal while you carry such a volatile artifact. Secure it within your guild's stronghold, then return.

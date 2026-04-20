@@ -1,0 +1,23 @@
+
+TerritoryRelics.Pad.WrongGuild:					Vous ne pouvez placer cette relique que dans un territoire contrôlé par votre guilde.
+TerritoryRelics.Pad.Secured:					Vous avez sécurisé avec succès {0} !
+TerritoryRelics.Manager.Recalled:				[Territoires] La relique '{0}' a été rappelée par ses protecteurs.
+TerritoryRelics.Manager.Manifested:				[Territoires] Les rumeurs disent que la puissante relique '{0}' s'est manifestée. Emparez-vous-en pour rallier son pouvoir à votre cause !
+TerritoryRelics.Manager.Dissipated:				[Territoires] La relique '{0}' s'est dissipée dans un autre plan.
+TerritoryRelics.Static.Unlocked:				{0} n'est plus protégée et peut être réclamée !
+TerritoryRelics.Static.Truce:					Une trêve règne sur le royaume. Les reliques ne peuvent être réclamées tant que les guerres de guildes n'ont pas repris.
+TerritoryRelics.Static.Protected:				La relique est magiquement liée à ses protecteurs en vie. Battez-les tous pour briser le sceau.
+TerritoryRelics.Static.CannotPickupDead:		Vous ne pouvez pas ramasser cette relique en étant mort·e.
+TerritoryRelics.Static.CannotPickupStealthed:	Vous ne pouvez pas ramasser cette relique en étant furtif !
+TerritoryRelics.Static.CannotPickupMounted:		Vous ne pouvez pas ramasser cette relique en étant à cheval !
+TerritoryRelics.Static.CannotPickupCombat:		Vous ne pouvez pas ramasser cette relique en combat !
+TerritoryRelics.Static.CannotPickupAFK:			Vous ne pouvez pas ramasser cette relique en étant AFK!
+TerritoryRelics.Static.CannotPickupDuel:		Vous ne pouvez pas ramasser cette relique en étant engagé dans un duel !
+TerritoryRelics.Static.CannotPickupGuildBanner:	Vous ne pouvez pas ramasser cette relique tout en brandissant une bannière de guilde.
+TerritoryRelics.Static.CannotPickupDamned:		Vous ne pouvez pas ramasser cette relique en étant damné·e.
+TerritoryRelics.Static.CannotPickupPtrified:	Vous ne pouvez pas ramasser cette relique en étant pétrifié·e.
+TerritoryRelics.Static.CannotPickupFrog:		Vous ne pouvez pas ramasser cette relique en étant sous enchantement "grenouille".
+TerritoryRelics.Static.NeedTerritory:			Votre guilde doit posséder au moins un territoire pour porter une relique de territoire.
+TerritoryRelics.Static.OnlyOne:					Vous ne pouvez porter qu'une seule relique de territoire à la fois.
+TerritoryRelics.Static.AlreadySecured:			Votre guilde a déjà sécurisé cette relique.
+TerritoryRelics.Static.PickedUp:				Vous avez ramassé {0} !

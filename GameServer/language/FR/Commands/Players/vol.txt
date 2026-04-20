@@ -14,6 +14,7 @@ Commands.Players.Vol.AFK:					Vous ne pouvez voler lorsque vous êtes afk ! Tape
 Commands.Players.Vol.Dead:					Vous ne pouvez voler étant mort !
 Commands.Players.Vol.AlreadyStealing:		Vous êtes déjà en train de voler quelqu'un !
 Commands.Players.Vol.TargetAFK: 			Vous ne pouvez pas voler un joueur afk !
+Commands.Players.Vol.CarryRelic: 			Vous ne pouvez pas voler de relique de territoire car vous en possédez déjà une !
 Commands.Players.Vol.Time: 					Vous devez attendre {0} secondes avant de pouvoir voler à nouveau !
 Commands.Players.Vol.Steal: 				Vous commencez à voler {0}
 Commands.Players.Vol.StealWindow: 			Vous êtes actuellement en train de voler

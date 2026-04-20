@@ -191,12 +191,12 @@ namespace DOL.GS
                     success = AssignTitle(player, PlayerTitleMgr.TaskTitles.Adventurer, level, "Titles.Adventurer");
                     break;
 
-                // PvE Tokens
+                // PvE Xp Tokens
                 case "TaskToken_PvE":
                     success = GrantTaskExperience(player, level);
                     break;
 
-                // PvPGvG Realm Point Tokens
+                // Realm Point Tokens
                 case "TaskToken_PvPGvG":
                     success = GrantTaskRealmPoints(player, level);
                     break;
@@ -251,7 +251,7 @@ namespace DOL.GS
             return true;
         }
 
-        private static bool GrantTaskExperience(GamePlayer player, int level)
+        public static bool GrantTaskExperience(GamePlayer player, int level)
         {
             int percentage = level switch
             {
@@ -266,7 +266,7 @@ namespace DOL.GS
             return GrantPvEExperience(player, percentage);
         }
 
-        private static bool GrantPvEExperience(GamePlayer player, int percentage)
+        public static bool GrantPvEExperience(GamePlayer player, int percentage)
         {
             if (!player.GainXP || percentage <= 0)
             {
@@ -321,7 +321,7 @@ namespace DOL.GS
             }
         }
 
-        private bool GrantTaskRealmPoints(GamePlayer player, int level)
+        public static bool GrantTaskRealmPoints(GamePlayer player, int level)
         {
             int percentage = level switch
             {
@@ -336,7 +336,7 @@ namespace DOL.GS
             return GrantRealmPoints(player, percentage);
         }
 
-        private bool GrantRealmPoints(GamePlayer player, int percentage)
+        public static bool GrantRealmPoints(GamePlayer player, int percentage)
         {
             if (!player.GainRP)
             {

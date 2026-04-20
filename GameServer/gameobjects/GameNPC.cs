@@ -5242,40 +5242,42 @@ namespace DOL.GS
             var currentTerritory = TerritoryManager.GetCurrentTerritory(this);
             var rvrTerritory = RvrManager.Instance.GetRvRTerritory(this.CurrentRegionID);
 
-            if (currentTerritory != null)
+            if (!killerPlayer.IsInRvR && !killerPlayer.IsInPvP && currentTerritory != null)
             {
                 switch (GetType().FullName)
                 {
                     case "DOL.GS.Scripts.MageMob":
                     case "DOL.GS.Scripts.TerritoryGuard":
                     case "DOL.GS.Scripts.GuardNPC":
-                        TaskManager.UpdateTaskProgress(killerPlayer, "KillTerritoryGuards", 1);
+                        if (GvGManager.IsOpen)
+                        {
+                            TaskManager.UpdateTaskProgress(killerPlayer, "KillTerritoryGuards", 1);
+                        }
                         return;
                     case "DOL.GS.Scripts.TerritoryBoss":
                         if (killerPlayer.Guild != null && killerPlayer.Guild.GuildType == Guild.eGuildType.PlayerGuild)
                         {
-                            TaskManager.UpdateTaskProgress(killerPlayer, "KillTerritoryBoss", 1);
+                            if (GvGManager.IsOpen)
+                            {
+                                TaskManager.UpdateTaskProgress(killerPlayer, "KillTerritoryBoss", 1);
+                            }
                         }
                         return;
                     default:
                         return;
                 }
             }
-            else if (rvrTerritory != null)
+            else if (killerPlayer.IsInRvR && rvrTerritory != null)
             {
-                var keepArea = rvrTerritory.Areas.FirstOrDefault();
-                if (keepArea != null && keepArea.IsContaining(killerPlayer.Coordinate, true))
+                switch (GetType().FullName)
                 {
-                    switch (GetType().FullName)
-                    {
-                        case "AmteMob":
-                        case "DOL.GS.Scripts.MageMob":
-                        case "DOL.GS.Scripts.GuardNPC":
-                        case "GuardArcher":
-                        case "GuardFighter":
-                            TaskManager.UpdateTaskProgress(killerPlayer, "KillKeepGuards", 1);
-                            return;
-                    }
+                    case "AmteMob":
+                    case "DOL.GS.Scripts.MageMob":
+                    case "DOL.GS.Scripts.GuardNPC":
+                    case "GuardArcher":
+                    case "GuardFighter":
+                        TaskManager.UpdateTaskProgress(killerPlayer, "KillKeepGuards", 1);
+                        return;
                 }
             }
             else

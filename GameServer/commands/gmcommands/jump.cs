@@ -65,6 +65,10 @@ namespace DOL.GS.Commands
                 {
                     var target = client.Player.TargetObject;
                     var player = client.Player;
+
+                    if (client.Player.CurrentRegionID != target.CurrentRegionID && client.Player.HasTerritoryRelic())
+                        client.Player.DropTerritoryRelicsOnDeath(null);
+
                     player.MoveTo(target.Position);
                     return;
                 }
@@ -90,6 +94,9 @@ namespace DOL.GS.Commands
                     }
                     if (house != null)
                     {
+                        if (client.Player.HasTerritoryRelic())
+                            client.Player.DropTerritoryRelicsOnDeath(null);
+
                         client.Player.MoveTo(house.OutdoorJumpPosition);
                     }
                     else
@@ -102,7 +109,11 @@ namespace DOL.GS.Commands
                 #region Jump t region #
                 if (args.Length == 4 && args[1] == "to" && args[2] == "region")
                 {
-                    client.Player.MoveTo(client.Player.Position.With(regionID: Convert.ToUInt16(args[3])));
+                    ushort targetRegion = Convert.ToUInt16(args[3]);
+                    if (client.Player.CurrentRegionID != targetRegion && client.Player.HasTerritoryRelic())
+                        client.Player.DropTerritoryRelicsOnDeath(null);
+
+                    client.Player.MoveTo(client.Player.Position.With(regionID: targetRegion));
                     return;
                 }
                 #endregion Jump t region #
@@ -163,6 +174,8 @@ namespace DOL.GS.Commands
                     if (CheckExpansion(client, clientc, clientc.Player.CurrentRegionID))
                     {
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.Jump.JumpToX", clientc.Player.CurrentRegion.Description), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        if (client.Player.CurrentRegionID != clientc.Player.CurrentRegionID && client.Player.HasTerritoryRelic())
+                            client.Player.DropTerritoryRelicsOnDeath(null);
                         if (clientc.Player.CurrentHouse != null && clientc.Player.InHouse)
                             clientc.Player.CurrentHouse.Enter(client.Player);
                         else
@@ -253,14 +266,19 @@ namespace DOL.GS.Commands
                 #region Jump to X Y Z RegionID
                 else if (args.Length == 6 && args[1] == "to")
                 {
-                    if (CheckExpansion(client, client, (ushort)Convert.ToUInt16(args[5])))
+                    ushort targetRegion = Convert.ToUInt16(args[5]);
+                    if (CheckExpansion(client, client, targetRegion))
                     {
                         var jumpPosition = Position.Create(
-                            regionID: Convert.ToUInt16(args[5]),
+                            regionID: targetRegion,
                             x: Convert.ToInt32(args[2]),
                             y: Convert.ToInt32(args[3]),
                             z: Convert.ToInt32(args[4]),
                             client.Player.Orientation);
+
+                        if (client.Player.CurrentRegionID != targetRegion && client.Player.HasTerritoryRelic())
+                            client.Player.DropTerritoryRelicsOnDeath(null);
+
                         client.Player.MoveTo(jumpPosition);
                         return;
                     }
@@ -291,16 +309,22 @@ namespace DOL.GS.Commands
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.Jump.PlayerIsNotInGame", args[1]), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
-                    if (CheckExpansion(clientc, clientc, (ushort)Convert.ToUInt16(args[6])))
+
+                    ushort targetRegion = Convert.ToUInt16(args[6]);
+                    if (CheckExpansion(clientc, clientc, targetRegion))
                     {
-                        var jumpPosition = Position.Create(clientc.Player.CurrentRegionID, x: Convert.ToInt32(args[3]), y: Convert.ToInt32(args[4]), z: Convert.ToInt32(args[5]), clientc.Player.Orientation);
+                        var jumpPosition = Position.Create(targetRegion, x: Convert.ToInt32(args[3]), y: Convert.ToInt32(args[4]), z: Convert.ToInt32(args[5]), clientc.Player.Orientation);
+
+                        if (clientc.Player.CurrentRegionID != targetRegion && clientc.Player.HasTerritoryRelic())
+                            clientc.Player.DropTerritoryRelicsOnDeath(null);
+
                         clientc.Player.MoveTo(jumpPosition);
                         return;
                     }
                     return;
                 }
                 #endregion Jump PlayerName to X Y Z RegionID
-                #region Jump PlayerName to PlayerCible
+                #region Jump PlayerName to TargetCible (Player or NPC)
                 else if (args.Length == 4 && args[2] == "to")
                 {
                     GameClient clientc;
@@ -311,6 +335,7 @@ namespace DOL.GS.Commands
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.Jump.PlayerIsNotInGame", args[1]), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
+
                     if (args[3] == "me")
                     {
                         clientto = client;
@@ -320,21 +345,58 @@ namespace DOL.GS.Commands
                         clientto = WorldMgr.GetClientByPlayerName(args[3], false, false);
                     }
 
-                    if (clientto == null)
+                    if (clientto != null)
                     {
-                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.Jump.PlayerIsNotInGame", args[3]), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        if (CheckExpansion(clientto, clientc, clientto.Player.CurrentRegionID))
+                        {
+                            if (clientc.Player.CurrentRegionID != clientto.Player.CurrentRegionID && clientc.Player.HasTerritoryRelic())
+                                clientc.Player.DropTerritoryRelicsOnDeath(null);
+
+                            if (clientto.Player.CurrentHouse != null && clientto.Player.InHouse)
+                                clientto.Player.CurrentHouse.Enter(clientc.Player);
+                            else
+                                clientc.Player.MoveTo(clientto.Player.Position.With(clientc.Player.Orientation));
+                            return;
+                        }
                         return;
                     }
                     else
                     {
-                        if (CheckExpansion(clientto, clientc, clientto.Player.CurrentRegionID))
+                        GameNPC[] npcs = WorldMgr.GetNPCsByName(args[3], eRealm.None);
+
+                        if (npcs.Length > 0)
                         {
-                            if (clientto.Player.CurrentHouse != null && clientto.Player.InHouse)
-                                clientto.Player.CurrentHouse.Enter(clientc.Player);
-                            else
-                                clientc.Player.MoveTo(clientto.Player.Position);
+                            GameNPC jumpTarget = npcs[0];
+
+                            foreach (GameNPC npc in npcs)
+                            {
+                                if (npc.CurrentRegionID == clientc.Player.CurrentRegionID)
+                                {
+                                    jumpTarget = npc;
+                                    break;
+                                }
+                            }
+
+                            if (CheckExpansion(client, clientc, jumpTarget.CurrentRegionID))
+                            {
+                                if (clientc.Player.CurrentRegionID != jumpTarget.CurrentRegionID && clientc.Player.HasTerritoryRelic())
+                                    clientc.Player.DropTerritoryRelicsOnDeath(null);
+
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.Jump.JumpToX", jumpTarget.CurrentRegion.Description), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                                if (jumpTarget.InHouse && jumpTarget.CurrentHouse != null)
+                                {
+                                    jumpTarget.CurrentHouse.Enter(clientc.Player);
+                                }
+                                else
+                                {
+                                    clientc.Player.MoveTo(jumpTarget.Position.With(clientc.Player.Orientation));
+                                }
+                            }
                             return;
                         }
+
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.Jump.CannotBeFound", args[3]), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
                 }

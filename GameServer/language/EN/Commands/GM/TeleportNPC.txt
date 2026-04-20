@@ -31,3 +31,4 @@ Commands.GM.TeleportNPC.Usage.AreaPulse.CastTicks:			'/teleportnpc areapulsecast
 Commands.GM.TeleportNPC.Usage.AreaPulse.ClientEffect:		'/teleportnpc areapulseclienteffect <id>' Sets the effect played on the NPC itself.
 Commands.GM.TeleportNPC.Usage.AreaPulse.CastEffect:			'/teleportnpc areapulsecasteffect <id>' Sets the spell casting animation ID.
 Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect:		'/teleportnpc areapulseplayereffect <id>' Sets the effect played on players within range.
+Commands.GM.TeleportNPC.Usage.Conditions.BlockRelic:		'/teleportnpc blockrelic' - Forbids the player to jump to a specific destination if he carries a relic.

@@ -5,6 +5,7 @@ using DOL.GS.ServerProperties;
 using DOL.Language;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Numerics;
 
 
 namespace DOL.GS.Spells
@@ -109,7 +110,12 @@ namespace DOL.GS.Spells
                     return true;
                 }
             }
-            
+
+            if (target is GamePlayer targetPlayer && targetPlayer.HasTerritoryRelic() && targetPlayer.CurrentRegionID != tPPoint.Position.RegionID)
+            {
+                targetPlayer.DropTerritoryRelicsOnDeath(m_caster);
+            }
+
             target.TPPoint = tPPoint;
             target.MoveTo(tPPoint.Position.With(target.Orientation));
             return true;

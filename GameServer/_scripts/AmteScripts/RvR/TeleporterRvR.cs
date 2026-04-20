@@ -47,6 +47,13 @@ namespace DOL.GS.Scripts
 
             TurnTo(player);
 
+            if (player.HasTerritoryRelic())
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.RelicRefusal1"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.RelicRefusal2"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                return true;
+            }
+
             if (SpellHandler.FindEffectOnTarget(player, "Damnation") != null)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.DamnationRefusal1", player.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);

@@ -328,7 +328,11 @@ namespace DOL.GS.Scripts
         {
             var conditionsNotMet = new List<string>();
             var eventName = GetEventName(jumpPos.Conditions.ActiveEventId);
-            
+
+            if (jumpPos.Conditions.BlockRelic && player.HasTerritoryRelic())
+            {
+                conditionsNotMet.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.RelicBlocked"));
+            }
             if (!string.IsNullOrEmpty(jumpPos.Conditions.ActiveEventId))
             {
                 var e = GameEventManager.Instance.GetEventByID(jumpPos.Conditions.ActiveEventId);
@@ -533,6 +537,9 @@ namespace DOL.GS.Scripts
                         {
                             if (p.GetDistanceTo(this) <= m_Range)
                             {
+                                if (!WillTalkTo(p, silent: true))
+                                    continue;
+
                                 if (IsTerritoryLinked)
                                 {
                                     if (CurrentTerritory == null || CurrentTerritory.IsNeutral()
@@ -1067,6 +1074,8 @@ namespace DOL.GS.Scripts
 
             public bool CanJump(GamePlayer player)
             {
+                if (Conditions.BlockRelic && player.HasTerritoryRelic())
+                    return false;
                 if (!Conditions.IsActiveAtTick(WorldMgr.GetCurrentGameTime(player)))
                     return false;
                 if (player.Level < Conditions.LevelMin || player.Level > Conditions.LevelMax)
@@ -1154,6 +1163,7 @@ namespace DOL.GS.Scripts
 
             public bool Bind;
             public bool Visible = true;
+            public bool BlockRelic;
 
             public string Item
             {
@@ -1222,6 +1232,9 @@ namespace DOL.GS.Scripts
                             string[] arg = s.Split('=');
                             switch (arg[0])
                             {
+                                case "BlockRelic":
+                                    BlockRelic = bool.Parse(arg[1]);
+                                    break;
                                 case "Bind":
                                     Bind = bool.Parse(arg[1]);
                                     break;
@@ -1271,6 +1284,12 @@ namespace DOL.GS.Scripts
             public string GetStringDB()
             {
                 StringBuilder sb = new StringBuilder();
+                if (BlockRelic)
+                {
+                    if (sb.Length > 0) sb.Append("/");
+                    sb.Append("BlockRelic=");
+                    sb.Append(BlockRelic);
+                }
                 if (!Visible)
                 {
                     if (sb.Length > 0) sb.Append("/");
@@ -1353,6 +1372,11 @@ namespace DOL.GS.Scripts
                 sb.Append(Bind ? "oui" : "non");
                 sb.Append("\nVisible dans la liste: ");
                 sb.Append(Visible ? "oui" : "non");
+                if (BlockRelic)
+                {
+                    if (sb.Length > 0) sb.Append("\n");
+                    sb.Append("Bloque le TP avec une relique : oui");
+                }
                 if (!string.IsNullOrEmpty(Item))
                 {
                     if (sb.Length > 0) sb.Append("\n");

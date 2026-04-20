@@ -69,17 +69,17 @@ namespace DOL.GS.Scripts
                 return false;
             if (!player.GuildRank.Claim)
             {
-                player.Out.SendMessage(string.Format("Bonjour {0}, je ne discute pas avec les bleus, circulez.", player.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                string msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "SimpleGvGGuard.Interact.TooLowRank", player.Name);
+                player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return true;
             }
 
             var cloaks = GameServer.Database.SelectObjects<NPCEquipment>(DB.Column("TemplateID").IsLike("gvg_guard_%").And(DB.Column("Slot").IsEqualTo(26)));
-            player.Out.SendMessage(
-                string.Format("Bonjour {0}, vous pouvez modifier l'équipement que je porte, sélectionnez l'ensemble que vous souhaitez :\n", player.Name) +
-                string.Join("\n", cloaks.Select(c => string.Format("[{0}]", c.TemplateID.Substring(10)))),
-                eChatType.CT_System,
-                eChatLoc.CL_PopupWindow
-            );
+            string cloakList = string.Join("\n", cloaks.Select(c => string.Format("[{0}]", c.TemplateID.Substring(10))));
+
+            string interactMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "SimpleGvGGuard.Interact.ChooseEquip", player.Name, cloakList);
+            player.Out.SendMessage(interactMsg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+
             return true;
         }
         public override bool WhisperReceive(GameLiving source, string text)
@@ -93,7 +93,8 @@ namespace DOL.GS.Scripts
                 return false;
             if (!player.GuildRank.Claim)
             {
-                player.Out.SendMessage(string.Format("Bonjour {0}, je ne discute pas avec les bleus, circulez.", player.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                string msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "SimpleGvGGuard.Interact.TooLowRank", player.Name);
+                player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return true;
             }
 
@@ -114,24 +115,29 @@ namespace DOL.GS.Scripts
                 var guild = GuildMgr.GetGuildByName(GuildName);
                 if (guild == null)
                     return;
-                var name = "un inconnu";
-                if (!string.IsNullOrEmpty(plKiller.GuildName))
-                    name = string.Format("un membre de la guilde {0}", plKiller.GuildName);
-                string captainName;
-                if (Captain == null || Captain.Name == null)
-                {
-                    captainName = "Capitaine";
-                }
-                else
-                {
-                    captainName = Captain.Name;
-                }
+                string captainName = (Captain == null || string.IsNullOrEmpty(Captain.Name)) ? "Capitaine" : Captain.Name;
 
-                guild.SendMessageToGuildMembers(
-                    string.Format("{0}: un garde vient d'être tué par {1}.", captainName, name),
-                    eChatType.CT_Guild,
-                    eChatLoc.CL_ChatWindow
-                );
+                // Loop through online members to send personalized killer names
+                foreach (GamePlayer member in guild.GetListOfOnlineMembers())
+                {
+                    string killerPersoName = member.GetPersonalizedName(plKiller);
+                    string killerText;
+
+                    if (!string.IsNullOrEmpty(plKiller.GuildName))
+                    {
+                        killerText = LanguageMgr.GetTranslation(member.Client.Account.Language, "SimpleGvGGuard.Die.GuildMember", killerPersoName, plKiller.GuildName);
+                    }
+                    else
+                    {
+                        killerText = killerPersoName;
+                    }
+
+                    string translatedCaptain = captainName == "Capitaine" ? LanguageMgr.GetTranslation(member.Client.Account.Language, "SimpleGvGGuard.Die.CaptainName") : captainName;
+
+                    string broadcastMsg = LanguageMgr.GetTranslation(member.Client.Account.Language, "SimpleGvGGuard.Die.Broadcast", translatedCaptain, killerText);
+
+                    member.Out.SendMessage(broadcastMsg, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
+                }
             }
         }
 

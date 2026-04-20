@@ -54,6 +54,7 @@ GameUtils.Guild.Territory.Capture.Captured:             {0} has taken control of
 GameUtils.Guild.Territory.Capture.Renewed:              {0} has renewed your control of {1}!
 GameUtils.Guild.Territory.Capture.CapturedPvP:          {0} earns {1} realm points for capturing {2} from {3}!
 GameUtils.Guild.Territory.Capture.CapturedPvE:          {0} earns {1} realm points for capturing {2}!
+GameUtils.Guild.Territory.RelicTooHeavy:				Your guild has lost all of its territories! The relic has become too heavy and you can't hold it anymore!
 
 GameUtils.Guild.Banner.BannerInGroup:			Someone in your group already has a guild banner active!
 GameUtils.Guild.Banner.BannerNoGroup:			You have left the group and your guild banner disappears!
@@ -72,3 +73,11 @@ GameUtils.Guild.Banner.Captured.OtherGuild.InGuild:	{0} of {1} has captured {2}'
 GameUtils.Guild.Banner.Captured.You:			You have captured {0}'s guild banner!
 GameUtils.Guild.Banner.Lost:					Your guild banner is lost!
 GameUtils.Guild.Banner.Expired:					Your guild banner disappears.
+
+GameUtils.Guild.MemberLoggedIn:					Guild member {0} has logged in!
+GameUtils.Guild.AgreedToJoin:					You have agreed to join {0}!
+GameUtils.Guild.CurrentRankIs:					Your current rank is {0}!
+GameUtils.Guild.MemberJoined:					{0} has joined the guild!
+GameUtils.Guild.YouLeave:						You leave the guild.
+GameUtils.Guild.RemovedBy:						{0} removed you from {1}.
+GameUtils.Guild.Removed:						You have been removed from {0}.

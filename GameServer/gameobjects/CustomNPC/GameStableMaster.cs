@@ -132,6 +132,12 @@ namespace DOL.GS
                 return false;
             }
 
+            if (player.HasTerritoryRelic())
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerInteract.TerRelic"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
             var morph = player.FindMorph(cancel: true);
             if (morph != null)
             {

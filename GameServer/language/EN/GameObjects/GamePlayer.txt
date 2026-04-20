@@ -81,6 +81,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:			You are already playing a so
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:			You can't cast while mesmerized!		
 GameObjects.GamePlayer.CastSpell.CantCastStunned:			You can't cast while stunned!
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:			You can't cast this spell while riding!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:			You can't cast spells while carrying a territory relic.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords:		You are fumbling for your words, and cannot cast!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:			You cannot cast this spell directly!
 GameObjects.GamePlayer.CastSpell.FollowSpell:			    You ready a {0} as a follow up!
@@ -142,6 +143,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:			(+{0} from {1}% Low Populat
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:		Talk to your trainer for more information.			
 GameObjects.GamePlayer.GainExperience.YouGet:				You get {0} experience points.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:     including {0} Renaissance xp bonus points
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:		including a Rebirth penalty of: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:       including {0} Territory xp bonus points
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:       including {0} Event xp bonus points
 
@@ -156,6 +158,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:				You get {0} realm points!
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:			(+{0} RP from {1}% Low Population bonus)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:	(+{0} RP from {1}% Under Populated Realm bonus)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:	(+{0} RP from {1} event bonus)
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:		(+{0} RP from your territory relics.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:			You gain {0} realm points from area bonuses!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:	You gain {0} realm points for defending your territory!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:	You gain {0} realm points for healing a member of your realm!
@@ -403,7 +406,8 @@ GameObjects.GamePlayer.StartAttack.CantAttackStunned:		You can't attack when you
 GameObjects.GamePlayer.StartAttack.CantDisarmed:			You are disarmed and cannot attack!
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:			You are disarmed and can't use this spell!
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:			You cannot enter combat in shade mode!
-GameObjects.GamePlayer.StartAttack.CantUseQuiver:			You can't use the selected quiver ammo with your weapon!		
+GameObjects.GamePlayer.StartAttack.CantUseQuiver:			You can't use the selected quiver ammo with your weapon!
+GameObjects.GamePlayer.StartAttack.CantTerRelic:		    You cannot engage in combat while carrying a territory relic.
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:			You enter combat mode but have no target!		
 GameObjects.GamePlayer.StartAttack.CombatTarget:			You enter combat mode and target [{0}]		
 GameObjects.GamePlayer.StartAttack.SelectQuiver:			You must select a quiver slot to draw from!		
@@ -543,6 +547,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                     You have strayed too far
 GameObjects.GamePlayer.RvR.Capture.Timer:               Keep capture
 GameObjects.GamePlayer.RvR.Capture.Start:               {0} begins to take control of the keep!
 GameObjects.GamePlayer.PvP.DieDropItem:					You have dropped {0} of your treasure item(s) upon dying!
+GameObjects.GamePlayer.PvP.DropTerRelic:				Your territory relic has dropped on the ground!
+GameObjects.GamePlayer.PvP.DropFlag:					The flag you held has dropped on the ground!
 
 GameObjects.GamePlayer.Champion.LevelUp:				You have gained one Champion level!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:		You must be a Champion to use this inventory.

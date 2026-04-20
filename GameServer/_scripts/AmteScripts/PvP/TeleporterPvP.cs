@@ -78,6 +78,13 @@ namespace DOL.GS.Scripts
             if (_BaseSay(player, ""))
                 return true; // stops if teleporter is busy or player is disqualified
 
+            if (player.HasTerritoryRelic())
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.RelicRefusal1"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.RelicRefusal2"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                return true;
+            }
+
             if (player.Group != null && PvpManager.Instance.IsPlayerInQueue(player))
             {
                 PlayerJoinedGroup(player);

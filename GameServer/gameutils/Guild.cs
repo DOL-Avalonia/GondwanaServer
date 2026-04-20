@@ -227,6 +227,15 @@ namespace DOL.GS
             private set;
         }
 
+        /// <summary>
+        /// Realm points bonus factor based on territory relics set on owned Territories
+        /// </summary>
+        public double TerritoryBonusRealmPointsFactor
+        {
+            get;
+            private set;
+        }
+
         public int CalcBPOnKill(int killedLevel)
         {
             if (killedLevel < 45)
@@ -242,13 +251,13 @@ namespace DOL.GS
         public static double GetServerBaseBonusPercent(eBonusType type) => type switch
         {
             eBonusType.None => 0,
-            eBonusType.Experience => ServerProperties.Properties.GUILD_BUFF_XP,
-            eBonusType.RealmPoints => ServerProperties.Properties.GUILD_BUFF_RP,
-            eBonusType.BountyPoints => ServerProperties.Properties.GUILD_BUFF_BP,
-            eBonusType.CraftingHaste => ServerProperties.Properties.GUILD_BUFF_CRAFTING,
-            eBonusType.ArtifactXP => ServerProperties.Properties.GUILD_BUFF_ARTIFACT_XP,
-            eBonusType.Coin => ServerProperties.Properties.GUILD_BUFF_COIN,
-            eBonusType.Tension => ServerProperties.Properties.GUILD_BUFF_TENSION,
+            eBonusType.Experience => Properties.GUILD_BUFF_XP,
+            eBonusType.RealmPoints => Properties.GUILD_BUFF_RP,
+            eBonusType.BountyPoints => Properties.GUILD_BUFF_BP,
+            eBonusType.CraftingHaste => Properties.GUILD_BUFF_CRAFTING,
+            eBonusType.ArtifactXP => Properties.GUILD_BUFF_ARTIFACT_XP,
+            eBonusType.Coin => Properties.GUILD_BUFF_COIN,
+            eBonusType.Tension => Properties.GUILD_BUFF_TENSION,
             eBonusType.MasterLevelXP => Properties.GUILD_BUFF_MASTERLEVEL_XP,
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
@@ -556,29 +565,43 @@ namespace DOL.GS
             if (territory.Type == Territory.eType.Normal)
             {
                 ++TerritoryCount;
-                if (TerritoryCount > MaxTerritories)
+                // Only apply base territory bonuses if within the MaxTerritories limit
+                if (TerritoryCount <= MaxTerritories)
                 {
-                    return;
+                    this.TerritoryBonusBountyPoints += 1;
+                    this.TerritoryBonusExperienceFactor += 0.03;
+
+                    foreach (var resist in territory.BonusResist)
+                    {
+                        if (!this.TerritoryResists.TryAdd(resist.Key, resist.Value))
+                            this.TerritoryResists[resist.Key] += resist.Value;
+                    }
+                    this.TerritoryMeleeAbsorption += territory.BonusMeleeAbsorption;
+                    this.TerritorySpellAbsorption += territory.BonusSpellAbsorption;
+                    this.TerritoryDotAbsorption += territory.BonusDoTAbsorption;
+                    this.TerritoryDebuffDurationReduction += territory.BonusReducedDebuffDuration;
+                    this.TerritorySpellRangeBonus += territory.BonusSpellRange;
                 }
-                this.TerritoryBonusBountyPoints += 1;
-                this.TerritoryBonusExperienceFactor += 0.03;
             }
 
-            foreach (var resist in territory.BonusResist)
+            // Relic bonuses are placed OUTSIDE the limit check, so they always apply
+            this.TerritoryBonusBountyPoints += (territory.RelicCount * 3);
+            this.TerritoryBonusExperienceFactor += (territory.RelicCount * 0.03);
+            this.TerritoryBonusRealmPointsFactor += (territory.RelicCount * Properties.GVG_RELIC_RP_BONUS * 0.01);
+
+            foreach (var resist in territory.RelicBonusResist)
             {
                 if (!this.TerritoryResists.TryAdd(resist.Key, resist.Value))
-                {
                     this.TerritoryResists[resist.Key] += resist.Value;
-                }
             }
-            this.TerritoryMeleeAbsorption += territory.BonusMeleeAbsorption;
-            this.TerritorySpellAbsorption += territory.BonusSpellAbsorption;
-            this.TerritoryDotAbsorption += territory.BonusDoTAbsorption;
-            this.TerritoryDebuffDurationReduction += territory.BonusReducedDebuffDuration;
-            this.TerritorySpellRangeBonus += territory.BonusSpellRange;
+            this.TerritoryMeleeAbsorption += territory.RelicBonusMeleeAbsorption;
+            this.TerritorySpellAbsorption += territory.RelicBonusSpellAbsorption;
+            this.TerritoryDotAbsorption += territory.RelicBonusDoTAbsorption;
+            this.TerritoryDebuffDurationReduction += territory.RelicBonusReducedDebuffDuration;
+            this.TerritorySpellRangeBonus += territory.RelicBonusSpellRange;
         }
 
-        private void UpdateTerritoryStats()
+        public void UpdateTerritoryStats()
         {
             this.TerritoryResists.Clear();
             this.TerritoryCount = 0;
@@ -589,6 +612,7 @@ namespace DOL.GS
             this.TerritorySpellRangeBonus = 0;
             this.TerritoryBonusBountyPoints = 0;
             this.TerritoryBonusExperienceFactor = 0.0d;
+            this.TerritoryBonusRealmPointsFactor = 0.0d;
             territories.ForEach(this.ApplyTerritoryBonus);
 
             this.m_onlineGuildPlayers.Values.Foreach(p => p.Out.SendCharResistsUpdate());
@@ -626,6 +650,26 @@ namespace DOL.GS
                     this.SaveIntoDatabase();
 
                     UpdateTerritoryStats();
+
+                    if (this.territories.Count == 0)
+                    {
+                        foreach (GamePlayer player in GetListOfOnlineMembers())
+                        {
+                            for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
+                            {
+                                if (player.Inventory.GetItem(slot) is TerritoryRelicInventoryItem relicItem)
+                                {
+                                    relicItem.IsRemovalExpected = true;
+                                    player.Inventory.RemoveItem(relicItem);
+                                    if (relicItem.RelicReference != null)
+                                    {
+                                        relicItem.RelicReference.DropOnGround(player.Position.X, player.Position.Y, player.Position.Z, player.Heading, player.CurrentRegion);
+                                    }
+                                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.Territory.RelicTooHeavy"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -692,7 +736,7 @@ namespace DOL.GS
             }
             m_DBguild.Bank -= amount;
 
-            if (giveToPlayer)
+            if (giveToPlayer && player != null)
             {
                 var amt = long.Parse(amount.ToString());
                 player.AddMoney(Currency.Copper.Mint(amt));
@@ -700,7 +744,7 @@ namespace DOL.GS
                 player.Out.SendUpdatePlayer();
                 player.SaveIntoDatabase();
             }
-            player.Guild.SaveIntoDatabase();
+            this.SaveIntoDatabase();
             UpdateGuildWindow();
             return true;
         }
@@ -1137,7 +1181,9 @@ namespace DOL.GS
             {
                 if (player == member) continue;
                 if (player.ShowGuildLogins)
-                    player.Out.SendMessage("Guild member " + member.Name + " has logged in!", DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameUtils.Guild.MemberLoggedIn", member.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
             }
         }
 
@@ -1263,10 +1309,13 @@ namespace DOL.GS
 
                 foreach (var (addPlayer, _) in validPlayers)
                 {
-                    addPlayer.Out.SendMessage("You have agreed to join " + this.Name + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    addPlayer.Out.SendMessage(LanguageMgr.GetTranslation(addPlayer.Client.Account.Language, "GameUtils.Guild.AgreedToJoin", this.Name), eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+
                     string rankTitle = addPlayer.GuildRank?.Title ?? "Rank 9";
-                    addPlayer.Out.SendMessage("Your current rank is " + rankTitle + "!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
-                    SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    addPlayer.Out.SendMessage(LanguageMgr.GetTranslation(addPlayer.Client.Account.Language, "GameUtils.Guild.CurrentRankIs", rankTitle), eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+
+                    SendMessageToGuildMembersKey("GameUtils.Guild.MemberJoined", eChatType.CT_Group, eChatLoc.CL_SystemWindow, addPlayer.Name);
+
                     addPlayer.Client.Out.SendCharResistsUpdate();
                     if (addPlayer.IsInPvP)
                         PvpManager.Instance.OnMemberJoinGuild(this, addPlayer);
@@ -1308,7 +1357,7 @@ namespace DOL.GS
                     GameServer.Database.SaveObject(addPlayer);
 
                     GuildMgr.AddPlayerToAllGuildPlayersList(addPlayer);
-                    SendMessageToGuildMembers(addPlayer.Name + " has joined the guild!", eChatType.CT_Group, eChatLoc.CL_SystemWindow);
+                    SendMessageToGuildMembersKey("GameUtils.Guild.MemberJoined", eChatType.CT_Group, eChatLoc.CL_SystemWindow, addPlayer.Name);
                     any = true;
                 }
                 catch (Exception e)
@@ -1382,11 +1431,17 @@ namespace DOL.GS
 
                 // Send message to removerClient about successful removal
                 if (removername == member.Name)
-                    member.Out.SendMessage("You leave the guild.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                {
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "GameUtils.Guild.YouLeave"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
                 else if (!string.IsNullOrEmpty(removername))
-                    member.Out.SendMessage(removername + " removed you from " + this.Name + '.', eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                {
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "GameUtils.Guild.RemovedBy", removername, this.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
                 else
-                    member.Out.SendMessage("You have been removed from " + this.Name + '.', eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                {
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "GameUtils.Guild.Removed", this.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
 
                 member.Client.Out.SendCharResistsUpdate();
                 if (member.IsInPvP)
@@ -1630,7 +1685,7 @@ namespace DOL.GS
         /// <param name="guildMsg">message to others</param>
         /// <param name="type">message type</param>
         /// <param name="loc">message location</param>
-        public void SendPlayerActionToGuildMembers(GamePlayer player, string playerMsg, string guildMsg, PacketHandler.eChatType type, PacketHandler.eChatLoc loc)
+        public void SendPlayerActionToGuildMembers(GamePlayer player, string playerMsg, string guildMsg, eChatType type, eChatLoc loc)
         {
             lock (m_onlineGuildPlayers)
             {
@@ -1662,7 +1717,7 @@ namespace DOL.GS
         /// <param name="key">message translation</param>
         /// <param name="type">message type</param>
         /// <param name="loc">message location</param>
-        public void SendPlayerActionTranslationToGuildMembers(GamePlayer player, string key, PacketHandler.eChatType type, PacketHandler.eChatLoc loc, params object[] args)
+        public void SendPlayerActionTranslationToGuildMembers(GamePlayer player, string key, eChatType type, eChatLoc loc, params object[] args)
         {
             lock (m_onlineGuildPlayers)
             {
@@ -1693,7 +1748,7 @@ namespace DOL.GS
         /// <param name="guildKey">message to others</param>
         /// <param name="type">message type</param>
         /// <param name="loc">message location</param>
-        public void SendPlayerActionTranslationToGuildMembers(GamePlayer player, string playerKey, string guildKey, PacketHandler.eChatType type, PacketHandler.eChatLoc loc, params object[] args)
+        public void SendPlayerActionTranslationToGuildMembers(GamePlayer player, string playerKey, string guildKey, eChatType type, eChatLoc loc, params object[] args)
         {
             lock (m_onlineGuildPlayers)
             {

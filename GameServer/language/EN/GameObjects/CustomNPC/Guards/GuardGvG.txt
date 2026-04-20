@@ -1,0 +1,8 @@
+SimpleGvGGuard.Interact.TooLowRank:		Greetings {0}, I do not speak with rookies, move along.
+SimpleGvGGuard.Interact.ChooseEquip:	Greetings {0}, you can modify my equipment, please select the set you wish to use: {1}
+SimpleGvGGuard.Die.GuildMember:			{0} from the guild {1}
+SimpleGvGGuard.Die.CaptainName:			Captain
+SimpleGvGGuard.Die.Broadcast:			{0}: A guard has just been killed by {1}.
+
+TerritoryGuard.Die.GuildMember:			{0} from the guild {1}
+TerritoryGuard.Die.Broadcast:			A guard has just been killed by {0}.

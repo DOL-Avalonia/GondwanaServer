@@ -348,6 +348,14 @@ namespace DOL.Territories
             get => guild_id;
         }
 
+        public Dictionary<eResist, int> RelicBonusResist { get; } = new();
+        public int RelicBonusMeleeAbsorption { get; set; }
+        public int RelicBonusSpellAbsorption { get; set; }
+        public int RelicBonusDoTAbsorption { get; set; }
+        public int RelicBonusReducedDebuffDuration { get; set; }
+        public int RelicBonusSpellRange { get; set; }
+        public int RelicCount { get; set; }
+
         private Guild? m_ownerGuild;
 
         public Guild? OwnerGuild
@@ -687,6 +695,12 @@ namespace DOL.Territories
 
         private void ReleaseTerritory()
         {
+            var relicsInTerritory = TerritoryRelicManager.ActiveRelics.Values.Where(r => r.CurrentTerritory == this).ToList();
+            foreach (var relic in relicsInTerritory)
+            {
+                relic.ReturnToSpawn();
+            }
+
             if (m_ownerGuild != null)
             {
                 m_ownerGuild.RemoveTerritory(this);
@@ -856,6 +870,77 @@ namespace DOL.Territories
                 resists.Add("spellrange:" + BonusSpellRange);
 
             return resists.Count > 0 ? string.Join('|', resists) : null;
+        }
+
+        public void AddRelicBonus(string raw)
+        {
+            lock (m_lockObject)
+            {
+                RelicCount++;
+                if (!string.IsNullOrEmpty(raw))
+                {
+                    foreach (var item in raw.Split('|'))
+                    {
+                        var parsedItem = item.Split(':');
+                        int amount = 1;
+                        if (parsedItem.Length > 1)
+                        {
+                            if (!int.TryParse(parsedItem[1], out amount) || amount == 0) continue;
+                        }
+                        if (Enum.TryParse(parsedItem[0], true, out eResist resist))
+                        {
+                            this.RelicBonusResist.TryGetValue(resist, out int current);
+                            this.RelicBonusResist[resist] = current + amount;
+                        }
+                        else switch (parsedItem[0].ToLower())
+                            {
+                                case "melee": RelicBonusMeleeAbsorption += amount; break;
+                                case "spell": RelicBonusSpellAbsorption += amount; break;
+                                case "dot": RelicBonusDoTAbsorption += amount; break;
+                                case "debuffduration": RelicBonusReducedDebuffDuration += amount; break;
+                                case "spellrange": RelicBonusSpellRange += amount; break;
+                            }
+                    }
+                }
+                RefreshBannerEffects();
+                OwnerGuild?.UpdateTerritoryStats();
+            }
+        }
+
+        public void RemoveRelicBonus(string raw)
+        {
+            lock (m_lockObject)
+            {
+                RelicCount--;
+                if (!string.IsNullOrEmpty(raw))
+                {
+                    foreach (var item in raw.Split('|'))
+                    {
+                        var parsedItem = item.Split(':');
+                        int amount = 1;
+                        if (parsedItem.Length > 1)
+                        {
+                            if (!int.TryParse(parsedItem[1], out amount) || amount == 0) continue;
+                        }
+                        if (Enum.TryParse(parsedItem[0], true, out eResist resist))
+                        {
+                            this.RelicBonusResist.TryGetValue(resist, out int current);
+                            this.RelicBonusResist[resist] = current - amount;
+                            if (this.RelicBonusResist[resist] <= 0) this.RelicBonusResist.Remove(resist);
+                        }
+                        else switch (parsedItem[0].ToLower())
+                            {
+                                case "melee": RelicBonusMeleeAbsorption -= amount; break;
+                                case "spell": RelicBonusSpellAbsorption -= amount; break;
+                                case "dot": RelicBonusDoTAbsorption -= amount; break;
+                                case "debuffduration": RelicBonusReducedDebuffDuration -= amount; break;
+                                case "spellrange": RelicBonusSpellRange -= amount; break;
+                            }
+                    }
+                }
+                RefreshBannerEffects();
+                OwnerGuild?.UpdateTerritoryStats();
+            }
         }
 
         private void SetBossAndMobsInEventInTerritory()

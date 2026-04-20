@@ -78,9 +78,10 @@ GameObjects.GamePlayer.CastSpell.AlreadyCastFollow:     Vous êtes déjà en tra
 GameObjects.GamePlayer.CastSpell.AlreadyCastNoQueue:    Vous êtes déjà en train de lancer un sort, pour activer le système de mise en attente des sorts, utilisez '/noqueue'.
 GameObjects.GamePlayer.CastSpell.AlreadyChosenSpells:	Vous avez déjà choisi vos sorts pour cette chambre.
 GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Vous jouez déja un morceau.
-GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Vous ne pouvez pas incanter lorsque vous êtes hypnotisé·e.
+GameObjects.GamePlayer.CastSpell.CantCastMezzed:		Vous ne pouvez pas incanter lorsque vous êtes hypnotisé·e.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Vous ne pouvez pas incanter lorsque vous êtes étourdi·e.
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Vous ne pouvez pas lancer ce sort lorsque vous êtes sur une monture !
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:		Vous ne pouvez pas incanter tout en portant une relique de territoire.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords:		Vous échouez votre incantation et vous ne parvenez pas à lancer votre sort !
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:			Vous ne pouvez pas lancer ce sort directement !
 GameObjects.GamePlayer.CastSpell.FollowSpell:			    Vous avez préparé un {0} en guise de suivi !
@@ -142,6 +143,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:					(+{0} grâce au bonus Fai
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:	            Parlez à votre entraîneur pour plus d'informations.
 GameObjects.GamePlayer.GainExperience.YouGet:			            Vous obtenez {0} points d'expérience.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:             dont {0} points bonus de Renaissance
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:				dont un malus renaissance de: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:               dont {0} points bonus de Territoires
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:               dont {0} points bonus d'Evenements
 
@@ -156,6 +158,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:			            Vous gagnez {0} poi
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:					(+{0} PR grâce au bonus Faible Population de {1}%)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:			(+{0} PR grâce au bonus Royaume Sous-Peuplé de {1}%)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:			(+{0} PR grâce au bonus d'évènement {1})
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:				(+{0} PR grâce à vos reliques de territoires)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:					Vous obtenez {0} points de royaume de bonus grâce aux bonus d'area !
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:			Vous obtenez {0} points de royaume pour avoir défendu votre territoire !
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:			Vous gagnez {0} points de royaume pour avoir soigné un membre de votre royaume !
@@ -404,6 +407,7 @@ GameObjects.GamePlayer.StartAttack.CantDisarmed:			Vous êtes désarmé et ne po
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:			Vous êtes désarmé et ne pouvez pas lancer ce sort !
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:			Vous ne pouvez pas entrer en combat en mode ombre !
 GameObjects.GamePlayer.StartAttack.CantUseQuiver:		    Vous ne pouvez pas sélectionner ce carquois avec votre arme courante.
+GameObjects.GamePlayer.StartAttack.CantTerRelic:		    Vous ne pouvez pas entrer en combat tout en portant une relique de territoire !
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:		    Vous entrez en combat, mais n'avez aucune cible.
 GameObjects.GamePlayer.StartAttack.CombatTarget:		    Vous entrez en combat, et ciblez [{0}]
 GameObjects.GamePlayer.StartAttack.SelectQuiver:		    Vous devez sélectionner un carquois à utiliser.
@@ -543,6 +547,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                     Vous vous êtes trop él
 GameObjects.GamePlayer.RvR.Capture.Timer:               Prise du fort
 GameObjects.GamePlayer.RvR.Capture.Start:               {0} commence à prendre le contrôle du fort !
 GameObjects.GamePlayer.PvP.DieDropItem:					Votre trépas a dispersé {0} de vos trésors !
+GameObjects.GamePlayer.PvP.DropTerRelic:				Votre relique de territoire est tombée au sol !
+GameObjects.GamePlayer.PvP.DropFlag:					L'étendard que vous portiez est tombé au sol !
 
 GameObjects.GamePlayer.Champion.LevelUp:				Vous avez gagné un niveau de Champion supplémentaire !
 GameObjects.GamePlayer.Champion.NeedToBeChampion:		Vous devez être un Champion pour utiliser cet inventaire.

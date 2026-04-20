@@ -20,4 +20,5 @@ Commands.Players.Market.Cant.DeployMorphed:		You cannot set up your market while
 Commands.Players.Market.Cant.DeployCrafting:	You cannot set up your market while you're crafting!
 Commands.Players.Market.Cant.DeployAFK:			You cannot set up your market while you're AFK!
 Commands.Players.Market.Cant.DeployClimbing:	You cannot set up your market while climbing!
+Commands.Players.Market.Cant.DeployTerRelic:	You cannot set up your market while carrying a territory relic.
 Commands.Players.Market.InvalidName:			The chosen market name is invalid or contains restricted terms.

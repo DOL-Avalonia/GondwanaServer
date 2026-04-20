@@ -33,6 +33,7 @@ namespace DOL.GS.Scripts
          "Commands.GM.TeleportNPC.Usage.Conditions.Event",
          "Commands.GM.TeleportNPC.Usage.Conditions.CompletedQuest",
          "Commands.GM.TeleportNPC.Usage.Conditions.QuestStep",
+         "Commands.GM.TeleportNPC.Usage.Conditions.BlockRelic",
          "Commands.GM.TeleportNPC.Usage.TerritoryLinked",
          "Commands.GM.TeleportNPC.Usage.ShowTeleporterIndicator",
          "Commands.GM.TeleportNPC.Usage.ShowBoundary",
@@ -605,6 +606,25 @@ namespace DOL.GS.Scripts
                     {
                         jump.Conditions.RequiredQuestStepID = stepID;
                         DisplayMessage(client, "Le jump \"" + jump.Name + "\" nécessite la quête ID : " + questID + ", étape : " + stepID + ".");
+                    }
+                    else
+                    {
+                        DisplaySyntax(client);
+                        return;
+                    }
+                    break;
+                #endregion
+
+                #region blockrelic
+                case "blockrelic":
+                case "relic":
+                    if (args.Length > 4 && (args[4].Equals("on", StringComparison.CurrentCultureIgnoreCase) || args[4].Equals("off", StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        jump.Conditions.BlockRelic = args[4].Equals("on", StringComparison.CurrentCultureIgnoreCase);
+                        if (jump.Conditions.BlockRelic)
+                            DisplayMessage(client, "Le jump \"" + jump.Name + "\" est maintenant bloqué si le joueur porte une relique.");
+                        else
+                            DisplayMessage(client, "Le jump \"" + jump.Name + "\" autorise maintenant les porteurs de relique.");
                     }
                     else
                     {

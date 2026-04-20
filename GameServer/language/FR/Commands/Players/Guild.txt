@@ -41,6 +41,7 @@ Commands.Players.Guild.BannerSummonDamned:			Vous êtes damné ! Impossible d'in
 Commands.Players.Guild.BannerSummonPetrified:		Vous êtes pétrifié ! Impossible d'invoquer une bannière de guilde !
 Commands.Players.Guild.BannerSummonMorphed:			Vous ne pouvez pas invoquer votre bannière de guilde en étant sous l'effet d'un enchantement "{0}"!
 Commands.Players.Guild.BannerSummonJailed:			Vous ne pouvez pas invoquer votre bannière de guilde lorsque vous êtes emprisonné !
+Commands.Players.Guild.BannerSummonTerRelic:		Vous ne pouvez pas invoquer de bannière de guilde tout en portant une relique de territoire.
 Commands.Players.Guild.BannerUnsummoned.You:		Vous avez retiré votre bannière de guilde.
 Commands.Players.Guild.BannerUnsummoned:			{0} a retiré la bannière de guilde.
 Commands.Players.Guild.BannerUnsummoned.You.Forced:	{0} vous a retiré votre bannière de guilde.
@@ -302,11 +303,13 @@ Commands.Players.Guild.JailRelease.NotEnoughMoney:		Votre banque de guilde n'a p
 Commands.Players.Guild.JailRelease.Released:			{0} a été relâché(e) de prison par {1}.
 
 Commands.Players.Guild.TerritoryBanner.NotInTerritory:	Vous ne pouvez pas invoquer vos bannières de guilde en dehors d'un territoire contrôlé par votre guilde.
+Commands.Players.Guild.TerritoryBanner.NotInExtraTerritory:		La limite de territoires de votre guilde est atteinte. Impossible de planter votre étendard ici pour renforcer cette position.
 Commands.Players.Guild.TerritoryBanner.Denied:			Vous devez être au moins rang 2 pour invoquer un portail de guilde.
 Commands.Players.Guild.TerritoryBanner.ConfirmCost:		Invoquer vos bannières dans ce territoire coûtera {0} points de mérite à votre guilde. Confirmer?
 Commands.Players.Guild.TerritoryBanner.NotEnoughMerit:	Votre guilde doit avoir {0} points de mérite pour invoquer les bannières de territoire.
 Commands.Players.Guild.TerritoryBanner.Summoned:		{0} a invoqué les bannières dans {1} !
 Commands.Players.Guild.TerritoryBanner.AlreadySummoned:	Les bannières de guilde sont déjà disposées dans ce territoire.
+Commands.Players.Guild.TerritoryBanner.NotAllowedZone:	Impossible de déployer un étendard de guilde sur ces terres.
 
 Commands.Players.Guild.TerritoryPortal.NoGuild:			Vous devez faire partie d'une guilde pour invoquer un portail de guilde.
 Commands.Players.Guild.TerritoryPortal.Denied:			Vous devez être au moins rang 4 pour invoquer un portail de guilde.
@@ -324,6 +327,7 @@ Commands.Players.Guild.BuyDefender.NoGuild:				Vous devez faire partie d'une gui
 Commands.Players.Guild.BuyDefender.AvailableDefenders:	Vous pouvez acheter {0} gardes supplémentaires.
 Commands.Players.Guild.BuyDefender.DefenderLimit:		Votre niveau de guilde ne vous permet pas d'acheter de défenseurs supplémentaires sur ce territoire pour le moment.
 Commands.Players.Guild.BuyDefender.NotInTerritory:		Vous ne pouvez pas acheter un garde en dehors d'un territoire contrôlé par votre guilde.
+Commands.Players.Guild.BuyDefender.NotInExtraTerritory:	La limite de territoires de votre guilde est atteinte. Impossible d'y engager des gardes pour renforcer cette position !
 Commands.Players.Guild.BuyDefender.UnsupportedType:		Le territoire {0} n'offre pas ce type de garde.
 Commands.Players.Guild.BuyDefender.NoMoney:				Vous devez avoir {0} pièces d'or dans votre banque de guilde pour acheter un garde !
 Commands.Players.Guild.BuyDefender.ConfirmCost:			Acheter un garde pour {0} coûtera {1} pièces d'or à votre guilde. Continuer ?

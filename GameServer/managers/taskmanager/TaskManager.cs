@@ -98,6 +98,9 @@ namespace DOL.GS
                 case "KillTerritoryBoss":
                     taskData.KillTerritoryBossStats++;
                     break;
+                case "CapturedRelics":
+                    taskData.CapturedRelicsStats++;
+                    break;
                 case "KillCreaturesInDungeons":
                     taskData.KillCreaturesInDungeonsStats++;
                     break;
@@ -198,6 +201,7 @@ namespace DOL.GS
                 "KillKeepGuards" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillKeepGuardsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
                 "KillTerritoryGuards" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillTerritoryGuardsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
                 "KillTerritoryBoss" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillTerritoryBossLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
+                "CapturedRelics" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.CapturedRelicsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
                 "SuccessfulItemCombinations" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.SuccessfulItemCombinationsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
                 "MasteredCrafts" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.MasteredCraftsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
                 "MasterpieceCrafted" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.MasterpieceCraftedLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
@@ -297,7 +301,7 @@ namespace DOL.GS
         {
             return taskName == "KillEnemyPlayersGroup" || taskName == "KillEnemyPlayersAlone" ||
                    taskName == "KillKeepGuards" || taskName == "TakeKeeps" || taskName == "RvRChampionOfTheDay" ||
-                   taskName == "KillTerritoryGuards" || taskName == "KillTerritoryBoss";
+                   taskName == "KillTerritoryGuards" || taskName == "KillTerritoryBoss" || taskName == "CapturedRelics";
         }
 
         private static bool IsPvETask(string taskName)
@@ -359,18 +363,18 @@ namespace DOL.GS
                 {
                     0 => 25,
                     1 => 50,
-                    2 => 80,
-                    3 => 120,
-                    4 => 180,
+                    2 => 90,
+                    3 => 150,
+                    4 => 220,
                     _ => int.MaxValue
                 },
                 "TakeKeeps" => level switch
                 {
                     0 => 3,
                     1 => 6,
-                    2 => 10,
-                    3 => 16,
-                    4 => 25,
+                    2 => 12,
+                    3 => 20,
+                    4 => 30,
                     _ => int.MaxValue
                 },
                 "RvRChampionOfTheDay" => level switch
@@ -386,9 +390,9 @@ namespace DOL.GS
                 {
                     0 => 25,
                     1 => 50,
-                    2 => 80,
-                    3 => 120,
-                    4 => 180,
+                    2 => 90,
+                    3 => 150,
+                    4 => 220,
                     _ => int.MaxValue
                 },
                 "KillTerritoryBoss" => level switch
@@ -396,8 +400,17 @@ namespace DOL.GS
                     0 => 5,
                     1 => 10,
                     2 => 15,
-                    3 => 25,
-                    4 => 40,
+                    3 => 30,
+                    4 => 60,
+                    _ => int.MaxValue
+                },
+                "CapturedRelics" => level switch
+                {
+                    0 => 4,
+                    1 => 8,
+                    2 => 12,
+                    3 => 20,
+                    4 => 30,
                     _ => int.MaxValue
                 },
                 "TurnInPvPGvGTaskToken" => level switch
@@ -405,26 +418,26 @@ namespace DOL.GS
                     0 => 1,
                     1 => 3,
                     2 => 6,
-                    3 => 10,
-                    4 => 15,
+                    3 => 12,
+                    4 => 18,
                     _ => int.MaxValue
                 },
                 "KillCreaturesInDungeons" => level switch
                 {
-                    0 => 25,
-                    1 => 40,
-                    2 => 75,
-                    3 => 140,
-                    4 => 250,
+                    0 => 40,
+                    1 => 80,
+                    2 => 140,
+                    3 => 220,
+                    4 => 400,
                     _ => int.MaxValue
                 },
                 "KillOutdoorsCreatures" => level switch
                 {
-                    0 => 30,
-                    1 => 60,
-                    2 => 120,
-                    3 => 250,
-                    4 => 500,
+                    0 => 50,
+                    1 => 100,
+                    2 => 200,
+                    3 => 350,
+                    4 => 700,
                     _ => int.MaxValue
                 },
                 "KillAnimalCreatures" => level switch
@@ -432,8 +445,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillDemonCreatures" => level switch
@@ -441,8 +454,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillDragonCreatures" => level switch
@@ -450,8 +463,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillElementalCreatures" => level switch
@@ -459,8 +472,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillGiantCreatures" => level switch
@@ -468,8 +481,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillHumanoidCreatures" => level switch
@@ -477,8 +490,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillInsectCreatures" => level switch
@@ -486,8 +499,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillMagicalCreatures" => level switch
@@ -495,8 +508,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillReptileCreatures" => level switch
@@ -504,8 +517,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillPlantCreatures" => level switch
@@ -513,8 +526,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "KillUndeadCreatures" => level switch
@@ -522,8 +535,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 140,
                     _ => int.MaxValue
                 },
                 "TurnInPvETaskToken" => level switch
@@ -558,9 +571,9 @@ namespace DOL.GS
                 {
                     0 => 2,
                     1 => 4,
-                    2 => 7,
-                    3 => 12,
-                    4 => 20,
+                    2 => 8,
+                    3 => 15,
+                    4 => 25,
                     _ => int.MaxValue
                 },
                 "TurnInCraftingTaskToken" => level switch
@@ -577,8 +590,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 120,
                     _ => int.MaxValue
                 },
                 "ItemsSoldToPlayers" => level switch
@@ -631,8 +644,8 @@ namespace DOL.GS
                     0 => 15,
                     1 => 25,
                     2 => 50,
-                    3 => 75,
-                    4 => 100,
+                    3 => 80,
+                    4 => 120,
                     _ => int.MaxValue
                 },
                 _ => int.MaxValue

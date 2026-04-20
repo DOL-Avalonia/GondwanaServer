@@ -61,7 +61,7 @@ namespace DOL.GS.Commands
                 #region Open
                 case "open":
                     {
-                        if (!client.Player.HasAbility(DOL.GS.Abilities.Trading))
+                        if (!client.Player.HasAbility(Abilities.Trading))
                         {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.No.Ability"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                             break;
@@ -115,6 +115,11 @@ namespace DOL.GS.Commands
                         if (client.Player.PlayerAfkMessage != null)
                         {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployAFK"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            break;
+                        }
+                        if (client.Player.HasTerritoryRelic())
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployTerRelic"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             break;
                         }
                         if (SpellHandler.FindEffectOnTarget(client.Player, "Petrify") != null)

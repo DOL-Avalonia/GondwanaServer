@@ -16,3 +16,4 @@ TeleportNPC.QuestStepNotCompleted:		You must currently be doing the quest "{0}" 
 TeleportNPC.ConditionsNotMet:			I can't let you go to this location yet!
 TeleportNPC.ItemConsumed:			The magic depletes your {0}, consuming it entirely!
 TeleportNPC.ItemDegrading:			The strain of travel cracks your {0} ({1}% condition remaining).
+TeleportNPC.RelicBlocked:			I cannot channel the weave... the relic's ancient magic rejects this destination!

@@ -10,3 +10,5 @@ TeleporterRvR.Leave:					Partir
 TeleporterRvR.Ready:					Prêt
 TeleporterRvR.DamnationRefusal1:		Arrière, {0} !
 TeleporterRvR.DamnationRefusal2:		Je ne peux prendre le risque de nuire aux autres en assistant quelqu'un affligé par une si sombre malédiction !
+TeleporterRvR.RelicRefusal1:			Cette puissante relique enchaîne votre âme à ces terres, voyageur.
+TeleporterRvR.RelicRefusal2:			L'énergie volatile de l'objet m'empêche de maintenir un passage sûr vers votre destination. Allez porter ce trésor en lieu sûr dans vos territoires, puis la voie s'ouvrira à nouveau.

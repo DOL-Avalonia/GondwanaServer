@@ -47,7 +47,9 @@ namespace DOL.GS.PacketHandler.Client.v168
             switch ((eMerchantWindowType)menu_id)
             {
                 case eMerchantWindowType.HousingInsideShop:
+                case eMerchantWindowType.HousingInsideMenu:
                 case eMerchantWindowType.HousingOutsideShop:
+                case eMerchantWindowType.HousingOutsideMenu:
                 case eMerchantWindowType.HousingBindstoneHookpoint:
                 case eMerchantWindowType.HousingCraftingHookpoint:
                 case eMerchantWindowType.HousingNPCHookpoint:

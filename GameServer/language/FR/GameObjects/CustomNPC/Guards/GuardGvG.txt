@@ -1,0 +1,8 @@
+SimpleGvGGuard.Interact.TooLowRank:		Bonjour {0}, je ne discute pas avec les bleus, circulez.
+SimpleGvGGuard.Interact.ChooseEquip:	Bonjour {0}, vous pouvez modifier l'équipement que je porte, sélectionnez l'ensemble que vous souhaitez : {1}
+SimpleGvGGuard.Die.GuildMember:			{0} de la guilde {1}
+SimpleGvGGuard.Die.CaptainName:			Capitaine
+SimpleGvGGuard.Die.Broadcast:			{0} : Un garde vient d'être tué par {1}.
+
+TerritoryGuard.Die.GuildMember:			{0} de la guilde {1}
+TerritoryGuard.Die.Broadcast:			Un garde vient d'être tué par {0}.

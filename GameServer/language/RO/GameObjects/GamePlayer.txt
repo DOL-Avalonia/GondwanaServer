@@ -80,6 +80,7 @@ GameObjects.GamePlayer.CastSpell.AlreadyPlaySong:       Deja cânți o melodie.
 GameObjects.GamePlayer.CastSpell.CantCastMezzed:        Nu poți lansa vrăji cât timp ești hipnotizat.
 GameObjects.GamePlayer.CastSpell.CantCastStunned:       Nu poți lansa vrăji cât timp ești uluit.
 GameObjects.GamePlayer.CastSpell.CannotCastRiding:		Nu poți lansa această vrajă în timp ce călărești!
+GameObjects.GamePlayer.CastSpell.CantCastTerRelic:		Nu poți face vrăji în timp ce porți o relicvă a teritoriului.
 GameObjects.GamePlayer.CastSpell.CantCastFumblingWords: Incantația ta eșuează; nu poți lansa vraja!
 GameObjects.GamePlayer.CastSpell.CantSpellDirectly:     Nu poți lansa această vrajă direct!
 GameObjects.GamePlayer.CastSpell.FollowSpell:           Ai pregătit un {0} ca vrajă de urmărire!
@@ -141,6 +142,7 @@ GameObjects.GamePlayer.GainExperience.LowPopBonus:				(+{0} din {1}% bonus de po
 GameObjects.GamePlayer.GainExperience.TalkToTrainer:          Vorbește cu instructorul tău pentru mai multe informații.
 GameObjects.GamePlayer.GainExperience.YouGet:                 Primești {0} puncte de experiență.
 GameObjects.GamePlayer.GainExperience.BonusRenaissance:       dintre care {0} puncte bonus din Renaștere
+GameObjects.GamePlayer.GainExperience.MalusRenaissance:			inclusiv o penalizare de Renaștere de: {0}
 GameObjects.GamePlayer.GainExperience.BonusTerritory:         dintre care {0} puncte bonus din Teritorii
 GameObjects.GamePlayer.GainExperience.BonusGameEvent:         dintre care {0} puncte bonus din Evenimente
 
@@ -155,6 +157,7 @@ GameObjects.GamePlayer.GainRealmPoints.YouGet:                Primești {0} punc
 GameObjects.GamePlayer.GainRealmPoints.LowPopBonus:				(+{0} RP din {1}% bonus de populație scăzută)
 GameObjects.GamePlayer.GainRealmPoints.RealmLowPopBonus:		(+{0} RP din {1}% bonus de tărâm subpopulat)
 GameObjects.GamePlayer.GainRealmPoints.YearlyEventBonus:		(+{0} RP din bonusul de eveniment {1})
+GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:			(+{0} RP de la relicvele teritoriului tău.)
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Primești {0} puncte de regat în plus datorită bonusurilor de zonă!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Primești {0} puncte de regat pentru apărarea teritoriului tău!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Primești {0} puncte de regat pentru vindecarea unui membru al regatului tău!
@@ -403,6 +406,7 @@ GameObjects.GamePlayer.StartAttack.CantDisarmed:           Ești dezarmat și nu
 GameObjects.GamePlayer.StartAttack.CantDisarmed2:          Ești dezarmat și nu poți lansa această vrajă!
 GameObjects.GamePlayer.StartAttack.CantInShadeMode:        Nu poți începe lupta în modul Umbră!
 GameObjects.GamePlayer.StartAttack.CantUseQuiver:          Nu poți selecta această tolbă cu arma curentă.
+GameObjects.GamePlayer.StartAttack.CantTerRelic:		    Nu poți intra în luptă în timp ce porți o relicvă a teritoriului.
 GameObjects.GamePlayer.StartAttack.CombatNoTarget:         Intri în luptă, dar nu ai țintă.
 GameObjects.GamePlayer.StartAttack.CombatTarget:           Intri în luptă și fixezi focusul pe [{0}]
 GameObjects.GamePlayer.StartAttack.SelectQuiver:           Trebuie să selectezi o tolbă.
@@ -542,6 +546,8 @@ GameObjects.GamePlayer.RvR.Too.Far:                    Te-ai îndepărtat prea m
 GameObjects.GamePlayer.RvR.Capture.Timer:              Cucerirea fortului
 GameObjects.GamePlayer.RvR.Capture.Start:              {0} începe să preia controlul asupra fortului!
 GameObjects.GamePlayer.PvP.DieDropItem:                Moartea ta a împrăștiat {0} dintre comorile tale!
+GameObjects.GamePlayer.PvP.DropTerRelic:				Relicva teritoriului tău a căzut pe jos!
+GameObjects.GamePlayer.PvP.DropFlag:					Steagul pe care îl țineai a căzut pe jos!
 
 GameObjects.GamePlayer.Champion.LevelUp:               Ai primit un nivel suplimentar de Campion!
 GameObjects.GamePlayer.Champion.NeedToBeChampion:      Trebuie să fii Campion pentru a folosi acest inventar.

@@ -54,6 +54,7 @@ GameUtils.Guild.Territory.Capture.Captured:             {0} a pris le territoire
 GameUtils.Guild.Territory.Capture.Renewed:              {0} a renouvelé votre contrôle du territoire {1}!
 GameUtils.Guild.Territory.Capture.CapturedPvP:          {0} gagne {1} points de royaume pour avoir capturé {2} des mains de {3}!
 GameUtils.Guild.Territory.Capture.CapturedPvE:          {0} gagne {1} points de royaume pour avoir capturé {2}!
+GameUtils.Guild.Territory.RelicTooHeavy:				Votre guilde a perdu tous ses territoires ! La relique est devenue trop pesante et vous ne pouvez plus la porter !
 
 GameUtils.Guild.Banner.BannerInGroup:			Quelqu'un dans votre groupe a déjà une bannière active!
 GameUtils.Guild.Banner.BannerNoGroup:			Vous avez quitté le groupe et votre bannière disparaît!
@@ -71,3 +72,11 @@ GameUtils.Guild.Banner.Captured.OtherGuild:			{0} a capturé la bannière de {1}
 GameUtils.Guild.Banner.Captured.OtherGuild.InGuild:	{0} de {1} a capturé la bannière de {2}!
 GameUtils.Guild.Banner.Captured.You:			Vous avez capturé la bannière de {0}!
 GameUtils.Guild.Banner.Lost:					Votre bannière de guilde est perdue!
+
+GameUtils.Guild.MemberLoggedIn:					Le membre de guilde {0} s'est connecté !
+GameUtils.Guild.AgreedToJoin:					Vous avez accepté de rejoindre {0} !
+GameUtils.Guild.CurrentRankIs:					Votre rang actuel est {0} !
+GameUtils.Guild.MemberJoined:					{0} a rejoint la guilde !
+GameUtils.Guild.YouLeave:						Vous quittez la guilde.
+GameUtils.Guild.RemovedBy:						{0} vous a renvoyé de {1}.
+GameUtils.Guild.Removed:						Vous avez été renvoyé de {0}.

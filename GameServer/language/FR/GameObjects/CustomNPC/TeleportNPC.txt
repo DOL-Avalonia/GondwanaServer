@@ -16,3 +16,4 @@ TeleportNPC.QuestStepNotCompleted:		Vous devez actuellement faire la quête "{0}
 TeleportNPC.ConditionsNotMet:			Je ne peux pas encore vous transporter à cet endroit !
 TeleportNPC.ItemConsumed:			La magie épuise votre {0} ; il tombe en poussière !
 TeleportNPC.ItemDegrading:			Le voyage abîme votre {0} ({1}% de condition restante).
+TeleportNPC.RelicBlocked:			Je ne parviens pas à canaliser le flux... l'ancienne magie de la relique rejette cette destination !

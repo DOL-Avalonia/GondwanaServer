@@ -8,7 +8,8 @@ namespace DOL.GS.Commands
         "&gvg",
         ePrivLevel.GM,
         "Manage GvG status",
-        "/gvg <on|off> - Forces GvG open or reverts to schedule")]
+        "/gvg <on|off> - Forces GvG open or reverts to schedule",
+        "/gvg resetrelics - Forces GvG to reset territory relics")]
     public class GvGCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -24,11 +25,17 @@ namespace DOL.GS.Commands
             {
                 case "on":
                     GvGManager.ForceOpen = true;
+                    GvGManager.IsOpen = true;
                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ForcedOpen"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     break;
                 case "off":
                     GvGManager.ForceOpen = false;
+                    GvGManager.EvaluateSchedule();
                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.TimeSchedule"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    break;
+                case "resetrelics":
+                    AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();
+                    client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ResetRelics"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     break;
                 default:
                     DisplaySyntax(client);

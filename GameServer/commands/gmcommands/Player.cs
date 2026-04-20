@@ -1631,7 +1631,10 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Player.KickUseNameForGMs"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                                 return;
                             }
-                            
+
+                            if (player.HasTerritoryRelic())
+                                player.DropTerritoryRelicsOnDeath(null);
+
                             player.Client.Out.SendPlayerQuit(true);
                             player.Client.Player.SaveIntoDatabase();
                             player.Client.Player.Quit(true);
@@ -1649,7 +1652,8 @@ namespace DOL.GS.Commands
                                             if (allplayer.Account.PrivLevel == 1)
                                             {
                                                 allplayer.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Player.KickAllPlayers", client.Player.Name, client.Account.PrivLevel), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                                                
+
+                                                allplayer.Player.DropTerritoryRelicsOnDeath(null);
                                                 allplayer.Out.SendPlayerQuit(true);
                                                 allplayer.Player.SaveIntoDatabase();
                                                 allplayer.Player.Quit(true);
@@ -1992,6 +1996,9 @@ namespace DOL.GS.Commands
 
                                         if (pname.Player.GuildName == guild && guild != "")
                                         {
+                                            if (pname.Player.CurrentRegionID != client.Player.CurrentRegionID && pname.Player.HasTerritoryRelic())
+                                                pname.Player.DropTerritoryRelicsOnDeath(null);
+
                                             count++;
                                             pname.Player.MoveTo(client.Player.Position);
                                         }
@@ -2019,6 +2026,9 @@ namespace DOL.GS.Commands
                                         {
                                             foreach (GameLiving groupedplayers in pname.Player.Group.GetMembersInTheGroup())
                                             {
+                                                if (groupedplayers is GamePlayer gPlayer && gPlayer.CurrentRegionID != client.Player.CurrentRegionID && gPlayer.HasTerritoryRelic())
+                                                    gPlayer.DropTerritoryRelicsOnDeath(null);
+
                                                 groupedplayers.MoveTo(client.Player.Position);
                                                 count++;
                                             }
@@ -2048,6 +2058,9 @@ namespace DOL.GS.Commands
                                         {
                                             foreach (GamePlayer cgplayers in cg.Members.Keys)
                                             {
+                                                if (cgplayers.CurrentRegionID != client.Player.CurrentRegionID && cgplayers.HasTerritoryRelic())
+                                                    cgplayers.DropTerritoryRelicsOnDeath(null);
+
                                                 cgplayers.MoveTo(client.Player.Position);
                                                 count++;
                                             }
@@ -2078,6 +2091,9 @@ namespace DOL.GS.Commands
                                         {
                                             foreach (GamePlayer cgplayers in cg.Members.Keys)
                                             {
+                                                if (cgplayers.CurrentRegionID != client.Player.CurrentRegionID && cgplayers.HasTerritoryRelic())
+                                                    cgplayers.DropTerritoryRelicsOnDeath(null);
+
                                                 cgplayers.MoveTo(client.Player.Position);
                                                 count++;
                                             }

@@ -1824,6 +1824,24 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("rvr", "rvr_tick_base_rp", "The base Realm Points awarded per RvR tick.", 20)]
         public static int RVR_TICK_BASE_RP;
 
+        /// <summary>
+        /// How many territory relics spawn when GvG starts / resets.
+        /// </summary>
+        [ServerProperty("gvg", "relics_per_cycle", "Amount of territory relics spawned on each GvGmanager day cycle.", 2)]
+        public static int GVG_RELICS_PER_CYCLE;
+
+        /// <summary>
+        /// How long a territory relic stays on the ground after dropped by a dead player
+        /// </summary>
+        [ServerProperty("gvg", "relic_drop_duration", "Amount of time (in seconds) before a dropped territory relic returns to its outpost.", 30)]
+        public static int GVG_RELIC_DROP_DURATION;
+
+        /// <summary>
+        /// How much Realm Points in "%" a single GvG relic gives.
+        /// </summary>
+        [ServerProperty("gvg", "gvg_relic_rp_bonus", "Amount (in %) of Realm Points bonus a single territory relic gives.", 4)]
+        public static int GVG_RELIC_RP_BONUS;
+
         #endregion
 
         #region KEEPS

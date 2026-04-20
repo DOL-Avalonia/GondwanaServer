@@ -9,7 +9,7 @@ Commands.GM.DebugJump.Usage:					Usage : ']jump <zoneID> <locX> <locY> <locZ> <h
 # /jump Command
 Commands.GM.Jump.CannotBeFound:					{0} est introuvable.
 Commands.GM.Jump.CannotBeFoundInRealm:			{0} est introuvable dans le royaume {1}.
-Commands.GM.Jump.CannotJumpToInsideHouse:		Impossible de « jump » sur quelqu'un dans une maison. Vous n'êtes pas le père noël.
+Commands.GM.Jump.CannotJumpToInsideHouse:		Impossible de « jump » sur quelqu'un dans une maison. Vous n'êtes pas le Père Noël !
 Commands.GM.Jump.CheckExpansion.CannotJump:		{0} ne peut « jump » dans la région de destination ({1}) car elle n'est pas supportée par son client.
 Commands.GM.Jump.CheckExpansion.ClientNoSup:	{0} a essayé de vous « jump » dans la région ({1}) mais votre client ne le supporte pas.
 Commands.GM.Jump.Description:					Téléporte un joueur ou vous-même aux coordonnées définies.
@@ -22,11 +22,11 @@ Commands.GM.Jump.Pushed:						Coordonnées actuelles empilées.
 Commands.GM.Jump.PushedTotal:					({0} total)
 Commands.GM.Jump.Usage.PlayerNameToXYZ:			'/jump <PlayerName> to <x> <y> <z>'
 Commands.GM.Jump.Usage.PlayerNameToXYZRegID:	'/jump <PlayerName> to <x> <y> <z> [<RegionID>]'
-Commands.GM.Jump.Usage.PlayerNToPlayerN:		'/jump <PlayerName> to <PlayerName>'
+Commands.GM.Jump.Usage.PlayerNToPlayerN:		'/jump <PlayerName> to <PlayerName  ou MobName>'
 Commands.GM.Jump.Usage.Pop:						'/jump pop' Dépile les coordonnées précédentes et s'y rend.
 Commands.GM.Jump.Usage.Push:					'/jump push' Empile les coordonnées actuelles.
 Commands.GM.Jump.Usage.RelXYZ:					'/jump rel <x> <y> <z>'
 Commands.GM.Jump.Usage.ToGT:					'/jump to GT'
 Commands.GM.Jump.Usage.ToNameRealmID:			'/jump to <Name> <RealmID>'
-Commands.GM.Jump.Usage.ToPlayerName:			'/jump to <PlayerName or MobName>'
+Commands.GM.Jump.Usage.ToPlayerName:			'/jump to <PlayerName ou MobName>'
 Commands.GM.Jump.Usage.ToXYZRegionID:			'/jump to <x> <y> <z> [<RegionID>]'

@@ -14,6 +14,7 @@ Commands.Players.Vol.AFK:					You cannot steal while being afk ! Type /afk to di
 Commands.Players.Vol.Dead:					You cannot steal once dead!
 Commands.Players.Vol.AlreadyStealing:		You are already stealing someone!
 Commands.Players.Vol.TargetAFK: 			You cannot steal a player who is afk!
+Commands.Players.Vol.CarryRelic: 			You cannot steal a territory relic because you are already carrying one!
 Commands.Players.Vol.Time: 					You must wait {0} seconds to be able to steal again!
 Commands.Players.Vol.Steal: 				You start a theft attempt {0}
 Commands.Players.Vol.StealWindow: 			You are currently stealing {0}

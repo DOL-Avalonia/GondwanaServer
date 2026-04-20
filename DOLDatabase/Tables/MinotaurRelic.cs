@@ -39,6 +39,9 @@ namespace DOL.Database
         private int m_effect;
         private string m_protectorClassType;
         private bool m_spawnLocked;
+        private bool m_isTerritoryRelic;
+        private string m_bonuses;
+        private string m_relicPadSpawn;
 
         /// <summary>
         /// Create a relic row
@@ -178,6 +181,27 @@ namespace DOL.Database
                 Dirty = true;
                 m_effect = value;
             }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public bool IsTerritoryRelic
+        {
+            get { return m_isTerritoryRelic; }
+            set { Dirty = true; m_isTerritoryRelic = value; }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public string Bonuses
+        {
+            get { return m_bonuses; }
+            set { Dirty = true; m_bonuses = value; }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public string RelicPadSpawn
+        {
+            get { return m_relicPadSpawn; }
+            set { Dirty = true; m_relicPadSpawn = value; }
         }
 
         /// <summary>

@@ -84,7 +84,23 @@ namespace DOL.GS.GameEvents
                     {
                         return;
                     }
-                    
+
+                    bool nearRelicCarrier = TerritoryRelicManager.ActiveRelics.Values
+                        .Any(r => r.CurrentCarrier != null
+                               && r.CurrentCarrier.CurrentRegionID == playerVictim.CurrentRegionID
+                               && r.CurrentCarrier.Coordinate.DistanceTo(playerVictim.Coordinate) <= 3000);
+
+                    bool nearPhysicalRelic = TerritoryRelicManager.ActiveRelics.Values
+                        .Any(r => r.CurrentCarrier == null
+                               && r.ObjectState == GameObject.eObjectState.Active
+                               && r.CurrentRegionID == playerVictim.CurrentRegionID
+                               && r.Coordinate.DistanceTo(playerVictim.Coordinate) <= 2500);
+
+                    if (nearRelicCarrier || nearPhysicalRelic)
+                    {
+                        return;
+                    }
+
                     bool autoReport = DeathCheck.Instance.IsChainKiller(playerKiller, playerVictim);
                     if (autoReport)
                     {
