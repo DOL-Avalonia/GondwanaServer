@@ -19,12 +19,19 @@ PvPManager.MaxGroup:						Your group is already at the maximum size for this PvP
 PvPManager.GroupTooBig:						This PvP session only allows groups of up to {0} players.
 PvPManager.KickedFromPvP:					You have been kicked from the PvP group.
 PvPManager.WelcomeBack:						Welcome back! Your PvP state has been preserved.
-PvPManager.Solo:							(Solo)
-PvPManager.Group:							(Group)
+PvPManager.RewardSolo:						[PvP Task] You reached a Solo Milestone ({0} kills)! You have been rewarded.
+PvPManager.RewardGroup:						[PvP Task] Your group reached a Milestone ({0} kills)! Rewards have been shared.
+PvPManager.Solo:						(Solo)
+PvPManager.Group:						(Group)
 PvPManager.NotEnoughPlayers:				You did not score points because there are not enough players in this PvP session.
 
 PvPManager.BossHunt.ScoredPoints:			You scored {0} points on {1}!
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} slew the {2} for {3} points!
+
+PvPManager.KingHill.CapturedBy:				The Hill has been captured by {0}!
+PvPManager.KingHill.Pressuring:				Pressuring the Hill... (+{0} pressure)
+PvPManager.KingHill.YouCapture:				You captured the Hill!
+PvPManager.KingHill.Holding:				Holding Hill... (+{0})
 
 PvPManager.CoreRun.Begins:					The Core Run begins! GREEN LIGHT - GO!
 PvPManager.CoreRun.CastMovement:			Casting non-instant spells implies movement!

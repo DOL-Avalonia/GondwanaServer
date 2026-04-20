@@ -1,5 +1,6 @@
 Tasks.SystemDisabled: Il sistema delle missioni è attualmente disattivato.
 Tasks.PvPRvRGvGTasks: ======= MISSIONI PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== INCARICHI RvR/GvG (Inattivi in PvP) ===
 Tasks.PvETasks: ======== MISSIONI PvE ========
 Tasks.CraftingTasks: == MISSIONI DI ARTIGIANATO (Livello min: {0}) ==
 Tasks.SpecialTasks: ======== MISSIONI SPECIALI ========
@@ -13,6 +14,7 @@ Tasks.TakeKeeps: Conquista forti
 Tasks.RvRChampionOfTheDay: Essere Campione del Giorno in RvR
 Tasks.KillTerritoryGuards: Uccidi le guardie di territorio
 Tasks.KillTerritoryBoss: Conquista territori
+Tasks.CapturedRelics: Reliquie catturate
 Tasks.TurnInPvPGvGTaskToken: Gettone Missione PvP/RvR/GvG
 Tasks.KillCreaturesInDungeons: Uccidi creature dei dungeon
 Tasks.KillOutdoorsCreatures: Uccidi creature all'aperto
@@ -39,6 +41,7 @@ Tasks.OutlawPlayersSentToJail: Neutralizza i Fuorilegge
 Tasks.EnemiesKilledInAdrenalineMode: Nemici uccisi in modalità Adrenalina
 Tasks.EnemyKilledInDuel: Vittorie in duello
 Tasks.QuestsCompleted: Missioni completate
+Tasks.PlayersAssassinated: Giocatori assassinati
 Tasks.MaxLevelReached: Livello massimo
 Tasks.Level: Livello {0}
 
@@ -48,6 +51,7 @@ Tasks.KillKeepGuardsLog: Uccidi le guardie dei forti: {0}/{1}
 Tasks.TakeKeepsLog: Conquista forti: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Uccidi le guardie di territorio: {0}/{1}
 Tasks.KillTerritoryBossLog: Conquista territori: {0}/{1}
+Tasks.CapturedRelicsLog: Reliquie catturate : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Combinazioni di oggetti riuscite: {0}/{1}
 Tasks.MasteredCraftsLog: Oggetti creati tramite Artigianato: {0}/{1}
 Tasks.MasterpieceCraftedLog: Capolavori creati: {0}/{1}

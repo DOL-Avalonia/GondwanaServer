@@ -505,6 +505,12 @@ namespace DOL.GS.GameEvents
         public static uint RPsEarnedFromKill(GamePlayer killer, GamePlayer killedPlayer)
         {
             long noExpSeconds = ServerProperties.Properties.RP_WORTH_SECONDS;
+
+            if (killedPlayer.IsInRvR || killedPlayer.IsInPvP)
+            {
+                noExpSeconds /= 4;
+            }
+
             if (killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
                 return 0;
 

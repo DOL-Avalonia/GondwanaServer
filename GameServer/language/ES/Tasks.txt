@@ -1,5 +1,6 @@
 Tasks.SystemDisabled: El sistema de tareas está desactivado actualmente.
 Tasks.PvPRvRGvGTasks: ======= TAREAS PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== TAREAS RvR/GvG (Inactivas en PvP) ===
 Tasks.PvETasks: ======== TAREAS PvE ========
 Tasks.CraftingTasks: == TAREAS DE ARTESANÍA (Nivel mín.: {0}) ==
 Tasks.SpecialTasks: ======== TAREAS ESPECIALES ========
@@ -13,6 +14,7 @@ Tasks.TakeKeeps: Tomad fortalezas
 Tasks.RvRChampionOfTheDay: Sed Campeón del Día en RvR
 Tasks.KillTerritoryGuards: Matad guardias de territorio
 Tasks.KillTerritoryBoss: Capturad territorios
+Tasks.CapturedRelics: Reliquias capturadas
 Tasks.TurnInPvPGvGTaskToken: Ficha de Tarea PvP/RvR/GvG
 Tasks.KillCreaturesInDungeons: Matad criaturas de mazmorras
 Tasks.KillOutdoorsCreatures: Matad criaturas de exterior
@@ -39,6 +41,7 @@ Tasks.OutlawPlayersSentToJail: Neutralizad forajidos
 Tasks.EnemiesKilledInAdrenalineMode: Enemigos eliminados en modo Adrenalina
 Tasks.EnemyKilledInDuel: Victorias en duelo
 Tasks.QuestsCompleted: Misiones completadas
+Tasks.PlayersAssassinated: Jugadores asesinados
 Tasks.MaxLevelReached: Nivel máximo
 Tasks.Level: Nivel {0}
 
@@ -48,6 +51,7 @@ Tasks.KillKeepGuardsLog: Matad guardias de fortalezas: {0}/{1}
 Tasks.TakeKeepsLog: Tomad fortalezas: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Matad guardias de territorio: {0}/{1}
 Tasks.KillTerritoryBossLog: Capturad territorios: {0}/{1}
+Tasks.CapturedRelicsLog: Reliquias capturadas : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Combinaciones de objetos exitosas: {0}/{1}
 Tasks.MasteredCraftsLog: Objetos creados por Artesanía: {0}/{1}
 Tasks.MasterpieceCraftedLog: Obras maestras creadas: {0}/{1}

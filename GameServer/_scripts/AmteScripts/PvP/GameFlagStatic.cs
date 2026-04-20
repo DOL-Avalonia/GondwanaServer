@@ -70,8 +70,56 @@ namespace AmteScripts.PvP.CTF
 
             if (player.IsStealthed)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupStealthed"),
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupStealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (player.IsDamned)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupDamned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (SpellHandler.FindEffectOnTarget(player, "Petrify") != null)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupPtrified"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            var wsd = SpellHandler.FindEffectOnTarget(player, "WarlockSpeedDecrease");
+            if (wsd != null && wsd.Spell != null && wsd.Spell.AmnesiaChance == 1)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupFrog"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (player.InCombat)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (player.IsOnHorse)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupMounted"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (player.PlayerAfkMessage != null)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupAFK"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (player.DuelTarget != null)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupDuel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (player.ActiveBanner != null)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.CannotPickupGuildBanner"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 

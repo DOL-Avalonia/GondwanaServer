@@ -98,7 +98,10 @@ namespace DOL.GS.Commands
 
             var messages = new List<string>
             {
-                LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PvPRvRGvGTasks"),
+                Properties.PVP_ALLOW_TASKSPOINTS
+                    ? LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PvPRvRGvGTasks")
+                    : LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.RvRGvGTasksNoPvP"),
+
                 FormatTaskStatus(player, "KillEnemyPlayersGroup", taskData.KillEnemyPlayersGroup),
                 FormatTaskStatus(player, "KillEnemyPlayersAlone", taskData.KillEnemyPlayersAlone),
                 FormatTaskStatus(player, "KillKeepGuards", taskData.KillKeepGuards),
@@ -107,6 +110,7 @@ namespace DOL.GS.Commands
                 "",
                 FormatTaskStatus(player, "KillTerritoryGuards", taskData.KillTerritoryGuards),
                 FormatTaskStatus(player, "KillTerritoryBoss", taskData.KillTerritoryBoss),
+                FormatTaskStatus(player, "CapturedRelics", taskData.CapturedRelics),
                 "",
                 FormatTaskStatus(player, "TurnInPvPGvGTaskToken", taskData.TurnInPvPGvGTaskToken),
                 "",

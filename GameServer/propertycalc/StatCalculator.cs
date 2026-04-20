@@ -129,27 +129,33 @@ namespace DOL.GS.PropertyCalc
             int propertyIndex = (int)property;
 
             // Base stats/abilities/debuffs/death.
-
-            int baseStat = living.GetBaseStat((eStat)property) < ServerProperties.Properties.MOB_STRENGTH_INCREASE_LOWLEVEL ? ServerProperties.Properties.MOB_STRENGTH_INCREASE_LOWLEVEL : living.GetBaseStat((eStat)property);
+            int baseStat = living.GetBaseStat((eStat)property);
+            if (living is GameNPC npc && !(npc.Brain is IControlledBrain))
+            {
+                if (property == eProperty.Strength)
+                {
+                    if (npc.Level == 0)
+                        baseStat += (ServerProperties.Properties.MOB_STRENGTH_INCREASE_LOWLEVEL * 150) / 100;
+                    else if (npc.Level == 1)
+                        baseStat += ServerProperties.Properties.MOB_STRENGTH_INCREASE_LOWLEVEL;
+                    else if (npc.Level == 2)
+                        baseStat += (ServerProperties.Properties.MOB_STRENGTH_INCREASE_LOWLEVEL * 150) / 170;
+                    else if (npc.Level == 3)
+                        baseStat += (ServerProperties.Properties.MOB_STRENGTH_INCREASE_LOWLEVEL * 150) / 300;
+                }
+            }
             int abilityBonus = living.AbilityBonus[propertyIndex];
             int debuff = living.DebuffCategory[propertyIndex];
-
 
             int itemBonus = CalcValueFromItems(living, property);
             int buffBonus = CalcValueFromBuffs(living, property);
 
-
-
             // Apply debuffs, 100% effectiveness for player buffs, 50% effectiveness
             // for item and base stats
-
             int unbuffedBonus = baseStat + itemBonus;
             buffBonus -= Math.Abs(debuff);
 
-
-
             // Add up and apply any multiplicators.
-
             int stat = unbuffedBonus + buffBonus + abilityBonus;
             stat = (int)(stat * living.BuffBonusMultCategory1.Get((int)property));
 

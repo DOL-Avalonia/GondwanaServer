@@ -3,5 +3,13 @@ PvPGameFlag.AlreadyOwnFlag:		You already own this flag; you cannot pick it up ag
 PvPGameFlag.GroupOwnsFlag:		Your group already owns this flag; you cannot pick it up again!
 PvPGameFlag.CannotPickupDead:		You can't pick up the flag while dead.
 PvPGameFlag.CannotPickupStealthed:	You can't pick up the flag while stealthed!
+PvPGameFlag.CannotPickupMounted:	You can't pick up the flag while mounted!
+PvPGameFlag.CannotPickupCombat:		You can't pick up the flag in combat!
+PvPGameFlag.CannotPickupAFK:		You can't pick up the flag while AFK!
+PvPGameFlag.CannotPickupDuel:		You can't pick up the flag while beeing engaged in a duel!
+PvPGameFlag.CannotPickupGuildBanner:	You can't pick up the flag while carrying a guild banner.
+PvPGameFlag.CannotPickupDamned:		You can't pick up the flag while damned.
+PvPGameFlag.CannotPickupPtrified:	You can't pick up the flag while petrified.
+PvPGameFlag.CannotPickupFrog:		You can't pick up the flag while under 'frog' enchantment.
 PvPGameFlag.InventoryFull:		Your inventory is full!
 PvPGameFlag.DepositedFlag:		You have deposited the flag on your outpost!

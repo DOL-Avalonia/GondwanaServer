@@ -1,6 +1,7 @@
 
 Tasks.SystemDisabled: Systém úkolů je momentálně vypnutý.
 Tasks.PvPRvRGvGTasks: ======= ÚKOLY PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== RvR/GvG ÚKOLY (Neaktivní v PvP) ===
 Tasks.PvETasks: ======== ÚKOLY PvE ========
 Tasks.CraftingTasks: == ŘEMESLNÉ ÚKOLY (min. úroveň: {0}) ==
 Tasks.SpecialTasks: ======== SPECIÁLNÍ ÚKOLY ========
@@ -14,6 +15,7 @@ Tasks.TakeKeeps: Dobýt pevnosti
 Tasks.RvRChampionOfTheDay: Stát se RvR šampionem dne
 Tasks.KillTerritoryGuards: Zabít stráže území
 Tasks.KillTerritoryBoss: Dobytí území
+Tasks.CapturedRelics: Ukořistěné relikvie
 Tasks.TurnInPvPGvGTaskToken: Odevzdat žeton za splnění úkolu PvP/RvR/GvG
 Tasks.KillCreaturesInDungeons: Zabít bytosti v kobkách
 Tasks.KillOutdoorsCreatures: Zabít bytosti ve volné přírodě
@@ -40,6 +42,7 @@ Tasks.OutlawPlayersSentToJail: Zabít psance
 Tasks.EnemiesKilledInAdrenalineMode: Nepřátelé zabití ve stavu Adrenalinu
 Tasks.EnemyKilledInDuel: Vítězství v duelech
 Tasks.QuestsCompleted: Splněné úkoly
+Tasks.PlayersAssassinated: Zavraždění hráči
 Tasks.MaxLevelReached: Maximální úroveň
 Tasks.Level: Úroveň {0}
 
@@ -49,6 +52,7 @@ Tasks.KillKeepGuardsLog: Zabít stráže pevnosti: {0}/{1}
 Tasks.TakeKeepsLog: Dobýt pevnosti: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Zabít stráže území: {0}/{1}
 Tasks.KillTerritoryBossLog: Dobytí území: {0}/{1}
+Tasks.CapturedRelicsLog: Ukořistěné relikvie : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Úspěšné kombinace předmětů: {0}/{1}
 Tasks.MasteredCraftsLog: Zvládnutá řemesla: {0}/{1}
 Tasks.MasterpieceCraftedLog: Vytvořená mistrovská díla: {0}/{1}

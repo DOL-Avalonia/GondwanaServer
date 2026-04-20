@@ -19,12 +19,19 @@ PvPManager.MaxGroup:						Votre groupe a déjà le nombre maximal de joueurs pou
 PvPManager.GroupTooBig:						Cette session PvP autorise un maximum de {0} joueurs en groupe.
 PvPManager.KickedFromPvP:					Vous avez été expulsé du groupe PvP.
 PvPManager.WelcomeBack:						Bon retour ! Votre progression PvP a été préservée.
-PvPManager.Solo:							(Solo)
-PvPManager.Group:							(Groupe)
+PvPManager.RewardSolo:						[Objectif PvP] Nouveau cap de victimes en solo franchi ({0} joueurs) ! Votre bravoure est récompensée.
+PvPManager.RewardGroup:						[Objectif PvP] Votre groupe a franchi le cap des {0} victimes ! Le butin a été distribué.
+PvPManager.Solo:						(Solo)
+PvPManager.Group:						(Groupe)
 PvPManager.NotEnoughPlayers:				Vous n'avez pas gagné de points car il n'y a pas assez de joueurs dans cette session PvP.
 
 PvPManager.BossHunt.ScoredPoints:			Vous avez marqué {0} points sur {1} !
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} a terrassé {2} pour {3} points !
+
+PvPManager.KingHill.CapturedBy:				{0} a pris le contrôle de la colline !
+PvPManager.KingHill.Pressuring:				Mise sous pression de la colline... (+{0} pression)
+PvPManager.KingHill.YouCapture:				Vous avez capturé la colline !
+PvPManager.KingHill.Holding:				Contrôle de la colline... (+{0})
 
 PvPManager.CoreRun.Begins:					La Course au Coeur commence ! FEU VERT - PARTEZ !
 PvPManager.CoreRun.CastMovement:			Lancer des sorts non-instantanés implique du mouvement !

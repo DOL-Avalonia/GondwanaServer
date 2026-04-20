@@ -1,6 +1,7 @@
 
 Tasks.SystemDisabled: Het taak­systeem is momenteel uitgeschakeld.
 Tasks.PvPRvRGvGTasks: ======= PvP/RvR/GvG TAKEN =======
+Tasks.RvRGvGTasksNoPvP:		=== RvR/GvG TAKEN (Inactief in PvP) ===
 Tasks.PvETasks: ======== PvE TAKEN ========
 Tasks.CraftingTasks: == VAKMANSCHAPSTAKEN (Min. niveau: {0}) ==
 Tasks.SpecialTasks: ======== SPECIALE TAKEN ========
@@ -14,6 +15,7 @@ Tasks.TakeKeeps: Kastelen veroveren
 Tasks.RvRChampionOfTheDay: RvR‑kampioen van de dag worden
 Tasks.KillTerritoryGuards: Territoriumwachters doden
 Tasks.KillTerritoryBoss: Territorium veroveren
+Tasks.CapturedRelics: Veroverde relikwieën
 Tasks.TurnInPvPGvGTaskToken: Voltooiings­token PvP/RvR/GvG inleveren
 Tasks.KillCreaturesInDungeons: Wezens in kerkers doden
 Tasks.KillOutdoorsCreatures: Wezens in buitengebieden doden
@@ -40,6 +42,7 @@ Tasks.OutlawPlayersSentToJail: Spelers buiten de wet doden
 Tasks.EnemiesKilledInAdrenalineMode: Vijanden gedood in Adrenaline
 Tasks.EnemyKilledInDuel: Dueloverwinningen
 Tasks.QuestsCompleted: Voltooide quests
+Tasks.PlayersAssassinated: Vermoorde spelers
 Tasks.MaxLevelReached: Maximaal niveau
 Tasks.Level: Niveau {0}
 
@@ -49,6 +52,7 @@ Tasks.KillKeepGuardsLog: Kasteelwachters doden: {0}/{1}
 Tasks.TakeKeepsLog: Kastelen veroveren: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Territoriumwachters doden: {0}/{1}
 Tasks.KillTerritoryBossLog: Territorium veroveren: {0}/{1}
+Tasks.CapturedRelicsLog: Veroverde relikwieën : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Succesvolle itemcombinaties: {0}/{1}
 Tasks.MasteredCraftsLog: Beheerde ambachten: {0}/{1}
 Tasks.MasterpieceCraftedLog: Gemaakte meesterwerken: {0}/{1}

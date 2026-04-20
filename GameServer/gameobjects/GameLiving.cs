@@ -3991,11 +3991,11 @@ namespace DOL.GS
                     missrate += ad.Target.GetModified(eProperty.DefensiveBonus);
                 if (ad.IsPVP)
                 {
-                    missrate = (int)(missrate * ServerProperties.Properties.PVP_BASE_MISS_MULTIPLIER);
+                    missrate = (int)(missrate * Properties.PVP_BASE_MISS_MULTIPLIER);
                 }
                 else
                 {
-                    missrate = (int)(missrate * ServerProperties.Properties.PVE_BASE_MISS_MULTIPLIER);
+                    missrate = (int)(missrate * Properties.PVE_BASE_MISS_MULTIPLIER);
                 }
                 // PVE group missrate
                 if (this is GameNPC && ad.Attacker is GamePlayer { Group: {} group } attackerPlayer &&
@@ -4067,6 +4067,18 @@ namespace DOL.GS
                 if (this is GamePlayer { IsSitting: true })
                 {
                     missrate >>= 1; //halved
+                }
+
+                if (ad.Attacker is GameNPC attackerNpc && !(attackerNpc.Brain is IControlledBrain))
+                {
+                    if (ad.Target is GamePlayer && attackerNpc.Level == 0)
+                    {
+                        if (ad.Attacker.Level < 2) missrate -= 40;
+                    }
+                    else if (ad.Target is GamePlayer && (attackerNpc.Level == 1 || attackerNpc.Level == 2))
+                    {
+                        if (ad.Attacker.Level < 3) missrate -= 20;
+                    }
                 }
 
                 ad.MissChance = ((double)Math.Min(95, missrate) / 100); // cap the missrate
@@ -4156,8 +4168,8 @@ namespace DOL.GS
 
                 if (evadeChance < 0.01)
                     evadeChance = 0.01;
-                else if (evadeChance > ServerProperties.Properties.EVADE_CAP && ad.Attacker is GamePlayer && ad.Target is GamePlayer)
-                    evadeChance = ServerProperties.Properties.EVADE_CAP; //50% evade cap RvR only; http://www.camelotherald.com/more/664.shtml
+                else if (evadeChance > Properties.EVADE_CAP && ad.Attacker is GamePlayer && ad.Target is GamePlayer)
+                    evadeChance = Properties.EVADE_CAP; //50% evade cap RvR only; http://www.camelotherald.com/more/664.shtml
                 else if (evadeChance > 0.995)
                     evadeChance = 0.995;
             }

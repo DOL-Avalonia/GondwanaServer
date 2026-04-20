@@ -1,5 +1,6 @@
 Tasks.SystemDisabled: Das Aufgabensystem ist derzeit deaktiviert.
 Tasks.PvPRvRGvGTasks: ======= AUFGABEN PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== RvR/GvG-AUFGABEN (Inaktiv im PvP) ===
 Tasks.PvETasks: ======== PvE‑AUFGABEN ========
 Tasks.CraftingTasks: == HANDWERKS‑AUFGABEN (Mindeststufe: {0}) ==
 Tasks.SpecialTasks: ======== SPEZIALAUFGABEN ========
@@ -13,6 +14,7 @@ Tasks.TakeKeeps: Erobert Festungen
 Tasks.RvRChampionOfTheDay: Seid Champion des Tages im RvR
 Tasks.KillTerritoryGuards: Tötet Gebietswachen
 Tasks.KillTerritoryBoss: Gebietseroberungen
+Tasks.CapturedRelics: Eroberte Relikte
 Tasks.TurnInPvPGvGTaskToken: PvP/RvR/GvG‑Aufgabentoken
 Tasks.KillCreaturesInDungeons: Tötet Dungeon‑Kreaturen
 Tasks.KillOutdoorsCreatures: Tötet Außenwelt‑Kreaturen
@@ -39,6 +41,7 @@ Tasks.OutlawPlayersSentToJail: Setzt Gesetzlose außer Gefecht
 Tasks.EnemiesKilledInAdrenalineMode: Im Adrenalinmodus getötete Feinde
 Tasks.EnemyKilledInDuel: Duelle gewonnen
 Tasks.QuestsCompleted: Abgeschlossene Quests
+Tasks.PlayersAssassinated: Ermordete Spieler
 Tasks.MaxLevelReached: Maximalstufe
 Tasks.Level: Stufe {0}
 
@@ -48,6 +51,7 @@ Tasks.KillKeepGuardsLog: Tötet Festungswachen: {0}/{1}
 Tasks.TakeKeepsLog: Erobert Festungen: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Tötet Gebietswachen: {0}/{1}
 Tasks.KillTerritoryBossLog: Gebietseroberungen: {0}/{1}
+Tasks.CapturedRelicsLog: Eroberte Relikte : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Erfolgreiche Objektkombinationen: {0}/{1}
 Tasks.MasteredCraftsLog: Über Handwerk hergestellte Gegenstände: {0}/{1}
 Tasks.MasterpieceCraftedLog: Herstellte Meisterwerke: {0}/{1}

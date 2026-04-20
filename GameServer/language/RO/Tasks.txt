@@ -1,5 +1,6 @@
 Tasks.SystemDisabled: Sistemul de sarcini este în prezent dezactivat.
 Tasks.PvPRvRGvGTasks: ======= SARCINI PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== SARCINI RvR/GvG (Inactive în PvP) ===
 Tasks.PvETasks: ======== SARCINI PvE ========
 Tasks.CraftingTasks: == SARCINI DE MEȘTEȘUG (Nivel min: {0}) ==
 Tasks.SpecialTasks: ======== SARCINI SPECIALE ========
@@ -13,6 +14,7 @@ Tasks.TakeKeeps: Cuceriri de forturi
 Tasks.RvRChampionOfTheDay: Fiți Campionul Zilei în RvR
 Tasks.KillTerritoryGuards: Ucideți gardieni ai teritoriilor
 Tasks.KillTerritoryBoss: Capturi de teritorii
+Tasks.CapturedRelics: Relicve capturate
 Tasks.TurnInPvPGvGTaskToken: Jeton de Sarcină PvP/RvR/GvG
 Tasks.KillCreaturesInDungeons: Ucideți creaturi din temnițe
 Tasks.KillOutdoorsCreatures: Ucideți creaturi din exterior
@@ -39,6 +41,7 @@ Tasks.OutlawPlayersSentToJail: Neutralizați Nelegiuiți
 Tasks.EnemiesKilledInAdrenalineMode: Inamici uciși în Adrenalină
 Tasks.EnemyKilledInDuel: Victorii în duel
 Tasks.QuestsCompleted: Misiuni finalizate
+Tasks.PlayersAssassinated: Jucători asasinați
 Tasks.MaxLevelReached: Nivel maxim
 Tasks.Level: Nivel {0}
 
@@ -48,6 +51,7 @@ Tasks.KillKeepGuardsLog: Ucideți gardieni ai forturilor: {0}/{1}
 Tasks.TakeKeepsLog: Cuceriri de forturi: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Ucideți gardieni ai teritoriilor: {0}/{1}
 Tasks.KillTerritoryBossLog: Capturi de teritorii: {0}/{1}
+Tasks.CapturedRelicsLog: Relicve capturate : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Combinații de obiecte reușite: {0}/{1}
 Tasks.MasteredCraftsLog: Obiecte fabricate prin Meșteșug: {0}/{1}
 Tasks.MasterpieceCraftedLog: Capodopere fabricate: {0}/{1}

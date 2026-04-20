@@ -1692,20 +1692,26 @@ namespace DOL.GS.ServerRules
         {
             var gainers = killedPlayer.XPGainers.ToArray();
 
-            if (ServerProperties.Properties.ENABLE_WARMAPMGR && killer is GamePlayer && killer.CurrentRegion.ID == 163)
+            if (Properties.ENABLE_WARMAPMGR && killer is GamePlayer && killer.CurrentRegion.ID == 163)
                 WarMapMgr.AddFight((byte)killer.CurrentZone.ID, (int)killer.Position.X, (int)killer.Position.Y, (byte)killer.Realm, (byte)killedPlayer.Realm);
 
             killedPlayer.LastDeathRealmPoints = 0;
             // "player has been killed recently"
-            long noExpSeconds = ServerProperties.Properties.RP_WORTH_SECONDS;
+            long noExpSeconds = Properties.RP_WORTH_SECONDS;
+
+            if (IsInPvPArea(killedPlayer))
+            {
+                noExpSeconds /= 4;
+            }
+
             if (killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
             {
                 foreach (var de in gainers)
                 {
                     if (de.Key is GamePlayer player)
                     {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoRP", killedPlayer.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoXP", killedPlayer.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoRP", player.GetPersonalizedName(killedPlayer)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoXP", player.GetPersonalizedName(killedPlayer)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
                 }
                 return;
@@ -2104,11 +2110,28 @@ namespace DOL.GS.ServerRules
                     string specialBonus = GetSpecialBonus(player.CurrentTitle, player);
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.TitleSpecialBonus") + ": " + "\r\n" + specialBonus);
                     stat.Add(" ");
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsPVP"));
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersGroup") + ": " + player.TaskXPlayer.KillEnemyPlayersGroupStats.ToString("F0"));
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersAlone") + ": " + player.TaskXPlayer.KillEnemyPlayersAloneStats.ToString("F0"));
-                    stat.Add(" ");
-                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers") + ": " + (player.TaskXPlayer.KillEnemyPlayersGroupStats + player.TaskXPlayer.KillEnemyPlayersAloneStats + player.TaskXPlayer.OutlawPlayersSentToJailStats).ToString("F0"));
+                    if (Properties.PVP_ALLOW_TASKSPOINTS)
+                    {
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsPVP"));
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersGroup") + ": " + player.TaskXPlayer.KillEnemyPlayersGroupStats.ToString("F0"));
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersAlone") + ": " + player.TaskXPlayer.KillEnemyPlayersAloneStats.ToString("F0"));
+                        stat.Add(" ");
+                        long totalPvP = player.TaskXPlayer.KillEnemyPlayersGroupStats + player.TaskXPlayer.KillEnemyPlayersAloneStats + player.TaskXPlayer.OutlawPlayersSentToJailStats;
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers") + ": " + totalPvP.ToString("F0"));
+                    }
+                    else
+                    {
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsCombatRvRPvE"));
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersGroup") + ": " + player.TaskXPlayer.KillEnemyPlayersGroupStats.ToString("F0"));
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersAlone") + ": " + player.TaskXPlayer.KillEnemyPlayersAloneStats.ToString("F0"));
+                        stat.Add(" ");
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsCombatPvP"));
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersGroup") + ": " + player.TaskXPlayer.KillEnemyPlayersPvPGroupStats.ToString("F0"));
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersAlone") + ": " + player.TaskXPlayer.KillEnemyPlayersPvPAloneStats.ToString("F0"));
+                        stat.Add(" ");
+                        long totalKills = player.TaskXPlayer.KillEnemyPlayersGroupStats + player.TaskXPlayer.KillEnemyPlayersAloneStats + player.TaskXPlayer.OutlawPlayersSentToJailStats + player.TaskXPlayer.KillEnemyPlayersPvPGroupStats + player.TaskXPlayer.KillEnemyPlayersPvPAloneStats;
+                        stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Kill.TotalPlayers") + ": " + totalKills.ToString("F0"));
+                    }
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.Deathblows.TotalPlayers") + ": " + total.ToString("F0"));
                     stat.Add(" ");
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsRVR"));
@@ -2119,6 +2142,7 @@ namespace DOL.GS.ServerRules
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsGVG"));
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillTerritoryGuards") + ": " + player.TaskXPlayer.KillTerritoryGuardsStats.ToString("F0"));
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillTerritoryBoss") + ": " + player.TaskXPlayer.KillTerritoryBossStats.ToString("F0"));
+                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.CapturedRelics") + ": " + player.CapturedRelics.ToString("F0"));
                     stat.Add(" ");
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsPVE"));
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillCreaturesInDungeons") + ": " + player.TaskXPlayer.KillCreaturesInDungeonsStats.ToString("F0"));
@@ -2142,6 +2166,11 @@ namespace DOL.GS.ServerRules
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EnemiesKilledInAdrenalineMode") + ": " + player.TaskXPlayer.EnemiesKilledInAdrenalineModeStats.ToString("F0"));
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EnemyKilledInDuel") + ": " + player.TaskXPlayer.EnemyKilledInDuelStats.ToString("F0"));
                     stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.QuestsCompleted") + ": " + player.TaskXPlayer.QuestsCompletedStats.ToString("F0"));
+                    stat.Add(" ");
+                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.StatsMiscellaneous"));
+                    //stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.PlayersAssassinated") + ": " + player.TaskXPlayer.AssassinationKillsStats.ToString("F0"));
+                    long totalLifetimeDeaths = player.DBCharacter.DeathCount + player.DBCharacter.DeathsPvP;
+                    stat.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerStatistic.TotalDeathCount") + ": " + totalLifetimeDeaths.ToString("F0"));
                 }
             }
             else

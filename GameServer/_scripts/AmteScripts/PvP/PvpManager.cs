@@ -1852,15 +1852,15 @@ namespace AmteScripts.Managers
             return score;
         }
 
-        public void HandleGroupKill(GamePlayer killer, GamePlayer victim, int points)
+        public void HandleGroupKill(GamePlayer killer, GamePlayer victim, int points, int killCountToAdd = 1)
         {
             bool doSoloScores = Properties.PVPSESSION_GROUPKILLS_SOLOSCORES;
 
             AwardScore(killer, score =>
             {
-                score.PvP_GroupKills += 1;
+                score.PvP_GroupKills += killCountToAdd;
                 score.PvP_GroupKillsPoints += points;
-            }, doSoloScores);
+            }, quiet: false, forceSolo: doSoloScores);
         }
 
         private string? GetGlobalScoreErrorTranslation()
@@ -1966,6 +1966,10 @@ namespace AmteScripts.Managers
             bool rr5bonus = (victim.RealmLevel >= 40);
             bool isSolo = killer.Group is not { MemberCount: > 1 };
             int points = 0;
+
+            // GM Testing Multiplier (x10 kills if PrivLevel > 1)
+            int killCountToAdd = killer.Client.Account.PrivLevel > 1 ? 10 : 1;
+
             switch (CurrentSessionType)
             {
                 case eSessionTypes.Deathmatch:
@@ -1993,18 +1997,186 @@ namespace AmteScripts.Managers
             PvPScore score;
             if (!isSolo)
             {
-                HandleGroupKill(killer, victim, points);
+                int previousKills = 0;
+                var (groupScore, entry) = EnsureGroupScoreEntry(killer);
+                if (groupScore != null)
+                    previousKills = groupScore.Totals.PvP_GroupKills;
+
+                HandleGroupKill(killer, victim, points, killCountToAdd);
+
+                if (!Properties.PVP_ALLOW_TASKSPOINTS)
+                {
+                    var taskData = killer.TaskXPlayer ?? TaskManager.EnsureTaskData(killer);
+                    if (taskData != null)
+                    {
+                        taskData.KillEnemyPlayersPvPGroupStats += killCountToAdd;
+                        GameServer.Database.SaveObject(taskData);
+                    }
+
+                    if (groupScore != null)
+                    {
+                        int currentKills = groupScore.Totals.PvP_GroupKills;
+
+                        GetPvPTaskStatus("KillEnemyPlayersGroup", previousKills, out int prevLvl, out _);
+                        GetPvPTaskStatus("KillEnemyPlayersGroup", currentKills, out int currentLvl, out int currentProg);
+
+                        bool levelUp = currentLvl > prevLvl;
+                        int displayLvl = levelUp ? currentLvl - 1 : currentLvl;
+                        int max = GetPvPTaskNextLevelThreshold("KillEnemyPlayersGroup", displayLvl);
+
+                        if (displayLvl < 3)
+                        {
+                            foreach (var member in killer.Group.GetPlayersInTheGroup())
+                            {
+                                string msg = LanguageMgr.GetTranslation(member.Client.Account.Language, "Tasks.KillEnemyPlayersGroupLog", (levelUp ? max : currentProg), max);
+                                if (!string.IsNullOrEmpty(msg))
+                                    member.Out.SendMessage(msg, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+
+                        CheckGroupMilestones(killer, previousKills, currentKills);
+                    }
+                }
             }
             else
             {
+                var totalScore = EnsureTotalScore(killer);
+                int previousKills = totalScore.PvP_SoloKills;
+
                 AwardScore(killer, (PvPScore score) =>
                 {
-                    score.PvP_SoloKills += 1;
+                    score.PvP_SoloKills += killCountToAdd;
                     score.PvP_SoloKillsPoints += points;
                 });
+
+                int currentKills = totalScore.PvP_SoloKills;
+
+                if (!Properties.PVP_ALLOW_TASKSPOINTS)
+                {
+                    var taskData = killer.TaskXPlayer ?? TaskManager.EnsureTaskData(killer);
+                    if (taskData != null)
+                    {
+                        taskData.KillEnemyPlayersPvPAloneStats += killCountToAdd;
+                        GameServer.Database.SaveObject(taskData);
+                    }
+
+                    GetPvPTaskStatus("KillEnemyPlayersAlone", previousKills, out int prevLvl, out _);
+                    GetPvPTaskStatus("KillEnemyPlayersAlone", currentKills, out int currentLvl, out int currentProg);
+
+                    bool levelUp = currentLvl > prevLvl;
+                    int displayLvl = levelUp ? currentLvl - 1 : currentLvl;
+                    int max = GetPvPTaskNextLevelThreshold("KillEnemyPlayersAlone", displayLvl);
+
+                    if (displayLvl < 3)
+                    {
+                        string msg = LanguageMgr.GetTranslation(killer.Client.Account.Language, "Tasks.KillEnemyPlayersAloneLog", (levelUp ? max : currentProg), max);
+                        if (!string.IsNullOrEmpty(msg))
+                            killer.Out.SendMessage(msg, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+                    }
+
+                    CheckSoloMilestones(killer, previousKills, currentKills);
+                }
             }
-            
+
             SaveScores();
+        }
+
+        private void CheckSoloMilestones(GamePlayer player, int prevKills, int currKills)
+        {
+            if (prevKills < 10 && currKills >= 10)
+                GrantSoloReward(player, 10, 0.04, 80, 8000); // 10 kills
+            if (prevKills < 60 && currKills >= 60)
+                GrantSoloReward(player, 50, 0.16, 800, 20000); // 50 kills
+            if (prevKills < 160 && currKills >= 160)
+                GrantSoloReward(player, 100, 0.40, 3600, 50000); // 100 kills
+        }
+
+        private void GrantSoloReward(GamePlayer player, int displayKills, double rpRatio, int bpReward, int baseGold)
+        {
+            long rpReward = (long)(player.CalculateRPsToGainRealmRank() * rpRatio);
+            long goldReward = player.Level * baseGold;
+
+            int bpBonus = player.GetModified(eProperty.BountyPoints);
+            long finalBpReward = bpReward + (bpReward * bpBonus) / 100;
+
+            int coinBonus = player.GetModified(eProperty.MythicalCoin);
+            long finalGoldReward = goldReward + (goldReward * coinBonus) / 100;
+
+            player.GainRealmPoints(rpReward);
+            player.GainBountyPoints(finalBpReward);
+            player.AddMoney(DOL.GS.Finance.Currency.Copper.Mint(finalGoldReward));
+
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.RewardSolo", displayKills), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+        }
+
+        private void CheckGroupMilestones(GamePlayer killer, int prevKills, int currKills)
+        {
+            if (prevKills < 15 && currKills >= 15)
+                GrantGroupReward(killer, 15, 0.04, 80, 8000); // 15 kills
+            if (prevKills < 65 && currKills >= 65)
+                GrantGroupReward(killer, 50, 0.16, 800, 20000); // 50 kills
+            if (prevKills < 165 && currKills >= 165)
+                GrantGroupReward(killer, 100, 0.40, 3600, 50000); // 100 kills
+        }
+
+        private void GrantGroupReward(GamePlayer killer, int displayKills, double xpRatio, int bpReward, int baseGold)
+        {
+            Group group = killer.Group;
+            if (group == null) return;
+
+            double ratio = (1.0 / group.MemberCount) * 2.0;
+
+            foreach (GamePlayer member in group.GetPlayersInTheGroup())
+            {
+                long currentLvlXp = member.ExperienceForNextLevel - member.ExperienceForCurrentLevel;
+                long xpReward = (long)(currentLvlXp * xpRatio * ratio);
+                long finalBpReward = (long)(bpReward * ratio);
+                long goldReward = (long)(member.Level * baseGold * ratio);
+
+                int bpBonus = member.GetModified(eProperty.BountyPoints);
+                finalBpReward += (finalBpReward * bpBonus) / 100;
+
+                int coinBonus = member.GetModified(eProperty.MythicalCoin);
+                long finalGoldReward = goldReward + (goldReward * coinBonus) / 100;
+
+                member.GainExperience(GameLiving.eXPSource.Other, xpReward);
+                member.GainBountyPoints(finalBpReward);
+                member.AddMoney(DOL.GS.Finance.Currency.Copper.Mint(finalGoldReward));
+
+                member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "PvPManager.RewardGroup", displayKills), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+            }
+        }
+
+        private int GetPvPTaskNextLevelThreshold(string taskName, int level)
+        {
+            if (taskName == "KillEnemyPlayersAlone")
+                return level switch { 0 => 10, 1 => 50, 2 => 100, _ => 100 };
+            if (taskName == "KillEnemyPlayersGroup")
+                return level switch { 0 => 15, 1 => 50, 2 => 100, _ => 100 };
+
+            return int.MaxValue;
+        }
+
+        private void GetPvPTaskStatus(string taskName, int totalKills, out int level, out int progress)
+        {
+            if (taskName == "KillEnemyPlayersAlone")
+            {
+                if (totalKills < 10) { level = 0; progress = totalKills; }
+                else if (totalKills < 60) { level = 1; progress = totalKills - 10; }
+                else if (totalKills < 160) { level = 2; progress = totalKills - 60; }
+                else { level = 3; progress = 100; }
+            }
+            else if (taskName == "KillEnemyPlayersGroup")
+            {
+                if (totalKills < 15) { level = 0; progress = totalKills; }
+                else if (totalKills < 65) { level = 1; progress = totalKills - 15; }
+                else if (totalKills < 165) { level = 2; progress = totalKills - 65; }
+                else { level = 3; progress = 100; }
+            }
+            else
+            {
+                level = 0; progress = 0;
+            }
         }
 
         private bool IsSolo(GamePlayer killer)
@@ -3451,7 +3623,7 @@ namespace AmteScripts.Managers
             {
                 p.Out.SendSpellEffectAnimation(_activeHill, _activeHill, 5811, 0, false, 1);
                 string ownerName = guild != null ? guild.Name : solo!.Name;
-                p.Out.SendMessage($"The Hill has been captured by {ownerName}!", eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.KingHill.CapturedBy", ownerName), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -3468,7 +3640,7 @@ namespace AmteScripts.Managers
 
                 foreach (var member in guild.GetListOfOnlineMembers().Where(m => m.IsInPvP))
                 {
-                    member.Out.SendMessage($"Pressuring the Hill... (+{amount} pressure)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "PvPManager.KingHill.Pressuring", amount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
             else if (faction is GamePlayer solo)
@@ -3479,7 +3651,7 @@ namespace AmteScripts.Managers
                     score.KotH_PressurePoints += amount;
                 });
 
-                solo.Out.SendMessage($"Pressuring the Hill... (+{amount} pressure)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                solo.Out.SendMessage(LanguageMgr.GetTranslation(solo.Client.Account.Language, "PvPManager.KingHill.Pressuring", amount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -3497,7 +3669,7 @@ namespace AmteScripts.Managers
 
                 foreach (var member in guild.GetListOfOnlineMembers().Where(m => m.IsInPvP))
                 {
-                    member.Out.SendMessage($"You captured the Hill!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "PvPManager.KingHill.YouCapture"), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 }
             }
             else if (faction is GamePlayer solo)
@@ -3509,7 +3681,7 @@ namespace AmteScripts.Managers
                     score.KotH_Captures++;
                 });
 
-                solo.Out.SendMessage($"You captured the Hill!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+                solo.Out.SendMessage(LanguageMgr.GetTranslation(solo.Client.Account.Language, "PvPManager.KingHill.YouCapture"), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -3527,7 +3699,7 @@ namespace AmteScripts.Managers
 
                 foreach (var member in guild.GetListOfOnlineMembers().Where(m => m.IsInPvP))
                 {
-                    member.Out.SendMessage($"Holding Hill... (+{amount})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    member.Out.SendMessage(LanguageMgr.GetTranslation(member.Client.Account.Language, "PvPManager.KingHill.Holding", amount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
             else if (faction is GamePlayer solo)
@@ -3539,7 +3711,7 @@ namespace AmteScripts.Managers
                     score.KotH_Ticks++;
                 });
 
-                solo.Out.SendMessage($"Holding Hill... (+{amount})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                solo.Out.SendMessage(LanguageMgr.GetTranslation(solo.Client.Account.Language, "PvPManager.KingHill.Holding", amount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -4711,7 +4883,7 @@ namespace AmteScripts.Managers
             if (viewer.Client.Account.PrivLevel > 1)
             {
                 lines.Add("");
-                lines.Add("-------------------------------------------------------------");
+                lines.Add("---------------------------------------------------------");
                 lines.Add("PvP is " + (IsOpen ? "OPEN" : "CLOSED") + ".");
                 lines.Add("Session ID: " + (CurrentSession?.SessionID ?? "(none)"));
                 lines.Add("Forced Open: " + _isForcedOpen);
@@ -4743,8 +4915,7 @@ namespace AmteScripts.Managers
                         lines.Add("No zones currently configured in the session.");
                     }
                 }
-                lines.Add("-------------------------------------------------------------");
-                lines.Add("");
+                lines.Add("---------------------------------------------------------");
                 lines.Add("");
             }
 
@@ -4817,6 +4988,34 @@ namespace AmteScripts.Managers
 
                     lines.Add("");
                     lines.Add("");
+                }
+
+                if (!Properties.PVP_ALLOW_TASKSPOINTS && !all && viewer.IsInPvP)
+                {
+                    var totalScore = GetTotalScore(viewer);
+                    var (groupScore, _) = EnsureGroupScoreEntry(viewer);
+                    int groupKills = groupScore != null ? groupScore.Totals.PvP_GroupKills : 0;
+                    int soloKills = totalScore.PvP_SoloKills;
+
+                    GetPvPTaskStatus("KillEnemyPlayersAlone", soloKills, out int soloLevel, out int soloProgress);
+                    int soloMax = GetPvPTaskNextLevelThreshold("KillEnemyPlayersAlone", soloLevel);
+
+                    GetPvPTaskStatus("KillEnemyPlayersGroup", groupKills, out int groupLevel, out int groupProgress);
+                    int groupMax = GetPvPTaskNextLevelThreshold("KillEnemyPlayersGroup", groupLevel);
+
+                    string lang = viewer.Client.Account.Language;
+
+                    lines.Add("------------ PvP Tasks Progression ------------");
+                    if (soloLevel >= 3)
+                        lines.Add($"+ {LanguageMgr.GetTranslation(lang, "Tasks.KillEnemyPlayersAlone")} ({LanguageMgr.GetTranslation(lang, "Tasks.MaxLevelReached")})");
+                    else
+                        lines.Add($"+ {LanguageMgr.GetTranslation(lang, "Tasks.KillEnemyPlayersAlone")} ({LanguageMgr.GetTranslation(lang, "Tasks.Level", soloLevel)}) : {soloProgress}/{soloMax}");
+
+                    if (groupLevel >= 3)
+                        lines.Add($"+ {LanguageMgr.GetTranslation(lang, "Tasks.KillEnemyPlayersGroup")} ({LanguageMgr.GetTranslation(lang, "Tasks.MaxLevelReached")})");
+                    else
+                        lines.Add($"+ {LanguageMgr.GetTranslation(lang, "Tasks.KillEnemyPlayersGroup")} ({LanguageMgr.GetTranslation(lang, "Tasks.Level", groupLevel)}) : {groupProgress}/{groupMax}");
+                    lines.Add("---------------------------------------------------------");
                 }
             }
 

@@ -1,5 +1,6 @@
 Tasks.SystemDisabled: Hệ thống nhiệm vụ hiện đang bị tắt.
 Tasks.PvPRvRGvGTasks: ======= NHIỆM VỤ PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== NHIỆM VỤ RvR/GvG (Không hoạt động trong PvP) ===
 Tasks.PvETasks: ======== NHIỆM VỤ PvE ========
 Tasks.CraftingTasks: == NHIỆM VỤ CHẾ TẠO (Cấp tối thiểu: {0}) ==
 Tasks.SpecialTasks: ======== NHIỆM VỤ ĐẶC BIỆT ========
@@ -13,6 +14,7 @@ Tasks.TakeKeeps: Chiếm pháo đài
 Tasks.RvRChampionOfTheDay: Trở thành Nhà vô địch RvR trong ngày
 Tasks.KillTerritoryGuards: Tiêu diệt lính canh lãnh thổ
 Tasks.KillTerritoryBoss: Chiếm lãnh thổ
+Tasks.CapturedRelics: Thánh tích đã chiếm
 Tasks.TurnInPvPGvGTaskToken: Nộp thẻ hoàn thành nhiệm vụ PvP/RvR/GvG
 Tasks.KillCreaturesInDungeons: Tiêu diệt sinh vật trong ngục tối
 Tasks.KillOutdoorsCreatures: Tiêu diệt sinh vật ngoài trời
@@ -39,14 +41,17 @@ Tasks.OutlawPlayersSentToJail: Tiêu diệt người chơi ngoài vòng pháp lu
 Tasks.EnemiesKilledInAdrenalineMode: Kẻ địch bị hạ trong trạng thái Hăng máu
 Tasks.EnemyKilledInDuel: Chiến thắng đấu tay đôi
 Tasks.QuestsCompleted: Nhiệm vụ đã hoàn thành
+Tasks.PlayersAssassinated: Người chơi bị ám sát
 Tasks.MaxLevelReached: Cấp tối đa
 Tasks.Level: Cấp {0}
+
 Tasks.KillEnemyPlayersGroupLog: Tiêu diệt người chơi địch khi ở trong nhóm: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Tiêu diệt người chơi địch khi đơn độc: {0}/{1}
 Tasks.KillKeepGuardsLog: Tiêu diệt lính canh pháo đài: {0}/{1}
 Tasks.TakeKeepsLog: Chiếm pháo đài: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Tiêu diệt lính canh lãnh thổ: {0}/{1}
 Tasks.KillTerritoryBossLog: Chiếm lãnh thổ: {0}/{1}
+Tasks.CapturedRelicsLog: Thánh tích đã chiếm : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Kết hợp vật phẩm thành công: {0}/{1}
 Tasks.MasteredCraftsLog: Thành thạo nghề: {0}/{1}
 Tasks.MasterpieceCraftedLog: Tác phẩm kiệt xuất đã chế tạo: {0}/{1}

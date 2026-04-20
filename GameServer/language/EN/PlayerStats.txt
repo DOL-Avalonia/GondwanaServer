@@ -34,6 +34,8 @@ PlayerStatistic.PvE.KillsLegion:			Legion Kills
 PlayerStatistic.TitleNone:					None
 PlayerStatistic.TitleAssigned:				Assigned Title
 PlayerStatistic.TitleSpecialBonus:			Special Bonuses
+PlayerStatistic.StatsCombatRvRPvE:			RvR-GvG zones Combat Stats:
+PlayerStatistic.StatsCombatPvP:				PvP zones Combat Stats:
 PlayerStatistic.StatsPVP:					PvP Statistics:
 PlayerStatistic.StatsRVR:					RvR Statistics:
 PlayerStatistic.StatsGVG:					GvG Territories Statistics:
@@ -43,6 +45,8 @@ PlayerStatistic.StatsGreatAchievements:		Great Achievements:
 PlayerStatistic.StatsSpecialAchievements:	Special Achievements:
 PlayerStatistic.TotalCreaturesKilled:		Total Creatures killed
 PlayerStatistic.TotalCraftPerformed:		Total Item created
+PlayerStatistic.StatsMiscellaneous:			Miscellaneous:
+PlayerStatistic.TotalDeathCount:			Total death count
 
 # /Title bonuses
 PlayerStatistic.Bonus.DemonslayerTitle:         +{0}% DPS in melee / +{1}% spell dmg / +{2}% All critical hit chance

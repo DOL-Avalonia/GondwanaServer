@@ -1,19 +1,21 @@
 
-Tasks.SystemDisabled: Le système de tâches est actuellement désactivé.
-Tasks.PvPRvRGvGTasks: ======= TACHES PvP/RvR/GvG =======
-Tasks.PvETasks: ======== TACHES PvE ========
-Tasks.CraftingTasks: == TACHES D'ARTISANAT (Niveau min : {0}) ==
-Tasks.SpecialTasks: ======== TACHES SPECIALES ========
+Tasks.SystemDisabled:		Le système de tâches est actuellement désactivé.
+Tasks.PvPRvRGvGTasks:		======= TACHES PvP/RvR/GvG =======
+Tasks.RvRGvGTasksNoPvP:		=== TACHES RvR/GvG (Inactives en PvP) ===
+Tasks.PvETasks:			======== TACHES PvE ========
+Tasks.CraftingTasks:		== TACHES D'ARTISANAT (Niveau min : {0}) ==
+Tasks.SpecialTasks:		======== TACHES SPECIALES ========
 Tasks.TaskCompletionTokenInfo: Chaque jeton de tâches PvP, RvR, GvG, PvE ou d'Artisanat doit être remis au Maître des Tâches pour recevoir des récompenses.
 Tasks.SpecialTaskCompletionTokenInfo: Les jetons de tâches spéciales sont spécifiques à chaque tâche. Ces jetons débloquent de nouveaux titres de joueur auxquels sont associés des bonus spéciaux.
 Tasks.SnapshotTitle: TACHES
-Tasks.KillEnemyPlayersGroup: Tuez des joueurs ennemis en étant groupé
+Tasks.KillEnemyPlayersGroup: Tuez des joueurs ennemis en groupe
 Tasks.KillEnemyPlayersAlone: Tuez des joueurs ennemis seul
 Tasks.KillKeepGuards: Tuez des gardes de forts
 Tasks.TakeKeeps: Prise de forts
 Tasks.RvRChampionOfTheDay: Etre Champion du Jour en RvR
 Tasks.KillTerritoryGuards: Tuez des gardes de territoires
 Tasks.KillTerritoryBoss: Captures de territoires
+Tasks.CapturedRelics: Captures de reliques
 Tasks.TurnInPvPGvGTaskToken: Jeton de Tâche PvP/RvR/GvG
 Tasks.KillCreaturesInDungeons: Tuez des créatures de donjons
 Tasks.KillOutdoorsCreatures: Tuez des créatures d'extérieur
@@ -40,6 +42,7 @@ Tasks.OutlawPlayersSentToJail: Neutralisez des Hors-la-loi
 Tasks.EnemiesKilledInAdrenalineMode: Ennemis tués en Adrénaline
 Tasks.EnemyKilledInDuel: Victoires en duel
 Tasks.QuestsCompleted: Quêtes terminées
+Tasks.PlayersAssassinated: Joueurs assassinés
 Tasks.MaxLevelReached: Niveau max
 Tasks.Level: Niveau {0}
 
@@ -49,6 +52,7 @@ Tasks.KillKeepGuardsLog: Tuez des gardes de forts : {0}/{1}
 Tasks.TakeKeepsLog: Prise de forts : {0}/{1}
 Tasks.KillTerritoryGuardsLog: Tuez des gardes de territoires : {0}/{1}
 Tasks.KillTerritoryBossLog: Captures de territoires : {0}/{1}
+Tasks.CapturedRelicsLog: Captures de reliques : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Combinaisons d'objets réussies : {0}/{1}
 Tasks.MasteredCraftsLog: Objets fabriqués via l'Artisanat : {0}/{1}
 Tasks.MasterpieceCraftedLog: Chef-d'œuvres fabriqués : {0}/{1}

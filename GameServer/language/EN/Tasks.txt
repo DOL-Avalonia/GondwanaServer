@@ -1,9 +1,10 @@
 
-Tasks.SystemDisabled: The task system is currently disabled.
-Tasks.PvPRvRGvGTasks: ======= PvP/RvR/GvG TASKS =======
-Tasks.PvETasks: ======== PvE TASKS ========
-Tasks.CraftingTasks: == CRAFTING TASKS (Level Min: {0}) ==
-Tasks.SpecialTasks: ======== SPECIAL TASKS ========
+Tasks.SystemDisabled:		The task system is currently disabled.
+Tasks.PvPRvRGvGTasks:		======= PvP/RvR/GvG TASKS =======
+Tasks.RvRGvGTasksNoPvP:		=== TACHES RvR/GvG (Inactives en PvP) ===
+Tasks.PvETasks:				======== PvE TASKS ========
+Tasks.CraftingTasks:		== CRAFTING TASKS (Level Min: {0}) ==
+Tasks.SpecialTasks:			======== SPECIAL TASKS ========
 Tasks.TaskCompletionTokenInfo: Each task completion token for PvP, RvR, GvG, PvE, or crafting tasks should be returned to the Taskmaster to receive rewards.
 Tasks.SpecialTaskCompletionTokenInfo: Special task completion tokens are specific to each task. These tokens unlock new player titles and provide special bonuses associated with those titles.
 Tasks.SnapshotTitle: TASKS
@@ -14,6 +15,7 @@ Tasks.TakeKeeps: Take Keeps
 Tasks.RvRChampionOfTheDay: Be RvR Champion of the Day
 Tasks.KillTerritoryGuards: Kill Territory Guards
 Tasks.KillTerritoryBoss: Territory Capture
+Tasks.CapturedRelics: Captured Relics
 Tasks.TurnInPvPGvGTaskToken: Turn in PvP/RvR/GvG Task completion token
 Tasks.KillCreaturesInDungeons: Kill Creatures in Dungeons
 Tasks.KillOutdoorsCreatures: Kill Outdoors Creatures
@@ -40,6 +42,7 @@ Tasks.OutlawPlayersSentToJail: Kill Outlaw Players
 Tasks.EnemiesKilledInAdrenalineMode: Enemies killed in Adrenaline
 Tasks.EnemyKilledInDuel: Duel Victories
 Tasks.QuestsCompleted: Quests completed
+Tasks.PlayersAssassinated: Players assassinated
 Tasks.MaxLevelReached: Max level
 Tasks.Level: Level {0}
 
@@ -49,6 +52,7 @@ Tasks.KillKeepGuardsLog: Kill Keep Guards: {0}/{1}
 Tasks.TakeKeepsLog: Take Keeps: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Kill Territory Guards: {0}/{1}
 Tasks.KillTerritoryBossLog: Territory Capture: {0}/{1}
+Tasks.CapturedRelicsLog: Captured Relics : {0}/{1}
 Tasks.SuccessfulItemCombinationsLog: Successful Item Combinations: {0}/{1}
 Tasks.MasteredCraftsLog: Mastered Crafts: {0}/{1}
 Tasks.MasterpieceCraftedLog: Masterpieces crafted: {0}/{1}

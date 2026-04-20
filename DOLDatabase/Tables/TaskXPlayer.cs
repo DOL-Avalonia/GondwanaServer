@@ -19,6 +19,7 @@ namespace DOL.Database
         private string m_rvRChampionOfTheDay = "0|0";
         private string m_killTerritoryGuards = "0|0";
         private string m_killTerritoryBoss = "0|0";
+        private string m_capturedRelics = "0|0";
         private string m_turnInPvPGvGTaskToken = "0|0";
         private string m_killCreaturesInDungeons = "0|0";
         private string m_killOutdoorsCreatures = "0|0";
@@ -51,6 +52,7 @@ namespace DOL.Database
         private int m_rvRChampionOfTheDayStats;
         private int m_killTerritoryGuardsStats;
         private int m_killTerritoryBossStats;
+        private int m_capturedRelicsStats;
         private int m_killCreaturesInDungeonsStats;
         private int m_killOutdoorsCreaturesStats;
         private int m_successfulItemCombinationsStats;
@@ -62,6 +64,9 @@ namespace DOL.Database
         private int m_enemiesKilledInAdrenalineModeStats;
         private int m_enemyKilledInDuelStats;
         private int m_questsCompletedStats;
+        private int m_killEnemyPlayersPvPGroupStats;
+        private int m_killEnemyPlayersPvPAloneStats;
+        private int m_assassinationKillsStats;
 
         [DataElement(AllowDbNull = false, Unique = true)]
         public string PlayerId
@@ -159,6 +164,17 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_killTerritoryBoss = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public string CapturedRelics
+        {
+            get { return m_capturedRelics; }
+            set
+            {
+                Dirty = true;
+                m_capturedRelics = value;
             }
         }
 
@@ -515,6 +531,17 @@ namespace DOL.Database
         }
 
         [DataElement(AllowDbNull = false)]
+        public int CapturedRelicsStats
+        {
+            get { return m_capturedRelicsStats; }
+            set
+            {
+                Dirty = true;
+                m_capturedRelicsStats = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
         public int KillCreaturesInDungeonsStats
         {
             get { return m_killCreaturesInDungeonsStats; }
@@ -632,6 +659,39 @@ namespace DOL.Database
             {
                 Dirty = true;
                 m_questsCompletedStats = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int KillEnemyPlayersPvPGroupStats
+        {
+            get { return m_killEnemyPlayersPvPGroupStats; }
+            set
+            {
+                Dirty = true;
+                m_killEnemyPlayersPvPGroupStats = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int KillEnemyPlayersPvPAloneStats
+        {
+            get { return m_killEnemyPlayersPvPAloneStats; }
+            set
+            {
+                Dirty = true;
+                m_killEnemyPlayersPvPAloneStats = value;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public int AssassinationKillsStats
+        {
+            get { return m_assassinationKillsStats; }
+            set
+            {
+                Dirty = true;
+                m_assassinationKillsStats = value;
             }
         }
     }

@@ -5939,6 +5939,7 @@ namespace DOL.GS
                 string expCampBonusStr = "";
                 string expGroupBonusStr = "";
                 string expOutpostBonusStr = "";
+                string expLowPopBonusStr = "";
 
                 if (expCampBonus > 0)
                 {
@@ -5952,8 +5953,12 @@ namespace DOL.GS
                 {
                     expOutpostBonusStr = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainExperience.OutpostBonus", expOutpostBonus.ToString("F0", format));
                 }
+                if (lowPopBonusExp > 0)
+                {
+                    expLowPopBonusStr = " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainExperience.LowPopBonus", lowPopBonusExp.ToString("F0", format), lowPopBonusPercent);
+                }
 
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainExperience.YouGet", totalExpStr) + expCampBonusStr + expGroupBonusStr, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainExperience.YouGet", totalExpStr) + expLowPopBonusStr + expCampBonusStr + expGroupBonusStr + expOutpostBonusStr, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
                 if (bonusRenaissance > 0)
                 {
@@ -5961,7 +5966,7 @@ namespace DOL.GS
                 }
                 else if (bonusRenaissance < 0)
                 {
-                    Out.SendMessage("dont un malus renaissance de: " + Math.Abs(bonusRenaissance), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainExperience.MalusRenaissance", Math.Abs(bonusRenaissance)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
 
                 if (territoryExp > 0)

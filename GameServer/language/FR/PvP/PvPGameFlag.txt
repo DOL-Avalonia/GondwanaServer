@@ -1,7 +1,15 @@
 
 PvPGameFlag.AlreadyOwnFlag:		Ce drapeau est déjà vôtre ; vous ne pouvez le saisir à nouveau !
 PvPGameFlag.GroupOwnsFlag:		Votre groupe possède déjà ce drapeau ; vous ne pouvez pas le reprendre !
-PvPGameFlag.CannotPickupDead:		Vous ne pouvez pas ramasser le drapeau en étant mort.
+PvPGameFlag.CannotPickupDead:		Vous ne pouvez pas ramasser le drapeau en étant mort·e.
 PvPGameFlag.CannotPickupStealthed:	Vous ne pouvez pas ramasser le drapeau en étant furtif !
+PvPGameFlag.CannotPickupMounted:	Vous ne pouvez pas ramasser le drapeau en étant à cheval !
+PvPGameFlag.CannotPickupCombat:		Vous ne pouvez pas ramasser le drapeau en combat !
+PvPGameFlag.CannotPickupAFK:		Vous ne pouvez pas ramasser le drapeau en étant AFK!
+PvPGameFlag.CannotPickupDuel:		Vous ne pouvez pas ramasser le drapeau en étant engagé dans un duel !
+PvPGameFlag.CannotPickupGuildBanner:	Vous ne pouvez pas ramasser le drapeau tout en brandissant une bannière de guilde.
+PvPGameFlag.CannotPickupDamned:		Vous ne pouvez pas ramasser le drapeau en étant damné·e.
+PvPGameFlag.CannotPickupPtrified:	Vous ne pouvez pas ramasser le drapeau en étant pétrifié·e.
+PvPGameFlag.CannotPickupFrog:		Vous ne pouvez pas ramasser le drapeau en étant sous enchantement "grenouille".
 PvPGameFlag.InventoryFull:		Votre inventaire est plein !
 PvPGameFlag.DepositedFlag:		Vous avez planté le drapeau sur votre avant-poste !
