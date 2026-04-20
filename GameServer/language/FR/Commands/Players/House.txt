@@ -11,4 +11,14 @@ Commands.Players.House.ModelInvalid:	Les modèles de maison valides sont compris
 Commands.Players.House.ModelChanged:	Le modèle de la maison a été remplacé par {0} !
 Commands.Players.House.ConfirmYES:	Vous devez confirmer cette suppression par 'YES'
 Commands.Players.House.Removed:		Maison supprimée !
-Commands.Players.House.Description:	affiche diverses informations sur la zone résidentielle.
+Commands.Players.House.Description:	Affiche diverses informations sur la zone résidentielle.
+Commands.Players.House.InfoLot:		'/house info <lotnumber>' # Affiche les informations détaillées sur une propriété que vous possédez.
+
+Commands.Players.House.NotYourHouse:		Vous ne possédez pas cette maison.
+Commands.Players.House.ListHouse:			Maison {0} :
+Commands.Players.House.ListNoRent:			Pas de loyer !
+Commands.Players.House.ListRentDaysHours:	{0} jours, {1} heures
+Commands.Players.House.ListRentSeconds:		{0} secondes
+Commands.Players.House.ListRentDue:			Paiement du loyer dans : {0}
+Commands.Players.House.ListMoreInfoInstruction:	(Plus d'infos sur cette propriété avec la commande '/house info {0}')
+Commands.Players.House.YourProperties:		Vos Propriétés

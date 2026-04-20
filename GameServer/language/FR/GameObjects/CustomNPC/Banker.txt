@@ -10,6 +10,14 @@ Banker.Greetings2:				Que voulez-vous faire ?
 Banker.Greetings3:				[retirer de l'argent]
 Banker.Greetings4:				[faire un chèque]
 Banker.Greetings5:				[encaisser un chèque]
+Banker.Greetings6:				[transférer de l'argent]
+Banker.Greetings7:				[dépôts à terme]
+Banker.Greetings8:				[paiement automatique du loyer ({0})]
+Banker.AutoRent.On:				ACTIVÉ
+Banker.AutoRent.Off:			DÉSACTIVÉ
+Banker.AutoRent.Prompt:			Voulez-vous que le loyer de votre maison soit automatiquement prélevé sur votre compte bancaire ? [Oui] [Non]
+Banker.AutoRent.SetOn:			Le paiement automatique du loyer est maintenant ACTIVÉ.
+Banker.AutoRent.SetOff:			Le paiement automatique du loyer est maintenant DÉSACTIVÉ.
 Banker.HowMuchWithdraw:			Combien voulez-vous retirer ?
 Banker.WithdrawAmount:			[La totalité] [quelques pièces]
 Banker.NoAccountYet1:			Bonjour, vous n'avez pas encore de compte.
@@ -17,3 +25,19 @@ Banker.NoAccountYet2:			Pour créer un compte il suffit de me donner de l'argent
 Banker.WithdrawSomeCoins:		Pour retirer quelques pièces, il suffit de me sélectionner et de taper la commande /banque.
 Banker.WriteCheck:				Pour faire un chèque, il suffit de me sélectionner et de taper la commande /banque cheque.
 Banker.CashCheck:				Pour encaisser un chèque, il suffit de me le donner.
+Banker.Transfer.Help:			Pour transférer de l'argent directement, utilisez la commande : /banque transfer <NomDuJoueur> <Cuivre> <Argent> <Or> <Platine>
+Banker.Term.Header:				--- Dépôts à terme ({0}/{1}) ---
+Banker.Term.Active:				Contrats actifs :
+Banker.Term.Contract:			- {0} à {1}% (Arrive à échéance dans {2})
+Banker.Term.Days:				{0} jours
+Banker.Term.Hours:				{0} heures
+Banker.Term.NewContract:		Ouvrir un nouveau contrat :
+Banker.Term.Option1:			[ouvrir un dépôt bimensuel] - 3% d'intérêts
+Banker.Term.Option2:			[ouvrir un dépôt mensuel] - 5% d'intérêts
+Banker.Term.Option3:			[ouvrir un dépôt trimestriel] - 7% d'intérêts
+Banker.Term.MaxReached:			Vous avez atteint le nombre maximum de dépôts à terme actifs.
+Banker.Term.Prompt:				Pour ouvrir un dépôt {0} à {1}%, utilisez la commande : /banque termdeposit {2} <Cuivre> <Argent> <Or> <Platine>
+Banker.Term.Matured:			Un dépôt à terme est arrivé à échéance ! {0} (Capital + {1}% d'intérêts) ont été crédités sur votre compte.
+Banker.Term.Biweekly:			bimensuel
+Banker.Term.Monthly:			mensuel
+Banker.Term.Quarterly:			trimestriel

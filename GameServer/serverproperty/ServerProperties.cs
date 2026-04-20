@@ -2546,6 +2546,12 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("housing", "market_search_limit", "How many items can the market search return?", 300)]
         public static int MARKET_SEARCH_LIMIT;
 
+        /// <summary>
+        /// How many term deposit contracts a player can do with a banker?
+        /// </summary>
+        [ServerProperty("banking", "max_term_deposits", "Maximum number of term deposit contracts a player can have at once.", 3)]
+        public static int MAX_TERM_DEPOSITS;
+
         #endregion
 
         #region CLASSES

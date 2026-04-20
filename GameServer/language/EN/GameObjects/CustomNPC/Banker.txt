@@ -10,6 +10,14 @@ Banker.Greetings2:				What do you want to do?
 Banker.Greetings3:				[withdraw money]
 Banker.Greetings4:				[write a check]
 Banker.Greetings5:				[cash a check]
+Banker.Greetings6:				[transfer money]
+Banker.Greetings7:				[term deposits]
+Banker.Greetings8:				[automatic house rental payment ({0})]
+Banker.AutoRent.On:				ON
+Banker.AutoRent.Off:			OFF
+Banker.AutoRent.Prompt:			Would you like your house rental to be automatically withdrawn from your bank account? [Yes] [No]
+Banker.AutoRent.SetOn:			Automatic house rental is now ON.
+Banker.AutoRent.SetOff:			Automatic house rental is now OFF.
 Banker.HowMuchWithdraw:			How much would you like to withdraw?
 Banker.WithdrawAmount:			[everything] [some coins]
 Banker.NoAccountYet1:			Hello, you don't have any bank account yet.
@@ -17,3 +25,19 @@ Banker.NoAccountYet2:			To create an account, just give me some money, the accou
 Banker.WithdrawSomeCoins:		To withdraw some coins, simply select me and type the command /banque.
 Banker.WriteCheck:				To write a check, simply select me and type the command /banque cheque.
 Banker.CashCheck:				To cash a check, just give it to me.
+Banker.Transfer.Help:			To transfer money directly, use the command: /banque transfer <PlayerName> <Copper> <Silver> <Gold> <Platinum>
+Banker.Term.Header:				--- Term Deposits ({0}/{1}) ---
+Banker.Term.Active:				Active Contracts:
+Banker.Term.Contract:			- {0} at {1}% (Matures in {2})
+Banker.Term.Days:				{0} days
+Banker.Term.Hours:				{0} hours
+Banker.Term.NewContract:		Open a new contract:
+Banker.Term.Option1:			[open biweekly deposit] - 3% Interest
+Banker.Term.Option2:			[open monthly deposit] - 5% Interest
+Banker.Term.Option3:			[open quarterly deposit] - 7% Interest
+Banker.Term.MaxReached:			You have reached the maximum number of active term deposits.
+Banker.Term.Prompt:				To open a {0} deposit at {1}%, use the command: /banque termdeposit {2} <Copper> <Silver> <Gold> <Platinum>
+Banker.Term.Matured:			A Term Deposit has matured! {0} (Principal + {1}% interest) has been credited to your bank.
+Banker.Term.Biweekly:			biweekly
+Banker.Term.Monthly:			monthly
+Banker.Term.Quarterly:			quarterly

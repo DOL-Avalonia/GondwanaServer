@@ -3,6 +3,7 @@ House.DBHousePermissions.AccessLevel:			Toegangsniveau {0}
 House.Edit.NotEnoughMoney:				Je hebt niet genoeg geld om dat te doen!
 House.Edit.PayForChanges:				Betaal {0} voor de wijzigingen.
 House.Enter.EnteredHouse:				Je bent huis nummer {0} binnengegaan.
+House.Enter.EnteringHouse:				Je betreedt het huis van {0}.
 House.Exit.LeftHouse:					Je hebt huis nummer {0} verlaten.
 House.SendHouseInfo.DoorMaterial:			-Deur: {0}	
 House.SendHouseInfo.ExteriorMaterials:			Exterieurmaterialen:
@@ -33,7 +34,11 @@ House.SendHouseInfo.Rug3Color:					-Kleur 3: {0}
 House.SendHouseInfo.Rug4Color:					-Kleur 4: {0}
 House.SendHouseInfo.TrussMaterial:				-Spanten: {0}	
 House.SendHouseInfo.WallMaterial:				-Muren: {0}	
-House.SendHouseInfo.WindowMaterial:				-Ramen: {0}	
+House.SendHouseInfo.WindowMaterial:				-Ramen: {0}
+House.SendHouseInfo.RentDueInSec:			Huur verschuldigd over: {0} seconden
+House.EmptyHookpoint.NotOwner:				Alleen de eigenaar van een huis kan voorwerpen verwijderen of plaatsen op ophangpunten!
+House.EmptyHookpoint.InvalidPosition:		Ongeldige ophangpunt-positie {0}
+House.EmptyHookpoint.NoItemFound:			Geen ophangpunt-voorwerp gevonden op positie {0}
 
 HouseEnterLeave.TooFarAway:					Je bent te ver weg om huis {0} binnen te gaan.
 HouseEnterLeave.CantEnter:					Je kunt huis {0} niet betreden.
@@ -69,6 +74,7 @@ Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	Je bezit al een andere kavel o
 Housing.LotMarker.YouJustBoughtThisLotFor:			Je hebt zojuist deze kavel gekocht voor {0}.
 Housing.LotMarker.YouDontHaveEnoughMoney:			Onvoldoende middelen!
 Housing.LotMarker.ThisItemCantBeSold:				Dit object kan niet worden verkocht.
+Housing.LotMarker.LotNotItem:					Dit is geen geldig eigendomsdocument.
 
 Scripts.Player.Housing.BadShieldBanner:			Dit is geen geldig object of banner.
 Scripts.Player.Housing.CantBeSold:				Dit object kan niet worden verkocht!
@@ -79,7 +85,15 @@ Scripts.Player.Housing.GardenItemPlaced:			Tuinobjecten geplaatst. {0} plaatsen 
 Scripts.Player.Housing.GardenItemPlacedName:		Laat het object {0} in je tuin.
 Scripts.Player.Housing.GardenMaxObjects:			Je hebt 30 objecten in je tuin geplaatst. Geen ruimte meer.
 Scripts.Player.Housing.GuildNowOwns:				[Gilde] {0} bezit nu een gildehuis van {1}!
-Scripts.Player.Housing.HookPointAdded:			Dit object is aan je huis toegevoegd.
+Scripts.Player.Housing.NotOwner:					Je bent niet de eigenaar van dit huis!
+Scripts.Player.Housing.NotGuildLeader:				Je bent niet de leider van een gilde!
+Scripts.Player.Housing.ConsignmentNotEmpty:			Alle voorwerpen en geld moeten van je consignatiehandelaar worden verwijderd om dit huis te kunnen overdragen!
+Scripts.Player.Housing.RentPaidFromBank:			{0} is van je bankrekening afgeschreven voor de huurbetaling van je huis.
+Scripts.Player.Housing.TargetLotMarker:				Je moet een kavelmarkering selecteren om een akte te kopen.
+Scripts.Player.Housing.MerchantListNotFound:		Kan transactie niet voltooien: Handelaarslijst niet gevonden.
+Scripts.Player.Housing.GuildHouseEvicted:			[Huisvesting] Het gildehuis op kavel {0} is door het rijk in beslag genomen wegens onbetaalde huur!
+Scripts.Player.Housing.PersonalHouseEvicted:		[Huisvesting] Jouw huis op kavel {0} is door het rijk in beslag genomen wegens onbetaalde huur!
+Scripts.Player.Housing.HookPointAdded:				Dit object is aan je huis toegevoegd.
 Scripts.Player.Housing.HookPointAlready:			Dat bevestigingspunt heeft al een object!
 Scripts.Player.Housing.HookPointCleared:			Het bevestigingspunt is nu leeg.
 Scripts.Player.Housing.HookPointCloser:			Ga zo dicht mogelijk bij de gewenste kavel staan en druk op “accepteren”.
@@ -88,8 +102,8 @@ Scripts.Player.Housing.HookPointLogged:			Positie van bevestigingspunt {0} gelog
 Scripts.Player.Housing.HookPointLogLoc:			Bevestigingspunten weergeven?
 Scripts.Player.Housing.HookPointNot:				Dit is geen object dat op bevestigingspunten kan worden gebruikt!
 Scripts.Player.Housing.HookPointNotPlaced:			Het object is niet op dat bevestigingspunt geplaatst.
-Scripts.Player.Housing.HouseUseMaterial:			Gebruik Shift+rechtermuisklik in je huis om het uiterlijk te wijzigen.
-Scripts.Player.Housing.HouseUseMaterial:			Gebruik Shift+rechtermuisklik in je huis om de kleden te wijzigen.
+Scripts.Player.Housing.HouseUseMaterials:			Gebruik Shift+rechtermuisklik in je huis om het uiterlijk te wijzigen.
+Scripts.Player.Housing.HouseUseCarpets:				Gebruik Shift+rechtermuisklik in je huis om de kleden te wijzigen.
 Scripts.Player.Housing.IndoorFloorPlaced:			Je hebt {0} op de verdieping van je huis geplaatst.
 Scripts.Player.Housing.IndoorItemPlaced:			Interieurobject geplaatst. {0} plek over.
 Scripts.Player.Housing.IndoorMaxItems:			Je hebt momenteel {0} objecten in je huis geplaatst. Je kunt er geen meer plaatsen.
@@ -98,14 +112,6 @@ Scripts.Player.Housing.InteriorBannersAdded:		De binnenste gildebanner is gewijz
 Scripts.Player.Housing.InteriorBannersRemoved:		De binnenste gildebanner is verwijderd.
 Scripts.Player.Housing.InteriorShieldsAdded:		Het binnenste gildeschild is gewijzigd.
 Scripts.Player.Housing.InteriorShieldsRemoved:		Het binnenste gildeschild is verwijderd.
-Scripts.Player.Housing.LeftHouse:				Je verlaat huis {0}.
-Scripts.Player.Housing.LotAlready:				Je bezit al een andere kavel of een huis (nr. {0})
-Scripts.Player.Housing.LotBought:				Je hebt zojuist deze kavel gekocht voor {0}!
-Scripts.Player.Housing.LotCost:					Kan gekocht worden voor {0}.
-Scripts.Player.Housing.LotNotItem:				Dit is geen geldig eigendomsdocument.
-Scripts.Player.Housing.LotNotYours:				Je bezit deze kavel niet!
-Scripts.Player.Housing.LotOffer:				Wil je deze kavel kopen? Het kost {0}.
-Scripts.Player.Housing.LotTargeted:				Je richt op kavel nummer {0}.
 Scripts.Player.Housing.NotFloorObject:			Dit object kan niet op de bovenverdieping worden geplaatst!
 Scripts.Player.Housing.NotHookPoint:				Dit object kan niet op een bevestigingspunt worden geplaatst!
 Scripts.Player.Housing.NotWallObject:				Dit object kan niet op de muur worden geplaatst!

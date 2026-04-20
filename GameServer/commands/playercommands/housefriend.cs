@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using DOL.GS.PacketHandler;
 using DOL.GS.Housing;
+using DOL.GS.PacketHandler;
 using DOL.Language;
+using System;
 
 namespace DOL.GS.Commands
 {
@@ -28,8 +29,9 @@ namespace DOL.GS.Commands
         "Commands.Players.Housefriend.Description",
         "Commands.Players.Housefriend.All",
         "Commands.Players.Housefriend.Player",
+        "Commands.Players.Housefriend.PlayerRemove",
         "Commands.Players.Housefriend.Account",
-        "Commands.Players.Housepoint.Guild")]
+        "Commands.Players.Housefriend.Guild")]
     public class HousefriendCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -50,10 +52,47 @@ namespace DOL.GS.Commands
             {
                 case "player":
                     {
-                        if (args.Length == 2)
+                        if (args.Length < 3)
                             return;
 
-                        if (client.Player.Name == args[2])
+                        if (args.Length == 4 && args[2].ToLower() == "remove")
+                        {
+                            string targetNameToRemove = args[3];
+                            int slotToRemove = -1;
+
+                            foreach (var kvp in client.Player.CurrentHouse.CharXPermissions)
+                            {
+                                if (kvp.Value.PermissionType == (int)PermissionType.Player &&
+                                    kvp.Value.TargetName.Equals(targetNameToRemove, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    slotToRemove = kvp.Key;
+                                    break;
+                                }
+                            }
+
+                            if (slotToRemove != -1)
+                            {
+                                client.Player.CurrentHouse.RemovePermission(slotToRemove);
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Housefriend.RemovedPlayer", targetNameToRemove), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                                foreach (GamePlayer p in client.Player.CurrentHouse.GetAllPlayersInHouse())
+                                {
+                                    if (p.Name.Equals(targetNameToRemove, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        client.Player.CurrentHouse.Exit(p, false);
+                                        p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client, "Commands.Players.Housefriend.AccessRevoked", client.Player.CurrentHouse.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Housefriend.NotOnList", targetNameToRemove), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
+                            return;
+                        }
+
+                        if (client.Player.Name.Equals(args[2], StringComparison.OrdinalIgnoreCase))
                             return;
 
                         GameClient targetClient = WorldMgr.GetClientByPlayerNameAndRealm(args[2], 0, true);
@@ -66,6 +105,10 @@ namespace DOL.GS.Commands
                         if (client.Player.CurrentHouse.AddPermission(targetClient.Player, PermissionType.Player, HousingConstants.MinPermissionLevel))
                         {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Housefriend.Added", targetClient.Player.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        else
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.Players.Housefriend.AlreadyAllowed", targetClient.Player.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
                         break;
                     }

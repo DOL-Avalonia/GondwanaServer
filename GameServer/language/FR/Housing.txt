@@ -4,37 +4,42 @@ House.DBHousePermissions.AccessLevel:			Access level {0}
 House.Edit.NotEnoughMoney:				Vous n'avez pas assez d'argent pour faire cela!
 House.Edit.PayForChanges:				Vous payez {0} pour les modifications.
 House.Enter.EnteredHouse:				Vous êtes entré dans la maison numéro {0}.
+House.Enter.EnteringHouse:				Vous entrez dans la maison de {0}.
 House.Exit.LeftHouse:					Vous avez quitté la maison numéro {0}.
-House.SendHouseInfo.DoorMaterial:			-Porte: {0}	
-House.SendHouseInfo.ExteriorMaterials:			Matériaux extérieurs:
-House.SendHouseInfo.ExteriorUpgrades:			Améliorations extérieurs:	
+House.SendHouseInfo.DoorMaterial:			-Porte : {0}	
+House.SendHouseInfo.ExteriorMaterials:			Matériaux extérieurs :
+House.SendHouseInfo.ExteriorUpgrades:			Améliorations extérieurs :	
 House.SendHouseInfo.HouseOwner:				La maison de {0}
-House.SendHouseInfo.IndoorGuildBanner:			-Bannières: {0}	
-House.SendHouseInfo.IndoorGuildShield:			-Boucliers: {0}	
-House.SendHouseInfo.InteriorCarpets:			Tapis intérieur:	
-House.SendHouseInfo.InteriorUpgrades:			Ajouts intérieur:	
-House.SendHouseInfo.Level:				Niveau: {0}
-House.SendHouseInfo.Lockbox:				Coffre: {0}
-House.SendHouseInfo.Lotnum:				Numéro du lot: {0}
-House.SendHouseInfo.MaxLockbox:				Max de place dans le coffre: {0}
-House.SendHouseInfo.OutdoorGuildBanner:			-Bannières: {0}	
-House.SendHouseInfo.OutdoorGuildShield:			-Boucliers: {0}	
-House.SendHouseInfo.Owner:				Propriétaire: {0}
-House.SendHouseInfo.Owners:				Propriétaires:
+House.SendHouseInfo.IndoorGuildBanner:			-Bannières : {0}	
+House.SendHouseInfo.IndoorGuildShield:			-Boucliers : {0}
+House.SendHouseInfo.InteriorCarpets:			Tapis intérieur :
+House.SendHouseInfo.InteriorUpgrades:			Ajouts intérieur :
+House.SendHouseInfo.Level:				Niveau : {0}
+House.SendHouseInfo.Lockbox:				Coffre : {0}
+House.SendHouseInfo.Lotnum:				Numéro du lot : {0}
+House.SendHouseInfo.MaxLockbox:				Max de place dans le coffre : {0}
+House.SendHouseInfo.OutdoorGuildBanner:			-Bannières : {0}	
+House.SendHouseInfo.OutdoorGuildShield:			-Boucliers : {0}	
+House.SendHouseInfo.Owner:				Propriétaire : {0}
+House.SendHouseInfo.Owners:				Propriétaires :
 House.SendHouseInfo.Porch:				Porche: 
-House.SendHouseInfo.PorchEnabled:			-Disponible: {0}	
-House.SendHouseInfo.PorchMaterial:			-Porche: {0}	
-House.SendHouseInfo.PorchRoofColor:			-Couleur: {0}	
-House.SendHouseInfo.RentalPrice:			Loyer: {0}	
+House.SendHouseInfo.PorchEnabled:			-Disponible : {0}	
+House.SendHouseInfo.PorchMaterial:			-Porche : {0}	
+House.SendHouseInfo.PorchRoofColor:			-Couleur : {0}	
+House.SendHouseInfo.RentalPrice:			Loyer : {0}	
 House.SendHouseInfo.RentDueIn:				Date du paiement : {0} jours, {1} heures
 House.SendHouseInfo.RoofMaterial:			-Toit: {0}	
-House.SendHouseInfo.Rug1Color:				-Couleur 1: {0}
-House.SendHouseInfo.Rug2Color:				-Couleur 2: {0}
-House.SendHouseInfo.Rug3Color:				-Couleur 3: {0}
-House.SendHouseInfo.Rug4Color:				-Couleur 4: {0}
-House.SendHouseInfo.TrussMaterial:			-Support: {0}	
-House.SendHouseInfo.WallMaterial:			-Murs: {0}	
-House.SendHouseInfo.WindowMaterial:			-Volets: {0}	
+House.SendHouseInfo.Rug1Color:				-Couleur 1 : {0}
+House.SendHouseInfo.Rug2Color:				-Couleur 2 : {0}
+House.SendHouseInfo.Rug3Color:				-Couleur 3 : {0}
+House.SendHouseInfo.Rug4Color:				-Couleur 4 : {0}
+House.SendHouseInfo.TrussMaterial:			-Support : {0}
+House.SendHouseInfo.WallMaterial:			-Murs : {0}
+House.SendHouseInfo.WindowMaterial:			-Volets : {0}
+House.SendHouseInfo.RentDueInSec:			Date du paiement : {0} secondes
+House.EmptyHookpoint.NotOwner:				Seul le propriétaire de la maison peut retirer ou placer des objets sur les points d'ancrage !
+House.EmptyHookpoint.InvalidPosition:		Position du point d'ancrage invalide {0}
+House.EmptyHookpoint.NoItemFound:			Aucun objet d'ancrage trouvé à la position {0}
 
 HouseEnterLeave.TooFarAway:					Vous êtes trop loin pour entrer dans la maison {0}.
 HouseEnterLeave.CantEnter:					Vous ne pouvez pas entrer dans la maison {0}.
@@ -70,6 +75,7 @@ Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	Vous possédez déjà un terra
 Housing.LotMarker.YouJustBoughtThisLotFor:		Vous venez d'acheter ce terrain pour {0}.
 Housing.LotMarker.YouDontHaveEnoughMoney:		Vos fonds sont insuffisants !
 Housing.LotMarker.ThisItemCantBeSold:			Cet objet ne peut pas être vendu.
+Housing.LotMarker.LotNotItem:					Ce n'est pas un acte de propriété valide.
 
 Scripts.Player.Housing.BadShieldBanner:			Ce n'est pas un objet ou une bannière valide.
 Scripts.Player.Housing.CantBeSold:				Cet objet ne peut être vendu !
@@ -80,6 +86,15 @@ Scripts.Player.Housing.GardenItemPlaced:		Objets du jardin placés. {0} places r
 Scripts.Player.Housing.GardenItemPlacedName:	Vous déposez l'objet {0} dans votre jardin.
 Scripts.Player.Housing.GardenMaxObjects:		Vous avez déposé un nombre de 30 objets dans votre jardin. Vous n'avez plus de place.
 Scripts.Player.Housing.GuildNowOwns:			[Guilde] {0} possède maintenant une maison de guilde de {1} !
+Scripts.Player.Housing.NotOwner:				Vous ne possédez pas cette maison !
+Scripts.Player.Housing.NotGuildLeader:			Vous n'êtes pas le chef d'une guilde !
+Scripts.Player.Housing.ConsignmentNotEmpty:		Tous les objets et l'argent doivent être retirés de votre marchand personnel avant de pouvoir transférer cette maison !
+Scripts.Player.Housing.RentPaidFromBank:		{0} a été prélevé sur votre compte bancaire pour le paiement du loyer de votre maison.
+Scripts.Player.Housing.GuildRentPaidFromBank:	{0} a été prélevé de votre banque de guilde pour le paiement du loyer de la maison de guilde.
+Scripts.Player.Housing.TargetLotMarker:			Vous devez cibler un marqueur de terrain pour acheter un acte de propriété.
+Scripts.Player.Housing.MerchantListNotFound:	Impossible de terminer la transaction : liste de marchand introuvable.
+Scripts.Player.Housing.GuildHouseEvicted:		[Zone résidentielle] La maison de guilde du lot {0} a été saisie par le royaume en raison de loyers impayés !
+Scripts.Player.Housing.PersonalHouseEvicted:	[Zone résidentielle] Votre maison au lot {0} a été saisie par le royaume en raison de loyers impayés !
 Scripts.Player.Housing.HookPointAdded:			Cet objet a été ajouté à votre maison.
 Scripts.Player.Housing.HookPointAlready:		Cet ancrage possède déjà un objet!
 Scripts.Player.Housing.HookPointCleared:		Le point d'ancrage est maintenant vide.
@@ -89,8 +104,8 @@ Scripts.Player.Housing.HookPointLogged:			La position du point d'ancrage {0}!
 Scripts.Player.Housing.HookPointLogLoc:			Afficher les points d'ancrage ?
 Scripts.Player.Housing.HookPointNot:			Ce n'est pas un objet utilisable sur les ancrages!
 Scripts.Player.Housing.HookPointNotPlaced:		L'objet n'a pas été placé sur cet ancrage.
-Scripts.Player.Housing.HouseUseMaterial:		Utilisez shift+clic-droit dans votre maison pour changer l'apparence de votre maison.
-Scripts.Player.Housing.HouseUseMaterial:		Utilisez shift+clic-droit dans votre maison pour changer vos tapis.
+Scripts.Player.Housing.HouseUseMaterials:		Utilisez shift+clic-droit dans votre maison pour changer l'apparence de votre maison.
+Scripts.Player.Housing.HouseUseCarpets:			Utilisez shift+clic-droit dans votre maison pour changer vos tapis.
 Scripts.Player.Housing.IndoorFloorPlaced:		Vous avez placé {0} à l'étage de votre maison.
 Scripts.Player.Housing.IndoorItemPlaced:		Objet intérieur placé. {0} place restante.
 Scripts.Player.Housing.IndoorMaxItems:			Vous avez actuellement placé {0} objets dans votre maison. Vous ne pouvez plus en placer.
@@ -99,14 +114,6 @@ Scripts.Player.Housing.InteriorBannersAdded:		Votre bannière de guilde intérie
 Scripts.Player.Housing.InteriorBannersRemoved:		Votre bannière de guilde intérieure a été retirée.
 Scripts.Player.Housing.InteriorShieldsAdded:		Votre emblème de guilde intérieur a été changé.
 Scripts.Player.Housing.InteriorShieldsRemoved:		Votre emblème de guilde intérieur a été retiré.
-Scripts.Player.Housing.LeftHouse:			Sortie de la maison {0}.
-Scripts.Player.Housing.LotAlready:			Vous possédez déjà un autre lot ou une maison (numéro {0})
-Scripts.Player.Housing.LotBought:			Vous venez d'acheter ce lot pour {0} !
-Scripts.Player.Housing.LotCost:				Il peut être acheté pour {0}.
-Scripts.Player.Housing.LotNotItem:			Ce n'est pas un acte de propriété valide.
-Scripts.Player.Housing.LotNotYours:			Vous ne possédez pas ce lot !
-Scripts.Player.Housing.LotOffer:			Voulez-vous acheter ce lot ? Il coûte {0}.
-Scripts.Player.Housing.LotTargeted:			Vous sélectionnez le lot numéro {0}.
 Scripts.Player.Housing.NotFloorObject:			Cet objet ne peut pas être placé à l'étage !
 Scripts.Player.Housing.NotHookPoint:			Cet objet ne peut pas être placé sur l'ancrage !
 Scripts.Player.Housing.NotWallObject:			Cet objet ne peut pas être placé sur le mur !

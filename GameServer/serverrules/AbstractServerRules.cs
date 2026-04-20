@@ -2504,17 +2504,21 @@ namespace DOL.GS.ServerRules
         /// </summary>
         /// <param name="player"></param>
         /// <param name="merchantType"></param>
-        public virtual void SendHousingMerchantWindow(GamePlayer player, DOL.GS.PacketHandler.eMerchantWindowType merchantType)
+        public virtual void SendHousingMerchantWindow(GamePlayer player, eMerchantWindowType merchantType)
         {
             switch (merchantType)
             {
                 case eMerchantWindowType.HousingInsideShop:
-                case eMerchantWindowType.HousingInsideMenu:
                     player.Out.SendMerchantWindow(HouseTemplateMgr.IndoorShopItems.Catalog, merchantType);
                     break;
+                case eMerchantWindowType.HousingInsideMenu:
+                    player.Out.SendMerchantWindow(HouseTemplateMgr.IndoorMenuItems.Catalog, merchantType);
+                    break;
                 case eMerchantWindowType.HousingOutsideShop:
-                case eMerchantWindowType.HousingOutsideMenu:
                     player.Out.SendMerchantWindow(HouseTemplateMgr.OutdoorShopItems.Catalog, merchantType);
+                    break;
+                case eMerchantWindowType.HousingOutsideMenu:
+                    player.Out.SendMerchantWindow(HouseTemplateMgr.OutdoorMenuItems.Catalog, merchantType);
                     break;
                 case eMerchantWindowType.HousingBindstoneHookpoint:
                     player.Out.SendMerchantWindow(HouseTemplateMgr.IndoorBindstoneShopItems.Catalog, merchantType);
@@ -2529,7 +2533,15 @@ namespace DOL.GS.ServerRules
                     player.Out.SendMerchantWindow(HouseTemplateMgr.IndoorVaultShopItems.Catalog, merchantType);
                     break;
                 case eMerchantWindowType.HousingDeedMenu:
-                    player.Out.SendMerchantWindow(/* TODO */HouseTemplateMgr.OutdoorMenuItems.Catalog, eMerchantWindowType.HousingDeedMenu);
+                    GameLotMarker lotMarker = player.TargetObject as GameLotMarker;
+                    if (lotMarker != null)
+                    {
+                        player.Out.SendMerchantWindow(HouseTemplateMgr.GetLotMarkerItems(lotMarker).Catalog, merchantType);
+                    }
+                    else
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.TargetLotMarker"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
                     break;
                 default:
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "ServerRules.AbstractServerRules.Housing.UnknownMerchantType"), eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
@@ -2556,8 +2568,14 @@ namespace DOL.GS.ServerRules
                 case eMerchantWindowType.HousingInsideShop:
                     items = HouseTemplateMgr.IndoorShopItems;
                     break;
+                case eMerchantWindowType.HousingInsideMenu:
+                    items = HouseTemplateMgr.IndoorMenuItems;
+                    break;
                 case eMerchantWindowType.HousingOutsideShop:
                     items = HouseTemplateMgr.OutdoorShopItems;
+                    break;
+                case eMerchantWindowType.HousingOutsideMenu:
+                    items = HouseTemplateMgr.OutdoorMenuItems;
                     break;
                 case eMerchantWindowType.HousingBindstoneHookpoint:
                     items = HouseTemplateMgr.IndoorBindstoneShopItems;
@@ -2571,26 +2589,41 @@ namespace DOL.GS.ServerRules
                 case eMerchantWindowType.HousingVaultHookpoint:
                     items = HouseTemplateMgr.IndoorVaultShopItems;
                     break;
+                case eMerchantWindowType.HousingDeedMenu:
+                    GameLotMarker lotMarker = player.TargetObject as GameLotMarker;
+                    if (lotMarker != null)
+                    {
+                        items = HouseTemplateMgr.GetLotMarkerItems(lotMarker);
+                    }
+                    break;
             }
 
-            GameMerchant.OnPlayerBuy(player, slot, count, items);
+            if (items != null)
+            {
+                GameMerchant.OnPlayerBuy(player, slot, count, items);
+            }
+            else
+            {
+                log.Error($"[Housing] Failed to process purchase. Window Type {merchantType} generated a null item list.");
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.MerchantListNotFound"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         [Obsolete("Use .PlaceHousingNPC(House, ItemTemplate, Coordinate, ushort) instead!")]
-        public virtual GameNPC PlaceHousingNPC(DOL.GS.Housing.House house, ItemTemplate item, Vector3 location, ushort heading)
+        public virtual GameNPC PlaceHousingNPC(House house, ItemTemplate item, Vector3 location, ushort heading)
             => PlaceHousingNPC(house, item, Coordinate.Create((int)location.X, (int)location.Y, (int)location.Z), heading);
 
         /// <summary>
         /// Get a housing hookpoint NPC
         /// </summary>
         /// <returns></returns>
-        public virtual GameNPC PlaceHousingNPC(DOL.GS.Housing.House house, ItemTemplate item, Coordinate coordinate, ushort heading)
+        public virtual GameNPC PlaceHousingNPC(House house, ItemTemplate item, Coordinate coordinate, ushort heading)
         {
             NpcTemplate npcTemplate = NpcTemplateMgr.GetTemplate(item.Bonus);
 
             try
             {
-                string defaultClassType = ServerProperties.Properties.GAMENPC_DEFAULT_CLASSTYPE;
+                string defaultClassType = Properties.GAMENPC_DEFAULT_CLASSTYPE;
 
                 if (npcTemplate == null || string.IsNullOrEmpty(npcTemplate.ClassType))
                 {
@@ -2670,10 +2703,10 @@ namespace DOL.GS.ServerRules
         }
 
         [Obsolete("Use .PlaceHousingInteriorItem(House, ItemTemplate, Coordinate, ushort) instead!")]
-        public virtual GameStaticItem PlaceHousingInteriorItem(DOL.GS.Housing.House house, ItemTemplate item, Vector3 location, ushort heading)
+        public virtual GameStaticItem PlaceHousingInteriorItem(House house, ItemTemplate item, Vector3 location, ushort heading)
             => PlaceHousingInteriorItem(house, item, Coordinate.Create((int)location.X, (int)location.Y, (int)location.Z), heading);
 
-        public virtual GameStaticItem PlaceHousingInteriorItem(DOL.GS.Housing.House house, ItemTemplate item, Coordinate coordinate, ushort heading)
+        public virtual GameStaticItem PlaceHousingInteriorItem(House house, ItemTemplate item, Coordinate coordinate, ushort heading)
         {
             GameStaticItem hookpointObject = new GameStaticItem();
             hookpointObject.CurrentHouse = house;

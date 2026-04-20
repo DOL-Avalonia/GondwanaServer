@@ -172,8 +172,9 @@ Commands.Players.Guild.Help.GuildUsage:			Usage :
 Commands.Players.Guild.Help.GuildWebpage:			'/gc webpage <la.pagedeguilde.fr>' # Option non obligatoire qui permet d'indiquer le site de guilde aux membres et sur le herald officiel.
 Commands.Players.Guild.Help.GuildWho:			    '/gc who' # Montre les joueurs de la guilde connectés.
 Commands.Players.Guild.Help.GuildWithdraw:		    '/gc withdraw <montant>' # Retire les fonds de votre caisse de guilde.
-Commands.Players.Guild.Help.GuildTerritories:	    '/gc territories' Affiche tous les territoires, leurs propriétaires, ainsi que tous les bonus et pénalités pour les territoires capturés.
-Commands.Players.Guild.Help.GuildSubTerritories:    '/gc subterritories' Affiche les sous-territoires, leurs propriétaires ainsi que leur compte à rebours avant expiration.
+Commands.Players.Guild.Help.GuildTerritories:	    '/gc territories' # Affiche tous les territoires, leurs propriétaires, ainsi que tous les bonus et pénalités pour les territoires capturés.
+Commands.Players.Guild.Help.GuildSubTerritories:    '/gc subterritories' # Affiche les sous-territoires, leurs propriétaires ainsi que leur compte à rebours avant expiration.
+Commands.Players.Guild.Help.GuildHouseRent:			'/gc houserent <on|off>' # Active/désactive le paiement automatique du loyer de la maison de guilde via la banque de guilde.
 Commands.Players.Guild.InCombat:				    Vous ne pouvez pas invoquer la bannière de guilde en combat !
 Commands.Players.Guild.InfoAMotd:				    Message de l'alliance : {0}
 Commands.Players.Guild.InfoBanner.Lost:         La bannière est tombée entre les mains de l'ennemi.
@@ -284,6 +285,7 @@ Commands.Players.Guild.WithdrawInvalid:			Ce n'est pas un montant valide.
 Commands.Players.Guild.WithdrawTooMuch:			Il n'y a pas assez d'argent dans la caisse de guilde !
 
 Commands.Players.Guild.CantInSubterritory:		Vous ne pouvez pas utiliser cette commande dans un sous-territoire.
+Commands.Players.Guild.HouseRentToggled:		Le paiement automatique du loyer de guilde est maintenant {0}.
 
 Commands.Players.Guild.RealmPointsSet:			La guilde {0} a maintenant {1} points de royaume.
 Commands.Players.Guild.MeritPointsSet:			La guilde {0} a maintenant {1} points de mérite.
@@ -350,6 +352,8 @@ Commands.Players.Guild.TerritoryMeritPoints:   L'occupation de vos territoires v
 Commands.Players.Guild.TerritoryBeGuilded:	Vous devez etre dans une guilde pour voir les territoires occupés.
 
 Commands.Players.Guild.Territories.WindowTitle:			[ TERRITOIRES ]
+Commands.Players.Guild.Territories.WindowTitleOpen:		[ TERRITOIRES - (GvG Actif) ]
+Commands.Players.Guild.Territories.WindowTitleClosed:	[ TERRITOIRES - GvG Inactif - Ouvre dans {0} min ]
 Commands.Players.Guild.Territories.TerritoriesOwned:	---- Territoires de {0} ----
 Commands.Players.Guild.Territories.TerritoriesOther:	---- Autres territoires ----
 Commands.Players.Guild.Territories.TerritoriesList:		---- Territoires ----
@@ -361,6 +365,7 @@ Commands.Players.Guild.Territories.DailyMeritPoints:	Total des points de mérite
 Commands.Players.Guild.Territories.TimeBeforeRent:		Temps restant avant paiement des loyers : {0}
 Commands.Players.Guild.Territories.TotalXPBonus:		Bonus total d'expérience : {0:0}%
 Commands.Players.Guild.Territories.TotalBPBonus:		Bonus total de points de butin pour mobs Nv65+ : {0}
+Commands.Players.Guild.Territories.RelicRPBonus:		Bonus total PR offert par les reliques de territoire: {0}%
 Commands.Players.Guild.Territories.Bonuses:				---- Bonus des territoires ----
 Commands.Players.Guild.Territories.DebuffDuration:		Durée des effets négatifs
 Commands.Players.Guild.Territories.SpellRange:			Portée des sorts

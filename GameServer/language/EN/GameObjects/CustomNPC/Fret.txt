@@ -19,3 +19,13 @@ Fret.PackageNoMoney:			You don't have enough money!
 Fret.PackageNotPrepared:		You haven't prepared any package!
 Fret.PackageSendError:			A problem occured while sending the package, please start all over again. (Do not move your items in your inventory while the package is being created)
 Fret.PackageSent:			Your package has been sent!
+Fret.CannotSendToSelf:		You cannot send a package to yourself!
+Fret.PackageReceived:		You just received a package from {0}! You can pick it up from the nearest Fret merchant.
+Fret.ItemReceived:			You retrieved {0}{1} given by {2}!
+Fret.InventoryFull:			Please check that your backpack is not full!
+Fret.ErrorRetrieving:		A problem occurred, please try again to retrieve your item.
+Fret.PlayerNotFound:		I cannot find anyone named {0}, please check the name.
+Fret.TargetSet:				Your package is for {0}.
+Fret.MaxItemsReached:		You can only send {0} items in a package.
+Fret.ItemRemoved:			The item "{0}" has been removed from the package.
+Fret.ItemAdded:				The item "{0}" has been added to the package.

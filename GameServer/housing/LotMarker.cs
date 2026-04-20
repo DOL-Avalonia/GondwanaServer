@@ -180,6 +180,7 @@ namespace DOL.GS.Housing
                         CreateHouse(player, 12);
                         break;
                     default:
+                        ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.LotNotItem"));
                         return false;
                 }
 

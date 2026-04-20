@@ -1,6 +1,8 @@
 Commands.Players.Banque.Description:	To do some operations with your banker.
 Commands.Players.Banque.Usage:			/banque <Copper> <Silver> <Gold> <Platinum>' Add money in your bank account
 Commands.Players.Banque.Usage.Cheque:			/banque cheque <Copper> <Silver> <Gold> <Platinum>' Write a check
+Commands.Players.Banque.Usage.Transfer:			/banque transfer <Player> <Copper> <Silver> <Gold> <Platinum>' Transfer directly to a player's bank
+Commands.Players.Banque.Usage.TermDeposit:		/banque termdeposit <biweekly|monthly|quarterly> <Copper> <Silver> <Gold> <Platinum>' Open a Term Deposit
 
 Banque.Cheque.NoAccount:						You don't have an account, so you can't write a check!
 Banque.Cheque.MaxValue:							You can write a check for a maximum value of 100 platinum!
@@ -14,3 +16,16 @@ Banque.AccountOverview:							You now have "{0}" in your account.
 Banque.Withdraw.NoAccount:						You don't have an account, so you can't get any money back!
 Banque.Withdraw.NoMoney:						You don't have enough money in the bank!
 Banque.Withdraw.SelectNPC:						You must select a banker to collect money!
+Banque.Transfer.Usage:							Usage: /banque transfer <PlayerName> <Copper> <Silver> <Gold> <Platinum>
+Banque.Transfer.NotEnoughFunds:					You do not have enough funds in your bank for this transfer.
+Banque.Transfer.PlayerNotFound:					Cannot find a player named {0}.
+Banque.Transfer.CannotTransferSelf:				You cannot transfer money to yourself.
+Banque.Transfer.TargetNoAccount:				The player {0} doesn't seem to have any bank account yet.
+Banque.Transfer.Success:						Successfully transferred {0} to {1}'s bank account.
+Banque.Transfer.Received:						A bank transfer of {0} was just credited to your account from {1}.
+
+Banque.TermDeposit.Usage:						Usage: /banque termdeposit <biweekly|monthly|quarterly> <Copper> <Silver> <Gold> <Platinum>
+Banque.TermDeposit.InvalidTerm:					Invalid term. Must be biweekly, monthly, or quarterly.
+Banque.TermDeposit.NotEnoughFunds:				You do not have enough funds in your bank for this deposit.
+Banque.TermDeposit.MaxReached:					You already have the maximum number of term deposits ({0}).
+Banque.TermDeposit.Success:						You successfully locked {0} for {1} days at {2}% interest.

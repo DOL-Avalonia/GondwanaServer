@@ -36,7 +36,7 @@ namespace DOL.GS.Housing
 {
     public class HouseMgr
     {
-        public static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static Timer CheckRentTimer = null;
         private static Dictionary<ushort, Dictionary<int, House>> _houseList;
@@ -109,13 +109,23 @@ namespace DOL.GS.Housing
             if (client != null)
                 client.Out.SendMessage("Loaded " + houses + " houses and " + lotmarkers + " lotmarkers in " + regions + " regions!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
+            int timerInterval = Properties.RENT_CHECK_INTERVAL * 60 * 1000;
+
+            // Testing Mode Override
+            if (Properties.RENT_DUE_DAYS < 0)
+            {
+                timerInterval = 60 * 1000;
+                if (log.IsInfoEnabled)
+                    log.Info("[Housing] RENT_DUE_DAYS is negative. Testing mode enabled: Rent checking every 1 minute.");
+            }
+
             if (CheckRentTimer != null)
             {
-                CheckRentTimer.Change(Properties.RENT_CHECK_INTERVAL * 60 * 1000, Properties.RENT_CHECK_INTERVAL * 60 * 1000);
+                CheckRentTimer.Change(timerInterval, timerInterval);
             }
             else
             {
-                CheckRentTimer = new Timer(CheckRents, null, Properties.RENT_CHECK_INTERVAL * 60 * 1000, Properties.RENT_CHECK_INTERVAL * 60 * 1000);
+                CheckRentTimer = new Timer(CheckRents, null, timerInterval, timerInterval);
             }
 
             return true;
@@ -447,11 +457,16 @@ namespace DOL.GS.Housing
                 player.LeaveHouse();
             }
 
-            // remove the house for all nearby players
-            foreach (GamePlayer player in WorldMgr.GetPlayersCloseToSpot(house.Position, WorldMgr.OBJ_UPDATE_DISTANCE))
+            house.Model = 0;
+
+            foreach (GameClient cl in WorldMgr.GetAllClients())
             {
-                player.Out.SendRemoveHouse(house);
-                player.Out.SendGarden(house);
+                if (cl.Player != null && cl.Player.CurrentRegionID == house.RegionID)
+                {
+                    cl.Player.Out.SendHouse(house);
+                    cl.Player.Out.SendRemoveHouse(house);
+                    cl.Player.Out.SendGarden(house);
+                }
             }
 
             if (house.Model > 0)
@@ -498,7 +513,7 @@ namespace DOL.GS.Housing
             {
                 if (item.GameObject is GameObject)
                 {
-                    (item.GameObject as GameObject).Delete();
+                    (item.GameObject as GameObject)!.Delete();
                 }
             }
             house.HousepointItems.Clear();
@@ -513,6 +528,8 @@ namespace DOL.GS.Housing
                 if (guild != null)
                 {
                     guild.GuildHouseNumber = 0;
+                    guild.SaveIntoDatabase();
+                    guild.UpdateGuildWindow();
                 }
             }
 
@@ -618,6 +635,23 @@ namespace DOL.GS.Housing
         }
 
         /// <summary>
+        /// Get a list of ALL houses owned by the player
+        /// </summary>
+        public static List<House> GetHousesByPlayer(GamePlayer p)
+        {
+            List<House> list = new List<House>();
+            foreach (var regs in _houseList)
+            {
+                foreach (var entry in regs.Value)
+                {
+                    if (entry.Value.OwnerID == p.ObjectId)
+                        list.Add(entry.Value);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
         /// Gets the guild house object by real owner
         /// </summary>
         /// <param name="p"></param>
@@ -670,14 +704,14 @@ namespace DOL.GS.Housing
             // player needs to own the house to be able to xfer it
             if (house.HasOwnerPermissions(player) == false)
             {
-                ChatUtil.SendSystemMessage(player, "You do not own this house!");
+                ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.NotOwner"));
                 return false;
             }
 
             // player needs to be a GM in the guild to xfer his personal house to the guild
             if (player.Guild.HasRank(player, Guild.eRank.Leader) == false)
             {
-                ChatUtil.SendSystemMessage(player, "You are not the leader of a guild!");
+                ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.NotGuildLeader"));
                 return false;
             }
 
@@ -685,11 +719,12 @@ namespace DOL.GS.Housing
             var consignmentMerchant = house.ConsignmentMerchant;
             if (consignmentMerchant != null && (consignmentMerchant.DBItems().Count > 0 || consignmentMerchant.TotalMoney > 0))
             {
-                ChatUtil.SendSystemMessage(player, "All items and money must be removed from your consigmment merchant in order to transfer this house!");
+                ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.ConsignmentNotEmpty"));
                 return false;
             }
 
             // send house xfer prompt to player
+            player.TempProperties.setProperty("GuildTransferHouse", house);
             player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.TransferToGuild", player.Guild.Name), MakeGuildLot);
 
             return true;
@@ -697,16 +732,15 @@ namespace DOL.GS.Housing
 
         private static void MakeGuildLot(GamePlayer player, byte response)
         {
+            House playerHouse = player.TempProperties.getProperty<House>("GuildTransferHouse", null);
+            player.TempProperties.removeProperty("GuildTransferHouse");
+
             // user responded no/decline
             if (response != 0x01)
                 return;
 
-            var playerHouse = GetHouse(GetHouseNumberByPlayer(player));
+            if (playerHouse == null || player.Guild == null) return;
             var playerGuild = player.Guild;
-
-            // double check and make sure this guild isn't null
-            if (playerGuild == null)
-                return;
 
             // adjust the house to be under guild control
             playerHouse.DatabaseItem.OwnerID = playerGuild.GuildID;
@@ -715,16 +749,16 @@ namespace DOL.GS.Housing
             playerHouse.DatabaseItem.GuildName = playerGuild.Name;
 
             // adjust guild to reflect their new guild house
-            player.Guild.GuildHouseNumber = playerHouse.HouseNumber;
+            playerGuild.GuildHouseNumber = playerHouse.HouseNumber;
 
             // notify guild members of the guild house acquisition
-            player.Guild.SendMessageToGuildMembers(
-                LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.GuildNowOwns", player.Guild.Name, player.Name),
+            playerGuild.SendMessageToGuildMembers(
+                LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Player.Housing.GuildNowOwns", playerGuild.Name, player.Name),
                 eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 
             // save the guild and broadcast updates
-            player.Guild.SaveIntoDatabase();
-            player.Guild.UpdateGuildWindow();
+            playerGuild.SaveIntoDatabase();
+            playerGuild.UpdateGuildWindow();
 
             // save the house and broadcast updates
             playerHouse.SaveIntoDatabase();
@@ -778,41 +812,109 @@ namespace DOL.GS.Housing
                     // get the amount of rent for the given house
                     long rent = GetRentByModel(house.Model);
 
+                    // Determine if rent is due based on normal or testing mode
+                    bool isRentDue = false;
+                    if (Properties.RENT_DUE_DAYS > 0)
+                        isRentDue = diff.Days >= Properties.RENT_DUE_DAYS;
+                    else if (Properties.RENT_DUE_DAYS < 0)
+                        isRentDue = diff.TotalMinutes >= 1; // 1 minute test mode
+
                     // Does this house need to pay rent?
-                    if (rent > 0L && diff.Days >= Properties.RENT_DUE_DAYS)
+                    if (rent > 0L && isRentDue)
                     {
-                        long lockboxAmount = house.KeptMoney;
-                        long consignmentAmount = 0;
+                        bool paidFromBank = false;
 
-                        var consignmentMerchant = house.ConsignmentMerchant;
-                        if (consignmentMerchant != null)
+                        if (house.DatabaseItem.GuildHouse)
                         {
-                            consignmentAmount = consignmentMerchant.TotalMoney;
-                        }
+                            Guild guild = GuildMgr.GetGuildByGuildID(house.OwnerID);
+                            if (guild != null)
+                            {
+                                DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(house.OwnerID);
+                                if (bank != null && bank.AutoPayRent)
+                                {
+                                    if (guild.GetGuildBank() >= rent)
+                                    {
+                                        guild.WithdrawGuildBank(null, rent, false);
 
-                        // try to pull from the lockbox first
-                        if (lockboxAmount >= rent)
-                        {
-                            house.KeptMoney -= rent;
-                            house.LastPaid = DateTime.Now;
-                            house.SaveIntoDatabase();
+                                        house.LastPaid = DateTime.Now;
+                                        house.SaveIntoDatabase();
+                                        paidFromBank = true;
+                                        log.Debug($"[Housing] Rent of {rent} for guild house #{house.HouseNumber} automatically paid from Guild Bank.");
+
+                                        string rentFormatted = Finance.Currency.Copper.Mint(rent).ToText();
+                                        foreach (GamePlayer guildPlayer in guild.GetListOfOnlineMembers())
+                                        {
+                                            if (guildPlayer.GuildRank != null && guildPlayer.GuildRank.RankLevel <= 3)
+                                            {
+                                                string rentMessage = LanguageMgr.GetTranslation(guildPlayer.Client.Account.Language, "Scripts.Player.Housing.GuildRentPaidFromBank", rentFormatted);
+                                                guildPlayer.Out.SendMessage(rentMessage, eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            long remainingDifference = (rent - lockboxAmount);
+                            DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(house.OwnerID);
 
-                            // not enough was in the lockbox.  see if we have the difference
-                            // on the consignment merchant
-                            if (remainingDifference <= consignmentAmount)
+                            if (bank != null && bank.AutoPayRent)
                             {
-                                // we have the difference, phew!
-                                house.KeptMoney = 0;
-                                consignmentMerchant.TotalMoney -= remainingDifference;
+                                if (bank.Money >= rent)
+                                {
+                                    bank.Money -= rent;
+                                    GameServer.Database.SaveObject(bank);
+
+                                    house.LastPaid = DateTime.Now;
+                                    house.SaveIntoDatabase();
+                                    paidFromBank = true;
+                                    log.Debug($"[Housing] Rent of {rent} for personal house #{house.HouseNumber} automatically paid from Bank.");
+
+                                    GameClient ownerClient = WorldMgr.GetClientByPlayerID(house.OwnerID, true, false);
+                                    if (ownerClient != null && ownerClient.Player != null)
+                                    {
+                                        string rentFormatted = Finance.Currency.Copper.Mint(rent).ToText();
+                                        string rentMessage = LanguageMgr.GetTranslation(ownerClient.Account.Language, "Scripts.Player.Housing.RentPaidFromBank", rentFormatted);
+                                        ownerClient.Player.Out.SendMessage(rentMessage, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!paidFromBank)
+                        {
+                            long lockboxAmount = house.KeptMoney;
+                            long consignmentAmount = 0;
+
+                            var consignmentMerchant = house.ConsignmentMerchant;
+                            if (consignmentMerchant != null)
+                            {
+                                consignmentAmount = consignmentMerchant.TotalMoney;
+                            }
+
+                            if (lockboxAmount >= rent)
+                            {
+                                house.KeptMoney -= rent;
+                                house.LastPaid = DateTime.Now;
+                                house.SaveIntoDatabase();
                             }
                             else
                             {
-                                // house can't afford rent, so we schedule house to be repossessed.
-                                houseRemovalList.Add(house);
+                                long remainingDifference = (rent - lockboxAmount);
+
+                                // not enough was in the lockbox. see if we have the difference on the consignment merchant
+                                if (remainingDifference <= consignmentAmount)
+                                {
+                                    house.KeptMoney = 0;
+                                    consignmentMerchant!.TotalMoney -= remainingDifference;
+                                    house.LastPaid = DateTime.Now;
+                                    house.SaveIntoDatabase();
+                                }
+                                else
+                                {
+                                    // house can't afford rent, so we schedule house to be repossessed.
+                                    houseRemovalList.Add(house);
+                                }
                             }
                         }
                     }
@@ -821,6 +923,25 @@ namespace DOL.GS.Housing
 
             foreach (House h in houseRemovalList)
             {
+                if (h.DatabaseItem.GuildHouse)
+                {
+                    Guild guild = GuildMgr.GetGuildByGuildID(h.OwnerID);
+                    if (guild != null)
+                    {
+                        foreach (GamePlayer p in guild.GetListOfOnlineMembers())
+                        {
+                            p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "Scripts.Player.Housing.GuildHouseEvicted", h.HouseNumber), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+                    }
+                }
+                else
+                {
+                    GameClient ownerClient = WorldMgr.GetClientByPlayerID(h.OwnerID, true, false);
+                    if (ownerClient != null && ownerClient.Player != null)
+                    {
+                        ownerClient.Player.Out.SendMessage(LanguageMgr.GetTranslation(ownerClient.Account.Language, "Scripts.Player.Housing.PersonalHouseEvicted", h.HouseNumber), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    }
+                }
                 RemoveHouse(h);
             }
         }

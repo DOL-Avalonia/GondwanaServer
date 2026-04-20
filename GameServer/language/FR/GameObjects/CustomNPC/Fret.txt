@@ -19,3 +19,13 @@ Fret.PackageNoMoney:			Vous n'avez pas assez d'argent !
 Fret.PackageNotPrepared:		Vous n'avez pas préparé de colis !
 Fret.PackageSendError:			Un problème est survenu lors de l'envoi du colis, veuillez tout recommencer. (Ne déplacez pas vos objets pendant la création du colis)
 Fret.PackageSent:			Votre colis a été envoyé !
+Fret.CannotSendToSelf:		Vous ne pouvez pas vous envoyer un colis à vous-même !
+Fret.PackageReceived:		Vous venez de recevoir un colis de {0} ! Vous pouvez le récupérer auprès du marchand Fret le plus proche.
+Fret.ItemReceived:			Vous récupérez {0}{1} donné(s) par {2} !
+Fret.InventoryFull:			Vérifiez que votre sac à dos n'est pas plein !
+Fret.ErrorRetrieving:		Un problème est survenu, recommencez la manipulation pour récupérer votre objet.
+Fret.PlayerNotFound:		Je ne trouve pas de personne nommée {0}, vérifiez le nom.
+Fret.TargetSet:				Votre colis est pour {0}.
+Fret.MaxItemsReached:		Vous ne pouvez envoyer que {0} objets dans un colis.
+Fret.ItemRemoved:			L'objet "{0}" a été retiré des objets du colis.
+Fret.ItemAdded:				L'objet "{0}" a été ajouté aux autres objets du colis.

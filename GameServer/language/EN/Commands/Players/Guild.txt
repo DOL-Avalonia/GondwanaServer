@@ -174,6 +174,7 @@ Commands.Players.Guild.Help.GuildWho:			    '/gc who' # Shows connected guild m
 Commands.Players.Guild.Help.GuildWithdraw:		'/gc withdraw <amount>' # Withdraw money from your guild bank.
 Commands.Players.Guild.Help.GuildTerritories:		'/gc territories' # Displays all territories, their owners, as well as all bonuses and penalties for captured territories.
 Commands.Players.Guild.Help.GuildSubTerritories:    '/gc subterritories' # Displays subterritories, their owners as well as their expiration timer.
+Commands.Players.Guild.Help.GuildHouseRent:			'/gc houserent <on|off>' # Toggles automatic guild house rent payment from the guild bank.
 Commands.Players.Guild.InCombat:				    You cannot summon the guild banner while fighting!
 Commands.Players.Guild.InfoAMotd:				    Alliance message: {0}
 Commands.Players.Guild.InfoBanner.Lost:         The banner fell into the hands of the enemy.
@@ -284,6 +285,7 @@ Commands.Players.Guild.WithdrawInvalid:			This is not a valid amount.
 Commands.Players.Guild.WithdrawTooMuch:			There is not enough money in the guild's bank!
 
 Commands.Players.Guild.CantInSubterritory:		You cannot use this command in a subterritory.
+Commands.Players.Guild.HouseRentToggled:		Automatic guild house rental payment is now {0}.
 
 Commands.Players.Guild.RealmPointsSet:			Guild {0} now has {1} realm points.
 Commands.Players.Guild.MeritPointsSet:			Guild {0} now has {1} merit points.
@@ -349,6 +351,8 @@ Commands.Players.Guild.TerritoryNoMoney:			Your guild could not honor its debts 
 Commands.Players.Guild.TerritoryMeritPoints:		Territories occupation earns your guild {0} merit points.
 
 Commands.Players.Guild.Territories.WindowTitle:			[ TERRITORIES ]
+Commands.Players.Guild.Territories.WindowTitleOpen:		[ TERRITORIES - (GvG Active) ]
+Commands.Players.Guild.Territories.WindowTitleClosed:	[ TERRITORIES - GvG Inactive - Opens in {0} min ]
 Commands.Players.Guild.Territories.TerritoriesOwned:	---- Territories owned by {0} ----
 Commands.Players.Guild.Territories.TerritoriesOther:	---- Other territories ----
 Commands.Players.Guild.Territories.TerritoriesList:		---- Territories ----
@@ -360,6 +364,7 @@ Commands.Players.Guild.Territories.DailyMeritPoints:	Total hourly merit points: 
 Commands.Players.Guild.Territories.TimeBeforeRent:		Time remaining before rental payment: {0}
 Commands.Players.Guild.Territories.TotalXPBonus:		Total bonus XP: {0:0}%
 Commands.Players.Guild.Territories.TotalBPBonus:		Total bonus bounty points for Lv65+ mobs: {0}
+Commands.Players.Guild.Territories.RelicRPBonus:		Total RP Bonus from territory relics: {0}%
 Commands.Players.Guild.Territories.Bonuses:				---- Territory Bonuses ----
 Commands.Players.Guild.Territories.DebuffDuration:		Nefarious effect duration
 Commands.Players.Guild.Territories.SpellRange:			Spell range

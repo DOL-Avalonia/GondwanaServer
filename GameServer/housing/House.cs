@@ -36,7 +36,7 @@ namespace DOL.GS.Housing
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private readonly DBHouse _databaseItem;
         private readonly Dictionary<int, DBHouseCharsXPerms> _housePermissions;
@@ -478,7 +478,14 @@ namespace DOL.GS.Housing
         public void SendHouseInfo(GamePlayer player)
         {
             int level = Model - ((Model - 1) / 4) * 4;
-            TimeSpan due = (LastPaid.AddDays(ServerProperties.Properties.RENT_DUE_DAYS).AddHours(1) - DateTime.Now);
+            TimeSpan due;
+            if (ServerProperties.Properties.RENT_DUE_DAYS > 0)
+                due = (LastPaid.AddDays(ServerProperties.Properties.RENT_DUE_DAYS).AddHours(1) - DateTime.Now);
+            else if (ServerProperties.Properties.RENT_DUE_DAYS < 0)
+                due = (LastPaid.AddMinutes(1) - DateTime.Now); // 1 minute test mode
+            else
+                due = TimeSpan.Zero;
+
             var text = new List<string>();
 
             text.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "House.SendHouseInfo.Owner", Name));
@@ -495,6 +502,8 @@ namespace DOL.GS.Housing
             text.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "House.SendHouseInfo.MaxLockbox", Money.GetString(HouseMgr.GetRentByModel(Model) * ServerProperties.Properties.RENT_LOCKBOX_PAYMENTS)));
             if (ServerProperties.Properties.RENT_DUE_DAYS > 0)
                 text.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "House.SendHouseInfo.RentDueIn", due.Days, due.Hours));
+            else if (ServerProperties.Properties.RENT_DUE_DAYS < 0)
+                text.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "House.SendHouseInfo.RentDueInSec", Math.Max(0, (int)due.TotalSeconds)));
             else
                 text.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "House.SendHouseInfo.RentDueIn", "No Rent! 0", "0"));
 
@@ -762,7 +771,7 @@ namespace DOL.GS.Housing
         {
             if (player.CurrentHouse != this || CanEmptyHookpoint(player) == false)
             {
-                ChatUtil.SendSystemMessage(player, "Only the Owner of a House can remove or place Items on Hookpoints!");
+                ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "House.EmptyHookpoint.NotOwner"));
                 return;
             }
 
@@ -770,14 +779,14 @@ namespace DOL.GS.Housing
 
             if (position < 0)
             {
-                ChatUtil.SendSystemMessage(player, "Invalid hookpoint position " + position);
+                ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "House.EmptyHookpoint.InvalidPosition", position));
                 return;
             }
 
             var items = DOLDB<DBHouseHookpointItem>.SelectObjects(DB.Column(nameof(DBHouseHookpointItem.HookpointID)).IsEqualTo(position).And(DB.Column(nameof(DBHouseHookpointItem.HouseNumber)).IsEqualTo(obj.CurrentHouse.HouseNumber)));
             if (items.Count == 0)
             {
-                ChatUtil.SendSystemMessage(player, "No hookpoint item found at position " + position);
+                ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "House.EmptyHookpoint.NoItemFound", position));
                 return;
             }
 
@@ -1332,8 +1341,23 @@ namespace DOL.GS.Housing
 
         public bool CanEnterHome(GamePlayer player)
         {
-            // check if player has access
-            return HasAccess(player, cp => cp.CanEnterHouse);
+            // 1. If it's a guild house, automatically let all guild members in.
+            if (_databaseItem.GuildHouse && player.Guild != null && player.Guild.GuildID == OwnerID)
+            {
+                return true;
+            }
+
+            // 2. DB permissions check
+            bool hasDbAccess = HasAccess(player, cp => cp.CanEnterHouse);
+            if (hasDbAccess) return true;
+
+            // 3. If the player has ANY permission mapping at all, let them enter the house.
+            if (GetPlayerPermissions(player) != null)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public bool CanUseVault(GamePlayer player, GameHouseVault vault, VaultPermissions vaultPerms)

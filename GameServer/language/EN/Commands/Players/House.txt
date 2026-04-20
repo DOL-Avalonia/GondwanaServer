@@ -12,3 +12,13 @@ Commands.Players.House.ModelChanged:	House model changed to {0}!
 Commands.Players.House.ConfirmYES:	You must confirm this removal with 'YES'
 Commands.Players.House.Removed:		House removed!
 Commands.Players.House.Description:	Show various housing information
+Commands.Players.House.InfoLot:		'/house info <lotnumber>' # Show detailed infos about a specific lot you own.
+
+Commands.Players.House.NotYourHouse:		You do not own that house.
+Commands.Players.House.ListHouse:			House {0}:
+Commands.Players.House.ListNoRent:			No Rent!
+Commands.Players.House.ListRentDaysHours:	{0} days, {1} hours
+Commands.Players.House.ListRentSeconds:		{0} seconds
+Commands.Players.House.ListRentDue:			Rent Due in: {0}
+Commands.Players.House.ListMoreInfoInstruction:	(More infos about this lot using '/house info {0}')
+Commands.Players.House.YourProperties:		Your Properties

@@ -3,6 +3,7 @@ House.DBHousePermissions.AccessLevel:			Nivel de acces {0}
 House.Edit.NotEnoughMoney:				Nu aveți destui bani pentru a face asta!
 House.Edit.PayForChanges:				Plătiți {0} pentru modificări.
 House.Enter.EnteredHouse:				Ați intrat în casa numărul {0}.
+House.Enter.EnteringHouse:				Intri în casa lui {0}.
 House.Exit.LeftHouse:					Ați părăsit casa numărul {0}.
 House.SendHouseInfo.DoorMaterial:			-Ușă: {0}	
 House.SendHouseInfo.ExteriorMaterials:			Materiale exterioare:
@@ -33,7 +34,11 @@ House.SendHouseInfo.Rug3Color:					-Culoarea 3: {0}
 House.SendHouseInfo.Rug4Color:					-Culoarea 4: {0}
 House.SendHouseInfo.TrussMaterial:				-Susținere: {0}	
 House.SendHouseInfo.WallMaterial:				-Pereți: {0}	
-House.SendHouseInfo.WindowMaterial:				-Obloane: {0}	
+House.SendHouseInfo.WindowMaterial:				-Obloane: {0}
+House.SendHouseInfo.RentDueInSec:			Chirie scadentă în: {0} secunde
+House.EmptyHookpoint.NotOwner:				Doar proprietarul unei case poate elimina sau plasa obiecte pe punctele de fixare!
+House.EmptyHookpoint.InvalidPosition:		Poziție nevalidă a punctului de fixare {0}
+House.EmptyHookpoint.NoItemFound:			Nu a fost găsit niciun obiect de punct de fixare la poziția {0}
 
 HouseEnterLeave.TooFarAway:					Sunteți prea departe pentru a intra în casa {0}.
 HouseEnterLeave.CantEnter:					Nu puteți intra în casa {0}.
@@ -69,6 +74,7 @@ Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	Dețineți deja un teren sau o
 Housing.LotMarker.YouJustBoughtThisLotFor:			Tocmai ați cumpărat acest teren pentru {0}.
 Housing.LotMarker.YouDontHaveEnoughMoney:			Fonduri insuficiente!
 Housing.LotMarker.ThisItemCantBeSold:				Acest obiect nu poate fi vândut.
+Housing.LotMarker.LotNotItem:					Acesta nu este un act de proprietate valid.
 
 Scripts.Player.Housing.BadShieldBanner:			Acesta nu este un obiect sau un banner valid.
 Scripts.Player.Housing.CantBeSold:				Acest obiect nu poate fi vândut!
@@ -79,7 +85,15 @@ Scripts.Player.Housing.GardenItemPlaced:			Obiecte de grădină plasate. {0} loc
 Scripts.Player.Housing.GardenItemPlacedName:		Lăsați obiectul {0} în grădina dumneavoastră.
 Scripts.Player.Housing.GardenMaxObjects:			Ați depus 30 de obiecte în grădina dumneavoastră. Nu mai aveți loc.
 Scripts.Player.Housing.GuildNowOwns:				[Breaslă] {0} deține acum o casă de breaslă de {1}!
-Scripts.Player.Housing.HookPointAdded:			Acest obiect a fost adăugat casei dumneavoastră.
+Scripts.Player.Housing.NotOwner:					Nu ești proprietarul acestei case!
+Scripts.Player.Housing.NotGuildLeader:				Nu ești liderul unei bresle!
+Scripts.Player.Housing.ConsignmentNotEmpty:			Toate obiectele și banii trebuie retrase de la negustorul tău de consignație pentru a putea transfera această casă!
+Scripts.Player.Housing.RentPaidFromBank:			{0} au fost retrase din contul tău bancar pentru plata chiriei casei tale.
+Scripts.Player.Housing.TargetLotMarker:				Trebuie să țintești un Marcaj de lot pentru a cumpăra un act.
+Scripts.Player.Housing.MerchantListNotFound:		Nu se poate finaliza tranzacția: lista negustorului nu a fost găsită.
+Scripts.Player.Housing.GuildHouseEvicted:			[Locuințe] Casa breslei de la lotul {0} a fost confiscată de regat din cauza chiriei neplătite!
+Scripts.Player.Housing.PersonalHouseEvicted:		[Locuințe] Casa ta de la lotul {0} a fost confiscată de regat din cauza chiriei neplătite!
+Scripts.Player.Housing.HookPointAdded:				Acest obiect a fost adăugat casei dumneavoastră.
 Scripts.Player.Housing.HookPointAlready:			Această ancorare are deja un obiect!
 Scripts.Player.Housing.HookPointCleared:			Punctul de ancorare este acum gol.
 Scripts.Player.Housing.HookPointCloser:			Apropiați-vă cât mai mult de lotul dorit și apăsați „acceptă”.
@@ -88,8 +102,8 @@ Scripts.Player.Housing.HookPointLogged:			Poziția punctului de ancorare {0}!
 Scripts.Player.Housing.HookPointLogLoc:			Afișați punctele de ancorare?
 Scripts.Player.Housing.HookPointNot:				Acesta nu este un obiect utilizabil pe ancorări!
 Scripts.Player.Housing.HookPointNotPlaced:			Obiectul nu a fost plasat pe această ancorare.
-Scripts.Player.Housing.HouseUseMaterial:			Folosiți shift+clic-dreapta în casa dumneavoastră pentru a schimba aspectul casei.
-Scripts.Player.Housing.HouseUseMaterial:			Folosiți shift+clic-dreapta în casa dumneavoastră pentru a schimba covoarele.
+Scripts.Player.Housing.HouseUseMaterials:			Folosiți shift+clic-dreapta în casa dumneavoastră pentru a schimba aspectul casei.
+Scripts.Player.Housing.HouseUseCarpets:				Folosiți shift+clic-dreapta în casa dumneavoastră pentru a schimba covoarele.
 Scripts.Player.Housing.IndoorFloorPlaced:			Ați plasat {0} la etajul casei dumneavoastră.
 Scripts.Player.Housing.IndoorItemPlaced:			Obiect de interior plasat. {0} loc rămas.
 Scripts.Player.Housing.IndoorMaxItems:			În prezent ați plasat {0} obiecte în casa dumneavoastră. Nu puteți plasa mai multe.
@@ -98,14 +112,6 @@ Scripts.Player.Housing.InteriorBannersAdded:		Bannerul de breaslă interior a fo
 Scripts.Player.Housing.InteriorBannersRemoved:		Bannerul de breaslă interior a fost îndepărtat.
 Scripts.Player.Housing.InteriorShieldsAdded:		Emblema de breaslă interioară a fost schimbată.
 Scripts.Player.Housing.InteriorShieldsRemoved:		Emblema de breaslă interioară a fost îndepărtată.
-Scripts.Player.Housing.LeftHouse:				Ieșire din casa {0}.
-Scripts.Player.Housing.LotAlready:				Dețineți deja un alt lot sau o casă (numărul {0})
-Scripts.Player.Housing.LotBought:				Tocmai ați cumpărat acest lot pentru {0}!
-Scripts.Player.Housing.LotCost:					Poate fi cumpărat pentru {0}.
-Scripts.Player.Housing.LotNotItem:				Acesta nu este un act de proprietate valid.
-Scripts.Player.Housing.LotNotYours:				Nu dețineți acest lot!
-Scripts.Player.Housing.LotOffer:				Doriți să cumpărați acest lot? Costă {0}.
-Scripts.Player.Housing.LotTargeted:				Selectați lotul numărul {0}.
 Scripts.Player.Housing.NotFloorObject:			Acest obiect nu poate fi plasat la etaj!
 Scripts.Player.Housing.NotHookPoint:				Acest obiect nu poate fi plasat pe ancorare!
 Scripts.Player.Housing.NotWallObject:				Acest obiect nu poate fi plasat pe perete!

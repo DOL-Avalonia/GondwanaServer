@@ -49,6 +49,15 @@ PvPManager.Biohazard.NewSamples:			De nouveaux échantillons toxiques se sont ma
 PvPManager.Biohazard.FleshRots:				Votre chair morte-vivante pourrit rapidement en dehors de la zone radioactive !
 PvPManager.Biohazard.SampleLeaks:			L'échantillon toxique s'infiltre dans vos veines...
 
+PvPManager.Session.CaptureTheFlag:			Capture de Drapeau
+PvPManager.Session.TreasureHunt:			Chasse au Trésor
+PvPManager.Session.BringAFriend:			Escorte d'Allié
+PvPManager.Session.TerritoryCapture:		Captures de Territoires
+PvPManager.Session.BossHunt:				Traque de Boss
+PvPManager.Session.KingOfTheHill:			Roi de la Colline
+PvPManager.Session.CoreRun:					L'Épreuve du Cœur
+PvPManager.Session.Biohazard:				Contamination
+
 PvPManager.Rules.Title:						=== Règles de la session PvP ===
 PvPManager.Rules.Deathmatch:				Bienvenue dans l'Arène. Les règles sont simples : tuer ou être tué. Traquez vos ennemis pour gagner des points.
 PvPManager.Rules.CaptureTheFlag:			Capture de drapeau ! Une bannière sacrée s'est matérialisée dans la région. Localisez-la et sécurisez-la dans votre avant-poste. Intercepter et vaincre un porteur ennemi le forcera à lâcher le drapeau, saisissez-le avant qu'ils ne le récupèrent ! Une attaque audacieuse contre une base ennemie peut aussi libérer les bannières qu'ils détiennent. Restez vigilant : tout drapeau tombé au sol et laissé sans surveillance finira par se dissiper pour réapparaître à son point d'origine.

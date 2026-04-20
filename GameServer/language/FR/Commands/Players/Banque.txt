@@ -1,6 +1,8 @@
 Commands.Players.Banque.Description:			Pour récupérer de l'argent à la banque.
 Commands.Players.Banque.Usage:					/banque <Cuivre> <Argent> <Or> <Platine>
 Commands.Players.Banque.Usage.Cheque:			/banque cheque <Cuivre> <Argent> <Or> <Platine>
+Commands.Players.Banque.Usage.Transfer:			/banque transfer <NomDuJoueur> <Cuivre> <Argent> <Or> <Platine>' Effectue un virement direct vers le compte bancaire d'un joueur
+Commands.Players.Banque.Usage.TermDeposit:		/banque termdeposit <biweekly|monthly|quarterly> <Cuivre> <Argent> <Or> <Platine>' Ouvre un compte de dépôt à terme
 
 Banque.Cheque.NoAccount:						Vous n'avez pas de compte, vous ne pouvez donc pas faire de chèque !
 Banque.Cheque.MaxValue:							Vous pouvez faire un chèque de maximum 100 platines !
@@ -14,3 +16,16 @@ Banque.AccountOverview:							Vous avez maintenant " {0} " dans votre compte.
 Banque.Withdraw.NoAccount:						Vous n'avez pas de compte, vous ne pouvez donc pas récupérer d'argent !
 Banque.Withdraw.NoMoney:						Vous n'avez pas assez d'argent à la banque !
 Banque.Withdraw.SelectNPC:						Vous devez sélectionner un banquier pour récupérer de l'argent !
+Banque.Transfer.Usage:							Utilisation : /banque transfer <NomDuJoueur> <Cuivre> <Argent> <Or> <Platine>
+Banque.Transfer.NotEnoughFunds:					Vous n'avez pas assez d'argent à la banque pour ce virement.
+Banque.Transfer.PlayerNotFound:					Impossible de trouver un joueur du nom de {0}.
+Banque.Transfer.CannotTransferSelf:				Vous ne pouvez pas transférer d'argent à vous-même.
+Banque.Transfer.TargetNoAccount:				Le joueur {0} ne semble pas encore avoir de compte bancaire.
+Banque.Transfer.Success:						Vous avez transféré {0} avec succès sur le compte bancaire de {1}.
+Banque.Transfer.Received:						Un virement bancaire de {0} vient d'être crédité sur votre compte de la part de {1}.
+
+Banque.TermDeposit.Usage:						Utilisation : /banque termdeposit <bimensuel|mensuel|trimestriel> <Cuivre> <Argent> <Or> <Platine>
+Banque.TermDeposit.InvalidTerm:					Durée invalide. Doit être bimensuel, mensuel, ou trimestriel.
+Banque.TermDeposit.NotEnoughFunds:				Vous n'avez pas assez d'argent à la banque pour ce dépôt.
+Banque.TermDeposit.MaxReached:					Vous avez déjà le nombre maximum de dépôts à terme ({0}).
+Banque.TermDeposit.Success:						Vous avez bloqué {0} avec succès pour {1} jours à {2}% d'intérêts.

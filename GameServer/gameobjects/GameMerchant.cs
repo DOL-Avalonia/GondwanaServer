@@ -16,21 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using DOL.AI.Brain;
+using DOL.Database;
+using DOL.Events;
+using DOL.GS.Finance;
+using DOL.GS.PacketHandler;
+using DOL.GS.Profession;
+using DOL.GS.Quests;
+using DOL.GS.Scripts;
+using DOL.Language;
+using DOL.Territories;
+using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using DOL.AI.Brain;
-using DOL.Database;
-using DOL.Language;
-using DOL.GS.PacketHandler;
-using DOL.Events;
-using DOL.GS.Quests;
-using DOL.Territories;
-using DOL.GS.Finance;
-using DOL.GS.Profession;
-using DOL.GS.Scripts;
 
 namespace DOL.GS
 {
@@ -206,6 +207,11 @@ namespace DOL.GS
 
         public static void OnPlayerBuy(GamePlayer player, int item_slot, int page, int number, MerchantTradeItems TradeItems)
         {
+            if (TradeItems == null)
+            {
+                return;
+            }
+
             ItemTemplate template = TradeItems.GetItem(page, (eMerchantWindowSlot)item_slot);
             if (template == null) return;
 

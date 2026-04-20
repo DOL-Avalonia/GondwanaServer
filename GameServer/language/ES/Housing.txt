@@ -3,6 +3,7 @@ House.DBHousePermissions.AccessLevel:			Nivel de acceso {0}
 House.Edit.NotEnoughMoney:				¡No tienes suficiente dinero para hacer eso!
 House.Edit.PayForChanges:				Paga {0} por los cambios.
 House.Enter.EnteredHouse:				Has entrado en la casa número {0}.
+House.Enter.EnteringHouse:				Entras en la casa de {0}.
 House.Exit.LeftHouse:					Has salido de la casa número {0}.
 House.SendHouseInfo.DoorMaterial:			-Puerta: {0}	
 House.SendHouseInfo.ExteriorMaterials:			Materiales exteriores:
@@ -33,7 +34,11 @@ House.SendHouseInfo.Rug3Color:					-Color 3: {0}
 House.SendHouseInfo.Rug4Color:					-Color 4: {0}
 House.SendHouseInfo.TrussMaterial:				-Cerchas: {0}	
 House.SendHouseInfo.WallMaterial:				-Paredes: {0}	
-House.SendHouseInfo.WindowMaterial:				-Ventanas: {0}	
+House.SendHouseInfo.WindowMaterial:				-Ventanas: {0}
+House.SendHouseInfo.RentDueInSec:			Vencimiento del alquiler en: {0} segundos
+House.EmptyHookpoint.NotOwner:				¡Solo el propietario de una casa puede retirar o colocar objetos en los puntos de anclaje!
+House.EmptyHookpoint.InvalidPosition:		Posición de punto de anclaje no válida {0}
+House.EmptyHookpoint.NoItemFound:			No se encontró ningún objeto de punto de anclaje en la posición {0}
 
 HouseEnterLeave.TooFarAway:					Estás demasiado lejos para entrar en la casa {0}.
 HouseEnterLeave.CantEnter:					No puedes entrar en la casa {0}.
@@ -69,6 +74,7 @@ Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	Ya posees otra parcela o casa 
 Housing.LotMarker.YouJustBoughtThisLotFor:			Acabas de comprar esta parcela por {0}.
 Housing.LotMarker.YouDontHaveEnoughMoney:			¡Fondos insuficientes!
 Housing.LotMarker.ThisItemCantBeSold:				Este objeto no puede venderse.
+Housing.LotMarker.LotNotItem:					Este no es un título de propiedad válido.
 
 Scripts.Player.Housing.BadShieldBanner:			Esto no es un objeto o estandarte válido.
 Scripts.Player.Housing.CantBeSold:				¡Este objeto no puede venderse!
@@ -79,7 +85,15 @@ Scripts.Player.Housing.GardenItemPlaced:			Objetos de jardín colocados. Quedan 
 Scripts.Player.Housing.GardenItemPlacedName:		Deja el objeto {0} en tu jardín.
 Scripts.Player.Housing.GardenMaxObjects:			Has puesto 30 objetos en tu jardín. No queda espacio.
 Scripts.Player.Housing.GuildNowOwns:				[Gremio] ¡{0} ahora posee una casa de gremio de {1}!
-Scripts.Player.Housing.HookPointAdded:			Este objeto se ha añadido a tu casa.
+Scripts.Player.Housing.NotOwner:					¡No eres el dueño de esta casa!
+Scripts.Player.Housing.NotGuildLeader:				¡No eres el líder de un gremio!
+Scripts.Player.Housing.ConsignmentNotEmpty:			¡Todos los objetos y el dinero deben ser retirados de tu mercader de consignación para poder transferir esta casa!
+Scripts.Player.Housing.RentPaidFromBank:			Se han retirado {0} de tu cuenta bancaria para el pago del alquiler de tu casa.
+Scripts.Player.Housing.TargetLotMarker:				Debes apuntar a un marcador de lote para comprar una escritura.
+Scripts.Player.Housing.MerchantListNotFound:		No se puede completar la transacción: no se encontró la lista del mercader.
+Scripts.Player.Housing.GuildHouseEvicted:			[Vivienda] ¡La casa de gremio en el lote {0} ha sido embargada por el reino debido a la falta de pago del alquiler!
+Scripts.Player.Housing.PersonalHouseEvicted:		[Vivienda] ¡Tu casa en el lote {0} ha sido embargada por el reino debido a la falta de pago del alquiler!
+Scripts.Player.Housing.HookPointAdded:				Este objeto se ha añadido a tu casa.
 Scripts.Player.Housing.HookPointAlready:			¡Ese punto de anclaje ya tiene un objeto!
 Scripts.Player.Housing.HookPointCleared:			El punto de anclaje ahora está vacío.
 Scripts.Player.Housing.HookPointCloser:			Acércate lo máximo posible a la parcela deseada y pulsa “aceptar”.
@@ -88,8 +102,8 @@ Scripts.Player.Housing.HookPointLogged:			¡Posición del punto de anclaje {0} r
 Scripts.Player.Housing.HookPointLogLoc:			¿Mostrar puntos de anclaje?
 Scripts.Player.Housing.HookPointNot:				¡Este no es un objeto utilizable en puntos de anclaje!
 Scripts.Player.Housing.HookPointNotPlaced:			El objeto no se ha colocado en ese punto de anclaje.
-Scripts.Player.Housing.HouseUseMaterial:			Usa Mayús+clic derecho en tu casa para cambiar el aspecto.
-Scripts.Player.Housing.HouseUseMaterial:			Usa Mayús+clic derecho en tu casa para cambiar las alfombras.
+Scripts.Player.Housing.HouseUseMaterials:			Usa Mayús+clic derecho en tu casa para cambiar el aspecto.
+Scripts.Player.Housing.HouseUseCarpets:				Usa Mayús+clic derecho en tu casa para cambiar las alfombras.
 Scripts.Player.Housing.IndoorFloorPlaced:			Has colocado {0} en el piso de tu casa.
 Scripts.Player.Housing.IndoorItemPlaced:			Objeto interior colocado. Queda {0} espacio.
 Scripts.Player.Housing.IndoorMaxItems:			Actualmente has colocado {0} objetos en tu casa. No puedes colocar más.
@@ -98,14 +112,6 @@ Scripts.Player.Housing.InteriorBannersAdded:		El estandarte de gremio interior h
 Scripts.Player.Housing.InteriorBannersRemoved:		El estandarte de gremio interior ha sido retirado.
 Scripts.Player.Housing.InteriorShieldsAdded:		El escudo de gremio interior ha sido cambiado.
 Scripts.Player.Housing.InteriorShieldsRemoved:		El escudo de gremio interior ha sido retirado.
-Scripts.Player.Housing.LeftHouse:				Sales de la casa {0}.
-Scripts.Player.Housing.LotAlready:				Ya posees otra parcela o una casa (n.º {0})
-Scripts.Player.Housing.LotBought:				¡Acabas de comprar esta parcela por {0}!
-Scripts.Player.Housing.LotCost:					Se puede comprar por {0}.
-Scripts.Player.Housing.LotNotItem:				Este no es un título de propiedad válido.
-Scripts.Player.Housing.LotNotYours:				¡No posees esta parcela!
-Scripts.Player.Housing.LotOffer:				¿Quieres comprar esta parcela? Cuesta {0}.
-Scripts.Player.Housing.LotTargeted:				Apuntas a la parcela número {0}.
 Scripts.Player.Housing.NotFloorObject:			Este objeto no puede colocarse en el piso superior.
 Scripts.Player.Housing.NotHookPoint:				¡Este objeto no puede colocarse en un punto de anclaje!
 Scripts.Player.Housing.NotWallObject:				¡Este objeto no puede colocarse en la pared!

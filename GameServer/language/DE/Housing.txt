@@ -1,24 +1,25 @@
-﻿House.DBHousePermissions.AccessLevel:			Zugangsstufe: {0}		
-House.Edit.NotEnoughMoney:				Ihr habt nicht genug Geld, um dies machen zu können!	
+﻿# HOUSING (DE)
+House.DBHousePermissions.AccessLevel:			Zugangsstufe: {0}		
+House.Edit.NotEnoughMoney:				Ihr habt nicht genug Geld, um dies machen zu können!
 House.Edit.PayForChanges:				Ihr zahlt {0} für diese Änderungen.
 House.Enter.EnteredHouse:				Ihr habt das Haus Nummer {0} betreten.
 House.Enter.EnteringHouse:				Haus {0} wurde betreten.
 House.Exit.LeftHouse:					Ihr habt das Haus Nummer {0} verlassen.
-House.SendHouseInfo.DoorMaterial:			- Tür: {0}		
-House.SendHouseInfo.ExteriorMaterials:			Material im Außenbereich:		
-House.SendHouseInfo.ExteriorUpgrades:			Erweiterungen im Außenbereich:		
-House.SendHouseInfo.HouseOwner:				Haus von {0}	
-House.SendHouseInfo.IndoorGuildBanner:			- Banner: {0}		
-House.SendHouseInfo.IndoorGuildShield:			- Schild: {0}		
-House.SendHouseInfo.InteriorCarpets:			Teppichboden:		
-House.SendHouseInfo.InteriorUpgrades:			Erweiterungen im Innenbereich:		
-House.SendHouseInfo.Level:				Ausbaustufe: {0}	
+House.SendHouseInfo.DoorMaterial:			- Tür: {0}
+House.SendHouseInfo.ExteriorMaterials:			Material im Außenbereich:
+House.SendHouseInfo.ExteriorUpgrades:			Erweiterungen im Außenbereich:
+House.SendHouseInfo.HouseOwner:				Haus von {0}
+House.SendHouseInfo.IndoorGuildBanner:			- Banner: {0}
+House.SendHouseInfo.IndoorGuildShield:			- Schild: {0}
+House.SendHouseInfo.InteriorCarpets:			Teppichboden:
+House.SendHouseInfo.InteriorUpgrades:			Erweiterungen im Innenbereich:
+House.SendHouseInfo.Level:				Ausbaustufe: {0}
 House.SendHouseInfo.Lockbox:				Schließfach: {0}	
 House.SendHouseInfo.Lotnum:				Grundstücksnummer: {0}	
 House.SendHouseInfo.MaxLockbox:				Schließfach(max): {0}	
-House.SendHouseInfo.OutdoorGuildBanner:			- Banner: {0}		
-House.SendHouseInfo.OutdoorGuildShield:			- Schild: {0}		
-House.SendHouseInfo.Owner:				Eigentümer: {0}	
+House.SendHouseInfo.OutdoorGuildBanner:			- Banner: {0}
+House.SendHouseInfo.OutdoorGuildShield:			- Schild: {0}
+House.SendHouseInfo.Owner:				Eigentümer: {0}
 House.SendHouseInfo.Owners:				Bewohner:	
 House.SendHouseInfo.Porch:				Veranda: 	
 House.SendHouseInfo.PorchEnabled:			- vorhanden: {0}
@@ -34,6 +35,93 @@ House.SendHouseInfo.Rug4Color:				- Vierte Farbe: {0}
 House.SendHouseInfo.TrussMaterial:			- Support/Truss: {0}
 House.SendHouseInfo.WallMaterial:			- Mauer: {0}
 House.SendHouseInfo.WindowMaterial:			- Fensterladen: {0}
-HouseEnterLeave.TooFarAway:				Ihr seid zu weit weg vom Haus {0} um es zu betreten.
-HouseEnterLeave.CantEnter:				Ihr könnt das Haus {0} nicht betreten.
+House.SendHouseInfo.RentDueInSec:			Miete fällig in: {0} Sekunden
+House.EmptyHookpoint.NotOwner:				Nur der Besitzer eines Hauses kann Gegenstände an Befestigungspunkten entfernen oder platzieren!
+House.EmptyHookpoint.InvalidPosition:		Ungültige Befestigungspunkt-Position {0}
+House.EmptyHookpoint.NoItemFound:			Kein Befestigungspunkt-Gegenstand an Position {0} gefunden
+
+HouseEnterLeave.TooFarAway:					Ihr seid zu weit weg vom Haus {0} um es zu betreten.
+HouseEnterLeave.CantEnter:					Ihr könnt das Haus {0} nicht betreten.
+
 HousingDecorationRotate.Rotated:			Ein internes Objekt wurde von {0} Grad nach {1} Grad gedreht.
+
+# /HousingPlaceItemHandler
+HousingPickupItemHandler.GardenRemoved:			Gartenobjekt entfernt.
+HousingPickupItemHandler.PickUp:				Ihr legt {0} in Euer Inventar.
+HousingPlaceItemHandler.30objects:				Ihr habt bereits 30 Gegenstände platziert. Mehr könnt Ihr nicht aufstellen.
+HousingPlaceItemHandler.40objects:				Ihr habt bereits 40 Gegenstände platziert. Mehr könnt Ihr nicht aufstellen.
+HousingPlaceItemHandler.CantFloor:				Dieser Gegenstand kann nicht auf den Boden gestellt werden!
+HousingPlaceItemHandler.CantWall:				Dieser Gegenstand kann nicht an der Wand angebracht werden!
+HousingPlaceItemHandler.DropOnFloor:			Ihr stellt {0} auf den Boden Eures Hauses.
+HousingPlaceItemHandler.DropOnGarden:			Ihr stellt {0} in Eurem Garten auf.
+HousingPlaceItemHandler.DropOnWall:				Ihr hängt {0} an die Wand Eures Hauses.
+HousingPlaceItemHandler.GardenObjectPlaced:		Gartenobjekt platziert. {0} Plätze verbleiben.
+HousingPlaceItemHandler.HasPorch:				Dieses Haus besitzt bereits eine Veranda!
+HousingPlaceItemHandler.HasNoPorch:				Dieses Haus besitzt keine Veranda!
+HousingPlaceItemHandler.IndoorObjectPlaced:		Innenausstattung platziert. {0} Plätze verbleiben.
+HousingPlaceItemHandler.NoHookpoint:			Es ist kein Stellplatz mehr frei!
+HousingPlaceItemHandler.PutMoney:				Ihr zahlt Geld auf das Konto Eures Hauses ein.
+
+# /Housing LotMarker
+Housing.LotMarker.TargetLotNumber:				Du visierst Grundstücksnummer {0} an.
+Housing.LotMarker.ItCanBeBoughtFor:				Es kann für {0} gekauft werden.
+Housing.LotMarker.ItIsOwnedBy:					Es gehört {0}.
+Housing.LotMarker.YouAlreadyOwnAHouse:			Du besitzt bereits ein Haus!
+Housing.LotMarker.DoYouWantToBuyThisLot1:		Möchtest du dieses Grundstück kaufen?
+Housing.LotMarker.DoYouWantToBuyThisLot2:		Es kostet {0}!
+Housing.LotMarker.YouDoNotOwnThisLot:			Du besitzt dieses Grundstück nicht!
+Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	Du besitzt bereits ein anderes Grundstück oder Haus (Nummer {0}).
+Housing.LotMarker.YouJustBoughtThisLotFor:		Du hast dieses Grundstück gerade für {0} gekauft.
+Housing.LotMarker.YouDontHaveEnoughMoney:		Du hast nicht genug Geld!
+Housing.LotMarker.ThisItemCantBeSold:			Dieser Gegenstand kann nicht verkauft werden.
+Housing.LotMarker.LotNotItem:					Das ist keine gültige Besitzurkunde.
+
+Scripts.Player.Housing.BadShieldBanner:			Das ist kein gültiges Schild oder Banner.
+Scripts.Player.Housing.CantBeSold:			Ihr könnt diesen Gegenstand nicht verkaufen!
+Scripts.Player.Housing.CarpetsRemoved:			Eure Teppiche wurden entfernt.
+Scripts.Player.Housing.ClearHookPoint:			Wollt Ihr diesen Stellplatz räumen?
+Scripts.Player.Housing.EnteredHouse:			Ihr habt Haus Nr. {0} betreten.
+Scripts.Player.Housing.GardenItemPlaced:		Gartenartikel aufgestellt. Es verbleiben {0} Stellmöglichkeiten.
+Scripts.Player.Housing.GardenItemPlacedName:		Ihr habt {0} in Eurem Garten aufgestellt.
+Scripts.Player.Housing.GardenMaxObjects:		Ihr habt bereits 30 Artikel in Eurem Garten aufgestellt. Mehr geht nicht.
+Scripts.Player.Housing.GuildNowOwns:			[Gilde] {0} besitzt nun ein Gildenhaus für {1}!
+Scripts.Player.Housing.NotOwner:				Du bist nicht der Besitzer dieses Hauses!
+Scripts.Player.Housing.NotGuildLeader:			Du bist nicht der Anführer einer Gilde!
+Scripts.Player.Housing.ConsignmentNotEmpty:		Alle Gegenstände und das gesamte Geld müssen von deinem Konsignationshändler entfernt werden, um dieses Haus zu übertragen!
+Scripts.Player.Housing.RentPaidFromBank:		{0} wurden für die Mietzahlung deines Hauses von deinem Bankkonto abgebucht.
+Scripts.Player.Housing.TargetLotMarker:			Du musst eine Grundstücksmarkierung anvisieren, um eine Urkunde zu kaufen.
+Scripts.Player.Housing.MerchantListNotFound:	Transaktion kann nicht abgeschlossen werden: Händlerliste nicht gefunden.
+Scripts.Player.Housing.GuildHouseEvicted:		[Wohnen] Das Gildenhaus auf Grundstück {0} wurde wegen unbezahlter Miete vom Reich beschlagnahmt!
+Scripts.Player.Housing.PersonalHouseEvicted:	[Wohnen] Dein Haus auf Grundstück {0} wurde wegen unbezahlter Miete vom Reich beschlagnahmt!
+Scripts.Player.Housing.HookPointAdded:			Der Gegenstand wurde Eurem Haus hinzugefügt.
+Scripts.Player.Housing.HookPointAlready:		Dieser Stellplatz ist bereits belegt!
+Scripts.Player.Housing.HookPointCleared:		Der Stellplatz wurde geräumt.
+Scripts.Player.Housing.HookPointCloser:			Geht so nahe an den Stellplatz heran wie möglich, blickt in die richtige Richtung und akzeptiert.
+Scripts.Player.Housing.HookPointID:				Die Stellplatz-ID ist: {0}
+Scripts.Player.Housing.HookPointLogged:			Die Position von Stellplatz {0}!
+Scripts.Player.Housing.HookPointLogLoc:			Wollt Ihr die Position dieses Stellplatzes in die Logdatei schreiben?
+Scripts.Player.Housing.HookPointNot:			Dieser Gegenstand ist nicht für einen Stellplatz bestimmt!
+Scripts.Player.Housing.HookPointNotPlaced:		Der Gegenstand wurde nicht aufgestellt.
+Scripts.Player.Housing.HouseUseMaterials:		Ihr müßt die Umschalttaste gedrückt halten und dann mit der Maus auf Euer Haus rechts-clicken um das Material zu verändern.
+Scripts.Player.Housing.HouseUseCarpets:			Ihr müßt die Umschalttaste gedrückt halten und dann mit der Maus auf Euer Haus rechts-clicken um Eure Teppiche auszutauschen.
+Scripts.Player.Housing.IndoorFloorPlaced:		Ihr habt {0} auf den Boden Eures Hauses gestellt.
+Scripts.Player.Housing.IndoorItemPlaced:		Inneneinrichtung aufgestellt. {0} freie Plätze verbleibend.
+Scripts.Player.Housing.IndoorMaxItems:			Ihr habt bereits {0} Gegenstände platziert. Mehr geht nicht.
+Scripts.Player.Housing.IndoorWallPlaced:		Ihr habt {0} an der Wand Eures Hauses aufgehangen.
+Scripts.Player.Housing.InteriorBannersAdded:		Die Gildenbanner in Eurem Haus wurden verändert.
+Scripts.Player.Housing.InteriorBannersRemoved:		Die Gildenbanner in Eurem Haus wurden entfernt.
+Scripts.Player.Housing.InteriorShieldsAdded:		Die Gildenschilde in Eurem Haus wurden verändert.
+Scripts.Player.Housing.InteriorShieldsRemoved:		Die Gildenschilde in Eurem Haus wurden entfernt.
+Scripts.Player.Housing.NotFloorObject:			Dieser Gegenstand kann nicht auf den Boden gestellt werden!
+Scripts.Player.Housing.NotHookPoint:			Dieser Gegenstand gehört nicht auf einen Stellplatz!
+Scripts.Player.Housing.NotWallObject:			Dieser Gegenstand kann nicht aufgehangen werden.
+Scripts.Player.Housing.OutdoorBannersAdded:		Die Gildenbanner an Eurem Haus wurden verändert.
+Scripts.Player.Housing.OutdoorBannersRemoved:		Die Gildenbanner an Eurem Haus wurden entfernt.
+Scripts.Player.Housing.OutdoorShieldsAdded:		Die Gildenschilde an Eurem Haus wurden verändert.
+Scripts.Player.Housing.OutdoorShieldsRemoved:		Die Gildenschilde an Eurem Haus wurden entfernt.
+Scripts.Player.Housing.PaidChanges:			Ihr habt {0} für die Änderungen ausgegeben.
+Scripts.Player.Housing.PaidNotEnough:			Ihr habt dafür nicht genug Geld!
+Scripts.Player.Housing.PorchAlready:			Dieses Haus verfügt bereits über eine Veranda!
+Scripts.Player.Housing.PorchNone:			Dieses Haus verfügt über keine Veranda!
+Scripts.Player.Housing.PorchNotItem:			Das ist keine Veranda!
+Scripts.Player.Housing.TransferToGuild:			Möchtet Ihr dieses Haus an {0} übertragen?

@@ -5,7 +5,7 @@ House.Edit.NotEnoughMoney:				You don't have enough money to do that!
 House.Edit.PayForChanges:				You pay {0} for your changes.
 House.Enter.EnteredHouse:				You have entered house number {0}.
 House.Enter.EnteringHouse:				Entering house {0}.
-House.Exit.LeftHouse:					You have left house number {0}.
+House.Exit.LeftHouse:					You have exited house number {0}.
 House.SendHouseInfo.DoorMaterial:			-Door: {0}	
 House.SendHouseInfo.ExteriorMaterials:			Exterior Materials:	
 House.SendHouseInfo.ExteriorUpgrades:			Exterior Upgrades:	
@@ -36,6 +36,10 @@ House.SendHouseInfo.Rug4Color:				-Fourth Color: {0}
 House.SendHouseInfo.TrussMaterial:			-Support: {0}	
 House.SendHouseInfo.WallMaterial:			-Wall: {0}	
 House.SendHouseInfo.WindowMaterial:			-Shutter: {0}
+House.SendHouseInfo.RentDueInSec:			Rent due in: {0} seconds
+House.EmptyHookpoint.NotOwner:				Only the Owner of a House can remove or place Items on Hookpoints!
+House.EmptyHookpoint.InvalidPosition:		Invalid hookpoint position {0}
+House.EmptyHookpoint.NoItemFound:			No hookpoint item found at position {0}
 
 HouseEnterLeave.TooFarAway:					You are too far to enter the house {0}.
 HouseEnterLeave.CantEnter:					You cannot enter the house {0}.
@@ -45,32 +49,33 @@ HousingDecorationRotate.Rotated:			A {0} degrees to {1} degrees turned interior 
 # /HousingPlaceItemHandler
 HousingPickupItemHandler.GardenRemoved:			Garden object removed.
 HousingPickupItemHandler.PickUp:				You get {0} and put it in your backpack.
-HousingPlaceItemHandler.30objects:				Vous avez déjà placé 30 objets. Vous ne pouvez pas en placer plus.
-HousingPlaceItemHandler.40objects:				Vous avez déjà placé 40 objets. Vous ne pouvez pas en placer plus.
-HousingPlaceItemHandler.CantFloor:				Cet objet ne peut pas être placé sur le sol !
-HousingPlaceItemHandler.CantWall:				Cet objet ne peut pas être placé sur un mur !
-HousingPlaceItemHandler.DropOnFloor:			Vous déposez l'objet {0} sur le sol de votre maison.
-HousingPlaceItemHandler.DropOnGarden:			Vous déposez l'objet {0} dans votre jardin.
-HousingPlaceItemHandler.DropOnWall:				Vous déposez l'objet {0} sur le mur de votre maison.
-HousingPlaceItemHandler.GardenObjectPlaced:		Objet de jardin placé. {0} places restantes.
-HousingPlaceItemHandler.HasPorch:				Cette maison a déjà un porche !
-HousingPlaceItemHandler.HasNoPorch:				Cette maison n'a pas de porche !
-HousingPlaceItemHandler.IndoorObjectPlaced:		Objet intérieur placé. {0} places restantes.
-HousingPlaceItemHandler.NoHookpoint:			Il n'y a plus de point d'ancrage !
-HousingPlaceItemHandler.PutMoney:				Vous déposez de l'argent sur le compte de votre maison.
+HousingPlaceItemHandler.30objects:				You have already placed 30 objects. You cannot place any more.
+HousingPlaceItemHandler.40objects:				You have already placed 40 objects. You cannot place any more.
+HousingPlaceItemHandler.CantFloor:				This object cannot be placed on the ground!
+HousingPlaceItemHandler.CantWall:				This object cannot be placed on walls!
+HousingPlaceItemHandler.DropOnFloor:			You drop the object {0} on the floor of your house.
+HousingPlaceItemHandler.DropOnGarden:			You drop the object {0} in your garden.
+HousingPlaceItemHandler.DropOnWall:				You place the object {0} on the wall of your house.
+HousingPlaceItemHandler.GardenObjectPlaced:		Garden object placed. {0} slots remaining.
+HousingPlaceItemHandler.HasPorch:				This house already has a porch!
+HousingPlaceItemHandler.HasNoPorch:				This house does not have a porch!
+HousingPlaceItemHandler.IndoorObjectPlaced:		Indoor object placed. {0} slots remaining.
+HousingPlaceItemHandler.NoHookpoint:			There are no more hookpoints left!
+HousingPlaceItemHandler.PutMoney:				You deposit money into your house lockbox account.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				You target lot number {0}.
-Housing.LotMarker.ItCanBeBoughtFor:				It can be bought for {0}.
+Housing.LotMarker.ItCanBeBoughtFor:				This lot can be purchased for {0}.
 Housing.LotMarker.ItIsOwnedBy:					It is owned by {0}.
 Housing.LotMarker.YouAlreadyOwnAHouse:			You already own a house!
 Housing.LotMarker.DoYouWantToBuyThisLot1:		Do you want to buy this lot?
 Housing.LotMarker.DoYouWantToBuyThisLot2:		It costs {0}!
 Housing.LotMarker.YouDoNotOwnThisLot:			You do not own this lot!
 Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	You already own another lot or house (Number {0}).
-Housing.LotMarker.YouJustBoughtThisLotFor:		You just bought this lot for {0}.
+Housing.LotMarker.YouJustBoughtThisLotFor:		You just bought this lot for {0}!
 Housing.LotMarker.YouDontHaveEnoughMoney:		You don't have enough money!
 Housing.LotMarker.ThisItemCantBeSold:			This item can't be sold.
+Housing.LotMarker.LotNotItem:					That is not a valid house deed.		
 
 Scripts.Player.Housing.BadShieldBanner:			That is not a valid shield or banner object.
 Scripts.Player.Housing.CantBeSold:			This item cannot be sold!
@@ -81,17 +86,26 @@ Scripts.Player.Housing.GardenItemPlaced:		Garden object placed. {0} slots remain
 Scripts.Player.Housing.GardenItemPlacedName:		You have placed {0} in your garden.	
 Scripts.Player.Housing.GardenMaxObjects:		You have already placed 30 objects in your garden. You cannot place more.	
 Scripts.Player.Housing.GuildNowOwns:			[Guild] {0} now owns a guild house from {1}!
+Scripts.Player.Housing.NotOwner:				You do not own this house!
+Scripts.Player.Housing.NotGuildLeader:			You are not the leader of a guild!
+Scripts.Player.Housing.ConsignmentNotEmpty:		All items and money must be removed from your consignment merchant in order to transfer this house!
+Scripts.Player.Housing.RentPaidFromBank:		{0} has been withdrawn from your bank account for your house rental payment.
+Scripts.Player.Housing.GuildRentPaidFromBank:	{0} has been withdrawn from your guild bank for the guild house rental payment.
+Scripts.Player.Housing.TargetLotMarker:			You must target a Lot Marker to purchase a deed.
+Scripts.Player.Housing.MerchantListNotFound:	Unable to complete transaction: Merchant list not found.
+Scripts.Player.Housing.GuildHouseEvicted:		[Housing] The Guild House at lot {0} has been repossessed by the realm due to unpaid rent!
+Scripts.Player.Housing.PersonalHouseEvicted:	[Housing] Your house at lot {0} has been repossessed by the realm due to unpaid rent!
 Scripts.Player.Housing.HookPointAdded:			That item has been added to your house.
 Scripts.Player.Housing.HookPointAlready: 		That HookPoint already has an item!	
 Scripts.Player.Housing.HookPointCleared: 		That HookPoint has been cleared.	
 Scripts.Player.Housing.HookPointCloser:			Stand as close to the housepoint as possible and face the proper direction and press accept.
-Scripts.Player.Housing.HookPointID:			The hookpoint ID is: {0}
+Scripts.Player.Housing.HookPointID:				The hookpoint ID is: {0}
 Scripts.Player.Housing.HookPointLogged:			Logged hookpoint position {0}!
 Scripts.Player.Housing.HookPointLogLoc:			Log this housepoint location?
 Scripts.Player.Housing.HookPointNot:			That is not a hookpoint item!
 Scripts.Player.Housing.HookPointNotPlaced:		That hookpoint item was not placed.	
-Scripts.Player.Housing.HouseUseMaterial:		You need to hold shift+right-click on your house to change those materials.	
-Scripts.Player.Housing.HouseUseMaterial:		You need to hold shift+right-click on your house to change your carpets.	
+Scripts.Player.Housing.HouseUseMaterials:		You need to hold shift+right-click on your house to change those materials.	
+Scripts.Player.Housing.HouseUseCarpets:			You need to hold shift+right-click on your house to change your carpets.	
 Scripts.Player.Housing.IndoorFloorPlaced:		You have placed {0} on the floor of your house.	
 Scripts.Player.Housing.IndoorItemPlaced:		Indoor item placed. {0} slots remaining.	
 Scripts.Player.Housing.IndoorMaxItems:			You have already placed {0} in your house. You cannot place more.
@@ -100,14 +114,6 @@ Scripts.Player.Housing.InteriorBannersAdded:		Your interior guild banners have b
 Scripts.Player.Housing.InteriorBannersRemoved:		Your interior guild banners have been removed.	
 Scripts.Player.Housing.InteriorShieldsAdded:		Your interior guild shields have been changed.	
 Scripts.Player.Housing.InteriorShieldsRemoved:		Your interior guild shields have been removed.	
-Scripts.Player.Housing.LeftHouse:			You have exited house number {0}.
-Scripts.Player.Housing.LotAlready:			You already own another lot or house (Number {0})
-Scripts.Player.Housing.LotBought:			You just bought this lot for {0}!
-Scripts.Player.Housing.LotCost:			
-Scripts.Player.Housing.LotNotItem:			That is not a valid house deed.
-Scripts.Player.Housing.LotNotYours:			You do not own this lot!
-Scripts.Player.Housing.LotOffer:			Do you wish to buy this lot? It costs {0}.
-Scripts.Player.Housing.LotTargeted:			You target lot number {0}.
 Scripts.Player.Housing.NotFloorObject:			This item cannot be placed on the floor!
 Scripts.Player.Housing.NotHookPoint:			This item cannot be placed on a hookpoint!
 Scripts.Player.Housing.NotWallObject:			This item cannot be placed on a wall!

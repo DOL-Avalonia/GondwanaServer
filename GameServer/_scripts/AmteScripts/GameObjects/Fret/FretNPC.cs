@@ -115,14 +115,18 @@ namespace DOL.GS.Scripts
                         GameServer.Database.DeleteObject(item);
                         if (item.Template is ItemUnique)
                             GameServer.Database.AddObject(item.Template);
-                        msg = "Vous récupérez " + (item.Count > 1 ? item.Count.ToString() : "") + item.Name +
-                              " donné par " + item.FromPlayer + " !";
+
+                        string countStr = item.Count > 1 ? item.Count.ToString() + " " : "";
+                        msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.ItemReceived", countStr, item.Name, item.FromPlayer);
                     }
-                    else msg = "Vérifiez que votre sac à dos n'est pas plein !";
+                    else
+                    {
+                        msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.InventoryFull");
+                    }
                 }
                 catch
                 {
-                    msg = "Un problème est survenu, recommencez la manipulation pour récupérer votre objet.";
+                    msg = LanguageMgr.GetTranslation(player!.Client.Account.Language, "Fret.ErrorRetrieving");
                 }
 
                 player!.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
@@ -134,7 +138,7 @@ namespace DOL.GS.Scripts
                 if (TempItems.ContainsKey(player!.InternalID))
                 {
                     InteractPlayer IP = TempItems[player.InternalID];
-                    player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendConfirm") + Money.GetString(IP.Price) + " ?",
+                    player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendConfirm") + " " + Money.GetString(IP.Price) + " ?",
                                                 SendColisResponse);
                 }
                 else
@@ -148,10 +152,16 @@ namespace DOL.GS.Scripts
                 DOLCharacters ch = GameServer.Database.SelectObject<DOLCharacters>(c => c.Name == str);
                 string msg;
                 if (ch == null)
-                    msg = "Je ne trouve pas de personne nommée " + str + ", vérifiez le nom.";
+                {
+                    msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.PlayerNotFound", str);
+                }
+                else if (ch.ObjectId == player.InternalID && player.Client.Account.PrivLevel <= 1)
+                {
+                    msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.CannotSendToSelf");
+                }
                 else
                 {
-                    msg = "Votre colis est pour " + ch.Name + ".";
+                    msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.TargetSet", ch.Name);
                     TempItems[player.InternalID].ToPlayerAccountName = ch.AccountName;
                     TempItems[player.InternalID].ToPlayerID = ch.ObjectId;
                     TempItems[player.InternalID].ToPlayerName = ch.Name;
@@ -203,10 +213,10 @@ namespace DOL.GS.Scripts
         {
             InteractPlayer IP = TempItems[player.InternalID];
             string msg = LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription01") + "\n";
-            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription02") + (IP.ToPlayerID == "" ? LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription03") : IP.ToPlayerName) + "\n";
-            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription04") + (IP.Weight / 10) + "," + (IP.Weight % 10) + LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription05") + "\n";
-            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription06") + Money.GetString(IP.Price) + "\n";
-            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription07") + IP.Items.Count + "/" + MaxItem + "\n";
+            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription02") + " " + (IP.ToPlayerID == "" ? LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription03") : IP.ToPlayerName) + "\n";
+            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription04") + " " + (IP.Weight / 10) + "," + (IP.Weight % 10) + " " + LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription05") + "\n";
+            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription06") + " " + Money.GetString(IP.Price) + "\n";
+            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription07") + " " + IP.Items.Count + "/" + MaxItem + "\n";
             int id = 1;
             foreach (InventoryItem item in IP.Items)
             {
@@ -233,17 +243,17 @@ namespace DOL.GS.Scripts
             }
             if (IP.Items.Count >= MaxItem)
             {
-                player.Out.SendMessage("Vous ne pouvez envoyer que " + MaxItem + " objets dans un colis.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.MaxItemsReached", MaxItem), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return;
             }
             if (IP.Items.Contains(item))
             {
                 IP.RemoveItem(item);
-                player.Out.SendMessage("L'objet \"" + item.Name + "\" a été retiré des objets du colis.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.ItemRemoved", item.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return;
             }
             IP.AddItem(item);
-            player.Out.SendMessage("L'objet \"" + item.Name + "\" a été ajouté aux autres objets du colis.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Fret.ItemAdded", item.Name), eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
 
         /// <summary>
@@ -325,6 +335,14 @@ namespace DOL.GS.Scripts
             }
             TempItems.Remove(player.InternalID);
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSent"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+
+            GameClient targetClient = WorldMgr.GetClientByPlayerName(IP.ToPlayerName, true, false);
+            if (targetClient != null && targetClient.Player != null)
+            {
+                string notification = LanguageMgr.GetTranslation(targetClient.Account.Language, "Fret.PackageReceived", player.Name);
+                targetClient.Player.Out.SendMessage(notification, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            }
+
             return true;
         }
         #endregion

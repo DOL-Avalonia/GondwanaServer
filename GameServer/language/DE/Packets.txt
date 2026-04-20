@@ -1,11 +1,10 @@
-﻿# /packets/Client/168
+﻿
+# /packets/Client/168
 # /DetailDisplayHandler
 DetailDisplayHandler.HandlePacket.UniqueObject:		Einzigartiger Gegenstand
 
 DetailDisplayHandler.GetShortItemInfo.CrafterName:	Handwerker : {0}
 DetailDisplayHandler.GetShortItemInfo.NoDrop:		 Nicht ablegbar.
-DetailDisplayHandler.GetShortItemInfo.NoSell:		 Nicht verkaufbar.
-DetailDisplayHandler.GetShortItemInfo.NoTrade:		 Nicht handelbar.
 
 DetailDisplayHandler.HandlePacket.Any:			Egal
 DetailDisplayHandler.HandlePacket.Back:			(von Hinten)
@@ -75,10 +74,8 @@ DetailDisplayHandler.HandlePacket.YouFumble:		Ihr verstolpert
 DetailDisplayHandler.HandlePacket.YouHit:		Ihr trefft
 DetailDisplayHandler.HandlePacket.YouMiss:		Ihr trefft nicht
 DetailDisplayHandler.HandlePacket.YouParry:		Ihr pariert
-
 DetailDisplayHandler.WriteBonusLine.Points:		 Punkte
 DetailDisplayHandler.WriteBonusLine.PowerPool:		% vom Magiekraftvorrat.
-
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Absorption
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:	Rüstungsmodifikator:
 DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor:	- RF {0} Ausgangswert
@@ -87,7 +84,6 @@ DetailDisplayHandler.WriteClassicArmorInfos.Condition:	- {0}% Zustand
 DetailDisplayHandler.WriteClassicArmorInfos.EffArmor:	Effektive Rüstung:
 DetailDisplayHandler.WriteClassicArmorInfos.Factor:	- {0} Rüstfaktor
 DetailDisplayHandler.WriteClassicArmorInfos.Quality:	- {0}% Qualität
-
 DetailDisplayHandler.WriteClassicShieldInfos.BaseDPS:	- {0} DPS Ausgangswert
 DetailDisplayHandler.WriteClassicShieldInfos.ClampDPS:	- {0} DPS für Euch nutzbar
 DetailDisplayHandler.WriteClassicShieldInfos.DamageMod:	Schadensmodifikator (bei Verwendung von Schildstilen):
@@ -95,7 +91,6 @@ DetailDisplayHandler.WriteClassicShieldInfos.Large:	- Schildgröße: Groß
 DetailDisplayHandler.WriteClassicShieldInfos.Medium:	- Schildgröße: Mittel
 DetailDisplayHandler.WriteClassicShieldInfos.Small:	- Schildgröße: Klein
 DetailDisplayHandler.WriteClassicShieldInfos.SPD:	- {0} Schildgeschwindigkeit
-
 DetailDisplayHandler.WriteClassicWeaponInfos.BaseDPS:	- {0} DPS Ausgangswert
 DetailDisplayHandler.WriteClassicWeaponInfos.ClampDPS:	- {0} DPS für Euch nutzbar
 DetailDisplayHandler.WriteClassicWeaponInfos.Condition:	- {0}% Zustand
@@ -144,7 +139,6 @@ DetailDisplayHandler.WritePoisonInfo.Level:		- Stufe {0}
 DetailDisplayHandler.WritePoisonInfo.LevelRequired:	Benötigte Erfahrung:
 DetailDisplayHandler.WritePoisonInfo.MaxCharges:	- {0} Max
 DetailDisplayHandler.WritePoisonInfo.ProcAbility:	Offensive Proc Fähigkeit:
-
 DetailDisplayHandler.WritePotionInfo.ChargedMagic:	Charged Magic Fähigkeit:
 DetailDisplayHandler.WritePotionInfo.Charges:		- {0} Ladungen
 DetailDisplayHandler.WritePotionInfo.Level:		- Stufe {0}
@@ -157,80 +151,10 @@ DetailDisplayHandler.WritePotionInfo.Type:		Typ : {0}
 DetailDisplayHandler.WritePotionInfo.Value:		Wert : {0}
 DetailDisplayHandler.WritePotionInfo.Target:		Ziel : {0}
 DetailDisplayHandler.WritePotionInfo.Range:		Reichweite : {0}
-
 DetailDisplayHandler.WriteUsableClasses.UsableBy:	Geeignet für: 
-
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:			Ihr seid zu weit weg von {0}!
-
-HousingPickupItemHandler.GardenRemoved:			Gartenobjekt entfernt.
-HousingPickupItemHandler.PickUp:				Ihr legt {0} in Euer Inventar.
-HousingPlaceItemHandler.30objects:				Ihr habt bereits 30 Gegenstände platziert. Mehr könnt Ihr nicht aufstellen.
-HousingPlaceItemHandler.40objects:				Ihr habt bereits 40 Gegenstände platziert. Mehr könnt Ihr nicht aufstellen.
-HousingPlaceItemHandler.CantFloor:				Dieser Gegenstand kann nicht auf den Boden gestellt werden!
-HousingPlaceItemHandler.CantWall:				Dieser Gegenstand kann nicht an der Wand angebracht werden!
-HousingPlaceItemHandler.DropOnFloor:			Ihr stellt {0} auf den Boden Eures Hauses.
-HousingPlaceItemHandler.DropOnGarden:			Ihr stellt {0} in Eurem Garten auf.
-HousingPlaceItemHandler.DropOnWall:				Ihr hängt {0} an die Wand Eures Hauses.
-HousingPlaceItemHandler.GardenObjectPlaced:		Gartenobjekt platziert. {0} Plätze verbleiben.
-HousingPlaceItemHandler.HasPorch:				Dieses Haus besitzt bereits eine Veranda!
-HousingPlaceItemHandler.HasNoPorch:				Dieses Haus besitzt keine Veranda!
-HousingPlaceItemHandler.IndoorObjectPlaced:		Innenausstattung platziert. {0} Plätze verbleiben.
-HousingPlaceItemHandler.NoHookpoint:			Es ist kein Stellplatz mehr frei!
-HousingPlaceItemHandler.PutMoney:				Ihr zahlt Geld auf das Konto Eures Hauses ein.
-
-# /HousingPlaceItemHandler
-Scripts.Player.Housing.BadShieldBanner:			Das ist kein gültiges Schild oder Banner.	
-Scripts.Player.Housing.CantBeSold:			Ihr könnt diesen Gegenstand nicht verkaufen!	
-Scripts.Player.Housing.CarpetsRemoved:			Eure Teppiche wurden entfernt.	
-Scripts.Player.Housing.ClearHookPoint:			Wollt Ihr diesen Stellplatz räumen?	
-Scripts.Player.Housing.EnteredHouse:			Ihr habt Haus Nr. {0} betreten.	
-Scripts.Player.Housing.GardenItemPlaced:		Gartenartikel aufgestellt. Es verbleiben {0} Stellmöglichkeiten.		
-Scripts.Player.Housing.GardenItemPlacedName:		Ihr habt {0} in Eurem Garten aufgestellt.		
-Scripts.Player.Housing.GardenMaxObjects:		Ihr habt bereits 30 Artikel in Eurem Garten aufgestellt. Mehr geht nicht.		
-Scripts.Player.Housing.GuildNowOwns:			[Gilde] {0} besitzt nun ein Gildenhaus für {1}!	
-Scripts.Player.Housing.HookPointAdded:			Der Gegenstand wurde Eurem Haus hinzugefügt.	
-Scripts.Player.Housing.HookPointAlready:		Dieser Stellplatz ist bereits belegt!		
-Scripts.Player.Housing.HookPointCleared:		Der Stellplatz wurde geräumt.		
-Scripts.Player.Housing.HookPointCloser:			Geht so nahe an den Stellplatz heran wie möglich, blickt in die richtige Richtung und akzeptiert.	
-Scripts.Player.Housing.HookPointID:			Die Stellplatz-ID ist: {0}	
-Scripts.Player.Housing.HookPointLogged:			Die Position von Stellplatz {0}!	
-Scripts.Player.Housing.HookPointLogLoc:			Wollt Ihr die Position dieses Stellplatzes in die Logdatei schreiben?	
-Scripts.Player.Housing.HookPointNot:			Dieser Gegenstand ist nicht für einen Stellplatz bestimmt!	
-Scripts.Player.Housing.HookPointNotPlaced:		Der Gegenstand wurde nicht aufgestellt.		
-Scripts.Player.Housing.HouseUseMaterial:		Ihr müßt die Umschalttaste gedrückt halten und dann mit der Maus auf Euer Haus rechts-clicken um das Material zu verändern.		
-Scripts.Player.Housing.HouseUseMaterial:		Ihr müßt die Umschalttaste gedrückt halten und dann mit der Maus auf Euer Haus rechts-clicken um Eure Teppiche auszutauschen.		
-Scripts.Player.Housing.IndoorFloorPlaced:		Ihr habt {0} auf den Boden Eures Hauses gestellt.		
-Scripts.Player.Housing.IndoorItemPlaced:		Inneneinrichtung aufgestellt. {0} freie Plätze verbleibend.		
-Scripts.Player.Housing.IndoorMaxItems:			Ihr habt bereits {0} Gegenstände platziert. Mehr geht nicht.	
-Scripts.Player.Housing.IndoorWallPlaced:		Ihr habt {0} an der Wand Eures Hauses aufgehangen.		
-Scripts.Player.Housing.InteriorBannersAdded:		Die Gildenbanner in Eurem Haus wurden verändert.		
-Scripts.Player.Housing.InteriorBannersRemoved:		Die Gildenbanner in Eurem Haus wurden entfernt.		
-Scripts.Player.Housing.InteriorShieldsAdded:		Die Gildenschilde in Eurem Haus wurden verändert.		
-Scripts.Player.Housing.InteriorShieldsRemoved:		Die Gildenschilde in Eurem Haus wurden entfernt.		
-Scripts.Player.Housing.LeftHouse:			Ihr habt Haus Nr. {0} verlassen.	
-Scripts.Player.Housing.LotAlready:			Ihr besitzt bereits ein Haus oder Grundstück (Nr. {0})!	
-Scripts.Player.Housing.LotBought:			Ihr habt soeben dieses Grundstück für {0} erworben!	
-Scripts.Player.Housing.LotCost:				Für {0} ist dieses Grundstück nicht zu haben.
-Scripts.Player.Housing.LotNotItem:			Das ist keine gültige Besitzurkunde.	
-Scripts.Player.Housing.LotNotYours:			Dieses Grundstück gehört Euch nicht!	
-Scripts.Player.Housing.LotOffer:			Wünscht Ihr dieses Grundstück zu kaufen? Es kostet {0}.	
-Scripts.Player.Housing.LotTargeted:			Es interessiert Euch Grundstück Nr. {0}.	
-Scripts.Player.Housing.NotFloorObject:			Dieser Gegenstand kann nicht auf den Boden gestellt werden!	
-Scripts.Player.Housing.NotHookPoint:			Dieser Gegenstand gehört nicht auf einen Stellplatz!	
-Scripts.Player.Housing.NotWallObject:			Dieser Gegenstand kann nicht aufgehangen werden!	
-Scripts.Player.Housing.OutdoorBannersAdded:		Die Gildenbanner an Eurem Haus wurden verändert.		
-Scripts.Player.Housing.OutdoorBannersRemoved:		Die Gildenbanner an Eurem Haus wurden entfernt.		
-Scripts.Player.Housing.OutdoorShieldsAdded:		Die Gildenschilde an Eurem Haus wurden verändert.		
-Scripts.Player.Housing.OutdoorShieldsRemoved:		Die Gildenschilde an Eurem Haus wurden entfernt.		
-Scripts.Player.Housing.PaidChanges:			Ihr habt {0} für die Änderungen ausgegeben.	
-Scripts.Player.Housing.PaidNotEnough:			Ihr habt dafür nicht genug Geld!	
-Scripts.Player.Housing.PorchAlready:			Dieses Haus verfügt bereits über eine Veranda!	
-Scripts.Player.Housing.PorchNone:			Dieses Haus verfügt über keine Veranda!	
-Scripts.Player.Housing.PorchNotItem:			Das ist keine Veranda!	
-Scripts.Player.Housing.TransferToGuild:			Möchtet Ihr dieses Haus an {0} übertragen?
-
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Momentane Boni
@@ -243,7 +167,6 @@ PlayerBonusesListRequestHandler.HandlePacket.Resist:	Resistenzen:
 PlayerBonusesListRequestHandler.HandlePacket.Special:	Besondere Gegenstandsboni:
 PlayerBonusesListRequestHandler.HandlePacket.Specs:	 +{0} auf ALLE Spezialisierungen
 
-
 # /PlayerInitRequestHandler
 PlayerInitRequestHandler.AllianceMessage:		Allianznachricht: {0}
 PlayerInitRequestHandler.FreeLevel:			Ihr seid nun würdig, eine freie Stufe zu erhalten. Klickt auf Euren Ausbilder, um sie zu bekommen!
@@ -251,7 +174,6 @@ PlayerInitRequestHandler.GuildMessage:			Gildennachricht:
 PlayerInitRequestHandler.LevelCap:			Ihr habt für dieses Schlachtfeld die Stufenobergrenze erreicht!
 PlayerInitRequestHandler.OfficerMessage:		Offiziersnachricht: {0}
 PlayerInitRequestHandler.SaferLocation:			Diese Gegend ist im Moment nicht sicher. Ihr werdet an einen sicheren Ort versetzt.
-
 
 # /PlayerMoveItemRequestHandler
 PlayerMoveItemRequestHandler.InvalidTradeTarget:		Ungültiges Handelsziel. ({0})
@@ -263,11 +185,9 @@ PlayerMoveItemRequestHandler.CantDropItem:			Ihr könnt diesen Gegenstand nicht 
 PlayerMoveItemRequestHandler.YouDropItem:			Ihr legt {0} auf den Boden!
 PlayerMoveItemRequestHandler.TooFarAway:			Ihr seid zu weit weg, um {0} etwas zu geben.
 
-
 # /PlayerPickUpRequestHandler
 PlayerPickUpRequestHandler.HandlePacket.InvalidTarget:	Dieses Ziel könnt Ihr nicht auswählen!
 PlayerPickUpRequestHandler.HandlePacket.Target:		Ihr müsst erst ein Ziel auswählen, um etwas zu nehmen!
-
 
 # /PlayerPositionUpdateHandler
 PlayerPositionUpdateHandler.Endurance:			Ihr verliert Ausdauer!
@@ -278,7 +198,6 @@ PlayerPositionUpdateHandler.SafeFall:			Der Schaden wurde durch Eure Fallschutz-
 PlayerPositionUpdateHandler.MythSafeFall:		Der Fallschaden wurde durch Ihre Ausrüstung verringert!
 PlayerPositionUpdateHandler.CloudsongFall:		Euer Gewicht, so leicht wie eine Feder, hat den Aufprall stark abgeschwächt!
 PlayerPositionUpdateHandler.UnknownZone:		Unbekannte Zone! Ihr werdet zu Eurem letzten Bindepunkt gebracht.
-
 
 # /PlayerTrainRequestHandler
 PlayerTrainRequestHandler.MustSelectValidTrainer:			Ihr müsst einen für Eure Klasse gültigen Ausbilder auswählen.
@@ -294,10 +213,8 @@ PlayerTrainRequestHandler.NotEnoughRealmAbilityPoints:		Ihr habt nicht genug Rei
 PlayerTrainRequestHandler.NotExperiencedEnoughForAbility:	Ihr seid noch nicht erfahren genug, um {0} zu erlernen. Kommt später wieder.
 PlayerTrainRequestHandler.TrainingFailed:					Leider ist Euer Training fehlgeschlagen. Bitte meldet dies einem Admin oder Spielleiter. Danke.
 
-
 # /PlayerTargetHandler
 PlayerTargetHandler.Gravestone:				Ihr habt Euer Grab nicht mehr anvisiert. Euer Gebet bleibt wirkungslos.
-
 
 # /DestroyItemRequestHandler
 DestroyItemRequestHandler.CantDestroyItem:		Ihr könnt {0} nicht zerstören!
@@ -305,7 +222,6 @@ DestroyItemRequestHandler.CantDestroyRelic:		Ihr könnt ein Relikt nicht zerstö
 DestroyItemRequestHandler.CantDestroyEquippedItem:		Ihr könnt einen angelegten Gegenstand nicht zerstören!
 DestroyItemRequestHandler.ItemDestroyed:		Ihr zerstört {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		Die PvP-Markierung kann nicht zerstört werden!
-
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:		Ihr müsst Euch in derselben Region wie der Gildenleiter befinden, um eine Einladung anzunehmen.
@@ -324,7 +240,6 @@ DialogResponseHandler.DepositInLockbox:						Ihr zahlt {0} in die Kasse ein.
 DialogResponseHandler.LockboxHasMoneyWeeklyPayment:			Die Kasse enthält nun {0}. Die wöchentliche Zahlung beträgt {1}.
 DialogResponseHandler.HousePrepaidForPayments:				Das Haus ist nun für die nächsten {0} Zahlungen im Voraus bezahlt.
 
-
 # /InviteToGroupHandler
 InviteToGroupHandler.InvalidTarget:							Ihr habt keinen gültigen Spieler als Ziel ausgewählt.
 InviteToGroupHandler.NotLeader:								Ihr seid nicht der Anführer Eurer Gruppe.
@@ -335,20 +250,16 @@ InviteToGroupHandler.InvitePrompt1:							{0} hat Euch eingeladen, der Gruppe vo
 InviteToGroupHandler.InvitePrompt2:							Möchtet Ihr beitreten?
 InviteToGroupHandler.InviteNotification:					{0} hat {1} eingeladen, der Gruppe beizutreten.
 
-
 # /PlayerGroundTargetHandler
 PlayerGroundTargetHandler.GroundTargetNotVisible:			Euer Bodenziel ist nicht sichtbar!
 PlayerGroundTargetHandler.BoatMoveOrder:					Ihr lasst euer Boot vorwärts fahren.
 PlayerGroundTargetHandler.NotEnoughPassengers:				Das {0} hat noch nicht genug Passagiere, um sich zu bewegen! 
 
-
 # /PlayerAttackRequestHandler
 PlayerAttackRequestHandler.CantEnterMelee:					Ihr könnt mit einer Fernwaffe nicht in den Nahkampfmodus wechseln!
 
-
 # /PlayerDismountRequestHandler
 PlayerDismountRequestHandler.NoRidingSteed:					Ihr sitzt auf keinem Reittier!
-
 
 # /EmblemDialogReponseHandler
 EmblemDialogReponseHandler.EmblemAlreadyInUse:				Dieses Emblem wird bereits von einer anderen Gilde verwendet. Bitte wählt ein anderes!

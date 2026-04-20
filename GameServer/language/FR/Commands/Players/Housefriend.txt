@@ -6,6 +6,12 @@ Commands.Players.Housefriend.NoGuild:		Aucune guilde portant ce nom n'a été tr
 Commands.Players.Housefriend.AddedAll:		Vous avez ajouté tout le monde !
 Commands.Players.Housefriend.Description:	Invitez un joueur spécifié dans votre maison
 Commands.Players.Housefriend.All:			/housefriend all
-Commands.Players.Housefriend.Player:		/housefriend player <player>
+Commands.Players.Housefriend.Player:		/housefriend player <player> # Autorise l'accès à votre maison par un joueur.
+Commands.Players.Housefriend.PlayerRemove:	/housefriend player remove <player> # Retire l'accès à votre maison par un joueur.
 Commands.Players.Housefriend.Account:		/housefriend account <player>
-Commands.Players.Housepoint.Guild:			/housefriend guild <guild> (S'il y a deux mots ou plus, entourez-les de \" \")
+Commands.Players.Housefriend.Guild:			/housefriend guild <guild> (S'il y a deux mots ou plus, entourez-les de \" \")
+
+Commands.Players.Housefriend.RemovedPlayer:		{0} a été retiré(e) de la liste d'amis de la maison.
+Commands.Players.Housefriend.AccessRevoked:		Votre accès à la maison de {0} a été révoqué.
+Commands.Players.Housefriend.NotOnList:			{0} n'est pas actuellement sur la liste d'amis de la maison.
+Commands.Players.Housefriend.AlreadyAllowed:	{0} est déjà autorisé(e) à entrer dans cette maison.

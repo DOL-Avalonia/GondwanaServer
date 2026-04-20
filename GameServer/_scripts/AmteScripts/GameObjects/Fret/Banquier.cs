@@ -1,8 +1,10 @@
-using DOL.Database;
-using DOL.GS.PacketHandler;
 using DOL.AI.Brain;
+using DOL.Database;
 using DOL.GS.Finance;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using DOL.Language;
+using System;
 
 namespace DOL.GS.Scripts
 {
@@ -72,7 +74,7 @@ namespace DOL.GS.Scripts
 
             if (!item.Id_nb.StartsWith("BANQUE_CHEQUE")) return false;
 
-            if (player.Inventory.RemoveCountFromStack(item, item.Count))
+            if (player!.Inventory.RemoveCountFromStack(item, item.Count))
             {
                 ReceiveMoney(player, item.Price, false);
                 InventoryLogging.LogInventoryAction(source, this, eInventoryActionType.Other, item, item.Count);
@@ -99,8 +101,21 @@ namespace DOL.GS.Scripts
                 return true;
             }
 
+            ProcessMaturedDeposits(player, bank);
+
+            string autoRentToggle = bank.AutoPayRent
+                ? LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.On")
+                : LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.Off");
+
+            string formattedMoney = Currency.Copper.Mint(bank.Money).ToText();
             string message = LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.Greetings1", player.Name, Money.GetString(bank.Money)) + " " + "\r\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.Greetings2") + "\n\n" + LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.Greetings3") + "\n" + LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.Greetings4") + "\n" + LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.Greetings5");
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings2") + "\n\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings3") + "\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings4") + "\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings5") + "\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings6") + "\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings7") + "\n\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings8", autoRentToggle);
             player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             return true;
         }
@@ -126,11 +141,46 @@ namespace DOL.GS.Scripts
                 return true;
             }
 
-            switch (str.ToLower())
+            string lowerStr = str.ToLower();
+
+            // Toggle Auto Rent
+            if (lowerStr == "automatic house rental payment (on)" || lowerStr == "automatic house rental payment (off)" ||
+                lowerStr == "paiement automatique du loyer (activé)" || lowerStr == "paiement automatique du loyer (désactivé)")
+            {
+                player.TempProperties.setProperty("Banker_PromptingAutoRent", true);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.Prompt"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                return true;
+            }
+
+            // Capture YES or OUI
+            if ((lowerStr == "yes" || lowerStr == "oui") && player.TempProperties.getProperty<bool>("Banker_PromptingAutoRent", false))
+            {
+                player.TempProperties.removeProperty("Banker_PromptingAutoRent");
+                bank.AutoPayRent = true;
+                GameServer.Database.SaveObject(bank);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.SetOn"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Interact(player);
+                return true;
+            }
+
+            // Capture NO or NON
+            if ((lowerStr == "no" || lowerStr == "non") && player.TempProperties.getProperty<bool>("Banker_PromptingAutoRent", false))
+            {
+                player.TempProperties.removeProperty("Banker_PromptingAutoRent");
+                bank.AutoPayRent = false;
+                GameServer.Database.SaveObject(bank);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.SetOff"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Interact(player);
+                return true;
+            }
+
+            player.TempProperties.removeProperty("Banker_PromptingAutoRent");
+
+            switch (lowerStr)
             {
                 case "retirer de l'argent":
                 case "withdraw money":
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.HowMuchWithdraw") + "\r\n" + LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.WithdrawAmount"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.HowMuchWithdraw") + "\r\n" + LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.WithdrawAmount"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     break;
                 case "la totalité":
                 case "everything":
@@ -138,18 +188,99 @@ namespace DOL.GS.Scripts
                     break;
                 case "quelques pièces":
                 case "some coins":
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.WithdrawSomeCoins"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.WithdrawSomeCoins"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     break;
                 case "faire un chèque":
                 case "write a check":
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.WriteCheck"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.WriteCheck"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     break;
                 case "encaisser un chèque":
                 case "cash a check":
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.CashCheck"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.CashCheck"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    break;
+                case "transfer money":
+                case "transférer de l'argent":
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Transfer.Help"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    break;
+                case "term deposits":
+                case "dépôts à terme":
+                    ShowTermDepositMenu(player, bank);
+                    break;
+                case "open biweekly deposit":
+                case "ouvrir un dépôt bimensuel":
+                    PromptTermDeposit(player, "Banker.Term.Biweekly", "biweekly", 3);
+                    break;
+                case "open monthly deposit":
+                case "ouvrir un dépôt mensuel":
+                    PromptTermDeposit(player, "Banker.Term.Monthly", "monthly", 5);
+                    break;
+                case "open quarterly deposit":
+                case "ouvrir un dépôt trimestriel":
+                    PromptTermDeposit(player, "Banker.Term.Quarterly", "quarterly", 7);
                     break;
             }
             return true;
+        }
+
+        private void ShowTermDepositMenu(GamePlayer player, DBBanque bank)
+        {
+            var deposits = GameServer.Database.SelectObjects<DBTermDeposit>(d => d.PlayerID == player.InternalID);
+
+            string msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Header", deposits.Count, Properties.MAX_TERM_DEPOSITS) + "\n\n";
+
+            if (deposits.Count > 0)
+            {
+                msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Active") + "\n";
+                foreach (var d in deposits)
+                {
+                    TimeSpan remaining = d.MaturityDate - DateTime.Now;
+                    string timeStr = remaining.Days > 0
+                        ? LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Days", remaining.Days)
+                        : LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Hours", remaining.Hours);
+
+                    msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Contract", Currency.Copper.Mint(d.Amount).ToText(), d.InterestRate, timeStr) + "\n";
+                }
+                msg += "\n";
+            }
+
+            if (deposits.Count < Properties.MAX_TERM_DEPOSITS)
+            {
+                msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.NewContract") + "\n";
+                msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Option1") + "\n";
+                msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Option2") + "\n";
+                msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Option3") + "\n";
+            }
+            else
+            {
+                msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.MaxReached") + "\n";
+            }
+
+            player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+        }
+
+        private void PromptTermDeposit(GamePlayer player, string termDisplayKey, string termCmd, int interest)
+        {
+            string displayLabel = LanguageMgr.GetTranslation(player.Client.Account.Language, termDisplayKey);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Prompt", displayLabel, interest, termCmd), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+        }
+
+        private void ProcessMaturedDeposits(GamePlayer player, DBBanque bank)
+        {
+            var deposits = GameServer.Database.SelectObjects<DBTermDeposit>(d => d.PlayerID == player.InternalID);
+            foreach (var d in deposits)
+            {
+                if (DateTime.Now >= d.MaturityDate)
+                {
+                    long interestEarned = (long)(d.Amount * (d.InterestRate / 100.0));
+                    long totalReturn = d.Amount + interestEarned;
+
+                    bank.Money += totalReturn;
+                    GameServer.Database.SaveObject(bank);
+                    GameServer.Database.DeleteObject(d);
+
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Matured", Currency.Copper.Mint(totalReturn).ToText(), d.InterestRate), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
         }
 
         /// <summary>

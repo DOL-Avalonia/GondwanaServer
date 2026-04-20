@@ -1,8 +1,10 @@
-using System;
 using DOL.Database;
+using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
 using DOL.Language;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +16,9 @@ namespace DOL.GS.Commands
         ePrivLevel.Player,
         "Commands.Players.Banque.Description",
         "Commands.Players.Banque.Usage",
-        "Commands.Players.Banque.Usage.Cheque")]
+        "Commands.Players.Banque.Usage.Cheque",
+        "Commands.Players.Banque.Usage.Transfer",
+        "Commands.Players.Banque.Usage.TermDeposit")]
     public class BanqueCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -31,14 +35,127 @@ namespace DOL.GS.Commands
                 if (target != null)
                 {
                     DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(client.Player.InternalID);
-                    if (args[1].ToLower() == "chèque" || args[1].ToLower() == "cheque")
+                    string action = args[1].ToLower();
+
+                    if (bank == null)
                     {
-                        if (bank == null)
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.NoAccount"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    if (action == "transfer")
+                    {
+                        if (args.Length < 4)
                         {
-                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.NoAccount"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.Usage"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return;
                         }
 
+                        string targetPlayerName = args[2];
+                        long transferAmount = GetMoney(args, 3);
+
+                        if (transferAmount <= 0) return;
+
+                        if (bank.Money < transferAmount)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.NotEnoughFunds"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        DOLCharacters targetChar = GameServer.Database.SelectObject<DOLCharacters>(c => c.Name == targetPlayerName);
+                        if (targetChar == null)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.PlayerNotFound", targetPlayerName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        if (targetChar.ObjectId == client.Player.InternalID)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.CannotTransferSelf"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        DBBanque targetBank = GameServer.Database.FindObjectByKey<DBBanque>(targetChar.ObjectId);
+                        if (targetBank == null)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.TargetNoAccount", targetPlayerName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        // Execute Transfer
+                        bank.Money -= transferAmount;
+                        targetBank.Money += transferAmount;
+                        GameServer.Database.SaveObject(bank);
+                        GameServer.Database.SaveObject(targetBank);
+
+                        string formattedTransferAmount = Currency.Copper.Mint(transferAmount).ToText();
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.Success", formattedTransferAmount, targetPlayerName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                        // Notify target if online
+                        GameClient targetClient = WorldMgr.GetClientByPlayerName(targetPlayerName, true, false);
+                        if (targetClient != null && targetClient.Player != null)
+                        {
+                            targetClient.Player.Out.SendMessage(LanguageMgr.GetTranslation(targetClient.Account.Language, "Banque.Transfer.Received", formattedTransferAmount, client.Player.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+                        return;
+                    }
+
+                    else if (action == "termdeposit")
+                    {
+                        if (args.Length < 4)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.Usage"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        string termStr = args[2].ToLower();
+                        int days = 0;
+                        int interestRate = 0;
+
+                        if (termStr == "biweekly" || termStr == "bimensuel") { days = 14; interestRate = 3; }
+                        else if (termStr == "monthly" || termStr == "mensuel") { days = 30; interestRate = 5; }
+                        else if (termStr == "quarterly" || termStr == "trimestriel") { days = 90; interestRate = 7; }
+                        else
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.InvalidTerm"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        long depositAmount = GetMoney(args, 3);
+                        if (depositAmount <= 0) return;
+
+                        if (bank.Money < depositAmount)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.NotEnoughFunds"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        var currentDeposits = GameServer.Database.SelectObjects<DBTermDeposit>(d => d.PlayerID == client.Player.InternalID);
+                        if (currentDeposits.Count >= Properties.MAX_TERM_DEPOSITS)
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.MaxReached", Properties.MAX_TERM_DEPOSITS), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        // Execute Deposit
+                        bank.Money -= depositAmount;
+                        GameServer.Database.SaveObject(bank);
+
+                        DBTermDeposit term = new DBTermDeposit
+                        {
+                            PlayerID = client.Player.InternalID,
+                            Amount = depositAmount,
+                            InterestRate = interestRate,
+                            MaturityDate = DateTime.Now.AddDays(days)
+                        };
+                        GameServer.Database.AddObject(term);
+
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.Success", Currency.Copper.Mint(depositAmount).ToText(), days, interestRate), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    else if (action == "chèque" || action == "cheque")
+                    {
                         long newMoney = GetMoney(args, 2);
                         if (newMoney > 1000000000)
                         {

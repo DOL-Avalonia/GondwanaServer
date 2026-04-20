@@ -3,6 +3,7 @@ House.DBHousePermissions.AccessLevel:			Livello di accesso {0}
 House.Edit.NotEnoughMoney:				Non hai abbastanza denaro per farlo!
 House.Edit.PayForChanges:				Paga {0} per le modifiche.
 House.Enter.EnteredHouse:				Sei entrato nella casa numero {0}.
+House.Enter.EnteringHouse:				Entri nella casa di {0}.
 House.Exit.LeftHouse:					Hai lasciato la casa numero {0}.
 House.SendHouseInfo.DoorMaterial:			-Porta: {0}	
 House.SendHouseInfo.ExteriorMaterials:			Materiali esterni:
@@ -33,7 +34,11 @@ House.SendHouseInfo.Rug3Color:					-Colore 3: {0}
 House.SendHouseInfo.Rug4Color:					-Colore 4: {0}
 House.SendHouseInfo.TrussMaterial:				-Capriate: {0}	
 House.SendHouseInfo.WallMaterial:				-Pareti: {0}	
-House.SendHouseInfo.WindowMaterial:				-Finestre: {0}	
+House.SendHouseInfo.WindowMaterial:				-Finestre: {0}
+House.SendHouseInfo.RentDueInSec:			Affitto in scadenza tra: {0} secondi
+House.EmptyHookpoint.NotOwner:				Solo il proprietario di una casa può rimuovere o posizionare oggetti sui punti di ancoraggio!
+House.EmptyHookpoint.InvalidPosition:		Posizione del punto di ancoraggio non valida {0}
+House.EmptyHookpoint.NoItemFound:			Nessun oggetto del punto di ancoraggio trovato alla posizione {0}
 
 HouseEnterLeave.TooFarAway:					Sei troppo lontano per entrare nella casa {0}.
 HouseEnterLeave.CantEnter:					Non puoi entrare nella casa {0}.
@@ -69,6 +74,7 @@ Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse:	Possiedi già un altro lotto o
 Housing.LotMarker.YouJustBoughtThisLotFor:			Hai appena acquistato questo lotto per {0}.
 Housing.LotMarker.YouDontHaveEnoughMoney:			Fondi insufficienti!
 Housing.LotMarker.ThisItemCantBeSold:				Questo oggetto non può essere venduto.
+Housing.LotMarker.LotNotItem:					Questo non è un valido atto di proprietà.
 
 Scripts.Player.Housing.BadShieldBanner:			Questo non è un oggetto o uno stendardo valido.
 Scripts.Player.Housing.CantBeSold:				Questo oggetto non può essere venduto!
@@ -79,7 +85,15 @@ Scripts.Player.Housing.GardenItemPlaced:			Oggetti da giardino posizionati. {0} 
 Scripts.Player.Housing.GardenItemPlacedName:		Lascia l'oggetto {0} nel tuo giardino.
 Scripts.Player.Housing.GardenMaxObjects:			Hai depositato 30 oggetti nel tuo giardino. Spazio esaurito.
 Scripts.Player.Housing.GuildNowOwns:				[Gilda] {0} ora possiede una casa di gilda di {1}!
-Scripts.Player.Housing.HookPointAdded:			Questo oggetto è stato aggiunto alla tua casa.
+Scripts.Player.Housing.NotOwner:					Non sei il proprietario di questa casa!
+Scripts.Player.Housing.NotGuildLeader:				Non sei il capo di una gilda!
+Scripts.Player.Housing.ConsignmentNotEmpty:			Tutti gli oggetti e il denaro devono essere rimossi dal tuo mercante in conto vendita per poter trasferire questa casa!
+Scripts.Player.Housing.RentPaidFromBank:			Sono stati prelevati {0} dal tuo conto bancario per il pagamento dell'affitto della casa.
+Scripts.Player.Housing.TargetLotMarker:				Devi selezionare un indicatore del lotto per acquistare un atto di proprietà.
+Scripts.Player.Housing.MerchantListNotFound:		Impossibile completare la transazione: elenco del mercante non trovato.
+Scripts.Player.Housing.GuildHouseEvicted:			[Alloggi] La casa di gilda al lotto {0} è stata pignorata dal regno a causa dell'affitto non pagato!
+Scripts.Player.Housing.PersonalHouseEvicted:		[Alloggi] La tua casa al lotto {0} è stata pignorata dal regno a causa dell'affitto non pagato!
+Scripts.Player.Housing.HookPointAdded:				Questo oggetto è stato aggiunto alla tua casa.
 Scripts.Player.Housing.HookPointAlready:			Quel punto di ancoraggio ha già un oggetto!
 Scripts.Player.Housing.HookPointCleared:			Il punto di ancoraggio ora è vuoto.
 Scripts.Player.Housing.HookPointCloser:			Avvicinati il più possibile al lotto desiderato e premi “accetta”.
@@ -88,8 +102,8 @@ Scripts.Player.Housing.HookPointLogged:			Posizione del punto di ancoraggio {0} 
 Scripts.Player.Housing.HookPointLogLoc:			Mostrare i punti di ancoraggio?
 Scripts.Player.Housing.HookPointNot:				Questo non è un oggetto utilizzabile sui punti di ancoraggio!
 Scripts.Player.Housing.HookPointNotPlaced:			L'oggetto non è stato posizionato su quel punto di ancoraggio.
-Scripts.Player.Housing.HouseUseMaterial:			Usa Maiusc+clic destro nella tua casa per modificare l'aspetto.
-Scripts.Player.Housing.HouseUseMaterial:			Usa Maiusc+clic destro nella tua casa per cambiare i tappeti.
+Scripts.Player.Housing.HouseUseMaterials:			Usa Maiusc+clic destro nella tua casa per modificare l'aspetto.
+Scripts.Player.Housing.HouseUseCarpets:				Usa Maiusc+clic destro nella tua casa per cambiare i tappeti.
 Scripts.Player.Housing.IndoorFloorPlaced:			Hai posizionato {0} al piano della tua casa.
 Scripts.Player.Housing.IndoorItemPlaced:			Oggetto interno posizionato. {0} posto rimanente.
 Scripts.Player.Housing.IndoorMaxItems:			Attualmente hai posizionato {0} oggetti nella tua casa. Non puoi posizionarne altri.
@@ -98,14 +112,6 @@ Scripts.Player.Housing.InteriorBannersAdded:		Lo stendardo di gilda interno è s
 Scripts.Player.Housing.InteriorBannersRemoved:		Lo stendardo di gilda interno è stato rimosso.
 Scripts.Player.Housing.InteriorShieldsAdded:		Lo scudo di gilda interno è stato cambiato.
 Scripts.Player.Housing.InteriorShieldsRemoved:		Lo scudo di gilda interno è stato rimosso.
-Scripts.Player.Housing.LeftHouse:				Esci dalla casa {0}.
-Scripts.Player.Housing.LotAlready:				Possiedi già un altro lotto o una casa (n. {0})
-Scripts.Player.Housing.LotBought:				Hai appena acquistato questo lotto per {0}!
-Scripts.Player.Housing.LotCost:					Può essere acquistato per {0}.
-Scripts.Player.Housing.LotNotItem:				Questo non è un valido atto di proprietà.
-Scripts.Player.Housing.LotNotYours:				Non possiedi questo lotto!
-Scripts.Player.Housing.LotOffer:				Vuoi acquistare questo lotto? Costa {0}.
-Scripts.Player.Housing.LotTargeted:				Prendi di mira il lotto numero {0}.
 Scripts.Player.Housing.NotFloorObject:			Questo oggetto non può essere posizionato al piano superiore!
 Scripts.Player.Housing.NotHookPoint:				Questo oggetto non può essere posizionato su un punto di ancoraggio!
 Scripts.Player.Housing.NotWallObject:				Questo oggetto non può essere posizionato sulla parete!

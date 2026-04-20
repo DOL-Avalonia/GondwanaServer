@@ -3809,6 +3809,55 @@ namespace DOL.GS.Commands
                         }
                         break;
                     #endregion
+                    #region HouseRent
+                    case "houserent":
+                        {
+                            if (client.Player.Guild == null)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.NotMember"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
+                            if (client.Player.GuildRank == null || client.Player.GuildRank.RankLevel > 3)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.NoPrivileges"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
+                            if (args.Length < 3)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.Help.GuildHouseRent"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
+                            string toggleStr = args[2].ToLower();
+                            bool isAuto = false;
+
+                            if (toggleStr == "on" || toggleStr == "oui" || toggleStr == "activé")
+                                isAuto = true;
+                            else if (toggleStr == "off" || toggleStr == "non" || toggleStr == "désactivé")
+                                isAuto = false;
+                            else
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.Help.GuildHouseRent"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
+                            DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(client.Player.Guild.GuildID);
+                            if (bank == null)
+                            {
+                                bank = new DBBanque(client.Player.Guild.GuildID);
+                                GameServer.Database.AddObject(bank);
+                            }
+
+                            bank.AutoPayRent = isAuto;
+                            GameServer.Database.SaveObject(bank);
+
+                            string statusLocalized = isAuto ? "ON" : "OFF";
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.HouseRentToggled", statusLocalized), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                        }
+                        break;
+                    #endregion
                     #region Logins
                     case "logins":
                         {
@@ -4181,7 +4230,8 @@ namespace DOL.GS.Commands
                 "Commands.Players.Guild.Help.BuyTerritoryDefender",
                 "Commands.Players.Guild.Help.MoveTerritoryDefender",
                 "Commands.Players.Guild.Help.CombatZone",
-                "Commands.Players.Guild.Help.JailRelease"
+                "Commands.Players.Guild.Help.JailRelease",
+                "Commands.Players.Guild.Help.GuildHouseRent"
             };
 
             foreach (string key in helpKeys)
