@@ -3752,9 +3752,21 @@ namespace DOL.GS.Spells
         /// <returns>chance that spell will be resisted for specific target</returns>
         public virtual int CalculateSpellResistChance(GameLiving target)
         {
-            if (target != null && SpellHandler.FindEffectOnTarget(target, "Damnation") != null && ((HasPositiveEffect && SpellHandler.FindEffectOnTarget(target, "Heal") == null) || Spell.SpellType == "Disease"))
+            if (target != null && SpellHandler.FindEffectOnTarget(target, "Damnation") != null)
             {
-                return 100;
+                if (Spell.SpellType == "Disease" ||
+                    Spell.SpellType == "Ascendance" ||
+                    Spell.SpellType == "EffectivenessBuff" ||
+                    Spell.SpellType == "VampiirEffectivenessDeBuff" ||
+                    Spell.SpellType == "EffectivenessDeBuff")
+                {
+                    return 100;
+                }
+
+                if (HasPositiveEffect && SpellHandler.FindEffectOnTarget(target, "Heal") == null)
+                {
+                    return 100;
+                }
             }
 
             if (m_spellLine.KeyName == GlobalSpellsLines.Combat_Styles_Effect || HasPositiveEffect)

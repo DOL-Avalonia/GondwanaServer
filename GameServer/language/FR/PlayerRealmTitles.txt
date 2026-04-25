@@ -1,8 +1,10 @@
 # Unknown
 GamePlayer.RealmTitle.UnknownRealm:				Royaume Inconnu
+
 # Starter titles
 GamePlayer.RealmTitle.Defender:					Defenseur
 GamePlayer.RealmTitle.Invader:					Envahisseur
+
 # Albion
 # /Male
 GamePlayer.RealmTitle.Albion.RR0.Male:				Défenseur
@@ -20,6 +22,8 @@ GamePlayer.RealmTitle.Albion.RR11.Male:				Seigneur
 GamePlayer.RealmTitle.Albion.RR12.Male:				Baron
 GamePlayer.RealmTitle.Albion.RR13.Male:				Comte
 GamePlayer.RealmTitle.Albion.RR14.Male:				Archiduc
+GamePlayer.RealmTitle.Albion.RR15.Male:				Prince
+
 # /Female
 GamePlayer.RealmTitle.Female.Guardian:			Défenseur
 GamePlayer.RealmTitle.Female.Warder:			Gardienne
@@ -34,6 +38,9 @@ GamePlayer.RealmTitle.Female.DragonKnight:		Chevalière-Dragon
 GamePlayer.RealmTitle.Female.Lady:				Dame
 GamePlayer.RealmTitle.Female.Baronetess:		Maîtresse
 GamePlayer.RealmTitle.Female.Baroness:			Comtesse
+GamePlayer.RealmTitle.Albion.RR14.Female:		Archiduchesse
+GamePlayer.RealmTitle.Albion.RR15.Female:		Princesse
+
 # Midgard
 # /Male
 GamePlayer.RealmTitle.Male.Skiltvakten:			Skiltvakten
@@ -49,6 +56,9 @@ GamePlayer.RealmTitle.Male.Einherjar:			Einherjar
 GamePlayer.RealmTitle.Male.Herra:				Isen Einherjar
 GamePlayer.RealmTitle.Male.Hersir:				Flammen Einherjar
 GamePlayer.RealmTitle.Male.Vicomte:				Elding Einherjar
+GamePlayer.RealmTitle.Midgard.RR14.Male:		Stor Jarl
+GamePlayer.RealmTitle.Midgard.RR15.Male:		Konungsson
+
 # /Female
 GamePlayer.RealmTitle.Female.Skiltvakten:		Skiltvakten
 GamePlayer.RealmTitle.Female.IsenVakten:		Isen Vakten
@@ -63,6 +73,9 @@ GamePlayer.RealmTitle.Female.Einherjar:			Einherjar
 GamePlayer.RealmTitle.Female.Fru:				Isen Einherjar
 GamePlayer.RealmTitle.Female.Baronsfru:			Flammen Einherjar
 GamePlayer.RealmTitle.Female.Vicomtessa:		Elding Einherjar
+GamePlayer.RealmTitle.Midgard.RR14.Female:		Stor Hurfru
+GamePlayer.RealmTitle.Midgard.RR15.Female:		Konungsdottir
+
 # Hibernia
 # /Male
 GamePlayer.RealmTitle.Male.Savant:				Savant
@@ -78,6 +91,9 @@ GamePlayer.RealmTitle.Male.EmeraldRidere:		Cavalier d'Emeraude
 GamePlayer.RealmTitle.Male.Barun:				Sionad
 GamePlayer.RealmTitle.Male.ArdTiarna:			Triath
 GamePlayer.RealmTitle.Male.CiannCath:			Ciann Cath
+GamePlayer.RealmTitle.Hibernia.RR14.Male:		Ard Diuc
+GamePlayer.RealmTitle.Hibernia.RR15.Male:		Prionsa
+
 # /Female
 GamePlayer.RealmTitle.Female.Savant:			Savant
 GamePlayer.RealmTitle.Female.Cosantoir:			Cosantoir
@@ -92,3 +108,5 @@ GamePlayer.RealmTitle.Female.EmeraldRidere:		Cavalière d'Emeraude
 GamePlayer.RealmTitle.Female.Banbharun:			Ben Segr
 GamePlayer.RealmTitle.Female.ArdBantiarna:		Ben Reill
 GamePlayer.RealmTitle.Female.CiannCath:			Ciann Cath
+GamePlayer.RealmTitle.Hibernia.RR14.Female:		Ard Bandiuc
+GamePlayer.RealmTitle.Hibernia.RR15.Female:		Banphrionsa

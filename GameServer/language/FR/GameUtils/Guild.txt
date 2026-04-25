@@ -80,3 +80,4 @@ GameUtils.Guild.MemberJoined:					{0} a rejoint la guilde !
 GameUtils.Guild.YouLeave:						Vous quittez la guilde.
 GameUtils.Guild.RemovedBy:						{0} vous a renvoyé de {1}.
 GameUtils.Guild.Removed:						Vous avez été renvoyé de {0}.
+GameUtils.Guild.AlreadyExists:					{0} existe déjà !

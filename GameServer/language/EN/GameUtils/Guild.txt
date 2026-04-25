@@ -81,3 +81,4 @@ GameUtils.Guild.MemberJoined:					{0} has joined the guild!
 GameUtils.Guild.YouLeave:						You leave the guild.
 GameUtils.Guild.RemovedBy:						{0} removed you from {1}.
 GameUtils.Guild.Removed:						You have been removed from {0}.
+GameUtils.Guild.AlreadyExists:					{0} already exists!

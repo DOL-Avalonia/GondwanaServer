@@ -1,0 +1,8 @@
+# GameVault
+GameVault.NoPermissionView:			Vous n'avez pas la permission de consulter ce coffre !
+GameVault.NotViewingVault:			Vous ne consultez aucun coffre actuellement !
+GameVault.NoPermissionAdd:			Vous n'avez pas la permission d'ajouter cet objet !
+GameVault.NoPermissionRemove:		Vous n'avez pas la permission de retirer cet objet !
+GameVault.CannotSwapUntradable:		Vous ne pouvez pas échanger un objet non échangeable !
+GameVault.CannotPutUntradable:		Vous ne pouvez pas placer cet objet dans un coffre de maison !
+GameVault.VaultFull:				Ce coffre est plein !

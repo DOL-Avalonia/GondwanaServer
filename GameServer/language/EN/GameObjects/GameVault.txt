@@ -1,0 +1,8 @@
+# GameVault
+GameVault.NoPermissionView:			You don't have permission to view this vault!
+GameVault.NotViewingVault:			You are not actively viewing a vault!
+GameVault.NoPermissionAdd:			You don't have permission to add this item!
+GameVault.NoPermissionRemove:		You don't have permission to remove this item!
+GameVault.CannotSwapUntradable:		You cannot swap with an untradable item!
+GameVault.CannotPutUntradable:		You can not put this item into a House Vault!
+GameVault.VaultFull:				This vault is full!

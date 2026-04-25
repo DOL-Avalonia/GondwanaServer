@@ -16,10 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
+using DOL.Language;
+using System;
+using System.Collections;
 
 namespace DOL.GS
 {
@@ -101,8 +102,12 @@ namespace DOL.GS
             {
                 int damageAmount = 50 + Util.Random(200);
                 living.TakeDamage(Owner, eDamageType.Crush, damageAmount, 0);
-                Owner.SendMessage("The " + this.Name + " hits " + living.Name + " for " + damageAmount + " damage!", eChatType.CT_YouHit,
-                                      eChatLoc.CL_SystemWindow);
+
+                if (Owner is GamePlayer p)
+                {
+                    Owner.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "GameSiegeWeapon.Catapult.YouHit", this.Name, living.Name, damageAmount), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                }
+
                 foreach (GamePlayer player in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                     player.Out.SendCombatAnimation(this, living, 0x0000, 0x0000, 0x00, 0x00, 0x14, living.HealthPercent);
             }

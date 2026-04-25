@@ -355,6 +355,7 @@ namespace DOL.Territories
         public int RelicBonusReducedDebuffDuration { get; set; }
         public int RelicBonusSpellRange { get; set; }
         public int RelicCount { get; set; }
+        public int DungeonRelicCount { get; set; }
 
         private Guild? m_ownerGuild;
 
@@ -872,11 +873,12 @@ namespace DOL.Territories
             return resists.Count > 0 ? string.Join('|', resists) : null;
         }
 
-        public void AddRelicBonus(string raw)
+        public void AddRelicBonus(string raw, bool isDungeon)
         {
             lock (m_lockObject)
             {
-                RelicCount++;
+                if (isDungeon) DungeonRelicCount++; else RelicCount++;
+
                 if (!string.IsNullOrEmpty(raw))
                 {
                     foreach (var item in raw.Split('|'))
@@ -907,11 +909,12 @@ namespace DOL.Territories
             }
         }
 
-        public void RemoveRelicBonus(string raw)
+        public void RemoveRelicBonus(string raw, bool isDungeon)
         {
             lock (m_lockObject)
             {
-                RelicCount--;
+                if (isDungeon) DungeonRelicCount--; else RelicCount--;
+
                 if (!string.IsNullOrEmpty(raw))
                 {
                     foreach (var item in raw.Split('|'))

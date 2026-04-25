@@ -585,9 +585,9 @@ namespace DOL.GS
             }
 
             // Relic bonuses are placed OUTSIDE the limit check, so they always apply
-            this.TerritoryBonusBountyPoints += (territory.RelicCount * 3);
-            this.TerritoryBonusExperienceFactor += (territory.RelicCount * 0.03);
-            this.TerritoryBonusRealmPointsFactor += (territory.RelicCount * Properties.GVG_RELIC_RP_BONUS * 0.01);
+            this.TerritoryBonusBountyPoints += (territory.RelicCount * 2) + (territory.DungeonRelicCount * 4);
+            this.TerritoryBonusExperienceFactor += (territory.RelicCount * 0.02) + (territory.DungeonRelicCount * 0.04);
+            this.TerritoryBonusRealmPointsFactor += (territory.RelicCount * Properties.GVG_RELIC_RP_BONUS * 0.01) + (territory.DungeonRelicCount * (Properties.GVG_RELIC_RP_BONUS * 1.25) * 0.01);
 
             foreach (var resist in territory.RelicBonusResist)
             {

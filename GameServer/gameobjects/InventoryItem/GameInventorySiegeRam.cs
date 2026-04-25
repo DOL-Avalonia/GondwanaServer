@@ -72,7 +72,9 @@ namespace DOL.GS
             ram.Level = Convert.ToByte(Level);
             ram.Name = Name;
             ram.Model = (ushort)Model;
+            ram.CurrentRegion = player.CurrentRegion;
             ram.Position = player.Position;
+            ram.Heading = player.Heading;
             ram.Realm = player.Realm;
             ram.AddToWorld();
 

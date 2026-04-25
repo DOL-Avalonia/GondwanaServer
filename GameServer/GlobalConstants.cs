@@ -2251,7 +2251,8 @@ namespace DOL.GS
                     "Lord",
                     "Baronet",
                     "Baron",
-                    "Arch Duke"
+                    "Arch Duke",
+                    "Prince"
                 }
                 ,
                 // Female
@@ -2270,6 +2271,7 @@ namespace DOL.GS
                     "Baronetess",
                     "Baroness",
                     "Arch Duchess",
+                    "Princess",
                 }
             }
             ,
@@ -2290,7 +2292,8 @@ namespace DOL.GS
                     "Herra",
                     "Hersir",
                     "Vicomte",
-                    "Stor Jarl"
+                    "Stor Jarl",
+                    "Konungsson"
                 }
                 ,
                 // Female
@@ -2309,6 +2312,7 @@ namespace DOL.GS
                     "Baronsfru",
                     "Vicomtessa",
                     "Stor Hurfru",
+                    "Konungsdottir",
                 }
             }
             ,
@@ -2329,7 +2333,8 @@ namespace DOL.GS
                     "Barun",
                     "Ard Tiarna",
                     "Ciann Cath",
-                    "Ard Diuc"
+                    "Ard Diuc",
+                    "Prionsa"
                 }
                 ,
                 // Female
@@ -2347,7 +2352,8 @@ namespace DOL.GS
                     "Banbharun",
                     "Ard Bantiarna",
                     "Ciann Cath",
-                    "Ard Bandiuc"
+                    "Ard Bandiuc",
+                    "Banphrionsa"
                 }
             }
         };

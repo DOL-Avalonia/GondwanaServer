@@ -17,19 +17,18 @@
  *
  */
 
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-
 using DOL.Database;
+using DOL.Events;
 using DOL.GS;
 using DOL.GS.PacketHandler;
-using DOL.Events;
-
-using log4net;
+using DOL.GS.ServerProperties;
 using DOL.Language;
+using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace DOL.GS
 {
@@ -508,7 +507,7 @@ namespace DOL.GS.GameEvents
 
             if (killedPlayer.IsInRvR || killedPlayer.IsInPvP)
             {
-                noExpSeconds /= 4;
+                noExpSeconds /= Properties.RP_WORTH_SECONDS_PVPDIVIDER;
             }
 
             if (killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)

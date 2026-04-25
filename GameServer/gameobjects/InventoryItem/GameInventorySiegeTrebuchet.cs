@@ -66,15 +66,17 @@ namespace DOL.GS
         public override bool Use(GamePlayer player)
         {
             // Create the siege trebuchet 
-            GameSiegeBallista bal = new GameSiegeBallista();
+            GameSiegeTrebuchet treb = new GameSiegeTrebuchet();
 
             // Level, name and model of the siege trebuchet are retrieved from the inventory item
-            bal.Level = Convert.ToByte(Level);
-            bal.Name = Name;
-            bal.Model = (ushort)Model;
-            bal.Position = player.Position;
-            bal.Realm = player.Realm;
-            bal.AddToWorld();
+            treb.Level = Convert.ToByte(Level);
+            treb.Name = Name;
+            treb.Model = (ushort)Model;
+            treb.CurrentRegion = player.CurrentRegion;
+            treb.Position = player.Position;
+            treb.Heading = player.Heading;
+            treb.Realm = player.Realm;
+            treb.AddToWorld();
 
             // Remove current item from player's inventory 
             InventoryItem item = player.Inventory.GetItem((eInventorySlot)SlotPosition);

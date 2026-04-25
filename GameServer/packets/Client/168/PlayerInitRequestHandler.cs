@@ -17,16 +17,17 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
 using DOL.Events;
 using DOL.GS.Housing;
 using DOL.GS.Keeps;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
@@ -36,7 +37,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -117,11 +118,18 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     player.Out.SendMessage(Properties.MOTD, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
-                else if (player.Level == 1)
+                else if (player.Level < 6 && !player.IsRenaissance)
                 {
                     player.Out.SendStarterHelp();
-                    if (Properties.STARTING_MSG != "")
+
+                    if (Properties.USE_RPG_STARTING_MSG)
+                    {
+                        SendServerRPGMessage(player);
+                    }
+                    else if (Properties.STARTING_MSG != "")
+                    {
                         player.Out.SendMessage(Properties.STARTING_MSG, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    }
                 }
 
                 if (Properties.ENABLE_DEBUG)
@@ -195,6 +203,63 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
 
                 #endregion TempPropertiesManager LookUp
+            }
+
+            private void SendServerRPGMessage(GamePlayer player)
+            {
+                string lang = player.Client.Account.Language;
+
+                string shortdescription = LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ShortDescription");
+
+                string lore =
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Lore1") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Lore2");
+
+                string features =
+                    "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturesHeader") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureEvents1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureEvents2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGvG1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGvG2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureDungeons1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureDungeons2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureBanker1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureBanker2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildCreation1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildCreation2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildLeveling1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildLeveling2") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAdrenaline1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAdrenaline2");
+
+                string servercommands =
+                    "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ServerCommandsHeader") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdLanguage") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdMarket") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCraft") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdVol");
+
+                string guildcommands =
+                    "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GuildCommandsHeader") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCMap") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCPortal") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCCombatZone") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCJail") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCRent") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCBanners") + "\n\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Outro");
+
+                player.Out.SendMessage(shortdescription, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(lore, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(features, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(servercommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(guildcommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
 
             private static void CheckBGLevelCapForPlayerAndMoveIfNecessary(GamePlayer player)

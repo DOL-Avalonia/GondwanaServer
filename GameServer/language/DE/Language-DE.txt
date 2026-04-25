@@ -1,0 +1,147 @@
+﻿# LANGUAGEMGR
+System.LanguagesName.EN:					Englisch
+System.LanguagesName.FR:					Französisch
+System.LanguagesName.DE:					Deutsch
+System.LanguagesName.ES:					Spanisch
+System.LanguagesName.CZ:					Tschechisch
+System.LanguagesName.IT:					Italienisch
+
+# Miscellaneous Language
+Language.Hours.Short:								{0}h
+Language.Minutes.Short:								{0}min
+Language.Seconds.Short:								{0}s
+Language.Hours.Long:								{0} Stunden
+Language.Minutes.Short:								{0} Minuten
+Language.Seconds.Short:								{0} Sekunden
+Language.NotApplicable:								N/A
+
+Language.Time.Long:                                 0 Sekunden
+Language.Time.LongH:                                {0:%h} Stunden
+Language.Time.Longh:                                {0:%h} Stunde
+Language.Time.LongHM:                               {0:%h} Stunden und {0:%m} Minuten
+Language.Time.LongHm:                               {0:%h} Stunden und {0:%m} Minute
+Language.Time.LonghM:                               {0:%h} Stunde und {0:%m} Minuten
+Language.Time.Longhm:                               {0:%h} Stunde und {0:%m} Minute
+Language.Time.LongHMS:                              {0:%h} Stunden, {0:%m} Minuten und {0:%s} Sekunden
+Language.Time.LongHMs:                              {0:%h} Stunden, {0:%m} Minuten und {0:%s} Sekunde
+Language.Time.LongHmS:                              {0:%h} Stunden, {0:%m} Minute und {0:%s} Sekunden
+Language.Time.LongHms:                              {0:%h} Stunden, {0:%m} Minute und {0:%s} Sekunde
+Language.Time.LonghMS:                              {0:%h} Stunde, {0:%m} Minuten und {0:%s} Sekunden
+Language.Time.LonghMs:                              {0:%h} Stunde, {0:%m} Minuten und {0:%s} Sekunde
+Language.Time.LonghmS:                              {0:%h} Stunde, {0:%m} Minute und {0:%s} Sekunden
+Language.Time.Longhms:                              {0:%h} Stunde, {0:%m} Minute und {0:%s} Sekunde
+Language.Time.LongM:                                {0:%m} Minuten
+Language.Time.Longm:                                {0:%m} Minute
+Language.Time.LongMS:                               {0:%m} Minuten und {0:%s} Sekunden
+Language.Time.LongMs:                               {0:%m} Minuten und {0:%s} Sekunde
+Language.Time.LongmS:                               {0:%m} Minute und {0:%s} Sekunden
+Language.Time.Longms:                               {0:%m} Minute und {0:%s} Sekunde
+Language.Time.LongS:                                {0:%s} Sekunden
+Language.Time.Longs:                                {0:%s} Sekunde
+
+Language.Mithril.Amount:						{0} Mithril
+Language.Platinum.Amount:						{0} Platin
+Language.Gold.Amount:							{0} Gold
+Language.Silver.Amount:							{0} Silber
+Language.Copper.Amount:							{0} Kupfer
+
+Language.Systems.Spell:							Zauber
+
+# Stats
+Language.Resists:								Resistenzen
+Language.DamageType.Natural.Noun:				Natur
+Language.DamageType.Crush.Noun:					Schlag
+Language.DamageType.Slash.Noun:					Schnitt
+Language.DamageType.Thrust.Noun:				Stich
+Language.DamageType.Body.Noun:					Körper
+Language.DamageType.Cold.Noun:					Kälte
+Language.DamageType.Energy.Noun:				Energie
+Language.DamageType.Heat.Noun:					Hitze
+Language.DamageType.Matter.Noun:				Materie
+Language.DamageType.Spirit.Noun:				Geist
+Language.DamageType.Falling.Noun:				Sturz
+Language.DamageType.GM.Noun:					Roh
+
+Language.DamageType.Melee.Noun:					Alle Nahkampfschäden
+Language.DamageType.Spell.Noun:					Alle Zauberschäden
+Language.DamageType.DoT.Noun:					Schaden-über-Zeit-Zauber
+
+Language.DamageType.Natural.Damage:				Naturschaden
+Language.DamageType.Crush.Damage:				Schlagschaden
+Language.DamageType.Slash.Damage:				Schnittschaden
+Language.DamageType.Thrust.Damage:				Stichschaden
+Language.DamageType.Body.Damage:				Körperschaden
+Language.DamageType.Cold.Damage:				Kälteschaden
+Language.DamageType.Energy.Damage:				Energieschaden
+Language.DamageType.Heat.Damage:				Hitzeschaden
+Language.DamageType.Matter.Damage:				Materieschaden
+Language.DamageType.Spirit.Damage:				Geistschaden
+Language.DamageType.Falling.Damage:				Sturzschaden
+Language.DamageType.GM.Damage:					Rohschaden
+
+Language.DamageType.Melee.Damage:				Nahkampfschaden
+Language.DamageType.Spell.Damage:				Zauberschaden
+Language.DamageType.DoT.Damage:					Schaden-über-Zeit
+
+# Target
+Language.SpellTarget.Realm:						Reich
+Language.SpellTarget.Self:						selbst
+Language.SpellTarget.Enemy:						Feind
+Language.SpellTarget.Pet:						Begleiter
+Language.SpellTarget.Group:						Gruppe
+Language.SpellTarget.Area:						Gebiet
+Language.SpellTarget.Corpse:					Leiche
+Language.SpellTarget.Unknown:					unbekanntes Ziel
+
+# /horse
+HorseEmote.graze.NoTargetToOthers:				{0} lässt {1} Reittier grasen.
+HorseEmote.graze.NoTargetToSource:				Du lässt dein Reittier grasen.
+
+HorseEmote.pet.NoTargetToOthers:				{0} streichelt {1} Reittier.
+HorseEmote.pet.NoTargetToSource:				Du streichelst dein Reittier.
+
+HorseEmote.trick.ToOthers:					{0} stellt sich auf {2} Reittier, um {1} zu beeindrucken.
+HorseEmote.trick.ToSource:					Du stellst dich auf dein Reittier, um {0} zu beeindrucken.
+HorseEmote.trick.NoTargetToOthers:			{0} stellt sich auf {1} Reittier, um alle zu beeindrucken.
+HorseEmote.trick.NoTargetToSource:			Du stellst dich auf dein Reittier, um alle zu beeindrucken.
+
+Language.InternalError:						Ein Serverfehler ist aufgetreten, während versucht wurde, diese Aktion abzuschließen; bitte kontaktiert das Server-Team.
+
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Willkommen in Arcanum, einer Welt, die aus der Asche des Großen Magiekrieges geschmiedet wurde! In diesem fesselnden RP/PvP-Reich kämpfen zerbrochene Königreiche ums Überleben, während Gilden das Gesetz diktieren. Bitte konsultiert die heiligen Grundsätze und Serverregeln auf www.arcanum-server.com. Schärft eure Klingen, haltet eure Zauber bereit und genießt eure Reise in Arcanum!
+ServerRPGMessage.Lore1:					Willkommen in Arcanum !
+ServerRPGMessage.Lore2:					Vor zweitausend Jahren war Arcanum ein leuchtendes Netzwerk aus fliegenden Zitadellen und Manaschmieden. Dann kam der Große Magiekrieg. Kontinente wurden auseinandergerissen und hinterließen eine vernarbte und ausgedünnte Welt. Aus diesen Trümmern erhoben sich drei Reiche: Valeria, Skeldheim und Sylvaris. Heute herrschen Könige nur noch auf dem Papier, aber in Wahrheit sind es die Gilden, die die zersplitterten Lande regieren, während Geächtete tief im Untergrund ihre eigenen Imperien errichten. Wählt euren Weg mit Bedacht.
+ServerRPGMessage.FeaturesHeader:		--------- SERVER-FUNKTIONEN ---------
+ServerRPGMessage.FeatureEvents1:		[Dynamische Events & Quests]
+ServerRPGMessage.FeatureEvents2:		Nehmt an weltverändernden Ereignissen und legendären Bossjagden teil.
+ServerRPGMessage.FeatureGvG1:			[Gilde gegen Gilde (GvG)]
+ServerRPGMessage.FeatureGvG2:			Erobert Territorien und Sub-Territorien. Sichert euch mächtige Relikte, um eurer Gilde massive Kampfboni zu verleihen.
+ServerRPGMessage.FeatureDungeons1:		[Dungeon-Erkundung]
+ServerRPGMessage.FeatureDungeons2:		Trotzt dem tiefen Untergrund, dem labyrinthischen DarkSpire oder dem gefährlichen Schleierriss (Veil Rift).
+ServerRPGMessage.FeaturePvP1:			[Spieler gegen Spieler (PvP)]
+ServerRPGMessage.FeaturePvP2:			Tretet in epischen PvP-Modi an, darunter Deathmatch, Capture the Flag, King of the Hill, Core Run und Biohazard.
+ServerRPGMessage.FeatureRenaissance1:	[Renaissance]
+ServerRPGMessage.FeatureRenaissance2:	Legenden besagen, dass diejenigen, die den Höhepunkt ihrer Reise erreichen, eine gefährliche Prüfung auf sich nehmen können, um wiedergeboren zu werden. Beginnt von vorn, aber erwacht mit einer verborgenen, gottgleichen Kraft, um noch größere Feinde zu besiegen.
+ServerRPGMessage.FeatureAFK1:			[Dynamisches AFK-Training]
+ServerRPGMessage.FeatureAFK2:			Im echten Leben beschäftigt? Nutzt spezielle Marken aus PvP und Quests, um euren Charakter in eurer Abwesenheit zu trainieren. Stellt euch in einer beliebigen Stadt vor eine Übungspuppe und tippt '/afk xp' oder '/afk combat', um Kampferfahrung zu sammeln!
+ServerRPGMessage.FeatureBanker1:		[Der Bankier]
+ServerRPGMessage.FeatureBanker2:		Visiert einen Bankier an und flüstert 'withdraw money', 'write a check', 'cash a check' oder 'term deposits', um euer Vermögen zu verwalten. Ihr könnt so auch die Hausmiete automatisieren.
+ServerRPGMessage.FeatureGuildCreation1:	[Neues Gilden-Erstellungssystem]
+ServerRPGMessage.FeatureGuildCreation2:	Kauft eine leere Schriftrolle, nutzt '/book create <Name>' und '/book write', um Gründer zu versammeln, und bringt sie dann zum Königlichen Schatzmeister, um sie abstempeln zu lassen.
+ServerRPGMessage.FeatureGuildLeveling1:	[Gilden-Leveling]
+ServerRPGMessage.FeatureGuildLeveling2:	Gilden steigen dynamisch auf! Schaltet neue Befehle frei, während ihr wachst, und stärkt eure Territorien.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenalin]
+ServerRPGMessage.FeatureAdrenaline2:	Baut Kampfspannung im PvE und PvP auf, um verheerende taktische Vorteile freizusetzen.
+ServerRPGMessage.ServerCommandsHeader:	--------- NEUE SERVER-BEFEHLE ---------
+ServerRPGMessage.CmdLanguage:			/autotranslate <on|off> & /language: Übersetzt den Chat und ändert die Sprache eures Clients.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Platziert, benennt oder schließt euren persönlicher Markt.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatisiert eure Handwerks-Warteschlange und kauft fehlende Rezeptzutaten ganz einfach direkt bei Händlern.
+ServerRPGMessage.CmdVol:				/vol oder /steal <Spieler>: Benutzt eure Dietriche, um Münzen oder wertvolle Territoriums-Relikte von rivalisierenden Spielern zu stehlen!
+ServerRPGMessage.GuildCommandsHeader:	--------- NEUE GILDEN-BEFEHLE ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Zeigt GvG-Karten und Status an.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Öffnet ein Portal direkt zu euren beanspruchten Ländereien.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Erstellt eine temporäre PvP-Kampfzone.
+ServerRPGMessage.GCJail:				/gc jailrelease <Name> : Zahlt Kaution, um ein Gildenmitglied aus dem Gefängnis zu befreien.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Schaltet automatische Gildenhaus-Mietzahlungen ein oder aus.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Kauft und platziert taktische Banner, um eure Mitglieder oder Territoriumswachen zu stärken.
+ServerRPGMessage.Outro:					Viel Glück, und möge euer Vermächtnis in Arcanum legendär sein!

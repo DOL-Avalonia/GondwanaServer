@@ -1,0 +1,3 @@
+
+Lootgenerator.OneTimeDrop.ReceiveItem:		Vous recevez {0} de {1} !
+Lootgenerator.OneTimeDrop.InventoryFull:	Votre inventaire est plein, la récompense unique n'a pas pu y être ajoutée !

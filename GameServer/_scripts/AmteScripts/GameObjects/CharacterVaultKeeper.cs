@@ -1,15 +1,17 @@
-using System.Collections.Generic;
+using AmteScripts.PvP.CTF;
 using DOL.Database;
 using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
 using DOL.Language;
+using System.Collections.Generic;
+using static AmteScripts.PvP.PvPScore;
 
 namespace DOL.GS
 {
     public class CharacterVaultKeeper : GameNPC
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public override bool Interact(GamePlayer player)
         {
@@ -140,7 +142,7 @@ namespace DOL.GS
                 return false;
             }
 
-            if (item is StorageBagItem)
+            if (item is StorageBagItem || item is FlagInventoryItem || item is PvPTreasure || item is AmteScripts.Managers.TerritoryRelicInventoryItem)
             {
                 return false;
             }

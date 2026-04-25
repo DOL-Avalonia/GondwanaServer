@@ -1,3 +1,5 @@
+
+# /Appeal
 Commands.Players.Appeal.AlreadyActiveAppeal:	Vous avez déjà un appel en cours, veuillez attendre que le staff y réponde avant d'en soumettre un autre.
 Commands.Players.Appeal.AppealSubmitted:		Votre appel a été soumis avec succès... utilisez /checkappeal pour vérifier son statut.
 Commands.Players.Appeal.BeingHelped:			Ce joueur est déjà en train de recevoir de l'aide.
@@ -38,3 +40,13 @@ Commands.Players.Appeal.UseCmdTurnBackOn:		Utilisez '/gmappeal mute' à nouveau 
 Commands.Players.Appeal.UseGMappeal:			Utilisez '/gmappeal' pour aider les joueurs avec leur appel.
 Commands.Players.Appeal.YouAreMuted:			Vous êtes en sourdine et ne pouvez pas soumettre un appel pour le moment.
 Commands.Players.Appeal.YouHavePendingAppeal:	Vous avez un appel en attente, utilisez '/checkappeal' pour voir son statut ou l'annuler.
+
+# AppealMgr
+Commands.Players.Appeal.QueueCountPlural:		Il y a {0} appels dans la file d'attente.
+Commands.Players.Appeal.QueueCountSingular:		Il y a {0} appel dans la file d'attente.
+Commands.Players.Appeal.QueueStatus:			Crit:{0}, Haut:{1}, Moy:{2}, Bas:{3}.  [utilisez /gmappeal]
+Commands.Players.Appeal.StaffNotifyStatus:		Le membre du staff {0} a changé le statut de l'appel de {1} en {2}.
+Commands.Players.Appeal.StaffNotifyClosed:		Le membre du staff {0} vient de clôturer l'appel de {1}.
+Commands.Players.Appeal.StaffNotifyClosedOff:	Le membre du staff {0} vient de clôturer l'appel (hors ligne) de {1}.
+Commands.Players.Appeal.StaffNotifyCanceled:	{0} a annulé son appel.
+Commands.Players.Appeal.StaffLoginQueueWarn:	Il y a {0} appels dans la file d'attente ! Utilisez /gmappeal pour les traiter.

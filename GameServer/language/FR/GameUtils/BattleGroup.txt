@@ -1,0 +1,5 @@
+
+Battlegroup.Guild.YouJoin:			Vous rejoignez le groupe de combat.
+Battlegroup.Guild.PlayerJoined:		{0} a rejoint le groupe de combat.
+Battlegroup.Guild.YouLeave:			Vous quittez le groupe de combat.
+Battlegroup.Guild.PlayerLeft:		{0} a quitté le groupe de combat.

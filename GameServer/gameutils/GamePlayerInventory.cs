@@ -667,6 +667,23 @@ namespace DOL.GS
                 if (fromItem == toItem || fromItem == null)
                     valid = false;
 
+                if (valid)
+                {
+                    bool isToVault = (toSlot >= eInventorySlot.FirstVault && toSlot <= eInventorySlot.LastVault) || (toSlot >= eInventorySlot.FirstBagHorse && toSlot <= eInventorySlot.LastBagHorse);
+                    bool isFromVault = (fromSlot >= eInventorySlot.FirstVault && fromSlot <= eInventorySlot.LastVault) || (fromSlot >= eInventorySlot.FirstBagHorse && fromSlot <= eInventorySlot.LastBagHorse);
+
+                    if (isToVault && (fromItem is Scripts.StorageBagItem || fromItem is AmteScripts.PvP.CTF.FlagInventoryItem || toItem is PvPTreasure || fromItem is AmteScripts.Managers.TerritoryRelicInventoryItem))
+                    {
+                        valid = false;
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemCantStoreThere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    else if (isFromVault && toItem != null && (toItem is Scripts.StorageBagItem || toItem is AmteScripts.PvP.CTF.FlagInventoryItem || toItem is PvPTreasure || toItem is AmteScripts.Managers.TerritoryRelicInventoryItem))
+                    {
+                        valid = false;
+                        m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemCantSwapThere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                }
+
                 /*************** Horse Inventory **************/
                 if (((toSlot >= eInventorySlot.FirstBagHorse && toSlot <= eInventorySlot.LastBagHorse) ||
                      (fromSlot >= eInventorySlot.FirstBagHorse && fromSlot <= eInventorySlot.LastBagHorse)))

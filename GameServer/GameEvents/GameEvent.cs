@@ -40,6 +40,7 @@ namespace DOL.GameEvents
         
         public GameEvent? ChainPreviousEvent { get; set; }
         public GameEvent? ChainNextEvent { get; set; }
+        public bool IsCompleted { get; set; }
 
         /**
          * @brief Event instance constructor
@@ -99,6 +100,7 @@ namespace DOL.GameEvents
             _eventFamily = new(ev.EventFamily);
             TimeBeforeReset = ev.TimeBeforeReset;
             EventFamilyType = ev.EventFamilyType;
+            IsCompleted = ev.IsCompleted;
             EventFamilyOrdering = ev.EventFamilyOrdering;
             ActionCancelQuestId = ev.ActionCancelQuestId;
             if (TimeBeforeReset > 0)
@@ -318,9 +320,15 @@ namespace DOL.GameEvents
                 if (!(TimerType == TimerType.DateType && IsGlobalYearlyEvent))
                     EndTime = (DateTimeOffset?)null;
                 WantedMobsCount = 0;
+
+                if (StartConditionType == StartingConditionType.Onetime)
+                {
+                    IsCompleted = false;
+                }
+
                 EventFamily.ForEach(c => c.Active = false);
                 _Cleanup();
-                
+
                 if (GameEventManager.Instance.EventRelations.TryGetValue(ID, out var list))
                 {
                     foreach (var ev in list)
@@ -813,6 +821,11 @@ namespace DOL.GameEvents
                 return;
             }
 
+            if (evID == this.ID)
+            {
+                await Task.Delay(100);
+            }
+
             ev.OnRequestStart(this);
         }
 
@@ -1257,6 +1270,11 @@ namespace DOL.GameEvents
                     await PerformEndAction(EndingActionB);
                 }
 
+                if (StartConditionType == StartingConditionType.Onetime)
+                {
+                    IsCompleted = true;
+                }
+
                 log.Info(string.Format("Event Id: {0}, Name: {1} was stopped At: {2}", ID, EventName, DateTime.Now.ToString()));
 
                 SaveToDatabase();
@@ -1597,6 +1615,7 @@ namespace DOL.GameEvents
             EventFamilyType = (FamilyConditionType)db.EventFamilyType;
             EventFamilyOrdering = (FamilyOrdering)db.EventFamilyOrdering;
             FamilyFailText = db.FamilyFailText;
+            IsCompleted = db.IsCompleted;
 
             // get kes from string[] db.EventFamily, and set values to false 
             if (db.EventFamily != null)
@@ -2367,6 +2386,7 @@ namespace DOL.GameEvents
             db.EventFamilyType = (int)EventFamilyType;
             db.EventFamilyOrdering = (int)EventFamilyOrdering;
             db.FamilyFailText = FamilyFailText ?? string.Empty;
+            db.IsCompleted = IsCompleted;
 
             if (ID == null)
             {

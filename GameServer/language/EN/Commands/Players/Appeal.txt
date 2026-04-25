@@ -1,3 +1,5 @@
+
+# /Appeal
 Commands.Players.Appeal.AlreadyActiveAppeal:	You already have an active appeal, please wait for server staff to address your appeal before submitting another.
 Commands.Players.Appeal.AppealSubmitted:		Your appeal has been submitted successfully...  use /checkappeal to check the status of your appeal.
 Commands.Players.Appeal.BeingHelped:			That player is already being helped.
@@ -38,3 +40,13 @@ Commands.Players.Appeal.UseCmdTurnBackOn:		Use /gmappeal mute again to turn the 
 Commands.Players.Appeal.UseGMappeal:			Use /gmappeal to assist players with their appeal.
 Commands.Players.Appeal.YouAreMuted:			You are muted and are not allowed to submit an appeal at this time.
 Commands.Players.Appeal.YouHavePendingAppeal:	You have a pending appeal in the queue, please use /checkappeal to see its status or to cancel the appeal.
+
+# AppealMgr
+Commands.Players.Appeal.QueueCountPlural:		There are {0} Appeals in the queue.
+Commands.Players.Appeal.QueueCountSingular:		There is {0} appeal in the queue.
+Commands.Players.Appeal.QueueStatus:			Crit:{0}, High:{1}, Med:{2}, Low:{3}.  [use /gmappeal]
+Commands.Players.Appeal.StaffNotifyStatus:		Staff member {0} has changed the status of {1}'s appeal to {2}.
+Commands.Players.Appeal.StaffNotifyClosed:		Staff member {0} has just closed {1}'s appeal.
+Commands.Players.Appeal.StaffNotifyClosedOff:	Staff member {0} has just closed {1}'s (offline) appeal.
+Commands.Players.Appeal.StaffNotifyCanceled:	{0} has canceled their appeal.
+Commands.Players.Appeal.StaffLoginQueueWarn:	There are {0} appeals in the queue!  Use /gmappeal to work the appeals queue.

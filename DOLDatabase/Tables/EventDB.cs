@@ -56,6 +56,7 @@ namespace DOLDatabase.Tables
         private int m_eventFamilyType = 1;
         private int m_eventFamilyOrdering;
         private string m_familyFailTest;
+        private bool m_isCompleted;
 
         [DataElement(AllowDbNull = false, Varchar = 255)]
         public string EventName
@@ -692,6 +693,17 @@ namespace DOLDatabase.Tables
             set
             {
                 m_cancelQuestId = value;
+                Dirty = true;
+            }
+        }
+
+        [DataElement(AllowDbNull = false)]
+        public bool IsCompleted
+        {
+            get { return m_isCompleted; }
+            set
+            {
+                m_isCompleted = value;
                 Dirty = true;
             }
         }

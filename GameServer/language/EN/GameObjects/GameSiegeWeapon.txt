@@ -1,0 +1,30 @@
+# GameSiegeWeapon
+GameSiegeWeapon.AlreadyControlled:			{0} is already under control.
+GameSiegeWeapon.AlreadyHaveWeapon:			You already have a siege weapon under your control.
+GameSiegeWeapon.CantControlMoving:			You can't take control of a siege weapon while it is moving.
+GameSiegeWeapon.TakeControl:				You take control of {0}.
+GameSiegeWeapon.NoLongerControlling:		You are no longer controlling {0}.
+GameSiegeWeapon.TurningToTarget:			{0} is turning to your target.
+GameSiegeWeapon.PrepareFiring:				You prepare {0} for firing. ({1}s until armed)
+GameSiegeWeapon.TargetTooFarToMove:			Ground target is too far away to move to!
+GameSiegeWeapon.TargetOutOfSight:			Ground target is out of sight!
+GameSiegeWeapon.RamTooCloseToDoor:			You can't move a ram that close to a door!
+GameSiegeWeapon.WeaponAimed:				Your {0} is now aimed!
+GameSiegeWeapon.WeaponArmed:				Your {0} is now armed!
+GameSiegeWeapon.NotReadyToFire:				The {0} is not ready to fire yet!
+GameSiegeWeapon.YouFireWeapon:				You fire {0}!
+GameSiegeWeapon.NeedWoodworkingToRepair:	You must have woodworking skill to repair a siege weapon.
+GameSiegeWeapon.DecayedBeyondRepair:		The siegeweapon has decayed beyond repairs!
+GameSiegeWeapon.NeedCrafterToSalvage:		You must be a Siege weapon crafter to salvage it.
+GameSiegeWeapon.CantUseWeaponNow:			You can't use this siegeweapon now!
+GameSiegeWeapon.NeedsRepair:				The siegeweapon needs to be repaired!
+GameSiegeWeapon.TooFarToControl:			You are too far from your siege equipment to control it any longer!
+
+# GameSiegeRam
+GameSiegeWeapon.Ram.SelectTarget:			Select a target first.
+GameSiegeWeapon.Ram.TooFar:					You are too far away to attack {0}.
+GameSiegeWeapon.Ram.YouHit:					The Ram hits {0} for {1} dmg!
+GameSiegeWeapon.Ram.HitObserver:			{0} hits {1}!
+
+# GameSiegeCatapult
+GameSiegeWeapon.Catapult.YouHit:			The {0} hits {1} for {2} damage!

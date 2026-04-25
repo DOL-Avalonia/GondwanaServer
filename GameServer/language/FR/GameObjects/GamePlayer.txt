@@ -129,8 +129,8 @@ GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Vous perdez 5% de vo
 
 GameObjects.GamePlayer.DuelStop.DuelEnds:				            Votre duel se termine.
 
-GameObjects.GamePlayer.GainBountyPoints.YouGet:			            Vous obtenez {0} primes de royaume.
-GameObjects.GamePlayer.GainBountyPoints.TerritoryBonus:             Vous gagnez un bonus grâce à vos territoires de {0} primes de royaumes.
+GameObjects.GamePlayer.GainBountyPoints.YouGet:			            Vous obtenez {0} points de prime.
+GameObjects.GamePlayer.GainBountyPoints.TerritoryBonus:             Vous gagnez un bonus grâce à vos territoires de {0} points de prime.
 
 GameObjects.GamePlayer.GainCraftingSkill.GainSkill:                 Vous gagnez une compétence en {0}. ({1})
 GameObjects.GamePlayer.GainCraftingSkill.ReachedSkill:              {0} a atteint le titre "Légendaire" (1000 points de capacité) en {1}

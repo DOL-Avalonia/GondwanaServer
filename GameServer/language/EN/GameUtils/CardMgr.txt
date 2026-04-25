@@ -1,0 +1,32 @@
+
+CardMgr.Held.YouNoCards:					You have no cards.
+CardMgr.Held.TargetNoCards:					{0} has no cards.
+CardMgr.Held.YouHoldingCards:				You are holding {0} card(s).
+CardMgr.Held.TargetHoldingCards:			{0} is holding {1} card(s).
+CardMgr.Discard.YouDiscardNamed:			You discard the {0} from your hand.
+CardMgr.Discard.TargetDiscardNamed:			{0} discards the {1} from their hand.
+CardMgr.Discard.TargetDiscardUnknown:		{0} discards a card from their hand.
+CardMgr.Discard.NoSuchCard:					No card with ID {0} exists in your hand!
+CardMgr.Discard.YouNoCards:					You have no cards to discard.
+CardMgr.DiscardAll.You:						You discard all your cards.
+CardMgr.DiscardAll.Target:					{0} discards all their cards.
+CardMgr.Cards.NoGroup:						You cannot play cards without a group!
+CardMgr.Shuffle.NoGroup:					You must have a group to play cards!
+CardMgr.Shuffle.You:						You shuffle {0} of cards.
+CardMgr.Shuffle.Target:						{0} shuffles {1} of cards.
+CardMgr.Shuffle.DeckSingular:				1 deck
+CardMgr.Shuffle.DeckPlural:					{0} decks
+CardMgr.Deal.MustBeInGroup:					{0} must be in your group to play cards!
+CardMgr.Deal.MustShuffleFirst:				You must use /shuffle to prepare cards before dealing!
+CardMgr.Deal.NoCardsLeft:					There are no cards left in the deck. Use /shuffle to prepare a new deck.
+CardMgr.Deal.YouDealYourselfNamed:			You deal yourself the {0}.
+CardMgr.Deal.YouDealYourselfUnknown:		You deal yourself a card face down.
+CardMgr.Deal.YouDealTargetNamed:			You deal {0} the {1}.
+CardMgr.Deal.YouDealTargetUnknown:			You deal {0} a card face down.
+CardMgr.Deal.TargetDealsYouNamed:			{0} deals you the {1}.
+CardMgr.Deal.TargetDealsThemselfNamed:		{0} deals themself the {1}.
+CardMgr.Deal.TargetDealsThemselfUnknown:	{0} deals themself a card face down.
+CardMgr.Deal.TargetDealsOtherNamed:			{0} deals {1} the {2}.
+CardMgr.Deal.TargetDealsOtherUnknown:		{0} deals {1} a card face down.
+CardMgr.Show.You:							You show your hand.
+CardMgr.Show.Target:						{0} shows their hand.

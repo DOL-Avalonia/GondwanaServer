@@ -22,7 +22,7 @@ namespace DOL.GS.Scripts
             GameCoffre coffre = player.TargetObject as GameCoffre;
             switch (args[1].ToLower())
             {
-                #region create - model
+                #region create - createcatapult - model
                 case "create":
                     coffre = new GameCoffre
                     {
@@ -38,6 +38,26 @@ namespace DOL.GS.Scripts
                     coffre.AddToWorld();
                     coffre.SaveIntoDatabase();
                     ChatUtil.SendSystemMessage(client, "Vous avez créé un coffre (OID:" + coffre.ObjectID + ")");
+                    break;
+
+                case "createcatapult":
+                    GameStaticCatapult catapult = new GameStaticCatapult
+                    {
+                        Name = "Catapult_Backbone",
+                        Model = 1682,
+                        SecondaryModel = 2598,
+                        Position = player.Position,
+                        Heading = player.Heading,
+                        CurrentRegionID = player.CurrentRegionID,
+                        RespawnInterval = 0 * 0,
+                        ItemChance = 100,
+                        CoffreOpeningInterval = 0,
+                        PunishSpellId = 20622
+                    };
+                    catapult.LoadedFromScript = false;
+                    catapult.AddToWorld();
+                    catapult.SaveIntoDatabase();
+                    ChatUtil.SendSystemMessage(client, "Vous avez créé une catapulte (OID Backbone:" + catapult.ObjectID + ")");
                     break;
 
                 case "model":
@@ -659,6 +679,11 @@ namespace DOL.GS.Scripts
                     {
                         coffre.SecondaryModel = int.Parse(args[2].Substring(0, Math.Min(5, args[2].Length)));
                         coffre.SaveIntoDatabase();
+
+                        if (coffre is GameStaticCatapult cat && cat.NPCCatapult != null)
+                        {
+                            cat.NPCCatapult.Model = (ushort)coffre.SecondaryModel;
+                        }
                     }
                     catch
                     {
@@ -1099,6 +1124,7 @@ namespace DOL.GS.Scripts
          ePrivLevel.GM,
          "Commands.GM.Coffre.Description",
          "Commands.GM.Coffre.Usage.Create",
+        "Commands.GM.Coffre.Usage.CreateCatapult",
          "Commands.GM.Coffre.Usage.Model",
          "Commands.GM.Coffre.Usage.Item",
          "Commands.GM.Coffre.Usage.Add",
@@ -1157,6 +1183,7 @@ namespace DOL.GS.Scripts
         ePrivLevel.GM,
         "Commands.GM.Chest.Description",
         "Commands.GM.Chest.Usage.Create",
+        "Commands.GM.Chest.Usage.CreateCatapult",
         "Commands.GM.Chest.Usage.Model",
         "Commands.GM.Chest.Usage.Item",
         "Commands.GM.Chest.Usage.Add",

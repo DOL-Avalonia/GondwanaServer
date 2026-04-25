@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using System.Collections;
 using System.Collections.Specialized;
-using DOL.GS.PacketHandler;
 namespace DOL.GS
 {
     /// <summary>
@@ -82,10 +83,12 @@ namespace DOL.GS
                 if (m_battlegroupMembers.Contains(player))
                     return false;
                 player.TempProperties.setProperty(BATTLEGROUP_PROPERTY, this);
-                player.Out.SendMessage("You join the battle group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Battlegroup.Guild.YouJoin"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
                 foreach (GamePlayer member in Members.Keys)
                 {
-                    member.Out.SendMessage(member.GetPersonalizedName(player) + " has joined the battle group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    string msg = LanguageMgr.GetTranslation(member.Client.Account.Language, "Battlegroup.Guild.PlayerJoined", member.GetPersonalizedName(player));
+                    member.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 m_battlegroupMembers.Add(player, leader);
 
@@ -213,10 +216,12 @@ namespace DOL.GS
                     return false;
                 m_battlegroupMembers.Remove(player);
                 player.TempProperties.removeProperty(BATTLEGROUP_PROPERTY);
-                player.Out.SendMessage("You leave the battle group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Battlegroup.Guild.YouLeave"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
                 foreach (GamePlayer member in Members.Keys)
                 {
-                    member.Out.SendMessage(member.GetPersonalizedName(player) + " has left the battle group.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    string msg = LanguageMgr.GetTranslation(member.Client.Account.Language, "Battlegroup.Guild.PlayerLeft", member.GetPersonalizedName(player));
+                    member.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 if (m_battlegroupMembers.Count == 1)
                 {

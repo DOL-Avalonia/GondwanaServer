@@ -1146,6 +1146,15 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("rates", "rp_worth_seconds", "Realm Points Worth Seconds - Edit this to change how many seconds until a player is worth RPs again after being killed ", 300)]
         public static int RP_WORTH_SECONDS;
 
+        /// <summary>
+        /// Pvp-rvr feature - Divide the time until a player is worth rps again after death
+        /// </summary>
+        [ServerProperty("rates", "rp_worth_seconds_pvpdivider", "Divider applied in PvP and RvR for Realm Points Worth Seconds deleay between kills ", 4)]
+        public static int RP_WORTH_SECONDS_PVPDIVIDER;
+
+        /// <summary>
+        /// Define Delay in minutes between each Vol
+        /// </summary>
         [ServerProperty("vol", "vol_delay", "Define Delay in minutes between each Vol.", 4)]
         public static int VOL_DELAY;
 
@@ -1728,8 +1737,17 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("pvp", "pvp_death_con_loss", "Loose con on pvp death on PvP servertype", true)]
         public static bool PVP_DEATH_CON_LOSS;
 
-        [ServerProperty("system", "reward_outlaw_head_gold", "The price in golds for the head of an outlaw", 50)]
+        /// <summary>
+        /// Base reward in gold for giving an outlaw's head to a guard
+        /// </summary>
+        [ServerProperty("system", "reward_outlaw_head_gold", "The price in golds for the head of an outlaw", 10)]
         public static int REWARD_OUTLAW_HEAD_GOLD;
+
+        /// <summary>
+        /// Caps the Assassination Kills Stats multiplier for Outlaw Head rewards.
+        /// </summary>
+        [ServerProperty("system", "reward_outlaw_head_max_stats_multiplier", "Max multiplier cap for assassination kills in the head reward formula", 50)]
+        public static int REWARD_OUTLAW_HEAD_MAX_STATS_MULTIPLIER;
 
         [ServerProperty("system", "is_reputation_recovery_activated", "Is Reputation recovery interval activated", true)]
         public static bool IS_REPUTATION_RECOVERY_ACTIVATED;

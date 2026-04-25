@@ -108,6 +108,15 @@ namespace DOL.GS.Commands
                         client.Out.SendCharStatsUpdate();
                         client.Out.SendPlayerTitles();
                         client.Out.SendQuestListUpdate();
+
+                        foreach (GamePlayer p in client.Player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                        {
+                            if (p == null) continue;
+
+                            client.Out.SendObjectRemove(p);
+                            client.Out.SendPlayerCreate(p);
+                            client.Out.SendLivingEquipmentUpdate(p);
+                        }
                         return;
                     }
                 #endregion set

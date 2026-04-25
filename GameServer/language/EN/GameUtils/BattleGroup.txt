@@ -1,0 +1,5 @@
+
+Battlegroup.Guild.YouJoin:          You join the battle group.
+Battlegroup.Guild.PlayerJoined:     {0} has joined the battle group.
+Battlegroup.Guild.YouLeave:         You leave the battle group.
+Battlegroup.Guild.PlayerLeft:       {0} has left the battle group.

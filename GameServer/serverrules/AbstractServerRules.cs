@@ -1711,7 +1711,7 @@ namespace DOL.GS.ServerRules
 
             if (IsInPvPArea(killedPlayer))
             {
-                noExpSeconds /= 4;
+                noExpSeconds /= Properties.RP_WORTH_SECONDS_PVPDIVIDER;
             }
 
             if (killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
@@ -2014,6 +2014,23 @@ namespace DOL.GS.ServerRules
         }
 
         /// <summary>
+        /// Centralized check to determine if a target's identity should be hidden from the source.
+        /// </summary>
+        public virtual bool IsPlayerNameHidden(GamePlayer source, GamePlayer target)
+        {
+            if (!Properties.HIDE_PLAYER_NAME) return false;
+
+            if (source == target) return false;
+
+            if (source.Client.Account.PrivLevel > 1 || target.Client.Account.PrivLevel > 1) return false;
+
+            if (source.SerializedAskNameList.Contains(target.Name)) return false;
+            if (source.SerializedFriendsList.Contains(target.Name)) return false;
+
+            return true;
+        }
+
+        /// <summary>
         /// Gets the player name based on server type
         /// </summary>
         /// <param name="source">The "looking" player</param>
@@ -2029,8 +2046,9 @@ namespace DOL.GS.ServerRules
         /// <returns>The Realmranktitle of the target</returns>
         public virtual string GetPlayerPrefixName(GamePlayer source, GamePlayer target)
         {
-            var language = source?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+            if (IsPlayerNameHidden(source, target)) return string.Empty;
 
+            var language = source?.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
             if (IsSameRealm(source, target, true) && target.RealmLevel >= 110)
                 return target.RealmRankTitle(language);
 
@@ -2045,6 +2063,8 @@ namespace DOL.GS.ServerRules
         /// <returns>The last name of the target</returns>
         public virtual string GetPlayerLastName(GamePlayer source, GamePlayer target)
         {
+            if (IsPlayerNameHidden(source, target)) return string.Empty;
+
             return target.LastName;
         }
 
@@ -2056,9 +2076,8 @@ namespace DOL.GS.ServerRules
         /// <returns>The guild name of the target</returns>
         public virtual string GetPlayerGuildName(GamePlayer source, GamePlayer target)
         {
-            if (Properties.HIDE_PLAYER_NAME &&
-                !source.SerializedAskNameList.Contains(target.Name))
-                return string.Empty;
+            if (IsPlayerNameHidden(source, target)) return string.Empty;
+
             return target.GuildName;
         }
 
@@ -2070,6 +2089,8 @@ namespace DOL.GS.ServerRules
         /// <returns>The custom title of the target</returns>
         public virtual string GetPlayerTitle(GamePlayer source, GamePlayer target)
         {
+            if (IsPlayerNameHidden(source, target)) return string.Empty;
+
             return target.CurrentTitle.GetValue(source, target);
         }
 

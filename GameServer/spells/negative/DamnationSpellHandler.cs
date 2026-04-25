@@ -27,6 +27,10 @@ namespace DOL.GS.Spells
         private const int SlashBuff = 5;
         private const int CrushBuff = 5;
 
+        private const int InternalEffectivenessBuff = 6;
+        private const int DISEASE_SUBSPELL_ID = 25296;
+        private const int DISEASE_PROC_CHANCE = 30;
+
         public DamnationSpellHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine)
         {
             Priority = 666;
@@ -38,7 +42,7 @@ namespace DOL.GS.Spells
         {
             if (living is not GamePlayer)
                 return 0;
-            
+
             switch (living.Race)
             {
                 case 1:
@@ -141,10 +145,10 @@ namespace DOL.GS.Spells
             {
                 return true;
             }
-            
+
             if (spellHandler!.HasPositiveOrSpeedEffect())
                 return true;
-            
+
             return base.PreventsApplication(self, other);
         }
 
@@ -168,10 +172,10 @@ namespace DOL.GS.Spells
 
             int harmvalue = (int)Spell.Value;
             living.TempProperties.setProperty("DamnationValue", harmvalue);
-            
+
             ApplyDebuffs(living);
             ApplyBuffs(living);
-            
+
             living.IsDamned = true;
             if (living is GamePlayer player)
             {
@@ -183,12 +187,13 @@ namespace DOL.GS.Spells
                 living.TempProperties.setProperty("OriginalModel", living.Model);
                 MessageToLiving(player, LanguageMgr.GetTranslation(player.Client, "Damnation.Self.Message2"), eChatType.CT_Spell);
             }
-            else if (living is GameNPC ncp && ncp.Brain is IOldAggressiveBrain aggroBrain)
+            else if (living is GameNPC npc && npc.Brain is IOldAggressiveBrain aggroBrain)
                 aggroBrain.AddToAggroList(Caster, 1);
-            
+
             base.OnEffectStart(effect);
 
             GameEventMgr.AddHandler(living, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(DamnationEventHandler));
+            GameEventMgr.AddHandler(living, GameLivingEvent.AttackedByEnemy, OnDamnedAttackedDiseaseProc);
 
             if (Caster is GamePlayer casterPlayer)
             {
@@ -207,6 +212,8 @@ namespace DOL.GS.Spells
 
             if (living is GamePlayer player)
             {
+                player.Out.SendUpdateWeaponAndArmorStats();
+                player.Out.SendStatusUpdate();
                 player.Out.SendCharResistsUpdate();
             }
         }
@@ -221,7 +228,50 @@ namespace DOL.GS.Spells
 
             if (living is GamePlayer player)
             {
+                player.Out.SendUpdateWeaponAndArmorStats();
+                player.Out.SendStatusUpdate();
                 player.Out.SendCharResistsUpdate();
+            }
+        }
+
+        /// <summary>
+        /// Chance to infect attackers with a disease, scaling with DamnationEffectEnhancement.
+        /// </summary>
+        protected virtual void OnDamnedAttackedDiseaseProc(DOLEvent e, object sender, EventArgs arguments)
+        {
+            if (arguments is not AttackedByEnemyEventArgs { AttackData: { } ad }) return;
+            var damnedPlayer = (GameLiving)sender;
+
+            if ((ad.Damage + ad.CriticalDamage) <= 0)
+                return;
+
+            if (ad.IsSuccessfulHit && (ad.IsMeleeAttack || ad.IsRangedAttack))
+            {
+                int damnationEnhancement = damnedPlayer.GetModified(eProperty.DamnationEffectEnhancement);
+                int totalProcChance = DISEASE_PROC_CHANCE + damnationEnhancement;
+
+                if (Util.Chance(totalProcChance))
+                {
+                    Spell disease = SkillBase.GetSpellByID(DISEASE_SUBSPELL_ID);
+                    if (disease == null)
+                    {
+                        var db = new DOL.Database.DBSpell
+                        {
+                            SpellID = DISEASE_SUBSPELL_ID,
+                            Name = "Damnation's Disease",
+                            Description = "Inflicts a wasting disease on the target that slows it, weakens it, and inhibits heal spells.",
+                            Type = "Disease",
+                            Target = "enemy",
+                            Damage = 30,
+                            DamageType = (int)eDamageType.Body,
+                            Duration = 20000
+                        };
+                        disease = new Spell(db, 50);
+                    }
+                    SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
+                    ISpellHandler h = ScriptMgr.CreateSpellHandler(damnedPlayer, disease, line);
+                    h?.StartSpell(ad.Attacker);
+                }
             }
         }
 
@@ -232,8 +282,17 @@ namespace DOL.GS.Spells
             living.BaseBuffBonusCategory[eProperty.Resist_Slash] += SlashBuff;
             living.BaseBuffBonusCategory[eProperty.Resist_Crush] += CrushBuff;
 
+            // Internael effectiveness buff enhanced with "DamnationEffectEnhancement"
+            int damnationEnhancement = living.GetModified(eProperty.DamnationEffectEnhancement);
+            double bonusMultiplier = (2.0 * damnationEnhancement) / 100.0;
+            double calculatedEffectiveness = InternalEffectivenessBuff + (bonusMultiplier * InternalEffectivenessBuff);
+            int totalInternalEffectivenessBuff = (int)Math.Ceiling(calculatedEffectiveness);
+            living.BuffBonusMultCategory1.Set((int)eProperty.LivingEffectiveness, this, 1.0 + (totalInternalEffectivenessBuff / 100.0));
+
             if (living is GamePlayer player)
             {
+                player.Out.SendUpdateWeaponAndArmorStats();
+                player.Out.SendStatusUpdate();
                 player.Out.SendCharResistsUpdate();
             }
         }
@@ -244,9 +303,12 @@ namespace DOL.GS.Spells
             living.BaseBuffBonusCategory[eProperty.Resist_Matter] -= MatterBuff;
             living.BaseBuffBonusCategory[eProperty.Resist_Slash] -= SlashBuff;
             living.BaseBuffBonusCategory[eProperty.Resist_Crush] -= CrushBuff;
+            living.BuffBonusMultCategory1.Remove((int)eProperty.LivingEffectiveness, this);
 
             if (living is GamePlayer player)
             {
+                player.Out.SendUpdateWeaponAndArmorStats();
+                player.Out.SendStatusUpdate();
                 player.Out.SendCharResistsUpdate();
             }
         }
@@ -314,6 +376,7 @@ namespace DOL.GS.Spells
         {
             GameLiving living = effect.Owner;
             GameEventMgr.RemoveHandler(living, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(DamnationEventHandler));
+            GameEventMgr.RemoveHandler(living, GameLivingEvent.AttackedByEnemy, OnDamnedAttackedDiseaseProc);
 
             RemoveDebuffs(living);
             RemoveBuffs(living);

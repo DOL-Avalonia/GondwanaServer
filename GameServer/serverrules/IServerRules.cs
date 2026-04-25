@@ -307,6 +307,11 @@ namespace DOL.GS.ServerRules
         byte GetLivingRealm(GamePlayer player, GameLiving target);
 
         /// <summary>
+        /// Centralized check to determine if a target's identity should be hidden from the source.
+        /// </summary>
+        bool IsPlayerNameHidden(GamePlayer source, GamePlayer target);
+
+        /// <summary>
         /// Gets the player name based on server type
         /// </summary>
         /// <param name="source">The "looking" player</param>

@@ -40,11 +40,34 @@ namespace AmteScripts.Managers
             }
         }
 
+        private static bool IsDungeonLocation(DBMinotaurRelic dbRelic)
+        {
+            var region = WorldMgr.GetRegion((ushort)dbRelic.SpawnRegion);
+            if (region == null) return false;
+            var zone = region.GetZone(dbRelic.SpawnX, dbRelic.SpawnY);
+            return zone != null && zone.IsDungeon;
+        }
+
         public static void OnServerStarted(DOLEvent e, object sender, EventArgs args)
         {
-            // Load only relics that were active in the current GvG cycle
-            var activeDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>()
-                                .Where(r => r.IsTerritoryRelic && r.relicTarget != "inactive" && !string.IsNullOrEmpty(r.relicTarget)).ToList();
+            var allDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>()
+                        .Where(r => r.IsTerritoryRelic).ToList();
+
+            foreach (var dbRelic in allDbRelics)
+            {
+                if (!string.IsNullOrEmpty(dbRelic.ProtectorClassType))
+                {
+                    if (MobGroupManager.Instance.Groups.TryGetValue(dbRelic.ProtectorClassType, out MobGroup group))
+                    {
+                        foreach (var npc in group.NPCs)
+                        {
+                            npc.RemoveFromWorld();
+                        }
+                    }
+                }
+            }
+
+            var activeDbRelics = allDbRelics.Where(r => r.relicTarget != "inactive" && !string.IsNullOrEmpty(r.relicTarget)).ToList();
 
             foreach (var dbRelic in activeDbRelics)
             {
@@ -161,7 +184,32 @@ namespace AmteScripts.Managers
             if (allDbRelics.Count == 0) return;
 
             int relicsToSpawn = Properties.GVG_RELICS_PER_CYCLE > 0 ? Properties.GVG_RELICS_PER_CYCLE : 2;
-            var shuffled = allDbRelics.OrderBy(x => Util.Random(1000)).Take(relicsToSpawn).ToList();
+
+            var dungeonRelics = allDbRelics.Where(r => IsDungeonLocation(r)).ToList();
+            var overworldRelics = allDbRelics.Where(r => !IsDungeonLocation(r)).ToList();
+
+            int targetDungeonSpawns = relicsToSpawn / 2;
+            int targetOverworldSpawns = relicsToSpawn - targetDungeonSpawns;
+
+            if (targetDungeonSpawns > dungeonRelics.Count)
+            {
+                targetDungeonSpawns = dungeonRelics.Count;
+                targetOverworldSpawns = relicsToSpawn - targetDungeonSpawns;
+            }
+            else if (targetOverworldSpawns > overworldRelics.Count)
+            {
+                targetOverworldSpawns = overworldRelics.Count;
+                targetDungeonSpawns = relicsToSpawn - targetOverworldSpawns;
+            }
+
+            var shuffledDungeon = dungeonRelics.OrderBy(x => Util.Random(1000)).Take(targetDungeonSpawns).ToList();
+            var shuffledOverworld = overworldRelics.OrderBy(x => Util.Random(1000)).Take(targetOverworldSpawns).ToList();
+
+            var shuffled = new List<DBMinotaurRelic>();
+            shuffled.AddRange(shuffledDungeon);
+            shuffled.AddRange(shuffledOverworld);
+            shuffled = shuffled.OrderBy(x => Util.Random(1000)).ToList();
+
             var newActiveIds = shuffled.Select(r => r.RelicID).ToList();
             var eventsToBroadcast = new List<KeyValuePair<string, string>>();
 

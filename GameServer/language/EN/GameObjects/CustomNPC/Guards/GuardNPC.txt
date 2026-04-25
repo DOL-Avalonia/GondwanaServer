@@ -10,4 +10,9 @@ GuardNPC.Response.Nobodywanted:			No one is currently wanted.
 GuardNPC.Response.Blacklist:			The following people are blacklisted:
 GuardNPC.Response.Dontknow:				Hmm, maybe... no, that doesn't remind me of anything!
 GuardNPC.Response.Rottenhead:			That head looks completely rotten, I cannot recognize it!
-GuardNPC.Response.Headreward:			Thank you for your precious help, here is {0} gold coins for you!
+GuardNPC.Response.Headreward1:			Thank you for your precious help, here is {0} gold coins for you!
+GuardNPC.Response.Headreward2:			Thank you for your precious help, here is {0} gold coins for you
+GuardNPC.Response.HeadrewardBounty:		and {0} Bounty Points!
+GuardNPC.Response.GoldReward:			{0} gold
+GuardNPC.Response.BPReward:				, {0} bounty points
+GuardNPC.Response.WantedReward:			{0} - Wanted / Reward: {1}

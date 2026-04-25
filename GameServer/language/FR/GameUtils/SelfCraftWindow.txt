@@ -1,0 +1,3 @@
+
+Selfcraftwindow.CannotRepair:       Vous ne pouvez pas réparer d'objets lors d'un artisanat personnel !
+Selfcraftwindow.CombineAutoset:     L'option de combinaison est automatique lors d'un artisanat personnel !

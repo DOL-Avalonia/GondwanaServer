@@ -95,3 +95,42 @@ Language.SpellTarget.Corpse:					cadavre
 Language.SpellTarget.Unknown:					cible inconnue
 
 Language.InternalError:							Une erreur serveur est survenue lors de l'éxécution de cette action ; veuillez contacter le staff du serveur.
+
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Bienvenue sur Arcanum, un monde forgé dans les cendres de la Grande Guerre Magique ! Dans ce royaume immersif RP/PvP, des royaumes fracturés luttent pour leur survie tandis que les Guildes dictent la loi. Veuillez consulter les règles sacrées et celles du serveur sur www.arcanum-server.com. Aiguisez vos lames, préparez vos sorts, et profitez de votre aventure sur Arcanum !
+ServerRPGMessage.Lore1:					Bienvenue sur Arcanum !
+ServerRPGMessage.Lore2:					Il y a deux mille ans, Arcanum était un réseau étincelant de citadelles volantes et de forges de mana. Puis vint la Grande Guerre Magique. Les continents furent déchirés, laissant un monde meurtri et aminci. De ces ruines, trois royaumes se sont élevés : Valeria, Skeldheim et Sylvaris. Aujourd'hui, les rois gouvernent sur le papier, mais ce sont les Guildes qui dirigent véritablement ces terres fracturées, tandis que les hors-la-loi bâtissent leurs propres empires dans le sombre Souterrain. Choisissez votre voie avec sagesse.
+ServerRPGMessage.FeaturesHeader:		--------- FONCTIONNALITÉS DU SERVEUR ---------
+ServerRPGMessage.FeatureEvents1:		[Événements Dynamiques & Quêtes]
+ServerRPGMessage.FeatureEvents2:		Participez à des événements modifiant le monde et à des chasses de boss légendaires.
+ServerRPGMessage.FeatureGvG1:			[Guilde contre Guilde (GvG)]
+ServerRPGMessage.FeatureGvG2:			Capturez des Territoires et Sous-territoires. Saisissez de puissantes Reliques pour accorder à votre guilde des bonus de combat massifs.
+ServerRPGMessage.FeatureDungeons1:		[Exploration de Donjons]
+ServerRPGMessage.FeatureDungeons2:		Bravez les profondeurs du Souterrain, le labyrinthe de DarkSpire, ou le périlleux Voile (Veil Rift).
+ServerRPGMessage.FeaturePvP1:			[Joueur contre Joueur (PvP)]
+ServerRPGMessage.FeaturePvP2:			Participez à des modes PvP épiques incluant Match à mort, Capture de Drapeau, Roi de la Colline, Course au Noyau (Core Run), et Risque Biologique (Biohazard).
+ServerRPGMessage.FeatureRenaissance1:	[Renaissance]
+ServerRPGMessage.FeatureRenaissance2:	Les légendes racontent que ceux qui atteignent le sommet de leur périple peuvent entreprendre une épreuve périlleuse pour renaître. Recommencez à zéro, mais éveillez-vous avec un pouvoir latent quasi-divin pour vaincre des ennemis encore plus redoutables.
+ServerRPGMessage.FeatureAFK1:			[Entraînement AFK Dynamique]
+ServerRPGMessage.FeatureAFK2:			Occupé dans le monde réel ? Utilisez des jetons spéciaux gagnés en PvP et lors de quêtes pour entraîner votre personnage pendant votre absence. Placez-vous devant un pantin d'entraînement dans n'importe quelle ville et tapez '/afk xp' ou '/afk combat' pour gagner de l'expérience de combat !
+ServerRPGMessage.FeatureBanker1:		[Le Banquier]
+ServerRPGMessage.FeatureBanker2:		Ciblez un banquier et murmurez 'retirer de l'argent', 'faire un chèque', 'encaisser un chèque' ou 'dépôts à terme' pour gérer votre richesse. Vous pouvez aussi automatiser le paiement du loyer de votre maison.
+ServerRPGMessage.FeatureGuildCreation1:	[Nouveau système de Création de Guilde]
+ServerRPGMessage.FeatureGuildCreation2:	Achetez un parchemin vierge, utilisez '/book create <Nom>' et '/book write' pour rassembler vos fondateurs, puis apportez-le au Trésorier Royal pour le faire tamponner.
+ServerRPGMessage.FeatureGuildLeveling1:	[Niveaux de Guilde]
+ServerRPGMessage.FeatureGuildLeveling2:	Les guildes montent en niveau dynamiquement ! Débloquez de nouvelles commandes en évoluant et renforcez vos territoires.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrénaline]
+ServerRPGMessage.FeatureAdrenaline2:	Faites monter la tension de combat en PvE et PvP pour déclencher des avantages tactiques dévastateurs.
+ServerRPGMessage.ServerCommandsHeader:	--------- NOUVELLES COMMANDES SERVEUR ---------
+ServerRPGMessage.CmdLanguage:			/autotranslate <on|off> & /language : Traduisez le chat et changez la langue de votre client.
+ServerRPGMessage.CmdMarket:				/market <open|close|name> : Déployez, renommez ou fermez votre marché personnel.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto> : Automatisez votre file d'attente d'artisanat et achetez facilement les ingrédients manquants directement aux marchands.
+ServerRPGMessage.CmdVol:				/vol ou /steal <joueur> : Utilisez vos crochets pour voler des pièces ou de précieuses Reliques de Territoire aux joueurs rivaux !
+ServerRPGMessage.GuildCommandsHeader:	--------- NOUVELLES COMMANDES DE GUILDE ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Affichez les cartes et statuts GvG.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Ouvrez un portail directement vers vos terres revendiquées.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Créez une zone de combat PvP temporaire.
+ServerRPGMessage.GCJail:				/gc jailrelease <nom> : Payez une caution pour libérer un membre de votre guilde de prison.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Activez/désactivez les paiements automatiques du loyer de la maison de guilde.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Achetez et déployez des bannières tactiques pour améliorer vos membres ou les gardes de votre territoire.
+ServerRPGMessage.Outro:					Bonne chance, et que votre héritage sur Arcanum soit légendaire !

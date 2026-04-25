@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
 using DOL.Events;
 using DOL.GS.PacketHandler;
+using DOL.Language;
+using System;
 
 namespace DOL.GS
 {
@@ -85,27 +86,33 @@ namespace DOL.GS
             GameLiving target = (TargetObject as GameLiving);
             if (target == null)
             {
-                Owner.SendMessage("Select a target first.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                if (Owner is GamePlayer p)
+                    Owner.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "GameSiegeWeapon.Ram.SelectTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             //todo good  distance check
             if (!this.IsWithinRadius(target, AttackRange))
             {
-                Owner.SendMessage("You are too far away to attack " + target.Name, eChatType.CT_System,
-                                      eChatLoc.CL_SystemWindow);
+                if (Owner is GamePlayer p)
+                    Owner.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "GameSiegeWeapon.Ram.TooFar", target.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             int damageAmount = RamDamage;
 
             //TODO: dps change by number
             target.TakeDamage(this, eDamageType.Crush, damageAmount, 0);
-            Owner.SendMessage("The Ram hits " + target.Name + " for " + damageAmount + " dmg!", eChatType.CT_YouHit,
-                                  eChatLoc.CL_SystemWindow);
+
+            if (Owner is GamePlayer ownerPlayer)
+            {
+                Owner.SendMessage(LanguageMgr.GetTranslation(ownerPlayer.Client.Account.Language, "GameSiegeWeapon.Ram.YouHit", target.Name, damageAmount), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+            }
+
             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
             {
                 if (!(Owner == player))
                 {
-                    player.MessageFromArea(this, player.GetPersonalizedName(this) + " hits " + player.GetPersonalizedName(target), eChatType.CT_OthersCombat, eChatLoc.CL_SystemWindow);
+                    string msg = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameSiegeWeapon.Ram.HitObserver", player.GetPersonalizedName(this), player.GetPersonalizedName(target));
+                    player.MessageFromArea(this, msg, eChatType.CT_OthersCombat, eChatLoc.CL_SystemWindow);
                 }
             }
             base.DoDamage();

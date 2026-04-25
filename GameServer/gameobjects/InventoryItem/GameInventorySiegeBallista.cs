@@ -72,7 +72,9 @@ namespace DOL.GS
             bal.Level = Convert.ToByte(Level);
             bal.Name = Name;
             bal.Model = (ushort)Model;
+            bal.CurrentRegion = player.CurrentRegion;
             bal.Position = player.Position;
+            bal.Heading = player.Heading;
             bal.Realm = player.Realm;
             bal.AddToWorld();
 

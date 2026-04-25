@@ -6,12 +6,12 @@ Commands.Players.Bountyrent.InHouseError:			Vous devez être dans votre maison p
 Commands.Players.Bountyrent.NoPayRentPerm:			Vous n'avez pas la permission d'utiliser /bountyrent ici !
 Commands.Players.Bountyrent.NoHouseError:			Vous ne possédez pas de maison !
 Commands.Players.Bountyrent.NotAHouseGuildLeader:	Cette maison n'appartient pas à une guilde dont vous êtes le chef!
-Commands.Players.Bountyrent.NotEnoughBp:			Vous ne disposez pas d'assez de primes de royaume !
-Commands.Players.Bountyrent.NotEnoughGuildBp:		Votre guilde ne dispose pas d'assez de primes de royaume !
+Commands.Players.Bountyrent.NotEnoughBp:			Vous ne disposez pas d'assez de points de prime !
+Commands.Players.Bountyrent.NotEnoughGuildBp:		Votre guilde ne dispose pas d'assez de points de prime !
 Commands.Players.Bountyrent.RangeOfAHouse:			Vous devez être à portée d'une maison pour utiliser la commande /bountyrent.
 Commands.Players.Bountyrent.ToManyMoney:			C'est davantage d'argent que ce que peut contenir le coffre-fort ! Dépôt annulé.
-Commands.Players.Bountyrent.Usage:					'/bountyrent <personal|guild> <montant>' # Pour payer votre loyer avec vos primes de royaume.
-Commands.Players.Bountyrent.YouSpendGuild:			Vous avez dépensé {0} primes de royaume de guide 
+Commands.Players.Bountyrent.Usage:					'/bountyrent <personal|guild> <montant>' # Pour payer votre loyer avec vos points de prime.
+Commands.Players.Bountyrent.YouSpendGuild:			Vous avez dépensé {0} points de prime de guide 
 afin de payer l'équivalent de {1} pièces d'or de loyer.
-Commands.Players.Bountyrent.YouSpend:				Vous avez dépensé {0} primes de royaume personnelles 
+Commands.Players.Bountyrent.YouSpend:				Vous avez dépensé {0} points de prime personnelles 
 afin de payer l'équivalent de {1} pièces d'or de loyer.

@@ -1,3 +1,4 @@
+
 # LANGUAGEMGR
 System.LanguagesName.EN:					English
 System.LanguagesName.FR:					French
@@ -93,9 +94,6 @@ Language.SpellTarget.Area:						area
 Language.SpellTarget.Corpse:					corpse
 Language.SpellTarget.Unknown:					unknown target
 
-Language.InternalError:							A server error has occured while trying to complete this action; please contact server staff.
-
-
 # /horse
 HorseEmote.graze.NoTargetToOthers:				{0} lets {1} mount graze.
 HorseEmote.graze.NoTargetToSource:				You let your mount graze.
@@ -107,3 +105,44 @@ HorseEmote.trick.ToOthers:					{0} stands on {2} mount to impress {1}.
 HorseEmote.trick.ToSource:					You stand on your mount to impress {0}.
 HorseEmote.trick.NoTargetToOthers:				{0} stands on {1} mount to impress everyone.
 HorseEmote.trick.NoTargetToSource:				You stand on your mount to impress everyone.
+
+Language.InternalError:							A server error has occured while trying to complete this action; please contact server staff.
+
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Welcome to Arcanum, a world forged from the ashes of the Great Magical War! In this immersive RP/PvP realm, fractured kingdoms vie for survival while Guilds dictate the law. Please consult the sacred tenets and server rules at www.arcanum-server.com. Sharpen your blades, ready your spells, and enjoy your journey in Arcanum!
+ServerRPGMessage.Lore1:					Welcome to Arcanum !
+ServerRPGMessage.Lore2:					Two thousand years ago, Arcanum was a shining lattice of floating citadels and mana forges. Then came the Great Magical War. Continents were torn apart, leaving a world scarred and thinned. From this wreckage, three realms rose: Valeria, Skeldheim, and Sylvaris. Today, kings rule on paper, but it is the Guilds that truly govern the fractured lands, while outlaws carve their own empires in the dark Underground. Choose your path wisely.
+ServerRPGMessage.FeaturesHeader:		--------- SERVER FEATURES ---------
+ServerRPGMessage.FeatureEvents1:		[Dynamic Events & Quests]
+ServerRPGMessage.FeatureEvents2:		Participate in world-altering events and legendary boss hunts.
+ServerRPGMessage.FeatureGvG1:			[Guild vs Guild (GvG)]
+ServerRPGMessage.FeatureGvG2:			Capture Territories and Subterritories. Seize powerful Relics to grant your guild massive combat bonuses.
+ServerRPGMessage.FeatureDungeons1:		[Dungeon Exploration]
+ServerRPGMessage.FeatureDungeons2:		Brave the deep Underground, the labyrinthine DarkSpire, or the perilous Veil Rift.
+ServerRPGMessage.FeaturePvP1:			[Player vs Player (PvP)]
+ServerRPGMessage.FeaturePvP2:			Engage in epic PvP modes including Deathmatch, Capture the Flag, King of the Hill, Core Run, and Biohazard.
+ServerRPGMessage.FeatureRenaissance1:	[Renaissance]
+ServerRPGMessage.FeatureRenaissance2:	Legends say those who reach the pinnacle of their journey may undertake a perilous trial to be reborn. Start anew, but awaken with latent, god-like power to conquer even greater foes.
+ServerRPGMessage.FeatureAFK1:			[Dynamic AFK Training]
+ServerRPGMessage.FeatureAFK2:			Busy in the real world? Use special tokens earned from PvP and quests to train your character while away. Stand before a training dummy in any city and type '/afk xp' or '/afk combat' to gain combat experience!
+ServerRPGMessage.FeatureBanker1:		[The Banker]
+ServerRPGMessage.FeatureBanker2:		Target a banker and whisper 'withdraw money', 'write a check', 'cash a check', or 'term deposits' to manage your wealth. You can also automate house rent payments.
+ServerRPGMessage.FeatureGuildCreation1:	[New Guild Creation system]
+ServerRPGMessage.FeatureGuildCreation2:	Buy a blank scroll, use '/book create <Name>' and '/book write' to gather founders, then bring it to the Royal Treasury Clerk to get it stamped.
+ServerRPGMessage.FeatureGuildLeveling1:	[Guild Leveling]
+ServerRPGMessage.FeatureGuildLeveling2:	Guilds level up dynamically! Unlock new commands as you grow and strenghten your territories.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenaline]
+ServerRPGMessage.FeatureAdrenaline2:	Build combat tension in PvE and PvP to unleash devastating tactical advantages.
+ServerRPGMessage.ServerCommandsHeader:	--------- NEW SERVER COMMANDS ---------
+ServerRPGMessage.CmdLanguage:			/autotranslate <on|off> & /language: Translate chat and change your client's language.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Deploy, rename, or close your personal market.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automate your crafting queue and easily buy missing recipe ingredients directly from merchants.
+ServerRPGMessage.CmdVol:				/vol or /steal <player>: Use your lockpicks to steal coin or precious Territory Relics from rival players!
+ServerRPGMessage.GuildCommandsHeader:	--------- NEW GUILD COMMANDS ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : View GvG maps and statuses.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Open a portal directly to your claimed lands.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Create a temporary PvP combat zone.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Pay bail to release a guildmate from prison.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Toggle automatic guild house rent payments.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Buy and deploy tactical banners to buff your members or territory guards.
+ServerRPGMessage.Outro:					Good luck, and may your legacy in Arcanum be legendary!

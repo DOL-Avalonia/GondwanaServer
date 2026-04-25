@@ -16,3 +16,9 @@ GameTrainer.ReceiveItem.RespecRealm:				Thanks, I added a realm respec to use /r
 GameTrainer.ReceiveItem.RespecSingle:				Thanks, I added a single spec respec to use /respec <linename>
 GameTrainer.Train.WouldYouLikeTo:					Would you like to do some training?
 GameTrainer.Train.SeekElsewhere:					You must seek elsewhere for your training.
+GameTrainer.PromotePlayer.TokenLookOver:			{0} looks you over. "If you strip any tokens of valor from the corpses of beasts or fallen foes, bring them to me. I will ensure your experience and realm standing are properly recognized."
+GameTrainer.PromotePlayer.TokenEagerness:			{0} smiles gently. "It is good to see such eagerness, {1}, but you must crawl before you run. Focus on your fundamental training for now. Once you have grown stronger, I may gladly accept these if you become one of my trainees."
+GameTrainer.PromotePlayer.TokenOnlyStudents:		{0} shakes their head. "I only accept tokens of valor from my own fully-trained students. Seek your class trainer, or a Master Trainer."
+GameTrainer.PromotePlayer.TokenPvE:					{0} inspects the token closely. "The dark blood of monsters stains this coin. Well fought, {1}! Your skills sharpen with every beast slain."
+GameTrainer.PromotePlayer.TokenPvPGvG:				{0} salutes you. "You bring honor to our realm, {1}. The gods reward your valor!"
+GameTrainer.PromotePlayer.TokenCannotGrant:			{0} shakes his head. "I cannot grant you anything for this right now."

@@ -22,7 +22,7 @@ namespace DOL.Database
     [DataTable(TableName = "Coffre")]
     public class DBCoffre : DataObject
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
@@ -39,6 +39,16 @@ namespace DOL.Database
             {
                 i++;
                 GameCoffre coffre = new GameCoffre();
+
+                if (obj.Name.StartsWith("Catapult_Backbone"))
+                {
+                    coffre = new GameStaticCatapult();
+                }
+                else
+                {
+                    coffre = new GameCoffre();
+                }
+
                 coffre.LoadFromDatabase(obj);
 
                 if (obj.EventID == null)

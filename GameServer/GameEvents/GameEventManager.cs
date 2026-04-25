@@ -51,32 +51,23 @@ namespace DOL.GameEvents
         public IEnumerable<GameEvent> RunningEvents { get => Events.Values.Where(ev => ev.IsRunning);  }
 
         private Dictionary<IArea, List<GameEvent>> _areaEvents = new();
-        
         private List<GameEvent> _timeStartEvents = new();
-        
         private List<GameEvent> _timeEndEvents = new();
-        
         private List<GameEvent> _timeChanceEvents = new();
-        
+        private List<GameEvent> _onetimeEvents = new();
+
         private Dictionary<string, List<GameEvent>> _groupKillEvents = new();
-        
         private Dictionary<string, List<GameEvent>> _questEvents = new();
-        
         private Dictionary<string, List<GameEvent>> _eventRelations = new();
-        
         private Dictionary<InstancedConditionTypes, List<GameEvent>> _instancedEvents = new();
 
         public IDictionary<IArea, List<GameEvent>> AreaEvents => _areaEvents;
-
         public IEnumerable<GameEvent> TimeStartEvents => _timeStartEvents;
-
         public IEnumerable<GameEvent> TimeEndEvents => _timeEndEvents;
-
         public IEnumerable<GameEvent> TimeChanceEvents => _timeChanceEvents;
-
         public IEnumerable<GameEvent> GroupKillEvents => _groupKillEvents!.Values.SelectMany(l => l);
-
         public IEnumerable<GameEvent> QuestEvents => _questEvents!.Values.SelectMany(l => l);
+        public IEnumerable<GameEvent> OnetimeEvents => _onetimeEvents;
 
         public IDictionary<string, List<GameEvent>> EventRelations => _eventRelations;
 
@@ -324,6 +315,9 @@ namespace DOL.GameEvents
                         break;
                     case StartingConditionType.Switch:
                         break;
+                    case StartingConditionType.Onetime:
+                        Instance._onetimeEvents.Add(newEvent);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -379,6 +373,17 @@ namespace DOL.GameEvents
 
             CreateMissingRelationObjects(Instance.Events.Values.Select(ev => ev.ID));
             Instance.timer = new System.Threading.Timer(Instance.TimeCheck, Instance, Instance.dueTime, Instance.period);
+
+            // Evaluate and start uncompleted Onetime events
+            foreach (var ev in Instance._onetimeEvents.Where(e => !e.IsCompleted))
+            {
+                bool isChained = Instance.Events.Values.Any(e => e.EndActionStartEventID == ev.ID);
+
+                if (!isChained || ev.StartedTime.HasValue)
+                {
+                    Task.Run(() => ev.Start());
+                }
+            }
             GameEventMgr.Notify(GameServerEvent.GameEventLoaded);
         }
 
@@ -685,6 +690,19 @@ namespace DOL.GameEvents
             if (resetIds.Any())
             {
                 log.Info(string.Format("Event Reset called by Event {0}, Reset events are : {1}", id, string.Join(",", resetIds)));
+
+                foreach (var resetId in resetIds)
+                {
+                    var ev = GetEventByID(resetId);
+                    if (ev != null && ev.StartConditionType == StartingConditionType.Onetime)
+                    {
+                        bool isChained = Instance.Events.Values.Any(e => e.EndActionStartEventID == ev.ID);
+                        if (!isChained)
+                        {
+                            Task.Run(() => ev.Start());
+                        }
+                    }
+                }
             }
             else
             {
@@ -806,8 +824,25 @@ namespace DOL.GameEvents
 
         private IEnumerable<string> SearchDependencies(GameEvent ev)
         {
-            var events = Instance.Events.Values.Where(e => e.EndActionStartEventID?.Equals(ev.ID) == true).Select(e => e.ID).Concat(ev.EventFamily.Select(c => c.EventID));
-            return events;
+            if (ev.StartConditionType == StartingConditionType.Onetime)
+            {
+                List<string> deps = new List<string>();
+
+                if (!string.IsNullOrEmpty(ev.EndActionStartEventID))
+                    deps.Add(ev.EndActionStartEventID);
+
+                if (!string.IsNullOrEmpty(ev.ResetEventId))
+                    deps.Add(ev.ResetEventId);
+
+                deps.AddRange(ev.EventFamily.Select(c => c.EventID));
+
+                return deps;
+            }
+            else
+            {
+                var events = Instance.Events.Values.Where(e => e.EndActionStartEventID?.Equals(ev.ID) == true).Select(e => e.ID).Concat(ev.EventFamily.Select(c => c.EventID));
+                return events;
+            }
         }
         
         public void StartEvent(GameEvent gameEvent, GamePlayer? triggerPlayer = null)

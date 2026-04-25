@@ -134,6 +134,56 @@ namespace DOL.GS
             return player.CharacterClass.ID == (int)TrainedClass || TrainedClass == eCharacterClass.Unknown;
         }
 
+        #region Token Logic Gatekeepers
+        /// <summary>
+        /// Checks if this specific trainer should handle tokens for this specific player.
+        /// </summary>
+        protected virtual bool CanHandleTokens(GamePlayer player)
+        {
+            if (player.Level <= 5 && !player.IsRenaissance)
+                return false;
+
+            if (this.TrainedClass == eCharacterClass.Unknown)
+                return true;
+
+            if (IsBaseClass(this.TrainedClass))
+                return false;
+
+            if (player.CharacterClass.ID == (int)this.TrainedClass)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Helper to determine if a class is a Base Class
+        /// </summary>
+        protected virtual bool IsBaseClass(eCharacterClass characterClass)
+        {
+            switch (characterClass)
+            {
+                case eCharacterClass.Acolyte:
+                case eCharacterClass.AlbionRogue:
+                case eCharacterClass.Disciple:
+                case eCharacterClass.Elementalist:
+                case eCharacterClass.Fighter:
+                case eCharacterClass.Forester:
+                case eCharacterClass.Guardian:
+                case eCharacterClass.Mage:
+                case eCharacterClass.Magician:
+                case eCharacterClass.MidgardRogue:
+                case eCharacterClass.Mystic:
+                case eCharacterClass.Naturalist:
+                case eCharacterClass.Seer:
+                case eCharacterClass.Stalker:
+                case eCharacterClass.Viking:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        #endregion Token Logic Gatekeepers
+
         /// <summary>
         /// Interact with trainer
         /// </summary>
@@ -145,6 +195,11 @@ namespace DOL.GS
 
             // Turn to face player
             TurnTo(player, 10000);
+
+            if (CanHandleTokens(player))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.PromotePlayer.TokenLookOver", Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+            }
 
             // Unknown class must be used for multitrainer
             if (CanTrain(player))
@@ -264,7 +319,7 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// For Recieving Respec Stones.
+        /// For Recieving Tokens and Respec Stones.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="item"></param>
@@ -276,6 +331,26 @@ namespace DOL.GS
             GamePlayer player = source as GamePlayer;
             if (player != null)
             {
+                if (item.Id_nb.StartsWith("TaskToken_PvE") || item.Id_nb.StartsWith("TaskToken_PvPGvG"))
+                {
+                    if (CanHandleTokens(player))
+                    {
+                        return HandleTaskToken(player, item);
+                    }
+                    else
+                    {
+                        if (player.Level <= 5 && !player.IsRenaissance && !IsBaseClass(this.TrainedClass))
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.PromotePlayer.TokenEagerness", Name, player.Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                        }
+                        else if (!IsBaseClass(this.TrainedClass))
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.PromotePlayer.TokenOnlyStudents", Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                        }
+                        return false;
+                    }
+                }
+
                 switch (item.Id_nb)
                 {
                     case "respec_single":
@@ -306,6 +381,51 @@ namespace DOL.GS
             }
             return base.ReceiveItem(source, item);
         }
+
+        #region Task Tokens Handler
+        protected virtual bool HandleTaskToken(GamePlayer player, InventoryItem item)
+        {
+            int indexOfEnd = item.Id_nb.LastIndexOf('_');
+            if (indexOfEnd == -1)
+            {
+                return false;
+            }
+
+            string end = item.Id_nb.Substring(indexOfEnd + 1);
+            int level = 1;
+            if (end.StartsWith("lv"))
+            {
+                if (!Int32.TryParse(end.Substring(2), out level))
+                {
+                    return false;
+                }
+            }
+
+            bool success = false;
+
+            if (item.Id_nb.StartsWith("TaskToken_PvE"))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.PromotePlayer.TokenPvE", Name, player.Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                success = TaskMaster.GrantTaskExperience(player, level);
+            }
+            else if (item.Id_nb.StartsWith("TaskToken_PvPGvG"))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.PromotePlayer.TokenPvPGvG", Name, player.Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                success = TaskMaster.GrantTaskRealmPoints(player, level);
+            }
+
+            if (success)
+            {
+                player.Inventory.RemoveItem(item);
+                return true;
+            }
+            else
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.PromotePlayer.TokenCannotGrant", Name), eChatType.CT_Say, eChatLoc.CL_PopupWindow);
+                return true;
+            }
+        }
+        #endregion Task Tokens Handler
 
         public void PromotePlayer(GamePlayer player)
         {
@@ -422,7 +542,7 @@ namespace DOL.GS
         {
             if (CanTrainChampionLevels(player) == false)
             {
-                SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.Train.SeekElsewhere"));
+                _ = SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.Train.SeekElsewhere"));
             }
         }
 
@@ -432,7 +552,7 @@ namespace DOL.GS
         /// <param name="player"></param>
         protected virtual void OfferTraining(GamePlayer player)
         {
-            SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.Train.WouldYouLikeTo"));
+            _ = SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameTrainer.Train.WouldYouLikeTo"));
         }
 
         /// <summary>

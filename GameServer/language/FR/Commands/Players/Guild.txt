@@ -56,8 +56,8 @@ Commands.Players.Guild.Banner.BuyPrice:             Vous devez payer la somme de
 Commands.Players.Guild.Banner.LostMinutes           Votre bannière a été prise par l'ennemi. Vous devez attendre {0} minute(s) !
 Commands.Players.Guild.Banner.LostHours:            Votre bannière a été prise par l'ennemi. Vous devez attendre {0} Heure(s) !
 Commands.Players.Guild.BuffActivated:			    {0} a activé une Amélioration de Guilde : "{1}" ayant coûté {2} Points de Mérite.
-Commands.Players.Guild.BuffBountyPoints:		    Votre guilde gagnera maintenant 5 % aux primes de royaume de plus pendant 6 heures !
-Commands.Players.Guild.BuffBPActivated:		    [Guild Buff] Votre guilde recevra un bonus aux primes de royaume pendant 6 heures !
+Commands.Players.Guild.BuffBountyPoints:		    Votre guilde gagnera maintenant 5 % aux points de prime de plus pendant 6 heures !
+Commands.Players.Guild.BuffBPActivated:		    [Guild Buff] Votre guilde recevra un bonus aux points de prime pendant 6 heures !
 Commands.Players.Guild.BuffMPActivated:		    [Guild Buff] Votre guilde recevra un bonus aux points de mérite de guilde pendant 6 heures !
 Commands.Players.Guild.BuffRealmPoints:		    Votre guilde gagnera maintenant 5 % de points de royaume en plus pendant 6 heures !
 Commands.Players.Guild.ClaimNotNear:			    Vous devez être près du Lord pour revendiquer ce fort.
@@ -154,7 +154,7 @@ Commands.Players.Guild.Help.GuildGMRemovePlayer:	'/gc removeplayer <nom de joueu
 Commands.Players.Guild.Help.GuildGMRename:		'/gc rename <ancien nom> to <nouveau nom>' # Renomme une guilde <ancien nom> <nouveau nom>.
 Commands.Players.Guild.Help.GuildGMRealmPoints:		'/gc realmpoints <set|add|remove> <montant> <guilde>' # Change les points de royaume d'une guilde
 Commands.Players.Guild.Help.GuildGMMeritPoints:		'/gc meritpoints <set|add|remove> <montant> <guilde>' # Change les points de mérite d'une guilde
-Commands.Players.Guild.Help.GuildGMBountyPoints:	'/gc bountypoints <set|add|remove> <montant> <guilde>' # Change les points de butin d'une guilde
+Commands.Players.Guild.Help.GuildGMBountyPoints:	'/gc bountypoints <set|add|remove> <montant> <guilde>' # Change les points de prime d'une guilde
 Commands.Players.Guild.Help.GuildRename:		'/gc rename <new name>' # Renomme votre guilde <new name>.
 Commands.Players.Guild.Help.GuildInfo:			'/gc info' # Liste les informations à propos de cette guilde.
 Commands.Players.Guild.Help.GuildInvite:			'/gc invite <nom de joueur>' # Invite un joueur à rejoindre la guilde.
@@ -290,7 +290,7 @@ Commands.Players.Guild.HouseRentToggled:		Le paiement automatique du loyer de gu
 
 Commands.Players.Guild.RealmPointsSet:			La guilde {0} a maintenant {1} points de royaume.
 Commands.Players.Guild.MeritPointsSet:			La guilde {0} a maintenant {1} points de mérite.
-Commands.Players.Guild.BountyPointsSet:			La guilde {0} a maintenant {1} points de butin.
+Commands.Players.Guild.BountyPointsSet:			La guilde {0} a maintenant {1} points de prime.
 
 Commands.Players.Guild.JailRelease.NoGuild:				Vous devez faire partie d'une guilde pour utiliser cette commande.
 Commands.Players.Guild.JailRelease.GuildTooLow:			Votre guilde n'est pas assez haut niveau pour utiliser cette commande.
@@ -368,7 +368,7 @@ Commands.Players.Guild.Territories.DailyRent:			Total de la taxe horaire : {0} O
 Commands.Players.Guild.Territories.DailyMeritPoints:	Total des points de mérite horaires : {0}
 Commands.Players.Guild.Territories.TimeBeforeRent:		Temps restant avant paiement des loyers : {0}
 Commands.Players.Guild.Territories.TotalXPBonus:		Bonus total d'expérience : {0:0}%
-Commands.Players.Guild.Territories.TotalBPBonus:		Bonus total de points de butin pour mobs Nv65+ : {0}
+Commands.Players.Guild.Territories.TotalBPBonus:		Bonus total de points de prime pour mobs Nv65+ : {0}
 Commands.Players.Guild.Territories.RelicRPBonus:		Bonus total PR offert par les reliques de territoire: {0}%
 Commands.Players.Guild.Territories.Bonuses:				---- Bonus des territoires ----
 Commands.Players.Guild.Territories.DebuffDuration:		Durée des effets négatifs

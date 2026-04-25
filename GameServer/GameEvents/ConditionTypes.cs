@@ -9,7 +9,8 @@
         Interval,
         Areaxevent,
         Quest,
-        Switch
+        Switch,
+        Onetime
     }
 
     public enum EndingConditionType

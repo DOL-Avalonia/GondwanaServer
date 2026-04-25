@@ -1,0 +1,3 @@
+
+Lootgenerator.OneTimeDrop.ReceiveItem:		You receive {0} from {1}!
+Lootgenerator.OneTimeDrop.InventoryFull:	Your inventory is full and a one time drop cannot be added!

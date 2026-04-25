@@ -9,6 +9,7 @@ using DOL.GS.Finance;
 using DOL.Language;
 using DOL.GS.PacketHandler;
 using GameServerScripts.Amtescripts.Managers;
+using DOL.GS.ServerProperties;
 
 
 namespace DOL.GS.Scripts
@@ -66,14 +67,48 @@ namespace DOL.GS.Scripts
 
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine(LanguageMgr.GetTranslation(player.Client.Account.Language, "GuardNPC.Response.Blacklist"));
-                    outlaws.ForEach(s => sb.AppendLine(s.Name));
+
+                    if (Properties.SHOW_NEW_PLAYER_STATS)
+                    {
+                        int baseGold = Properties.REWARD_OUTLAW_HEAD_GOLD;
+                        int maxMultiplier = Properties.REWARD_OUTLAW_HEAD_MAX_STATS_MULTIPLIER;
+
+                        foreach (var outlaw in outlaws)
+                        {
+                            TaskXPlayer tData = GameServer.Database.SelectObject<TaskXPlayer>(DB.Column("PlayerId").IsEqualTo(outlaw.ObjectId));
+                            int assassinKills = tData != null ? tData.AssassinationKillsStats : 0;
+
+                            int cappedKills = Math.Min(assassinKills, maxMultiplier);
+                            int statsMultiplier = Math.Max(1, cappedKills / 3);
+                            int repMultiplier = outlaw.Reputation < 0 ? Math.Abs(outlaw.Reputation) : 1;
+
+                            int goldReward = baseGold * repMultiplier * statsMultiplier;
+                            string rewardText = LanguageMgr.GetTranslation(player.Client.Account.Language, "GuardNPC.Response.GoldReward", goldReward);
+
+                            if (assassinKills > 0)
+                            {
+                                int bpReward = cappedKills * 2;
+                                rewardText += LanguageMgr.GetTranslation(player.Client.Account.Language, "GuardNPC.Response.BPReward", bpReward);
+                            }
+
+                            sb.AppendLine(LanguageMgr.GetTranslation(player.Client.Account.Language, "GuardNPC.Response.WantedReward", outlaw.Name, rewardText));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var s in outlaws)
+                        {
+                            sb.AppendLine(s.Name);
+                        }
+                    }
+
                     player.Out.SendMessage(sb.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     break;
             }
             return true;
         }
 
-        public override bool ReceiveItem(GameLiving source, Database.InventoryItem item)
+        public override bool ReceiveItem(GameLiving source, InventoryItem item)
         {
             if (!(source is GamePlayer srcPlayer) || item == null || !item.Id_nb.StartsWith(srcPlayer.HeadTemplate.Id_nb))
                 return false;
@@ -92,17 +127,71 @@ namespace DOL.GS.Scripts
 
             if (!srcPlayer.Inventory.RemoveCountFromStack(item, 1))
                 return false;
-            int reward = ServerProperties.Properties.REWARD_OUTLAW_HEAD_GOLD;
+
             List<string> messages = item.Template.MessageArticle.Split(';').ToList();
 
-            if (messages.Count >= 2)
+            if (Properties.SHOW_NEW_PLAYER_STATS)
             {
-                reward *= (int)(-int.Parse(messages[1]) / 0.5);
-            }
+                int baseGold = Properties.REWARD_OUTLAW_HEAD_GOLD;
+                int maxMultiplier = Properties.REWARD_OUTLAW_HEAD_MAX_STATS_MULTIPLIER;
+                int finalGoldReward = baseGold;
+                int finalBpReward = 0;
 
-            var prime = Money.GetMoney(0, 0, reward, 0, 0);
-            srcPlayer.AddMoney(Currency.Copper.Mint(prime));
-            srcPlayer.Out.SendMessage(LanguageMgr.GetTranslation(srcPlayer.Client.Account.Language, "GuardNPC.Response.Headreward", reward), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                if (messages.Count >= 2)
+                {
+                    string victimId = messages[0];
+                    int victimRep = int.Parse(messages[1]);
+
+                    TaskXPlayer tData = GameServer.Database.SelectObject<TaskXPlayer>(DB.Column("PlayerId").IsEqualTo(victimId));
+                    int assassinKills = tData != null ? tData.AssassinationKillsStats : 0;
+                    int cappedKills = Math.Min(assassinKills, maxMultiplier);
+                    int statsMultiplier = Math.Max(1, cappedKills / 3);
+                    int repMultiplier = victimRep < 0 ? Math.Abs(victimRep) : 1;
+
+                    // Base rewards calculations
+                    int calculatedGold = baseGold * repMultiplier * statsMultiplier;
+
+                    // Calculate item-based gold bonus for the turning-in player
+                    int coinBonusPercent = srcPlayer.GetModified(eProperty.MythicalCoin);
+                    finalGoldReward = calculatedGold + ((calculatedGold * coinBonusPercent) / 100);
+
+                    if (assassinKills > 0)
+                    {
+                        int calculatedBp = cappedKills * 2;
+                        int bpBonusPercent = srcPlayer.GetModified(eProperty.BountyPoints);
+                        finalBpReward = calculatedBp + ((calculatedBp * bpBonusPercent) / 100);
+                    }
+                }
+
+                var prime = Money.GetMoney(0, 0, finalGoldReward, 0, 0);
+                srcPlayer.AddMoney(Currency.Copper.Mint(prime));
+
+                if (finalBpReward == 0)
+                {
+                    string rewardMsg = LanguageMgr.GetTranslation(srcPlayer.Client.Account.Language, "GuardNPC.Response.Headreward1", finalGoldReward);
+                    srcPlayer.Out.SendMessage(rewardMsg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
+                else if (finalBpReward > 0)
+                {
+                    string rewardMsg = LanguageMgr.GetTranslation(srcPlayer.Client.Account.Language, "GuardNPC.Response.Headreward2", finalGoldReward);
+                    srcPlayer.GainBountyPoints(finalBpReward);
+                    rewardMsg += " " + LanguageMgr.GetTranslation(srcPlayer.Client.Account.Language, "GuardNPC.Response.HeadrewardBounty", finalBpReward);
+                    srcPlayer.Out.SendMessage(rewardMsg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
+            }
+            else
+            {
+                int reward = Properties.REWARD_OUTLAW_HEAD_GOLD;
+
+                if (messages.Count >= 2)
+                {
+                    reward *= (int)(-int.Parse(messages[1]) / 0.5);
+                }
+
+                var prime = Money.GetMoney(0, 0, reward, 0, 0);
+                srcPlayer.AddMoney(Currency.Copper.Mint(prime));
+                srcPlayer.Out.SendMessage(LanguageMgr.GetTranslation(srcPlayer.Client.Account.Language, "GuardNPC.Response.Headreward1", reward), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            }
 
             return true;
         }

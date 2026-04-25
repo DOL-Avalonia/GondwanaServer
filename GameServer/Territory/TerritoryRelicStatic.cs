@@ -21,6 +21,7 @@ namespace AmteScripts.Managers
         public TerRelicPadNPC CurrentPad { get; set; }
         public GamePlayer CurrentCarrier { get; set; }
         public bool IsDroppedOnGround { get; set; }
+        public bool IsDungeonRelic { get; private set; }
 
         private RegionTimer _respawnTimer;
         private GameStaticItem _visualPad;
@@ -33,18 +34,29 @@ namespace AmteScripts.Managers
             Model = record.Model;
             Level = 50;
             Realm = 0;
-            Position = Position.Create((ushort)record.SpawnRegion, record.SpawnX, record.SpawnY, record.SpawnZ, (ushort)record.SpawnHeading);
+            Position = Position.Create((ushort)record.SpawnRegion, record.SpawnX, record.SpawnY, record.SpawnZ + 100, (ushort)record.SpawnHeading);
+
+            var region = WorldMgr.GetRegion((ushort)record.SpawnRegion);
+            if (region != null)
+            {
+                var zone = region.GetZone(record.SpawnX, record.SpawnY);
+                IsDungeonRelic = zone != null && zone.IsDungeon;
+            }
         }
 
         public override bool AddToWorld()
         {
+            if (Position.X == DbRecord.SpawnX && Position.Y == DbRecord.SpawnY)
+            {
+                SpawnVisualPad();
+            }
+
             bool result = base.AddToWorld();
+
             if (result)
             {
                 if (Position.X == DbRecord.SpawnX && Position.Y == DbRecord.SpawnY)
                 {
-                    SpawnVisualPad();
-
                     if (!string.IsNullOrEmpty(DbRecord.ProtectorClassType))
                     {
                         IsLocked = true;
@@ -58,25 +70,28 @@ namespace AmteScripts.Managers
 
         private void SpawnProtectors()
         {
-            var groupMobs = GameServer.Database.SelectObjects<GroupMobXMobs>(DB.Column("GroupId").IsEqualTo(DbRecord.ProtectorClassType));
-
-            foreach (var gMob in groupMobs)
+            if (MobGroupManager.Instance.Groups.TryGetValue(DbRecord.ProtectorClassType, out MobGroup group))
             {
-                var mobDef = GameServer.Database.SelectObject<Mob>(DB.Column("Mob_ID").IsEqualTo(gMob.MobID));
-                if (mobDef != null)
+                foreach (var protector in group.NPCs)
                 {
-                    GameNPC protector = new GameNPC();
-                    protector.LoadFromDatabase(mobDef);
+                    protector.RemoveFromWorld();
 
-                    protector.Position = Position.Create((ushort)DbRecord.SpawnRegion, DbRecord.SpawnX + Util.Random(100, 200), DbRecord.SpawnY + Util.Random(100, 200), DbRecord.SpawnZ, (ushort)DbRecord.SpawnHeading);
+                    Position newPos = Position.Create(
+                        (ushort)DbRecord.SpawnRegion,
+                        DbRecord.SpawnX + Util.Random(100, 200),
+                        DbRecord.SpawnY + Util.Random(100, 200),
+                        DbRecord.SpawnZ,
+                        (ushort)DbRecord.SpawnHeading
+                    );
+
+                    protector.Position = newPos;
+                    protector.Home = newPos;
+                    protector.SpawnPosition = newPos;
+
                     protector.AddToWorld();
-                    _activeProtectors.Add(protector);
 
-                    if (MobGroupManager.Instance.Groups.TryGetValue(DbRecord.ProtectorClassType, out MobGroup group))
-                    {
-                        protector.AddToMobGroup(group);
-                        group.AddMob(protector, false);
-                    }
+                    if (!_activeProtectors.Contains(protector))
+                        _activeProtectors.Add(protector);
                 }
             }
         }
@@ -84,13 +99,16 @@ namespace AmteScripts.Managers
         private void SpawnVisualPad()
         {
             if (_visualPad != null) return;
+
+            ushort padModel = (this.CurrentZone != null && this.CurrentZone.IsDungeon) ? (ushort)2655 : (ushort)3547;
+
             _visualPad = new GameStaticItem
             {
-                Model = 2655,
+                Model = padModel,
                 Name = "Outpost Relic Pad",
                 Level = 50,
                 Realm = 0,
-                Position = this.Position
+                Position = this.Position.With(z: this.Position.Z - 100)
             };
             _visualPad.AddToWorld();
         }
@@ -201,7 +219,7 @@ namespace AmteScripts.Managers
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TerritoryRelics.Static.AlreadySecured"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
-                CurrentTerritory.RemoveRelicBonus(DbRecord.Bonuses);
+                CurrentTerritory.RemoveRelicBonus(DbRecord.Bonuses, IsDungeonRelic);
 
                 DbRecord.relicTarget = "carrier";
                 GameServer.Database.SaveObject(DbRecord);
@@ -247,7 +265,7 @@ namespace AmteScripts.Managers
 
             if (CurrentTerritory != null)
             {
-                CurrentTerritory.RemoveRelicBonus(DbRecord.Bonuses);
+                CurrentTerritory.RemoveRelicBonus(DbRecord.Bonuses, IsDungeonRelic);
                 CurrentTerritory = null;
             }
             if (CurrentPad != null)
@@ -305,7 +323,7 @@ namespace AmteScripts.Managers
 
             AddToWorld();
 
-            CurrentTerritory.AddRelicBonus(DbRecord.Bonuses);
+            CurrentTerritory.AddRelicBonus(DbRecord.Bonuses, IsDungeonRelic);
             TerritoryRelicManager.UpdateMapPins();
         }
 
@@ -324,7 +342,7 @@ namespace AmteScripts.Managers
 
             if (CurrentTerritory != null)
             {
-                CurrentTerritory.RemoveRelicBonus(DbRecord.Bonuses);
+                CurrentTerritory.RemoveRelicBonus(DbRecord.Bonuses, IsDungeonRelic);
                 CurrentTerritory = null;
             }
             if (CurrentPad != null)

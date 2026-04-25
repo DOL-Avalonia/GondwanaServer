@@ -1,6 +1,8 @@
 ﻿using DOL.Database;
 using DOL.GS;
+using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
 using DOL.Language;
 using System;
 
@@ -12,6 +14,7 @@ namespace AmteScripts.Managers
         public bool IsRemovalExpected { get; set; } = false;
         private bool _isSilencing = false;
         private RegionTimer _stateCheckTimer;
+        private GameSpellEffect _relicEffect;
 
         public bool IsSilencing
         {
@@ -63,6 +66,25 @@ namespace AmteScripts.Managers
             base.OnReceive(player);
             IsSilencing = true;
 
+            if (RelicReference != null && RelicReference.DbRecord.relicSpell > 0)
+            {
+                var spell = SkillBase.GetSpellByID(RelicReference.DbRecord.relicSpell);
+                if (spell != null)
+                {
+                    var handler = ScriptMgr.CreateSpellHandler(player, spell, SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells));
+                    if (handler != null)
+                    {
+                        _relicEffect = new GameSpellEffect(handler, spell.Duration, 0);
+                        _relicEffect.Start(player);
+                    }
+                }
+            }
+
+            if (RelicReference != null && RelicReference.DbRecord.Effect > 0)
+            {
+                player.Out.SendMinotaurRelicWindow(player, RelicReference.DbRecord.Effect, true);
+            }
+
             _stateCheckTimer = new RegionTimer(player, new RegionTimerCallback(StateCheckTimerCallback));
             _stateCheckTimer.Start(800);
         }
@@ -72,8 +94,8 @@ namespace AmteScripts.Managers
             var player = m_owner as GamePlayer;
             if (player == null || !player.IsAlive) return 0;
 
-            var wsd = DOL.GS.Spells.SpellHandler.FindEffectOnTarget(player, "WarlockSpeedDecrease");
-            if (player.IsDamned || DOL.GS.Spells.SpellHandler.FindEffectOnTarget(player, "Petrify") != null || (wsd != null && wsd.Spell?.AmnesiaChance == 1))
+            var wsd = SpellHandler.FindEffectOnTarget(player, "WarlockSpeedDecrease");
+            if (player.IsDamned || SpellHandler.FindEffectOnTarget(player, "Petrify") != null || (wsd != null && wsd.Spell?.AmnesiaChance == 1))
             {
                 player.DropTerritoryRelicsOnDeath(null);
                 return 0; // stop timer
@@ -84,6 +106,15 @@ namespace AmteScripts.Managers
         public override void OnLose(GamePlayer player)
         {
             IsSilencing = false;
+
+            if (_relicEffect != null)
+            {
+                _relicEffect.Cancel(false);
+                _relicEffect = null;
+            }
+
+            player.Out.SendMinotaurRelicWindow(player, 0, false);
+
             base.OnLose(player);
 
             if (!IsRemovalExpected && RelicReference != null)

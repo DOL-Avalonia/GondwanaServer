@@ -16,11 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
+using AmteScripts.PvP.CTF;
 using DOL.Database;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
+using DOL.Language;
+using System;
+using System.Collections.Generic;
+using static AmteScripts.PvP.PvPScore;
 
 namespace DOL.GS
 {
@@ -31,7 +34,7 @@ namespace DOL.GS
     /// <author>Aredhel, Tolakram</author>
     public class GameVault : GameStaticItem, IGameInventoryObject
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// This list holds all the players that are currently viewing
@@ -163,7 +166,7 @@ namespace DOL.GS
 
             if (!CanView(player))
             {
-                player.Out.SendMessage("You don't have permission to view this vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.NoPermissionView"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
@@ -230,7 +233,7 @@ namespace DOL.GS
             GameVault gameVault = player.ActiveInventoryObject as GameVault;
             if (gameVault == null)
             {
-                player.Out.SendMessage("You are not actively viewing a vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.NotViewingVault"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 player.Out.SendInventoryItemsUpdate(null);
                 return false;
             }
@@ -240,20 +243,20 @@ namespace DOL.GS
 
             if (toHousing && !gameVault.CanAddItem(player, itemInFromSlot))
             {
-                player.Out.SendMessage("You don't have permission to add this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.NoPermissionAdd"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             if (fromHousing && !gameVault.CanRemoveItem(player, itemInToSlot))
             {
-                player.Out.SendMessage("You don't have permission to remove this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.NoPermissionRemove"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             // Check for a swap to get around not allowing non-tradables in a housing vault - Tolakram
             if (fromHousing && !CanHoldItem(itemInToSlot))
             {
-                player.Out.SendMessage("You cannot swap with an untradable item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.CannotSwapUntradable"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 log.DebugFormat("GameVault: {0} attempted to swap untradable item {2} with {1}", player.Name, itemInFromSlot.Name, itemInToSlot.Name);
                 player.Out.SendInventoryItemsUpdate(null);
                 return false;
@@ -263,7 +266,7 @@ namespace DOL.GS
             // block placing untradables into housing vaults from any source - Tolakram
             if (toHousing && !CanHoldItem(itemInFromSlot))
             {
-                player.Out.SendMessage("You can not put this item into a House Vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.CannotPutUntradable"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 player.Out.SendInventoryItemsUpdate(null);
                 return false;
             }
@@ -285,7 +288,7 @@ namespace DOL.GS
             {
                 if (!quiet)
                 {
-                    player.Out.SendMessage("You don't have permission to add this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.NoPermissionAdd"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 return false;
             }
@@ -295,7 +298,7 @@ namespace DOL.GS
             {
                 if (!quiet)
                 {
-                    player.Out.SendMessage("This vault is full!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.VaultFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 return false;
             }
@@ -319,7 +322,7 @@ namespace DOL.GS
                 return false;
             }
 
-            if (item is StorageBagItem) // Prevent storing bags in vaults
+            if (item is StorageBagItem || item is FlagInventoryItem || item is PvPTreasure || item is AmteScripts.Managers.TerritoryRelicInventoryItem)
             {
                 return false;
             }

@@ -37,7 +37,7 @@ namespace DOL.GS.Commands
             if (IsSpammingCommand(client.Player, "appeal"))
                 return;
 
-            if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
+            if (Properties.DISABLE_APPEALSYSTEM)
             {
                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Appeal.SystemDisabled"));
                 return;
@@ -184,7 +184,7 @@ namespace DOL.GS.Commands
     {
         public void OnCommand(GameClient client, string[] args)
         {
-            if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
+            if (Properties.DISABLE_APPEALSYSTEM)
             {
                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Appeal.SystemDisabled"));
                 return;
@@ -230,7 +230,7 @@ namespace DOL.GS.Commands
     {
         public void OnCommand(GameClient client, string[] args)
         {
-            if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
+            if (Properties.DISABLE_APPEALSYSTEM)
             {
                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Appeal.SystemDisabled"));
                 return;
@@ -304,7 +304,7 @@ namespace DOL.GS.Commands
     {
         public void OnCommand(GameClient client, string[] args)
         {
-            if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
+            if (Properties.DISABLE_APPEALSYSTEM)
             {
                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Appeal.SystemDisabled"));
                 return;
@@ -350,7 +350,7 @@ namespace DOL.GS.Commands
     {
         public void OnCommand(GameClient client, string[] args)
         {
-            if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
+            if (Properties.DISABLE_APPEALSYSTEM)
             {
                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Appeal.SystemDisabled"));
                 return;

@@ -17,18 +17,19 @@
  *
  */
 
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using DOL.Database;
 using DOL.Events;
-using DOL.GS.PacketHandler;
-using log4net;
 using DOL.GS.Finance;
-using System.Collections;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using DOL.Territories;
+using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Reflection;
 
 namespace DOL.GS
 {
@@ -41,7 +42,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// ArrayList of all guilds in the game
@@ -212,7 +213,7 @@ namespace DOL.GS
             if (DoesGuildExist(guildName))
             {
                 if (creator != null && !quiet)
-                    creator.Out.SendMessage(guildName + " already exists!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    creator.Out.SendMessage(LanguageMgr.GetTranslation(creator.Client.Account.Language, "GameUtils.Guild.AlreadyExists", guildName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                 return null;
             }

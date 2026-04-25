@@ -10,4 +10,9 @@ GuardNPC.Response.Nobodywanted:			Personne n'est recherché actuellement.
 GuardNPC.Response.Blacklist:			Les personnes suivantes sont sur la liste noire:
 GuardNPC.Response.Dontknow:				Hmm, peut-être que... non, ça ne me dit rien !
 GuardNPC.Response.Rottenhead:			Elle a l'air pourrie cette tête, je ne la reconnais pas !
-GuardNPC.Response.Headreward:			Merci de votre précieuse aide, voici {0} pièces d'or pour vous !
+GuardNPC.Response.Headreward1:			Merci de votre précieuse aide, voici {0} pièces d'or pour vous !
+GuardNPC.Response.Headreward2:			Merci de votre précieuse aide, voici {0} pièces d'or pour vous
+GuardNPC.Response.HeadrewardBounty:		ainsi que {0} points de prime !
+GuardNPC.Response.GoldReward:			{0} pièces d'or
+GuardNPC.Response.BPReward:				, {0} points de prime
+GuardNPC.Response.WantedReward:			{0} - Recherché(e) / Récompense : {1}

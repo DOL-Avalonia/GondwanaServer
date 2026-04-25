@@ -16,4 +16,9 @@ GameTrainer.ReceiveItem.RespecRealm:				Merci, j'ai reçu une possibilité de re
 GameTrainer.ReceiveItem.RespecSingle:				Merci, j'ai reçu une possibilité de re-spécialisation simple. Pour l'utiliser : /respec <linename>
 GameTrainer.Train.WouldYouLikeTo:					Voulez-vous vous entraîner ?
 GameTrainer.Train.SeekElsewhere:					Vous devez allez ailleurs pour votre entraînement.
-
+GameTrainer.PromotePlayer.TokenLookOver:			{0} vous observe. "Si vous récupérez des insignes de bravoure sur les cadavres de bêtes ou d'ennemis tombés au combat, apportez-les-moi. Je m'assurerai que votre expérience et votre rang de royaume soient dûment reconnus."
+GameTrainer.PromotePlayer.TokenEagerness:			{0} sourit doucement. "Il est bon de voir un tel empressement, {1}, mais il faut savoir marcher avant de courir. Concentrez-vous sur votre entraînement de base pour le moment. Une fois que vous serez plus fort, j'accepterai volontiers ceci si vous devenez l'un de mes apprentis."
+GameTrainer.PromotePlayer.TokenOnlyStudents:		{0} secoue la tête. "Je n'accepte d'insignes de bravoure que de la part de mes propres élèves confirmés. Allez voir votre maître de classe, ou un Maître Entraîneur."
+GameTrainer.PromotePlayer.TokenPvE:					{0} inspecte l'insigne de près. "Le sang sombre des monstres tache cette pièce. Bien combattu, {1} ! Vos compétences s'aiguisent à chaque bête abattue."
+GameTrainer.PromotePlayer.TokenPvPGvG:				{0} vous salue. "Vous faites honneur à notre royaume, {1}. Les dieux récompensent votre bravoure !"
+GameTrainer.PromotePlayer.TokenCannotGrant:			{0} secoue la tête. "Je ne peux rien vous accorder pour cela en ce moment."

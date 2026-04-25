@@ -867,7 +867,7 @@ namespace DOL.GS.ServerRules
 
             if (IsInPvPArea(killedPlayer))
             {
-                noExpSeconds /= 4;
+                noExpSeconds /= Properties.RP_WORTH_SECONDS_PVPDIVIDER;
             }
 
             if (!Properties.ENABLE_DEBUG && killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)

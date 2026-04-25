@@ -1,0 +1,3 @@
+
+Selfcraftwindow.CannotRepair:		You cannot repair while self-crafting!
+Selfcraftwindow.CombineAutoset:		Combine flag is autoset while self-crafting!

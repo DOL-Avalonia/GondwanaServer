@@ -1,0 +1,30 @@
+# GameSiegeWeapon
+GameSiegeWeapon.AlreadyControlled:			{0} est déjà sous contrôle.
+GameSiegeWeapon.AlreadyHaveWeapon:			Vous contrôlez déjà une arme de siège.
+GameSiegeWeapon.CantControlMoving:			Vous ne pouvez pas prendre le contrôle d'une arme de siège pendant qu'elle se déplace.
+GameSiegeWeapon.TakeControl:				Vous prenez le contrôle de {0}.
+GameSiegeWeapon.NoLongerControlling:		Vous ne contrôlez plus {0}.
+GameSiegeWeapon.TurningToTarget:			{0} pivote vers votre cible.
+GameSiegeWeapon.PrepareFiring:				Vous préparez {0} à faire feu. ({1}s avant armement)
+GameSiegeWeapon.TargetTooFarToMove:			La cible au sol est trop éloignée pour s'y déplacer !
+GameSiegeWeapon.TargetOutOfSight:			La cible au sol est hors de vue !
+GameSiegeWeapon.RamTooCloseToDoor:			Vous ne pouvez pas déplacer un bélier aussi près d'une porte !
+GameSiegeWeapon.WeaponAimed:				Votre {0} a fini de viser !
+GameSiegeWeapon.WeaponArmed:				Votre {0} est armé(e) !
+GameSiegeWeapon.NotReadyToFire:				Le {0} n'est pas encore prêt à faire feu !
+GameSiegeWeapon.YouFireWeapon:				Vous faites feu avec {0} !
+GameSiegeWeapon.NeedWoodworkingToRepair:	Vous devez posséder la compétence de Travail du bois pour réparer une arme de siège.
+GameSiegeWeapon.DecayedBeyondRepair:		L'arme de siège s'est trop dégradée pour être réparée !
+GameSiegeWeapon.NeedCrafterToSalvage:		Vous devez être un artisan d'armes de siège pour la recycler.
+GameSiegeWeapon.CantUseWeaponNow:			Vous ne pouvez pas utiliser cette arme de siège pour le moment !
+GameSiegeWeapon.NeedsRepair:				L'arme de siège doit être réparée !
+GameSiegeWeapon.TooFarToControl:			Vous êtes trop éloigné(e) de votre équipement de siège pour le contrôler plus longtemps !
+
+# GameSiegeRam
+GameSiegeWeapon.Ram.SelectTarget:			Sélectionnez d'abord une cible.
+GameSiegeWeapon.Ram.TooFar:					Vous êtes trop loin pour attaquer {0}.
+GameSiegeWeapon.Ram.YouHit:					Le bélier frappe {0} et inflige {1} dégâts !
+GameSiegeWeapon.Ram.HitObserver:			{0} frappe {1} !
+
+# GameSiegeCatapult
+GameSiegeWeapon.Catapult.YouHit:			La {0} frappe {1} et inflige {2} dégâts !

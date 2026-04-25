@@ -1,0 +1,10 @@
+# GAMEFUNCATAPULT
+GameFunCatapult.AlreadyOperating:	Quelqu'un d'autre utilise déjà cette catapulte.
+GameFunCatapult.SeatOccupied:		Le siège de la catapulte est actuellement occupé.
+GameFunCatapult.MissingItem:		Il vous manque l'objet requis pour utiliser cette catapulte.
+GameFunCatapult.KeyBreaks:			Votre clé se brise alors que vous prenez le contrôle de la catapulte.
+GameFunCatapult.CancelLaunch:		Vous quittez la catapulte, annulant le lancement.
+GameFunCatapult.FixedAim:			Cette catapulte est fixe et vise automatiquement.
+GameFunCatapult.NotArmed:			La catapulte n'est pas encore prête à tirer ! Vous devez d'abord l'armer.
+GameFunCatapult.Launched:			Vous êtes propulsé par la catapulte !
+GameFunCatapult.Malfunction:		La catapulte a mal fonctionné. (Spell ID introuvable)

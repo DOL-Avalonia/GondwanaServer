@@ -7,6 +7,8 @@ GameUtils.GamePlayerInventory.CannotChangeInventoryWhenDead:				Vous ne pouvez p
 GameUtils.GamePlayerInventory.CannotMoveActiveHorseToSaddlebag:				Vous ne pouvez pas déplacer votre cheval actif dans une sacoche !
 GameUtils.GamePlayerInventory.ClassCannotUseThisItem:						Votre classe ne peut pas utiliser cet objet !
 GameUtils.GamePlayerInventory.ItemCantGoThere:								{0} ne peut pas être placé ici !
+ameUtils.GamePlayerInventory.ItemCantStoreThere:							Vous ne pouvez pas déposer cet objet ici !
+GameUtils.GamePlayerInventory.ItemCantSwapThere:							Vous ne pouvez pas échanger cet objet ici !
 GameUtils.GamePlayerInventory.CantUseItemChampionLevel:						Vous ne pouvez pas utiliser {0}, vous devriez augmenter votre niveau de champion.
 GameUtils.GamePlayerInventory.CantPutItemInActiveBardingSlot:				Vous ne pouvez pas placer {0} dans votre emplacement de bardage actif !
 GameUtils.GamePlayerInventory.CantPutItemInActiveHorseArmorSlot:			Vous ne pouvez pas placer {0} dans votre emplacement d'armure de cheval actif !

@@ -1,0 +1,32 @@
+
+CardMgr.Held.YouNoCards:					Vous n'avez aucune carte.
+CardMgr.Held.TargetNoCards:					{0} n'a aucune carte.
+CardMgr.Held.YouHoldingCards:				Vous tenez {0} carte(s).
+CardMgr.Held.TargetHoldingCards:			{0} tient {1} carte(s).
+CardMgr.Discard.YouDiscardNamed:			Vous défaussez {0} de votre main.
+CardMgr.Discard.TargetDiscardNamed:			{0} défausse {1} de sa main.
+CardMgr.Discard.TargetDiscardUnknown:		{0} défausse une carte de sa main.
+CardMgr.Discard.NoSuchCard:					Aucune carte avec l'ID {0} n'existe dans votre main !
+CardMgr.Discard.YouNoCards:					Vous n'avez aucune carte à défausser.
+CardMgr.DiscardAll.You:						Vous défaussez toutes vos cartes.
+CardMgr.DiscardAll.Target:					{0} défausse toutes ses cartes.
+CardMgr.Cards.NoGroup:						Vous ne pouvez pas jouer aux cartes sans groupe !
+CardMgr.Shuffle.NoGroup:					Vous devez être dans un groupe pour jouer aux cartes !
+CardMgr.Shuffle.You:						Vous battez {0} de cartes.
+CardMgr.Shuffle.Target:						{0} bat {1} de cartes.
+CardMgr.Shuffle.DeckSingular:				1 jeu
+CardMgr.Shuffle.DeckPlural:					{0} jeux
+CardMgr.Deal.MustBeInGroup:					{0} doit être dans votre groupe pour jouer aux cartes !
+CardMgr.Deal.MustShuffleFirst:				Vous devez utiliser /shuffle pour préparer les cartes avant de distribuer !
+CardMgr.Deal.NoCardsLeft:					Il n'y a plus de cartes dans le jeu. Utilisez /shuffle pour préparer un nouveau jeu.
+CardMgr.Deal.YouDealYourselfNamed:			Vous vous distribuez {0}.
+CardMgr.Deal.YouDealYourselfUnknown:		Vous vous distribuez une carte face cachée.
+CardMgr.Deal.YouDealTargetNamed:			Vous distribuez {1} à {0}.
+CardMgr.Deal.YouDealTargetUnknown:			Vous distribuez une carte face cachée à {0}.
+CardMgr.Deal.TargetDealsYouNamed:			{0} vous distribue {1}.
+CardMgr.Deal.TargetDealsThemselfNamed:		{0} se distribue {1}.
+CardMgr.Deal.TargetDealsThemselfUnknown:	{0} se distribue une carte face cachée.
+CardMgr.Deal.TargetDealsOtherNamed:			{0} distribue {2} à {1}.
+CardMgr.Deal.TargetDealsOtherUnknown:		{0} distribue une carte face cachée à {1}.
+CardMgr.Show.You:							Vous montrez votre main.
+CardMgr.Show.Target:						{0} montre sa main.

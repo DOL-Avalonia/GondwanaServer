@@ -2250,13 +2250,14 @@ namespace DOL.GS
             if (!(gameObject is GamePlayer player) || player == this)
                 return gameObject.Name;
 
-            if (!DOL.GS.ServerProperties.Properties.HIDE_PLAYER_NAME || player.Client.Account.PrivLevel > 1 || Client.Account.PrivLevel > 1)
+            if (!GameServer.ServerRules.IsPlayerNameHidden(this, player))
                 return player.Name;
 
-            if (SerializedAskNameList.Contains(player.Name) || SerializedFriendsList.Contains(player.Name))
-                return player.Name;
-            // get row position in db by CreationDate
-            return "(" + this.RaceToTranslatedName(player.Race, player.Gender) + " " + Client.SessionID + ")";
+            double hashFraction = (Math.Abs(player.Name.GetHashCode()) % 10000) / 10000.0;
+            int hiddenId = (int)(Math.Pow(hashFraction, 2) * 1200) + 10;
+            string formattedId = hiddenId.ToString("D3");
+
+            return "(" + this.RaceToTranslatedName(player.Race, player.Gender) + " " + formattedId + ")";
         }
 
         /// <summary>
@@ -4868,11 +4869,11 @@ namespace DOL.GS
                 return;
             
             //rp rate modifier
-            double modifier = ServerProperties.Properties.RP_RATE;
+            double modifier = Properties.RP_RATE;
             if (territoryBonus > 0)
             {
                 if (modify && modifier != -1)
-                    territoryBonus = (long)(territoryBonus * ServerProperties.Properties.RP_RATE);
+                    territoryBonus = (long)(territoryBonus * Properties.RP_RATE);
 
                 SendTranslatedMessage("GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP", eChatType.CT_Important, eChatLoc.CL_SystemWindow, territoryBonus);
             }
@@ -5165,6 +5166,11 @@ namespace DOL.GS
                         factor *= 1.0d + (yearlyEventBonusPercent / 100.0d);
                     }
                 }
+
+                if (Guild != null && Guild.TerritoryBonusRealmPointsFactor > 0)
+                {
+                    factor *= 1.0d + Guild.TerritoryBonusRealmPointsFactor;
+                }
             }
 
             return factor;
@@ -5419,7 +5425,16 @@ namespace DOL.GS
             152517769,	// for level 128
             169294723,	// for level 129
             187917143,	// for level 130
-
+            223084000,  // for level 14L1
+            278317600,  // for level 14L2
+            355644640,  // for level 14L3
+            445902496,  // for level 14L4
+            555928241,  // for level 14L5
+            680853214,  // for level 14L6
+            820594584,  // for level 14L7
+            990514251,  // for level 14L8
+            1230285525, // for level 14L9
+            1650444126  // for level 15L0
         };
 
         /// <summary>

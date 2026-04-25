@@ -1,13 +1,14 @@
-using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
+using DOL.Language;
+using System.Collections.Generic;
 
 namespace DOL.GS
 {
     public abstract class CustomVault : GameHouseVault
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public const int SIZE = 100;
         public const int Last_Used_FIRST_SLOT = 1600;
@@ -43,7 +44,7 @@ namespace DOL.GS
         {
             if (!CanView(player))
             {
-                player.Out.SendMessage("You don't have permission to view this vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.NoPermissionView"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
