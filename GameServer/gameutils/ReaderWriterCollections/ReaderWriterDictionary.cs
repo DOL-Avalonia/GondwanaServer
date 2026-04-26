@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using AmteScripts.PvP;
 using System;
 using System.Linq;
 using System.Collections;
@@ -327,6 +328,13 @@ namespace DOL.GS
             }
 
             return found;
+        }
+
+        public TValue GetValueOrDefault(TKey key, TValue orElse = default)
+        {
+            if (TryGetValue(key, out TValue value))
+                return value;
+            return orElse;
         }
         #endregion
 

@@ -54,7 +54,7 @@ namespace DOL.UnitTests.Gameserver
             var player1 = new PvPPlayerEntity(new FakePlayer("François"));
             var player2 = new PvPPlayerEntity(new FakePlayer("Marie-Françoise"));
             var pairs = AssignPairs([player0, player1], player2);
-            
+
             Assert.AreEqual(2, pairs.Count);
             Assert.AreEqual(pairs.Count, pairs.Select(p => p.Predator).Distinct().Count());
             Assert.AreEqual(pairs.Count, pairs.Select(p => p.Prey).Distinct().Count());
@@ -72,7 +72,7 @@ namespace DOL.UnitTests.Gameserver
             player0.AsPlayer!.SetGuild(fakeGuild1, false);
             player1.AsPlayer!.SetGuild(fakeGuild1, false);
             var pairs = AssignPairs([player0, player1], null);
-            
+
             Assert.AreEqual(2, pairs.Count);
             Assert.AreEqual(null, pairs[0].Prey);
             Assert.AreEqual(null, pairs[1].Prey);
@@ -94,7 +94,7 @@ namespace DOL.UnitTests.Gameserver
             Assert.That(player0.AssociatedGuild == fakeGuild1);
             PvPPlayerEntity[] players = [player0, player1, player2, player3];
             var pairs = AssignPairs(players, null);
-             
+
             Assert.AreEqual(4, pairs.Count);
             Assert.AreEqual(pairs.Count, pairs.Select(p => p.Predator).Distinct().Count());
             Assert.AreEqual(pairs.Count, pairs.Select(p => p.Prey).Distinct().Count());
@@ -106,7 +106,7 @@ namespace DOL.UnitTests.Gameserver
             Assert.AreNotEqual(null, jeanFrancois);
             Assert.AreNotEqual(null, jeanFrancois!.Prey);
             Assert.AreNotEqual(jeanFrancois.Prey!.AssociatedGuild, jeanFrancois.Predator.AssociatedGuild);
-            
+
             // Testing that if we force `next` to be our previous last, then the guild order should be reversed
             var previousLast= pairs[3];
             var player4 = new PvPPlayerEntity(new FakePlayer("Jean-Marie-François"));
@@ -220,7 +220,7 @@ namespace DOL.UnitTests.Gameserver
             var predatorPlayers = new List<PvPEntity>([player0, player1]);
             var predators = new List<PredatorPair>(predatorPlayers.Select(p => new PredatorPair(p)));
             var recombobulated = Recombobulate(predators, [player2, player0, player1]);
-            
+
             Assert.AreEqual(2, recombobulated.Count);
             Assert.AreEqual(recombobulated.Count, recombobulated.Select(p => p.Predator).Distinct().Count());
             Assert.AreEqual(recombobulated.Count, recombobulated.Select(p => p.Prey).Distinct().Count());

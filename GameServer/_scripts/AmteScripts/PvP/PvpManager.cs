@@ -1,43 +1,46 @@
-﻿using System;
+﻿using AmteScripts.Areas;
+using AmteScripts.PvP;
+using AmteScripts.PvP.CoreRun;
+using AmteScripts.PvP.CTF;
+using AmteScripts.PvP.KotH;
+using Discord;
+using Discord.Webhook;
+using DOL.Database;
+using DOL.Events;
+using DOL.GameEvents;
+using DOL.GS;
+using DOL.GS.Geometry;
+using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
+using DOL.GS.Spells;
+using DOL.Language;
+using DOL.Territories;
+using Google.Protobuf.WellKnownTypes;
+using log4net;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel;
+using System.Configuration;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using AmteScripts.Areas;
-using DOL.Database;
-using DOL.Events;
-using DOL.GS;
-using DOL.GS.Geometry;
-using DOL.Territories;
-using DOL.GS.PacketHandler;
-using DOL.Language;
-using log4net;
-using AmteScripts.PvP;
-using DOL.GS.Scripts;
-using static DOL.GS.Area;
-using AmteScripts.PvP.CTF;
-using Discord;
-using DOL.GS.ServerProperties;
-using Google.Protobuf.WellKnownTypes;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using static AmteScripts.Managers.PvpManager;
-using static System.Formats.Asn1.AsnWriter;
-using static DOL.GameEvents.GameEvent;
-using Newtonsoft.Json.Linq;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Security.Policy;
-using AmteScripts.PvP.KotH;
-using Zone = DOL.GS.Zone;
-using DOL.GS.Spells;
-using DOL.GameEvents;
-using AmteScripts.PvP.CoreRun;
-using Discord.Webhook;
 using System.Threading.Tasks;
+using static AmteScripts.Managers.PvpManager;
+using static DOL.GameEvents.GameEvent;
+using static DOL.GS.Area;
+using static System.Formats.Asn1.AsnWriter;
+using Region = DOL.GS.Region;
+using Zone = DOL.GS.Zone;
 
 namespace AmteScripts.Managers
 {
@@ -147,6 +150,8 @@ namespace AmteScripts.Managers
         private const int CORE_RUN_STORM_SIZE = 80;
         private const int CORE_RUN_EFFECT_VARIANCE = 20;
 
+        private const int PREDATOR_CHECK_START_INTERVAL = 60 * 1000;
+
         // Biohazard Variables
         private RegionTimer _biohazardTimer;
         private int _biohazardTicks;
@@ -212,11 +217,11 @@ namespace AmteScripts.Managers
 
         // Scoreboard
         // Total score for each player. DO NOT USE THIS FOR ANYTHING, only for stat display.
-        [NotNull] private readonly Dictionary<string, PvPScore> _totalScores = new Dictionary<string, PvPScore>();
+        [NotNull] private readonly ReaderWriterDictionary<string, PvPScore> _totalScores = new();
         // Total score earned WHILE SOLO for each player.
-        [NotNull] private readonly Dictionary<string, PvPScore> _soloScores = new Dictionary<string, PvPScore>();
+        [NotNull] private readonly ReaderWriterDictionary<string, PvPScore> _soloScores = new();
         // Total score earned WHILE GROUPED for each player.
-        [NotNull] private readonly Dictionary<Guild, PvPGroupScore> _groupScores = new Dictionary<Guild, PvPGroupScore>();
+        [NotNull] private readonly ReaderWriterDictionary<Guild, PvPGroupScore> _groupScores = new();
 
         // Queues
         [NotNull] private readonly List<GamePlayer> _soloQueue = new List<GamePlayer>();
@@ -246,16 +251,24 @@ namespace AmteScripts.Managers
         // Keep track of last guild of each player for scores to protect from griefing
         [NotNull] private readonly Dictionary<string, Guild> _playerLastGuilds = new();
         private static readonly Dictionary<string, long> _bossDamageAccumulator = new Dictionary<string, long>();
+        private static readonly Dictionary<string, PvPEntity> _allParticipants = new();
 
         private int _flagCounter = 0;
         private RegionTimer _territoryOwnershipTimer = null;
 
+        private PvPPredatorManager _predatorManager = new();
+
         #region Singleton
         [NotNull] public static PvpManager Instance { get; } = new PvpManager();
+
+        public Region CurrentRegion => WorldMgr.GetRegion(_currentRegionID);
 
         private bool CreateAreas => _activeSession is { CreateCustomArea: true } && _isUniqueSpawns();
         
         public eSessionTypes CurrentSessionType { get => IsOpen ? (eSessionTypes)(_activeSession?.SessionType ?? 0) : eSessionTypes.None; }
+
+        private RegionTimer _predatorTimer;
+        public bool IsPredatorEnabled { get => IsOpen ? _activeSession.MinTeamsForPredator >= 0 : false; }
 
         /// <summary>
         /// Called when a PvP linkdead player’s grace period expires.
@@ -351,6 +364,8 @@ namespace AmteScripts.Managers
                     }
                 }
             }
+
+            _allParticipants.Remove(player.InternalID);
             
             timer.Callback = (t) => LinkdeathPvPGraceCallback(player, t);
             timer.Start(1 + gracePeriodMs);
@@ -433,6 +448,7 @@ namespace AmteScripts.Managers
 
             lock (_sessionLock)
             {
+                ++_playersInPvP;
                 if (IsOpen && _activeSession?.SessionID == rec.PvPSession)
                 {
                     if (TryRestorePlayer(player, rec))
@@ -491,6 +507,7 @@ namespace AmteScripts.Managers
             {
                 AddToGuildGroup(guild, player);
                 SaveScores();
+                UpdatePredator();
             }
         }
 
@@ -503,6 +520,7 @@ namespace AmteScripts.Managers
             {
                 RemoveFromGuildGroup(guild, player);
                 SaveScores();
+                UpdatePredator();
             }
         }
 
@@ -517,6 +535,7 @@ namespace AmteScripts.Managers
                 
                 AddToGroupGuild(group, player);
                 SaveScores();
+                UpdatePredator();
             }
         }
 
@@ -531,13 +550,13 @@ namespace AmteScripts.Managers
                 
                 RemoveFromGroupGuild(group, player);
                 SaveScores();
+                UpdatePredator();
             }
         }
 
         private void OnPlayerRegionChanged(DOLEvent e, object sender, EventArgs args)
         {
-            var player = sender as GamePlayer;
-            if (player != null && player.IsInPvP)
+            if (sender is GamePlayer { IsInPvP: true } player)
             {
                 new RegionTimer(player, t =>
                 {
@@ -611,8 +630,10 @@ namespace AmteScripts.Managers
                 groupLeader.Out.SendMessage(LanguageMgr.GetTranslation(groupLeader.Client.Account.Language, "PvPManager.CannotCreatePvPGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return null;
             }
-            
+
+            var entity = new PvPGuildGroupEntity(pvpGuild, group);
             _allGuilds.Add(pvpGuild);
+            _allParticipants[pvpGuild.GuildID] = entity;
             _groupGuilds[group] = pvpGuild;
             _guildGroups[pvpGuild] = group;
             var groupScore = new PvPGroupScore(pvpGuild);
@@ -675,7 +696,7 @@ namespace AmteScripts.Managers
                 // Guild already exists
                 if (guild == player.Guild)
                     return; // Nothing to do
-                
+
                 guild.AddPlayer(player, guild.GetRankByID(_defaultGuildRank), true);
                 _playerLastGuilds[player.InternalID] = guild;
                 if (_groupSpawns.TryGetValue(guild, out Spawn spawn))
@@ -684,11 +705,14 @@ namespace AmteScripts.Managers
                     UpdatePvPState(player, spawn); // Update PvP DB record for state recovery
                     player.Bind(spawn.Position);
                 }
+
                 if (_groupAreas.ContainsKey(guild))
                 {
                     // Remove player solo area
                     _cleanupArea(player);
                 }
+
+                _allParticipants.Remove(player.InternalID);
 
                 if (!_groupScores.TryGetValue(guild, out PvPGroupScore groupScore))
                 {
@@ -747,12 +771,7 @@ namespace AmteScripts.Managers
             if (!guild.RemovePlayer(string.Empty, player))
                 return;
             
-            // Check if *all* members have left. If so, remove area:
-            if (!guild.GetListOfOnlineMembers().Any(m => m.IsInPvP))
-            {
-                _cleanupArea(guild);
-                _freeSpawn(guild);
-            }
+            _cleanupGuild(guild);
 
             PlayerGroupToSolo(player);
         }
@@ -773,7 +792,7 @@ namespace AmteScripts.Managers
                 log.ErrorFormat("{0} called with player.Guild != guild, add the player to the guild first!", MethodBase.GetCurrentMethod());
                 return;
             }
-
+            
             Group group = null;
             if (_guildGroups.TryGetValue(guild, out group))
             {
@@ -782,6 +801,7 @@ namespace AmteScripts.Managers
                     return; // Nothing to do
                 
                 group.AddMember(player);
+                _allParticipants.Remove(player.InternalID);
                 _freeSpawn(player);
                 _cleanupArea(player);
                 if (_groupSpawns.TryGetValue(guild, out Spawn guildSpawn))
@@ -802,7 +822,7 @@ namespace AmteScripts.Managers
             else
             {
                 // Guild needs to be created
-                
+
                 // There is a race condition here maybe?
                 // If two players log in at the same time, TryGetValue up there can maybe return false in both cases, and this can run twice...
                 GamePlayer leader = player;
@@ -812,11 +832,14 @@ namespace AmteScripts.Managers
                     if (leaderArea is PvpTempArea pvpArea)
                         pvpArea.SetOwnership(leader);
                 }
+
                 if (_playerSpawns.TryRemove(leader.InternalID, out Spawn spawn))
                 {
                     _groupSpawns.TryAdd(guild, spawn);
                 }
-                
+
+                _allParticipants.TryAdd(guild.GuildID, new PvPGuildGroupEntity(guild));
+
                 if (guild.MemberOnlineCount > 1)
                 {
                     group = new Group(player);
@@ -866,15 +889,9 @@ namespace AmteScripts.Managers
             if (!group.RemoveMember(player))
                 return;
 
-            // Check if *all* members have left. If so, remove area:
-            if (!guild.GetListOfOnlineMembers().Any(m => m.IsInPvP))
-            {
-                _cleanupArea(guild);
-                _freeSpawn(guild);
-            }
+            _cleanupGuild(guild);
 
             PlayerGroupToSolo(player);
-
         }
 
         private void PlayerGroupToSolo(GamePlayer player)
@@ -891,7 +908,7 @@ namespace AmteScripts.Managers
                 _playerSpawns[player.InternalID] = sp;
                 CreateSafeAreaForSolo(player, sp.Position, _activeSession.TempAreaRadius);
                 UpdatePvPState(player, sp); // Update PvP DB record for state recovery
-                
+
                 // Remove any owned flags before teleporting to new safe area, or they'll capture the flag instantly
                 int totalRemoved = RemoveItemsFromPlayer(player);
                 if (totalRemoved > 0)
@@ -901,6 +918,8 @@ namespace AmteScripts.Managers
 
                 player.MoveTo(sp.Position);
                 player.Bind(true);
+
+                _allParticipants[player.InternalID] = new PvPPlayerEntity(player);
             }
             else
                 KickPlayer(player, true);
@@ -987,6 +1006,8 @@ namespace AmteScripts.Managers
                     if (CreateAreas)
                         CreateSafeAreaForSolo(player, spawn.Position, _activeSession.TempAreaRadius);
                 }
+
+                _allParticipants[player.InternalID] = new PvPPlayerEntity(player);
             }
 
             if (!wasLinkDead)
@@ -1008,6 +1029,8 @@ namespace AmteScripts.Managers
 
             player.IsInPvP = true;
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.WelcomeBack"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            UpdatePredator();
             return true;
         }
 
@@ -1504,6 +1527,8 @@ namespace AmteScripts.Managers
 
         private void Stop()
         {
+            _predatorManager.Stop();
+
             if (_activeSession != null && CurrentSessionType is eSessionTypes.TreasureHunt && _territoryOwnershipTimer != null)
             {
                 _territoryOwnershipTimer.Stop();
@@ -2185,6 +2210,114 @@ namespace AmteScripts.Managers
         }
         #endregion
 
+        private void UpdatePredator()
+        {
+            log.Info("Update Predator");
+            if (!IsPredatorEnabled)
+            {
+                return;
+            }
+
+            lock (_predatorManager)
+            {
+                if (_playersInPvP >= CurrentSession?.MinTeamsForPredator)
+                {
+                    if (!_predatorManager.IsActive && _predatorTimer?.IsAlive != true)
+                    {
+                        _predatorTimer = new RegionTimer(CurrentRegion.TimeManager);
+                        _predatorTimer.Callback = (time) =>
+                        {
+                            var interval = CheckPredator();
+                            return interval;
+                        };
+                        log.DebugFormat("[PVP] Starting predator check timer ({0:.##} seconds).", PREDATOR_CHECK_START_INTERVAL / 1000.0f);
+                        _predatorTimer.Start(PREDATOR_CHECK_START_INTERVAL);
+                    }
+                }
+            }
+        }
+
+        private int CheckPredator()
+        {
+            if (!IsPredatorEnabled)
+                return 0;
+
+            lock (_predatorManager)
+            {
+                if (!_predatorManager.IsActive)
+                    return TryStartPredator();
+                else
+                    return EndPredator();
+            }
+        }
+
+        private int TryStartPredator()
+        {
+            log.Debug("[PVP] Checking predator.");
+            List<HighScore> scores;
+            Dictionary<string, PvPEntity> participants;
+            var predatorRoundSeconds = Properties.PVPSESSION_PREDATOR_ROUND_SECONDS;
+            var predatorRoundMilliseconds = predatorRoundSeconds * 1000;
+            lock (_sessionLock)
+            {
+                if (!IsOpen || !IsPredatorEnabled)
+                {
+                    log.Debug("[PVP] Not starting predator, session is closed / predator is disabled.");
+                    return 0;
+                }
+
+                TimeSpan sessionTimeLeft = _endTime - DateTime.Now.TimeOfDay;
+                TimeSpan requiredTimeLeft = new TimeSpan(0, 0, Properties.PVPSESSION_PREDATOR_ROUND_SECONDS);
+                if (sessionTimeLeft < requiredTimeLeft)
+                {
+                    log.DebugFormat("[PVP] Not starting predator because there is not enough time left in the session. ({0} < {1})", sessionTimeLeft, requiredTimeLeft);
+                    return 0;
+                }
+
+                participants = new(_allParticipants);
+                scores = GetHighScores().SelectMany(g => g).Reverse().ToList();
+            }
+
+            List<PvPEntity> pvpEntities = new(scores.Count * 2);
+            int numTeams = 0;
+            foreach (var score in scores)
+            {
+                if (score.IsGroup)
+                {
+                    var range = score.Children
+                        .Select(s => participants.TryGetValue(s.OwnerId, out PvPEntity entity) ? entity : null)
+                        .Where(e => e is not null)
+                        .ToList();
+                    if (range.Count > 0)
+                        ++numTeams;
+                    pvpEntities.AddRange(range);
+                }
+                else if (participants.TryGetValue(score.OwnerId, out PvPEntity entity))
+                {
+                    ++numTeams;
+                    pvpEntities.Add(entity);
+                }
+            }
+            pvpEntities.RemoveAll(p => p.AsPlayer == null);
+            if (numTeams < CurrentSession!.MinTeamsForPredator)
+            {
+                log.DebugFormat("[PVP] Not starting predator because there are not enough teams. ({0} < {1})", numTeams, CurrentSession.MinTeamsForPredator);
+                return PREDATOR_CHECK_START_INTERVAL;
+            }
+            if (log.IsDebugEnabled)
+            {
+                log.Debug("[PVP] Starting predator: " + string.Join(", ", pvpEntities.Select(e => e.Name)));
+            }
+            _predatorManager.Start(pvpEntities);
+            return predatorRoundMilliseconds;
+        }
+
+        private int EndPredator()
+        {
+            log.Info("predator tick");
+            return PREDATOR_CHECK_START_INTERVAL;
+        }
+
         #region Add Player/Group (with Guild + Bind Logic)
         /// <summary>
         /// Add a single player (solo) to PvP.
@@ -2219,6 +2352,8 @@ namespace AmteScripts.Managers
                 return false;
             }
 
+            log.Info("Players in PvP: " + _playersInPvP);
+
             player.Bind(true);
             player.SaveIntoDatabase();
             SaveScores();
@@ -2251,6 +2386,8 @@ namespace AmteScripts.Managers
                 _cleanupGroup(group, false);
                 return false;
             }
+            log.Info("Players in PvP: " + _playersInPvP);
+
             SaveScores();
             return true;
         }
@@ -2319,20 +2456,29 @@ namespace AmteScripts.Managers
 
             DequeueSolo(player);
             --_playersInPvP;
+            log.Info("Players in PvP: " + _playersInPvP);
+            _allParticipants.Remove(player.InternalID);
             _cleanupArea(player);
             _freeSpawn(player);
             if (pvpGuild != null)
             {
-                // Check if *all* members have left. If so, remove area:
-                if (!pvpGuild.GetListOfOnlineMembers().Any(m => m.IsInPvP))
-                {
-                    _cleanupArea(pvpGuild);
-                    _freeSpawn(pvpGuild);
-                }
+                _cleanupGuild(pvpGuild);
             }
             SaveScores();
+            log.Info("Players in PvP: " + _playersInPvP);
 
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.LeftPvP"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+        }
+
+        private void _cleanupGuild(Guild guild)
+        {
+            // Check if *all* members have left. If so, remove area:
+            if (!guild.GetListOfOnlineMembers().Any(m => m.IsInPvP))
+            {
+                _cleanupArea(guild);
+                _freeSpawn(guild);
+                _allParticipants.Remove(guild.GuildID);
+            }
         }
         
         private void _cleanupArea(AbstractArea area)
@@ -2527,7 +2673,6 @@ namespace AmteScripts.Managers
         #region Teleport logic
         private bool TeleportSoloPlayer(GamePlayer player)
         {
-
             Spawn spawnPos = FindSpawnPosition(player.Realm);
             if (spawnPos == null)
             {
@@ -2568,6 +2713,11 @@ namespace AmteScripts.Managers
             {
                 UpdateAllTerritoryMarkers(player);
             }
+
+            _allParticipants[player.InternalID] = new PvPPlayerEntity(player);
+            _soloScores[player.InternalID] = new PvPScore(player, true);
+
+            UpdatePredator();
             return true;
         }
 
@@ -2790,14 +2940,14 @@ namespace AmteScripts.Managers
                 lock (_usedSpawns)
                 {
                     var available = _spawnNpcsGlobal.Values.Where(n => !_usedSpawns.Contains(n)).ToList();
-                    log.Info($"all: {string.Join(',', _spawnNpcsGlobal.Select(n => n.Value.InternalID))}");
-                    log.Info($"used: {string.Join(',', _usedSpawns.Select(n => n.InternalID))}");
-                    log.Info($"available: {string.Join(',', available.Select(n => n.InternalID))}");
+                    log.Debug($"[PvP] all spawns: {string.Join(',', _spawnNpcsGlobal.Select(n => n.Value.InternalID))}");
+                    log.Debug($"[PvP] used spawns: {string.Join(',', _usedSpawns.Select(n => n.InternalID))}");
+                    log.Debug($"[PvP] available spawns: {string.Join(',', available.Select(n => n.InternalID))}");
                     if (available.Count > 0)
                     {
                         var idx = Util.Random(available.Count - 1);
                         var chosen = available[idx];
-                        log.Info($"chosen: {chosen.InternalID} ({idx})");
+                        log.Debug($"[PvP] chosen spawn: {chosen.InternalID} ({idx})");
                         _usedSpawns.Add(chosen);
                         return new Spawn(chosen, chosen.Position);
                     }

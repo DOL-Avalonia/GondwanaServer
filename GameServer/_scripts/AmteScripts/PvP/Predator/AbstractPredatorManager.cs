@@ -1,9 +1,13 @@
 ﻿#nullable enable
 
 using Discord.Net;
+using DOL.Events;
+using DOL.GameEvents;
 using DOL.GS;
 using DOL.GS.Commands;
 using DOL.GS.PacketHandler;
+using log4net;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections;
@@ -13,6 +17,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Resources;
 using System.Text;
 using System.Threading;
@@ -48,6 +53,8 @@ namespace AmteScripts.PvP
                 m_prey = value;
             }
         }
+
+        public bool IsPredator(GameObject? player) { return player != null && Predator.GetPlayers().Contains(player); }
 
         public bool RecordKill(PvPEntity killer, string victim)
         {
@@ -99,33 +106,102 @@ namespace AmteScripts.PvP
 
     public abstract class AbstractPredatorManager
     {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType!)!;
+
         private readonly object m_predatorsLock = new();
-        private List<PredatorPair> m_currentPredators = new();
+        private readonly List<PredatorPair> m_currentPredators = new();
+        private readonly ReaderWriterDictionary<GamePlayer, PredatorPair> m_preyLookup = new();
 
         private readonly object m_queueLock = new();
         private readonly List<PvPEntity> m_queue = new();
 
-        protected void Start(IList<PvPEntity> players)
+        public void Start(IEnumerable<PvPEntity> players)
         {
+            var pairs = AssignPairs(players, null);
+            if (pairs.Count > 0)
+            {
+                var last = pairs.Last();
+                var first = pairs.First();
+                if (last.Predator.AssociatedGuild != first.Predator.AssociatedGuild || last.Predator.AssociatedGuild == null && first.Predator.AssociatedGuild == null)
+                {
+                    last.Prey = first.Predator;
+                }
+            }
+
+            if (log.IsDebugEnabled)
+            {
+                log.Debug("Predator starting: " + string.Join(", ", pairs));
+            }
+
             lock (m_predatorsLock)
             {
+                m_preyLookup.Clear();
                 m_currentPredators.Clear();
-                m_currentPredators.Capacity = players.Count;
-                for (int i = 0; i < players.Count; ++i)
+                m_currentPredators.AddRange(pairs);
+                foreach (var pair in pairs)
                 {
-                    var predator = players[i];
-                    var prey = players[(i + 1) % players.Count];
-                    if (players.Count == 1)
-                        prey = null;
+                    if (pair.Prey != null)
+                    {
+                        foreach (GamePlayer player in pair.Prey.GetPlayers())
+                        {
+                            if (!m_preyLookup.TryAdd(player, pair))
+                            {
+                                log.ErrorFormat("Predator {0} has a prey {1} that is already being hunted by {2} ; there is an error in the implementation. Removing prey from {0}", pair.Predator, player, m_preyLookup[player]);
+                                pair.Prey = null;
+                                continue;
+                            }
 
-                    // var (foo, bar) = AssignPairs(players, null, null);
+                            GameEventMgr.AddHandler(player, GamePlayerEvent.Dying, PreyKilledHandler);
+                        }
+                    }
+                    pair.NotifyNewPrey();
                 }
+            }
+        }
+
+        protected void PreyKilledHandler(DOLEvent e, object sender, EventArgs arguments)
+        {
+            if (arguments is not DyingEventArgs args || sender is not GamePlayer victim)
+                return;
+
+            if (!m_preyLookup.TryGetValue(victim, out PredatorPair bounty))
+            {
+                log.ErrorFormat("Could not find predator for dying prey {0}", victim);
+                return;
+            }
+
+            OnPreyKilled(victim, bounty, args);
+        }
+
+        protected virtual void OnPreyKilled(GamePlayer prey, PredatorPair predator, DyingEventArgs dyingArgs)
+        {
+            if (predator.IsPredator(dyingArgs.Killer))
+            {
+                var playerKiller = dyingArgs.Killer as GamePlayer;
+                playerKiller.SendMessage("you killed your prey!");
+                prey.SendMessage("you were killed by your predator!");
+            }
+            else
+            {
+                log.Info("not predator");
             }
         }
 
         public void Start()
         {
             Start(Dequeue());
+        }
+
+        public void Stop()
+        {
+            lock (m_queueLock)
+            {
+                lock (m_currentPredators)
+                {
+                    m_queue.Clear();
+                    m_currentPredators.Clear();
+                }
+            }
         }
 
         protected List<PredatorPair> AssignPairs(IEnumerable<PvPEntity> entities, PvPEntity? prey)
@@ -135,6 +211,9 @@ namespace AmteScripts.PvP
             // And the predator becomes prey
             // To do this we reverse the list as an optimization to keep adding to the end
             List<PredatorPair> pairs = new();
+            if (entities is ICollection collection)
+                pairs.Capacity = collection.Count;
+
             var allPredators = entities.Reverse()
                 .GroupBy(e => (object?)e.AssociatedGuild ?? e, (g, e) => KeyValuePair.Create(g, new Queue<PvPEntity>(e)))
                 .ToList();
@@ -318,6 +397,14 @@ namespace AmteScripts.PvP
             }
         }
 
+        public void Queue(IEnumerable<PvPEntity> entities)
+        {
+            lock (m_queueLock)
+            {
+                m_queue.AddRange(entities);
+            }
+        }
+
         public void Queue(GamePlayer player)
         {
             Queue(new PvPPlayerEntity(player));
@@ -342,5 +429,7 @@ namespace AmteScripts.PvP
             OnAssignNewPreys(changed);
             return removed;
         }
+
+        public virtual bool IsActive => m_currentPredators.Count > 0;
     }
 }

@@ -169,6 +169,8 @@ namespace DOL.Events
         /// </summary>
         public static readonly GamePlayerEvent ChangeAnonymous = new GamePlayerEvent("GamePlayer.ExecuteCommand");
 
+        public static readonly GamePlayerEvent PreyKilled = new GamePlayerEvent("GamePlayer.PreyKilled");
+
         #region Statistics
 
         /// <summary>

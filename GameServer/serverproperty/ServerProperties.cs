@@ -1805,6 +1805,12 @@ namespace DOL.GS.ServerProperties
         public static bool PVPSESSION_GROUPKILLS_SOLOSCORES;
 
         /// <summary>
+        /// In PVP, do we count group kills in solo scores?
+        /// </summary>
+        [ServerProperty("pvp", "pvpsession_predator_round_seconds", "How long should a predator round last for, in seconds", 300)]
+        public static int PVPSESSION_PREDATOR_ROUND_SECONDS;
+
+        /// <summary>
         /// Allow task points for kills in PvP mode
         /// </summary>
         [ServerProperty("pvp", "pvp_allow_taskspoints", "Whether players receive task points (KillEnemyPlayersGroup or KillEnemyPlayersAlone) for kills in PvP mode", true)]

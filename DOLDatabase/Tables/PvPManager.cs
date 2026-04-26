@@ -24,6 +24,7 @@ namespace DOL.Database
         private bool _createCustomArea;
         private int _tempAreaRadius;
         private int _minPlayersForScore;
+        private int _minTeamsForPredator;
 
         [PrimaryKey] // we assume SessionID is unique
         public string SessionID
@@ -107,6 +108,13 @@ namespace DOL.Database
         {
             get { return _minPlayersForScore; }
             set { Dirty = true; _minPlayersForScore = value; }
+        }
+
+        [DataElement(AllowDbNull = false, DefaultDBValue = 2)]
+        public int MinTeamsForPredator
+        {
+            get { return _minTeamsForPredator; }
+            set { Dirty = true; _minTeamsForPredator = value; }
         }
     }
 }

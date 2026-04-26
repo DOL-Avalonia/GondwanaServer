@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AmteScripts.PvP
 {
-    public class PvPPredatorManager
+    public class PvPPredatorManager : AbstractPredatorManager
     {
     }
 
