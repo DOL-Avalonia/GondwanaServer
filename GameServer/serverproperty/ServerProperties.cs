@@ -564,6 +564,12 @@ namespace DOL.GS.ServerProperties
         public static string STARTING_MSG;
 
         /// <summary>
+        /// If true, cancels the standard STARTING_MSG and displays the custom Arcanum RPG welcome message.
+        /// </summary>
+        [ServerProperty("server", "use_rpg_starting_msg", "If true, cancels the standard STARTING_MSG and displays the custom Server RPG welcome message.", false)]
+        public static bool USE_RPG_STARTING_MSG;
+
+        /// <summary>
         /// The broadcast type
         /// </summary>
         [ServerProperty("server", "broadcast_type", "Broadcast Type - Edit this to change what /b does, values 0 = disabled, 1 = area, 2 = visibility distance, 3 = zone, 4 = region, 5 = realm, 6 = server", 1)]
@@ -676,6 +682,12 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("server", "free_respec", "Set to true to always allow respecs", false)]
         public static bool FREE_RESPEC;
+
+        /// <summary>
+        /// Enable or disable the dynamic Roleplay Reward system
+        /// </summary>
+        [ServerProperty("server", "roleplayreward_enabled", "Enable the dynamic Roleplay Reward system for character dialogues.", true)]
+        public static bool ROLEPLAYREWARD_ENABLED;
 
         /// <summary>
         /// Is the server cross realm?

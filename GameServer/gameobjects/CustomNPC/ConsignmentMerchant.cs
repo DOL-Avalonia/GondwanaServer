@@ -16,10 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using DOL.Database;
 using DOL.GS.Finance;
 using DOL.GS.Geometry;
@@ -27,13 +23,18 @@ using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
 using DOL.GS.PacketHandler.Client.v168;
 using DOL.GS.Scripts;
+using DOL.Language;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace DOL.GS
 {
     public class GameConsignmentMerchant : GameNPC, IGameInventoryObject
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         protected const string ITEM_BEING_ADDED = "ItemBeingAddedToObject";
         protected const string CONSIGNMENT_BUY_ITEM = "ConsignmentBuyItem";
@@ -138,7 +139,7 @@ namespace DOL.GS
 
             if (!player.IsWithinRadius(this, 500))
             {
-                ((GamePlayer)source).Out.SendMessage("You are too far away to give anything to " + this.Name + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                ((GamePlayer)source).Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)source).Client.Account.Language, "ConsignmentMerchant.TooFarToGive", this.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
@@ -188,9 +189,9 @@ namespace DOL.GS
         /// <summary>
         /// List of items in the Consignment Merchants Inventory
         /// </summary>
-        public virtual IList<InventoryItem> DBItems(GamePlayer player = null)
+        public virtual IEnumerable<InventoryItem> DBItems(GamePlayer player = null)
         {
-            return MarketCache.Items.Where(item => item.OwnerID == GetOwner(player)).ToList();
+            return MarketCache.SearchItems(new ItemQuery { Owner = GetOwner(player) });
         }
 
         /// <summary>
@@ -332,7 +333,7 @@ namespace DOL.GS
 
                         if (toItem != null)
                         {
-                            player.Client.Out.SendMessage("You can only move an item to an empty slot!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            player.Client.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.MoveToEmptySlot"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return false;
                         }
 
@@ -349,7 +350,7 @@ namespace DOL.GS
                         }
                         else
                         {
-                            player.Client.Out.SendMessage("You can't buy items from yourself!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            player.Client.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.BuyFromSelf"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return false;
                         }
                     }
@@ -362,7 +363,7 @@ namespace DOL.GS
                         if (GetClientInventory(player).TryGetValue(toClientSlot, out _))
                         {
                             // in most clients this is actually handled ON the client, but just in case...
-                            player.Client.Out.SendMessage("You can only move an item to an empty slot!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            player.Client.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.MoveToEmptySlot"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return false;
                         }
 
@@ -458,22 +459,24 @@ namespace DOL.GS
             {
                 // Unique DOL feature
                 item.SellPrice = 0;
-                player.Out.SendCustomDialog("This item is not tradable. You can store it here but cannot sell it.", null);
+                player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.NotTradable"), null);
             }
 
             // Ideally `MoveItem` shouldn't notify observers before a price is set.
             // But this is currently the case so we need to notify observers again, this time with the new price.
-            if (item.SellPrice > 0)
-            {
-                Dictionary<int, InventoryItem> updateItem = new() { { item.SlotPosition + (FirstClientSlot - FirstDBSlot), item } };
-                this.NotifyPlayers(this, player, _observers, updateItem);
-            }
+            // We notify regardless of price so the UI updates correctly even if price is 0.
+            Dictionary<int, InventoryItem> updateItem = new() { { item.SlotPosition + (FirstClientSlot - FirstDBSlot), item } };
+            this.NotifyPlayers(this, player, _observers, updateItem);
 
             item.OwnerLot = conMerchant.HouseNumber;
             item.OwnerID = conMerchant.GetOwner(player);
             GameServer.Database.SaveObject(item);
+
+            MarketCache.RemoveItem(item);
+            MarketCache.AddItem(item);
+
             ChatUtil.SendDebugMessage(player, item.Name + " SellPrice=" + price + ", OwnerLot=" + item.OwnerLot + ", OwnerID=" + item.OwnerID);
-            player.Out.SendMessage("Price set!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.PriceSet"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
             if (ServerProperties.Properties.MARKET_ENABLE_LOG)
             {
@@ -511,14 +514,13 @@ namespace DOL.GS
 
             if (fromItem == null)
             {
-                ChatUtil.SendErrorMessage(player, "I can't find the item you want to purchase!");
+                ChatUtil.SendErrorMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.ItemNotFound"));
                 log.ErrorFormat("CM: {0}:{1} can't find item to buy in slot {2} on consignment merchant on lot {3}.", player.Name, player.Client.Account, (int)fromClientSlot, HouseNumber);
                 return;
             }
             
             float tax = 1 + (float)ServerProperties.Properties.TRADING_TAX / 100;
-            string buyText = "Do you want to buy this Item? (Price after " + ServerProperties.Properties.TRADING_TAX + "% tax: "
-                + Money.GetString((long)(fromItem.SellPrice * tax)) + ")";
+            string buyText = LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.BuyConfirm", ServerProperties.Properties.TRADING_TAX, Money.GetString((long)(fromItem.SellPrice * tax)));
 
             // If the player has a marketExplorer activated they will be charged a commission
             if (player.TargetObject is MarketExplorer)
@@ -526,7 +528,8 @@ namespace DOL.GS
                 player.TempProperties.setProperty(CONSIGNMENT_BUY_ITEM, fromClientSlot);
                 if (ServerProperties.Properties.MARKET_FEE_PERCENT > 0)
                 {
-                    player.Out.SendCustomDialog("Buying directly from the Market Explorer costs an additional " + ServerProperties.Properties.MARKET_FEE_PERCENT + "% fee. Do you want to buy this Item?", new CustomDialogResponse(BuyMarketResponse));
+                    string feeText = LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.BuyConfirmFee", ServerProperties.Properties.MARKET_FEE_PERCENT);
+                    player.Out.SendCustomDialog(feeText, new CustomDialogResponse(BuyMarketResponse));
                 }
                 else
                 {
@@ -540,7 +543,7 @@ namespace DOL.GS
             }
             else
             {
-                ChatUtil.SendErrorMessage(player, "I'm sorry, you need to be talking to a market explorer or consignment merchant in order to make a purchase.");
+                ChatUtil.SendErrorMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.TalkToMerchant"));
                 log.ErrorFormat("CM: {0}:{1} did not have a CM or ME targeted when attempting to purchase {2} on consignment merchant on lot {3}.", player.Name, player.Client.Account, fromItem.Name, HouseNumber);
             }
         }
@@ -600,7 +603,7 @@ namespace DOL.GS
 
                 if (item == null)
                 {
-                    ChatUtil.SendErrorMessage(player, "I can't find the item you want to purchase!");
+                    ChatUtil.SendErrorMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.ItemNotFound"));
                     log.ErrorFormat("{0}:{1} tried to purchase an item from slot {2} for consignment merchant on lot {3} and the item does not exist.", player.Name, player.Client.Account, (int)fromClientSlot, HouseNumber);
 
                     return;
@@ -618,7 +621,7 @@ namespace DOL.GS
                 {
                     if (purchasePrice <= 0)
                     {
-                        ChatUtil.SendErrorMessage(player, "This item can't be purchased!");
+                        ChatUtil.SendErrorMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.CannotPurchase"));
                         log.ErrorFormat("{0}:{1} tried to purchase {2} for consignment merchant on lot {3} and purchasePrice was {4}.", player.Name, player.Client.Account, item.Name, HouseNumber, purchasePrice);
                         return;
                     }
@@ -733,7 +736,7 @@ namespace DOL.GS
                 // The above code is suspect, it seems to work 80% of the time, so let's make sure we update the player doing the move - Tolakram
                 if (hasUpdatedPlayer == false)
                 {
-                    player.Client.Out.SendInventoryItemsUpdate(updateItems, PacketHandler.eInventoryWindowType.Update);
+                    player.Client.Out.SendInventoryItemsUpdate(updateItems, eInventoryWindowType.Update);
                 }
             }
 
@@ -778,7 +781,7 @@ namespace DOL.GS
 
                 if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                 {
-                    player.Out.SendMessage("Your merchant currently holds " + amount + " BountyPoints.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.HoldsBountyPoints", amount), eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                 }
             }
             else

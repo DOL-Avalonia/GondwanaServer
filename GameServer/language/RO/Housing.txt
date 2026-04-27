@@ -56,11 +56,28 @@ HousingPlaceItemHandler.DropOnFloor:				Lăsați obiectul {0} pe podeaua casei d
 HousingPlaceItemHandler.DropOnGarden:				Lăsați obiectul {0} în grădina dumneavoastră.
 HousingPlaceItemHandler.DropOnWall:				Lăsați obiectul {0} pe peretele casei dumneavoastră.
 HousingPlaceItemHandler.GardenObjectPlaced:			Obiect de grădină plasat. {0} locuri rămase.
+HousingPlaceItemHandler.GardenObjectPlacedName:		Lăsați obiectul {0} în grădina dumneavoastră.
 HousingPlaceItemHandler.HasPorch:				Această casă are deja un pridvor!
 HousingPlaceItemHandler.HasNoPorch:				Această casă nu are pridvor!
 HousingPlaceItemHandler.IndoorObjectPlaced:			Obiect de interior plasat. {0} locuri rămase.
 HousingPlaceItemHandler.NoHookpoint:				Nu mai există punct de ancorare!
 HousingPlaceItemHandler.PutMoney:				Depuneți bani în contul casei dumneavoastră.
+HousingPlaceItemHandler.NotOtherHouse:          Nu poți modifica casele altor persoane.
+HousingPlaceItemHandler.WarningRemoveAll:       Avertisment: Acest lucru va elimina *toate* obiectele din casa ta curentă!
+HousingPlaceItemHandler.UpgradeConfirm:         Ești sigur că vrei să îți îmbunătățești casa?
+HousingPlaceItemHandler.MustBeGuildMember:      Trebuie să fii membru al unei bresle pentru a face asta.
+HousingPlaceItemHandler.GuildAlreadyOwnsHouse:  Breasla ta deține deja o casă.
+HousingPlaceItemHandler.MustRemoveMerchant:     Trebuie mai întâi să elimini negustorul de consignație.
+HousingPlaceItemHandler.NeedsPorchFirst:        Casa ta are nevoie mai întâi de o verandă.
+HousingPlaceItemHandler.CannotAddMerchant:      Nu poți adăuga un negustor de consignație aici.
+HousingPlaceItemHandler.UseAddHookpoints:       Folosește '/house addhookpoints' pentru a permite adăugarea de noi puncte de prindere.
+HousingPlaceItemHandler.CannotAddMoreVaults:    Nu mai poți adăuga alte seifuri în această casă!
+HousingPlaceItemHandler.UnknownMethod:          Plasare obiect: Metodă necunoscută, nu se face nimic.
+HousingPlaceItemHandler.ErrorProcessing:        Eroare la procesarea acțiunii casei; eroarea a fost înregistrată!
+HousingPlaceItemHandler.NoHouseSelected:        Nicio casă selectată!
+HousingPlaceItemHandler.NeedRemovalDeed:        Ai nevoie de un Act de Eliminare a Casei pentru asta.
+HousingPlaceItemHandler.HouseRemoved:           Casa ta a fost eliminată!
+HousingPlaceItemHandler.NeedHouseDeed:          Acest lucru nu funcționează fără un Act al Casei.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Țintiți terenul numărul {0}.
@@ -77,12 +94,8 @@ Housing.LotMarker.ThisItemCantBeSold:				Acest obiect nu poate fi vândut.
 Housing.LotMarker.LotNotItem:					Acesta nu este un act de proprietate valid.
 
 Scripts.Player.Housing.BadShieldBanner:			Acesta nu este un obiect sau un banner valid.
-Scripts.Player.Housing.CantBeSold:				Acest obiect nu poate fi vândut!
 Scripts.Player.Housing.CarpetsRemoved:			Covorul dumneavoastră a fost îndepărtat.
 Scripts.Player.Housing.ClearHookPoint:			Doriți să eliminați obiectul din punctul de ancorare?
-Scripts.Player.Housing.EnteredHouse:				Intrați în casa numărul {0}.
-Scripts.Player.Housing.GardenItemPlaced:			Obiecte de grădină plasate. {0} locuri rămase.
-Scripts.Player.Housing.GardenItemPlacedName:		Lăsați obiectul {0} în grădina dumneavoastră.
 Scripts.Player.Housing.GardenMaxObjects:			Ați depus 30 de obiecte în grădina dumneavoastră. Nu mai aveți loc.
 Scripts.Player.Housing.GuildNowOwns:				[Breaslă] {0} deține acum o casă de breaslă de {1}!
 Scripts.Player.Housing.NotOwner:					Nu ești proprietarul acestei case!
@@ -105,7 +118,6 @@ Scripts.Player.Housing.HookPointNotPlaced:			Obiectul nu a fost plasat pe aceast
 Scripts.Player.Housing.HouseUseMaterials:			Folosiți shift+clic-dreapta în casa dumneavoastră pentru a schimba aspectul casei.
 Scripts.Player.Housing.HouseUseCarpets:				Folosiți shift+clic-dreapta în casa dumneavoastră pentru a schimba covoarele.
 Scripts.Player.Housing.IndoorFloorPlaced:			Ați plasat {0} la etajul casei dumneavoastră.
-Scripts.Player.Housing.IndoorItemPlaced:			Obiect de interior plasat. {0} loc rămas.
 Scripts.Player.Housing.IndoorMaxItems:			În prezent ați plasat {0} obiecte în casa dumneavoastră. Nu puteți plasa mai multe.
 Scripts.Player.Housing.IndoorWallPlaced:			Tocmai ați plasat {0} pe peretele casei dumneavoastră.
 Scripts.Player.Housing.InteriorBannersAdded:		Bannerul de breaslă interior a fost schimbat.
@@ -119,10 +131,6 @@ Scripts.Player.Housing.OutdoorBannersAdded:		Bannerul de breaslă exterior a fos
 Scripts.Player.Housing.OutdoorBannersRemoved:		Bannerul de breaslă exterior a fost îndepărtat.
 Scripts.Player.Housing.OutdoorShieldsAdded:		Emblema de breaslă exterioară a fost schimbată.
 Scripts.Player.Housing.OutdoorShieldsRemoved:		Emblema de breaslă exterioară a fost îndepărtată.
-Scripts.Player.Housing.PaidChanges:				Plătiți {0} pentru a efectua schimbările.
-Scripts.Player.Housing.PaidNotEnough:			Nu aveți destui bani pentru a face asta!
-Scripts.Player.Housing.PorchAlready:				Această casă are deja un pridvor!
-Scripts.Player.Housing.PorchNone:				Această casă nu conține pridvor!
 Scripts.Player.Housing.PorchNotItem:				Acesta nu este un obiect pentru pridvor!
 Scripts.Player.Housing.TransferToGuild:			Doriți să transferați această casă către {0}?
 

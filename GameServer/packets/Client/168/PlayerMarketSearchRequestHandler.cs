@@ -1,28 +1,7 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Housing;
-using System.Text;
 using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
@@ -30,10 +9,7 @@ namespace DOL.GS.PacketHandler.Client.v168
     [PacketHandlerAttribute(PacketHandlerType.TCP, eClientPackets.MarketSearchRequest, "Handles player market search", eClientStatus.PlayerInGame)]
     public class PlayerMarketSearchRequestHandler : IPacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -43,45 +19,85 @@ namespace DOL.GS.PacketHandler.Client.v168
             if ((client.Player.TargetObject is IGameInventoryObject) == false)
                 return;
 
-            MarketSearch.SearchData search = new MarketSearch.SearchData
-            {
-                name = packet.ReadString(64),
-                slot = (int)packet.ReadInt(),
-                skill = (int)packet.ReadInt(),
-                resist = (int)packet.ReadInt(),
-                bonus = (int)packet.ReadInt(),
-                hp = (int)packet.ReadInt(),
-                power = (int)packet.ReadInt(),
-                proc = (int)packet.ReadInt(),
-                qtyMin = (int)packet.ReadInt(),
-                qtyMax = (int)packet.ReadInt(),
-                levelMin = (int)packet.ReadInt(),
-                levelMax = (int)packet.ReadInt(),
-                priceMin = (int)packet.ReadInt(),
-                priceMax = (int)packet.ReadInt(),
-                visual = (int)packet.ReadInt(),
-                page = (byte)packet.ReadByte()
-            };
-            byte unk1 = (byte)packet.ReadByte();
-            short unk2 = (short)packet.ReadShort();
-
-            // Dunnerholl 2009-07-28 Version 1.98 introduced new options to Market search. 12 Bytes were added, but only 7 are in usage so far in my findings.
-            // update this, when packets change and keep in mind, that this code reflects only the 1.98 changes
-            search.armorType = search.page; // page is now used for the armorType (still has to be logged, i just checked that 2 means leather, 0 = standard
-            search.damageType = (byte)packet.ReadByte(); // 1=crush, 2=slash, 3=thrust
-            byte unk3 = (byte)packet.ReadByte();
-            byte unk4 = (byte)packet.ReadByte();
-            byte unk5 = (byte)packet.ReadByte();
-            search.playerCrafted = (byte)packet.ReadByte(); // 1 = show only Player crafted, 0 = all
+            var searchOffset = packet.ReadByte();
             packet.Skip(3); // 3 bytes unused
-            search.page = (byte)packet.ReadByte(); // page is now sent here
-            byte unk6 = (byte)packet.ReadByte();
-            byte unk7 = (byte)packet.ReadByte();
-            byte unk8 = (byte)packet.ReadByte();
+
+            MarketSearch.SearchData search = new MarketSearch.SearchData();
+
+            search.name = packet.ReadString(searchOffset);
+
+            if (search.name.Equals("|"))
+            {
+                search.name = string.Empty;
+            }
+
+            search.realm = (eRealm)client.Player.Realm;
+            search.slot = (int)packet.ReadByte();
+
+            // Bonus 1
+            var bonus1 = packet.ReadByte();
+            var bonus1b = packet.ReadByte();
+            search.bonus1 = bonus1b * 256 + bonus1;
+
+            var bonus1Value = (int)packet.ReadByte();
+            var bonus1bValue = (int)packet.ReadByte();
+            search.bonus1Value = bonus1bValue * 256 + bonus1Value;
+
+            // Bonus 2
+            var bonus2 = packet.ReadByte();
+            var bonus2b = packet.ReadByte();
+            search.bonus2 = bonus2b * 256 + bonus2;
+
+            var bonus2Value = (int)packet.ReadByte();
+            var bonus2bValue = (int)packet.ReadByte();
+            search.bonus2Value = bonus2bValue * 256 + bonus2Value;
+
+            // Bonus 3
+            var bonus3 = packet.ReadByte();
+            var bonus3b = packet.ReadByte();
+            search.bonus3 = bonus3b * 256 + bonus3;
+
+            var bonus3Value = (int)packet.ReadByte();
+            var bonus3bValue = (int)packet.ReadByte();
+            search.bonus3Value = bonus3bValue * 256 + bonus3Value;
+
+            search.proc = (int)packet.ReadByte();
+            packet.Skip(1);
+
+            search.armorType = (byte)packet.ReadByte();
+            search.damageType = (byte)packet.ReadByte(); // 1=crush, 2=slash, 3=thrust
+            search.levelMin = (byte)packet.ReadByte();
+            search.levelMax = (byte)packet.ReadByte();
+            search.minQual = (byte)packet.ReadByte();
+
+            search.priceMin = packet.ReadIntLowEndian();
+            search.priceMax = packet.ReadIntLowEndian();
+
+            search.playerCrafted = (byte)packet.ReadByte(); // 1 = show only Player crafted, 0 = all
+            search.visual = (int)packet.ReadByte();
+            search.page = (byte)packet.ReadByte();
 
             search.clientVersion = client.Version.ToString();
 
-            (client.Player.TargetObject as IGameInventoryObject).SearchInventory(client.Player, search);
+            if (ServerProperties.Properties.MARKET_ENABLE_LOG && log.IsDebugEnabled)
+            {
+                log.Debug("----- MARKET EXPLORER SEARCH PACKET ANALYSIS ---------------------");
+                log.DebugFormat("name          : {0}", search.name);
+                log.DebugFormat("slot          : {0}", search.slot);
+                log.DebugFormat("armorType     : {0}", search.armorType);
+                log.DebugFormat("damageType    : {0}", search.damageType);
+                log.DebugFormat("levelMin      : {0}", search.levelMin);
+                log.DebugFormat("levelMax      : {0}", search.levelMax);
+                log.DebugFormat("minQual       : {0}", search.minQual);
+                log.DebugFormat("priceMin      : {0}", search.priceMin);
+                log.DebugFormat("priceMax      : {0}", search.priceMax);
+                log.DebugFormat("playerCrafted : {0}", search.playerCrafted);
+                log.DebugFormat("visual        : {0}", search.visual);
+                log.DebugFormat("page          : {0}", search.page);
+                log.Debug("------------------------------------------------------------------");
+            }
+
+            (client.Player.TargetObject as IGameInventoryObject)!.SearchInventory(client.Player, search);
         }
     }
 }

@@ -56,11 +56,28 @@ HousingPlaceItemHandler.DropOnFloor:				Đặt vật dụng {0} trên sàn nhà 
 HousingPlaceItemHandler.DropOnGarden:				Đặt vật dụng {0} trong khu vườn của bạn.
 HousingPlaceItemHandler.DropOnWall:				Gắn vật dụng {0} lên tường nhà của bạn.
 HousingPlaceItemHandler.GardenObjectPlaced:			Đã đặt vật dụng vườn. Còn {0} chỗ.
+HousingPlaceItemHandler.GardenObjectPlacedName:		Đặt vật dụng {0} trong khu vườn của bạn.
 HousingPlaceItemHandler.HasPorch:				Ngôi nhà này đã có hiên!
 HousingPlaceItemHandler.HasNoPorch:				Ngôi nhà này không có hiên!
 HousingPlaceItemHandler.IndoorObjectPlaced:			Đã đặt vật dụng nội thất. Còn {0} chỗ.
 HousingPlaceItemHandler.NoHookpoint:				Không còn điểm móc nào khả dụng!
 HousingPlaceItemHandler.PutMoney:				Nạp tiền vào tài khoản ngôi nhà của bạn.
+HousingPlaceItemHandler.NotOtherHouse:          Bạn không được thay đổi nhà của người khác.
+HousingPlaceItemHandler.WarningRemoveAll:       Cảnh báo: Thao tác này sẽ gỡ bỏ *tất cả* vật phẩm khỏi ngôi nhà hiện tại của bạn!
+HousingPlaceItemHandler.UpgradeConfirm:         Bạn có chắc chắn muốn nâng cấp Nhà của mình không?
+HousingPlaceItemHandler.MustBeGuildMember:      Bạn phải là thành viên của một bang hội để làm điều đó.
+HousingPlaceItemHandler.GuildAlreadyOwnsHouse:  Bang hội của bạn đã sở hữu một ngôi nhà.
+HousingPlaceItemHandler.MustRemoveMerchant:     Bạn phải gỡ bỏ thương nhân ký gửi trước.
+HousingPlaceItemHandler.NeedsPorchFirst:        Ngôi nhà của bạn cần có mái hiên trước.
+HousingPlaceItemHandler.CannotAddMerchant:      Bạn không thể thêm thương nhân ký gửi ở đây.
+HousingPlaceItemHandler.UseAddHookpoints:       Sử dụng '/house addhookpoints' để cho phép thêm các điểm neo nhà mới.
+HousingPlaceItemHandler.CannotAddMoreVaults:    Bạn không thể thêm bất kỳ hầm chứa nào nữa vào ngôi nhà này!
+HousingPlaceItemHandler.UnknownMethod:          Đặt vật phẩm: Phương thức không xác định, không làm gì cả.
+HousingPlaceItemHandler.ErrorProcessing:        Lỗi khi xử lý thao tác nhà ở; lỗi đã được ghi lại!
+HousingPlaceItemHandler.NoHouseSelected:        Chưa chọn ngôi nhà nào!
+HousingPlaceItemHandler.NeedRemovalDeed:        Bạn cần có Chứng thư dỡ bỏ nhà cho việc này.
+HousingPlaceItemHandler.HouseRemoved:           Ngôi nhà của bạn đã bị dỡ bỏ!
+HousingPlaceItemHandler.NeedHouseDeed:          Thao tác này không thể thực hiện nếu không có Chứng thư nhà.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Bạn đang nhắm tới lô số {0}.
@@ -77,12 +94,8 @@ Housing.LotMarker.ThisItemCantBeSold:				Vật dụng này không thể bán.
 Housing.LotMarker.LotNotItem:					Đây không phải là giấy chứng nhận sở hữu hợp lệ.
 
 Scripts.Player.Housing.BadShieldBanner:			Đây không phải là vật dụng hoặc cờ hiệu hợp lệ.
-Scripts.Player.Housing.CantBeSold:				Vật dụng này không thể bán!
 Scripts.Player.Housing.CarpetsRemoved:			Thảm của bạn đã bị gỡ.
 Scripts.Player.Housing.ClearHookPoint:			Bạn có muốn tháo vật dụng khỏi điểm móc không?
-Scripts.Player.Housing.EnteredHouse:				Bạn vào ngôi nhà số {0}.
-Scripts.Player.Housing.GardenItemPlaced:			Đã đặt vật dụng vườn. Còn {0} chỗ.
-Scripts.Player.Housing.GardenItemPlacedName:		Đặt vật dụng {0} trong khu vườn của bạn.
 Scripts.Player.Housing.GardenMaxObjects:			Bạn đã đặt 30 vật dụng trong vườn. Hết chỗ.
 Scripts.Player.Housing.GuildNowOwns:				[Bang hội] {0} hiện sở hữu một nhà bang hội cỡ {1}!
 Scripts.Player.Housing.NotOwner:					Bạn không phải là chủ của ngôi nhà này!
@@ -105,7 +118,6 @@ Scripts.Player.Housing.HookPointNotPlaced:			Vật dụng không được đặt
 Scripts.Player.Housing.HouseUseMaterials:			Dùng Shift+nhấp phải trong nhà để thay đổi diện mạo.
 Scripts.Player.Housing.HouseUseCarpets:				Dùng Shift+nhấp phải trong nhà để thay đổi thảm.
 Scripts.Player.Housing.IndoorFloorPlaced:			Bạn đã đặt {0} trên tầng của ngôi nhà.
-Scripts.Player.Housing.IndoorItemPlaced:			Đã đặt vật dụng nội thất. Còn {0} chỗ.
 Scripts.Player.Housing.IndoorMaxItems:			Bạn đã đặt {0} vật dụng trong nhà. Không thể đặt thêm.
 Scripts.Player.Housing.IndoorWallPlaced:			Bạn vừa gắn {0} lên tường nhà.
 Scripts.Player.Housing.InteriorBannersAdded:		Đã thay đổi cờ hiệu bang hội bên trong.
@@ -119,10 +131,6 @@ Scripts.Player.Housing.OutdoorBannersAdded:		Đã thay đổi cờ hiệu bang h
 Scripts.Player.Housing.OutdoorBannersRemoved:		Đã gỡ cờ hiệu bang hội bên ngoài.
 Scripts.Player.Housing.OutdoorShieldsAdded:		Đã thay đổi khiên bang hội bên ngoài.
 Scripts.Player.Housing.OutdoorShieldsRemoved:		Đã gỡ khiên bang hội bên ngoài.
-Scripts.Player.Housing.PaidChanges:				Bạn trả {0} để áp dụng thay đổi.
-Scripts.Player.Housing.PaidNotEnough:			Bạn không có đủ tiền để thực hiện điều đó!
-Scripts.Player.Housing.PorchAlready:				Ngôi nhà này đã có hiên!
-Scripts.Player.Housing.PorchNone:				Ngôi nhà này không có hiên!
 Scripts.Player.Housing.PorchNotItem:				Đây không phải là vật dụng hiên nhà!
 Scripts.Player.Housing.TransferToGuild:			Bạn có muốn chuyển ngôi nhà này cho {0} không?
 

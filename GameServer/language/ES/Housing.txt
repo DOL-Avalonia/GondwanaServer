@@ -56,11 +56,28 @@ HousingPlaceItemHandler.DropOnFloor:				Deja el objeto {0} en el suelo de tu cas
 HousingPlaceItemHandler.DropOnGarden:				Deja el objeto {0} en tu jardín.
 HousingPlaceItemHandler.DropOnWall:				Deja el objeto {0} en la pared de tu casa.
 HousingPlaceItemHandler.GardenObjectPlaced:			Objeto de jardín colocado. Quedan {0} espacios.
+HousingPlaceItemHandler.GardenObjectPlacedName:		Deja el objeto {0} en tu jardín.
 HousingPlaceItemHandler.HasPorch:				¡Esta casa ya tiene porche!
 HousingPlaceItemHandler.HasNoPorch:				¡Esta casa no tiene porche!
 HousingPlaceItemHandler.IndoorObjectPlaced:			Objeto interior colocado. Quedan {0} espacios.
 HousingPlaceItemHandler.NoHookpoint:				¡No queda punto de anclaje!
 HousingPlaceItemHandler.PutMoney:				Deposita dinero en la cuenta de tu casa.
+HousingPlaceItemHandler.NotOtherHouse:          No puedes modificar las casas de otras personas.
+HousingPlaceItemHandler.WarningRemoveAll:       Advertencia: ¡Esto eliminará *todos* los artículos de tu casa actual!
+HousingPlaceItemHandler.UpgradeConfirm:         ¿Estás seguro de que quieres mejorar tu casa?
+HousingPlaceItemHandler.MustBeGuildMember:      Debes ser miembro de un gremio para hacer eso.
+HousingPlaceItemHandler.GuildAlreadyOwnsHouse:  Tu gremio ya posee una casa.
+HousingPlaceItemHandler.MustRemoveMerchant:     Primero debes retirar al comerciante de consignación.
+HousingPlaceItemHandler.NeedsPorchFirst:        Tu casa necesita un porche primero.
+HousingPlaceItemHandler.CannotAddMerchant:      No puedes añadir un comerciante de consignación aquí.
+HousingPlaceItemHandler.UseAddHookpoints:       Usa '/house addhookpoints' para permitir la adición de nuevos puntos de anclaje.
+HousingPlaceItemHandler.CannotAddMoreVaults:    ¡No puedes añadir más cámaras acorazadas a esta casa!
+HousingPlaceItemHandler.UnknownMethod:          Colocar artículo: Método desconocido, no hacer nada.
+HousingPlaceItemHandler.ErrorProcessing:        Error al procesar la acción de la casa; ¡el error ha sido registrado!
+HousingPlaceItemHandler.NoHouseSelected:        ¡Ninguna casa seleccionada!
+HousingPlaceItemHandler.NeedRemovalDeed:        Necesitas una Escritura de Retirada de Casa para esto.
+HousingPlaceItemHandler.HouseRemoved:           ¡Tu casa ha sido eliminada!
+HousingPlaceItemHandler.NeedHouseDeed:          Esto no funciona sin una Escritura de Casa.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Apuntas a la parcela número {0}.
@@ -77,12 +94,8 @@ Housing.LotMarker.ThisItemCantBeSold:				Este objeto no puede venderse.
 Housing.LotMarker.LotNotItem:					Este no es un título de propiedad válido.
 
 Scripts.Player.Housing.BadShieldBanner:			Esto no es un objeto o estandarte válido.
-Scripts.Player.Housing.CantBeSold:				¡Este objeto no puede venderse!
 Scripts.Player.Housing.CarpetsRemoved:			Tu alfombra ha sido retirada.
 Scripts.Player.Housing.ClearHookPoint:			¿Quieres eliminar el objeto del punto de anclaje?
-Scripts.Player.Housing.EnteredHouse:				Entras en la casa número {0}.
-Scripts.Player.Housing.GardenItemPlaced:			Objetos de jardín colocados. Quedan {0} espacios.
-Scripts.Player.Housing.GardenItemPlacedName:		Deja el objeto {0} en tu jardín.
 Scripts.Player.Housing.GardenMaxObjects:			Has puesto 30 objetos en tu jardín. No queda espacio.
 Scripts.Player.Housing.GuildNowOwns:				[Gremio] ¡{0} ahora posee una casa de gremio de {1}!
 Scripts.Player.Housing.NotOwner:					¡No eres el dueño de esta casa!
@@ -105,7 +118,6 @@ Scripts.Player.Housing.HookPointNotPlaced:			El objeto no se ha colocado en ese 
 Scripts.Player.Housing.HouseUseMaterials:			Usa Mayús+clic derecho en tu casa para cambiar el aspecto.
 Scripts.Player.Housing.HouseUseCarpets:				Usa Mayús+clic derecho en tu casa para cambiar las alfombras.
 Scripts.Player.Housing.IndoorFloorPlaced:			Has colocado {0} en el piso de tu casa.
-Scripts.Player.Housing.IndoorItemPlaced:			Objeto interior colocado. Queda {0} espacio.
 Scripts.Player.Housing.IndoorMaxItems:			Actualmente has colocado {0} objetos en tu casa. No puedes colocar más.
 Scripts.Player.Housing.IndoorWallPlaced:			Acabas de colocar {0} en la pared de tu casa.
 Scripts.Player.Housing.InteriorBannersAdded:		El estandarte de gremio interior ha sido cambiado.
@@ -119,10 +131,6 @@ Scripts.Player.Housing.OutdoorBannersAdded:		El estandarte de gremio exterior ha
 Scripts.Player.Housing.OutdoorBannersRemoved:		El estandarte de gremio exterior ha sido retirado.
 Scripts.Player.Housing.OutdoorShieldsAdded:		El escudo de gremio exterior ha sido cambiado.
 Scripts.Player.Housing.OutdoorShieldsRemoved:		El escudo de gremio exterior ha sido retirado.
-Scripts.Player.Housing.PaidChanges:				Pagas {0} para efectuar los cambios.
-Scripts.Player.Housing.PaidNotEnough:			¡No tienes suficiente dinero para hacer eso!
-Scripts.Player.Housing.PorchAlready:				¡Esta casa ya tiene porche!
-Scripts.Player.Housing.PorchNone:				¡Esta casa no tiene porche!
 Scripts.Player.Housing.PorchNotItem:				¡Este no es un objeto de porche!
 Scripts.Player.Housing.TransferToGuild:			¿Quieres transferir esta casa a {0}?
 

@@ -1,21 +1,21 @@
+using DOL;
+using DOL.Database;
+using DOL.Events;
+using DOL.GS;
+using DOL.GS.GameEvents;
+using DOL.GS.Housing;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Timers;
-using DOL;
-using DOL.GS;
-using DOL.GS.GameEvents;
-using DOL.GS.PacketHandler;
-using DOL.Database;
-using DOL.Events;
-using DOL.GS.Housing;
-
 
 namespace DOL.GS
 {
     public class MarketExplorer : GameNPC, IGameInventoryObject
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public const string EXPLORER_ITEM_LIST = "MarketExplorerItems";
 
@@ -42,7 +42,7 @@ namespace DOL.GS
             }
             else
             {
-                player.Out.SendMessage("Sorry, the market is not available at this time.", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "MarketExplorer.MarketUnavailable"), eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
             }
             return true;
         }
@@ -60,9 +60,9 @@ namespace DOL.GS
         /// <summary>
         /// List of items in this objects inventory
         /// </summary>
-        public virtual IList<InventoryItem> DBItems(GamePlayer player = null)
+        public virtual IEnumerable<InventoryItem> DBItems(GamePlayer player = null)
         {
-            return MarketCache.Items;
+            return MarketCache.SearchItems(new ItemQuery());
         }
 
         /// <summary>
@@ -109,26 +109,29 @@ namespace DOL.GS
         public virtual bool SearchInventory(GamePlayer player, MarketSearch.SearchData searchData)
         {
             MarketSearch marketSearch = new MarketSearch(player);
-            List<InventoryItem> items = marketSearch.FindItemsInList(DBItems(), searchData);
+            List<InventoryItem> items = marketSearch.FindItems(searchData);
 
             if (items != null)
             {
                 int maxPerPage = 20;
-                byte maxPages = (byte)(Math.Ceiling((double)items.Count / (double)maxPerPage) - 1);
+
+                // Prevent negative maxPages if list is completely empty
+                byte maxPages = (byte)Math.Max(0, Math.Ceiling((double)items.Count / (double)maxPerPage) - 1);
+
                 int first = (searchData.page) * maxPerPage;
                 int last = first + maxPerPage;
                 List<InventoryItem> list = new List<InventoryItem>();
                 int index = 0;
                 foreach (InventoryItem item in items)
                 {
-                    if (index >= first && index <= last)
+                    if (index >= first && index < last)
                         list.Add(item);
                     index++;
                 }
 
                 if ((int)searchData.page == 0)
                 {
-                    player.Out.SendMessage("Items returned: " + items.Count + ".", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "MarketExplorer.ItemsReturned", items.Count), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
 
                 if (items.Count == 0)   // No items returned, let the client know
@@ -137,14 +140,13 @@ namespace DOL.GS
                 }
                 else if ((int)searchData.page <= (int)maxPages) //Don't let us tell the client about any more than the max pages
                 {
-                    player.Out.SendMessage("Moving to page " + ((int)(searchData.page + 1)) + ".", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "MarketExplorer.MovingToPage", ((int)(searchData.page + 1))), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     player.Out.SendMarketExplorerWindow(list, searchData.page, maxPages);
                 }
 
                 // Save the last search list in case we buy an item from it
                 player.TempProperties.setProperty(EXPLORER_ITEM_LIST, list);
             }
-
 
             return true;
         }
@@ -237,12 +239,17 @@ namespace DOL.GS
 
         public virtual void BuyItem(InventoryItem item, GamePlayer player)
         {
-            GameConsignmentMerchant cm = HouseMgr.GetConsignmentByHouseNumber((int)item.OwnerLot);
+            GameConsignmentMerchant cm = null;
+
+            if (item.OwnerLot > 0)
+            {
+                cm = HouseMgr.GetConsignmentByHouseNumber((int)item.OwnerLot);
+            }
 
             if (cm == null)
             {
-                player.Out.SendMessage("I can't find the consigmnent merchant for this item!", eChatType.CT_Merchant, eChatLoc.CL_ChatWindow);
-                log.ErrorFormat("ME: Error finding consignment merchant for lot {0}; {1}:{2} trying to buy {3}", item.OwnerLot, player.Name, player.Client.Account.Name, item.Name);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "MarketExplorer.MerchantOffline"), eChatType.CT_Merchant, eChatLoc.CL_ChatWindow);
+                log.ErrorFormat("ME: Error finding consignment merchant for lot {0} / owner {1}; {2}:{3} trying to buy {4}", item.OwnerLot, item.OwnerID, player.Name, player.Client.Account.Name, item.Name);
                 return;
             }
 

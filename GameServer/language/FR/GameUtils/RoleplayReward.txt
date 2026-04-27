@@ -1,0 +1,17 @@
+
+RoleplayReward.GuardWarning.0:      Surveille ton langage, {0} ! De tels mots sont interdits ici !
+RoleplayReward.GuardWarning.1:      Prends garde à tes paroles, {0} ! Les gardes écoutent.
+RoleplayReward.GuardWarning.2:      {0}, cessez ces profanités sur-le-champ !
+
+RoleplayReward.GuardAttack.0:       Tu as suffisamment souillé ces lieux, {0} ! À nous deux !
+RoleplayReward.GuardAttack.1:       Au nom du Roi, je vais te faire taire, {0} !
+RoleplayReward.GuardAttack.2:       Ta bouche fétide causera ta perte, {0} !
+
+RoleplayReward.RewardMsg.0:         Les dieux ont favorisé vos paroles habiles. (+{0} PR)
+RoleplayReward.RewardMsg.1:         Votre prestance marque les esprits. (+{0} PR)
+RoleplayReward.RewardMsg.2:         Le peuple loue votre éloquence. (+{0} PR)
+RoleplayReward.RewardMsg.3:         Votre verbe touche l'âme de ceux qui vous écoutent. (+{0} PR)
+RoleplayReward.RewardMsg.4:         La puissance de vos mots résonne dans tout le royaume. (+{0} PR)
+RoleplayReward.RewardMsg.5:         Vos paroles sont empreintes de sagesse et d'honneur. (+{0} PR)
+RoleplayReward.RewardMsg.6:         Un barde pourrait chanter vos récits. (+{0} PR)
+RoleplayReward.RewardMsg.7:         L'aura de votre noblesse grandit à chaque mot. (+{0} PR)

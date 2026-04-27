@@ -27,10 +27,11 @@ namespace DOL.Database
     /// Abstract Baseclass for all DataObject's. All Classes that are derived from this class
     /// are stored in a Datastore
     /// </summary>
-    public abstract class DataObject : ICloneable
+    public abstract class DataObject : ICloneable, IEquatable<DataObject>
     {
         bool m_allowAdd = true;
         bool m_allowDelete = true;
+        private int? m_cachedHash;
 
         /// <summary>
         /// Default-Construktor that generates a new Object-ID and set
@@ -136,6 +137,7 @@ namespace DOL.Database
         {
             var obj = (DataObject)MemberwiseClone();
             obj.ObjectId = IDGenerator.GenerateID();
+            obj.m_cachedHash = null;
             return obj;
         }
 
@@ -144,6 +146,25 @@ namespace DOL.Database
         public override string ToString()
         {
             return string.Format("DataObject: {0}, ObjectId{{{1}}}", TableName, ObjectId);
+        }
+
+        public override int GetHashCode()
+        {
+            if (m_cachedHash.HasValue) return m_cachedHash.Value;
+            m_cachedHash = ObjectId?.GetHashCode() ?? base.GetHashCode();
+            return m_cachedHash.Value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as DataObject);
+        }
+
+        public bool Equals(DataObject other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ObjectId == other.ObjectId;
         }
     }
 }

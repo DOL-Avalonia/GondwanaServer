@@ -56,11 +56,28 @@ HousingPlaceItemHandler.DropOnFloor:				Polož předmět {0} na podlahu svého d
 HousingPlaceItemHandler.DropOnGarden:				Polož předmět {0} na svou zahradu.
 HousingPlaceItemHandler.DropOnWall:				Připevni předmět {0} na stěnu svého domu.
 HousingPlaceItemHandler.GardenObjectPlaced:			Zahradní předmět umístěn. Zbývá {0} míst.
+HousingPlaceItemHandler.GardenObjectPlacedName:		Polož předmět {0} na svou zahradu.
 HousingPlaceItemHandler.HasPorch:				Tento dům už má verandu!
 HousingPlaceItemHandler.HasNoPorch:				Tento dům nemá verandu!
 HousingPlaceItemHandler.IndoorObjectPlaced:			Vnitřní předmět umístěn. Zbývá {0} míst.
 HousingPlaceItemHandler.NoHookpoint:				Žádný volný kotevní bod!
 HousingPlaceItemHandler.PutMoney:				Vlož peníze na účet svého domu.
+HousingPlaceItemHandler.NotOtherHouse:          Nesmíte měnit domy ostatních lidí.
+HousingPlaceItemHandler.WarningRemoveAll:       Varování: Tímto odstraníte *všechny* předměty z vašeho současného domu!
+HousingPlaceItemHandler.UpgradeConfirm:         Jste si jisti, že chcete vylepšit svůj dům?
+HousingPlaceItemHandler.MustBeGuildMember:      K tomu musíte být členem cechu.
+HousingPlaceItemHandler.GuildAlreadyOwnsHouse:  Váš cech již vlastní dům.
+HousingPlaceItemHandler.MustRemoveMerchant:     Nejprve musíte odstranit konsignačního obchodníka.
+HousingPlaceItemHandler.NeedsPorchFirst:        Váš dům potřebuje nejprve verandu.
+HousingPlaceItemHandler.CannotAddMerchant:      Sem nemůžete přidat konsignačního obchodníka.
+HousingPlaceItemHandler.UseAddHookpoints:       Použijte '/house addhookpoints' k povolení přidávání nových přípojných bodů pro dům.
+HousingPlaceItemHandler.CannotAddMoreVaults:    Do tohoto domu už nemůžete přidat žádné další trezory!
+HousingPlaceItemHandler.UnknownMethod:          Umístit předmět: Neznámá metoda, nic se neprovede.
+HousingPlaceItemHandler.ErrorProcessing:        Chyba při zpracování akce domu; chyba byla zaznamenána!
+HousingPlaceItemHandler.NoHouseSelected:        Nebyl vybrán žádný dům!
+HousingPlaceItemHandler.NeedRemovalDeed:        K tomuto potřebujete listinu o odstranění domu.
+HousingPlaceItemHandler.HouseRemoved:           Váš dům byl odstraněn!
+HousingPlaceItemHandler.NeedHouseDeed:          Toto nefunguje bez listiny k domu.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Míříš na parcelu číslo {0}.
@@ -77,12 +94,8 @@ Housing.LotMarker.ThisItemCantBeSold:				Tento předmět nelze prodat.
 Housing.LotMarker.LotNotItem:					Toto není platný vlastnický list.
 
 Scripts.Player.Housing.BadShieldBanner:			Toto není platný předmět ani prapor.
-Scripts.Player.Housing.CantBeSold:				Tento předmět nelze prodat!
 Scripts.Player.Housing.CarpetsRemoved:			Tvůj koberec byl odstraněn.
 Scripts.Player.Housing.ClearHookPoint:			Chceš odstranit předmět z kotevního bodu?
-Scripts.Player.Housing.EnteredHouse:				Vstupuješ do domu číslo {0}.
-Scripts.Player.Housing.GardenItemPlaced:			Zahradní předměty umístěny. Zbývá {0} míst.
-Scripts.Player.Housing.GardenItemPlacedName:		Polož předmět {0} na svou zahradu.
 Scripts.Player.Housing.GardenMaxObjects:			Na svou zahradu jsi umístil(a) 30 předmětů. Žádné místo nezbývá.
 Scripts.Player.Housing.GuildNowOwns:				[Cech] {0} nyní vlastní cechovní dům o velikosti {1}!
 Scripts.Player.Housing.NotOwner:					Tento dům nevlastníš!
@@ -105,7 +118,6 @@ Scripts.Player.Housing.HookPointNotPlaced:			Předmět nebyl umístěn na tento 
 Scripts.Player.Housing.HouseUseMaterials:			Použij Shift+pravé kliknutí na svůj dům pro změnu vzhledu.
 Scripts.Player.Housing.HouseUseCarpets:			Použij Shift+pravé kliknutí na svůj dům pro změnu koberců.
 Scripts.Player.Housing.IndoorFloorPlaced:			Umístil(a) jsi {0} na podlahu svého domu.
-Scripts.Player.Housing.IndoorItemPlaced:			Vnitřní předmět umístěn. Zbývá {0} místo.
 Scripts.Player.Housing.IndoorMaxItems:			Aktuálně máš v domě umístěno {0} předmětů. Další už nelze.
 Scripts.Player.Housing.IndoorWallPlaced:			Právě jsi připevnil(a) {0} na stěnu svého domu.
 Scripts.Player.Housing.InteriorBannersAdded:		Vnitřní cechovní prapor byl změněn.
@@ -120,9 +132,6 @@ Scripts.Player.Housing.OutdoorBannersRemoved:		Vnější cechovní prapor byl od
 Scripts.Player.Housing.OutdoorShieldsAdded:		Vnější cechovní štít byl změněn.
 Scripts.Player.Housing.OutdoorShieldsRemoved:		Vnější cechovní štít byl odstraněn.
 Scripts.Player.Housing.PaidChanges:				Platíš {0} za provedení změn.
-Scripts.Player.Housing.PaidNotEnough:			Nemáš dostatek peněz, abys to mohl provést!
-Scripts.Player.Housing.PorchAlready:				Tento dům už má verandu!
-Scripts.Player.Housing.PorchNone:				Tento dům nemá verandu!
 Scripts.Player.Housing.PorchNotItem:				Toto není verandový předmět!
 Scripts.Player.Housing.TransferToGuild:			Chceš převést tento dům na {0}?
 

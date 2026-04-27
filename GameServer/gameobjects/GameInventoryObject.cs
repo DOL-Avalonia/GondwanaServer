@@ -34,7 +34,7 @@ namespace DOL.GS
         int FirstDBSlot { get; }
         int LastDBSlot { get; }
         string GetOwner(GamePlayer player);
-        IList<InventoryItem> DBItems(GamePlayer player = null);
+        IEnumerable<InventoryItem> DBItems(GamePlayer player);
         Dictionary<int, InventoryItem> GetClientInventory(GamePlayer player);
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace DOL.GS
 
         public static Dictionary<int, InventoryItem> GetClientItems(this IGameInventoryObject thisObject, GamePlayer player)
         {
-            Dictionary<int, InventoryItem> inventory = new();
+            Dictionary<int, InventoryItem> inventory = new Dictionary<int, InventoryItem>();
             int slotOffset = thisObject.FirstClientSlot - thisObject.FirstDBSlot;
 
             foreach (InventoryItem item in thisObject.DBItems(player))

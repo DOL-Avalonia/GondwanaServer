@@ -1,0 +1,19 @@
+
+# ConsignmentMerchant
+ConsignmentMerchant.TooFarToGive:		You are too far away to give anything to {0}.
+ConsignmentMerchant.MoveToEmptySlot:	You can only move an item to an empty slot!
+ConsignmentMerchant.BuyFromSelf:		You can't buy items from yourself!
+ConsignmentMerchant.NotTradable:		This item is not tradable. You can store it here but cannot sell it.
+ConsignmentMerchant.PriceSet:			Price set!
+ConsignmentMerchant.ItemNotFound:		I can't find the item you want to purchase!
+ConsignmentMerchant.BuyConfirm:			Do you want to buy this Item? (Price after {0}% tax: {1})
+ConsignmentMerchant.BuyConfirmFee:		Buying directly from the Market Explorer costs an additional {0}% fee. Do you want to buy this Item?
+ConsignmentMerchant.TalkToMerchant:		I'm sorry, you need to be talking to a market explorer or consignment merchant in order to make a purchase.
+ConsignmentMerchant.CannotPurchase:		This item can't be purchased!
+ConsignmentMerchant.HoldsBountyPoints:	Your merchant currently holds {0} BountyPoints.
+
+# MarketExplorer
+MarketExplorer.MarketUnavailable:		Sorry, the market is not available at this time.
+MarketExplorer.ItemsReturned:			Items returned: {0}.
+MarketExplorer.MovingToPage:			Moving to page {0}.
+MarketExplorer.MerchantOffline:			I can't find the consignment merchant for this item! The merchant may be offline.

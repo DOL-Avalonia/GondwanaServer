@@ -1,0 +1,17 @@
+
+RoleplayReward.GuardWarning.0:      Watch thy tongue, {0}! Such foul language is forbidden here!
+RoleplayReward.GuardWarning.1:      Mind your words, {0}! The guards are listening.
+RoleplayReward.GuardWarning.2:      {0}, cease this profanity at once!
+
+RoleplayReward.GuardAttack.0:       Thou hast fouled this place enough, {0}! Have at thee!
+RoleplayReward.GuardAttack.1:       In the name of the King, I shall silence you, {0}!
+RoleplayReward.GuardAttack.2:       Your foul mouth will be your doom, {0}!
+
+RoleplayReward.RewardMsg.0:         The gods have favored your skillful words. (+{0} RP)
+RoleplayReward.RewardMsg.1:         Your presence leaves a lasting impression. (+{0} RP)
+RoleplayReward.RewardMsg.2:         The people praise your eloquence. (+{0} RP)
+RoleplayReward.RewardMsg.3:         Your words touch the souls of those who listen. (+{0} RP)
+RoleplayReward.RewardMsg.4:         The power of your words echoes throughout the realm. (+{0} RP)
+RoleplayReward.RewardMsg.5:         Your words are imbued with wisdom and honor. (+{0} RP)
+RoleplayReward.RewardMsg.6:         A bard could sing of your tales. (+{0} RP)
+RoleplayReward.RewardMsg.7:         The aura of your nobility grows with every word. (+{0} RP)

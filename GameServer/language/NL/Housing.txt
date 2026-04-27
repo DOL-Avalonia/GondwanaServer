@@ -56,11 +56,28 @@ HousingPlaceItemHandler.DropOnFloor:				Laat het object {0} op de vloer van je h
 HousingPlaceItemHandler.DropOnGarden:				Laat het object {0} in je tuin.
 HousingPlaceItemHandler.DropOnWall:				Bevestig het object {0} aan de muur van je huis.
 HousingPlaceItemHandler.GardenObjectPlaced:			Tuinobject geplaatst. {0} plaatsen over.
+HousingPlaceItemHandler.GardenObjectPlacedName:		Laat het object {0} in je tuin.
 HousingPlaceItemHandler.HasPorch:				Dit huis heeft al een veranda!
 HousingPlaceItemHandler.HasNoPorch:				Dit huis heeft geen veranda!
 HousingPlaceItemHandler.IndoorObjectPlaced:			Interieurobject geplaatst. {0} plaatsen over.
 HousingPlaceItemHandler.NoHookpoint:				Geen bevestigingspunt meer beschikbaar!
 HousingPlaceItemHandler.PutMoney:				Stort geld op de huisrekening.
+HousingPlaceItemHandler.NotOtherHouse:          Je mag de huizen van andere mensen niet veranderen.
+HousingPlaceItemHandler.WarningRemoveAll:       Waarschuwing: Dit zal *alle* items uit je huidige huis verwijderen!
+HousingPlaceItemHandler.UpgradeConfirm:         Weet je zeker dat je je huis wilt upgraden?
+HousingPlaceItemHandler.MustBeGuildMember:      Je moet lid zijn van een gilde om dat te doen.
+HousingPlaceItemHandler.GuildAlreadyOwnsHouse:  Je gilde bezit al een huis.
+HousingPlaceItemHandler.MustRemoveMerchant:     Je moet eerst de consignatiekoopman verwijderen.
+HousingPlaceItemHandler.NeedsPorchFirst:        Je huis heeft eerst een veranda nodig.
+HousingPlaceItemHandler.CannotAddMerchant:      Je kunt hier geen consignatiekoopman toevoegen.
+HousingPlaceItemHandler.UseAddHookpoints:       Gebruik '/house addhookpoints' om het toevoegen van nieuwe huis-hookpoints toe te staan.
+HousingPlaceItemHandler.CannotAddMoreVaults:    Je kunt geen kluizen meer toevoegen aan dit huis!
+HousingPlaceItemHandler.UnknownMethod:          Item plaatsen: Onbekende methode, doe niets.
+HousingPlaceItemHandler.ErrorProcessing:        Fout bij het verwerken van huisactie; de fout is gelogd!
+HousingPlaceItemHandler.NoHouseSelected:        Geen huis geselecteerd!
+HousingPlaceItemHandler.NeedRemovalDeed:        Je hebt hiervoor een Huis Verwijderingsakte nodig.
+HousingPlaceItemHandler.HouseRemoved:           Je huis is verwijderd!
+HousingPlaceItemHandler.NeedHouseDeed:          Dit werkt niet zonder een Huisakte.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Je richt op kavel nummer {0}.
@@ -77,12 +94,8 @@ Housing.LotMarker.ThisItemCantBeSold:				Dit object kan niet worden verkocht.
 Housing.LotMarker.LotNotItem:					Dit is geen geldig eigendomsdocument.
 
 Scripts.Player.Housing.BadShieldBanner:			Dit is geen geldig object of banner.
-Scripts.Player.Housing.CantBeSold:				Dit object kan niet worden verkocht!
 Scripts.Player.Housing.CarpetsRemoved:			Je kleed is verwijderd.
 Scripts.Player.Housing.ClearHookPoint:			Wil je het object van het bevestigingspunt verwijderen?
-Scripts.Player.Housing.EnteredHouse:				Je betreedt huis nummer {0}.
-Scripts.Player.Housing.GardenItemPlaced:			Tuinobjecten geplaatst. {0} plaatsen over.
-Scripts.Player.Housing.GardenItemPlacedName:		Laat het object {0} in je tuin.
 Scripts.Player.Housing.GardenMaxObjects:			Je hebt 30 objecten in je tuin geplaatst. Geen ruimte meer.
 Scripts.Player.Housing.GuildNowOwns:				[Gilde] {0} bezit nu een gildehuis van {1}!
 Scripts.Player.Housing.NotOwner:					Je bent niet de eigenaar van dit huis!
@@ -105,7 +118,6 @@ Scripts.Player.Housing.HookPointNotPlaced:			Het object is niet op dat bevestigi
 Scripts.Player.Housing.HouseUseMaterials:			Gebruik Shift+rechtermuisklik in je huis om het uiterlijk te wijzigen.
 Scripts.Player.Housing.HouseUseCarpets:				Gebruik Shift+rechtermuisklik in je huis om de kleden te wijzigen.
 Scripts.Player.Housing.IndoorFloorPlaced:			Je hebt {0} op de verdieping van je huis geplaatst.
-Scripts.Player.Housing.IndoorItemPlaced:			Interieurobject geplaatst. {0} plek over.
 Scripts.Player.Housing.IndoorMaxItems:			Je hebt momenteel {0} objecten in je huis geplaatst. Je kunt er geen meer plaatsen.
 Scripts.Player.Housing.IndoorWallPlaced:			Je hebt zojuist {0} aan de muur van je huis bevestigd.
 Scripts.Player.Housing.InteriorBannersAdded:		De binnenste gildebanner is gewijzigd.
@@ -119,10 +131,6 @@ Scripts.Player.Housing.OutdoorBannersAdded:		De buitenste gildebanner is gewijzi
 Scripts.Player.Housing.OutdoorBannersRemoved:		De buitenste gildebanner is verwijderd.
 Scripts.Player.Housing.OutdoorShieldsAdded:		Het buitenste gildeschild is gewijzigd.
 Scripts.Player.Housing.OutdoorShieldsRemoved:		Het buitenste gildeschild is verwijderd.
-Scripts.Player.Housing.PaidChanges:				Je betaalt {0} om de wijzigingen door te voeren.
-Scripts.Player.Housing.PaidNotEnough:			Je hebt niet genoeg geld om dat te doen!
-Scripts.Player.Housing.PorchAlready:				Dit huis heeft al een veranda!
-Scripts.Player.Housing.PorchNone:				Dit huis heeft geen veranda!
 Scripts.Player.Housing.PorchNotItem:				Dit is geen veranda-object!
 Scripts.Player.Housing.TransferToGuild:			Wil je dit huis overdragen aan {0}?
 

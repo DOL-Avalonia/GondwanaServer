@@ -1,0 +1,19 @@
+
+# ConsignmentMerchant
+ConsignmentMerchant.TooFarToGive:		Vous êtes trop loin pour donner quoi que ce soit à {0}.
+ConsignmentMerchant.MoveToEmptySlot:	Vous ne pouvez déplacer un objet que vers un emplacement vide !
+ConsignmentMerchant.BuyFromSelf:		Vous ne pouvez pas acheter vos propres objets !
+ConsignmentMerchant.NotTradable:		Cet objet n'est pas échangeable. Vous pouvez le stocker ici mais ne pourrez pas le vendre.
+ConsignmentMerchant.PriceSet:			Prix fixé !
+ConsignmentMerchant.ItemNotFound:		Impossible de trouver l'objet que vous souhaitez acheter !
+ConsignmentMerchant.BuyConfirm:			Voulez-vous acheter cet objet ? (Prix après la taxe de {0}% : {1})
+ConsignmentMerchant.BuyConfirmFee:		Acheter directement depuis l'Explorateur du Marché coûte {0}% de frais supplémentaires. Voulez-vous acheter cet objet ?
+ConsignmentMerchant.TalkToMerchant:		Je suis désolé, vous devez parler à un Explorateur du Marché ou à un Marchand Consignataire pour effectuer un achat.
+ConsignmentMerchant.CannotPurchase:		Cet objet ne peut pas être acheté !
+ConsignmentMerchant.HoldsBountyPoints:	Votre marchand détient actuellement {0} points de prime.
+
+# MarketExplorer
+MarketExplorer.MarketUnavailable:		Désolé, le marché n'est pas disponible pour le moment.
+MarketExplorer.ItemsReturned:			Objets trouvés : {0}.
+MarketExplorer.MovingToPage:			Passage à la page {0}.
+MarketExplorer.MerchantOffline:			Impossible de trouver le marchand pour cet objet ! Le marchand est peut-être hors ligne.

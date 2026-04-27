@@ -57,11 +57,28 @@ HousingPlaceItemHandler.DropOnFloor:			Vous déposez l'objet {0} sur le sol de v
 HousingPlaceItemHandler.DropOnGarden:			Vous déposez l'objet {0} dans votre jardin.
 HousingPlaceItemHandler.DropOnWall:				Vous déposez l'objet {0} sur le mur de votre maison.
 HousingPlaceItemHandler.GardenObjectPlaced:		Objet de jardin placé. {0} places restantes.
+HousingPlaceItemHandler.GardenObjectPlacedName:	Vous déposez l'objet {0} dans votre jardin.
 HousingPlaceItemHandler.HasPorch:				Cette maison a déjà un porche !
 HousingPlaceItemHandler.HasNoPorch:				Cette maison n'a pas de porche !
 HousingPlaceItemHandler.IndoorObjectPlaced:		Objet intérieur placé. {0} places restantes.
 HousingPlaceItemHandler.NoHookpoint:			Il n'y a plus de point d'ancrage !
 HousingPlaceItemHandler.PutMoney:				Vous déposez de l'argent sur le compte de votre maison.
+HousingPlaceItemHandler.NotOtherHouse:          Vous ne pouvez pas modifier les maisons d'autres personnes.
+HousingPlaceItemHandler.WarningRemoveAll:       Attention : Ceci supprimera *tous* les objets de votre maison actuelle !
+HousingPlaceItemHandler.UpgradeConfirm:         Êtes-vous sûr de vouloir améliorer votre maison ?
+HousingPlaceItemHandler.MustBeGuildMember:      Vous devez être membre d'une guilde pour faire cela.
+HousingPlaceItemHandler.GuildAlreadyOwnsHouse:  Votre guilde possède déjà une maison.
+HousingPlaceItemHandler.MustRemoveMerchant:     Vous devez d'abord retirer le marchand de consignation.
+HousingPlaceItemHandler.NeedsPorchFirst:        Votre maison a besoin d'un porche en premier lieu.
+HousingPlaceItemHandler.CannotAddMerchant:      Vous ne pouvez pas ajouter de marchand de consignation ici.
+HousingPlaceItemHandler.UseAddHookpoints:       Utilisez '/house addhookpoints' pour permettre l'ajout de nouveaux points d'accroche.
+HousingPlaceItemHandler.CannotAddMoreVaults:    Vous ne pouvez pas ajouter plus de coffres à cette maison !
+HousingPlaceItemHandler.UnknownMethod:          Placement d'objet : Méthode inconnue, annulation.
+HousingPlaceItemHandler.ErrorProcessing:        Erreur lors du traitement de l'action de logement ; l'erreur a été journalisée !
+HousingPlaceItemHandler.NoHouseSelected:        Aucune maison sélectionnée !
+HousingPlaceItemHandler.NeedRemovalDeed:        Vous avez besoin d'un Acte de Démolition pour cela.
+HousingPlaceItemHandler.HouseRemoved:           Votre maison a été détruite !
+HousingPlaceItemHandler.NeedHouseDeed:          Ceci ne fonctionnera pas sans un Acte de Propriété.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Vous ciblez le terrain numéro {0}.
@@ -78,12 +95,8 @@ Housing.LotMarker.ThisItemCantBeSold:			Cet objet ne peut pas être vendu.
 Housing.LotMarker.LotNotItem:					Ce n'est pas un acte de propriété valide.
 
 Scripts.Player.Housing.BadShieldBanner:			Ce n'est pas un objet ou une bannière valide.
-Scripts.Player.Housing.CantBeSold:				Cet objet ne peut être vendu !
 Scripts.Player.Housing.CarpetsRemoved:			Votre tapis a été retiré.
 Scripts.Player.Housing.ClearHookPoint:			Voulez vous retirer l'objet du point d'ancrage ?
-Scripts.Player.Housing.EnteredHouse:			Vous entrez dans la maison numéro {0}.
-Scripts.Player.Housing.GardenItemPlaced:		Objets du jardin placés. {0} places restante.
-Scripts.Player.Housing.GardenItemPlacedName:	Vous déposez l'objet {0} dans votre jardin.
 Scripts.Player.Housing.GardenMaxObjects:		Vous avez déposé un nombre de 30 objets dans votre jardin. Vous n'avez plus de place.
 Scripts.Player.Housing.GuildNowOwns:			[Guilde] {0} possède maintenant une maison de guilde de {1} !
 Scripts.Player.Housing.NotOwner:				Vous ne possédez pas cette maison !
@@ -107,7 +120,6 @@ Scripts.Player.Housing.HookPointNotPlaced:		L'objet n'a pas été placé sur cet
 Scripts.Player.Housing.HouseUseMaterials:		Utilisez shift+clic-droit dans votre maison pour changer l'apparence de votre maison.
 Scripts.Player.Housing.HouseUseCarpets:			Utilisez shift+clic-droit dans votre maison pour changer vos tapis.
 Scripts.Player.Housing.IndoorFloorPlaced:		Vous avez placé {0} à l'étage de votre maison.
-Scripts.Player.Housing.IndoorItemPlaced:		Objet intérieur placé. {0} place restante.
 Scripts.Player.Housing.IndoorMaxItems:			Vous avez actuellement placé {0} objets dans votre maison. Vous ne pouvez plus en placer.
 Scripts.Player.Housing.IndoorWallPlaced:		Vous venez de placer {0} sur le mur de votre maison.
 Scripts.Player.Housing.InteriorBannersAdded:		Votre bannière de guilde intérieure a été changée.
@@ -121,9 +133,5 @@ Scripts.Player.Housing.OutdoorBannersAdded:		Votre bannière de guilde extérieu
 Scripts.Player.Housing.OutdoorBannersRemoved:		Votre bannière de guilde extérieure a été retirée.
 Scripts.Player.Housing.OutdoorShieldsAdded:		Votre emblème de guilde extérieur a été changé.
 Scripts.Player.Housing.OutdoorShieldsRemoved:		Votre emblème de guilde extérieur a été retiré.
-Scripts.Player.Housing.PaidChanges:			Vous payez {0} pour effectuer les changements.
-Scripts.Player.Housing.PaidNotEnough:			Vous n'avez pas assez d'argent pour faire cela !
-Scripts.Player.Housing.PorchAlready:			Cette maison a déjà un porche !
-Scripts.Player.Housing.PorchNone:			Cette maison ne contient pas de porche !
 Scripts.Player.Housing.PorchNotItem:			Ce n'est pas un objet pour le porche !
 Scripts.Player.Housing.TransferToGuild:			Vous voulez transférer cette maison à {0} ?
