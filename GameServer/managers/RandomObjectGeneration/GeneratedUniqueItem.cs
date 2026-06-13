@@ -74,7 +74,7 @@ namespace DOL.GS
         //base Chance to get a magical RoG item, PlayerLevel*2 is added to get final value
         private static int MagicalItemOffset = Properties.ROG_MAGICAL_ITEM_OFFSET;
 
-        private eCharacterClass charClass = eCharacterClass.Unknown;
+        public eCharacterClass charClass = eCharacterClass.Unknown;
 
         private static Dictionary<int, Spell> ProcSpells = new Dictionary<int, Spell>();
 
@@ -229,7 +229,7 @@ namespace DOL.GS
                 this.Price = 2; // 2c as sell price is 50%
         }
 
-        private void GenerateItemStats()
+        protected void GenerateItemStats()
         {
             int templevel = 0;
             if (Level > 51)
@@ -347,7 +347,7 @@ namespace DOL.GS
                 this.Level = templevel;
         }
 
-        private void GenerateProc()
+        protected void GenerateProc()
         {
             if (!Util.Chance(1)) return;
             if (this.Object_Type == (int)eObjectType.Magical)
@@ -682,7 +682,7 @@ namespace DOL.GS
             return validColors[Util.Random(validColors.Count - 1)];
         }
 
-        private void GenerateMagicalBonuses(bool toa)
+        public void GenerateMagicalBonuses(bool toa)
         {
             // unique objects have more bonuses as level rises
 
@@ -4796,7 +4796,7 @@ namespace DOL.GS
         }
         #endregion
 
-        private void CapUtility(int mobLevel, int utilityMinimum)
+        protected void CapUtility(int mobLevel, int utilityMinimum)
         {
             int cap = 0;
             if (utilityMinimum < 1) utilityMinimum = 1;
@@ -7941,7 +7941,7 @@ namespace DOL.GS
         }
 
         #region Leather Model Generation
-        private static int GetLeatherTorsoForLevel(int Level, eRealm realm)
+        public static int GetLeatherTorsoForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -7986,7 +7986,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetLeatherPantsForLevel(int Level, eRealm realm)
+        public static int GetLeatherPantsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8031,7 +8031,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetLeatherSleevesForLevel(int Level, eRealm realm)
+        public static int GetLeatherSleevesForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8076,7 +8076,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetLeatherHandsForLevel(int Level, eRealm realm)
+        public static int GetLeatherHandsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8121,7 +8121,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetLeatherBootsForLevel(int Level, eRealm realm)
+        public static int GetLeatherBootsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8166,7 +8166,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetLeatherHelmForLevel(int Level, eRealm realm)
+        public static int GetLeatherHelmForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8205,7 +8205,7 @@ namespace DOL.GS
         #endregion
 
         #region Studded Model Generation
-        private static int GetStuddedTorsoForLevel(int Level, eRealm realm)
+        public static int GetStuddedTorsoForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8240,7 +8240,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetStuddedPantsForLevel(int Level, eRealm realm)
+        public static int GetStuddedPantsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8275,7 +8275,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetStuddedSleevesForLevel(int Level, eRealm realm)
+        public static int GetStuddedSleevesForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8310,7 +8310,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetStuddedHandsForLevel(int Level, eRealm realm)
+        public static int GetStuddedHandsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8345,7 +8345,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetStuddedBootsForLevel(int Level, eRealm realm)
+        public static int GetStuddedBootsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8380,7 +8380,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetStuddedHelmForLevel(int Level, eRealm realm)
+        public static int GetStuddedHelmForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8413,7 +8413,7 @@ namespace DOL.GS
         #endregion
 
         #region Chain Model Generation
-        private static int GetChainTorsoForLevel(int Level, eRealm realm)
+        public static int GetChainTorsoForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8452,7 +8452,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetChainPantsForLevel(int Level, eRealm realm)
+        public static int GetChainPantsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8489,7 +8489,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetChainSleevesForLevel(int Level, eRealm realm)
+        public static int GetChainSleevesForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8524,7 +8524,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetChainHandsForLevel(int Level, eRealm realm)
+        public static int GetChainHandsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8559,7 +8559,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetChainBootsForLevel(int Level, eRealm realm)
+        public static int GetChainBootsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8594,7 +8594,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetChainHelmForLevel(int Level, eRealm realm)
+        public static int GetChainHelmForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8625,7 +8625,7 @@ namespace DOL.GS
         #endregion
 
         #region Plate Model Generation
-        private static int GetPlateTorsoForLevel(int Level, eRealm realm)
+        public static int GetPlateTorsoForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8652,7 +8652,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetPlatePantsForLevel(int Level, eRealm realm)
+        public static int GetPlatePantsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8679,7 +8679,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetPlateSleevesForLevel(int Level, eRealm realm)
+        public static int GetPlateSleevesForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8706,7 +8706,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetPlateHandsForLevel(int Level, eRealm realm)
+        public static int GetPlateHandsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8730,7 +8730,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetPlateBootsForLevel(int Level, eRealm realm)
+        public static int GetPlateBootsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8754,7 +8754,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetPlateHelmForLevel(int Level, eRealm realm)
+        public static int GetPlateHelmForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8780,7 +8780,7 @@ namespace DOL.GS
         #endregion
 
         #region Reinforced Model Generation
-        private static int GetReinforcedTorsoForLevel(int Level, eRealm realm)
+        public static int GetReinforcedTorsoForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8806,7 +8806,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetReinforcedPantsForLevel(int Level, eRealm realm)
+        public static int GetReinforcedPantsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8832,7 +8832,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetReinforcedSleevesForLevel(int Level, eRealm realm)
+        public static int GetReinforcedSleevesForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8858,7 +8858,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetReinforcedHandsForLevel(int Level, eRealm realm)
+        public static int GetReinforcedHandsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8884,7 +8884,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetReinforcedBootsForLevel(int Level, eRealm realm)
+        public static int GetReinforcedBootsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8910,7 +8910,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetReinforcedHelmForLevel(int Level, eRealm realm)
+        public static int GetReinforcedHelmForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8936,7 +8936,7 @@ namespace DOL.GS
         #endregion
 
         #region Scale Model Generation
-        private static int GetScaleTorsoForLevel(int Level, eRealm realm)
+        public static int GetScaleTorsoForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8962,7 +8962,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetScalePantsForLevel(int Level, eRealm realm)
+        public static int GetScalePantsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -8988,7 +8988,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetScaleSleevesForLevel(int Level, eRealm realm)
+        public static int GetScaleSleevesForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9014,7 +9014,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetScaleHandsForLevel(int Level, eRealm realm)
+        public static int GetScaleHandsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9040,7 +9040,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetScaleBootsForLevel(int Level, eRealm realm)
+        public static int GetScaleBootsForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9066,7 +9066,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetScaleHelmForLevel(int Level, eRealm realm)
+        public static int GetScaleHelmForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9093,7 +9093,7 @@ namespace DOL.GS
 
         #region Weapon Model Generation
 
-        private static int Get2HAxeModelForLevel(int Level, eRealm realm)
+        public static int Get2HAxeModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9145,7 +9145,7 @@ namespace DOL.GS
 
             return validModels[Util.Random(validModels.Count - 1)];
         }
-        private static int GetAxeModelForLevel(int Level, eRealm realm)
+        public static int GetAxeModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9221,7 +9221,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int Get2HSwordForLevel(int Level, eRealm realm)
+        public static int Get2HSwordForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9304,7 +9304,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetBladeModelForLevel(int Level, eRealm realm)
+        public static int GetBladeModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9400,7 +9400,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int Get2HHammerForLevel(int Level, eRealm realm)
+        public static int Get2HHammerForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9488,7 +9488,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetBluntModelForLevel(int Level, eRealm realm)
+        public static int GetBluntModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9587,7 +9587,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int Get2HThrustForLevel(int Level, eRealm realm)
+        public static int Get2HThrustForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9631,7 +9631,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetThrustModelForLevel(int Level, eRealm realm)
+        public static int GetThrustModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9726,7 +9726,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetPolearmModelForLevel(int Level, eRealm realm, eDamageType dtype)
+        public static int GetPolearmModelForLevel(int Level, eRealm realm, eDamageType dtype)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9815,7 +9815,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetSpearModelForLevel(int Level, eRealm realm)
+        public static int GetSpearModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9891,7 +9891,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetBowModelForLevel(int Level, eRealm realm)
+        public static int GetBowModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -9962,7 +9962,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetFlexModelForLevel(int Level, eRealm realm, eDamageType dtype)
+        public static int GetFlexModelForLevel(int Level, eRealm realm, eDamageType dtype)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -10025,7 +10025,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetH2HModelForLevel(int Level, eRealm realm, eDamageType dtype)
+        public static int GetH2HModelForLevel(int Level, eRealm realm, eDamageType dtype)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -10109,7 +10109,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetCrossbowModelForLevel(int Level, eRealm realm)
+        public static int GetCrossbowModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -10149,7 +10149,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetScytheModelForLevel(int Level, eRealm realm)
+        public static int GetScytheModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -10186,7 +10186,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetStaffModelForLevel(int Level, eRealm realm)
+        public static int GetStaffModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -10271,7 +10271,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetShieldModelForLevel(int Level, eRealm realm, int size)
+        public static int GetShieldModelForLevel(int Level, eRealm realm, int size)
         {
             List<int> validModels = new List<int>();
             switch (realm)
@@ -10548,7 +10548,7 @@ namespace DOL.GS
             return validModels[Util.Random(validModels.Count - 1)];
         }
 
-        private static int GetInstrumentModelForLevel(int Level, eRealm realm)
+        public static int GetInstrumentModelForLevel(int Level, eRealm realm)
         {
             List<int> validModels = new List<int>();
             validModels.Add(227);

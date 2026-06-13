@@ -78,6 +78,8 @@ HousingPlaceItemHandler.NoHouseSelected:        Nicio casă selectată!
 HousingPlaceItemHandler.NeedRemovalDeed:        Ai nevoie de un Act de Eliminare a Casei pentru asta.
 HousingPlaceItemHandler.HouseRemoved:           Casa ta a fost eliminată!
 HousingPlaceItemHandler.NeedHouseDeed:          Acest lucru nu funcționează fără un Act al Casei.
+HousingPlaceItemHandler.GenistarLimitReached:	Ai atins limita maximă de {0} Genistar(e) pentru dimensiunea casei tale.
+HousingPlaceItemHandler.GenistarVisualPlaced:	Genistarul tău a fost plasat exact acolo unde stai.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Țintiți terenul numărul {0}.

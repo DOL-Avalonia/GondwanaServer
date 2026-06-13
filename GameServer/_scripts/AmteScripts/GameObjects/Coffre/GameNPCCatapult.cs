@@ -285,7 +285,32 @@ namespace DOL.GS.Scripts
 
                 if (m_backbone != null && m_backbone.PunishSpellId > 0)
                 {
-                    Spell bumpSpell = SkillBase.GetSpellByID(m_backbone.PunishSpellId);
+                    int spellIdToUse = m_backbone.PunishSpellId;
+
+                    if (m_backbone.ItemChance >= 0 && m_backbone.ItemChance < 100)
+                    {
+                        int roll = Util.Random(1, 100);
+                        if (roll > m_backbone.ItemChance)
+                        {
+                            if (Util.Chance(50))
+                            {
+                                spellIdToUse += 1;
+                            }
+                            else
+                            {
+                                spellIdToUse += 2;
+                            }
+                        }
+                    }
+
+                    Spell bumpSpell = SkillBase.GetSpellByID(spellIdToUse);
+
+                    // revert back to the default PunishSpellID to ensure the catapult still fires correctly if the randomly calculated +1 or +2 spell does not exist,.
+                    if (bumpSpell == null && spellIdToUse != m_backbone.PunishSpellId)
+                    {
+                        bumpSpell = SkillBase.GetSpellByID(m_backbone.PunishSpellId);
+                    }
+
                     if (bumpSpell != null)
                     {
                         SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects);

@@ -633,3 +633,16 @@ Titles.Adventurer.Level2:				Vagabond Curieux
 Titles.Adventurer.Level3:				Voyageur de l'Avant-Garde
 Titles.Adventurer.Level4:				Aventurier Émérite
 Titles.Adventurer.Level5:				Explorateur Légendaire
+
+# /Erudition
+Titles.Erudition.Level0:			Inculte
+Titles.Erudition.Level1:			Liseur
+Titles.Erudition.Level2:			Écolier
+Titles.Erudition.Level3:			Scribe
+Titles.Erudition.Level4:			Érudit
+Titles.Erudition.Level5:			Maître du Savoir
+Titles.Erudition.Level6:			Philosophe
+Titles.Erudition.Level7:			Sage
+Titles.Erudition.Level8:			Oracle
+Titles.Erudition.Level9:			Illuminé
+Titles.Erudition.Level10:			Omniscient

@@ -163,6 +163,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:					Vous obtenez {0} points 
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:			Vous obtenez {0} points de royaume pour avoir défendu votre territoire !
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:			Vous gagnez {0} points de royaume pour avoir soigné un membre de votre royaume !
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:					Vous obtenez {0} points d'Érudition.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:				Vous avez atteint le niveau {0} en Érudition !
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:				Le titre '{0}' vous est désormais accordé. Utilisez la commande /title pour l'équiper.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:	        Vous observez {0}. {1} est membre d'un royaume ennemi !
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:	        Vous observez {0}. {1} ne fait partie d'aucune guilde.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:	        Vous observez {0}. {1} est membre de la guilde: {2}.
@@ -518,6 +522,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:			Vous n'êtes pas assez puiss
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:			Vous ne pouvez pas utiliser cet inventaire.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	L'effet de charge ID {0} n'est pas encore implémenté.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:		L'effet de charge ID {0} non trouvé.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			Cet espace réservé Génistar ne peut être placé que dans le jardin.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Votre œuf de Genistar a été placé dans votre jardin. Prenez-en soin et modelez-le selon vos désirs !
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} hurle : « {1} »
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} hurle dans une langue qui vous est inconnue.

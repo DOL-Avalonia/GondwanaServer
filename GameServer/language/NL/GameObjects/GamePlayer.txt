@@ -162,6 +162,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Je ontvangt {0} ex
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Je ontvangt {0} rijkspunten voor de verdediging van je territorium!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Je ontvangt {0} rijkspunten voor het genezen van een lid van je rijk!
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			Je ontvangt {0} Eruditiepunten.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		Je Eruditieniveau is verhoogd naar {0}!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		Je hebt de titel ontgrendeld: '{0}'. Gebruik /title om deze uit te rusten.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:   Je bekijkt {0}. {1} is lid van een vijandig rijk!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:      Je bekijkt {0}. {1} behoort tot geen enkele gilde.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:   Je bekijkt {0}. {1} is lid van de gilde: {2}.
@@ -517,6 +521,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Je bent niet machtig geno
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Je kunt deze inventaris niet gebruiken.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Laad-effect met ID {0} is nog niet geïmplementeerd.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Laad-effect met ID {0} niet gevonden.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Deze Genistar-placeholder moet in een tuinslot worden geplaatst.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Je Genistar-ei is in je tuin geplaatst. Het is nu aan jou om het te verzorgen en te vormen naar jouw wensen!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} roept: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} roept iets in een taal die je niet begrijpt.

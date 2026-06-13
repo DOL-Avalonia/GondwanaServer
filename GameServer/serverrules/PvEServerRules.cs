@@ -40,6 +40,9 @@ namespace DOL.GS.ServerRules
             if (!base.IsAllowedToAttack(attacker, defender, quiet))
                 return false;
 
+            if (attacker is GameNPC && defender is GameNPC && attacker.HasForcedAttackTarget(defender))
+                return true;
+
             // if controlled NPC - do checks for owner instead
             if (attacker is GameNPC)
             {

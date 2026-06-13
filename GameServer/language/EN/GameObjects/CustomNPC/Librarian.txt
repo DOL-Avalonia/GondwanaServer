@@ -49,12 +49,14 @@ Librarian.Publish.Removed:				As you wish. I have removed your book from the lib
 Librarian.Publish.TooShort:				I can't publish this yet. It needs at least {0} words, and it has only {1}.
 Librarian.Publish.Gibberish:			I'm afraid this text looks like nonsense. Bring me something worthy of reading.
 Librarian.Publish.Prohibited:			I cannot publish this. A forbidden term was found: '{0}'.
+Librarian.Publish.RPReward:				The Librarian rewards you with {0} Erudition points and {1} Realm Points for your scholarly manuscript!
 
 Librarian.Buy.NotForSale:				That book cannot be purchased.
 Librarian.Buy.NotEnoughMoney:			You'll need {0} to buy that book.
 Librarian.Buy.CreateItemFail:			Something went wrong—I can't prepare the copy for you.
 Librarian.Buy.NoInventorySpace:			Your pack is full. Make room, then come back to me.
 Librarian.Buy.Success:					You buy "{0}" for {1}.
+Librarian.Buy.CannotBuyOwn:				You can't buy your own book!
 
 Librarian.Vote.CannotVoteOwn:			You can't vote on your own book—let the readers decide.
 Librarian.Vote.AlreadyVoted:			You have already cast your vote for this book.

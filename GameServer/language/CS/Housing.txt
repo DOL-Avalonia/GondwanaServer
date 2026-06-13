@@ -78,6 +78,8 @@ HousingPlaceItemHandler.NoHouseSelected:        Nebyl vybrán žádný dům!
 HousingPlaceItemHandler.NeedRemovalDeed:        K tomuto potřebujete listinu o odstranění domu.
 HousingPlaceItemHandler.HouseRemoved:           Váš dům byl odstraněn!
 HousingPlaceItemHandler.NeedHouseDeed:          Toto nefunguje bez listiny k domu.
+HousingPlaceItemHandler.GenistarLimitReached:	Dosáhli jste maximálního limitu {0} Genistarů pro velikost vašeho domu.
+HousingPlaceItemHandler.GenistarVisualPlaced:	Váš Genistar byl umístěn přesně tam, kde stojíte.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Míříš na parcelu číslo {0}.

@@ -1322,6 +1322,49 @@ namespace DOL.GS.Commands
                     }
                     break;
 
+                case "erudition":
+                    {
+                        var player = (client.Player.TargetObject as GamePlayer) ?? client.Player;
+
+                        if (args.Length == 2)
+                        {
+                            client.Player.Out.SendMessage($"Erudition Info for {player.Name}: Level {player.EruditionLevel}, Points {player.EruditionPoints}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        switch (args[2].ToLower())
+                        {
+                            case "add":
+                                {
+                                    if (args.Length < 4 || !long.TryParse(args[3], out long eruMod))
+                                    {
+                                        DisplaySyntax(client);
+                                        return;
+                                    }
+                                    player.GainEruditionPoints(eruMod, true);
+                                    client.Player.Out.SendMessage($"Added {eruMod} Erudition points to {player.Name}. New Total: {player.EruditionPoints} (Level {player.EruditionLevel})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                }
+                                break;
+
+                            case "sub":
+                                {
+                                    if (args.Length < 4 || !long.TryParse(args[3], out long eruMod))
+                                    {
+                                        DisplaySyntax(client);
+                                        return;
+                                    }
+                                    player.GainEruditionPoints(-eruMod, true);
+                                    client.Player.Out.SendMessage($"Subtracted {eruMod} Erudition points from {player.Name}. New Total: {player.EruditionPoints} (Level {player.EruditionLevel})", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                }
+                                break;
+
+                            default:
+                                DisplaySyntax(client);
+                                return;
+                        }
+                    }
+                    break;
+
                 #endregion
 
                 #region friend
@@ -2798,6 +2841,7 @@ namespace DOL.GS.Commands
             }
             text.Add("  - Current stats " + sTitle + " : " + sCurrent);
             text.Add("  - Current tension: " + player.Tension + " / " + player.MaxTension);
+            text.Add("  - Erudition level: " + player.EruditionLevel + ", " + player.EruditionPoints + " points");
 
             sCurrent = "";
             sTitle = "";

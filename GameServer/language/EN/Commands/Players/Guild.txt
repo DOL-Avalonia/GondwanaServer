@@ -216,7 +216,7 @@ Commands.Players.Guild.MemberRemoved:			{0} has removed {1} from the guild.
 Commands.Players.Guild.MeritPointReq:			Your guild need {0} more merit points to activate a guild buff! (Total merit points amount required for this action: {1}).
 Commands.Players.Guild.Buff.Activate.RP:        Are you sure you want to activate a Realm Points guild buff for {0} merit points?
 Commands.Players.Guild.Buff.NotAvailable:       This buff type is not available.
-Commands.Players.Guild.Buff.Buy:                Are you sure you want to activate a Bounty Points guild buff for {0} merit points?
+Commands.Players.Guild.Buff.Activate.BP:		Are you sure you want to activate a Bounty Points guild buff for {0} merit points?
 Commands.Players.Guild.Buff.Activate.Crafting:  Are you sure you want to activate a Crafting speed guild buff for {0} merit points?
 Commands.Players.Guild.Buff.Activate.XP:        Are you sure you want to activate an XP guild buff for {0} merit points?
 Commands.Players.Guild.Buff.Activate.Artifact:  Are you sure you want to activate an Artifact XP guild buff for {0} merit points?

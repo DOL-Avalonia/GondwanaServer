@@ -49,12 +49,14 @@ Librarian.Publish.Removed:				Comme vous le souhaitez. J'ai retiré votre livre 
 Librarian.Publish.TooShort:				Je ne peux pas publier ceci pour l'instant. Il faut au moins {0} mots, et il n'y en a que {1}.
 Librarian.Publish.Gibberish:			Pardonnez-moi, mais ce texte ressemble à du charabia. Revenez avec quelque chose de lisible.
 Librarian.Publish.Prohibited:			Je ne peux pas publier cela. Un terme interdit a été détecté : '{0}'.
+Librarian.Publish.RPReward:				Le Bibliothécaire vous octroie {0} points d'Érudition et {1} points de Royaume en échange de votre précieux manuscrit !
 
 Librarian.Buy.NotForSale:				Ce livre ne peut pas être acheté.
 Librarian.Buy.NotEnoughMoney:			Il vous faut {0} pour acheter ce livre.
 Librarian.Buy.CreateItemFail:			Il y a un souci… je n'arrive pas à préparer l'exemplaire.
 Librarian.Buy.NoInventorySpace:			Votre sac est plein. Faites de la place, puis revenez me voir.
 Librarian.Buy.Success:					Vous achetez "{0}" pour {1}.
+Librarian.Buy.CannotBuyOwn:				Vous ne pouvez pas acheter votre propre ouvrage !
 
 Librarian.Vote.CannotVoteOwn:			Vous ne pouvez pas voter pour votre propre livre, laissez les lecteurs décider !
 Librarian.Vote.AlreadyVoted:			Vous avez déjà voté pour ce livre.

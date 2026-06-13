@@ -1397,7 +1397,7 @@ namespace DOL.GS.Commands
                                         client.Out.SendCustomDialog(
                                             LanguageMgr.GetTranslation(
                                                 client.Account.Language,
-                                                "Commands.Players.Guild.Buff.Buy",
+                                                "Commands.Players.Guild.Buff.Activate.BP",
                                                 meritPointCost
                                             ),
                                             ConfirmBuffBuy);

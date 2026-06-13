@@ -216,7 +216,7 @@ Commands.Players.Guild.MemberRemoved:			{0} a retiré {1} de la guilde.
 Commands.Players.Guild.MeritPointReq:			Votre guilde a besoin de {0} points de mérite supplémentaires pour activer un buff de guilde ! (Points de mérite total nécessaires à cette action : {1})
 Commands.Players.Guild.Buff.Activate.RP:        Etes-vous sûr de vouloir activer un buff de guilde RP pour {0} points de mérite ?
 Commands.Players.Guild.Buff.NotAvailable:       Ce type de buff n'est pas disponible.
-Commands.Players.Guild.Buff.Buy:                Etes-vous sûr de vouloir activer un buff de guilde "Primes de Royaume" (BP) pour {0} points de mérite ?
+Commands.Players.Guild.Buff.Activate.BP:		Etes-vous sûr de vouloir activer un buff de guilde "Points de Prime" (BP) pour {0} points de mérite ?
 Commands.Players.Guild.Buff.Activate.Crafting:  Etes-vous sûr de vouloir activer un buff de guilde "Hâte de Craft" pour {0} points de mérite ?
 Commands.Players.Guild.Buff.Activate.XP:        Etes-vous sûr de vouloir activer un buff de guilde "Experience PvE" pour {0} points de mérite ?
 Commands.Players.Guild.Buff.Activate.Artifact:  Etes-vous sûr de vouloir activer un buff de guilde "Experience Artefact" pour {0} points de mérite ?

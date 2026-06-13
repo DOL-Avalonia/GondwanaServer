@@ -5597,6 +5597,67 @@ namespace DOL.GS
 
         #endregion
 
+        #region Erudition System
+
+        public static readonly long[] ERUDITION_POINTS_FOR_LEVEL =
+        {
+            0,       // Level 0
+            220,     // Level 1
+            500,     // Level 2
+            1200,    // Level 3
+            3500,    // Level 4
+            7000,    // Level 5
+            13000,   // Level 6
+            22000,   // Level 7
+            30000,   // Level 8
+            54000,   // Level 9
+            95000    // Level 10
+        };
+
+        public long EruditionPoints
+        {
+            get { return DBCharacter != null ? DBCharacter.EruditionPoints : 0; }
+            set { if (DBCharacter != null) DBCharacter.EruditionPoints = value; }
+        }
+
+        public int EruditionLevel
+        {
+            get { return DBCharacter != null ? DBCharacter.EruditionLevel : 0; }
+            set { if (DBCharacter != null) DBCharacter.EruditionLevel = value; }
+        }
+
+        public void GainEruditionPoints(long amount, bool sendMessage = true)
+        {
+            if (amount <= 0) return;
+        
+            EruditionPoints += amount;
+        
+            if (sendMessage)
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainEruditPoints.YouGain", amount), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+            bool leveledUp = false;
+        
+            while (EruditionLevel < 10 && EruditionPoints >= ERUDITION_POINTS_FOR_LEVEL[EruditionLevel + 1])
+            {
+                EruditionLevel++;
+
+                string titleName = LanguageMgr.GetTranslation(Client.Account.Language, $"Titles.Erudition.Level{EruditionLevel}");
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainEruditPoints.LevelIncreased", EruditionLevel), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked", titleName), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+
+                leveledUp = true;
+            }
+
+            if (leveledUp)
+            {
+                Out.SendUpdatePlayer();
+            }
+        
+            SaveIntoDatabase();
+        }
+
+        #endregion
+
         #region Level/Experience
 
         /// <summary>
@@ -13753,6 +13814,8 @@ namespace DOL.GS
             if (IsAfkActive())
                 ClearAFK(showMessage: true);
 
+            CheckForGenistarEggProximity();
+
             if (IsSitting)
             {
                 Sit(false);
@@ -13903,6 +13966,62 @@ namespace DOL.GS
         }
 
         public Position[] LastUniquePositions { get; } = new Position[4];
+
+        /// <summary>
+        /// Checks if the player has a Genistar egg and is near a Genistar placeholder to hatch/replace it.
+        /// </summary>
+        private void CheckForGenistarEggProximity()
+        {
+            InventoryItem eggItem = null;
+            lock (Inventory)
+            {
+                foreach (InventoryItem item in Inventory.AllItems)
+                {
+                    if (item.Template != null && item.Template.Flags == 26)
+                    {
+                        eggItem = item;
+                        break;
+                    }
+                }
+            }
+
+            if (eggItem != null)
+            {
+                foreach (House house in HouseMgr.GetHousesByPlayer(this))
+                {
+                    if (house.RegionID != this.CurrentRegionID) continue;
+
+                    foreach (var kvp in house.GenistarVisuals)
+                    {
+                        int dictKey = kvp.Key;
+                        GameStaticItem visual = kvp.Value;
+
+                        if (visual != null && visual.Model == 1293)
+                        {
+                            if (this.IsWithinRadius(visual, 250))
+                            {
+                                if (Inventory.RemoveItem(eggItem))
+                                {
+                                    visual.Model = 3739;
+                                    visual.SaveIntoDatabase();
+
+                                    if (house.OutdoorItems.TryGetValue(dictKey, out OutdoorItem outdoorItem))
+                                    {
+                                        outdoorItem.BaseItem = eggItem.Template;
+                                        outdoorItem.DatabaseItem.BaseItemID = eggItem.Id_nb;
+
+                                        GameServer.Database.SaveObject(outdoorItem.DatabaseItem);
+                                    }
+
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.GenistarEggPlaced"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Updates Health, Mana, Sitting, Endurance, Concentration and Alive status to client
@@ -14751,6 +14870,14 @@ namespace DOL.GS
                 {
                     InventoryItem item = Inventory.GetItem(slot_pos);
                     bool unauthorized = false;
+
+                    // Prevent genistar items from being dropped on the ground
+                    if (item.Template != null && (item.Template.Flags == 25 || item.Template.Flags == 26))
+                    {
+                        Out.SendMessage("You cannot drop a Genistar on the ground. It must be placed in a garden slot.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
                     if (!item.IsDropable)
                     {
                         unauthorized = true;

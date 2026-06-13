@@ -78,6 +78,8 @@ HousingPlaceItemHandler.NoHouseSelected:        Chưa chọn ngôi nhà nào!
 HousingPlaceItemHandler.NeedRemovalDeed:        Bạn cần có Chứng thư dỡ bỏ nhà cho việc này.
 HousingPlaceItemHandler.HouseRemoved:           Ngôi nhà của bạn đã bị dỡ bỏ!
 HousingPlaceItemHandler.NeedHouseDeed:          Thao tác này không thể thực hiện nếu không có Chứng thư nhà.
+HousingPlaceItemHandler.GenistarLimitReached:	Bạn đã đạt đến giới hạn tối đa là {0} Genistar cho kích thước ngôi nhà của mình.
+HousingPlaceItemHandler.GenistarVisualPlaced:	Genistar của bạn đã được đặt chính xác tại nơi bạn đang đứng.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Bạn đang nhắm tới lô số {0}.

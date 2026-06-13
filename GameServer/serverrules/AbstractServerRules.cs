@@ -451,6 +451,8 @@ namespace DOL.GS.ServerRules
                 return false;
             if (defender is GameNPC { IsPeaceful: true })
                 return false;
+            if (attacker is GameNPC && defender is GameNPC && attacker.HasForcedAttackTarget(defender))
+                return true;
 
             // Players can't attack mobs while they have immunity
             if (playerAttacker != null)

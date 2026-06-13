@@ -161,6 +161,9 @@ GameObjects.GamePlayer.GainRealmPoints.TerRelicBonus:			(+{0} RP de tus reliquia
 GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           ¡Obtienes {0} puntos de reino extra gracias a bonos de zona!
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      ¡Obtienes {0} puntos de reino por defender tu territorio!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     ¡Obtienes {0} puntos de reino por curar a un miembro de tu reino!
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			Ganas {0} puntos de Erudición.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		¡Tu nivel de Erudición ha aumentado a {0}!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		Has desbloqueado el título: '{0}'. Usa /title para equiparlo.
 
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:   Observas a {0}. ¡{1} es miembro de un reino enemigo!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:      Observas a {0}. {1} no pertenece a ningún clan.
@@ -517,6 +520,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      No eres lo bastante poder
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     No puedes usar este inventario.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  El efecto de carga con ID {0} aún no está implementado.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   No se encontró el efecto de carga con ID {0}.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Este marcador de posición de Genistar debe colocarse en un espacio del jardín.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Tu huevo de Genistar ha sido colocado en tu jardín. ¡Ahora es tuyo para cuidarlo y moldearlo según tus deseos!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} grita: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} grita algo en un idioma que no entiendes.

@@ -78,6 +78,8 @@ HousingPlaceItemHandler.NoHouseSelected:        Geen huis geselecteerd!
 HousingPlaceItemHandler.NeedRemovalDeed:        Je hebt hiervoor een Huis Verwijderingsakte nodig.
 HousingPlaceItemHandler.HouseRemoved:           Je huis is verwijderd!
 HousingPlaceItemHandler.NeedHouseDeed:          Dit werkt niet zonder een Huisakte.
+HousingPlaceItemHandler.GenistarLimitReached:	Je hebt de maximale limiet van {0} Genistar(s) voor jouw huisgrootte bereikt.
+HousingPlaceItemHandler.GenistarVisualPlaced:	Je Genistar is precies geplaatst op de plek waar je staat.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Je richt op kavel nummer {0}.

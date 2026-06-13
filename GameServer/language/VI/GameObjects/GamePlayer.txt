@@ -162,6 +162,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Bạn nhận thêm
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Bạn nhận {0} điểm vương quốc khi phòng thủ lãnh thổ!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Bạn nhận {0} điểm vương quốc vì đã hồi máu cho đồng minh!
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			Bạn nhận được {0} điểm Uyên bác.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		Cấp độ Uyên bác của bạn đã tăng lên {0}!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		Bạn đã mở khóa danh hiệu: '{0}'. Sử dụng lệnh /title để trang bị nó.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:   Bạn quan sát {0}. {1} là thành viên của vương quốc thù địch!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:      Bạn quan sát {0}. {1} không thuộc bang hội nào.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:   Bạn quan sát {0}. {1} là thành viên bang hội: {2}.
@@ -517,6 +521,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Bạn không đủ mạnh
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Bạn không thể dùng kho đồ này.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Hiệu ứng kích hoạt với ID {0} chưa được triển khai.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Không tìm thấy hiệu ứng kích hoạt với ID {0}.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Vật giữ chỗ Genistar này phải được đặt vào một ô trong sân vườn.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Trứng Genistar của bạn đã được đặt trong vườn. Giờ đây, bạn có quyền chăm sóc và nuôi dưỡng nó theo mong muốn của mình!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} hét: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} hét điều gì đó bằng ngôn ngữ bạn không hiểu.

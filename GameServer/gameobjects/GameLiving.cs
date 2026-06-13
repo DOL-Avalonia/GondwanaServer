@@ -5413,6 +5413,8 @@ namespace DOL.GS
         /// </summary>
         private readonly PropertyCollection m_tempProps = new PropertyCollection();
 
+        public const string GM_FORCED_ATTACK_TARGET_PROPERTY = "GM_FORCED_ATTACK_TARGET";
+
         /// <summary>
         /// use it to store temporary properties on this living
         /// beware to use unique keys so they do not interfere
@@ -5420,6 +5422,13 @@ namespace DOL.GS
         public PropertyCollection TempProperties
         {
             get { return m_tempProps; }
+        }
+
+        public bool HasForcedAttackTarget(GameLiving defender)
+        {
+            return defender != null &&
+                   !ReferenceEquals(this, defender) &&
+                   ReferenceEquals(TempProperties.getProperty<GameLiving>(GM_FORCED_ATTACK_TARGET_PROPERTY, null), defender);
         }
 
         /// <summary>

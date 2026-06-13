@@ -81,6 +81,7 @@ namespace DOL.GS.Commands
          "'/mob kill' kills the mob without removing it from the DB.",
          "'/mob heal' restores the mob's health to maximum.",
          "'/mob attack <PlayerName>' command mob to attack a player.",
+         "'/mob attacknpc <NPC name>' command mob to attack a nearby NPC.",
          "'/mob state' show mob state (attackers, effects).",
          "'/mob info' extended information about the mob.",
          "'/mob realm <eRealm>' set the mob's realm.",
@@ -233,6 +234,7 @@ namespace DOL.GS.Commands
                     case "flags": flags(client, targetMob, args); break;
                     case "heal": heal(client, targetMob, args); break;
                     case "attack": attack(client, targetMob, args); break;
+                    case "attacknpc": attacknpc(client, targetMob, args); break;
                     case "info": info(client, targetMob, args); break;
                     case "stats": stats(client, targetMob, args); break;
                     case "state": state(client, targetMob); break;
@@ -1358,6 +1360,11 @@ namespace DOL.GS.Commands
 
         private void attack(GameClient client, GameNPC targetMob, string[] args)
         {
+            if (args.Length < 3)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
 
             foreach (GamePlayer player in targetMob.GetPlayersInRadius(3000))
             {
@@ -1370,6 +1377,45 @@ namespace DOL.GS.Commands
                     break;
                 }
             }
+        }
+
+        private void attacknpc(GameClient client, GameNPC targetMob, string[] args)
+        {
+            if (args.Length < 3)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
+
+            const ushort attackNpcRadius = 3000;
+            string targetName = string.Join(" ", args, 2, args.Length - 2);
+            GameNPC npcTarget = targetMob.GetNPCsInRadius(attackNpcRadius)
+                .OfType<GameNPC>()
+                .Where(npc => npc != targetMob && string.Equals(npc.Name, targetName, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(npc => targetMob.GetDistanceTo(npc))
+                .FirstOrDefault();
+
+            if (npcTarget == null)
+            {
+                client.Out.SendMessage($"No NPC named '{targetName}' found within {attackNpcRadius} units of '{targetMob.Name}'.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            targetMob.TempProperties.setProperty(GameLiving.GM_FORCED_ATTACK_TARGET_PROPERTY, npcTarget);
+
+            if (!GameServer.ServerRules.IsAllowedToAttack(targetMob, npcTarget, false))
+            {
+                targetMob.TempProperties.removeProperty(GameLiving.GM_FORCED_ATTACK_TARGET_PROPERTY);
+                client.Out.SendMessage($"'{targetMob.Name}' cannot attack '{npcTarget.Name}' under the current server rules. Check PEACE flags, realm, and invulnerability state.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (targetMob.Brain is StandardMobBrain standardMobBrain)
+                standardMobBrain.AddToAggroList(npcTarget, standardMobBrain.AggroLevel + 1);
+
+            targetMob.TargetObject = npcTarget;
+            targetMob.StartAttack(npcTarget);
+            client.Out.SendMessage($"'{targetMob.Name}' is now attacking '{npcTarget.Name}'.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
         private void info(GameClient client, GameNPC targetMob, string[] args)

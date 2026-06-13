@@ -2468,6 +2468,12 @@ namespace AmteScripts.Managers
                 return false;
             }
 
+            if (player.Level < Properties.PVP_MIN_LEVEL)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.LevelTooLow", Properties.PVP_MIN_LEVEL), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
             // If group-only session => forbid
             if (_activeSession.GroupCompoOption == 2)
             {
@@ -2509,6 +2515,15 @@ namespace AmteScripts.Managers
             {
                 groupLeader.Out.SendMessage(LanguageMgr.GetTranslation(groupLeader.Client.Account.Language, "PvPManager.NoGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
+            }
+
+            foreach (var member in group.GetPlayersInTheGroup())
+            {
+                if (member.Level < Properties.PVP_MIN_LEVEL)
+                {
+                    groupLeader.Out.SendMessage(LanguageMgr.GetTranslation(groupLeader.Client.Account.Language, "PvPManager.GroupMemberLevelTooLow", member.Name, Properties.PVP_MIN_LEVEL), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
             }
 
             if (group.MemberCount > _activeSession.GroupMaxSize)
@@ -3133,6 +3148,12 @@ namespace AmteScripts.Managers
         #region Queue logic
         public void EnqueueSolo(GamePlayer player)
         {
+            if (player.Level < Properties.PVP_MIN_LEVEL)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.LevelTooLow", Properties.PVP_MIN_LEVEL), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             if (_soloQueue.Contains(player))
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.AlreadyInSoloQueue"), eChatType.CT_System, eChatLoc.CL_SystemWindow);

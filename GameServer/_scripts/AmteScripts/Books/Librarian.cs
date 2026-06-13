@@ -444,12 +444,38 @@ namespace DOL.GS.Scripts
                 return false;
             }
 
+            // Reject publication if it contains bad words
             if (BookUtils.ContainsProhibitedTerms(book.Text, out string bad))
             {
                 author.Out.SendMessage(LanguageMgr.Translate(author, "Librarian.Publish.Prohibited", bad),
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return false;
             }
+
+            // NEW ERUDITION & RP REWARDS (BOOK PUBLISHING)
+            var wordsInText = Regex.Matches(book.Text, @"\b[\p{L}]+\b").Cast<Match>().Select(m => m.Value).ToList();
+            var usedRPWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string w in wordsInText)
+            {
+                if (RoleplayReward.RP_WORDS.Contains(w) && !usedRPWords.Contains(w))
+                {
+                    usedRPWords.Add(w);
+                }
+            }
+
+            int goodWords = usedRPWords.Count;
+            int eruditionPoints = words + (goodWords * 5);
+            author.GainEruditionPoints(eruditionPoints, false);
+
+            int baseRP = words / 10;
+            if (baseRP < 1) baseRP = 1;
+
+            double eruditionMultiplier = Math.Pow(1.0 + (Properties.ERUDITION_RP_BONUS_PERCENT / 100.0), author.EruditionLevel);
+            int rpReward = (int)Math.Round(baseRP * eruditionMultiplier) + (goodWords * 2);
+
+            author.GainRealmPoints(rpReward, false, false, true);
+            author.Out.SendMessage(LanguageMgr.Translate(author, "Librarian.Publish.RPReward", eruditionPoints, rpReward), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
             book.WordCount = words;
             book.BasePriceCopper = ComputeBasePrice(words);

@@ -78,6 +78,8 @@ HousingPlaceItemHandler.NoHouseSelected:        Kein Haus ausgewählt!
 HousingPlaceItemHandler.NeedRemovalDeed:        Du benötigst dafür eine Haus-Abrissurkunde.
 HousingPlaceItemHandler.HouseRemoved:           Dein Haus wurde entfernt!
 HousingPlaceItemHandler.NeedHouseDeed:          Das funktioniert nicht ohne eine Hausurkunde.
+HousingPlaceItemHandler.GenistarLimitReached:	Du hast das maximale Limit von {0} Genistar(s) für deine Hausgröße erreicht.
+HousingPlaceItemHandler.GenistarVisualPlaced:	Dein Genistar wurde genau dort platziert, wo du stehst.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Du visierst Grundstücksnummer {0} an.

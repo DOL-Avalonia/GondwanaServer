@@ -24,6 +24,8 @@ PvPManager.RewardGroup:						[PvP Task] Your group reached a Milestone ({0} kill
 PvPManager.Solo:						(Solo)
 PvPManager.Group:						(Group)
 PvPManager.NotEnoughPlayers:				You did not score points because there are not enough players in this PvP session.
+PvPManager.LevelTooLow:						You must be at least level {0} to participate in PvP!
+PvPManager.GroupMemberLevelTooLow:			Your group cannot join! {0} must be at least level {1} to participate in PvP.
 
 PvPManager.BossHunt.ScoredPoints:			You scored {0} points on {1}!
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} slew the {2} for {3} points!

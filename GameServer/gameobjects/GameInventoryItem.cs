@@ -433,6 +433,12 @@ namespace DOL.GS
         /// <returns>true if item use is handled here</returns>
         public virtual bool Use(GamePlayer player)
         {
+            // Stop players from manually right-clicking /using the Genistar items
+            if (Template != null && Template.Flags == 25)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.UseSlot.GenistarHouseGarden"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return true; 
+            }
             return false;
         }
 

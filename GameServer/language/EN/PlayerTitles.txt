@@ -633,3 +633,16 @@ Titles.Adventurer.Level2:				Wanderlust Wayfarer
 Titles.Adventurer.Level3:				Vanguard Voyager
 Titles.Adventurer.Level4:				Great Adventurer
 Titles.Adventurer.Level5:				Legendary Explorer
+
+# /Erudition
+Titles.Erudition.Level0:			Illiterate
+Titles.Erudition.Level1:			Reader
+Titles.Erudition.Level2:			Scholar
+Titles.Erudition.Level3:			Scribe
+Titles.Erudition.Level4:			Erudite
+Titles.Erudition.Level5:			Loremaster
+Titles.Erudition.Level6:			Philosopher
+Titles.Erudition.Level7:			Sage
+Titles.Erudition.Level8:			Oracle
+Titles.Erudition.Level9:			Illuminated
+Titles.Erudition.Level10:			Omniscient

@@ -293,6 +293,17 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 return;
                             }
 
+                            // Check if the item being placed is a Genistar Placeholder (Flag 25) or an Egg (Flag 26)
+                            if (orgitem.Template != null && (orgitem.Template.Flags == 25 || orgitem.Template.Flags == 26))
+                            {
+                                if (!house.CanAddGenistar())
+                                {
+                                    int maxLimit = house.GetGenistarLimit();
+                                    ChatUtil.SendSystemMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "HousingPlaceItemHandler.GenistarLimitReached", maxLimit));
+                                    client.Out.SendInventorySlotsUpdate(new[] { slot });
+                                    return;
+                                }
+                            }
 
                             // garden is already full, return
                             if (house.OutdoorItems.Count >= Properties.MAX_OUTDOOR_HOUSE_ITEMS)
@@ -325,6 +336,12 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                             //add item to outdooritems
                             house.OutdoorItems.Add(pos, oitem);
+
+                            if (orgitem.Template != null && (orgitem.Template.Flags == 25 || orgitem.Template.Flags == 26))
+                            {
+                                house.SpawnGenistarVisual(pos, oitem, client.Player.Position);
+                                ChatUtil.SendSystemMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "HousingPlaceItemHandler.GenistarVisualPlaced"));
+                            }
 
                             ChatUtil.SendSystemMessage(client, "HousingPlaceItemHandler.GardenObjectPlaced",
                                                        Properties.MAX_OUTDOOR_HOUSE_ITEMS - house.OutdoorItems.Count);

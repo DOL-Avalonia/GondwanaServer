@@ -162,6 +162,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Získáváš {0} b
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Získáváš {0} bodů říše za obranu svého území!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Získáváš {0} bodů říše za vyléčení člena své říše!
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			Získáváte {0} bodů erudice.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		Vaše úroveň erudice se zvýšila na {0}!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		Odemkli jste titul: '{0}'. Použijte /title k jeho vybavení.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:   Prohlížíš si {0}. {1} je členem nepřátelské říše!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:      Prohlížíš si {0}. {1} nepatří do žádného cechu.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:   Prohlížíš si {0}. {1} je členem cechu: {2}.
@@ -515,8 +519,10 @@ GameObjects.GamePlayer.UseSlot.NoMagicItemZone:        V této oblasti není dov
 GameObjects.GamePlayer.UseSlot.CannotUseInState:       V tomto stavu nemůžeš nic použít.
 GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Nejsi dost mocný/mocná, abys použil/a kouzlo tohoto předmětu.
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Tento inventář nemůžeš použít.
-GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Nabíjecí efekt s ID {0} ještě není implementován.
-GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Nabíjecí efekt s ID {0} nebyl nalezen.
+GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Nabíjecí efekt s ID {0} ještě není implementován.
+GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:	Nabíjecí efekt s ID {0} nebyl nalezen.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Tento zástupce Genistaru musí být umístěn do zahradního slotu.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Vaše vejce Genistaru bylo umístěno na vaší zahradě. Nyní je jen na vás, abyste ho vychovali a formovali podle svých představ!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} křičí: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} křičí něco v jazyce, kterému nerozumíš.

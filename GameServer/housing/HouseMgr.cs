@@ -506,6 +506,16 @@ namespace DOL.GS.Housing
             GameServer.Database.DeleteObject(oobjs);
             house.OutdoorItems.Clear();
 
+            foreach (var visual in house.GenistarVisuals.Values)
+            {
+                if (visual != null)
+                {
+                    visual.DeleteFromDatabase();
+                    visual.Delete();
+                }
+            }
+            house.GenistarVisuals.Clear();
+
             IList<DBHouseHookpointItem> hpobjs = DOLDB<DBHouseHookpointItem>.SelectObjects(DB.Column(nameof(DBHouseHookpointItem.HouseNumber)).IsEqualTo(house.HouseNumber));
             GameServer.Database.DeleteObject(hpobjs);
 

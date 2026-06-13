@@ -56,3 +56,6 @@ PlayerStatistic.Bonus.BountyhunterTitle:        +{0}% Résistance au vol / +{1}%
 PlayerStatistic.Bonus.WrathTitle:               +{0}% Augmentation de tension / -{1}% Perte de tension à la mort
 PlayerStatistic.Bonus.AdventurerTitle:          +{0}% Vitesse max de marche & de nage / +{1}% de portée des Sorts-Archerie
 PlayerStatistic.Bonus.DuelistTitle:				+{0}% Chance de coups critiques / +{1} point(s) toutes compétences Mêlée & Deux armes
+PlayerStatistic.Bonus.EruditionTitle0:			Aucun bonus
+PlayerStatistic.Bonus.EruditionTitleLow:		+{0}% Vitesse d'incantation
+PlayerStatistic.Bonus.EruditionTitleHigh:		+{0}% Vitesse d'incantation / +{1}% Dégâts des sorts

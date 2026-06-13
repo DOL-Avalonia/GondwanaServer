@@ -78,6 +78,8 @@ HousingPlaceItemHandler.NoHouseSelected:        Nessuna casa selezionata!
 HousingPlaceItemHandler.NeedRemovalDeed:        Hai bisogno di un Atto di Rimozione della Casa per questo.
 HousingPlaceItemHandler.HouseRemoved:           La tua casa è stata rimossa!
 HousingPlaceItemHandler.NeedHouseDeed:          Questo non funziona senza un Atto di Proprietà della Casa.
+HousingPlaceItemHandler.GenistarLimitReached:	Hai raggiunto il limite massimo di {0} Genistar per le dimensioni della tua casa.
+HousingPlaceItemHandler.GenistarVisualPlaced:	Il tuo Genistar è stato posizionato esattamente dove ti trovi.
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Stai mirando al lotto numero {0}.

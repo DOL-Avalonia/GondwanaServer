@@ -163,6 +163,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:	Du erhältst {0} Reichspunkt
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:	Du erhältst {0} Reichspunkte für die Verteidigung deines Territoriums!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:	Du erhältst {0} Reichspunkte für das Heilen eines Mitglieds deines Reiches!
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			Du erhältst {0} Eruditionspunkte.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		Deine Eruditionsstufe ist auf {0} gestiegen!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		Du hast den Titel freigeschaltet: '{0}'. Verwende /title, um ihn auszurüsten.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:	Es interessiert Euch {0}. {1} gehört einem feindlichen Reich an!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:	Es interessiert Euch {0}. {1} gehört keiner Gilde an.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:	Es interessiert Euch {0}. {1} ist Mitglied der "{2}"-Gilde.
@@ -518,6 +522,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:	Du bist nicht mächtig genug, 
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:	Du kannst dieses Inventar nicht benutzen.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Lade‑Effekt mit ID {0} ist noch nicht implementiert.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:	Lade‑Effekt mit ID {0} nicht gefunden.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Dieser Genistar-Platzhalter muss in einem Garten-Slot platziert werden.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Dein Genistar-Ei wurde in deinem Garten platziert. Es liegt nun an dir, es zu pflegen und nach deinen Wünschen zu formen!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} ruft: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} ruft etwas in einer Sprache, die Ihr nicht versteht.

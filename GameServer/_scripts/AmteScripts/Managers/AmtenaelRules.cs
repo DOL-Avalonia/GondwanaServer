@@ -273,6 +273,14 @@ namespace DOL.GS.ServerRules
             if (defenderNpc?.Flags.HasFlag(GameNPC.eFlags.CANTTARGET) == true)
                 return false;
 
+            if (attacker is GameNPC && defender is GameNPC && attacker.HasForcedAttackTarget(defender))
+            {
+                if (attackerNpc is { IsPeaceful: true } || defenderNpc is { IsPeaceful: true })
+                    return false;
+
+                return true;
+            }
+
             GameLiving attackerController = attacker;
             GameLiving defenderController = defender;
             // if friend, let's define the controller once

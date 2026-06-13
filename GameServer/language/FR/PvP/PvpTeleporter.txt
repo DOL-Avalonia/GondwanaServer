@@ -9,6 +9,7 @@ TeleporterPvP.InCombat:					Vous ne pouvez pas être téléporté en étant en c
 TeleporterPvP.Leave:					Partir
 TeleporterPvP.Ready:					Prêt
 TeleporterPvP.NoSessionActive:			Le PvP n'est pas ouvert pour le moment ; aucune session n'est active.
+TeleporterPvP.LevelTooLow:				Désolé {0}, mais vous devez être au moins niveau {1} pour participer au PvP !
 TeleporterPvP.TeleportAsSolo:			[Se téléporter seul au combat]
 TeleporterPvP.TeleportYourGroup:		[Envoyer votre groupe au combat]
 TeleporterPvP.GroupMaxSize:				(max. {0} joueurs)

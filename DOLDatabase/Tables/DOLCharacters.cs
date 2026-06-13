@@ -202,6 +202,8 @@ namespace DOL.Database
 
         private bool m_receiveROG; // toggle receiving ROGs for the player
         private bool m_enableAutoTranslate = false; // toggle auto translations for the player
+        private long m_eruditionPoints;
+        private int m_eruditionLevel;
 
         /// <summary>
         /// Create the character row in table
@@ -2400,6 +2402,26 @@ namespace DOL.Database
                 Dirty = true;
                 m_wanted = value;
             }
+        }
+
+        /// <summary>
+        /// Gets/sets character Erudition points
+        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public long EruditionPoints
+        {
+            get { return m_eruditionPoints; }
+            set { m_eruditionPoints = value; Dirty = true; }
+        }
+
+        /// <summary>
+        /// Gets/sets character Erudition level
+        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public int EruditionLevel
+        {
+            get { return m_eruditionLevel; }
+            set { m_eruditionLevel = value; Dirty = true; }
         }
 
         /// <summary>

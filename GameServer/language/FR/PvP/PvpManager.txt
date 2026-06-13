@@ -24,6 +24,8 @@ PvPManager.RewardGroup:						[Objectif PvP] Votre groupe a franchi le cap des {0
 PvPManager.Solo:						(Solo)
 PvPManager.Group:						(Groupe)
 PvPManager.NotEnoughPlayers:				Vous n'avez pas gagné de points car il n'y a pas assez de joueurs dans cette session PvP.
+PvPManager.LevelTooLow:						Vous devez être au moins niveau {0} pour participer au PvP !
+PvPManager.GroupMemberLevelTooLow:			Votre groupe ne peut pas rejoindre ! {0} doit être au moins niveau {1} pour participer au PvP.
 
 PvPManager.BossHunt.ScoredPoints:			Vous avez marqué {0} points sur {1} !
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} a terrassé {2} pour {3} points !

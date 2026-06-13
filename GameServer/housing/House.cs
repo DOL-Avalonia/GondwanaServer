@@ -31,6 +31,8 @@ using Vector = DOL.GS.Geometry.Vector;
 
 namespace DOL.GS.Housing
 {
+    public class GenistarVisual : GameStaticItem { }
+
     public class House
     {
         /// <summary>
@@ -45,6 +47,7 @@ namespace DOL.GS.Housing
         private readonly Dictionary<int, OutdoorItem> _outdoorItems;
         private readonly Dictionary<int, DBHousePermissions> _permissionLevels;
         private GameConsignmentMerchant _consignmentMerchant;
+        public Dictionary<int, GenistarVisual> GenistarVisuals { get; } = new Dictionary<int, GenistarVisual>();
 
         #region Properties
 
@@ -811,6 +814,150 @@ namespace DOL.GS.Housing
 
         #endregion
 
+        #region Garden Genistars
+
+        /// <summary>
+        /// Gets the Genistar garden limit depending on the house size
+        /// </summary>
+        public int GetGenistarLimit()
+        {
+            switch (Model)
+            {
+                case 1: case 5: case 9: return 1;    // Cottages
+                case 2: case 6: case 10: return 2;   // Houses
+                case 3: case 7: case 11: return 3;   // Villas
+                case 4: case 8: case 12: return 4;   // Mansions
+                default: return 0;
+            }
+        }
+
+        public bool CanAddGenistar()
+        {
+            int limit = GetGenistarLimit();
+            int currentCount = _outdoorItems.Values.Count(i => i.BaseItem != null && (i.BaseItem.Flags == 25 || i.BaseItem.Flags == 26));
+            return currentCount < limit;
+        }
+
+        /// <summary>
+        /// Calculates the exact X,Y,Z of a specific Genistar slot around the house based on orientation.
+        /// </summary>
+        public Position GetGenistarSlotPosition(int slotIndex, Position? playerPos)
+        {
+            int localX = 0;
+            int localY = 0;
+
+            switch (slotIndex)
+            {
+                case 0: localX = -400; localY = -400; break;
+                case 1: localX = 400; localY = -400; break;
+                case 2: localX = -400; localY = 400; break;
+                case 3: localX = 400; localY = 400; break;
+            }
+
+            double rad = this.Position.Orientation.InRadians;
+
+            // Rotate the local X and Y around the center of the house
+            int rotX = (int)(localX * Math.Cos(rad) + localY * Math.Sin(rad));
+            int rotY = (int)(-localX * Math.Sin(rad) + localY * Math.Cos(rad));
+
+            int finalZ = playerPos.HasValue ? playerPos.Value.Z : this.Position.Z;
+            ushort finalHeading = playerPos.HasValue ? playerPos.Value.Orientation.InHeading : this.Position.Orientation.InHeading;
+
+            return Position.Create(this.Position.RegionID, this.Position.X + rotX, this.Position.Y + rotY, finalZ, finalHeading);
+        }
+
+        /// <summary>
+        /// Finds the first empty predefined slot (0 to limit - 1)
+        /// </summary>
+        private int GetNextAvailableGenistarSlot()
+        {
+            int limit = GetGenistarLimit();
+            for (int i = 0; i < limit; i++)
+            {
+                Position slotPos = GetGenistarSlotPosition(i, null);
+
+                bool occupied = GenistarVisuals.Values.Any(v =>
+                    Math.Abs(v.Position.X - slotPos.X) < 100 &&
+                    Math.Abs(v.Position.Y - slotPos.Y) < 100);
+
+                if (!occupied) return i;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Spawns a physical GameStaticItem in a predetermined slot to represent the Genistar
+        /// </summary>
+        public void SpawnGenistarVisual(int dictKey, OutdoorItem oitem, Position? playerPos = null)
+        {
+            if (oitem.BaseItem == null) return;
+
+            ushort visualModel = 0;
+            if (oitem.BaseItem.Flags == 25) visualModel = 1293;
+            else if (oitem.BaseItem.Flags == 26) visualModel = 3739;
+
+            if (visualModel > 0)
+            {
+                string uniqueName = "Genistar_" + oitem.DatabaseItem.ObjectId;
+                GenistarVisual visual = null;
+
+                if (playerPos == null)
+                {
+                    Region houseRegion = WorldMgr.GetRegion(this.Position.RegionID);
+                    if (houseRegion != null)
+                    {
+                        foreach (GameObject obj in houseRegion.Objects)
+                        {
+                            if (obj is GenistarVisual gv && gv.Name == uniqueName)
+                            {
+                                visual = gv;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (visual == null)
+                {
+                    int slotIndex = GetNextAvailableGenistarSlot();
+                    Position spawnPos = GetGenistarSlotPosition(slotIndex, playerPos);
+
+                    visual = new GenistarVisual();
+                    visual.Model = visualModel;
+                    visual.Name = uniqueName;
+                    visual.Position = spawnPos;
+                    visual.CurrentHouse = this;
+
+                    visual.LoadedFromScript = false;
+                    visual.SaveInDB = true;
+                    visual.SaveIntoDatabase();
+                    visual.AddToWorld();
+                }
+                else
+                {
+                    visual.Model = visualModel;
+                    visual.CurrentHouse = this;
+                }
+
+                GenistarVisuals[dictKey] = visual;
+            }
+        }
+
+        public void RemoveGenistarVisual(int dictKey)
+        {
+            if (GenistarVisuals.TryGetValue(dictKey, out GenistarVisual visual))
+            {
+                if (visual != null)
+                {
+                    visual.DeleteFromDatabase(); // Removes it from the WorldObject table forever
+                    visual.Delete();
+                }
+                GenistarVisuals.Remove(dictKey);
+            }
+        }
+
+        #endregion
+
         #region Editing
 
         public bool AddPorch()
@@ -1522,7 +1669,11 @@ namespace DOL.GS.Housing
             _outdoorItems.Clear();
             foreach (DBHouseOutdoorItem dboitem in DOLDB<DBHouseOutdoorItem>.SelectObjects(DB.Column(nameof(DBHouseOutdoorItem.HouseNumber)).IsEqualTo(HouseNumber)))
             {
-                _outdoorItems.Add(i++, new OutdoorItem(dboitem));
+                var oitem = new OutdoorItem(dboitem);
+                _outdoorItems.Add(i, oitem);
+
+                SpawnGenistarVisual(i, oitem, null);
+                i++;
             }
 
             _housePermissions.Clear();

@@ -163,6 +163,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:			You gain {0} realm points 
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:	You gain {0} realm points for defending your territory!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:	You gain {0} realm points for healing a member of your realm!
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			You gain {0} Erudition points.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		Your Erudition Level has increased to {0}!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		You have unlocked the title: '{0}'. Use /title to equip it.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:		You examine {0}. {1} is a member of an enemy realm!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:		You examine {0}. {1} is a neutral member with no guild allegiance.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:		You examine {0}. {1} is a member of the {2} guild.
@@ -518,6 +522,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:			You are not powerful enough 
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:			You can't use this inventory.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Charge effect ID {0} is not implemented yet.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:		Charge effect ID {0} not found.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			This Genistar placeholder must be placed in a garden slot.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Your Genistar egg has been placed in your garden. It is now yours to nurture and mold it according to your desires!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} yells, "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} yells something in a language you don't understand.

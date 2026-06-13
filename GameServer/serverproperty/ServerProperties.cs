@@ -1230,6 +1230,12 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("rates", "bounty_point_cap", "The maximum number of bounty points a player can have.", 500000)]
         public static long BOUNTY_POINT_CAP;
 
+        /// <summary>
+        /// The percentage of additional base Realm Points earned per Erudition Level
+        /// </summary>
+        [ServerProperty("system", "erudition_rp_bonus_percent", "Percentage of additional base RP earned per Erudition Level (e.g. 20 for 20%)", 20)]
+        public static int ERUDITION_RP_BONUS_PERCENT;
+
         #endregion
 
         #region NPCs
@@ -1694,6 +1700,12 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("pve", "Timer_PVE_Teleport", "PVE Immunity Timer when player teleports within the same region, in seconds", 30)] // 30 seconds default
         public static int TIMER_PVE_TELEPORT;
+
+        /// <summary>
+        /// Minimum level required to enter PvP
+        /// </summary>
+        [ServerProperty("pvp", "pvp_min_level", "The minimum level required to participate in PvP sessions", 30)]
+        public static int PVP_MIN_LEVEL;
 
         /// <summary>
         /// Time after a relic lost in nature is returning to his ReturnRelicPad pad

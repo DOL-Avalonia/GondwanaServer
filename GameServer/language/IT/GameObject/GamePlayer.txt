@@ -162,6 +162,10 @@ GameObjects.GamePlayer.GainRealmPoints.AreaBonusRP:           Ottieni {0} punti 
 GameObjects.GamePlayer.GainRealmPoints.TerritoryBonusRP:      Ottieni {0} punti reame per la difesa del tuo territorio!
 GameObjects.GamePlayer.GainRealmPoints.LifeTransferSpell:     Ottieni {0} punti reame per aver curato un membro del tuo reame!
 
+GameObjects.GamePlayer.GainEruditPoints.YouGain:			Ottieni {0} punti Erudizione.
+GameObjects.GamePlayer.GainEruditPoints.LevelIncreased:		Il tuo livello di Erudizione è aumentato a {0}!
+GameObjects.GamePlayer.GainEruditPoints.TitleUnlocked:		Hai sbloccato il titolo: '{0}'. Usa /title per equipaggiarlo.
+
 GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember:   Esamini {0}. {1} è membro di un reame nemico!
 GameObjects.GamePlayer.GetExamineMessages.NeutralMember:      Esamini {0}. {1} non appartiene a nessuna gilda.
 GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember:   Esamini {0}. {1} è membro della gilda: {2}.
@@ -517,6 +521,8 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Non sei abbastanza potent
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Non puoi usare questo inventario.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Effetto di carica con ID {0} non ancora implementato.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Effetto di carica con ID {0} non trovato.
+GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Questo segnaposto Genistar deve essere posizionato in uno slot del giardino.
+GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Il tuo uovo di Genistar è stato posizionato nel tuo giardino. Ora spetta a te nutrirlo e modellarlo secondo i tuoi desideri!
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} urla: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} urla qualcosa in una lingua che non capisci.

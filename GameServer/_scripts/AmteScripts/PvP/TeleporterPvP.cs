@@ -4,6 +4,7 @@ using DOL.GS.PacketHandler;
 using DOL.Language;
 using DOL.GS.Spells;
 using System;
+using DOL.GS.ServerProperties;
 using static System.Collections.Specialized.BitVector32;
 
 namespace DOL.GS.Scripts
@@ -44,12 +45,11 @@ namespace DOL.GS.Scripts
                 return true;
             }
 
-            // If PvP is closed or level < 20, only accept certain keywords
-            if (!PvpManager.Instance.IsOpen || player.Level < 20)
+            // 1. Check if PvP is closed
+            if (!PvpManager.Instance.IsOpen)
             {
                 if (!string.Equals(str, "Partir", StringComparison.OrdinalIgnoreCase) && !string.Equals(str, "Leave", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Show the "cannot help you" messages
                     player.Out.SendMessage(
                         LanguageMgr.GetTranslation(player.Client.Account.Language,
                             "TeleporterPvP.CannotHelpPart1", player.Name),
@@ -58,6 +58,19 @@ namespace DOL.GS.Scripts
                     player.Out.SendMessage(
                         LanguageMgr.GetTranslation(player.Client.Account.Language,
                             "TeleporterPvP.CannotHelpPart2"),
+                        eChatType.CT_System, eChatLoc.CL_PopupWindow);
+
+                    return true;
+                }
+            }
+            // 2. Check if player meets the minimum level property
+            else if (player.Level < Properties.PVP_MIN_LEVEL)
+            {
+                if (!string.Equals(str, "Partir", StringComparison.OrdinalIgnoreCase) && !string.Equals(str, "Leave", StringComparison.OrdinalIgnoreCase))
+                {
+                    player.Out.SendMessage(
+                        LanguageMgr.GetTranslation(player.Client.Account.Language,
+                            "TeleporterPvP.LevelTooLow", player.Name, Properties.PVP_MIN_LEVEL),
                         eChatType.CT_System, eChatLoc.CL_PopupWindow);
 
                     return true;

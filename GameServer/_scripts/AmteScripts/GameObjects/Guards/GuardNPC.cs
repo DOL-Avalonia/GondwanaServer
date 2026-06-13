@@ -130,6 +130,26 @@ namespace DOL.GS.Scripts
 
             List<string> messages = item.Template.MessageArticle.Split(';').ToList();
 
+            // GUILD BUFF LOGIC
+            double guildCoinMultiplier = 1.0;
+            double guildBpMultiplier = 1.0;
+
+            if (srcPlayer.Guild != null && srcPlayer.Guild.BonusType != Guild.eBonusType.None)
+            {
+                TimeSpan activeTime = DateTime.Now.Subtract(srcPlayer.Guild.BonusStartTime);
+                if (activeTime.TotalMinutes <= Properties.GUILD_BUFF_DURATION_MINUTES)
+                {
+                    if (srcPlayer.Guild.BonusType == Guild.eBonusType.Coin)
+                    {
+                        guildCoinMultiplier = srcPlayer.Guild.GetBonusMultiplier(Guild.eBonusType.Coin);
+                    }
+                    else if (srcPlayer.Guild.BonusType == Guild.eBonusType.BountyPoints)
+                    {
+                        guildBpMultiplier = srcPlayer.Guild.GetBonusMultiplier(Guild.eBonusType.BountyPoints);
+                    }
+                }
+            }
+
             if (Properties.SHOW_NEW_PLAYER_STATS)
             {
                 int baseGold = Properties.REWARD_OUTLAW_HEAD_GOLD;
@@ -153,13 +173,21 @@ namespace DOL.GS.Scripts
 
                     // Calculate item-based gold bonus for the turning-in player
                     int coinBonusPercent = srcPlayer.GetModified(eProperty.MythicalCoin);
-                    finalGoldReward = calculatedGold + ((calculatedGold * coinBonusPercent) / 100);
+                    int itemGoldReward = calculatedGold + ((calculatedGold * coinBonusPercent) / 100);
+
+                    // Multiply Gold by the active Guild Coin Buff
+                    finalGoldReward = (int)(itemGoldReward * guildCoinMultiplier);
 
                     if (assassinKills > 0)
                     {
                         int calculatedBp = cappedKills * 2;
+
+                        // Calculate item-based BP bonus
                         int bpBonusPercent = srcPlayer.GetModified(eProperty.BountyPoints);
-                        finalBpReward = calculatedBp + ((calculatedBp * bpBonusPercent) / 100);
+                        int itemBpReward = calculatedBp + ((calculatedBp * bpBonusPercent) / 100);
+
+                        // Multiply BP by the active Guild Bounty Buff
+                        finalBpReward = (int)(itemBpReward * guildBpMultiplier);
                     }
                 }
 
@@ -187,6 +215,9 @@ namespace DOL.GS.Scripts
                 {
                     reward *= (int)(-int.Parse(messages[1]) / 0.5);
                 }
+
+                // Apply Guild Coin buff in standard mode as well
+                reward = (int)(reward * guildCoinMultiplier);
 
                 var prime = Money.GetMoney(0, 0, reward, 0, 0);
                 srcPlayer.AddMoney(Currency.Copper.Mint(prime));
