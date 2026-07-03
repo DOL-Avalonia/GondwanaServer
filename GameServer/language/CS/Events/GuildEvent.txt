@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		Získal jsi {0} bodů zásluh pro svou gildu!
+GuildEvent.MeritPointsAward:		Tvá gilda získává {0} bodů zásluh!
+GuildEvent.GuildbonusXP:			Získáváš dalších {0} zkušeností díky buffu své gildy!
+GuildEvent.GuildbonusRP:			Získáváš dalších {0} bodů říše díky buffu své gildy!
+GuildEvent.GuildbonusBP:			Získáváš dalších {0} bodů odměn díky buffu své gildy!
+GuildEvent.GuildBuffEnd:			[Gildovní buff] Tvůj gildovní buff právě vypršel!

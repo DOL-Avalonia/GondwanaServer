@@ -1,8 +1,9 @@
-using DOL.GS.PacketHandler;
-using DOL.GS.Commands;
-using DOL.GS;
-using DOL.Database;
 using AmteScripts.PvP.CTF;
+using DOL.Database;
+using DOL.GS;
+using DOL.GS.Commands;
+using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
 using DOL.Language;
 
 namespace DOL.GS.Commands
@@ -81,6 +82,12 @@ namespace DOL.GS.Commands
                 return;
             }
 
+            string prompt = LanguageMgr.GetTranslation(player.Client, "Commands.Players.Destroy.ConfirmDestroy", item.Name);
+            if (item.Id_nb.StartsWith("genistar_pet") || item.Id_nb.StartsWith("genistar_remains"))
+            {
+                prompt = (LanguageMgr.GetTranslation(player.Client, "DestroyItemRequestHandler.GenItemDestroyAttempt", item.Name));
+            }
+
             player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Destroy.ConfirmDestroy", item.Name), new CustomDialogResponse(DestroyItemResponse));
             player.TempProperties.setProperty("DestroyItemSlot", slot);
         }
@@ -127,6 +134,11 @@ namespace DOL.GS.Commands
 
             if (player.Inventory.RemoveItem(item))
             {
+                if (item.Id_nb.StartsWith("genistar_pet") || item.Id_nb.StartsWith("genistar_remains"))
+                {
+                    GenistarLifecycleManager.ExecuteTotalVaporization(player, item);
+                }
+
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Commands.Players.Destroy.ItemDestroyed", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 InventoryLogging.LogInventoryAction(player, "", "(destroy)", eInventoryActionType.Other, item, item.Count);
             }

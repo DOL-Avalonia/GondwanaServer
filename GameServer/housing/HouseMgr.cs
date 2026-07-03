@@ -506,11 +506,53 @@ namespace DOL.GS.Housing
             GameServer.Database.DeleteObject(oobjs);
             house.OutdoorItems.Clear();
 
+            var genistars = GameServer.Database.SelectObjects<DBGenistar>(DB.Column("HouseNumber").IsEqualTo(house.HouseNumber));
+            foreach (var gen in genistars)
+            {
+                Region rgn = WorldMgr.GetRegion(house.RegionID);
+                if (rgn != null)
+                {
+                    foreach (GameObject obj in rgn.Objects)
+                    {
+                        if (obj is Scripts.GenistarEgg egg && egg.DBRecord?.GenistarID == gen.GenistarID) egg.RemoveFromWorld();
+                        if (obj is Scripts.GenistarNPC adult && adult.DBRecord?.GenistarID == gen.GenistarID) adult.RemoveFromWorld();
+                    }
+                }
+
+                GamePlayer owner = WorldMgr.GetClientByPlayerID(gen.OwnerID, true, false)?.Player;
+                if (owner != null)
+                {
+                    var itemsToRemove = new List<InventoryItem>();
+                    lock (owner.Inventory)
+                    {
+                        foreach (InventoryItem item in owner.Inventory.AllItems)
+                        {
+                            if (item.PackageID == gen.GenistarID && item.Id_nb.StartsWith("genistar_"))
+                                itemsToRemove.Add(item);
+                        }
+                    }
+                    foreach (var itm in itemsToRemove) owner.Inventory.RemoveItem(itm);
+                }
+                else
+                {
+                    var orphanedUniques = GameServer.Database.SelectObjects<ItemUnique>(DB.Column("PackageID").IsEqualTo(gen.GenistarID));
+                    foreach (var uT in orphanedUniques)
+                    {
+                        var invItems = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("ItemTemplate_ID").IsEqualTo(uT.Id_nb));
+                        foreach (var invItm in invItems) GameServer.Database.DeleteObject(invItm);
+                        GameServer.Database.DeleteObject(uT);
+                    }
+                }
+
+                gen.HouseNumber = 0;
+                gen.State = (int)eGenistarState.Archived;
+                GameServer.Database.SaveObject(gen);
+            }
+
             foreach (var visual in house.GenistarVisuals.Values)
             {
                 if (visual != null)
                 {
-                    visual.DeleteFromDatabase();
                     visual.Delete();
                 }
             }

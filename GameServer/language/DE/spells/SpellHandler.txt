@@ -333,9 +333,11 @@ SpellHandler.Occultist.CastCondition4:			Sie müssen Ihre aktuelle Form verlasse
 SpellHandler.Occultist.Self.AbsorbToPower:		Sie siphonen {0} Mana aus dem erhaltenen Angriff.
 SpellHandler.Occultist.ArawnsLegion.PetAnswer:			{0} antwortet Eurem Ruf!
 SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:	NSC-Vorlage {0} wurde nicht gefunden.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:	Dein Genistar zieht sich in dein Inventar zurück, während die Legion beschworen wird.
 
 SpellHandler.SummonMonster.Target.Resist:			{0} wurde aus den Limbus als Zombie zurückgeholt und bleibt gegen diesen Zauber unempfindlich!
 SpellHandler.IllusionSpell.Target.Resist:			{0} hat eine Illusion beschworen und kann von diesem Zauber nicht betroffen werden!
+SpellHandler.IllusionSpell.GenistarRetreat:			Dein Genistar zieht sich in dein Inventar zurück, während die Illusion wirksam wird.
 SpellHandler.Morphed.Target.Resist:			{0} hat eine Metamorphose durchlaufen und kann von diesem Zauber nicht betroffen werden!
 
 SpellHandler.DelveInfo.Sec:			Sekunde(n)

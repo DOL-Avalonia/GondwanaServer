@@ -1,0 +1,112 @@
+# /Genistar System
+Genistar.GenistarPet.LevelUp:				Je Genistar heeft level {0} bereikt.
+Genistar.GenistarPet.Examine:				Je onderzoekt {0}. {1} is {2} en het is een Genistar-huisdier. Om dit wezen te hernoemen of emotes te geven, gebruik je /genistar op je doelwit.
+Genistar.GenistarPet.CantEquip:				Dit item kan niet worden uitgerust door een Genistar.
+Genistar.GenistarPet.PackFull:				Je rugzak zat vol! De container van {0} is op de grond gevallen.
+Genistar.GenistarPet.PackSuccess:			{0} keert terug naar zijn draagbare container in je inventaris.
+Genistar.GenistarPet.Died:					Je Genistar is gestorven! Breng zijn overblijfselen binnen 1 uur terug naar je huis-incubator, anders is hij voorgoed verloren.
+Genistar.GenistarPet.RemainsDropped:		Je inventaris is vol. De overblijfselen zijn op de grond gevallen.
+Genistar.GenistarPet.CannotOnMount:			{0} kan je rijdier niet bijhouden en keert terug naar je inventaris.
+
+Genistar.SummonGenistar.PvPContested:		Je kunt je Genistar niet oproepen in een betwist PvP- of RvR-gebied.
+Genistar.SummonGenistar.AlreadySummoned:	Je hebt al een wezen opgeroepen. Laat het los voordat je je Genistar oproept.
+Genistar.SummonGenistar.Mounted:			Je kunt je Genistar niet oproepen terwijl je op een rijdier zit.
+Genistar.SummonGenistar.NeedItem:			Je moet een Genistar Pet-item in je inventaris hebben om dit te activeren.
+Genistar.SummonGenistar.NotFoundDB:			Je Genistar kon niet worden gevonden in de genetische database.
+Genistar.SummonGenistar.FailedUse:			Kan het Genistar-item niet gebruiken.
+
+Genistar.GenistarNPC.Awakened:				{0} heeft zijn cellulaire matrix volledig geregenereerd en is ontwaakt!
+Genistar.GenistarNPC.Examine:				Je onderzoekt {0}. {1} is {2} en het is een Genistar-huisdier. Om dit wezen te hernoemen of emotes te geven, gebruik je /genistar op je doelwit.
+Genistar.GenistarNPC.DormantComa:			Het wezen bevindt zich in een slapende genezingscoma. Resterende tijd: {0} seconden.
+Genistar.GenistarNPC.AlreadyCarry:			Je bezit al een Genistar-metgezel in je inventaris. Je kunt er niet nog een tegelijkertijd oppakken.
+Genistar.GenistarNPC.PackDialog:			Wil je '{0}' in je inventaris inpakken?
+Genistar.GenistarNPC.Level20Required:		Het besturen van een volwassen Genistar in actieve gevechten vereist Level 20.
+Genistar.GenistarNPC.RenameHint:			Selecteer dit wezen als doelwit en typ '/genistar rename <NieuweNaam>' om een nieuwe telemetrie-handtekening in te dienen.
+Genistar.GenistarNPC.PackSuccess:			Je pakt '{0}' veilig in zijn draagbare container.
+Genistar.GenistarNPC.PackFail:				Je rugzak heeft niet het benodigde volume om deze container te dragen.
+Genistar.GenistarNPC.RefuseStrangers:		Het wezen ontbloot zijn tanden; het weigert voedsel van vreemden.
+Genistar.GenistarNPC.RejectSpoiled:			{0} stoot de bedorven lading gewelddadig af!
+Genistar.GenistarNPC.MorphStatic:			{0} absorbeert het mutageen, maar de morfologie is statisch. Er treedt geen visuele verandering op.
+Genistar.GenistarNPC.MorphShift:			Het genetische weefsel van {0} verschuift! De fysieke vorm is veranderd.
+Genistar.GenistarNPC.StatExpand:			[Metabolische Synthese]: De fysiologie van {0} breidt permanent uit! (+{1} {2})
+Genistar.GenistarNPC.CombatSharpen:			[Metabolische Synthese]: De gevechtsparameters van {0} worden aangescherpt! (+{1} {2})
+Genistar.GenistarNPC.ResistHarden:			[Metabolische Synthese]: De huid van {0} verhardt! (+{1}% {2})
+Genistar.GenistarNPC.SkillEvolve:			[Neurale Synthese]: {0} evolueert zijn {1} meesterschap!
+Genistar.GenistarNPCBrain.StopFollow:		{0} stopt met je te volgen en keert terug naar zijn tuin.
+
+Genistar.GenistarEgg.SealRejects:			De biometrische verzegeling van de incubator weigert jouw handtekening.
+Genistar.GenistarEgg.StasisCollapsed:		Het stasis-veld is ingestort! Het wezen is klaar om tevoorschijn te komen!
+Genistar.GenistarEgg.StasisActive:			[Stasis Actief]: Levensvatbaarheid vereist nog {0} seconden directe /afk-zorg.
+Genistar.GenistarEgg.WeaveLocks:			Het genetische weefsel wordt vergrendeld! De schaal begint te breken!
+Genistar.GenistarEgg.TooFar:				Je bent te ver bij de incubator vandaan gestapt en bent gestopt met de verzorging. Het stasis-veld wordt automatisch opnieuw geactiveerd.
+
+Genistar.Lifecycle.Degraded:				Het genetische materiaal van je verslagen Genistar is onherstelbaar afgebroken. Je huis-incubator is vrij.
+Genistar.Lifecycle.EmbryoFailed:			De genetische sequentie is ingestort! Het embryo kon zich niet vormen.
+Genistar.Lifecycle.IncubationBegun:			De incubatie is begonnen. Gebruik /afk-zorg om het embryo met lenzen te vormen.
+Genistar.Lifecycle.RecoveryStarted:			Je plaatst de overblijfselen in de incubator. Het biologische herstelproces zal 24 uur duren.
+Genistar.Lifecycle.RemainsInert:			Deze overblijfselen zijn volledig inert en kunnen niet tot leven worden gewekt.
+Genistar.Lifecycle.Purged:					De biologische blauwdruk van '{0}' is permanent uit de wereld verwijderd. De stasis-pad van je huis is nu leeg.
+
+Genistar.LensMgr.InvalidLens:				Je actieve Lens is niet geldig (DPS_AF is 0).
+Genistar.LensMgr.UnknownLens:				Je actieve Lens (ID: {0}) heeft geen bekend genetisch algoritme.
+Genistar.LensMgr.Absorbs:					Het embryo absorbeert de lensmatrix! (+{0} {1})
+Genistar.LensMgr.Kneel:						Je knielt neer en breidt een alchemistisch stasis-veld uit over de incubator.
+Genistar.LensMgr.BreakFocus:				Je verbreekt je alchemistische focus en stapt weg van de incubator.
+Genistar.LensMgr.FocusBroken:				Je alchemistische focus op de incubator is verbroken.
+
+Genistar.Chimera.Legendary:					[Alchemistische Resonantie]: Jouw nauwkeurige synthese van lenzen manifesteert de legendarische {0}!
+Genistar.Chimera.Collapse:					Het onstabiele genetische weefsel stort in onder zijn eigen structurele complexiteit! Het embryo lost op in inerte organische smurrie.
+Genistar.Chimera.Birth:						[Geboorte Succesvol]: De volwassen '{0}' zet zijn eerste stappen in je tuin!
+
+Genistar.Equip.CantEquip:					Dit item kan niet worden uitgerust door een Genistar.
+Genistar.Equip.ArmorAnimal:					Dit pantser is structureel uitsluitend ontworpen voor Dierenfenotypes.
+Genistar.Equip.ArmorHumanoid:				Dit pantser is structureel uitsluitend ontworpen voor Humanouide fenotypes.
+Genistar.Equip.ArmorTitan:					Dit pantser is structureel uitsluitend ontworpen voor Titan-fenotypes.
+Genistar.Equip.GearAnimal:					Deze uitrusting is structureel uitsluitend ontworpen voor Dierenfenotypes.
+Genistar.Equip.GearTitan:					Deze uitrusting is structureel uitsluitend ontworpen voor Titan-fenotypes.
+Genistar.Equip.GearHumanoid:				Deze uitrusting is structureel uitsluitend ontworpen voor Humanouide fenotypes.
+Genistar.Equip.Duplicate:					Je Genistar is al uitgerust met een identiek item in die slot.
+Genistar.Equip.Swapped:						Je hebt uitrusting gewisseld en '{0}' van je Genistar teruggehaald.
+Genistar.Equip.Equipped:					Je hebt succesvol '{0}' uitgerust op je Genistar.
+Genistar.Equip.NoMods:						Je Genistar heeft geen uitrustingsmodificaties.
+Genistar.Equip.InvalidSlot:					Ongeldig slot. Gebruik right, left, shield, two, distance of armor.
+Genistar.Equip.EmptySlot:					Er is geen item uitgerust in die slot.
+Genistar.Equip.BackpackFull:				Je rugzak is vol. Maak ruimte voordat je uitrusting terughaalt.
+Genistar.Equip.Retrieved:					Je haalt '{0}' terug van je Genistar.
+
+
+# /Genistar Command Syntax
+Genistar.Command.Help.Desc:					Centrale Telemetrie & Commando-hub voor levende Genistar-levensvormen.
+Genistar.Command.Help.Care:					/genistar care - Schakelt alchemistische AFK-incubatiefocus over een nabijgelegen ei in/uit.
+Genistar.Command.Help.Rename:				/genistar rename <CallSign> - Wijst een aangepaste weergavenaam toe (gebruik spaties om te resetten naar de basis).
+Genistar.Command.Help.Emote:				/genistar emote <Action> - Activeert fysieke skelet-emote routines.
+Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Wisselt de zichtbare wapenslot (Alleen humanoïden).
+Genistar.Command.Help.Equip:				/genistar equip <vanaf rugzak slot> - Rust een item (wapen of pantser) rechtstreeks vanuit je rugzak uit op de Genistar.
+Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Haalt uitrusting terug van de Genistar.
+Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <aantal> - [GM] Manipuleert direct de ervaring van de doelwit-levensvorm.
+
+Genistar.Command.TargetVisual:				Je moet een direct visueel doelwit vaststellen op een van je levende Genistars.
+Genistar.Command.RejectsTelemetry:			Deze levensvorm weigert jouw telemetrie; het gehoorzaamt alleen zijn ware genetische meester.
+Genistar.Command.PhysicalState:				Je huidige fysieke toestand verhindert intense alchemistische focus.
+Genistar.Command.NearIncubator:				Je moet in de buurt van je huis-incubator staan om een AFK-zorgveld te projecteren.
+Genistar.Command.NameLimit:					Roepnaam overschrijdt de visuele renderinglimieten. Maximaal 20 tekens.
+Genistar.Command.NameRestricted:			Die handtekening wordt beperkt door de communicatieprotocollen van het Rijk. Toegang geweigerd.
+Genistar.Command.RenameDialogReset:			Geef je toestemming voor het wissen van aangepaste telemetrie en het resetten van '{0}' naar de biologische basis: '{1}'?
+Genistar.Command.RenameDialog:				Geef je toestemming om '{0}' opnieuw toe te wijzen aan de visuele handtekening '{1}'?
+Genistar.Command.RenameResetSuccess:		Biologische basis hersteld. Visuele handtekening: '{0}'.
+Genistar.Command.RenameSuccess:				Telemetrie bevestigd. Visuele rendering bijgewerkt naar: '{0}'.
+Genistar.Command.EmoteSyntax:				Syntaxis: /genistar emote <Action>\nBeschikbaar: angry, bang, beckon, beg, bow, charge, cheer, clap, confuse, cry, dance, flex, kiss, laugh, no, point, ponder, roar, salute, shrug, wave, yes
+Genistar.Command.EmoteUnrecognized:			Emote-routine '{0}' niet herkend door het skelet van de levensvorm.
+Genistar.Command.EmoteSuccess:				{0} voert emote-routine uit: {1}.
+Genistar.Command.VisibleSyntax:				Syntaxis: /genistar visibleweapon <right|left|two|distance>
+Genistar.Command.NoWeaponSwap:				De anatomie van deze levensvorm ondersteunt het wisselen van de zichtbare wapenslot niet.
+Genistar.Command.VisibleInvalid:			Ongeldig slot. Gebruik right, left, two of distance.
+Genistar.Command.VisibleShifted:			Zichtbare wapenslot van Genistar is veranderd.
+Genistar.Command.RemoveSyntax:				Syntaxis: /genistar removeweapon <right|left|shield|two|distance|armor>
+Genistar.Command.AddSyntax:					Syntaxis: /genistar equip <vanaf rugzak slot>
+Genistar.Command.AddBounds:					Rugzak slot moet tussen 1 en 40 liggen.
+Genistar.Command.NoItem:					Er zit geen item in dat rugzak slot.
+Genistar.Command.ExpSyntax:					Syntaxis: /genistar exp <add|sub|set> <aantal>
+Genistar.Command.ExpValid:					Ervaringsmodificator moet een geldig positief geheel getal zijn.
+Genistar.Command.ExpMode:					Niet-herkende modus. Gebruik 'add', 'sub' of 'set'.
+Genistar.Command.ExpSuccess:				{0:+#;-#;0} XP toegewezen aan '{1}'. Grootboek Totaal: {2} XP. Actief Level: {3}. Actieve Grootte: {4}.

@@ -217,6 +217,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		Nu puteți distruge o relicvă!
 DestroyItemRequestHandler.CantDestroyEquippedItem:	Nu puteți distruge un obiect echipat!
 DestroyItemRequestHandler.ItemDestroyed:			Distrugeți {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		Steagul PvP nu poate fi distrus!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	Încerci să vaporizezi permanent '{0}'! Această acțiune îți va șterge irevocabil Genistar-ul și va reseta platforma de stază a locuinței la zero. Dorești să continui?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Vaporizare anulată. Recipientul biologic rămâne în siguranță.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:	Trebuie să fiți în aceeași regiune cu liderul breslei pentru a accepta o invitație.

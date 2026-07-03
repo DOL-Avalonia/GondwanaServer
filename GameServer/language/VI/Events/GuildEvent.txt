@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		Bạn đã kiếm được {0} điểm công trạng cho bang hội của mình!
+GuildEvent.MeritPointsAward:		Bang hội của bạn được thưởng {0} điểm công trạng!
+GuildEvent.GuildbonusXP:			Bạn nhận thêm {0} kinh nghiệm nhờ bùa lợi của bang hội!
+GuildEvent.GuildbonusRP:			Bạn nhận thêm {0} điểm vương quốc nhờ bùa lợi của bang hội!
+GuildEvent.GuildbonusBP:			Bạn nhận thêm {0} điểm tiền thưởng nhờ bùa lợi của bang hội!
+GuildEvent.GuildBuffEnd:			[Bùa lợi Bang hội] Bùa lợi bang hội của bạn hiện đã hết tác dụng!

@@ -17,21 +17,42 @@
  *
  */
 
+using DOL.Database;
+using DOL.GS.Finance;
+using DOL.GS.Geometry;
+using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
+using DOL.Language;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using DOL.Database;
-using DOL.GS.Finance;
-using DOL.GS.Geometry;
-using DOL.Language;
-using log4net;
 using Vector = DOL.GS.Geometry.Vector;
 
 namespace DOL.GS.Housing
 {
-    public class GenistarVisual : GameStaticItem { }
+    public class GenistarVisual : GameStaticItem
+    {
+        public override bool Interact(GamePlayer player)
+        {
+            foreach (GameNPC npc in this.GetNPCsInRadius(150))
+            {
+                if (npc is GenistarEgg egg && egg.DBRecord != null && egg.DBRecord.OwnerID == player.InternalID)
+                {
+                    return egg.Interact(player);
+                }
+                if (npc is GenistarNPC adult && adult.DBRecord != null && adult.DBRecord.OwnerID == player.InternalID)
+                {
+                    return adult.Interact(player);
+                }
+            }
+
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "House.Genistar.Examine"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            return base.Interact(player);
+        }
+    }
 
     public class House
     {
@@ -885,6 +906,18 @@ namespace DOL.GS.Housing
             return 0;
         }
 
+        public void UpdateGenistarVisual(int dictKey, ushort newModel)
+        {
+            if (GenistarVisuals.TryGetValue(dictKey, out GenistarVisual visual))
+            {
+                if (visual != null)
+                {
+                    visual.Model = newModel;
+                    SendUpdate();
+                }
+            }
+        }
+
         /// <summary>
         /// Spawns a physical GameStaticItem in a predetermined slot to represent the Genistar
         /// </summary>
@@ -929,8 +962,7 @@ namespace DOL.GS.Housing
                     visual.CurrentHouse = this;
 
                     visual.LoadedFromScript = false;
-                    visual.SaveInDB = true;
-                    visual.SaveIntoDatabase();
+                    visual.SaveInDB = false;
                     visual.AddToWorld();
                 }
                 else
@@ -949,7 +981,6 @@ namespace DOL.GS.Housing
             {
                 if (visual != null)
                 {
-                    visual.DeleteFromDatabase(); // Removes it from the WorldObject table forever
                     visual.Delete();
                 }
                 GenistarVisuals.Remove(dictKey);
@@ -1674,6 +1705,47 @@ namespace DOL.GS.Housing
 
                 SpawnGenistarVisual(i, oitem, null);
                 i++;
+            }
+
+            var genistars = GameServer.Database.SelectObjects<DBGenistar>(DB.Column("HouseNumber").IsEqualTo(HouseNumber));
+            foreach (DBGenistar gen in genistars)
+            {
+                if (GenistarVisuals.TryGetValue(gen.PlaceholderKey, out GenistarVisual vis) && vis != null)
+                {
+                    switch ((eGenistarState)gen.State)
+                    {
+                        case eGenistarState.Incubating:
+                        case eGenistarState.Egg:
+                            vis.Model = 3739;
+                            break;
+
+                        case eGenistarState.Hatched:
+                        case eGenistarState.Recovering:
+                        case eGenistarState.Dead:
+                        case eGenistarState.InContainer:
+                            vis.Model = 1293;
+                            break;
+
+                        case eGenistarState.Archived:
+                            vis.Delete();
+                            GenistarVisuals.Remove(gen.PlaceholderKey);
+                            break;
+                    }
+                }
+                if (gen.State == (int)eGenistarState.Incubating)
+                {
+                    GenistarEgg egg = new GenistarEgg();
+                    egg.Position = GetGenistarSlotPosition(gen.PlaceholderKey, null);
+                    egg.LoadFromGenistarDB(gen);
+                    egg.AddToWorld();
+                }
+                else if (gen.State == (int)eGenistarState.Hatched || gen.State == (int)eGenistarState.Recovering)
+                {
+                    GenistarNPC adult = new GenistarNPC();
+                    adult.Position = GetGenistarSlotPosition(gen.PlaceholderKey, null);
+                    adult.LoadFromGenistarDB(gen);
+                    adult.AddToWorld();
+                }
             }
 
             _housePermissions.Clear();

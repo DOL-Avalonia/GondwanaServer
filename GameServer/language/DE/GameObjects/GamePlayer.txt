@@ -261,6 +261,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:			Ihr habt {0} Verdienstpunkte 
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:	Ihr bewegt Euch und könnt deshalb Euer Pferd nicht rufen.
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting:	Ihr bewegt Euch und unterbrecht damit Eure Arbeit.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Ihr bewegt Euch und unterbrecht Eure {0}!
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Du bewegst dich und hörst auf, dich um das Genistar-Ei zu kümmern.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious:	{0} trainiert verschiedene Spezialisierungen.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:	Ihr habt {0} Punkte übrig.
@@ -524,6 +525,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Lade‑Effekt mit ID 
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:	Lade‑Effekt mit ID {0} nicht gefunden.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Dieser Genistar-Platzhalter muss in einem Garten-Slot platziert werden.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Dein Genistar-Ei wurde in deinem Garten platziert. Es liegt nun an dir, es zu pflegen und nach deinen Wünschen zu formen!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Du musst deinen beschworenen Genistar freilassen, bevor du ihn wieder im Garten platzieren kannst.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Du lässt {0} wieder in deinen Garten frei, damit er dort umherstreifen kann.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} ruft: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} ruft etwas in einer Sprache, die Ihr nicht versteht.

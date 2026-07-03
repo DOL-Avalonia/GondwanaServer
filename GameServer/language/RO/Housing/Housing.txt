@@ -39,6 +39,7 @@ House.SendHouseInfo.RentDueInSec:			Chirie scadentă în: {0} secunde
 House.EmptyHookpoint.NotOwner:				Doar proprietarul unei case poate elimina sau plasa obiecte pe punctele de fixare!
 House.EmptyHookpoint.InvalidPosition:		Poziție nevalidă a punctului de fixare {0}
 House.EmptyHookpoint.NoItemFound:			Nu a fost găsit niciun obiect de punct de fixare la poziția {0}
+House.Genistar.Examine:						Examinezi locul rezervat pentru Genistar.
 
 HouseEnterLeave.TooFarAway:					Sunteți prea departe pentru a intra în casa {0}.
 HouseEnterLeave.CantEnter:					Nu puteți intra în casa {0}.
@@ -80,6 +81,7 @@ HousingPlaceItemHandler.HouseRemoved:           Casa ta a fost eliminată!
 HousingPlaceItemHandler.NeedHouseDeed:          Acest lucru nu funcționează fără un Act al Casei.
 HousingPlaceItemHandler.GenistarLimitReached:	Ai atins limita maximă de {0} Genistar(e) pentru dimensiunea casei tale.
 HousingPlaceItemHandler.GenistarVisualPlaced:	Genistarul tău a fost plasat exact acolo unde stai.
+HousingPlaceItemHandler.GenistarWalktoPlace:	Nu este nevoie să plasezi acest lucru manual. Pur și simplu mergi aproape de locul rezervat pentru Genistar în grădină, iar obiectul va fi plasat automat!
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Țintiți terenul numărul {0}.

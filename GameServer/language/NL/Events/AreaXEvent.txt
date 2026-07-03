@@ -1,0 +1,8 @@
+Area.Event.Timer.Start:				Er wordt een evenement geactiveerd, je hebt {0} seconden om te handelen.
+Area.Event.Timer.Stop:				De tijd van het evenement is om! Probeer het opnieuw!
+Area.Event.CannotUseItemAgain:		Je kunt dat item voorlopig niet nog een keer gebruiken!
+Area.Event.ConfirmUseItem:			Weet je zeker dat je [{0}] wilt gebruiken?
+Area.Event.UsedItem:				Je hebt [{0}] gebruikt.
+Area.Event.ItemNotInBackpack:		Je hebt dat item niet meer in je rugzak!
+Area.Event.LeftAreaCancelSingle:	Je hebt het gebied verlaten, dus het evenement is geannuleerd!
+Area.Event.LeftAreaCancelMultiple:	Alle spelers hebben het gebied verlaten, dus het evenement is geannuleerd!

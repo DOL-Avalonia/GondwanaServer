@@ -302,6 +302,10 @@ namespace DOL.GS
         public int BossAblativeShieldCurrent { get; set; }
         public bool BossAblativeErodible { get; set; }
         public double BossPlayerInRadiusEnhancement { get; set; }
+        public int BossCCResist { get; set; }
+        public int BossDebuffResist { get; set; }
+        public int BossCastRangeMod { get; set; }
+        public bool BossTasksIgnored { get; set; }
         protected long m_lastAblativeHitTime = 0;
         protected double m_lastPlayerEnhancementMultiplier = 1.0;
         protected RegionTimer m_bossDynamicStatsTimer = null;
@@ -2299,6 +2303,10 @@ namespace DOL.GS
                     BossAblativeShieldMult = bossParams.AblativeShield;
                     BossAblativeErodible = bossParams.ErodibleAblative > 0;
                     BossPlayerInRadiusEnhancement = bossParams.PlayerInRadiusEnhancement;
+                    BossCCResist = bossParams.CCResist;
+                    BossDebuffResist = bossParams.DebuffResist;
+                    BossCastRangeMod = bossParams.CastRange;
+                    BossTasksIgnored = bossParams.TasksIgnored > 0;
 
                     if (BossAblativeErodible && BossAblativeShieldMult > 0 && BossAblativeShieldCurrent <= 0)
                     {
@@ -2614,6 +2622,10 @@ namespace DOL.GS
                 bossParams.AblativeShield = BossAblativeShieldMult;
                 bossParams.ErodibleAblative = BossAblativeErodible ? 1 : 0;
                 bossParams.PlayerInRadiusEnhancement = BossPlayerInRadiusEnhancement;
+                bossParams.CCResist = BossCCResist;
+                bossParams.DebuffResist = BossDebuffResist;
+                bossParams.CastRange = BossCastRangeMod;
+                bossParams.TasksIgnored = BossTasksIgnored ? 1 : 0;
 
                 if (isNew) GameServer.Database.AddObject(bossParams);
                 else GameServer.Database.SaveObject(bossParams);
@@ -4666,7 +4678,19 @@ namespace DOL.GS
                 {
                     if (m_lastAblativeHitTime == 0 || CurrentRegion.Time - m_lastAblativeHitTime > 120000)
                     {
-                        BossAblativeShieldCurrent = maxAblative;
+                        bool isGenistar = this is GenistarPet || this is GenistarNPC;
+
+                        if (isGenistar)
+                        {
+                            if (Health >= MaxHealth)
+                            {
+                                BossAblativeShieldCurrent = maxAblative;
+                            }
+                        }
+                        else
+                        {
+                            BossAblativeShieldCurrent = maxAblative;
+                        }
                     }
                 }
 
@@ -5293,7 +5317,7 @@ namespace DOL.GS
             }
             IncrementBodyTypeTaskPoints(killerPlayer);
 
-            if (IsBoss)
+            if (IsBoss && !BossTasksIgnored)
             {
                 TaskManager.UpdateTaskProgress(killerPlayer, "EpicBossesSlaughtered", 1);
                 killerPlayer.KillsEpicBoss++;

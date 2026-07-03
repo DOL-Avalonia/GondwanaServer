@@ -207,6 +207,18 @@ SkillBase.RegisterPropertyNames.WindMagicFocus:		Windmagie
 SkillBase.RegisterPropertyNames.Witchcraft:		Hexerei
 SkillBase.RegisterPropertyNames.WitchcraftFocus:	Hexerei
 
+SkillBase.RegisterPropertyNames.GenistarProcSpellChance:		Proc-Auslösungschance
+SkillBase.RegisterPropertyNames.GenistarCastRange:				Zauber- und Fernkampfreichweite
+SkillBase.RegisterPropertyNames.GenistarDebuffResistChance:		Debuff-Widerstandschance
+SkillBase.RegisterPropertyNames.GenistarLeftHandSwingChance:	Linke-Hand-Schlagchance
+SkillBase.RegisterPropertyNames.GenistarMeleeAbsorb:			Nahkampfschaden-Absorption
+SkillBase.RegisterPropertyNames.GenistarDotAbsorb:				DoT-Zauberschaden-Absorption
+SkillBase.RegisterPropertyNames.GenistarCCResistChance:			CC-Zauber-Widerstandschance
+SkillBase.RegisterPropertyNames.GenistarSpellMagicAbsorb:		Zauberschaden-Absorption
+SkillBase.RegisterPropertyNames.GenistarWeaponSpeed:			Waffengeschwindigkeit
+SkillBase.RegisterPropertyNames.GenistarAblativeModifier:		Ablativschild-Modifikator
+
+
 # /Handlers
 # /DashingDefenseAbility
 DashingDefenseAbility.AddEffectsInfo.Info1:		Nur ein Spieler pro Gruppe kann für die ganze Gruppe parieren und abblocken.

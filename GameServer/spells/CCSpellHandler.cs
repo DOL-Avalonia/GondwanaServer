@@ -172,6 +172,9 @@ namespace DOL.GS.Spells
 
         public override int CalculateSpellResistChance(GameLiving target)
         {
+            if (RollBossCCResist(target))
+                return 100;
+
             int resistvalue = 0;
             int resist = 0;
             GameSpellEffect fury = SpellHandler.FindEffectOnTarget(target, "Fury");

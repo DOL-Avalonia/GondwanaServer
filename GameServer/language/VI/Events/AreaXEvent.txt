@@ -1,0 +1,8 @@
+Area.Event.Timer.Start:				Một sự kiện đang được kích hoạt, bạn có {0} giây để hành động.
+Area.Event.Timer.Stop:				Đã hết thời gian của sự kiện! Hãy thử lại!
+Area.Event.CannotUseItemAgain:		Bạn chưa thể sử dụng lại vật phẩm đó lúc này!
+Area.Event.ConfirmUseItem:			Bạn có chắc chắn muốn sử dụng [{0}] không?
+Area.Event.UsedItem:				Bạn đã sử dụng [{0}].
+Area.Event.ItemNotInBackpack:		Bạn không còn vật phẩm đó trong ba lô nữa!
+Area.Event.LeftAreaCancelSingle:	Bạn đã rời khỏi khu vực nên sự kiện bị hủy bỏ!
+Area.Event.LeftAreaCancelMultiple:	Tất cả người chơi đã rời khỏi khu vực nên sự kiện bị hủy bỏ!

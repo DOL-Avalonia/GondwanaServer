@@ -217,6 +217,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		Relikvii nelze zničit!
 DestroyItemRequestHandler.CantDestroyEquippedItem:	Nelze zničit vybavený předmět!
 DestroyItemRequestHandler.ItemDestroyed:			Ničíš {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		PvP vlajku nelze zničit!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	Pokoušíš se trvale vypařit '{0}'! Tato akce nenávratně vymaže tvůj Genistar a resetuje stázovou podložku tvého obydlí na nulu. Přeješ si pokračovat?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Vypařování zrušeno. Biologický kontejner zůstává v bezpečí.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:	Musíš být ve stejné oblasti jako vůdce cechu, abys mohl(a) přijmout pozvánku.

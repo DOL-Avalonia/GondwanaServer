@@ -1,0 +1,8 @@
+Area.Event.Timer.Start:				Se está activando un evento, tienes {0} segundos para actuar.
+Area.Event.Timer.Stop:				¡Se acabó el tiempo del evento! ¡Inténtalo de nuevo!
+Area.Event.CannotUseItemAgain:		¡No puedes volver a usar ese objeto por ahora!
+Area.Event.ConfirmUseItem:			¿Estás seguro de que quieres usar [{0}]?
+Area.Event.UsedItem:				Has usado [{0}].
+Area.Event.ItemNotInBackpack:		¡Ya no tienes ese objeto en tu mochila!
+Area.Event.LeftAreaCancelSingle:	¡Has abandonado el área, por lo que el evento ha sido cancelado!
+Area.Event.LeftAreaCancelMultiple:	¡Todos los jugadores han abandonado el área, por lo que el evento ha sido cancelado!

@@ -1,0 +1,8 @@
+Area.Event.Timer.Start:				Se declanșează un eveniment, ai {0} secunde pentru a acționa.
+Area.Event.Timer.Stop:				Timpul evenimentului a expirat! Încearcă din nou!
+Area.Event.CannotUseItemAgain:		Nu poți folosi acel obiect din nou pentru moment!
+Area.Event.ConfirmUseItem:			Ești sigur că vrei să folosești [{0}]?
+Area.Event.UsedItem:				Ai folosit [{0}].
+Area.Event.ItemNotInBackpack:		Nu mai ai acel obiect în rucsacul tău!
+Area.Event.LeftAreaCancelSingle:	Ai părăsit zona, așa că evenimentul este anulat!
+Area.Event.LeftAreaCancelMultiple:	Toți jucătorii au părăsit zona, așa că evenimentul este anulat!

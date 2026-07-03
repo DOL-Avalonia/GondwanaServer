@@ -333,9 +333,11 @@ SpellHandler.Occultist.CastCondition4:			Debes abandonar tu forma actual antes d
 SpellHandler.Occultist.Self.AbsorbToPower:		Sifonas {0} de maná del daño recibido.
 SpellHandler.Occultist.ArawnsLegion.PetAnswer:			¡{0} responde a tu llamada!
 SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:	Plantilla de PNJ {0} no encontrada.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:	Tu Genistar se retira a tu inventario mientras se invoca a la legión.
 
 SpellHandler.SummonMonster.Target.Resist:			{0} ha sido traído de los Limbus como zombi y permanece inmune a este hechizo.
 SpellHandler.IllusionSpell.Target.Resist:			{0} ha invocado una ilusión y no puede verse afectado por este hechizo.
+SpellHandler.IllusionSpell.GenistarRetreat:			Tu Genistar se retira a tu inventario a medida que la ilusión surte efecto.
 SpellHandler.Morphed.Target.Resist:			{0} ha sufrido una metamorfosis y no puede verse afectado por este hechizo.
 
 SpellHandler.DelveInfo.Sec:			seg

@@ -1,0 +1,61 @@
+﻿
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Bun venit în Arcanum, o lume făurită din cenușa Marelui Război Magic! În acest tărâm captivant RP/PvP, regate fracturate luptă pentru supraviețuire, în timp ce Breslele dictează legea. Te rugăm să consulți principiile sacre și regulile serverului pe www.arcanum-server.com. Ascute-ți săbiile, pregătește-ți vrăjile și bucură-te de călătoria ta în Arcanum!
+ServerRPGMessage.Lore1:					Bun venit în Arcanum!
+ServerRPGMessage.Lore2:					Acum două mii de ani, Arcanum era o rețea strălucitoare de citadele plutitoare și forje de mana. Apoi a venit Marele Război Magic. Continentele au fost destrămate, lăsând o lume cicatrizată și slăbită. Din aceste rămășițe, s-au ridicat trei regate: Valeria, Skeldheim și Sylvaris. Astăzi, regii domnesc pe hârtie, dar Breslele sunt cele care guvernează cu adevărat ținuturile fracturate, în timp ce nelegiuiții își sculptează propriile imperii în Subteranul întunecat. Alege-ți calea cu înțelepciune.
+ServerRPGMessage.FeaturesHeader:		--------- CARACTERISTICI SERVER ---------
+ServerRPGMessage.FeatureEvents1:		[Evenimente Dinamice & Misiuni]
+ServerRPGMessage.FeatureEvents2:		Participă la evenimente care alterează lumea și la vânătoare de boși legendari.
+ServerRPGMessage.FeatureTasks1:			[Sarcini & Titluri]
+ServerRPGMessage.FeatureTasks2:			Tastează '/task' pentru a vedea toate sarcinile disponibile. Îndeplinește sarcini speciale pentru a câștiga jetoane pentru Maestrul Sarcinilor și pentru a debloca noi titluri. Folosește '/title' pentru a-ți vizualiza statisticile și pentru a-ți alege titlul activ.
+ServerRPGMessage.FeatureGvG1:			[Breaslă contra Breaslă (GvG)]
+ServerRPGMessage.FeatureGvG2:			Capturează Teritorii și Subteritorii. Pune mâna pe Relicve puternice pentru a acorda breslei tale bonusuri masive.
+ServerRPGMessage.FeatureRvR1:			[Tărâm contra Tărâm (RvR)]
+ServerRPGMessage.FeatureRvR2:			Luptă pentru tărâmul tău în câmpuri de luptă clasice începând cu nivelul 20! Participă la 4 categorii diferite în funcție de nivelul tău (Începător, Standard, Expert, Maestru) pentru a captura fortărețe. Folosește '/rvr info' pentru a vizualiza informații globale și scoruri.
+ServerRPGMessage.FeatureDungeons1:		[Explorarea Temnițelor]
+ServerRPGMessage.FeatureDungeons2:		Înfruntă adâncurile Subteranului, labirinticul DarkSpire sau periculoasa Ruptură a Vălului.
+ServerRPGMessage.FeaturePvP1:			[Jucător contra Jucător (PvP)]
+ServerRPGMessage.FeaturePvP2:			Începând cu nivelul {0}, angajează-te în moduri PvP epice, inclusiv Deathmatch, Capturarea Steagului, Regele Dealului, Core Run și Biohazard. Folosește '/pvp info' și '/pvp scores' pentru a vedea detaliile sesiunii.
+ServerRPGMessage.FeatureRenaissance1:	[Renaștere]
+ServerRPGMessage.FeatureRenaissance2:	Legendele spun că cei care ating culmea călătoriei lor pot întreprinde o încercare periculoasă pentru a renaște. Începe din nou, dar trezește-te cu o putere latentă, divină, pentru a cuceri inamici și mai mari.
+ServerRPGMessage.FeatureAFK1:			[Antrenament AFK Dinamic]
+ServerRPGMessage.FeatureAFK2:			Ești ocupat în lumea reală? Folosește jetoane speciale câștigate din PvP și misiuni pentru a-ți antrena personajul în timp ce ești plecat. Stai în fața unui manechin de antrenament în orice oraș și tastează '/afk xp' sau '/afk combat' pentru a câștiga experiență de luptă!
+ServerRPGMessage.FeatureBanker1:		[Bancherul]
+ServerRPGMessage.FeatureBanker2:		Selectează un bancher și șoptește 'withdraw money', 'write a check', 'cash a check' sau 'term deposits' pentru a-ți gestiona averea. De asemenea, poți automatiza plățile pentru chiria casei.
+ServerRPGMessage.FeatureAltCraft1:		[Meșteșug Alternativ]
+ServerRPGMessage.FeatureAltCraft2:		În loc să te bazezi pe liste fixe de rețete, poți combina diverse ingrediente la întâmplare pentru a descoperi obiecte noi! Folosește '/combine list' pentru a-ți vedea formulele descoperite cu succes. Jucătorii pot scrie cărți pentru a vinde formule sau pot găsi 'grimoare' rare în timpul misiunilor care dezvăluie combinații ascunse.
+ServerRPGMessage.FeatureReputation1:	[Sistem de Reputație]
+ServerRPGMessage.FeatureReputation2:	Uciderea în lanț a jucătorilor în afara zonelor PvP îți scade reputația. Nelegiuiții cu reputație negativă nu pot face comerț cu jucători neutri sau negustori și sunt vânați activ de gărzile orașului. Alți jucători pot, de asemenea, să vâneze nelegiuiți în afara orașelor pentru a-i trimite la închisoare, câștigând aur și puncte de recompensă atunci când predau capul acestora unei gărzi a orașului!
+ServerRPGMessage.FeatureGuildCreation1:	[Nou sistem de Creare a Breslelor]
+ServerRPGMessage.FeatureGuildCreation2:	Cumpără un pergament gol, folosește '/book create <Name>' și '/book write' pentru a aduna fondatori, apoi du-l la Funcționarul Trezoreriei Regale pentru a-l ștampila.
+ServerRPGMessage.FeatureGuildLeveling1:	[Nivelarea Breslei]
+ServerRPGMessage.FeatureGuildLeveling2:	Breslele cresc în nivel în mod dinamic! Deblochează comenzi noi pe măsură ce crești și îți consolidezi teritoriile.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenalină]
+ServerRPGMessage.FeatureAdrenaline2:	Acumulează tensiune de luptă în PvE și PvP pentru a dezlănțui avantaje tactice devastatoare.
+ServerRPGMessage.FeatureAutotranslate1:	[Traducere Automată Dinamică]
+ServerRPGMessage.FeatureAutotranslate2:	Depășește bariera lingvistică! Setează limba contului tău cu '/language set', apoi activează '/autotranslate' (sau '/at') pentru a traduce automat toate dialogurile jucătorilor, textele misiunilor și cărțile din bibliotecă în limba selectată.
+ServerRPGMessage.FeatureLibrarian1:		[Bibliotecar & Recompense pentru Roleplay]
+ServerRPGMessage.FeatureLibrarian2:		Implică-te în roleplay semnificativ cu alții pentru a câștiga Erudiție și Puncte de Tărâm. Un vocabular bogat și conversațiile susținute aduc recompense mai mari, în timp ce vulgaritatea va chema gărzile orașului! De asemenea, poți scrie și publica cărți la Bibliotecar pentru a obține Erudiție și pentru a câștiga redevențe atunci când alți jucători îți cumpără lucrările.
+ServerRPGMessage.FeatureGenistar1:		[Genistari de Locuință]
+ServerRPGMessage.FeatureGenistar2:		Obține un ou de Genistar printr-o misiune și crește-l în grădina casei tale! Folosește lentile speciale de focalizare și punctele tale de Erudiție pentru a-i modela creșterea și pentru a-i determina capacitățile finale de luptă. Țintește-ți Genistar-ul și tastează '/genistar care' sau '/afk care' pentru a-l îngriji. Odată ajuns la maturitate, invocă-l din inventarul tău pentru a lupta alături de tine!
+ServerRPGMessage.ServerCommandsHeader:	--------- NOI COMENZI DE SERVER ---------
+ServerRPGMessage.CmdHelp:				/cmdhelp: Afișează lista tuturor comenzilor disponibile în joc.
+ServerRPGMessage.CmdLanguage:			/language set <EN | FR | DE | ES | IT | NL | CS | RO | VI>: Setează limba contului tău, astfel încât toate textele, descrierile și informațiile să fie traduse.
+ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (sau /at): Activează traducătorul automat pentru a traduce automat dialogurile, misiunile și cărțile altor jucători în limba ta.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Deschide, redenumește sau închide piața ta personală.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatizează lista de meșteșugit și cumpără cu ușurință ingredientele lipsă pentru rețete direct de la negustori.
+ServerRPGMessage.CmdCombineList:		/combine list: Afișează combinațiile tale de obiecte pentru meșteșugul alternativ descoperite cu succes.
+ServerRPGMessage.CmdVol:				/vol sau /steal <player>: Fură bani sau Relicve de Teritoriu prețioase de la jucătorii rivali! De asemenea, îți permite să furi comorile jefuite din cuferele unui clan advers în PvP.
+ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Te întoarce în direcția în care se află monstrul (mob) specificat în regiunea ta. Foarte util pentru misiuni!
+ServerRPGMessage.CmdAskName:			/askname: Cere numele țintei tale pentru a-l afișa. Trebuie să faci acest lucru înainte de a-i putea adăuga ca prieten.
+ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Interacționează și personalizează-ți animalul de companie Genistar. Țintește-ți oul pentru a-l îngriji, acordă-i tovarășului tău matur un nume personalizat, direcționează-i expresiile (emotes) și înarmează-l pentru luptă gestionându-i echipamentul de luptă vizibil.
+ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Afișează informații și scorurile curente pentru sesiunea PvP activă.
+ServerRPGMessage.CmdRvR:				/rvr info: Afișează informații și scorurile curente pentru campania RvR activă.
+ServerRPGMessage.GuildCommandsHeader:	--------- NOI COMENZI DE BREASLĂ ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Vizualizează hărțile și statusurile GvG.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Deschide un portal direct către terenurile revendicate de tine.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Creează o zonă de luptă PvP temporară.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Plătește cauțiunea pentru a elibera un coleg de breaslă din închisoare.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Comută plățile automate ale chiriei casei breslei.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Cumpără și desfășoară stindarde tactice pentru a-ți spori membrii sau gărzile teritoriului.
+ServerRPGMessage.Outro:					Mult noroc, și fie ca moștenirea ta în Arcanum să fie legendară!

@@ -264,12 +264,19 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual bool CanHoldItem(InventoryItem item)
         {
+            bool isGenistarItem = item.Id_nb.StartsWith("genistar_pet") || item.Id_nb.StartsWith("genistar_remains");
+
             if (item == null)
             {
                 return false;
             }
 
             if (item is StorageBagItem) // Prevent storing bags in vaults
+            {
+                return false;
+            }
+
+            if (isGenistarItem) // Prevent storing genistar pets in vaults
             {
                 return false;
             }

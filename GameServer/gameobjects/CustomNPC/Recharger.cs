@@ -55,7 +55,7 @@ namespace DOL.GS
                 return false;
 
             TurnTo(player);
-            SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.Interact"));
+            _ = SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.Interact"));
             return true;
         }
 
@@ -76,16 +76,30 @@ namespace DOL.GS
                 return false;
             }
 
+            if (item.Id_nb.StartsWith("genistar_pet"))
+            {
+                if (item.Condition >= item.MaxCondition)
+                {
+                    _ = SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.Genistar.AreadyHealthy"));
+                    return false;
+                }
+
+                long neededMoney = (item.MaxCondition - item.Condition) * 2;
+                player.TempProperties.setProperty(RECHARGE_ITEM_WEAK, new WeakRef(item));
+                player.Client.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.ReceiveItem.Cost", Money.GetString(neededMoney)), new CustomDialogResponse(RechargerDialogResponse));
+                return true;
+            }
+
             if ((item.SpellID == 0 && item.SpellID1 == 0) ||
                 (item.Object_Type == (int)eObjectType.Poison) ||
                 (item.Object_Type == (int)eObjectType.Magical && (item.Item_Type == 40 || item.Item_Type == 41)))
             {
-                SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.ReceiveItem.CantThat"));
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.ReceiveItem.CantThat"));
                 return false;
             }
             if (item.Charges == item.MaxCharges && item.Charges1 == item.MaxCharges1)
             {
-                SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.ReceiveItem.FullyCharged"));
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.ReceiveItem.FullyCharged"));
                 return false;
             }
 
@@ -132,6 +146,27 @@ namespace DOL.GS
                 return;
             }
 
+            if (item.Id_nb.StartsWith("genistar_pet"))
+            {
+                long genistarCost = (item.MaxCondition - item.Condition) * 2;
+
+                if (!player.RemoveMoney(Currency.Copper.Mint(genistarCost)))
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.NotMoney"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+                InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, genistarCost);
+
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.GiveMoney",
+                                       GetName(0, false, player.Client.Account.Language, this), Money.GetString((long)genistarCost)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                item.Condition = item.MaxCondition;
+
+                player.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.Genistar.FullyHealed"));
+                return;
+            }
+
             long cost = 0;
             if (item.Charges < item.MaxCharges)
             {
@@ -156,7 +191,7 @@ namespace DOL.GS
             item.Charges1 = item.MaxCharges1;
 
             player.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
-            SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.FullyCharged"));
+            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.FullyCharged"));
             return;
         }
 

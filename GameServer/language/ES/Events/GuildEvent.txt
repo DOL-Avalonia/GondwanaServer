@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		¡Has ganado {0} puntos de mérito para tu gremio!
+GuildEvent.MeritPointsAward:		¡A tu gremio se le otorgan {0} puntos de mérito!
+GuildEvent.GuildbonusXP:			¡Ganas {0} de experiencia adicional debido a la mejora de tu gremio!
+GuildEvent.GuildbonusRP:			¡Obtienes {0} puntos de reino adicionales debido a la mejora de tu gremio!
+GuildEvent.GuildbonusBP:			¡Obtienes {0} puntos de recompensa adicionales debido a la mejora de tu gremio!
+GuildEvent.GuildBuffEnd:			[Mejora de Gremio] ¡La mejora de tu gremio se ha desvanecido!

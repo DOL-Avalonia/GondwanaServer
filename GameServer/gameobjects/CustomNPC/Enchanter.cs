@@ -21,12 +21,13 @@
 //based on Nardin and Zjovaz previous script
 
 
-using System;
-using System.Collections;
 using DOL.Database;
 using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using System;
+using System.Collections;
+using System.Numerics;
 
 namespace DOL.GS
 {
@@ -83,7 +84,7 @@ namespace DOL.GS
                 else
                     Material = LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "Enchanter.Interact.Text2");
 
-                SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Enchanter.Interact.Text3", Material));
+                _ = SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Enchanter.Interact.Text3", Material));
                 return true;
             }
             return false;
@@ -95,6 +96,20 @@ namespace DOL.GS
             if (t == null || item == null)
                 return false;
 
+            if (item.Id_nb.StartsWith("genistar_pet"))
+            {
+                if (item.Condition >= item.MaxCondition)
+                {
+                    _ = SayTo(t, LanguageMgr.GetTranslation(t.Client.Account.Language, "Scripts.Recharger.Genistar.AreadyHealthy"));
+                    return false;
+                }
+
+                long neededMoney = (item.MaxCondition - item.Condition) * 2;
+                t.TempProperties.setProperty(ENCHANT_ITEM_WEAK, new WeakRef(item));
+                t.Client.Out.SendCustomDialog(LanguageMgr.GetTranslation(t.Client.Account.Language, "Scripts.Recharger.ReceiveItem.Cost", Money.GetString(neededMoney)), new CustomDialogResponse(EnchanterDialogResponse));
+                return true;
+            }
+
             if (item.Level >= 10 && item.IsCrafted)
             {
                 if (item.Object_Type != (int)eObjectType.Magical && item.Object_Type != (int)eObjectType.Bolt && item.Object_Type != (int)eObjectType.Poison)
@@ -105,13 +120,13 @@ namespace DOL.GS
                         t.Client.Out.SendCustomDialog(LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text1", Money.GetString(CalculEnchantPrice(item))), new CustomDialogResponse(EnchanterDialogResponse));
                     }
                     else
-                        SayTo(t, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text2"));
+                        _ = SayTo(t, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text2"));
                 }
                 else
-                    SayTo(t, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text3"));
+                    _ = SayTo(t, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text3"));
             }
             else
-                SayTo(t, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text4"));
+                _ = SayTo(t, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(t.Client, "Enchanter.ReceiveItem.Text4"));
 
             return false;
         }
@@ -137,11 +152,32 @@ namespace DOL.GS
                 return;
             }
 
+            if (item.Id_nb.StartsWith("genistar_pet"))
+            {
+                long genistarCost = (item.MaxCondition - item.Condition) * 2;
+
+                if (!player.RemoveMoney(Currency.Copper.Mint(genistarCost)))
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.NotMoney"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+                InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, genistarCost);
+
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.RechargerDialogResponse.GiveMoney",
+                                       GetName(0, false, player.Client.Account.Language, this), Money.GetString((long)genistarCost)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                item.Condition = item.MaxCondition;
+
+                player.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Scripts.Recharger.Genistar.FullyHealed"));
+                return;
+            }
+
             long Fee = CalculEnchantPrice(item);
 
             if (player.CopperBalance < Fee)
             {
-                SayTo(player, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Enchanter.EnchanterDialogResponse.Text2", Money.GetString(Fee)));
+                _ = SayTo(player, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Enchanter.EnchanterDialogResponse.Text2", Money.GetString(Fee)));
                 return;
             }
             if (item.Level < 50)
@@ -155,7 +191,7 @@ namespace DOL.GS
                                     GetName(0, false, player.Client.Account.Language, this), Money.GetString(Fee)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             player.RemoveMoney(Currency.Copper.Mint(Fee));
             InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, Fee);
-            SayTo(player, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Enchanter.EnchanterDialogResponse.Text5", item.GetName(1, false)));
+            _ = SayTo(player, eChatLoc.CL_SystemWindow, LanguageMgr.GetTranslation(player.Client.Account.Language, "Enchanter.EnchanterDialogResponse.Text5", item.GetName(1, false)));
             return;
         }
 

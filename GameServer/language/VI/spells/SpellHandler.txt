@@ -333,9 +333,11 @@ SpellHandler.Occultist.CastCondition4:			Bạn phải rời bỏ dạng hiện t
 SpellHandler.Occultist.Self.AbsorbToPower:		Bạn siphon {0} mana từ sát thương nhận vào.
 SpellHandler.Occultist.ArawnsLegion.PetAnswer:			{0} đáp lại lời triệu gọi của bạn!
 SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:	Không tìm thấy mẫu NPC {0}.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:	Genistar của bạn thu về túi đồ trong khi quân đoàn được triệu hồi.
 
 SpellHandler.SummonMonster.Target.Resist:			{0} đã được gọi từ Limbus dưới dạng xác sống và miễn nhiễm với phép này!
 SpellHandler.IllusionSpell.Target.Resist:			{0} đã triệu hồi ảo ảnh và không thể bị ảnh hưởng bởi phép này!
+SpellHandler.IllusionSpell.GenistarRetreat:			Genistar của bạn thu về túi đồ khi ảo ảnh bắt đầu có tác dụng.
 SpellHandler.Morphed.Target.Resist:			{0} đã biến hình và không thể bị ảnh hưởng bởi phép này!
 
 SpellHandler.DelveInfo.Sec:			giây

@@ -260,6 +260,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:			Bạn đã kiếm được {0
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:  Bạn đang di chuyển và không thể gọi thú cưỡi!
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting: Bạn di chuyển và làm gián đoạn chế tác.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Bạn di chuyển và làm gián đoạn {0} của mình!
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Bạn di chuyển và ngừng chăm sóc trứng Genistar.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious: {0} đang huấn luyện trong nhiều chuyên môn.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:         Bạn còn {0} điểm chuyên môn ở cấp này.
@@ -523,6 +524,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Hiệu ứng kích h
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Không tìm thấy hiệu ứng kích hoạt với ID {0}.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Vật giữ chỗ Genistar này phải được đặt vào một ô trong sân vườn.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Trứng Genistar của bạn đã được đặt trong vườn. Giờ đây, bạn có quyền chăm sóc và nuôi dưỡng nó theo mong muốn của mình!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Bạn phải thả Genistar đã triệu hồi của mình trước khi đặt nó trở lại khu vườn.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Bạn thả {0} trở lại khu vườn của mình để nó tự do đi lại.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} hét: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} hét điều gì đó bằng ngôn ngữ bạn không hiểu.

@@ -39,6 +39,7 @@ House.SendHouseInfo.RentDueInSec:			Hạn trả tiền thuê nhà trong: {0} gi�
 House.EmptyHookpoint.NotOwner:				Chỉ Chủ nhà mới có thể tháo hoặc đặt Vật phẩm lên các điểm gắn!
 House.EmptyHookpoint.InvalidPosition:		Vị trí điểm gắn không hợp lệ {0}
 House.EmptyHookpoint.NoItemFound:			Không tìm thấy vật phẩm điểm gắn nào tại vị trí {0}
+House.Genistar.Examine:						Bạn xem xét vị trí chờ của Genistar.
 
 HouseEnterLeave.TooFarAway:					Bạn ở quá xa để vào nhà {0}.
 HouseEnterLeave.CantEnter:					Bạn không thể vào nhà {0}.
@@ -80,6 +81,7 @@ HousingPlaceItemHandler.HouseRemoved:           Ngôi nhà của bạn đã bị
 HousingPlaceItemHandler.NeedHouseDeed:          Thao tác này không thể thực hiện nếu không có Chứng thư nhà.
 HousingPlaceItemHandler.GenistarLimitReached:	Bạn đã đạt đến giới hạn tối đa là {0} Genistar cho kích thước ngôi nhà của mình.
 HousingPlaceItemHandler.GenistarVisualPlaced:	Genistar của bạn đã được đặt chính xác tại nơi bạn đang đứng.
+HousingPlaceItemHandler.GenistarWalktoPlace:	Bạn không cần phải đặt vật phẩm này theo cách thủ công. Chỉ cần đi đến gần vị trí chờ Genistar của bạn trong khu vườn và vật phẩm sẽ tự động được đặt xuống!
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Bạn đang nhắm tới lô số {0}.

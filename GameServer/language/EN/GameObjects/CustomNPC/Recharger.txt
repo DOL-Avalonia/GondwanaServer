@@ -11,5 +11,7 @@ Scripts.Recharger.RechargerDialogResponse.FullyCharged:	There, it is now fully c
 Scripts.Recharger.RechargerDialogResponse.GiveMoney:	You give to {0} {1}.
 Scripts.Recharger.RechargerDialogResponse.InvalidItem:	Invalid item.
 Scripts.Recharger.RechargerDialogResponse.NotMoney:	You don't have enough money.
+Scripts.Recharger.Genistar.AreadyHealthy:			Your Genistar is already in perfect health.
+Scripts.Recharger.Genistar.FullyHealed:				Your Genistar has been fully restored to maximum health.
 
 

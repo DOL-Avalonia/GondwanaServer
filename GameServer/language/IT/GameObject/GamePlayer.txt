@@ -260,6 +260,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:			Hai guadagnato {0} punti meri
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:  Ti stai muovendo e non puoi richiamare la tua cavalcatura!
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting: Ti muovi e interrompi la tua creazione.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Ti muovi e interrompi il tuo {0}!
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Ti muovi e smetti di prenderti cura dell'uovo di Genistar.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious: {0} si allena in varie specializzazioni.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:         Ti restano {0} punti specializzazione a questo livello.
@@ -523,6 +524,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Effetto di carica co
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Effetto di carica con ID {0} non trovato.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Questo segnaposto Genistar deve essere posizionato in uno slot del giardino.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Il tuo uovo di Genistar è stato posizionato nel tuo giardino. Ora spetta a te nutrirlo e modellarlo secondo i tuoi desideri!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Devi liberare il tuo Genistar evocato prima di poterlo rimettere nel giardino.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Liberi {0} di nuovo nel tuo giardino per lasciarlo vagare.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} urla: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} urla qualcosa in una lingua che non capisci.

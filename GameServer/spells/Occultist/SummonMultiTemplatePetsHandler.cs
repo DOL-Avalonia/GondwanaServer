@@ -1,15 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DOL.AI.Brain;
 using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
 using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
 using DOL.GS.Utils;
 using DOL.Language;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DOL.GS.Spells
 {
@@ -41,6 +42,12 @@ namespace DOL.GS.Spells
 
         public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
+            if (Caster is GamePlayer player && player.ControlledBrain?.Body is GenistarPet)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "SpellHandler.Occultist.ArawnsLegion.GenistarRetreat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.CommandNpcRelease();
+            }
+
             bool isSelf = Spell.Target.Equals("self", StringComparison.OrdinalIgnoreCase);
             if (!isSelf && target != m_spellTarget) return true;
             if (isSelf && target != Caster) return true;

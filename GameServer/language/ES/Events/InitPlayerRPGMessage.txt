@@ -1,0 +1,61 @@
+﻿
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		¡Bienvenido a Arcanum, un mundo forjado de las cenizas de la Gran Guerra Mágica! En este reino inmersivo de rol y JcJ, los reinos fracturados luchan por la supervivencia mientras los gremios dictan la ley. Consulta los principios sagrados y las reglas del servidor en www.arcanum-server.com. ¡Afila tus espadas, prepara tus hechizos y disfruta de tu viaje en Arcanum!
+ServerRPGMessage.Lore1:					¡Bienvenido a Arcanum!
+ServerRPGMessage.Lore2:					Hace dos mil años, Arcanum era una brillante red de ciudadelas flotantes y forjas de maná. Luego llegó la Gran Guerra Mágica. Los continentes fueron destrozados, dejando un mundo marcado y debilitado. De estos escombros, surgieron tres reinos: Valeria, Skeldheim y Sylvaris. Hoy en día, los reyes gobiernan sobre el papel, pero son los gremios quienes realmente gobiernan las tierras fracturadas, mientras que los forajidos forjan sus propios imperios en el oscuro Subsuelo. Elige tu camino sabiamente.
+ServerRPGMessage.FeaturesHeader:		--------- CARACTERÍSTICAS DEL SERVIDOR ---------
+ServerRPGMessage.FeatureEvents1:		[Eventos Dinámicos y Misiones]
+ServerRPGMessage.FeatureEvents2:		Participa en eventos que alteran el mundo y en cacerías de jefes legendarios.
+ServerRPGMessage.FeatureTasks1:			[Tareas y Títulos]
+ServerRPGMessage.FeatureTasks2:			Escribe '/task' para ver todas las tareas disponibles. Completa tareas especiales para ganar fichas para el Maestro de Tareas y desbloquear nuevos títulos. Usa '/title' para ver tus estadísticas y elegir tu título activo.
+ServerRPGMessage.FeatureGvG1:			[Gremio vs Gremio (GvG)]
+ServerRPGMessage.FeatureGvG2:			Captura Territorios y Subterritorios. Apodérate de poderosas Reliquias para otorgar a tu gremio bonificaciones masivas.
+ServerRPGMessage.FeatureRvR1:			[Reino vs Reino (RvR)]
+ServerRPGMessage.FeatureRvR2:			¡Lucha por tu reino en campos de batalla clásicos a partir del nivel 20! Participa en 4 categorías diferentes basadas en tu nivel (Principiante, Estándar, Experto, Maestro) para capturar fortalezas. Usa '/rvr info' para ver información global y puntajes.
+ServerRPGMessage.FeatureDungeons1:		[Exploración de Mazmorras]
+ServerRPGMessage.FeatureDungeons2:		Atrévete con el profundo Subsuelo, la laberíntica Espira Oscura (DarkSpire) o la peligrosa Grieta del Velo (Veil Rift).
+ServerRPGMessage.FeaturePvP1:			[Jugador contra Jugador (JcJ)]
+ServerRPGMessage.FeaturePvP2:			A partir del nivel {0}, participa en modos épicos de JcJ que incluyen Combate a Muerte, Captura la Bandera, Rey de la Colina, Carrera del Núcleo (Core Run) y Riesgo Biológico (Biohazard). Usa '/pvp info' y '/pvp scores' para ver los detalles de la sesión.
+ServerRPGMessage.FeatureRenaissance1:	[Renacimiento]
+ServerRPGMessage.FeatureRenaissance2:	Las leyendas dicen que aquellos que alcanzan la cima de su viaje pueden emprender una peligrosa prueba para renacer. Comienza de nuevo, pero despierta con un poder latente similar al de un dios para conquistar a enemigos aún mayores.
+ServerRPGMessage.FeatureAFK1:			[Entrenamiento AFK Dinámico]
+ServerRPGMessage.FeatureAFK2:			¿Estás ocupado en el mundo real? Usa fichas especiales ganadas en JcJ y misiones para entrenar a tu personaje mientras estás ausente. ¡Párate frente a un maniquí de entrenamiento en cualquier ciudad y escribe '/afk xp' o '/afk combat' para ganar experiencia de combate!
+ServerRPGMessage.FeatureBanker1:		[El Banquero]
+ServerRPGMessage.FeatureBanker2:		Apunta a un banquero y susurra 'withdraw money', 'write a check', 'cash a check' o 'term deposits' para administrar tu riqueza. También puedes automatizar los pagos del alquiler de tu casa.
+ServerRPGMessage.FeatureAltCraft1:		[Elaboración Alternativa]
+ServerRPGMessage.FeatureAltCraft2:		En lugar de depender de listas de recetas fijas, ¡puedes combinar varios ingredientes al azar para descubrir nuevos objetos! Usa '/combine list' para ver tus fórmulas descubiertas con éxito. Los jugadores pueden escribir libros para vender fórmulas o encontrar raros 'grimorios' durante las misiones que revelan combinaciones ocultas.
+ServerRPGMessage.FeatureReputation1:	[Sistema de Reputación]
+ServerRPGMessage.FeatureReputation2:	Asesinar jugadores en cadena fuera de las zonas de JcJ reduce tu reputación. Los forajidos con reputación negativa no pueden comerciar con jugadores neutrales o comerciantes, y los guardias de la ciudad los persiguen activamente. ¡Otros jugadores también pueden cazar forajidos fuera de las ciudades para enviarlos a la cárcel, ganando oro y puntos de recompensa al entregar su cabeza a un guardia de la ciudad!
+ServerRPGMessage.FeatureGuildCreation1:	[Nuevo sistema de Creación de Gremios]
+ServerRPGMessage.FeatureGuildCreation2:	Compra un pergamino en blanco, usa '/book create <Name>' y '/book write' para reunir fundadores, luego llévalo al Funcionario del Tesoro Real para que lo selle.
+ServerRPGMessage.FeatureGuildLeveling1:	[Nivelación de Gremio]
+ServerRPGMessage.FeatureGuildLeveling2:	¡Los gremios suben de nivel dinámicamente! Desbloquea nuevos comandos a medida que creces y fortaleces tus territorios.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenalina]
+ServerRPGMessage.FeatureAdrenaline2:	Acumula tensión de combate en JcE y JcJ para desatar ventajas tácticas devastadoras.
+ServerRPGMessage.FeatureAutotranslate1:	[Traducción Automática Dinámica]
+ServerRPGMessage.FeatureAutotranslate2:	¡Rompe la barrera del idioma! Configura el idioma de tu cuenta con '/language set', luego activa '/autotranslate' (o '/at') para traducir automáticamente todos los diálogos de los jugadores, los textos de las misiones y los libros de la biblioteca a tu idioma seleccionado.
+ServerRPGMessage.FeatureLibrarian1:		[Bibliotecario y Recompensas de Rol]
+ServerRPGMessage.FeatureLibrarian2:		Participa en juegos de rol significativos con otros para ganar Erudición y Puntos de Reino. ¡Un vocabulario rico y conversaciones sostenidas rinden mayores recompensas, mientras que la vulgaridad convocará a los guardias de la ciudad! También puedes escribir y publicar libros en el Bibliotecario para ganar Erudición y cobrar regalías cuando otros jugadores compren tus obras.
+ServerRPGMessage.FeatureGenistar1:		[Genistars de Vivienda]
+ServerRPGMessage.FeatureGenistar2:		¡Obtén un huevo de Genistar mediante una misión y críalo en el jardín de tu casa! Usa lentes de enfoque especiales y tus puntos de Erudición para moldear su crecimiento y determinar sus capacidades de combate finales. Apunta a tu Genistar y escribe '/genistar care' o '/afk care' para criarlo. ¡Una vez que esté completamente desarrollado, invócalo desde tu inventario para que luche a tu lado!
+ServerRPGMessage.ServerCommandsHeader:	--------- NUEVOS COMANDOS DEL SERVIDOR ---------
+ServerRPGMessage.CmdHelp:				/cmdhelp: Muestra la lista de todos los comandos disponibles en el juego.
+ServerRPGMessage.CmdLanguage:			/language set <EN | FR | DE | ES | IT | NL | CS | RO | VI>: Configura el idioma de tu cuenta para que se traduzcan todos los textos, descripciones e información.
+ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (o /at): Enciende el traductor automático para traducir automáticamente los diálogos, misiones y libros de otros jugadores a tu idioma.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Despliega, renombra o cierra tu mercado personal.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatiza tu cola de elaboración y compra fácilmente los ingredientes de recetas que te falten directamente de los comerciantes.
+ServerRPGMessage.CmdCombineList:		/combine list: Muestra las combinaciones de objetos de elaboración alternativa que has descubierto con éxito.
+ServerRPGMessage.CmdVol:				/vol o /steal <player>: ¡Roba dinero o preciosas Reliquias de Territorio a jugadores rivales! También te permite saquear los tesoros robados de los cofres de un clan rival en JcJ.
+ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Gira hacia la dirección donde se encuentra el monstruo (mob) especificado en tu región. ¡Muy útil para las misiones!
+ServerRPGMessage.CmdAskName:			/askname: Pregunta por el nombre de tu objetivo para mostrarlo. Debes hacer esto antes de poder agregarlo como amigo.
+ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Interactúa y personaliza a tu mascota Genistar. Apunta a tu huevo para cuidarlo, otorga a tu compañero adulto un nombre personalizado, dirige sus gestos y ármalo para la batalla administrando su equipo de combate visible.
+ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Muestra información y los puntajes actuales para la sesión de JcJ activa.
+ServerRPGMessage.CmdRvR:				/rvr info: Muestra información y los puntajes actuales para la campaña de RvR activa.
+ServerRPGMessage.GuildCommandsHeader:	--------- NUEVOS COMANDOS DE GREMIO ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Ver mapas y estados de GvG.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Abre un portal directamente a tus tierras reclamadas.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Crea una zona de combate JcJ temporal.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Paga la fianza para liberar a un compañero de gremio de la prisión.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Activa/desactiva los pagos automáticos del alquiler de la casa del gremio.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Compra y despliega estandartes tácticos para potenciar a tus miembros o guardias del territorio.
+ServerRPGMessage.Outro:					¡Buena suerte, y que tu legado en Arcanum sea legendario!

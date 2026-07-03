@@ -260,6 +260,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:			Je hebt {0} verdienpunten voo
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:  Je bent in beweging en kunt je rijdier niet roepen!
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting: Je beweegt en onderbreekt je vervaardiging.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Je beweegt en onderbreekt je {0}!
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Je beweegt en stopt met het verzorgen van het Genistar-ei.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious: {0} traint in verschillende specialisaties.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:         Je hebt nog {0} specialisatiepunt(en) op dit niveau.
@@ -523,6 +524,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Laad-effect met ID {
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Laad-effect met ID {0} niet gevonden.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Deze Genistar-placeholder moet in een tuinslot worden geplaatst.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Je Genistar-ei is in je tuin geplaatst. Het is nu aan jou om het te verzorgen en te vormen naar jouw wensen!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Je moet je opgeroepen Genistar vrijlaten voordat je hem terug in de tuin kunt plaatsen.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Je laat {0} weer los in je tuin om rond te dwalen.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} roept: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} roept iets in een taal die je niet begrijpt.

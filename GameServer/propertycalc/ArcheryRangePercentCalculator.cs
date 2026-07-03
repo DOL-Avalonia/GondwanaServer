@@ -57,7 +57,11 @@ namespace DOL.GS.PropertyCalc
                     effect.Cancel(false);
             }
 
-            return item + ra;
+            int bossMod = (living is GameNPC { IsBoss: true, BossCastRangeMod: > 0 } bossNpc)
+                ? bossNpc.BossCastRangeMod
+                : 0;
+
+            return item + ra + bossMod;
         }
     }
 }

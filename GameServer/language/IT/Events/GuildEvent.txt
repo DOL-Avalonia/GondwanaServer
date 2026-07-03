@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		Hai guadagnato {0} punti merito per la tua gilda!
+GuildEvent.MeritPointsAward:		Alla tua gilda vengono assegnati {0} punti merito!
+GuildEvent.GuildbonusXP:			Ottieni {0} punti esperienza aggiuntivi grazie al potenziamento della tua gilda!
+GuildEvent.GuildbonusRP:			Ottieni {0} punti reame aggiuntivi grazie al potenziamento della tua gilda!
+GuildEvent.GuildbonusBP:			Ottieni {0} punti taglia aggiuntivi grazie al potenziamento della tua gilda!
+GuildEvent.GuildBuffEnd:			[Potenziamento Gilda] Il potenziamento della tua gilda è svanito!

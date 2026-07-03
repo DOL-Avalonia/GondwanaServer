@@ -173,23 +173,31 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         WriteUsableClasses(objectInfo, invItem, client);
 
-                        if (invItem.Object_Type >= (int)eObjectType.GenericWeapon
-                            && invItem.Object_Type <= (int)eObjectType._LastWeapon
-                            || invItem.Object_Type == (int)eObjectType.Instrument)
+                        int flags = invItem.Template != null ? invItem.Template.Flags : invItem.Flags;
+                        bool isGenWeaponH = flags >= 30 && flags <= 36 && flags != 32;
+                        bool isGenShieldH = flags == 32;
+                        bool isGenArmorH = flags >= 38 && flags <= 40;
+                        bool isGenistarH = isGenWeaponH || isGenShieldH || isGenArmorH;
+
+                        if (isGenWeaponH || (!isGenArmorH && !isGenShieldH && invItem.Object_Type >= (int)eObjectType.GenericWeapon && invItem.Object_Type <= (int)eObjectType.MaulerStaff) ||
+                            invItem.Object_Type == (int)eObjectType.Instrument)
                         {
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
+                            WriteUsableClasses(objectInfo, invItem, client);
+                            WriteMagicalBonuses(objectInfo, invItem, client, false, isGenistarH);
                             WriteClassicWeaponInfos(objectInfo, invItem, client);
                         }
 
-                        if (invItem.Object_Type >= (int)eObjectType.Cloth && invItem.Object_Type <= (int)eObjectType.Scale)
+                        if (isGenArmorH || (!isGenWeaponH && !isGenShieldH && invItem.Object_Type >= (int)eObjectType.Cloth && invItem.Object_Type <= (int)eObjectType.Scale))
                         {
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
+                            WriteUsableClasses(objectInfo, invItem, client);
+                            WriteMagicalBonuses(objectInfo, invItem, client, false, isGenistarH);
                             WriteClassicArmorInfos(objectInfo, invItem, client);
                         }
 
-                        if (invItem.Object_Type == (int)eObjectType.Shield)
+                        if (isGenShieldH || (!isGenWeaponH && !isGenArmorH && invItem.Object_Type == (int)eObjectType.Shield))
                         {
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
+                            WriteUsableClasses(objectInfo, invItem, client);
+                            WriteMagicalBonuses(objectInfo, invItem, client, false, isGenistarH);
                             WriteClassicShieldInfos(objectInfo, invItem, client);
                         }
 
@@ -197,7 +205,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             || invItem.Object_Type == (int)eObjectType.AlchemyTincture
                             || invItem.Object_Type == (int)eObjectType.SpellcraftGem)
                         {
-                            WriteMagicalBonuses(objectInfo, invItem, client, false);
+                            WriteMagicalBonuses(objectInfo, invItem, client, false, isGenistarH);
                         }
 
                         //***********************************
@@ -1103,28 +1111,34 @@ namespace DOL.GS.PacketHandler.Client.v168
 						ges) health regen Value: 8  Tradeable.".
 			 */
 
-            string str = "- [" + item.Name + "]: " + GlobalConstants.ObjectTypeToName(client, item.Object_Type);
+            int flags = item.Template != null ? item.Template.Flags : item.Flags;
+            string objTypeName = GlobalConstants.GetGenistarItemName(flags) ?? GlobalConstants.ObjectTypeToName(client, item.Object_Type);
+            string str = "- [" + item.Name + "]: " + objTypeName;
             var objectInfo = new List<string>();
 
-            if ((item.Object_Type >= (int)eObjectType.GenericWeapon) && (item.Object_Type <= (int)eObjectType.MaulerStaff))
+            bool isGenWeapon = flags >= 30 && flags <= 36 && flags != 32;
+            bool isGenShield = flags == 32;
+            bool isGenArmor = flags >= 38 && flags <= 40;
+            bool isGenistar = isGenWeapon || isGenShield || isGenArmor;
+
+            if (isGenWeapon || (!isGenShield && !isGenArmor && item.Object_Type >= (int)eObjectType.GenericWeapon && item.Object_Type <= (int)eObjectType.MaulerStaff))
             {
-                WriteMagicalBonuses(objectInfo, item, client, true);
+                WriteMagicalBonuses(objectInfo, item, client, true, isGenistar);
                 WriteClassicWeaponInfos(objectInfo, item, client);
             }
-            if (item.Object_Type >= (int)eObjectType.Cloth && item.Object_Type <= (int)eObjectType.Scale)
+            else if (isGenArmor || (!isGenWeapon && !isGenShield && item.Object_Type >= (int)eObjectType.Cloth && item.Object_Type <= (int)eObjectType.Scale))
             {
-                WriteMagicalBonuses(objectInfo, item, client, true);
+                WriteMagicalBonuses(objectInfo, item, client, true, isGenistar);
                 WriteClassicArmorInfos(objectInfo, item, client);
             }
-            if (item.Object_Type == (int)eObjectType.Shield)
+            else if (isGenShield || (!isGenWeapon && !isGenArmor && item.Object_Type == (int)eObjectType.Shield))
             {
-                WriteMagicalBonuses(objectInfo, item, client, true);
+                WriteMagicalBonuses(objectInfo, item, client, true, isGenistar);
                 WriteClassicShieldInfos(objectInfo, item, client);
             }
-            if (item.Object_Type == (int)eObjectType.Magical ||
-                item.Object_Type == (int)eObjectType.Instrument)
+            else if (!isGenWeapon && !isGenArmor && !isGenShield && (item.Object_Type == (int)eObjectType.Magical || item.Object_Type == (int)eObjectType.Instrument))
             {
-                WriteMagicalBonuses(objectInfo, item, client, true);
+                WriteMagicalBonuses(objectInfo, item, client, true, isGenistar);
             }
             if (item.IsCrafted)
             {
@@ -1343,21 +1357,21 @@ namespace DOL.GS.PacketHandler.Client.v168
             WriteMagicalBonuses(output, GameInventoryItem.Create(item), client, shortInfo);
         }
 
-        public void WriteMagicalBonuses(IList<string> output, InventoryItem item, GameClient client, bool shortInfo)
+        public void WriteMagicalBonuses(IList<string> output, InventoryItem item, GameClient client, bool shortInfo, bool isGenistar = false)
         {
             int oldCount = output.Count;
 
-            WriteBonusLine(output, client, item.Bonus1Type, item.Bonus1);
-            WriteBonusLine(output, client, item.Bonus2Type, item.Bonus2);
-            WriteBonusLine(output, client, item.Bonus3Type, item.Bonus3);
-            WriteBonusLine(output, client, item.Bonus4Type, item.Bonus4);
-            WriteBonusLine(output, client, item.Bonus5Type, item.Bonus5);
-            WriteBonusLine(output, client, item.Bonus6Type, item.Bonus6);
-            WriteBonusLine(output, client, item.Bonus7Type, item.Bonus7);
-            WriteBonusLine(output, client, item.Bonus8Type, item.Bonus8);
-            WriteBonusLine(output, client, item.Bonus9Type, item.Bonus9);
-            WriteBonusLine(output, client, item.Bonus10Type, item.Bonus10);
-            WriteBonusLine(output, client, item.ExtraBonusType, item.ExtraBonus);
+            WriteBonusLine(output, client, item.Bonus1Type, item.Bonus1, isGenistar);
+            WriteBonusLine(output, client, item.Bonus2Type, item.Bonus2, isGenistar);
+            WriteBonusLine(output, client, item.Bonus3Type, item.Bonus3, isGenistar);
+            WriteBonusLine(output, client, item.Bonus4Type, item.Bonus4, isGenistar);
+            WriteBonusLine(output, client, item.Bonus5Type, item.Bonus5, isGenistar);
+            WriteBonusLine(output, client, item.Bonus6Type, item.Bonus6, isGenistar);
+            WriteBonusLine(output, client, item.Bonus7Type, item.Bonus7, isGenistar);
+            WriteBonusLine(output, client, item.Bonus8Type, item.Bonus8, isGenistar);
+            WriteBonusLine(output, client, item.Bonus9Type, item.Bonus9, isGenistar);
+            WriteBonusLine(output, client, item.Bonus10Type, item.Bonus10, isGenistar);
+            WriteBonusLine(output, client, item.ExtraBonusType, item.ExtraBonus, isGenistar);
 
             if (output.Count > oldCount)
             {
@@ -1366,24 +1380,24 @@ namespace DOL.GS.PacketHandler.Client.v168
                 output.Insert(oldCount, " ");
             }
 
-            if (item is GameInventoryItem gameItem)
+            if (!isGenistar && item is GameInventoryItem gameItem)
             {
                 output.Add("| Total Uti: " + gameItem.GetTotalUtility().ToString("n2") + " |");
             }
 
             oldCount = output.Count;
 
-            WriteFocusLine(client, output, item.Bonus1Type, item.Bonus1);
-            WriteFocusLine(client, output, item.Bonus2Type, item.Bonus2);
-            WriteFocusLine(client, output, item.Bonus3Type, item.Bonus3);
-            WriteFocusLine(client, output, item.Bonus4Type, item.Bonus4);
-            WriteFocusLine(client, output, item.Bonus5Type, item.Bonus5);
-            WriteFocusLine(client, output, item.Bonus6Type, item.Bonus6);
-            WriteFocusLine(client, output, item.Bonus7Type, item.Bonus7);
-            WriteFocusLine(client, output, item.Bonus8Type, item.Bonus8);
-            WriteFocusLine(client, output, item.Bonus9Type, item.Bonus9);
-            WriteFocusLine(client, output, item.Bonus10Type, item.Bonus10);
-            WriteFocusLine(client, output, item.ExtraBonusType, item.ExtraBonus);
+            WriteFocusLine(client, output, item.Bonus1Type, item.Bonus1, isGenistar);
+            WriteFocusLine(client, output, item.Bonus2Type, item.Bonus2, isGenistar);
+            WriteFocusLine(client, output, item.Bonus3Type, item.Bonus3, isGenistar);
+            WriteFocusLine(client, output, item.Bonus4Type, item.Bonus4, isGenistar);
+            WriteFocusLine(client, output, item.Bonus5Type, item.Bonus5, isGenistar);
+            WriteFocusLine(client, output, item.Bonus6Type, item.Bonus6, isGenistar);
+            WriteFocusLine(client, output, item.Bonus7Type, item.Bonus7, isGenistar);
+            WriteFocusLine(client, output, item.Bonus8Type, item.Bonus8, isGenistar);
+            WriteFocusLine(client, output, item.Bonus9Type, item.Bonus9, isGenistar);
+            WriteFocusLine(client, output, item.Bonus10Type, item.Bonus10, isGenistar);
+            WriteFocusLine(client, output, item.ExtraBonusType, item.ExtraBonus, isGenistar);
 
             if (output.Count > oldCount)
             {
@@ -1691,14 +1705,14 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        protected void WriteBonusLine(IList<string> list, GameClient client, int bonusCat, int bonusValue)
+        protected void WriteBonusLine(IList<string> list, GameClient client, int bonusCat, int bonusValue, bool isGenistar = false)
         {
             if (bonusCat != 0 && bonusValue != 0 && !SkillBase.CheckPropertyType((eProperty)bonusCat, ePropertyType.Focus))
             {
                 if (IsPvEBonus((eProperty)bonusCat))
                 {
                     // Evade: {0}% (PvE Only)
-                    list.Add(string.Format(SkillBase.GetPropertyName(client, (eProperty)bonusCat), bonusValue));
+                    list.Add(string.Format(SkillBase.GetPropertyName(client, (eProperty)bonusCat, isGenistar), bonusValue));
                 }
                 else
                 {
@@ -1713,7 +1727,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     //Power: 6 % of power pool.
                     list.Add(string.Format(
                         "- {0}: {1}{2}",
-                        SkillBase.GetPropertyName(client, (eProperty)bonusCat),
+                        SkillBase.GetPropertyName(client, (eProperty)bonusCat, isGenistar),
                         bonusValue.ToString("+0 ;-0 ;0 "), //Eden
                         ((bonusCat == (int)eProperty.PowerPool)
                          || (bonusCat >= (int)eProperty.Resist_First && bonusCat <= (int)eProperty.Resist_Last)
@@ -1754,12 +1768,12 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        protected void WriteFocusLine(GameClient client, IList<string> list, int focusCat, int focusLevel)
+        protected void WriteFocusLine(GameClient client, IList<string> list, int focusCat, int focusLevel, bool isGenistar = false)
         {
             if (SkillBase.CheckPropertyType((eProperty)focusCat, ePropertyType.Focus))
             {
                 //- Body Magic: 4 lvls
-                list.Add(string.Format("- {0}: {1} lvls", SkillBase.GetPropertyName(client, (eProperty)focusCat), focusLevel));
+                list.Add(string.Format("- {0}: {1} lvls", SkillBase.GetPropertyName(client, (eProperty)focusCat, isGenistar), focusLevel));
             }
         }
 

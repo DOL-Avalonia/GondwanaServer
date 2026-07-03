@@ -260,6 +260,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:			Získal jsi {0} zásluh pro s
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:  Pohybuješ se a nemůžeš přivolat své jízdní zvíře!
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting: Pohybuješ se a přerušuješ svou výrobu.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Pohneš se a přerušíš svůj {0}!
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Pohnul ses a přestal ses starat o vejce Genistaru.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious: {0} se cvičí v různých specializacích.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:         Na této úrovni ti zbývá {0} bodů specializace.
@@ -523,6 +524,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Nabíjecí efekt s ID
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:	Nabíjecí efekt s ID {0} nebyl nalezen.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Tento zástupce Genistaru musí být umístěn do zahradního slotu.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Vaše vejce Genistaru bylo umístěno na vaší zahradě. Nyní je jen na vás, abyste ho vychovali a formovali podle svých představ!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Předtím, než svůj vyvolaný Genistar umístíš zpět do zahrady, ho musíš propustit.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Propouštíš {0} zpět do své zahrady, aby se mohl volně potulovat.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} křičí: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} křičí něco v jazyce, kterému nerozumíš.

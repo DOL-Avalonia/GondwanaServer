@@ -317,12 +317,14 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual bool CanHoldItem(InventoryItem item)
         {
+            bool isGenistarItem = item.Id_nb.StartsWith("genistar_pet") || item.Id_nb.StartsWith("genistar_remains");
+
             if (item == null)
             {
                 return false;
             }
 
-            if (item is StorageBagItem || item is FlagInventoryItem || item is PvPTreasure || item is AmteScripts.Managers.TerritoryRelicInventoryItem)
+            if (item is StorageBagItem || item is FlagInventoryItem || item is PvPTreasure || item is AmteScripts.Managers.TerritoryRelicInventoryItem || isGenistarItem)
             {
                 return false;
             }

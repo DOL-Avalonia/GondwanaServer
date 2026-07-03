@@ -1,0 +1,112 @@
+# /Genistar System
+Genistar.GenistarPet.LevelUp:				Tvůj Genistar dosáhl úrovně {0}.
+Genistar.GenistarPet.Examine:				Prohlížíš si {0}. {1} je {2} a je to mazlíček Genistar. Chceš-li tohoto tvora přejmenovat nebo mu dát pokyn k emoci, použij na cíl příkaz /genistar.
+Genistar.GenistarPet.CantEquip:				Tento předmět nemůže být vybaven Genistarem.
+Genistar.GenistarPet.PackFull:				Tvůj batoh byl plný! Kontejner s {0} spadl na zem.
+Genistar.GenistarPet.PackSuccess:			{0} se vrací do svého přenosného kontejneru v tvém inventáři.
+Genistar.GenistarPet.Died:					Tvůj Genistar zemřel! Vrať jeho ostatky do inkubátoru v tvém obydlí do 1 hodiny, jinak bude navždy ztracen.
+Genistar.GenistarPet.RemainsDropped:		Tvůj inventář je plný. Ostatky spadly na zem.
+Genistar.GenistarPet.CannotOnMount:			{0} nestíhá tvé jízdní zvíře a vrací se do inventáře.
+
+Genistar.SummonGenistar.PvPContested:		Nemůžeš vyvolat svého Genistara ve sporné zóně PvP nebo RvR.
+Genistar.SummonGenistar.AlreadySummoned:	Už máš vyvolaného tvora. Před vyvoláním Genistara ho musíš propustit.
+Genistar.SummonGenistar.Mounted:			Nemůžeš vyvolat Genistara, když jedeš na zvířeti.
+Genistar.SummonGenistar.NeedItem:			K zakouzlení tohoto kouzla musíš mít v inventáři předmět mazlíčka Genistar.
+Genistar.SummonGenistar.NotFoundDB:			Tvůj Genistar nebyl nalezen v genetické databázi.
+Genistar.SummonGenistar.FailedUse:			Nepodařilo se použít předmět Genistar.
+
+Genistar.GenistarNPC.Awakened:				{0} kompletně zregeneroval svou buněčnou matrici a probudil se!
+Genistar.GenistarNPC.Examine:				Prohlížíš si {0}. {1} je {2} a je to mazlíček Genistar. Chceš-li tohoto tvora přejmenovat nebo mu dát pokyn k emoci, použij na cíl příkaz /genistar.
+Genistar.GenistarNPC.DormantComa:			Tvor se nachází v léčebném kómatu. Zbývající čas: {0} sekund.
+Genistar.GenistarNPC.AlreadyCarry:			Ve svém inventáři už máš společníka Genistar. Nemůžeš u sebe mít dalšího ve stejnou chvíli.
+Genistar.GenistarNPC.PackDialog:			Přeješ si sbalit '{0}' do svého inventáře?
+Genistar.GenistarNPC.Level20Required:		Velit dospělému Genistarovi v ostrém boji vyžaduje úroveň 20.
+Genistar.GenistarNPC.RenameHint:			Vezmi tohoto tvora do cíle a napiš '/genistar rename <NoveJmeno>' pro odeslání nového telemetrického podpisu.
+Genistar.GenistarNPC.PackSuccess:			Bezpečně balíš '{0}' do jeho přenosného kontejneru.
+Genistar.GenistarNPC.PackFail:				Tvůj batoh nemá dostatečný objem pro nesení tohoto kontejneru.
+Genistar.GenistarNPC.RefuseStrangers:		Tvor cení zuby; odmítá potravu od cizinců.
+Genistar.GenistarNPC.RejectSpoiled:			{0} násilně odmítá zkaženou nálož!
+Genistar.GenistarNPC.MorphStatic:			{0} absorbuje mutagen, ale jeho morfologie je statická. K žádné vizuální změně nedochází.
+Genistar.GenistarNPC.MorphShift:			Genetická struktura {0} se mění! Jeho fyzická podoba byla pozměněna.
+Genistar.GenistarNPC.StatExpand:			[Metabolická syntéza]: Fyziologie {0} se trvale rozšiřuje! (+{1} {2})
+Genistar.GenistarNPC.CombatSharpen:			[Metabolická syntéza]: Bojové parametry {0} se vyostřují! (+{1} {2})
+Genistar.GenistarNPC.ResistHarden:			[Metabolická syntéza]: Kůže {0} tvrdne! (+{1}% {2})
+Genistar.GenistarNPC.SkillEvolve:			[Neurální syntéza]: {0} rozvíjí své mistrovství v {1}!
+Genistar.GenistarNPCBrain.StopFollow:		{0} tě přestává sledovat a vrací se do své zahrady.
+
+Genistar.GenistarEgg.SealRejects:			Biometrická pečeť inkubátoru odmítá tvůj podpis.
+Genistar.GenistarEgg.StasisCollapsed:		Stázové pole zkolabovalo! Tvor je připraven se vynořit!
+Genistar.GenistarEgg.StasisActive:			[Stáze aktivní]: Životaschopnost vyžaduje dalších {0} sekund přímé /afk péče.
+Genistar.GenistarEgg.WeaveLocks:			Genetická struktura se uzamyká! Skořápka začíná praskat!
+Genistar.GenistarEgg.TooFar:				Odstoupil jsi příliš daleko od inkubátoru a přestal ses o něj starat. Stázové pole se automaticky znovu aktivuje.
+
+Genistar.Lifecycle.Degraded:				Genetický materiál tvého poraženého Genistara zdegradoval natolik, že ho nelze zachránit. Tvůj inkubátor v obydlí je volný.
+Genistar.Lifecycle.EmbryoFailed:			Genetická sekvence zkolabovala! Embryo se nevytvořilo.
+Genistar.Lifecycle.IncubationBegun:			Inkubace začala. Použij /afk care k tvarování embrya pomocí čoček.
+Genistar.Lifecycle.RecoveryStarted:			Vkládáš ostatky do inkubátoru. Proces biologické obnovy potrvá 24 hodin.
+Genistar.Lifecycle.RemainsInert:			Tyto ostatky jsou zcela inertní a nelze je oživit.
+Genistar.Lifecycle.Purged:					Biologický plán '{0}' byl trvale vymazán ze světa. Tvá stázová podložka v obydlí je nyní prázdná.
+
+Genistar.LensMgr.InvalidLens:				Tvá aktivní čočka není platná (DPS_AF je 0).
+Genistar.LensMgr.UnknownLens:				Tvá aktivní čočka (ID: {0}) nemá žádný známý genetický algoritmus.
+Genistar.LensMgr.Absorbs:					Embryo absorbuje matrici čočky! (+{0} {1})
+Genistar.LensMgr.Kneel:						Poklekneš a rozšíříš alchymistické stázové pole nad inkubátorem.
+Genistar.LensMgr.BreakFocus:				Přerušíš své alchymistické soustředění a odstoupíš od inkubátoru.
+Genistar.LensMgr.FocusBroken:				Tvé alchymistické soustředění na inkubátor bylo přerušeno.
+
+Genistar.Chimera.Legendary:					[Alchymistická rezonance]: Tvá přesná syntéza čoček zhmotňuje legendárního {0}!
+Genistar.Chimera.Collapse:					Nestabilní genetická struktura kolabuje pod svou vlastní strukturální komplexností! Embryo se rozpouští na inertní organický kal.
+Genistar.Chimera.Birth:						[Zrození úspěšné]: Dospělý '{0}' dělá své první krůčky ve tvé zahradě!
+
+Genistar.Equip.CantEquip:					Tento předmět nemůže být vybaven Genistarem.
+Genistar.Equip.ArmorAnimal:					Toto brnění je strukturálně navrženo pouze pro fenotypy zvířat (Animal).
+Genistar.Equip.ArmorHumanoid:				Toto brnění je strukturálně navrženo pouze pro fenotypy humanoidů (Humanoid).
+Genistar.Equip.ArmorTitan:					Toto brnění je strukturálně navrženo pouze pro fenotypy titánů (Titan).
+Genistar.Equip.GearAnimal:					Toto vybavení je strukturálně navrženo pouze pro fenotypy zvířat (Animal).
+Genistar.Equip.GearTitan:					Toto vybavení je strukturálně navrženo pouze pro fenotypy titánů (Titan).
+Genistar.Equip.GearHumanoid:				Toto vybavení je strukturálně navrženo pouze pro fenotypy humanoidů (Humanoid).
+Genistar.Equip.Duplicate:					Tvůj Genistar už má v tomto slotu vybavený stejný předmět.
+Genistar.Equip.Swapped:						Vyměnil jsi vybavení a získal jsi '{0}' od svého Genistara.
+Genistar.Equip.Equipped:					Úspěšně jsi vybavil '{0}' svému Genistarovi.
+Genistar.Equip.NoMods:						Tvůj Genistar nemá žádné modifikace vybavení.
+Genistar.Equip.InvalidSlot:					Neplatný slot. Použij right, left, shield, two, distance nebo armor.
+Genistar.Equip.EmptySlot:					V tomto slotu není vybaven žádný předmět.
+Genistar.Equip.BackpackFull:				Tvůj batoh je plný. Než si vezmeš vybavení, udělej si místo.
+Genistar.Equip.Retrieved:					Odebíráš '{0}' svému Genistarovi.
+
+
+# /Genistar Command Syntax
+Genistar.Command.Help.Desc:					Centrální telemetrie a velicí centrum pro živé formy života Genistar.
+Genistar.Command.Help.Care:					/genistar care - Přepíná alchymistické AFK inkubační soustředění nad nedalekým vejcem.
+Genistar.Command.Help.Rename:				/genistar rename <CallSign> - Určuje vlastní jméno zobrazené nad hlavou (k resetování na základní hodnotu použij mezery).
+Genistar.Command.Help.Emote:				/genistar emote <Action> - Spouští rutiny fyzických emocí skeletu.
+Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Přepíná slot viditelné zbraně (Pouze humanoidi).
+Genistar.Command.Help.Equip:				/genistar equip <ze slotu batohu> - Vybaví předmět (zbraň nebo brnění) z batohu přímo Genistarovi.
+Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Získá vybavení zpět od Genistara.
+Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <množství> - [GM] Přímá manipulace se zkušenostmi cílové formy života.
+
+Genistar.Command.TargetVisual:				Musíš mít v přímém cíli jednoho ze svých živých Genistarů.
+Genistar.Command.RejectsTelemetry:			Tato forma života odmítá tvou telemetrii; poslouchá pouze svého skutečného genetického pána.
+Genistar.Command.PhysicalState:				Tvůj současný fyzický stav zabraňuje intenzivnímu alchymistickému soustředění.
+Genistar.Command.NearIncubator:				Abys mohl promítat pole AFK péče, musíš stát poblíž svého inkubátoru v obydlí.
+Genistar.Command.NameLimit:					Volací znak překračuje limity pro vykreslování nad hlavou. Maximum je 20 znaků.
+Genistar.Command.NameRestricted:			Tento podpis je omezen komunikačními protokoly říše. Přístup odepřen.
+Genistar.Command.RenameDialogReset:			Autorizuješ vymazání vlastní telemetrie a resetování '{0}' zpět na biologický základ: '{1}'?
+Genistar.Command.RenameDialog:				Autorizuješ přejmenování '{0}' na vizuální podpis '{1}'?
+Genistar.Command.RenameResetSuccess:		Biologický základ obnoven. Vizuální podpis: '{0}'.
+Genistar.Command.RenameSuccess:				Telemetrie odeslána. Vizuální vykreslování aktualizováno na: '{0}'.
+Genistar.Command.EmoteSyntax:				Syntaxe: /genistar emote <Action>\nDostupné: angry, bang, beckon, beg, bow, charge, cheer, clap, confuse, cry, dance, flex, kiss, laugh, no, point, ponder, roar, salute, shrug, wave, yes
+Genistar.Command.EmoteUnrecognized:			Emotivní rutina '{0}' není skeletem formy života rozpoznána.
+Genistar.Command.EmoteSuccess:				{0} spouští emotivní rutinu: {1}.
+Genistar.Command.VisibleSyntax:				Syntaxe: /genistar visibleweapon <right|left|two|distance>
+Genistar.Command.NoWeaponSwap:				Anatomie této formy života nepodporuje přepínání slotů viditelné zbraně.
+Genistar.Command.VisibleInvalid:			Neplatný slot. Použij right, left, two nebo distance.
+Genistar.Command.VisibleShifted:			Viditelný slot zbraně Genistara byl změněn.
+Genistar.Command.RemoveSyntax:				Syntaxe: /genistar removeweapon <right|left|shield|two|distance|armor>
+Genistar.Command.AddSyntax:					Syntaxe: /genistar equip <ze slotu batohu>
+Genistar.Command.AddBounds:					Slot batohu musí být v rozmezí 1 až 40.
+Genistar.Command.NoItem:					V tomto slotu batohu není žádný předmět.
+Genistar.Command.ExpSyntax:					Syntaxe: /genistar exp <add|sub|set> <množství>
+Genistar.Command.ExpValid:					Modifikátor zkušeností musí být platné kladné celé číslo.
+Genistar.Command.ExpMode:					Nerozpoznaný režim. Použij 'add', 'sub' nebo 'set'.
+Genistar.Command.ExpSuccess:				Přiděleno {0:+#;-#;0} ZK cíli '{1}'. Celkem v registru: {2} ZK. Aktivní úroveň: {3}. Aktivní velikost: {4}.

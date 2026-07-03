@@ -1,0 +1,113 @@
+
+# /Genistar System
+Genistar.GenistarPet.LevelUp:				Your Genistar has reached level {0}.
+Genistar.GenistarPet.Examine:				You examine {0}. {1} is {2} and it's a Genistar pet. To rename this creature or issue emotes, use /genistar on your target.
+Genistar.GenistarPet.CantEquip:				This item cannot be equipped by a Genistar.
+Genistar.GenistarPet.PackFull:				Your backpack was full! {0}'s container dropped to the floor.
+Genistar.GenistarPet.PackSuccess:			{0} returns to its portable container in your inventory.
+Genistar.GenistarPet.Died:					Your Genistar has died! Return its remains to your housing incubator within 1 hour, or it will be lost forever.
+Genistar.GenistarPet.RemainsDropped:		Your inventory is full. The remains dropped to the ground.
+Genistar.GenistarPet.CannotOnMount:			{0} cannot keep up with your mount and returns to your inventory.
+
+Genistar.SummonGenistar.PvPContested:		You cannot summon your Genistar in a PvP or RvR contested area.
+Genistar.SummonGenistar.AlreadySummoned:	You already have a summoned creature. Release it before summoning your Genistar.
+Genistar.SummonGenistar.Mounted:			You cannot summon your Genistar while mounted or riding.
+Genistar.SummonGenistar.NeedItem:			You must have a Genistar Pet item in your inventory to cast this.
+Genistar.SummonGenistar.NotFoundDB:			Your Genistar could not be found in the genetic database.
+Genistar.SummonGenistar.FailedUse:			Failed to use the Genistar item.
+
+Genistar.GenistarNPC.Awakened:				{0} has completely regenerated its cellular matrix and awakened!
+Genistar.GenistarNPC.Examine:				You examine {0}. {1} is {2} and it's a Genistar pet. To rename this creature or issue emotes, use /genistar on your target.
+Genistar.GenistarNPC.DormantComa:			The creature is in a dormant healing coma. Time remaining: {0} seconds.
+Genistar.GenistarNPC.AlreadyCarry:			You already possess a Genistar companion in your inventory. You can't pick up another at the same time.
+Genistar.GenistarNPC.PackDialog:			Do you wish to pack '{0}' into your inventory?
+Genistar.GenistarNPC.Level20Required:		Commanding an adult Genistar in live combat requires Level 20.
+Genistar.GenistarNPC.RenameHint:			Target this creature and type '/genistar rename <NewName>' to submit a new telemetry signature.
+Genistar.GenistarNPC.PackSuccess:			You safely pack '{0}' into its portable container.
+Genistar.GenistarNPC.PackFail:				Your backpack lacks the volume required to carry this container.
+Genistar.GenistarNPC.RefuseStrangers:		The creature bares its teeth; it refuses nourishment from strangers.
+Genistar.GenistarNPC.RejectSpoiled:			{0} violently rejects the spoiled payload!
+Genistar.GenistarNPC.MorphStatic:			{0} absorbs the mutagen, but its morphology is static. No visual change occurs.
+Genistar.GenistarNPC.MorphShift:			{0}'s genetic weave shifts! Its physical form has altered.
+Genistar.GenistarNPC.StatExpand:			[Metabolic Synthesis]: {0}'s physiology permanently expands! (+{1} {2})
+Genistar.GenistarNPC.CombatSharpen:			[Metabolic Synthesis]: {0}'s combat parameters sharpen! (+{1} {2})
+Genistar.GenistarNPC.ResistHarden:			[Metabolic Synthesis]: {0}'s hide hardens! (+{1}% {2})
+Genistar.GenistarNPC.SkillEvolve:			[Neural Synthesis]: {0} evolves its {1} mastery!
+Genistar.GenistarNPCBrain.StopFollow:		{0} stops following you and returns to its garden.
+
+Genistar.GenistarEgg.SealRejects:			The incubator's biometric seal rejects your signature.
+Genistar.GenistarEgg.StasisCollapsed:		The stasis field has collapsed! The creature is ready to emerge!
+Genistar.GenistarEgg.StasisActive:			[Stasis Active]: Viability requires {0} more seconds of direct /afk care.
+Genistar.GenistarEgg.WeaveLocks:			The genetic weave locks! The shell begins to fracture!
+Genistar.GenistarEgg.TooFar:				You stepped too far from the incubator and stopped caring for it. The stasis field automatically re-engages.
+
+Genistar.Lifecycle.Degraded:				The genetic material of your defeated Genistar has degraded beyond recovery. Your housing incubator is free.
+Genistar.Lifecycle.EmbryoFailed:			The genetic sequence collapsed! The embryo failed to form.
+Genistar.Lifecycle.IncubationBegun:			Incubation has begun. Use /afk care to shape the embryo with lenses.
+Genistar.Lifecycle.RecoveryStarted:			You place the remains inside the incubator. The biological recovery process will take 24 hours.
+Genistar.Lifecycle.RemainsInert:			These remains are completely inert and cannot be revived.
+Genistar.Lifecycle.Purged:					The biological blueprint of '{0}' has been permanently purged from the world. Your housing stasis pad is now vacant.
+
+Genistar.LensMgr.InvalidLens:				Your active Lens isn't valid (DPS_AF is 0).
+Genistar.LensMgr.UnknownLens:				Your active Lens (ID: {0}) has no known genetic algorithm.
+Genistar.LensMgr.Absorbs:					The embryo absorbs the lens matrix! (+{0} {1})
+Genistar.LensMgr.Kneel:						You kneel down and extend an alchemical stasis field over the incubator.
+Genistar.LensMgr.BreakFocus:				You break your alchemical focus and step away from the incubator.
+Genistar.LensMgr.FocusBroken:				Your alchemical focus on the incubator is broken.
+
+Genistar.Chimera.Legendary:					[Alchemical Resonance]: Your precise synthesis of lenses manifests the legendary {0}!
+Genistar.Chimera.Collapse:					The unstable genetic weave collapses under its own structural complexity! The embryo dissolves into inert organic sludge.
+Genistar.Chimera.Birth:						[Birth Successful]: The adult '{0}' takes its first steps into your garden!
+
+Genistar.Equip.CantEquip:					This item cannot be equipped by a Genistar.
+Genistar.Equip.ArmorAnimal:					This armor is structurally designed for Animal phenotypes only.
+Genistar.Equip.ArmorHumanoid:				This armor is structurally designed for Humanoid phenotypes only.
+Genistar.Equip.ArmorTitan:					This armor is structurally designed for Titan phenotypes only.
+Genistar.Equip.GearAnimal:					This gear is structurally designed for Animal phenotypes only.
+Genistar.Equip.GearTitan:					This gear is structurally designed for Titan phenotypes only.
+Genistar.Equip.GearHumanoid:				This gear is structurally designed for Humanoid phenotypes only.
+Genistar.Equip.Duplicate:					Your Genistar is already equipped with an identical item in that slot.
+Genistar.Equip.Swapped:						You swapped gear and retrieved '{0}' from your Genistar.
+Genistar.Equip.Equipped:					You successfully equipped '{0}' onto your Genistar.
+Genistar.Equip.NoMods:						Your Genistar has no equipment modifications.
+Genistar.Equip.InvalidSlot:					Invalid slot. Use right, left, shield, two, distance, or armor.
+Genistar.Equip.EmptySlot:					There is no item equipped in that slot.
+Genistar.Equip.BackpackFull:				Your backpack is full. Make room before retrieving equipment.
+Genistar.Equip.Retrieved:					You retrieve '{0}' from your Genistar.
+
+
+# /Genistar Command Syntax
+Genistar.Command.Help.Desc:					Central Telemetry & Command Hub for live Genistar lifeforms.
+Genistar.Command.Help.Care:					/genistar care - Toggles alchemical AFK incubation focus over a nearby egg.
+Genistar.Command.Help.Rename:				/genistar rename <CallSign> - Designates custom overhead name (use spaces to reset to baseline).
+Genistar.Command.Help.Emote:				/genistar emote <Action> - Triggers physical skeleton emotive routines.
+Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Switches the visible weapon slot (Humanoids only).
+Genistar.Command.Help.Equip:				/genistar equip <from backpack slot> - Equips an item (weapon or armor) directly from your backpack to the Genistar.
+Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Retrieves gear from the Genistar.
+Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <amount> - [GM] Directly manipulates target lifeform experience.
+
+Genistar.Command.TargetVisual:				You must establish a direct visual target on one of your live Genistars.
+Genistar.Command.RejectsTelemetry:			This lifeform rejects your telemetry; it obeys only its true genetic master.
+Genistar.Command.PhysicalState:				Your current physical state prevents intense alchemical focus.
+Genistar.Command.NearIncubator:				You must be standing near your housing incubator to project an AFK Care field.
+Genistar.Command.NameLimit:					Call-sign exceeds overhead rendering limits. Maximum 20 characters.
+Genistar.Command.NameRestricted:			That signature is restricted by the Realm's communication protocols. Access denied.
+Genistar.Command.RenameDialogReset:			Do you authorize scrubbing custom telemetry and resetting '{0}' back to its biological baseline: '{1}'?
+Genistar.Command.RenameDialog:				Do you authorize re-designating '{0}' to overhead signature '{1}'?
+Genistar.Command.RenameResetSuccess:		Biological baseline restored. Overhead signature: '{0}'.
+Genistar.Command.RenameSuccess:				Telemetry committed. Overhead visual rendering updated to: '{0}'.
+Genistar.Command.EmoteSyntax:				Syntax: /genistar emote <Action>\nAvailable: angry, bang, beckon, beg, bow, charge, cheer, clap, confuse, cry, dance, flex, kiss, laugh, no, point, ponder, roar, salute, shrug, wave, yes
+Genistar.Command.EmoteUnrecognized:			Emotive routine '{0}' unrecognized by lifeform skeleton.
+Genistar.Command.EmoteSuccess:				{0} executes emotive routine: {1}.
+Genistar.Command.VisibleSyntax:				Syntax: /genistar visibleweapon <right|left|two|distance>
+Genistar.Command.NoWeaponSwap:				This lifeform's anatomy does not support visible weapon slot switching.
+Genistar.Command.VisibleInvalid:			Invalid slot. Use right, left, two, or distance.
+Genistar.Command.VisibleShifted:			Genistar visible weapon slot shifted.
+Genistar.Command.RemoveSyntax:				Syntax: /genistar removeweapon <right|left|shield|two|distance|armor>
+Genistar.Command.AddSyntax:					Syntax: /genistar equip <from backpack slot>
+Genistar.Command.AddBounds:					Backpack slot must be between 1 and 40.
+Genistar.Command.NoItem:					There is no item in that backpack slot.
+Genistar.Command.ExpSyntax:					Syntax: /genistar exp <add|sub|set> <amount>
+Genistar.Command.ExpValid:					Experience modifier must be a valid positive integer.
+Genistar.Command.ExpMode:					Unrecognized mode. Use 'add', 'sub', or 'set'.
+Genistar.Command.ExpSuccess:				Committed {0:+#;-#;0} XP to '{1}'. Ledger Total: {2} XP. Active Level: {3}. Active Size: {4}.

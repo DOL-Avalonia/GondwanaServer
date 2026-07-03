@@ -1,0 +1,112 @@
+# /Genistar System
+Genistar.GenistarPet.LevelUp:				Genistar-ul tău a atins nivelul {0}.
+Genistar.GenistarPet.Examine:				Examinezi {0}. {1} este {2} și este un animal de companie Genistar. Pentru a redenumi această creatură sau a-i da comenzi de expresie (emote), folosește /genistar pe ținta ta.
+Genistar.GenistarPet.CantEquip:				Acest obiect nu poate fi echipat de un Genistar.
+Genistar.GenistarPet.PackFull:				Rucsacul tău era plin! Recipientul lui {0} a căzut pe jos.
+Genistar.GenistarPet.PackSuccess:			{0} se întoarce în recipientul său portabil din inventarul tău.
+Genistar.GenistarPet.Died:					Genistar-ul tău a murit! Returnează-i rămășițele în incubatorul locuinței tale în termen de 1 oră, altfel va fi pierdut pentru totdeauna.
+Genistar.GenistarPet.RemainsDropped:		Inventarul tău este plin. Rămășițele au căzut pe jos.
+Genistar.GenistarPet.CannotOnMount:			{0} nu poate ține pasul cu montura ta și se întoarce în inventar.
+
+Genistar.SummonGenistar.PvPContested:		Nu îți poți invoca Genistar-ul într-o zonă disputată PvP sau RvR.
+Genistar.SummonGenistar.AlreadySummoned:	Ai deja o creatură invocată. Eliberează-o înainte de a-ți invoca Genistar-ul.
+Genistar.SummonGenistar.Mounted:			Nu îți poți invoca Genistar-ul în timp ce ești pe montură sau călărești.
+Genistar.SummonGenistar.NeedItem:			Trebuie să ai un obiect Genistar Pet în inventar pentru a folosi asta.
+Genistar.SummonGenistar.NotFoundDB:			Genistar-ul tău nu a putut fi găsit în baza de date genetică.
+Genistar.SummonGenistar.FailedUse:			Nu s-a putut utiliza obiectul Genistar.
+
+Genistar.GenistarNPC.Awakened:				{0} și-a regenerat complet matricea celulară și s-a trezit!
+Genistar.GenistarNPC.Examine:				Examinezi {0}. {1} este {2} și este un animal de companie Genistar. Pentru a redenumi această creatură sau a-i da comenzi de expresie (emote), folosește /genistar pe ținta ta.
+Genistar.GenistarNPC.DormantComa:			Creatura se află într-o comă de vindecare latentă. Timp rămas: {0} secunde.
+Genistar.GenistarNPC.AlreadyCarry:			Posezi deja un companion Genistar în inventarul tău. Nu poți lua altul în același timp.
+Genistar.GenistarNPC.PackDialog:			Dorești să împachetezi '{0}' în inventarul tău?
+Genistar.GenistarNPC.Level20Required:		Comandarea unui Genistar adult în lupte reale necesită Nivelul 20.
+Genistar.GenistarNPC.RenameHint:			Țintește această creatură și tastează '/genistar rename <NumeNou>' pentru a trimite o nouă semnătură de telemetrie.
+Genistar.GenistarNPC.PackSuccess:			Împachetezi în siguranță '{0}' în recipientul său portabil.
+Genistar.GenistarNPC.PackFail:				Rucsacului tău îi lipsește volumul necesar pentru a transporta acest recipient.
+Genistar.GenistarNPC.RefuseStrangers:		Creatura își arată colții; refuză hrana de la străini.
+Genistar.GenistarNPC.RejectSpoiled:			{0} respinge violent încărcătura alterată!
+Genistar.GenistarNPC.MorphStatic:			{0} absoarbe mutagenul, dar morfologia sa este statică. Nu are loc nicio schimbare vizuală.
+Genistar.GenistarNPC.MorphShift:			Țesutul genetic al lui {0} se modifică! Forma sa fizică a fost alterată.
+Genistar.GenistarNPC.StatExpand:			[Sinteză Metabolică]: Fiziologia lui {0} se extinde permanent! (+{1} {2})
+Genistar.GenistarNPC.CombatSharpen:			[Sinteză Metabolică]: Parametrii de luptă ai lui {0} se ascut! (+{1} {2})
+Genistar.GenistarNPC.ResistHarden:			[Sinteză Metabolică]: Pielea lui {0} se întărește! (+{1}% {2})
+Genistar.GenistarNPC.SkillEvolve:			[Sinteză Neurală]: {0} își evoluează măiestria în {1}!
+Genistar.GenistarNPCBrain.StopFollow:		{0} încetează să te mai urmărească și se întoarce în grădina sa.
+
+Genistar.GenistarEgg.SealRejects:			Sigiliul biometric al incubatorului respinge semnătura ta.
+Genistar.GenistarEgg.StasisCollapsed:		Câmpul de stază a colapsat! Creatura este gata să iasă!
+Genistar.GenistarEgg.StasisActive:			[Stază Activă]: Viabilitatea necesită încă {0} secunde de îngrijire directă /afk.
+Genistar.GenistarEgg.WeaveLocks:			Țesutul genetic se fixează! Cochilia începe să se fractureze!
+Genistar.GenistarEgg.TooFar:				Te-ai îndepărtat prea mult de incubator și ai încetat să îl mai îngrijești. Câmpul de stază se reactivează automat.
+
+Genistar.Lifecycle.Degraded:				Materialul genetic al Genistar-ului tău învins s-a degradat dincolo de posibilitatea recuperării. Incubatorul din locuința ta este liber.
+Genistar.Lifecycle.EmbryoFailed:			Secvența genetică a colapsat! Embrionul nu a reușit să se formeze.
+Genistar.Lifecycle.IncubationBegun:			Incubația a început. Folosește îngrijirea /afk pentru a modela embrionul cu lentile.
+Genistar.Lifecycle.RecoveryStarted:			Așezi rămășițele în interiorul incubatorului. Procesul de recuperare biologică va dura 24 de ore.
+Genistar.Lifecycle.RemainsInert:			Aceste rămășițe sunt complet inerte și nu pot fi reînviate.
+Genistar.Lifecycle.Purged:					Planul biologic al lui '{0}' a fost eliminat definitiv din lume. Platforma de stază a locuinței tale este acum vacantă.
+
+Genistar.LensMgr.InvalidLens:				Lentila ta activă nu este validă (DPS_AF este 0).
+Genistar.LensMgr.UnknownLens:				Lentila ta activă (ID: {0}) nu are un algoritm genetic cunoscut.
+Genistar.LensMgr.Absorbs:					Embrionul absoarbe matricea lentilei! (+{0} {1})
+Genistar.LensMgr.Kneel:						Te îngenunchezi și extinzi un câmp de stază alchimic peste incubator.
+Genistar.LensMgr.BreakFocus:				Îți rupi concentrarea alchimică și te îndepărtezi de incubator.
+Genistar.LensMgr.FocusBroken:				Concentrarea ta alchimică asupra incubatorului a fost întreruptă.
+
+Genistar.Chimera.Legendary:					[Rezonanță Alchimică]: Sinteza ta precisă a lentilelor manifestă legendarul {0}!
+Genistar.Chimera.Collapse:					Țesutul genetic instabil colapsează sub propria complexitate structurală! Embrionul se dizolvă într-un nămol organic inert.
+Genistar.Chimera.Birth:						[Naștere Reușită]: Adultul '{0}' face primii pași în grădina ta!
+
+Genistar.Equip.CantEquip:					Acest obiect nu poate fi echipat de un Genistar.
+Genistar.Equip.ArmorAnimal:					Această armură este proiectată structural doar pentru fenotipurile Animale.
+Genistar.Equip.ArmorHumanoid:				Această armură este proiectată structural doar pentru fenotipurile Umanoide.
+Genistar.Equip.ArmorTitan:					Această armură este proiectată structural doar pentru fenotipurile Titan.
+Genistar.Equip.GearAnimal:					Acest echipament este proiectat structural doar pentru fenotipurile Animale.
+Genistar.Equip.GearTitan:					Acest echipament este proiectat structural doar pentru fenotipurile Titan.
+Genistar.Equip.GearHumanoid:				Acest echipament este proiectat structural doar pentru fenotipurile Umanoide.
+Genistar.Equip.Duplicate:					Genistar-ul tău este deja echipat cu un obiect identic în acel slot.
+Genistar.Equip.Swapped:						Ai schimbat echipamentul și ai preluat '{0}' de la Genistar-ul tău.
+Genistar.Equip.Equipped:					Ai echipat cu succes '{0}' pe Genistar-ul tău.
+Genistar.Equip.NoMods:						Genistar-ul tău nu are modificări de echipament.
+Genistar.Equip.InvalidSlot:					Slot invalid. Folosește right, left, shield, two, distance sau armor.
+Genistar.Equip.EmptySlot:					Nu există niciun obiect echipat în acel slot.
+Genistar.Equip.BackpackFull:				Rucsacul tău este plin. Fă loc înainte de a prelua echipamentul.
+Genistar.Equip.Retrieved:					Preiei '{0}' de la Genistar-ul tău.
+
+
+# /Genistar Command Syntax
+Genistar.Command.Help.Desc:					Centru de Telemetrie și Comandă pentru formele de viață Genistar active.
+Genistar.Command.Help.Care:					/genistar care - Comută focalizarea incubației alchimice AFK asupra unui ou din apropiere.
+Genistar.Command.Help.Rename:				/genistar rename <CallSign> - Desemnează un nume personalizat afișat deasupra capului (folosește spații pentru a reveni la valoarea de bază).
+Genistar.Command.Help.Emote:				/genistar emote <Action> - Declanșează rutine fizice de exprimare a scheletului.
+Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Schimbă slotul armei vizibile (Doar humanoizi).
+Genistar.Command.Help.Equip:				/genistar equip <din slotul rucsacului> - Echipează un obiect (armă sau armură) direct din rucsac pe Genistar.
+Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Preia echipamentul de la Genistar.
+Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <cantitate> - [GM] Manipulează direct experiența formei de viață vizate.
+
+Genistar.Command.TargetVisual:				Trebuie să stabilești o țintă vizuală directă pe unul dintre Genistar-urile tale active.
+Genistar.Command.RejectsTelemetry:			Această formă de viață respinge telemetria ta; se supune doar adevăratului său maestru genetic.
+Genistar.Command.PhysicalState:				Starea ta fizică actuală împiedică o concentrare alchimică intensă.
+Genistar.Command.NearIncubator:				Trebuie să stai lângă incubatorul locuinței pentru a proiecta un câmp de îngrijire AFK.
+Genistar.Command.NameLimit:					Semnul de apel depășește limitele de afișare deasupra capului. Maximum 20 de caractere.
+Genistar.Command.NameRestricted:			Acea semnătură este restricționată de protocoalele de comunicare ale Regatului. Acces respins.
+Genistar.Command.RenameDialogReset:			Autorizezi ștergerea telemetriei personalizate și resetarea lui '{0}' la baza sa biologică: '{1}'?
+Genistar.Command.RenameDialog:				Autorizezi redesemnarea lui '{0}' la semnătura vizuală '{1}'?
+Genistar.Command.RenameResetSuccess:		Bază biologică restaurată. Semnătură vizuală: '{0}'.
+Genistar.Command.RenameSuccess:				Telemetrie înregistrată. Randare vizuală actualizată la: '{0}'.
+Genistar.Command.EmoteSyntax:				Sintaxă: /genistar emote <Action>\nDisponibile: angry, bang, beckon, beg, bow, charge, cheer, clap, confuse, cry, dance, flex, kiss, laugh, no, point, ponder, roar, salute, shrug, wave, yes
+Genistar.Command.EmoteUnrecognized:			Rutina de expresie '{0}' nerecunoscută de scheletul formei de viață.
+Genistar.Command.EmoteSuccess:				{0} execută rutina de expresie: {1}.
+Genistar.Command.VisibleSyntax:				Sintaxă: /genistar visibleweapon <right|left|two|distance>
+Genistar.Command.NoWeaponSwap:				Anatomia acestei forme de viață nu acceptă schimbarea slotului pentru arma vizibilă.
+Genistar.Command.VisibleInvalid:			Slot invalid. Folosește right, left, two sau distance.
+Genistar.Command.VisibleShifted:			Slotul armei vizibile Genistar a fost schimbat.
+Genistar.Command.RemoveSyntax:				Sintaxă: /genistar removeweapon <right|left|shield|two|distance|armor>
+Genistar.Command.AddSyntax:					Sintaxă: /genistar equip <din slotul rucsacului>
+Genistar.Command.AddBounds:					Slotul rucsacului trebuie să fie între 1 și 40.
+Genistar.Command.NoItem:					Nu există niciun obiect în acel slot al rucsacului.
+Genistar.Command.ExpSyntax:					Sintaxă: /genistar exp <add|sub|set> <cantitate>
+Genistar.Command.ExpValid:					Modificatorul de experiență trebuie să fie un număr întreg pozitiv valid.
+Genistar.Command.ExpMode:					Mod nerecunoscut. Folosește 'add', 'sub' sau 'set'.
+Genistar.Command.ExpSuccess:				Alocat {0:+#;-#;0} XP pentru '{1}'. Total Registru: {2} XP. Nivel Activ: {3}. Mărime Activă: {4}.

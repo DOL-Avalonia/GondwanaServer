@@ -39,6 +39,7 @@ House.SendHouseInfo.RentDueInSec:			Huur verschuldigd over: {0} seconden
 House.EmptyHookpoint.NotOwner:				Alleen de eigenaar van een huis kan voorwerpen verwijderen of plaatsen op ophangpunten!
 House.EmptyHookpoint.InvalidPosition:		Ongeldige ophangpunt-positie {0}
 House.EmptyHookpoint.NoItemFound:			Geen ophangpunt-voorwerp gevonden op positie {0}
+House.Genistar.Examine:						Je onderzoekt de gereserveerde plek van de Genistar.
 
 HouseEnterLeave.TooFarAway:					Je bent te ver weg om huis {0} binnen te gaan.
 HouseEnterLeave.CantEnter:					Je kunt huis {0} niet betreden.
@@ -80,6 +81,7 @@ HousingPlaceItemHandler.HouseRemoved:           Je huis is verwijderd!
 HousingPlaceItemHandler.NeedHouseDeed:          Dit werkt niet zonder een Huisakte.
 HousingPlaceItemHandler.GenistarLimitReached:	Je hebt de maximale limiet van {0} Genistar(s) voor jouw huisgrootte bereikt.
 HousingPlaceItemHandler.GenistarVisualPlaced:	Je Genistar is precies geplaatst op de plek waar je staat.
+HousingPlaceItemHandler.GenistarWalktoPlace:	Je hoeft dit niet handmatig te plaatsen. Loop gewoon in de buurt van de gereserveerde plek van je Genistar in de tuin en het item wordt automatisch geplaatst!
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Je richt op kavel nummer {0}.

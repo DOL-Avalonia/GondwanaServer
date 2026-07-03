@@ -261,6 +261,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:		Vous avez gagné {0} points de
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:	Vous bougez et ne pouvez pas appeler votre monture !
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting:	Vous bougez, et interrompez votre fabrication.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Vous bougez et interrompez votre {0} !
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Vous bougez et arrêtez de vous occuper de l'œuf de Genistar.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious:		{0} s'entraîne dans différentes spécialisations.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:				Il vous reste {0} points de spécialisation pour ce niveau.
@@ -524,6 +525,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	L'effet de charge ID 
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:		L'effet de charge ID {0} non trouvé.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			Cet espace réservé Génistar ne peut être placé que dans le jardin.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Votre œuf de Genistar a été placé dans votre jardin. Prenez-en soin et modelez-le selon vos désirs !
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Vous devez relâcher votre Genistar invoqué avant de le replacer dans le jardin.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Vous relâchez {0} dans votre jardin pour qu'il s'y promène.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} hurle : « {1} »
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} hurle dans une langue qui vous est inconnue.

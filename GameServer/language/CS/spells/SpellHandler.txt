@@ -333,9 +333,11 @@ SpellHandler.Occultist.CastCondition4:			Před sesláním tohoto kouzla musíte 
 SpellHandler.Occultist.Self.AbsorbToPower:		Sifonujete {0} many z přijatého útoku.
 SpellHandler.Occultist.ArawnsLegion.PetAnswer:			{0} odpovídá na tvé volání!
 SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:	Šablona NPC {0} nebyla nalezena.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:	Tvůj Genistar se stáhne do inventáře, jakmile je legie vyvolána.
 
 SpellHandler.SummonMonster.Target.Resist:			{0} byl přiveden z Limbus jako zombie a zůstává vůči tomuto kouzlu necitlivý!
 SpellHandler.IllusionSpell.Target.Resist:			{0} vyvolal iluzi a nemůže být tímto kouzlem zasažen!
+SpellHandler.IllusionSpell.GenistarRetreat:			Tvůj Genistar se stáhne do inventáře, jakmile iluze začne působit.
 SpellHandler.Morphed.Target.Resist:			{0} prošel proměnou a nemůže být tímto kouzlem zasažen!
 
 SpellHandler.DelveInfo.Sec:			s

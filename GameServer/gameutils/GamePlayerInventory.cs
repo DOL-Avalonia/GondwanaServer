@@ -24,6 +24,7 @@ using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static AmteScripts.PvP.PvPScore;
 
 namespace DOL.GS
 {
@@ -669,15 +670,17 @@ namespace DOL.GS
 
                 if (valid)
                 {
+                    bool isFromGenistar = fromItem != null && (fromItem.Id_nb.StartsWith("genistar_pet") || fromItem.Id_nb.StartsWith("genistar_remains"));
+                    bool isToGenistar = toItem != null && (toItem.Id_nb.StartsWith("genistar_pet") || toItem.Id_nb.StartsWith("genistar_remains"));
                     bool isToVault = (toSlot >= eInventorySlot.FirstVault && toSlot <= eInventorySlot.LastVault) || (toSlot >= eInventorySlot.FirstBagHorse && toSlot <= eInventorySlot.LastBagHorse);
                     bool isFromVault = (fromSlot >= eInventorySlot.FirstVault && fromSlot <= eInventorySlot.LastVault) || (fromSlot >= eInventorySlot.FirstBagHorse && fromSlot <= eInventorySlot.LastBagHorse);
 
-                    if (isToVault && (fromItem is Scripts.StorageBagItem || fromItem is AmteScripts.PvP.CTF.FlagInventoryItem || toItem is PvPTreasure || fromItem is AmteScripts.Managers.TerritoryRelicInventoryItem))
+                    if (isToVault && (isFromGenistar || fromItem is Scripts.StorageBagItem || fromItem is AmteScripts.PvP.CTF.FlagInventoryItem || toItem is PvPTreasure || fromItem is AmteScripts.Managers.TerritoryRelicInventoryItem))
                     {
                         valid = false;
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemCantStoreThere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
-                    else if (isFromVault && toItem != null && (toItem is Scripts.StorageBagItem || toItem is AmteScripts.PvP.CTF.FlagInventoryItem || toItem is PvPTreasure || toItem is AmteScripts.Managers.TerritoryRelicInventoryItem))
+                    else if (isFromVault && toItem != null && (isToGenistar || toItem is Scripts.StorageBagItem || toItem is AmteScripts.PvP.CTF.FlagInventoryItem || toItem is PvPTreasure || toItem is AmteScripts.Managers.TerritoryRelicInventoryItem))
                     {
                         valid = false;
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemCantSwapThere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);

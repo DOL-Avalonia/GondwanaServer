@@ -217,6 +217,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		Je kunt een reliek niet vernietigen
 DestroyItemRequestHandler.CantDestroyEquippedItem:	Je kunt een uitgerust object niet vernietigen!
 DestroyItemRequestHandler.ItemDestroyed:			Je vernietigt {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		De PvP‑vlag kan niet worden vernietigd!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	Je staat op het punt om '{0}' permanent te verdampen! Deze actie zal je Genistar onherroepelijk wissen en de stasis-pad van je huis naar nul resetten. Wil je doorgaan?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Verdamping geannuleerd. De biologische container blijft beveiligd.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:	Je moet in dezelfde regio zijn als de gildeleider om een uitnodiging te accepteren.

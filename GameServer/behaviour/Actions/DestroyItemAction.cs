@@ -16,16 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+using DOL.Database;
+using DOL.Events;
+using DOL.GS.Behaviour;
+using DOL.GS.Behaviour.Attributes;
+using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
+using DOL.Language;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using DOL.GS.PacketHandler;
-using DOL.Events;
-using DOL.GS.Behaviour.Attributes;
-using DOL.GS.Behaviour;
-using DOL.Database;
-using System.Collections;
-using DOL.Language;
+using static AmteScripts.PvP.PvPScore;
 
 namespace DOL.GS.Behaviour.Actions
 {
@@ -104,7 +106,7 @@ namespace DOL.GS.Behaviour.Actions
             }
 
             GamePlayerInventory playerInventory = player.Inventory as GamePlayerInventory;
-            playerInventory.BeginChanges();
+            playerInventory!.BeginChanges();
             Dictionary<InventoryItem, int?>.Enumerator enumerator = dataSlots.GetEnumerator();
             while (enumerator.MoveNext())
             {
@@ -112,6 +114,12 @@ namespace DOL.GS.Behaviour.Actions
                 if (!de.Value.HasValue)
                 {
                     playerInventory.RemoveItem(de.Key);
+
+                    if (de.Key.Id_nb.StartsWith("genistar_pet") || de.Key.Id_nb.StartsWith("genistar_remains"))
+                    {
+                        GenistarLifecycleManager.ExecuteTotalVaporization(player, de.Key);
+                    }
+
                     InventoryLogging.LogInventoryAction(player, NPC, eInventoryActionType.Quest, de.Key, de.Key.Count);
                 }
                 else

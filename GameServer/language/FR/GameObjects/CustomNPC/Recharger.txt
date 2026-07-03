@@ -9,3 +9,5 @@ Scripts.Recharger.RechargerDialogResponse.FullyCharged:	Voilà, votre objet est 
 Scripts.Recharger.RechargerDialogResponse.GiveMoney:	Vous donnez {0} {1}.
 Scripts.Recharger.RechargerDialogResponse.InvalidItem:	Objet invalide.
 Scripts.Recharger.RechargerDialogResponse.NotMoney:		Vous n'avez pas assez d'argent.
+Scripts.Recharger.Genistar.AreadyHealthy:				Votre Génistar est déjà en parfaite santé.
+Scripts.Recharger.Genistar.FullyHealed:					La santé de votre Génistar a été restaurée à son maximum.

@@ -16,21 +16,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-
-using DOL.Language;
-using DOL.GS.PacketHandler;
-using DOL.Database;
-using DOL.GS.Spells;
-
-using log4net;
-using DOL.GS.Geometry;
-using DOL.Bonus;
-using System.Linq;
 using Discord;
+using DOL.Bonus;
+using DOL.Database;
+using DOL.GS.Geometry;
+using DOL.GS.PacketHandler;
 using DOL.GS.PacketHandler.Client.v168;
+using DOL.GS.Spells;
+using DOL.Language;
+using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using static AmteScripts.PvP.PvPScore;
 
 namespace DOL.GS
 {
@@ -481,33 +480,39 @@ namespace DOL.GS
             }
 
             WriteUsableClasses(delve, player.Client);
-            if ((Object_Type >= (int)eObjectType.GenericWeapon) && (Object_Type <= (int)eObjectType._LastWeapon))
+
+            bool isGenWeapon = Flags >= 30 && Flags <= 36 && Flags != 32;
+            bool isGenShield = Flags == 32;
+            bool isGenArmor = Flags >= 38 && Flags <= 40;
+            bool isGenistar = isGenWeapon || isGenShield || isGenArmor;
+
+            if (isGenWeapon || (!isGenShield && !isGenArmor && Object_Type >= (int)eObjectType.GenericWeapon && Object_Type <= (int)eObjectType._LastWeapon))
             {
-                WriteMagicalBonuses(delve, player.Client, false);
+                WriteMagicalBonuses(delve, player.Client, false, isGenistar);
                 DelveWeaponStats(delve, player);
             }
 
             if (Object_Type == (int)eObjectType.Instrument)
             {
-                WriteMagicalBonuses(delve, player.Client, false);
+                WriteMagicalBonuses(delve, player.Client, false, isGenistar);
             }
 
-            if (Object_Type >= (int)eObjectType.Cloth && Object_Type <= (int)eObjectType.Scale)
+            if (isGenArmor || (!isGenWeapon && !isGenShield && Object_Type >= (int)eObjectType.Cloth && Object_Type <= (int)eObjectType.Scale))
             {
-                WriteMagicalBonuses(delve, player.Client, false);
+                WriteMagicalBonuses(delve, player.Client, false, isGenistar);
                 DelveArmorStats(delve, player);
             }
 
-            if (Object_Type == (int)eObjectType.Shield)
+            if (isGenShield || (!isGenWeapon && !isGenArmor && Object_Type == (int)eObjectType.Shield))
             {
-                WriteMagicalBonuses(delve, player.Client, false);
+                WriteMagicalBonuses(delve, player.Client, false, isGenistar);
                 DelveShieldStats(delve, player.Client);
             }
 
             if (Object_Type == (int)eObjectType.Magical || Object_Type == (int)eObjectType.AlchemyTincture || Object_Type == (int)eObjectType.SpellcraftGem)
             {
                 WriteUsableClasses(delve, player.Client);
-                WriteMagicalBonuses(delve, player.Client, false);
+                WriteMagicalBonuses(delve, player.Client, false, isGenistar);
             }
 
             //***********************************
@@ -631,28 +636,34 @@ namespace DOL.GS
         }
 
 
-        protected virtual void WriteMagicalBonuses(IList<string> output, GameClient client, bool shortInfo)
+        protected virtual void WriteMagicalBonuses(IList<string> output, GameClient client, bool shortInfo, bool isGenistar = false)
         {
-            var utility = GetTotalUtility();
-            if (Math.Abs(utility) >= 0.01)
+            if (!isGenistar)
             {
-                output.Add("Total utility: " + String.Format("{0:0.00}", GetTotalUtility()));
-                output.Add(" ");
+                if (this is GameInventoryItem gameItemUtility)
+                {
+                    var utility = gameItemUtility.GetTotalUtility();
+                    if (Math.Abs(utility) >= 0.01)
+                    {
+                        output.Add("Total utility: " + String.Format("{0:0.00}", utility));
+                        output.Add(" ");
+                    }
+                }
             }
-            
+
             int oldCount = output.Count;
 
-            WriteBonusLine(output, client, Bonus1Type, Bonus1);
-            WriteBonusLine(output, client, Bonus2Type, Bonus2);
-            WriteBonusLine(output, client, Bonus3Type, Bonus3);
-            WriteBonusLine(output, client, Bonus4Type, Bonus4);
-            WriteBonusLine(output, client, Bonus5Type, Bonus5);
-            WriteBonusLine(output, client, Bonus6Type, Bonus6);
-            WriteBonusLine(output, client, Bonus7Type, Bonus7);
-            WriteBonusLine(output, client, Bonus8Type, Bonus8);
-            WriteBonusLine(output, client, Bonus9Type, Bonus9);
-            WriteBonusLine(output, client, Bonus10Type, Bonus10);
-            WriteBonusLine(output, client, ExtraBonusType, ExtraBonus);
+            WriteBonusLine(output, client, Bonus1Type, Bonus1, isGenistar);
+            WriteBonusLine(output, client, Bonus2Type, Bonus2, isGenistar);
+            WriteBonusLine(output, client, Bonus3Type, Bonus3, isGenistar);
+            WriteBonusLine(output, client, Bonus4Type, Bonus4, isGenistar);
+            WriteBonusLine(output, client, Bonus5Type, Bonus5, isGenistar);
+            WriteBonusLine(output, client, Bonus6Type, Bonus6, isGenistar);
+            WriteBonusLine(output, client, Bonus7Type, Bonus7, isGenistar);
+            WriteBonusLine(output, client, Bonus8Type, Bonus8, isGenistar);
+            WriteBonusLine(output, client, Bonus9Type, Bonus9, isGenistar);
+            WriteBonusLine(output, client, Bonus10Type, Bonus10, isGenistar);
+            WriteBonusLine(output, client, ExtraBonusType, ExtraBonus, isGenistar);
 
             if (output.Count > oldCount)
             {
@@ -673,7 +684,7 @@ namespace DOL.GS
                     if (condition.IsRenaissanceRequired)
                         conditions.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteBonusConditions.Renaissance"));
                     if (conditions.Count > 0)
-                        output.Add(" - " + this.GetBonusTypeFromBonusName(client, condition.BonusName) + ": " + String.Join(" | ", conditions));
+                        output.Add(" - " + this.GetBonusTypeFromBonusName(client, condition.BonusName, isGenistar) + ": " + String.Join(" | ", conditions));
                 }
                 output.Add(" ");
             }
@@ -686,17 +697,17 @@ namespace DOL.GS
 
             oldCount = output.Count;
 
-            WriteFocusLine(client, output, Bonus1Type, Bonus1);
-            WriteFocusLine(client, output, Bonus2Type, Bonus2);
-            WriteFocusLine(client, output, Bonus3Type, Bonus3);
-            WriteFocusLine(client, output, Bonus4Type, Bonus4);
-            WriteFocusLine(client, output, Bonus5Type, Bonus5);
-            WriteFocusLine(client, output, Bonus6Type, Bonus6);
-            WriteFocusLine(client, output, Bonus7Type, Bonus7);
-            WriteFocusLine(client, output, Bonus8Type, Bonus8);
-            WriteFocusLine(client, output, Bonus9Type, Bonus9);
-            WriteFocusLine(client, output, Bonus10Type, Bonus10);
-            WriteFocusLine(client, output, ExtraBonusType, ExtraBonus);
+            WriteFocusLine(client, output, Bonus1Type, Bonus1, isGenistar);
+            WriteFocusLine(client, output, Bonus2Type, Bonus2, isGenistar);
+            WriteFocusLine(client, output, Bonus3Type, Bonus3, isGenistar);
+            WriteFocusLine(client, output, Bonus4Type, Bonus4, isGenistar);
+            WriteFocusLine(client, output, Bonus5Type, Bonus5, isGenistar);
+            WriteFocusLine(client, output, Bonus6Type, Bonus6, isGenistar);
+            WriteFocusLine(client, output, Bonus7Type, Bonus7, isGenistar);
+            WriteFocusLine(client, output, Bonus8Type, Bonus8, isGenistar);
+            WriteFocusLine(client, output, Bonus9Type, Bonus9, isGenistar);
+            WriteFocusLine(client, output, Bonus10Type, Bonus10, isGenistar);
+            WriteFocusLine(client, output, ExtraBonusType, ExtraBonus, isGenistar);
 
             if (output.Count > oldCount)
             {
@@ -791,7 +802,7 @@ namespace DOL.GS
                             if (conditions.Count > 0)
                             {
                                 output.Add("Spell Proc Conditions: ");
-                                output.Add(" - " + this.GetBonusTypeFromBonusName(client, procCondition.BonusName) + ": " + String.Join(" | ", conditions));
+                                output.Add(" - " + this.GetBonusTypeFromBonusName(client, procCondition.BonusName, isGenistar) + ": " + String.Join(" | ", conditions));
                                 output.Add(" ");
                             }
                         }
@@ -860,7 +871,7 @@ namespace DOL.GS
                             if (conditions.Count > 0)
                             {
                                 output.Add("Spell Proc 2 Conditions: ");
-                                output.Add(" - " + this.GetBonusTypeFromBonusName(client, procCondition.BonusName) + ": " + String.Join(" | ", conditions));
+                                output.Add(" - " + this.GetBonusTypeFromBonusName(client, procCondition.BonusName, isGenistar) + ": " + String.Join(" | ", conditions));
                                 output.Add(" ");
                             }
                         }
@@ -1947,39 +1958,39 @@ namespace DOL.GS
             return totalUti;
         }
 
-        private string GetBonusTypeFromBonusName(GameClient client, string bonusName)
+        private string GetBonusTypeFromBonusName(GameClient client, string bonusName, bool isGenistar = false)
         {
             switch (bonusName)
             {
                 case nameof(Bonus1):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus1Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus1Type, isGenistar);
 
                 case nameof(Bonus2):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus2Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus2Type, isGenistar);
 
                 case nameof(Bonus3):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus3Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus3Type, isGenistar);
 
                 case nameof(Bonus4):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus4Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus4Type, isGenistar);
 
                 case nameof(Bonus5):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus5Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus5Type, isGenistar);
 
                 case nameof(Bonus6):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus6Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus6Type, isGenistar);
 
                 case nameof(Bonus7):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus7Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus7Type, isGenistar);
 
                 case nameof(Bonus8):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus8Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus8Type, isGenistar);
 
                 case nameof(Bonus9):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus9Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus9Type, isGenistar);
 
                 case nameof(Bonus10):
-                    return SkillBase.GetPropertyName(client, (eProperty)Bonus10Type);
+                    return SkillBase.GetPropertyName(client, (eProperty)Bonus10Type, isGenistar);
 
                 case nameof(ProcSpellID):
                     return SkillBase.GetSpellByID(ProcSpellID)?.Name ?? "(Invalid Spell)";
@@ -1992,7 +2003,7 @@ namespace DOL.GS
             }
         }
 
-        protected virtual void WriteBonusLine(IList<string> list, GameClient client, int bonusCat, int bonusValue)
+        protected virtual void WriteBonusLine(IList<string> list, GameClient client, int bonusCat, int bonusValue, bool isGenistar = false)
         {
             if (bonusCat == 0 || bonusValue == 0) return;
             if (SkillBase.CheckPropertyType((eProperty)bonusCat, ePropertyType.Focus))
@@ -2007,14 +2018,23 @@ namespace DOL.GS
             //Bonus to casting speed: 2%
             //Bonus to armor factor (AF): 18
             //Power: 6 % of power pool.
-            string singleUti = String.Format("{0:0.00}", GetSingleUtility(bonusCat, bonusValue));
             string bonusValueStr = bonusValue.ToString("0 ;-0;0 ");
-            string propertyName = SkillBase.GetPropertyName(client, (eProperty)bonusCat);
+            string propertyName = SkillBase.GetPropertyName(client, (eProperty)bonusCat, isGenistar);
             if (string.IsNullOrEmpty(propertyName))
                 propertyName = "UnknownProperty";
 
-            // Build the line e.g. "2.50 | Strength: 15"
-            string formattedLine = $"{singleUti} | {propertyName}: {bonusValueStr}";
+            string formattedLine = "";
+
+            if (!isGenistar)
+            {
+                // Build the line e.g. "2.50 | Strength: 15"
+                string singleUti = String.Format("{0:0.00}", GetSingleUtility(bonusCat, bonusValue));
+                formattedLine = $"{singleUti} | {propertyName}: {bonusValueStr}";
+            }
+            else
+            {
+                formattedLine = $"- {propertyName}: {bonusValueStr}";
+            }
 
             // If it's a % type, add a '%' at the end
             if (bonusCat == (int)eProperty.PowerPool
@@ -2088,14 +2108,14 @@ namespace DOL.GS
             return "";
         }
 
-        protected virtual void WriteFocusLine(GameClient client, IList<string> list, int focusCat, int focusLevel)
+        protected virtual void WriteFocusLine(GameClient client, IList<string> list, int focusCat, int focusLevel, bool isGenistar = false)
         {
             if (!SkillBase.CheckPropertyType((eProperty)focusCat, ePropertyType.Focus))
                 return;
             if (focusLevel <= 0)
                 return;
 
-            string propertyName = SkillBase.GetPropertyName(client, (eProperty)focusCat);
+            string propertyName = SkillBase.GetPropertyName(client, (eProperty)focusCat, isGenistar);
             if (string.IsNullOrEmpty(propertyName))
                 propertyName = "UnknownFocus";
 
@@ -2483,7 +2503,8 @@ namespace DOL.GS
             }
             delve.Add("");
             delve.Add("        Level: " + Level);
-            delve.Add("       Object: " + GlobalConstants.ObjectTypeToName(client, Object_Type) + " (" + Object_Type + ")");
+            string objTypeName = GlobalConstants.GetGenistarItemName(Flags) ?? GlobalConstants.ObjectTypeToName(client, Object_Type);
+            delve.Add("       Object: " + objTypeName + " (" + Object_Type + ")");
             delve.Add("         Type: " + GlobalConstants.SlotToName(client, Item_Type) + " (" + Item_Type + ")");
             delve.Add("");
             delve.Add("        Model: " + Model);
@@ -2498,7 +2519,11 @@ namespace DOL.GS
             delve.Add("  Type_Damage: " + Type_Damage);
             delve.Add("        Bonus: " + Bonus);
 
-            if (GlobalConstants.IsWeapon(Object_Type))
+            bool isGenWeaponTech = Template != null && Template.Flags >= 30 && Template.Flags <= 36 && Template.Flags != 32;
+            bool isGenShieldTech = Template != null && Template.Flags == 32;
+            bool isGenArmorTech = Template != null && Template.Flags >= 38 && Template.Flags <= 40;
+
+            if (isGenWeaponTech || (!isGenShieldTech && !isGenArmorTech && GlobalConstants.IsWeapon(Object_Type)))
             {
                 delve.Add("");
                 delve.Add("         Hand: " + GlobalConstants.ItemHandToName(client, Hand) + " (" + Hand + ")");
@@ -2507,14 +2532,14 @@ namespace DOL.GS
                 delve.Add("  Damage type: " + GlobalConstants.WeaponDamageTypeToName(Type_Damage) + " (" + Type_Damage + ")");
                 delve.Add("        Bonus: " + Bonus);
             }
-            else if (GlobalConstants.IsArmor(Object_Type))
+            else if (isGenArmorTech || (!isGenWeaponTech && !isGenShieldTech && GlobalConstants.IsArmor(Object_Type)))
             {
                 delve.Add("");
                 delve.Add("  Armorfactor: " + DPS_AF);
                 delve.Add("   Absorption: " + SPD_ABS);
                 delve.Add("        Bonus: " + Bonus);
             }
-            else if (Object_Type == (int)eObjectType.Shield)
+            else if (isGenShieldTech || (!isGenWeaponTech && !isGenArmorTech && Object_Type == (int)eObjectType.Shield))
             {
                 delve.Add("");
                 delve.Add("Damage/Second: " + (DPS_AF / 10.0f));

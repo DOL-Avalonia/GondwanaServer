@@ -21,11 +21,12 @@ namespace DOL.GS.Scripts
 
         public override bool ReceiveItem(GameLiving source, InventoryItem item)
         {
+            bool isGenistarItem = item.Id_nb is "genistar_pet" or "genistar_remains";
             GamePlayer player = source as GamePlayer;
             if (player == null || item == null)
                 return false;
 
-            if (item is StorageBagItem)
+            if (item is StorageBagItem || isGenistarItem)
             {
                 _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "TrashBinNPC.CannotDestroyObject"));
                 return false;

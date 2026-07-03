@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		Du hast {0} Verdienstpunkte für deine Gilde verdient!
+GuildEvent.MeritPointsAward:		Deiner Gilde werden {0} Verdienstpunkte verliehen!
+GuildEvent.GuildbonusXP:			Du erhältst zusätzlich {0} Erfahrungspunkte durch den Buff deiner Gilde!
+GuildEvent.GuildbonusRP:			Du erhältst zusätzlich {0} Reichspunkte durch den Buff deiner Gilde!
+GuildEvent.GuildbonusBP:			Du erhältst zusätzlich {0} Kopfgeldpunkte durch den Buff deiner Gilde!
+GuildEvent.GuildBuffEnd:			[Gilden-Buff] Dein Gilden-Buff ist nun abgeklungen!

@@ -50,6 +50,9 @@ namespace DOL.GS.PropertyCalc
             int value = Math.Max(0, 100 + living.BaseBuffBonusCategory[(int)property] + buff + item - debuff);
             if (value > 0 && living is GamePlayer { Guild: { TerritorySpellRangeBonus: > 0 } guild })
                 value += guild.TerritorySpellRangeBonus;
+            if (living is GameNPC { IsBoss: true, BossCastRangeMod: > 0 } bossNpc)
+                value += bossNpc.BossCastRangeMod;
+
             return value;
         }
 

@@ -3745,6 +3745,19 @@ namespace DOL.GS.Spells
             return 0;
         }
 
+        protected bool RollBossCCResist(GameLiving target)
+        {
+            if (target is GameNPC { IsBoss: true, BossCCResist: > 0 } bossNpc)
+            {
+                bool isCC = Spell?.SpellType is "Stun" or "Mesmerize"
+                    or "SpeedDecrease" or "Slow" or "VampSpeedDecrease" or "Root";
+
+                if (isCC && Util.Chance(bossNpc.BossCCResist))
+                    return true;
+            }
+            return false;
+        }
+
         /// <summary>
         /// Calculates chance of spell getting resisted
         /// </summary>
@@ -3752,6 +3765,9 @@ namespace DOL.GS.Spells
         /// <returns>chance that spell will be resisted for specific target</returns>
         public virtual int CalculateSpellResistChance(GameLiving target)
         {
+            if (RollBossCCResist(target))
+                return 100;
+
             if (target != null && SpellHandler.FindEffectOnTarget(target, "Damnation") != null)
             {
                 if (Spell.SpellType == "Disease" ||

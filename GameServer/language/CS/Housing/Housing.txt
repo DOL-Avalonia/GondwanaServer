@@ -39,6 +39,7 @@ House.SendHouseInfo.RentDueInSec:			Nájemné splatné za: {0} sekund
 House.EmptyHookpoint.NotOwner:				Pouze majitel domu může odebírat nebo umisťovat předměty na úchytné body!
 House.EmptyHookpoint.InvalidPosition:		Neplatná pozice úchytného bodu {0}
 House.EmptyHookpoint.NoItemFound:			Na pozici úchytného bodu {0} nebyl nalezen žádný předmět
+House.Genistar.Examine:						Prohlížíš si vyhrazené místo pro Genistar.
 
 HouseEnterLeave.TooFarAway:					Jsi příliš daleko na vstup do domu {0}.
 HouseEnterLeave.CantEnter:					Do domu {0} nemůžeš vstoupit.
@@ -80,6 +81,7 @@ HousingPlaceItemHandler.HouseRemoved:           Váš dům byl odstraněn!
 HousingPlaceItemHandler.NeedHouseDeed:          Toto nefunguje bez listiny k domu.
 HousingPlaceItemHandler.GenistarLimitReached:	Dosáhli jste maximálního limitu {0} Genistarů pro velikost vašeho domu.
 HousingPlaceItemHandler.GenistarVisualPlaced:	Váš Genistar byl umístěn přesně tam, kde stojíte.
+HousingPlaceItemHandler.GenistarWalktoPlace:	Tento předmět nemusíš umísťovat ručně. Stačí se projít poblíž vyhrazeného místa pro Genistar v zahradě a předmět se umístí automaticky!
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Míříš na parcelu číslo {0}.

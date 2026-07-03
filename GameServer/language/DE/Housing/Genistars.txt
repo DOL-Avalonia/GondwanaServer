@@ -1,0 +1,114 @@
+﻿
+# /Genistar System
+Genistar.GenistarPet.LevelUp:				Euer Genistar hat Stufe {0} erreicht.
+Genistar.GenistarPet.Examine:				Ihr untersucht {0}. {1} ist {2} und es ist ein Genistar-Begleiter. Um diese Kreatur umzubenennen oder Emotes auszugeben, verwendet /genistar auf Euer Ziel.
+Genistar.GenistarPet.CantEquip:				Dieser Gegenstand kann nicht von einem Genistar ausgerüstet werden.
+Genistar.GenistarPet.PackFull:				Euer Rucksack war voll! Der Behälter von {0} ist auf den Boden gefallen.
+Genistar.GenistarPet.PackSuccess:			{0} kehrt in seinen tragbaren Behälter in Eurem Inventar zurück.
+Genistar.GenistarPet.Died:					Euer Genistar ist gestorben! Bringt seine Überreste innerhalb von 1 Stunde zu Eurem Haus-Inkubator zurück, sonst ist er für immer verloren.
+Genistar.GenistarPet.RemainsDropped:		Euer Inventar ist voll. Die Überreste sind auf den Boden gefallen.
+Genistar.GenistarPetBrain.CannotKeepUp:		{0} kann mit Eurem Reittier nicht mithalten und kehrt in Euer Inventar zurück.
+
+Genistar.SummonGenistar.PvPContested:		Ihr könnt Euren Genistar nicht in einem umkämpften PvP- oder RvR-Gebiet beschwören.
+Genistar.SummonGenistar.AlreadySummoned:	Ihr habt bereits eine beschworene Kreatur. Gebt sie frei, bevor Ihr Euren Genistar beschwört.
+Genistar.SummonGenistar.Mounted:			Ihr könnt Euren Genistar nicht beschwören, während Ihr reitet.
+Genistar.SummonGenistar.NeedItem:			Ihr müsst einen Genistar-Begleiter in Eurem Inventar haben, um dies zu wirken.
+Genistar.SummonGenistar.NotFoundDB:			Euer Genistar konnte nicht in der genetischen Datenbank gefunden werden.
+Genistar.SummonGenistar.FailedUse:			Die Benutzung des Genistar-Gegenstands ist fehlgeschlagen.
+
+Genistar.GenistarNPC.Awakened:				{0} hat seine zelluläre Matrix vollständig regeneriert und ist erwacht!
+Genistar.GenistarNPC.Examine:				Ihr untersucht {0}. {1} ist {2} und es ist ein Genistar-Begleiter. Um diese Kreatur umzubenennen oder Emotes auszugeben, verwendet /genistar auf Euer Ziel.
+Genistar.GenistarNPC.DormantComa:			Die Kreatur befindet sich in einem ruhenden Heilungskoma. Verbleibende Zeit: {0} Sekunden.
+Genistar.GenistarNPC.AlreadyCarry:			Ihr besitzt bereits einen Genistar-Gefährten in Eurem Inventar. Ihr könnt nicht gleichzeitig einen weiteren aufnehmen.
+Genistar.GenistarNPC.PackDialog:			Möchtet Ihr '{0}' in Euer Inventar einpacken?
+Genistar.GenistarNPC.Level20Required:		Das Kommandieren eines erwachsenen Genistars im echten Kampf erfordert Stufe 20.
+Genistar.GenistarNPC.RenameHint:			Visiert diese Kreatur an und tippt '/genistar rename <NeuerName>', um eine neue Signatur einzureichen.
+Genistar.GenistarNPC.PackSuccess:			Ihr packt '{0}' sicher in seinen tragbaren Behälter.
+Genistar.GenistarNPC.PackFail:				Eurem Rucksack fehlt das erforderliche Volumen, um diesen Behälter zu tragen.
+Genistar.GenistarNPC.RefuseStrangers:		Die Kreatur fletscht die Zähne; sie verweigert Nahrung von Fremden.
+Genistar.GenistarNPC.RejectSpoiled:			{0} weist die verdorbene Ladung heftig zurück!
+Genistar.GenistarNPC.MorphStatic:			{0} absorbiert das Mutagen, aber seine Morphologie bleibt statisch. Es tritt keine visuelle Veränderung auf.
+Genistar.GenistarNPC.MorphShift:			Das genetische Geflecht von {0} verschiebt sich! Seine physische Form hat sich verändert.
+Genistar.GenistarNPC.StatExpand:			[Metabolische Synthese]: Die Physiologie von {0} erweitert sich permanent! (+{1} {2})
+Genistar.GenistarNPC.CombatSharpen:			[Metabolische Synthese]: Die Kampfparameter von {0} schärfen sich! (+{1} {2})
+Genistar.GenistarNPC.ResistHarden:			[Metabolische Synthese]: Das Fell von {0} verhärtet sich! (+{1}% {2})
+Genistar.GenistarNPC.SkillEvolve:			[Neuronale Synthese]: {0} entwickelt seine {1}-Meisterschaft!
+Genistar.GenistarNPC.DiedGarden:			Euer Genistar wurde im Garten getötet! Bringt seine Überreste innerhalb von 1 Stunde zu Eurem Haus-Inkubator zurück, sonst ist er für immer verloren.
+Genistar.GenistarNPCBrain.StopFollow:		{0} hört auf, Euch zu folgen, und kehrt in seinen Garten zurück.
+
+Genistar.GenistarEgg.SealRejects:			Das biometrische Siegel des Inkubators weist Eure Signatur zurück.
+Genistar.GenistarEgg.StasisCollapsed:		Das Stasisfeld ist zusammengebrochen! Die Kreatur ist bereit zu schlüpfen!
+Genistar.GenistarEgg.StasisActive:			[Stasis Aktiv]: Die Lebensfähigkeit erfordert noch {0} Sekunden direkte /afk-Pflege.
+Genistar.GenistarEgg.WeaveLocks:			Das genetische Geflecht rastet ein! Die Schale beginnt zu brechen!
+Genistar.GenistarEgg.TooFar:				Ihr seid zu weit vom Inkubator weggetreten. Das Stasisfeld schaltet sich automatisch wieder ein.
+
+Genistar.Lifecycle.Degraded:				Das genetische Material Eures besiegten Genistars ist über eine Wiederherstellung hinaus degradiert. Euer Haus-Inkubator ist nun frei.
+Genistar.Lifecycle.EmbryoFailed:			Die genetische Sequenz ist kollabiert! Der Embryo konnte sich nicht bilden.
+Genistar.Lifecycle.IncubationBegun:			Die Inkubation hat begonnen. Verwendet /afk care, um den Embryo mit Linsen zu formen.
+Genistar.Lifecycle.RecoveryStarted:			Ihr legt die Überreste in den Inkubator. Der biologische Wiederherstellungsprozess wird 24 Stunden dauern.
+Genistar.Lifecycle.RemainsInert:			Diese Überreste sind völlig inert und können nicht wiederbelebt werden.
+Genistar.Lifecycle.Purged:					Der biologische Bauplan von '{0}' wurde dauerhaft aus der Welt getilgt. Euer Stasis-Pad ist jetzt leer.
+
+Genistar.LensMgr.InvalidLens:				Eure aktive Linse ist ungültig (DPS_AF ist 0).
+Genistar.LensMgr.UnknownLens:				Eure aktive Linse (ID: {0}) hat keinen bekannten genetischen Algorithmus.
+Genistar.LensMgr.Absorbs:					Der Embryo absorbiert die Linsenmatrix! (+{0} {1})
+Genistar.LensMgr.Kneel:						Ihr kniet nieder und spannt ein alchemistisches Stasisfeld über dem Inkubator auf.
+Genistar.LensMgr.BreakFocus:				Ihr brecht Eure alchemistische Konzentration und tretet vom Inkubator zurück.
+Genistar.LensMgr.FocusBroken:				Eure alchemistische Konzentration auf den Inkubator wurde gebrochen.
+
+Genistar.Chimera.Legendary:					[Alchemistische Resonanz]: Eure präzise Synthese von Linsen manifestiert den legendären {0}!
+Genistar.Chimera.Collapse:					Das instabile genetische Geflecht kollabiert unter seiner eigenen strukturellen Komplexität! Der Embryo löst sich in inerten organischen Schlamm auf.
+Genistar.Chimera.Birth:						[Geburt Erfolgreich]: Der Erwachsene '{0}' macht seine ersten Schritte in Eurem Garten!
+
+Genistar.Equip.CantEquip:					Dieser Gegenstand kann nicht von einem Genistar ausgerüstet werden.
+Genistar.Equip.ArmorAnimal:					Diese Rüstung ist strukturell nur für tierische Phänotypen konzipiert.
+Genistar.Equip.ArmorHumanoid:				Diese Rüstung ist strukturell nur für humanoide Phänotypen konzipiert.
+Genistar.Equip.ArmorTitan:					Diese Rüstung ist strukturell nur für Titanen-Phänotypen konzipiert.
+Genistar.Equip.GearAnimal:					Diese Ausrüstung ist strukturell nur für tierische Phänotypen konzipiert.
+Genistar.Equip.GearTitan:					Diese Ausrüstung ist strukturell nur für Titanen-Phänotypen konzipiert.
+Genistar.Equip.GearHumanoid:				Diese Ausrüstung ist strukturell nur für humanoide Phänotypen konzipiert.
+Genistar.Equip.Duplicate:					Euer Genistar ist bereits mit einem identischen Gegenstand in diesem Platz ausgerüstet.
+Genistar.Equip.Swapped:						Ihr habt die Ausrüstung getauscht und '{0}' von Eurem Genistar erhalten.
+Genistar.Equip.Equipped:					Ihr habt '{0}' erfolgreich an Eurem Genistar ausgerüstet.
+Genistar.Equip.NoMods:						Euer Genistar hat keine Ausrüstungsmodifikationen.
+Genistar.Equip.InvalidSlot:					Ungültiger Platz. Verwendet right, left, shield, two, distance, oder armor.
+Genistar.Equip.EmptySlot:					In diesem Platz ist kein Gegenstand ausgerüstet.
+Genistar.Equip.BackpackFull:				Euer Rucksack ist voll. Schafft Platz, bevor Ihr Ausrüstung zurückholt.
+Genistar.Equip.Retrieved:					Ihr holt '{0}' von Eurem Genistar zurück.
+
+
+# /Genistar Command Syntax
+Genistar.Command.Help.Desc:					Zentrale Telemetrie & Befehls-Hub für lebende Genistar-Lebensformen.
+Genistar.Command.Help.Care:					/genistar care - Schaltet den alchemistischen AFK-Inkubationsfokus über einem nahen Ei ein/aus.
+Genistar.Command.Help.Rename:				/genistar rename <Rufzeichen> - Weist einen benutzerdefinierten Namen zu (Leerzeichen verwenden, um auf die Basislinie zurückzusetzen).
+Genistar.Command.Help.Emote:				/genistar emote <Aktion> - Löst physische emotive Routinen des Skeletts aus.
+Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Wechselt den sichtbaren Waffenplatz (Nur Humanoide).
+Genistar.Command.Help.Equip:				/genistar equip <Inventarplatz> - Rüstet einen Gegenstand (Waffe/Rüstung) direkt aus dem Rucksack am Genistar aus.
+Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Holt Ausrüstung vom Genistar zurück.
+Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <Menge> - [GM] Manipuliert direkt die Erfahrung der Ziel-Lebensform.
+
+Genistar.Command.TargetVisual:				Ihr müsst ein direktes visuelles Ziel auf einen Eurer lebenden Genistare richten.
+Genistar.Command.RejectsTelemetry:			Diese Lebensform weist Eure Telemetrie zurück; sie gehorcht nur ihrem wahren genetischen Meister.
+Genistar.Command.PhysicalState:				Euer aktueller physischer Zustand verhindert intensive alchemistische Konzentration.
+Genistar.Command.NearIncubator:				Ihr müsst in der Nähe Eures Haus-Inkubators stehen, um ein AFK-Care-Feld zu projizieren.
+Genistar.Command.NameLimit:					Das Rufzeichen überschreitet die Anzeigegrenzen. Maximal 20 Zeichen.
+Genistar.Command.NameRestricted:			Diese Signatur ist durch die Kommunikationsprotokolle des Reiches eingeschränkt. Zugriff verweigert.
+Genistar.Command.RenameDialogReset:			Autorisiert Ihr das Löschen der benutzerdefinierten Telemetrie und die Rücksetzung von '{0}' auf seine biologische Basislinie: '{1}'?
+Genistar.Command.RenameDialog:				Autorisiert Ihr die Neuzuweisung von '{0}' auf die Signatur '{1}'?
+Genistar.Command.RenameResetSuccess:		Biologische Basislinie wiederhergestellt. Signatur: '{0}'.
+Genistar.Command.RenameSuccess:				Telemetrie übermittelt. Visuelle Anzeige aktualisiert auf: '{0}'.
+Genistar.Command.EmoteSyntax:				Syntax: /genistar emote <Aktion>\nVerfügbar: angry, bang, beckon, beg, bow, charge, cheer, clap, confuse, cry, dance, flex, kiss, laugh, no, point, ponder, roar, salute, shrug, wave, yes
+Genistar.Command.EmoteUnrecognized:			Emotive Routine '{0}' vom Skelett der Lebensform nicht erkannt.
+Genistar.Command.EmoteSuccess:				{0} führt emotive Routine aus: {1}.
+Genistar.Command.VisibleSyntax:				Syntax: /genistar visibleweapon <right|left|two|distance>
+Genistar.Command.NoWeaponSwap:				Die Anatomie dieser Lebensform unterstützt den Wechsel des sichtbaren Waffenplatzes nicht.
+Genistar.Command.VisibleInvalid:			Ungültiger Platz. Verwendet right, left, two, oder distance.
+Genistar.Command.VisibleShifted:			Sichtbarer Waffenplatz des Genistars verschoben.
+Genistar.Command.RemoveSyntax:				Syntax: /genistar removeweapon <right|left|shield|two|distance|armor>
+Genistar.Command.AddSyntax:					Syntax: /genistar equip <Inventarplatz>
+Genistar.Command.AddBounds:					Der Inventarplatz muss zwischen 1 und 40 liegen.
+Genistar.Command.NoItem:					Auf diesem Rucksackplatz befindet sich kein Gegenstand.
+Genistar.Command.ExpSyntax:					Syntax: /genistar exp <add|sub|set> <Menge>
+Genistar.Command.ExpValid:					Der Erfahrungsmodifikator muss eine gültige positive Ganzzahl sein.
+Genistar.Command.ExpMode:					Unerkannter Modus. Verwendet 'add', 'sub', oder 'set'.
+Genistar.Command.ExpSuccess:				Es wurden {0:+#;-#;0} XP an '{1}' übermittelt. Gesamt: {2} XP. Aktuelle Stufe: {3}. Aktuelle Größe: {4}.

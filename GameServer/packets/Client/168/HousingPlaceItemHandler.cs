@@ -293,8 +293,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 return;
                             }
 
-                            // Check if the item being placed is a Genistar Placeholder (Flag 25) or an Egg (Flag 26)
-                            if (orgitem.Template != null && (orgitem.Template.Flags == 25 || orgitem.Template.Flags == 26))
+                            // Check if the item being placed is a Genistar Placeholder (Flag 25), Egg (Flag 26), or Remains (Flag 28)
+                            if (orgitem.Template != null && (orgitem.Template.Flags == 28 || orgitem.Template.Flags == 26 || orgitem.Id_nb.StartsWith("genistar_pet") || orgitem.Id_nb.StartsWith("genistar_remains")))
+                            {
+                                ChatUtil.SendSystemMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "HousingPlaceItemHandler.GenistarWalktoPlace"));
+                                client.Out.SendInventorySlotsUpdate(new[] { slot });
+                                return;
+                            }
+                            else if (orgitem.Template != null && orgitem.Template.Flags == 25)
                             {
                                 if (!house.CanAddGenistar())
                                 {
@@ -314,10 +320,18 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 return;
                             }
 
+                            string baseId = orgitem.Id_nb;
+                            if (baseId.Contains(ItemUnique.UNIQUE_SEPARATOR))
+                            {
+                                baseId = baseId.Split(new string[] { ItemUnique.UNIQUE_SEPARATOR }, StringSplitOptions.None)[0];
+                            }
+
+                            ItemTemplate pureTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(baseId) ?? GameServer.Database.FindObjectByKey<ItemUnique>(baseId);
+
                             // create an outdoor item to represent the item being placed
                             var oitem = new OutdoorItem
                             {
-                                BaseItem = GameServer.Database.FindObjectByKey<ItemTemplate>(orgitem.Id_nb),
+                                BaseItem = pureTemplate,
                                 Model = orgitem.Model,
                                 Position = (byte)_position,
                                 Rotation = (byte)rotation
@@ -337,7 +351,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             //add item to outdooritems
                             house.OutdoorItems.Add(pos, oitem);
 
-                            if (orgitem.Template != null && (orgitem.Template.Flags == 25 || orgitem.Template.Flags == 26))
+                            if (pureTemplate != null && (pureTemplate.Flags == 25 || pureTemplate.Flags == 26))
                             {
                                 house.SpawnGenistarVisual(pos, oitem, client.Player.Position);
                                 ChatUtil.SendSystemMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "HousingPlaceItemHandler.GenistarVisualPlaced"));

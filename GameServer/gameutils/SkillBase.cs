@@ -1507,8 +1507,25 @@ namespace DOL.GS
             }
         }
 
-        public static string GetPropertyTranslationName(eProperty prop)
+        public static string GetPropertyTranslationName(eProperty prop, bool isGenistar = false)
         {
+            if (isGenistar)
+            {
+                switch (prop)
+                {
+                    case eProperty.LootChance: return "GenistarProcSpellChance";
+                    case eProperty.SpellRange: return "GenistarCastRange";
+                    case eProperty.MythicalDebuffResistChance: return "GenistarDebuffResistChance";
+                    case eProperty.OffhandChanceBonus: return "GenistarLeftHandSwingChance";
+                    case eProperty.StyleAbsorb: return "GenistarMeleeAbsorb";
+                    case eProperty.CriticalDotHitChance: return "GenistarDotAbsorb";
+                    case eProperty.MythicalCrowdDuration: return "GenistarCCResistChance";
+                    case eProperty.MagicAbsorption: return "GenistarSpellMagicAbsorb";
+                    case eProperty.MeleeSpeed: return "GenistarWeaponSpeed";
+                    case eProperty.PieceAblative: return "GenistarAblativeModifier";
+                }
+            }
+
             //for every property from RegisterPropertyNames() 
             switch (prop)
             {
@@ -2107,9 +2124,9 @@ namespace DOL.GS
         /// </summary>
         /// <param name="prop"></param>
         /// <returns></returns>
-        public static string GetPropertyName(GameClient client, eProperty prop)
+        public static string GetPropertyName(GameClient client, eProperty prop, bool isGenistar = false)
         {
-            return LanguageMgr.GetTranslation(client, "SkillBase.RegisterPropertyNames." + GetPropertyTranslationName(prop));
+            return LanguageMgr.GetTranslation(client, "SkillBase.RegisterPropertyNames." + GetPropertyTranslationName(prop, isGenistar));
         }
 
         #endregion

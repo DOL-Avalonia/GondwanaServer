@@ -267,6 +267,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdVol") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdFaceMob") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAskName") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdGenistar") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdPvP") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdRvR");
 

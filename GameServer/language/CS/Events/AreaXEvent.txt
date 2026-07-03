@@ -1,0 +1,8 @@
+Area.Event.Timer.Start:				Spouští se událost, na reakci máš {0} sekund.
+Area.Event.Timer.Stop:				Čas události vypršel! Zkus to znovu!
+Area.Event.CannotUseItemAgain:		Tento předmět zatím nemůžeš znovu použít!
+Area.Event.ConfirmUseItem:			Opravdu chceš použít [{0}]?
+Area.Event.UsedItem:				Použil jsi [{0}].
+Area.Event.ItemNotInBackpack:		Tento předmět už ve svém batohu nemáš!
+Area.Event.LeftAreaCancelSingle:	Opustil jsi oblast, takže je událost zrušena!
+Area.Event.LeftAreaCancelMultiple:	Všichni hráči opustili oblast, takže je událost zrušena!

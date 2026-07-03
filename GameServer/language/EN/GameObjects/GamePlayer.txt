@@ -261,6 +261,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:		You have earned {0} merit poin
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:		You are moving and cannot call your mount.			
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting:		You move and interrupt your crafting.			
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	You move and interrupt your {0}!
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	You move and stop caring for the Genistar egg.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious:		{0} trains in various specializations.			
 GameObjects.GamePlayer.OnSkillTrained.YouHave:				You have {0} specialization points left this level.		
@@ -524,6 +525,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Charge effect ID {0} 
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:		Charge effect ID {0} not found.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			This Genistar placeholder must be placed in a garden slot.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Your Genistar egg has been placed in your garden. It is now yours to nurture and mold it according to your desires!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			You must release your summoned Genistar before placing it back in the garden.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			You release {0} back into your garden to roam.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} yells, "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} yells something in a language you don't understand.

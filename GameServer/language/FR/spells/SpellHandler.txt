@@ -331,11 +331,13 @@ SpellHandler.Occultist.CastCondition2:						Vous ne pouvez pas lancer ce sort en
 SpellHandler.Occultist.CastCondition3:						Vous ne pouvez pas lancer ce sort en étant sous forme décrépit ou esprit.
 SpellHandler.Occultist.CastCondition4:						Vous devez quitter votre forme actuelle avant de lancer ce sort.
 SpellHandler.Occultist.Self.AbsorbToPower:					Vous siphonnez {0} de mana de l'attaque reçue.
-SpellHandler.Occultist.ArawnsLegion.PetAnswer:					{0} répond à votre appel !
-SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:				Modèle de PNJ {0} introuvable.
+SpellHandler.Occultist.ArawnsLegion.PetAnswer:				{0} répond à votre appel !
+SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:		Modèle de PNJ {0} introuvable.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:		Votre Genistar retourne dans votre inventaire lorsque la légion est invoquée.
 
 SpellHandler.SummonMonster.Target.Resist:					{0} a été ressuscité des limbes sous forme de zombie et reste insensible à ce sort !
 SpellHandler.IllusionSpell.Target.Resist:					{0} a invoqué une illusion et ne peut pas être affecté contre ce sort !
+SpellHandler.IllusionSpell.GenistarRetreat:					Votre Genistar retourne dans votre inventaire à mesure que l'illusion prend effet.
 SpellHandler.Morphed.Target.Resist:							{0} a subi une métamorphose et ne peut pas être affecté par ce sort !
 
 SpellHandler.DelveInfo.Sec:			sec

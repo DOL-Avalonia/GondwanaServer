@@ -53,6 +53,12 @@ namespace DOL.GS.Spells
                 totalResistChance += mythicalResistChance;
             }
 
+            // 3. Boss Debuff Resist
+            if (target is GameNPC { IsBoss: true, BossDebuffResist: > 0 } bossNpc)
+            {
+                totalResistChance += bossNpc.BossDebuffResist;
+            }
+
             // Apply the combined resist chance
             if (Util.Chance(totalResistChance))
             {

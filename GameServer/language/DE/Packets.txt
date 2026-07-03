@@ -222,6 +222,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		Ihr könnt ein Relikt nicht zerstö
 DestroyItemRequestHandler.CantDestroyEquippedItem:		Ihr könnt einen angelegten Gegenstand nicht zerstören!
 DestroyItemRequestHandler.ItemDestroyed:		Ihr zerstört {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		Die PvP-Markierung kann nicht zerstört werden!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	Du versuchst, '{0}' dauerhaft zu verdampfen! Diese Aktion wird deinen Genistar unwiderruflich löschen und das Stasisfeld deines Hauses auf null zurücksetzen. Möchtest du fortfahren?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Verdampfung abgebrochen. Der biologische Behälter bleibt gesichert.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:		Ihr müsst Euch in derselben Region wie der Gildenleiter befinden, um eine Einladung anzunehmen.

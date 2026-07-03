@@ -217,6 +217,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		Không thể phá hủy thánh tíc
 DestroyItemRequestHandler.CantDestroyEquippedItem:	Không thể phá hủy vật phẩm đang trang bị!
 DestroyItemRequestHandler.ItemDestroyed:			Bạn phá hủy {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		Không thể phá hủy cờ PvP!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	Bạn đang cố gắng làm bốc hơi vĩnh viễn '{0}'! Hành động này sẽ xóa bỏ Genistar của bạn không thể khôi phục và đặt bệ ngưng đọng trong nhà của bạn về 0. Bạn có muốn tiếp tục không?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Đã hủy quá trình làm bốc hơi. Vật chứa sinh học vẫn được đảm bảo an toàn.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:	Bạn phải ở cùng khu vực với thủ lĩnh bang hội để chấp nhận lời mời.

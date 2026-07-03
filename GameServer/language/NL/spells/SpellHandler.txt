@@ -333,9 +333,11 @@ SpellHandler.Occultist.CastCondition4:			Je moet je huidige vorm verlaten voorda
 SpellHandler.Occultist.Self.AbsorbToPower:		Je siphont {0} mana uit de ontvangen aanval.
 SpellHandler.Occultist.ArawnsLegion.PetAnswer:			{0} geeft gehoor aan je roep!
 SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:	NPC-sjabloon {0} niet gevonden.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:	Je Genistar trekt zich terug in je inventaris terwijl het legioen wordt opgeroepen.
 
 SpellHandler.SummonMonster.Target.Resist:			{0} is uit de Limbus teruggehaald als zombie en blijft ongevoelig voor deze spreuk!
 SpellHandler.IllusionSpell.Target.Resist:			{0} heeft een illusie opgeroepen en kan niet door deze spreuk worden getroffen!
+SpellHandler.IllusionSpell.GenistarRetreat:			Je Genistar trekt zich terug in je inventaris zodra de illusie effect krijgt.
 SpellHandler.Morphed.Target.Resist:			{0} heeft een metamorfose ondergaan en kan niet door deze spreuk worden getroffen!
 
 SpellHandler.DelveInfo.Sec:			sec

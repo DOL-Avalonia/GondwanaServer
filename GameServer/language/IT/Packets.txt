@@ -217,6 +217,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		Non puoi distruggere una reliquia!
 DestroyItemRequestHandler.CantDestroyEquippedItem:	Non puoi distruggere un oggetto equipaggiato!
 DestroyItemRequestHandler.ItemDestroyed:			Distruggi {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:		La bandiera PvP non può essere distrutta!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	Stai tentando di vaporizzare permanentemente '{0}'! Questa azione eliminerà irrevocabilmente il tuo Genistar e azzererà la piattaforma di stasi del tuo alloggio. Vuoi procedere?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Vaporizzazione annullata. Il contenitore biologico rimane al sicuro.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:	Devi essere nella stessa regione del capogilda per accettare un invito.

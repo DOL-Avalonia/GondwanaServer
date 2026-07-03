@@ -282,6 +282,17 @@ SkillBase.RegisterPropertyNames.WraithsightFocus:		Wraithsight Focus
 SkillBase.RegisterPropertyNames.VoidAcolyte:			Void Acolyte
 SkillBase.RegisterPropertyNames.VoidAcolyteFocus:		Void Acolyte Focus
 
+SkillBase.RegisterPropertyNames.GenistarProcSpellChance:		Proc Trigger Chance
+SkillBase.RegisterPropertyNames.GenistarCastRange:				Spell and Archery Range
+SkillBase.RegisterPropertyNames.GenistarDebuffResistChance:		Debuff Resist Chance
+SkillBase.RegisterPropertyNames.GenistarLeftHandSwingChance:	Left Hand Swing Chance
+SkillBase.RegisterPropertyNames.GenistarMeleeAbsorb:			Melee Damage Absorption
+SkillBase.RegisterPropertyNames.GenistarDotAbsorb:				DoT Spell Damage Absorption
+SkillBase.RegisterPropertyNames.GenistarCCResistChance:			Crowd Control Spell Resist Chance
+SkillBase.RegisterPropertyNames.GenistarSpellMagicAbsorb:		Spell Damage Absorption
+SkillBase.RegisterPropertyNames.GenistarWeaponSpeed:			Weapon Speed
+SkillBase.RegisterPropertyNames.GenistarAblativeModifier:		Ablative Shield Modifier
+
 
 SkillBase.Property.Acuity:					Acuity
 SkillBase.Property.AcuityBonusCap:			Bonus cap to Acuity

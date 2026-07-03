@@ -1,0 +1,61 @@
+﻿
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Benvenuto in Arcanum, un mondo forgiato dalle ceneri della Grande Guerra Magica! In questo coinvolgente regno RP/PvP, regni frammentati lottano per la sopravvivenza mentre le Gilde dettano legge. Consulta i sacri principi e le regole del server su www.arcanum-server.com. Affila le tue lame, prepara i tuoi incantesimi e goditi il tuo viaggio in Arcanum!
+ServerRPGMessage.Lore1:					Benvenuto in Arcanum!
+ServerRPGMessage.Lore2:					Duemila anni fa, Arcanum era uno scintillante reticolo di cittadelle fluttuanti e fucine di mana. Poi arrivò la Grande Guerra Magica. I continenti furono lacerati, lasciando un mondo sfregiato e indebolito. Da queste rovine sorsero tre regni: Valeria, Skeldheim e Sylvaris. Oggi i re governano sulla carta, ma sono le Gilde a governare veramente le terre frammentate, mentre i fuorilegge si ritagliano i propri imperi nell'oscuro Sottosuolo. Scegli saggiamente la tua strada.
+ServerRPGMessage.FeaturesHeader:		--------- CARATTERISTICHE DEL SERVER ---------
+ServerRPGMessage.FeatureEvents1:		[Eventi Dinamici e Missioni]
+ServerRPGMessage.FeatureEvents2:		Partecipa a eventi che alterano il mondo e cacce a boss leggendari.
+ServerRPGMessage.FeatureTasks1:			[Incarichi e Titoli]
+ServerRPGMessage.FeatureTasks2:			Digita '/task' per visualizzare tutti gli incarichi disponibili. Completa incarichi speciali per ottenere gettoni per il Maestro degli Incarichi e sbloccare nuovi titoli. Usa '/title' per visualizzare le tue statistiche e scegliere il tuo titolo attivo.
+ServerRPGMessage.FeatureGvG1:			[Gilda contro Gilda (GvG)]
+ServerRPGMessage.FeatureGvG2:			Cattura Territori e Sottoterritori. Impossessati di potenti Reliquie per garantire alla tua gilda bonus enormi.
+ServerRPGMessage.FeatureRvR1:			[Regno contro Regno (RvR)]
+ServerRPGMessage.FeatureRvR2:			Combatti per il tuo regno nei classici campi di battaglia a partire dal livello 20! Partecipa a 4 diverse categorie in base al tuo livello (Principiante, Standard, Esperto, Maestro) per catturare le fortezze. Usa '/rvr info' per visualizzare informazioni globali e punteggi.
+ServerRPGMessage.FeatureDungeons1:		[Esplorazione di Dungeon]
+ServerRPGMessage.FeatureDungeons2:		Sfida il profondo Sottosuolo, il labirintico DarkSpire o la pericolosa Fenditura del Velo (Veil Rift).
+ServerRPGMessage.FeaturePvP1:			[Giocatore contro Giocatore (PvP)]
+ServerRPGMessage.FeaturePvP2:			A partire dal livello {0}, partecipa a epiche modalità PvP tra cui Deathmatch, Cattura la Bandiera, Re della Collina, Core Run e Biohazard. Usa '/pvp info' e '/pvp scores' per visualizzare i dettagli della sessione.
+ServerRPGMessage.FeatureRenaissance1:	[Rinascimento]
+ServerRPGMessage.FeatureRenaissance2:	Le leggende dicono che coloro che raggiungono l'apice del loro viaggio possono intraprendere una prova pericolosa per rinascere. Ricomincia da capo, ma risvegliati con un potere latente, simile a quello di un dio, per sconfiggere nemici ancora più grandi.
+ServerRPGMessage.FeatureAFK1:			[Addestramento AFK Dinamico]
+ServerRPGMessage.FeatureAFK2:			Sei occupato nel mondo reale? Usa speciali gettoni ottenuti da PvP e missioni per addestrare il tuo personaggio mentre sei lontano. Mettiti di fronte a un manichino da addestramento in qualsiasi città e digita '/afk xp' o '/afk combat' per ottenere esperienza di combattimento!
+ServerRPGMessage.FeatureBanker1:		[Il Banchiere]
+ServerRPGMessage.FeatureBanker2:		Seleziona un banchiere e sussurra 'withdraw money', 'write a check', 'cash a check' o 'term deposits' per gestire la tua ricchezza. Puoi anche automatizzare i pagamenti dell'affitto della casa.
+ServerRPGMessage.FeatureAltCraft1:		[Artigianato Alternativo]
+ServerRPGMessage.FeatureAltCraft2:		Invece di fare affidamento su elenchi di ricette fissi, puoi combinare casualmente vari ingredienti per scoprire nuovi oggetti! Usa '/combine list' per vedere le tue formule scoperte con successo. I giocatori possono scrivere libri per vendere formule o trovare rari 'grimoires' durante le missioni che rivelano combinazioni nascoste.
+ServerRPGMessage.FeatureReputation1:	[Sistema di Reputazione]
+ServerRPGMessage.FeatureReputation2:	Uccidere ripetutamente i giocatori al di fuori delle zone PvP abbassa la tua reputazione. I fuorilegge con reputazione negativa non possono commerciare con giocatori neutrali o mercanti e sono attivamente braccati dalle guardie cittadine. Anche gli altri giocatori possono dare la caccia ai fuorilegge fuori dalle città per mandarli in prigione, guadagnando oro e punti taglia quando consegnano la loro testa a una guardia cittadina!
+ServerRPGMessage.FeatureGuildCreation1:	[Nuovo sistema di Creazione della Gilda]
+ServerRPGMessage.FeatureGuildCreation2:	Compra una pergamena vuota, usa '/book create <Name>' e '/book write' per riunire i fondatori, poi portala all'Impiegato della Tesoreria Reale per farla timbrare.
+ServerRPGMessage.FeatureGuildLeveling1:	[Progressione della Gilda]
+ServerRPGMessage.FeatureGuildLeveling2:	Le gilde salgono di livello dinamicamente! Sblocca nuovi comandi man mano che cresci e rafforzi i tuoi territori.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenalina]
+ServerRPGMessage.FeatureAdrenaline2:	Accumula tensione di combattimento in PvE e PvP per scatenare devastanti vantaggi tattici.
+ServerRPGMessage.FeatureAutotranslate1:	[Traduzione Automatica Dinamica]
+ServerRPGMessage.FeatureAutotranslate2:	Abbatti la barriera linguistica! Imposta la lingua del tuo account con '/language set', quindi attiva '/autotranslate' (o '/at') per tradurre automaticamente tutti i dialoghi dei giocatori, i testi delle missioni e i libri della biblioteca nella lingua selezionata.
+ServerRPGMessage.FeatureLibrarian1:		[Bibliotecario e Ricompense del Gioco di Ruolo]
+ServerRPGMessage.FeatureLibrarian2:		Impegnati in un gioco di ruolo significativo con gli altri per guadagnare Erudizione e Punti Reame. Un vocabolario ricco e conversazioni sostenute producono ricompense maggiori, mentre la volgarità evocherà le guardie cittadine! Puoi anche scrivere e pubblicare libri presso il Bibliotecario per guadagnare Erudizione e ottenere royalty quando altri giocatori acquistano le tue opere.
+ServerRPGMessage.FeatureGenistar1:		[Genistar da Alloggio]
+ServerRPGMessage.FeatureGenistar2:		Ottieni un uovo di Genistar tramite una missione e allevatelo nel giardino di casa tua! Usa lenti di messa a fuoco speciali e i tuoi punti Erudizione per plasmare la sua crescita e determinare le sue capacità di combattimento finali. Seleziona il tuo Genistar e digita '/genistar care' o '/afk care' per nutrirlo. Una volta completamente cresciuto, evocalo dal tuo inventario per farlo combattere al tuo fianco!
+ServerRPGMessage.ServerCommandsHeader:	--------- NUOVI COMANDI DEL SERVER ---------
+ServerRPGMessage.CmdHelp:				/cmdhelp: Mostra l'elenco di tutti i comandi disponibili nel gioco.
+ServerRPGMessage.CmdLanguage:			/language set <EN | FR | DE | ES | IT | NL | CS | RO | VI>: Imposta la lingua del tuo account in modo che tutti i testi, le descrizioni e le informazioni vengano tradotti.
+ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (o /at): Attiva il traduttore automatico per tradurre automaticamente i dialoghi degli altri giocatori, le missioni e i libri nella tua lingua.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Apri, rinomina o chiudi il tuo mercato personale.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatizza la tua coda di creazione e acquista facilmente gli ingredienti delle ricette mancanti direttamente dai mercanti.
+ServerRPGMessage.CmdCombineList:		/combine list: Mostra le combinazioni di oggetti di artigianato alternativo scoperte con successo.
+ServerRPGMessage.CmdVol:				/vol o /steal <player>: Ruba denaro o preziose Reliquie Territoriali ai giocatori rivali! Ti permette anche di rubare i tesori saccheggiati dai forzieri di un clan avversario in PvP.
+ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Girati verso la direzione in cui si trova il mob specificato nella tua regione. Molto utile per le missioni!
+ServerRPGMessage.CmdAskName:			/askname: Chiedi il nome del tuo bersaglio per poterlo visualizzare. Devi farlo prima di poterlo aggiungere come amico.
+ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Interagisci e personalizza la tua mascotte Genistar. Seleziona il tuo uovo per curarlo, dai un nome personalizzato al tuo compagno adulto, dirigi le sue emote e armalo per la battaglia gestendo il suo equipaggiamento da combattimento visibile.
+ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Mostra le informazioni e i punteggi attuali per la sessione PvP attiva.
+ServerRPGMessage.CmdRvR:				/rvr info: Mostra informazioni e i punteggi attuali per la campagna RvR attiva.
+ServerRPGMessage.GuildCommandsHeader:	--------- NUOVI COMANDI DI GILDA ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Visualizza le mappe e gli stati GvG.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Apri un portale direttamente verso le tue terre rivendicate.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Crea una zona di combattimento PvP temporanea.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Paga la cauzione per rilasciare un compagno di gilda dalla prigione.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Attiva/disattiva i pagamenti automatici dell'affitto della casa di gilda.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Acquista e posiziona stendardi tattici per potenziare i tuoi membri o le guardie territoriali.
+ServerRPGMessage.Outro:					Buona fortuna, e che la tua eredità in Arcanum sia leggendaria!

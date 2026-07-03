@@ -218,6 +218,8 @@ DestroyItemRequestHandler.CantDestroyRelic:		You cannot destroy a relic!
 DestroyItemRequestHandler.CantDestroyEquippedItem:		You cannot destroy an equipped item!
 DestroyItemRequestHandler.ItemDestroyed:		You destroy the {0}.
 DestroyItemRequestHandler.CantDestroyPvPFlag:	The PvP Flag cannot be destroyed!
+DestroyItemRequestHandler.GenItemDestroyAttempt:	You are attempting to permanently vaporize '{0}'! This action will irrevocably erase your genistar and reset your housing stasis pad to zero. Do you wish to proceed?
+DestroyItemRequestHandler.GenItemDestroyAbort:		Vaporization aborted. The biological container remains secured.
 
 # /DialogResponseHandler
 DialogResponseHandler.SameRegionGuildLeaderToAccept:		You need to be in the same region as the guild leader to accept an invitation.

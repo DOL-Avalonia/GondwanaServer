@@ -1,0 +1,61 @@
+﻿
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Welkom in Arcanum, een wereld gesmeed uit de as van de Grote Magische Oorlog! In dit meeslepende RP/PvP-rijk strijden gefragmenteerde koninkrijken om te overleven, terwijl gilden de wet dicteren. Raadpleeg de heilige principes en serverregels op www.arcanum-server.com. Slijp je zwaarden, bereid je spreuken voor en geniet van je reis in Arcanum!
+ServerRPGMessage.Lore1:					Welkom in Arcanum!
+ServerRPGMessage.Lore2:					Tweeduizend jaar geleden was Arcanum een glanzend netwerk van zwevende citadellen en mana-smederijen. Toen kwam de Grote Magische Oorlog. Continenten werden verscheurd, wat een getekende en verzwakte wereld achterliet. Uit deze wrakstukken verrezen drie rijken: Valeria, Skeldheim en Sylvaris. Vandaag de dag regeren koningen op papier, maar het zijn de Gilden die de gefragmenteerde landen werkelijk besturen, terwijl vogelvrijverklaarden hun eigen keizerrijken opbouwen in de donkere Onderwereld. Kies je pad verstandig.
+ServerRPGMessage.FeaturesHeader:		--------- SERVERFUNCTIES ---------
+ServerRPGMessage.FeatureEvents1:		[Dynamische Evenementen & Missies]
+ServerRPGMessage.FeatureEvents2:		Neem deel aan wereldveranderende evenementen en legendarische baasjachten.
+ServerRPGMessage.FeatureTasks1:			[Taken & Titels]
+ServerRPGMessage.FeatureTasks2:			Typ '/task' om alle beschikbare taken te bekijken. Voltooi speciale taken om tokens voor de TaskMaster te verdienen en nieuwe titels te ontgrendelen. Gebruik '/title' om je statistieken te bekijken en je actieve titel te kiezen.
+ServerRPGMessage.FeatureGvG1:			[Gilde vs Gilde (GvG)]
+ServerRPGMessage.FeatureGvG2:			Verover Gebieden en Subgebieden. Grijp machtige Relikwieën om je gilde enorme bonussen te geven.
+ServerRPGMessage.FeatureRvR1:			[Rijk vs Rijk (RvR)]
+ServerRPGMessage.FeatureRvR2:			Vecht voor je rijk in klassieke slagvelden vanaf level 20! Neem deel aan 4 verschillende categorieën op basis van je level (Beginner, Standaard, Expert, Meester) om forten te veroveren. Gebruik '/rvr info' om globale informatie en scores te bekijken.
+ServerRPGMessage.FeatureDungeons1:		[Kerkerverkenning]
+ServerRPGMessage.FeatureDungeons2:		Trotseer de diepe Onderwereld, de labyrintische DarkSpire of de gevaarlijke Sluierkloof (Veil Rift).
+ServerRPGMessage.FeaturePvP1:			[Speler vs Speler (PvP)]
+ServerRPGMessage.FeaturePvP2:			Vanaf level {0} kun je deelnemen aan epische PvP-modi, waaronder Deathmatch, Capture the Flag, King of the Hill, Core Run en Biohazard. Gebruik '/pvp info' en '/pvp scores' om sessiedetails te bekijken.
+ServerRPGMessage.FeatureRenaissance1:	[Renaissance]
+ServerRPGMessage.FeatureRenaissance2:	Volgens de legendes kunnen degenen die het hoogtepunt van hun reis bereiken een gevaarlijke beproeving ondergaan om herboren te worden. Begin opnieuw, maar ontwaak met latente, goddelijke kracht om nog grotere vijanden te verslaan.
+ServerRPGMessage.FeatureAFK1:			[Dynamische AFK-training]
+ServerRPGMessage.FeatureAFK2:			Druk in de echte wereld? Gebruik speciale tokens verdiend met PvP en missies om je personage te trainen terwijl je weg bent. Ga voor een oefenpop staan in een willekeurige stad en typ '/afk xp' of '/afk combat' om gevechtservaring op te doen!
+ServerRPGMessage.FeatureBanker1:		[De Bankier]
+ServerRPGMessage.FeatureBanker2:		Selecteer een bankier en fluister 'withdraw money', 'write a check', 'cash a check' of 'term deposits' om je rijkdom te beheren. Je kunt ook de huurbetalingen voor je huis automatiseren.
+ServerRPGMessage.FeatureAltCraft1:		[Alternatief Knutselen]
+ServerRPGMessage.FeatureAltCraft2:		In plaats van te vertrouwen op vaste receptenlijsten, kun je willekeurig verschillende ingrediënten combineren om nieuwe voorwerpen te ontdekken! Gebruik '/combine list' om je succesvol ontdekte formules te zien. Spelers kunnen boeken schrijven om formules te verkopen, of zeldzame 'grimoires' vinden tijdens missies die verborgen combinaties onthullen.
+ServerRPGMessage.FeatureReputation1:	[Reputatiesysteem]
+ServerRPGMessage.FeatureReputation2:	Het herhaaldelijk doden van spelers buiten PvP-zones verlaagt je reputatie. Vogelvrijverklaarden met een negatieve reputatie kunnen niet handelen met neutrale spelers of handelaren en worden actief bejaagd door stadswachten. Andere spelers kunnen ook op vogelvrijverklaarden jagen buiten steden om ze naar de gevangenis te sturen, waardoor ze goud en premiepunten verdienen wanneer ze hun hoofd inleveren bij een stadswacht!
+ServerRPGMessage.FeatureGuildCreation1:	[Nieuw Gilde Creatiesysteem]
+ServerRPGMessage.FeatureGuildCreation2:	Koop een blanco rol, gebruik '/book create <Name>' en '/book write' om oprichters te verzamelen, en breng het vervolgens naar de Koninklijke Schatkistklerk om het te laten afstempelen.
+ServerRPGMessage.FeatureGuildLeveling1:	[Gilde Leveling]
+ServerRPGMessage.FeatureGuildLeveling2:	Gilden gaan dynamisch in level omhoog! Ontgrendel nieuwe commando's naarmate je groeit en je territoria versterkt.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenaline]
+ServerRPGMessage.FeatureAdrenaline2:	Bouw gevechtsspanning op in PvE en PvP om verwoestende tactische voordelen te ontketenen.
+ServerRPGMessage.FeatureAutotranslate1:	[Dynamische Automatische Vertaling]
+ServerRPGMessage.FeatureAutotranslate2:	Doorbreek de taalbarrière! Stel de taal van je account in met '/language set', activeer vervolgens '/autotranslate' (of '/at') om automatisch alle spelersdialogen, missieteksten en bibliotheekboeken naar je geselecteerde taal te vertalen.
+ServerRPGMessage.FeatureLibrarian1:		[Bibliothecaris & Roleplay Beloningen]
+ServerRPGMessage.FeatureLibrarian2:		Doe mee aan zinvolle roleplay met anderen om Eruditie- en Realmpunten te verdienen. Een rijke woordenschat en langdurige gesprekken leveren grotere beloningen op, terwijl vulgariteit de stadswachten oproept! Je kunt ook boeken schrijven en publiceren bij de Bibliothecaris om Eruditie op te doen en royalty's te verdienen wanneer andere spelers je werken kopen.
+ServerRPGMessage.FeatureGenistar1:		[Huisvesting Genistars]
+ServerRPGMessage.FeatureGenistar2:		Verkrijg een Genistar-ei via een missie en breng het groot in je huistuin! Gebruik speciale focuslenzen en je Eruditie-punten om de groei te sturen en de uiteindelijke gevechtscapaciteiten te bepalen. Selecteer je Genistar en typ '/genistar care' of '/afk care' om hem te verzorgen. Zodra hij volgroeid is, roep je hem op vanuit je inventaris om aan je zijde te vechten!
+ServerRPGMessage.ServerCommandsHeader:	--------- NIEUWE SERVERCOMMANDO'S ---------
+ServerRPGMessage.CmdHelp:				/cmdhelp: Geeft de lijst weer van alle beschikbare commando's in het spel.
+ServerRPGMessage.CmdLanguage:			/language set <EN | FR | DE | ES | IT | NL | CS | RO | VI>: Stel je accounttaal in, zodat alle teksten, beschrijvingen en informatie worden vertaald.
+ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (of /at): Schakel de automatische vertaler in om de dialogen, missies en boeken van andere spelers automatisch naar jouw taal te vertalen.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Zet je persoonlijke markt op, hernoem of sluit deze.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatiseer je crafting-wachtrij en koop eenvoudig ontbrekende receptingrediënten rechtstreeks bij handelaren.
+ServerRPGMessage.CmdCombineList:		/combine list: Toon je succesvol ontdekte combinaties van alternatieve ambachtsvoorwerpen.
+ServerRPGMessage.CmdVol:				/vol of /steal <player>: Steel geld of kostbare Gebiedsrelikwieën van rivaliserende spelers! Het stelt je ook in staat om schatten te stelen die geplunderd zijn uit kisten van een vijandige clan in PvP.
+ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Draai in de richting waar de gespecificeerde mob zich in jouw regio bevindt. Erg handig voor missies!
+ServerRPGMessage.CmdAskName:			/askname: Vraag om de naam van je doelwit om deze weer te geven. Je moet dit doen voordat je ze als vriend kunt toevoegen.
+ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Communiceer met en pas je Genistar-huisdier aan. Selecteer je ei als doelwit om ervoor te zorgen, geef je volwassen metgezel een eigen naam, stuur zijn emotes aan en bewapen hem voor de strijd door zijn zichtbare gevechtsuitrusting te beheren.
+ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Toon informatie en huidige scores voor de actieve PvP-sessie.
+ServerRPGMessage.CmdRvR:				/rvr info: Toon informatie en huidige scores voor de actieve RvR-campagne.
+ServerRPGMessage.GuildCommandsHeader:	--------- NIEUWE GILDECOMMANDO'S ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Bekijk GvG-kaarten en statussen.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Open een portaal direct naar je geclaimde gebieden.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Creëer een tijdelijke PvP-gevechtszone.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Betaal borgtocht om een gildegenoot uit de gevangenis te bevrijden.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Schakel automatische betalingen van gildehuishuur in of uit.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Koop en zet tactische banieren in om je leden of gebiedsbewakers te buffen.
+ServerRPGMessage.Outro:					Veel succes, en moge je nalatenschap in Arcanum legendarisch zijn!

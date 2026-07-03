@@ -54,6 +54,13 @@ namespace DOL.GS.Spells
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
+
+            if (Caster is GamePlayer player && player.ControlledBrain?.Body is GenistarPet)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "SpellHandler.IllusionSpell.GenistarRetreat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.CommandNpcRelease();
+            }
+
             CreateIllusionPets(effect.Owner as GamePlayer);
         }
 
@@ -236,7 +243,7 @@ namespace DOL.GS.Spells
                 var offset = offsets[i];
                 Coordinate coord = target.Coordinate + offset;
                 var walkOffset = coord - masterCoord;
-                (pet.Brain as IllusionPetBrain).SetOffset(walkOffset.X, walkOffset.Y);
+                (pet.Brain as IllusionPetBrain)!.SetOffset(walkOffset.X, walkOffset.Y);
                 if (enableTeleport) // Check LOS for initial placements & teleport, but then walk to the planned offset
                 {
                     RaycastStats stats = new();

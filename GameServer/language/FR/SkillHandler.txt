@@ -280,6 +280,18 @@ SkillBase.RegisterPropertyNames.WraithsightFocus:		Focus : Clairvoyance Spectral
 SkillBase.RegisterPropertyNames.VoidAcolyte:			Acolyte du Néant
 SkillBase.RegisterPropertyNames.VoidAcolyteFocus:		Focus : Acolyte du Néant
 
+SkillBase.RegisterPropertyNames.GenistarProcSpellChance:         Chance de Déclenchement de Proc
+SkillBase.RegisterPropertyNames.GenistarCastRange:               Portée des Sorts et Archerie
+SkillBase.RegisterPropertyNames.GenistarDebuffResistChance:      Chance de Résister aux Affaiblissements
+SkillBase.RegisterPropertyNames.GenistarLeftHandSwingChance:     Chance de Frappe Main Gauche
+SkillBase.RegisterPropertyNames.GenistarMeleeAbsorb:             Absorption des Dégâts de Mêlée
+SkillBase.RegisterPropertyNames.GenistarDotAbsorb:               Absorption des Dégâts de Sorts DoT
+SkillBase.RegisterPropertyNames.GenistarCCResistChance:          Chance de Résistance aux Sorts de Contrôle
+SkillBase.RegisterPropertyNames.GenistarSpellMagicAbsorb:        Absorption des Dégâts de Sorts
+SkillBase.RegisterPropertyNames.GenistarWeaponSpeed:             Vitesse de l'Arme
+SkillBase.RegisterPropertyNames.GenistarAblativeModifier:        Modificateur de Bouclier Ablatif
+
+
 SkillBase.Property.Acuity:               l'Acuité
 SkillBase.Property.AcuityBonusCap:         le Bonus au cap d'Acuité
 SkillBase.Property.AllArcherySkills:      toutes les compétences d'Archerie

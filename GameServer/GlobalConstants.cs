@@ -1399,7 +1399,13 @@ namespace DOL.GS
 
         public static string ShieldTypeToName(int shieldTypeID)
         {
-            return Enum.GetName(typeof(ShieldLevel), shieldTypeID);
+            switch (shieldTypeID)
+            {
+                case ShieldLevel.Small: return "Small";
+                case ShieldLevel.Medium: return "Medium";
+                case ShieldLevel.Large: return "Large";
+                default: return "Unknown";
+            }
         }
 
         public static string ArmorLevelToName(int armorLevel, eRealm realm)
@@ -2402,6 +2408,34 @@ namespace DOL.GS
         }
         #endregion
 
+        public static string GetGenistarItemName(int flag)
+        {
+            switch (flag)
+            {
+                case 30: return "Animal Weaponry";
+                case 31: return "Genistar Swords";
+                case 32: return "Genistar Shields";
+                case 33: return "Genistar Two-Handed";
+                case 34: return "Genistar Left Hand";
+                case 35: return "Genistar Bow";
+                case 36: return "Genistar Behemoth Weapon";
+                case 38: return "Animal Armor";
+                case 39: return "Genistar Armor";
+                case 40: return "Genistar Titan Armor";
+                default: return null;
+            }
+        }
+    }
+
+    public enum eGenistarState : int
+    {
+        Incubating = 0,
+        Egg = 1,
+        Hatched = 2,
+        Dead = 3,
+        Recovering = 4,
+        Archived = 5,    // House was destroyed, record kept for recovery tools
+        InContainer = 6
     }
 
     public static class Constants

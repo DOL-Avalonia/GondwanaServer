@@ -1,5 +1,6 @@
 using DOL.Database;
 using DOL.Database.Attributes;
+using System;
 
 namespace DOLDatabase.Tables
 {
@@ -12,10 +13,14 @@ namespace DOLDatabase.Tables
         private int m_meleeABS;
         private int m_maxhealth;
         private int m_effectiveness;
+        private int m_ccResist;
+        private int m_debuffResist;
+        private int m_castRange;
         private int m_bossDifficulty;
         private double m_ablativeShield;
         private int m_erodibleAblative;
         private double m_playerInRadiusEnhancement;
+        private int m_tasksIgnored;
 
         public DBBossParameters()
         {
@@ -24,9 +29,13 @@ namespace DOLDatabase.Tables
             m_meleeABS = 0;
             m_maxhealth = 0;
             m_effectiveness = 0;
+            m_ccResist = 0;
+            m_debuffResist = 0;
+            m_castRange = 0;
             m_bossDifficulty = 0;
             m_ablativeShield = 0.0;
             m_erodibleAblative = 1;
+            m_tasksIgnored = 0;
         }
 
         [DataElement(AllowDbNull = false, Index = true)]
@@ -72,6 +81,27 @@ namespace DOLDatabase.Tables
         }
 
         [DataElement(AllowDbNull = true)]
+        public int CCResist
+        {
+            get { return m_ccResist; }
+            set { Dirty = true; m_ccResist = Math.Clamp(value, 0, 100); }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int DebuffResist
+        {
+            get { return m_debuffResist; }
+            set { Dirty = true; m_debuffResist = Math.Clamp(value, 0, 100); }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int CastRange
+        {
+            get { return m_castRange; }
+            set { Dirty = true; m_castRange = Math.Clamp(value, 0, 100); }
+        }
+
+        [DataElement(AllowDbNull = true)]
         public int BossDifficulty
         {
             get { return m_bossDifficulty; }
@@ -97,6 +127,13 @@ namespace DOLDatabase.Tables
         {
             get { return m_playerInRadiusEnhancement; }
             set { Dirty = true; m_playerInRadiusEnhancement = value; }
+        }
+
+        [DataElement(AllowDbNull = true)]
+        public int TasksIgnored
+        {
+            get { return m_tasksIgnored; }
+            set { Dirty = true; m_tasksIgnored = value > 0 ? 1 : 0; }
         }
     }
 }

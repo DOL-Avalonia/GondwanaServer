@@ -40,6 +40,7 @@ House.SendHouseInfo.RentDueInSec:			Date du paiement : {0} secondes
 House.EmptyHookpoint.NotOwner:				Seul le propriétaire de la maison peut retirer ou placer des objets sur les points d'ancrage !
 House.EmptyHookpoint.InvalidPosition:		Position du point d'ancrage invalide {0}
 House.EmptyHookpoint.NoItemFound:			Aucun objet d'ancrage trouvé à la position {0}
+House.Genistar.Examine:						Vous examinez l'emplacement du Génistar.
 
 HouseEnterLeave.TooFarAway:					Vous êtes trop loin pour entrer dans la maison {0}.
 HouseEnterLeave.CantEnter:					Vous ne pouvez pas entrer dans la maison {0}.
@@ -81,6 +82,7 @@ HousingPlaceItemHandler.HouseRemoved:           Votre maison a été détruite !
 HousingPlaceItemHandler.NeedHouseDeed:          Ceci ne fonctionnera pas sans un Acte de Propriété.
 HousingPlaceItemHandler.GenistarLimitReached:	Vous avez atteint la limite maximale de {0} Génistar(s) pour votre type de résidence.
 HousingPlaceItemHandler.GenistarVisualPlaced:	Votre Génistar a été placé exactement là où vous vous trouvez.
+HousingPlaceItemHandler.GenistarWalktoPlace:	Vous n'avez pas besoin de placer ceci manuellement. Dirigez-vous simplement près de l'emplacement de votre Génistar dans le jardin et l'objet sera placé automatiquement !
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Vous ciblez le terrain numéro {0}.

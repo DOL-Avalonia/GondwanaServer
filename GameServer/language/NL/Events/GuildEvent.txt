@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		Je hebt {0} verdienstepunten verdiend voor je gilde!
+GuildEvent.MeritPointsAward:		Je gilde krijgt {0} verdienstepunten toegekend!
+GuildEvent.GuildbonusXP:			Je krijgt {0} extra ervaring door de buff van je gilde!
+GuildEvent.GuildbonusRP:			Je krijgt {0} extra realmpunten door de buff van je gilde!
+GuildEvent.GuildbonusBP:			Je krijgt {0} extra premiepunten door de buff van je gilde!
+GuildEvent.GuildBuffEnd:			[Gilde Buff] Je gilde buff is nu uitgewerkt!

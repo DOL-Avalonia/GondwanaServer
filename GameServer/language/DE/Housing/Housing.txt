@@ -39,6 +39,7 @@ House.SendHouseInfo.RentDueInSec:			Miete fällig in: {0} Sekunden
 House.EmptyHookpoint.NotOwner:				Nur der Besitzer eines Hauses kann Gegenstände an Befestigungspunkten entfernen oder platzieren!
 House.EmptyHookpoint.InvalidPosition:		Ungültige Befestigungspunkt-Position {0}
 House.EmptyHookpoint.NoItemFound:			Kein Befestigungspunkt-Gegenstand an Position {0} gefunden
+House.Genistar.Examine:						Du untersuchst den Genistar-Platzhalter.
 
 HouseEnterLeave.TooFarAway:					Ihr seid zu weit weg vom Haus {0} um es zu betreten.
 HouseEnterLeave.CantEnter:					Ihr könnt das Haus {0} nicht betreten.
@@ -80,6 +81,7 @@ HousingPlaceItemHandler.HouseRemoved:           Dein Haus wurde entfernt!
 HousingPlaceItemHandler.NeedHouseDeed:          Das funktioniert nicht ohne eine Hausurkunde.
 HousingPlaceItemHandler.GenistarLimitReached:	Du hast das maximale Limit von {0} Genistar(s) für deine Hausgröße erreicht.
 HousingPlaceItemHandler.GenistarVisualPlaced:	Dein Genistar wurde genau dort platziert, wo du stehst.
+HousingPlaceItemHandler.GenistarWalktoPlace:	Du musst dies nicht manuell platzieren. Gehe einfach in die Nähe deines Genistar-Platzhalters im Garten, und der Gegenstand wird automatisch platziert!
 
 # /Housing LotMarker
 Housing.LotMarker.TargetLotNumber:				Du visierst Grundstücksnummer {0} an.

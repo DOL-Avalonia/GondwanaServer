@@ -402,6 +402,9 @@ namespace DOL.GS.ServerRules
             if (attacker == null || defender == null)
                 return false;
 
+            if (defender is GenistarNPC || defender is GenistarEgg)
+                return false;
+
             if (attacker is GameNPC originalNPCAttacker)
             {
                 //if spawned by an event, check visibility -- Mishura: don't we want to always check visibility?

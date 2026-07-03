@@ -1,0 +1,61 @@
+﻿
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Vítejte v Arcanu, světě zrozeném z popela Velké magické války! V této pohlcující RP/PvP říši bojují rozpadlá království o přežití, zatímco gildy diktují zákony. Přečtěte si prosím posvátné zásady a pravidla serveru na www.arcanum-server.com. Nabruste své čepele, připravte si kouzla a užijte si cestu v Arcanu!
+ServerRPGMessage.Lore1:					Vítejte v Arcanu!
+ServerRPGMessage.Lore2:					Před dvěma tisíci lety bylo Arcanum zářící sítí létajících citadel a manových kovaren. Pak přišla Velká magická válka. Kontinenty byly roztrhány a zanechaly za sebou zjizvený a oslabený svět. Z těchto trosek povstaly tři říše: Valeria, Skeldheim a Sylvaris. Dnes králové vládnou pouze na papíře, ale jsou to gildy, kdo skutečně vládne roztříštěným zemím, zatímco psanci si budují svá vlastní impéria v temném Podzemí. Zvolte svou cestu moudře.
+ServerRPGMessage.FeaturesHeader:		--------- FUNKCE SERVERU ---------
+ServerRPGMessage.FeatureEvents1:		[Dynamické události a úkoly]
+ServerRPGMessage.FeatureEvents2:		Zúčastněte se událostí, které mění svět, a legendárních lovů bossů.
+ServerRPGMessage.FeatureTasks1:			[Úkoly a Tituly]
+ServerRPGMessage.FeatureTasks2:			Napište '/task' pro zobrazení všech dostupných úkolů. Plňte speciální úkoly a získávejte žetony pro TaskMastera k odemknutí nových titulů. Použijte '/title' k zobrazení svých statistik a výběru aktivního titulu.
+ServerRPGMessage.FeatureGvG1:			[Gilda proti Gildě (GvG)]
+ServerRPGMessage.FeatureGvG2:			Obsazujte území a podúzemí. Zmocněte se mocných relikvií a zajistěte své gildě obrovské bonusy.
+ServerRPGMessage.FeatureRvR1:			[Říše proti Říši (RvR)]
+ServerRPGMessage.FeatureRvR2:			Bojujte za svou říši na klasických bojištích od úrovně 20! Zúčastněte se 4 různých kategorií podle vaší úrovně (Začátečník, Standard, Expert, Mistr) a dobývejte pevnosti. Použijte '/rvr info' pro zobrazení globálních informací a skóre.
+ServerRPGMessage.FeatureDungeons1:		[Průzkum Dungeonů]
+ServerRPGMessage.FeatureDungeons2:		Postavte se temnému Podzemí, labyrintu DarkSpire nebo nebezpečné Trhlině v závoji.
+ServerRPGMessage.FeaturePvP1:			[Hráč proti Hráči (PvP)]
+ServerRPGMessage.FeaturePvP2:			Od úrovně {0} se zapojte do epických režimů PvP, jako jsou Deathmatch, Capture the Flag, King of the Hill, Core Run a Biohazard. K zobrazení podrobností relace použijte '/pvp info' a '/pvp scores'.
+ServerRPGMessage.FeatureRenaissance1:	[Renesance]
+ServerRPGMessage.FeatureRenaissance2:	Legendy vyprávějí, že ti, kteří dosáhnou vrcholu své cesty, mohou podstoupit nebezpečnou zkoušku, aby se znovu zrodili. Začněte znovu, ale probuďte se se skrytou, božskou mocí, abyste mohli dobýt ještě mocnější nepřátele.
+ServerRPGMessage.FeatureAFK1:			[Dynamický AFK trénink]
+ServerRPGMessage.FeatureAFK2:			Jste zaneprázdněni v reálném světě? Využijte speciální žetony získané z PvP a úkolů k tréninku své postavy během nepřítomnosti. Postavte se před tréninkového panáka v jakémkoli městě a napište '/afk xp' nebo '/afk combat', abyste získali bojové zkušenosti!
+ServerRPGMessage.FeatureBanker1:		[Bankéř]
+ServerRPGMessage.FeatureBanker2:		Zamiřte na bankéře a zašeptejte 'withdraw money', 'write a check', 'cash a check' nebo 'term deposits' pro správu vašeho bohatství. Můžete také automatizovat platby nájmu za dům.
+ServerRPGMessage.FeatureAltCraft1:		[Alternativní výroba]
+ServerRPGMessage.FeatureAltCraft2:		Namísto spoléhání se na pevné seznamy receptů můžete náhodně kombinovat různé ingredience a objevovat nové předměty! Použijte '/combine list' k zobrazení svých úspěšně objevených receptur. Hráči mohou psát knihy k prodeji receptur nebo během úkolů nacházet vzácné 'grimoáry', které odhalují skryté kombinace.
+ServerRPGMessage.FeatureReputation1:	[Systém reputace]
+ServerRPGMessage.FeatureReputation2:	Opakované zabíjení hráčů mimo PvP zóny snižuje vaši reputaci. Psanci se zápornou reputací nemohou obchodovat s neutrálními hráči ani obchodníky a jsou aktivně pronásledováni městskými strážemi. Ostatní hráči mohou také lovit psance mimo města a poslat je do vězení, čímž získají zlato a body odměn, když odevzdají jejich hlavu městské stráži!
+ServerRPGMessage.FeatureGuildCreation1:	[Nový systém vytváření gildy]
+ServerRPGMessage.FeatureGuildCreation2:	Kupte si prázdný svitek, použijte '/book create <Name>' a '/book write' ke shromáždění zakladatelů, poté jej přineste královskému úředníkovi státní pokladny, aby na něj dal razítko.
+ServerRPGMessage.FeatureGuildLeveling1:	[Zvyšování úrovně gildy]
+ServerRPGMessage.FeatureGuildLeveling2:	Gildy zvyšují svou úroveň dynamicky! S rostoucí silou odemykejte nové příkazy a posilujte svá území.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenalin]
+ServerRPGMessage.FeatureAdrenaline2:	Budujte bitevní napětí v PvE a PvP k rozpoutání zničujících taktických výhod.
+ServerRPGMessage.FeatureAutotranslate1:	[Dynamický automatický překlad]
+ServerRPGMessage.FeatureAutotranslate2:	Prolomte jazykovou bariéru! Nastavte jazyk svého účtu pomocí '/language set', poté aktivujte '/autotranslate' (nebo '/at') a automaticky tak překládejte všechny dialogy hráčů, texty úkolů a knihovnické knihy do vybraného jazyka.
+ServerRPGMessage.FeatureLibrarian1:		[Knihovník a odměny za Roleplay]
+ServerRPGMessage.FeatureLibrarian2:		Zapojte se do smysluplného hraní rolí s ostatními a získejte erudici a body říše. Bohatá slovní zásoba a trvalé konverzace přinášejí větší odměny, zatímco vulgarita přivolá městské stráže! U knihovníka můžete také psát a vydávat knihy, čímž získáte erudici a autorské honoráře, když si vaše díla zakoupí ostatní hráči.
+ServerRPGMessage.FeatureGenistar1:		[Domácí Genistarové]
+ServerRPGMessage.FeatureGenistar2:		Získejte vejce Genistara prostřednictvím úkolu a vychovejte ho na zahradě svého domu! Použijte speciální zaostřovací čočky a své body erudice k formování jeho růstu a určení jeho konečných bojových schopností. Zaměřte svého Genistara a napište '/genistar care' nebo '/afk care', abyste o něj pečovali. Jakmile plně dospěje, vyvolejte ho ze svého inventáře, aby bojoval po vašem boku!
+ServerRPGMessage.ServerCommandsHeader:	--------- NOVÉ PŘÍKAZY SERVERU ---------
+ServerRPGMessage.CmdHelp:				/cmdhelp: Zobrazí seznam všech dostupných příkazů ve hře.
+ServerRPGMessage.CmdLanguage:			/language set <EN | FR | DE | ES | IT | NL | CS | RO | VI>: Nastaví jazyk vašeho účtu tak, aby byly přeloženy všechny texty, popisy a informace.
+ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (nebo /at): Zapne automatický překladač, který automaticky přeloží dialogy ostatních hráčů, úkoly a knihy do vašeho jazyka.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Rozvine, přejmenuje nebo zavře váš osobní trh.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatizuje frontu výroby a snadno nakoupí chybějící ingredience do receptů přímo od obchodníků.
+ServerRPGMessage.CmdCombineList:		/combine list: Zobrazí vámi úspěšně objevené kombinace předmětů pro alternativní výrobu.
+ServerRPGMessage.CmdVol:				/vol nebo /steal <player>: Ukradněte peníze nebo vzácné relikvie území od nepřátelských hráčů! Umožňuje také ukrást poklady vyrabované z truhel nepřátelského klanu v PvP.
+ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Otočí vás do směru, kde se ve vašem regionu nachází určený mob. Velmi užitečné pro úkoly!
+ServerRPGMessage.CmdAskName:			/askname: Zeptá se na jméno vašeho cíle za účelem jeho zobrazení. Toto musíte udělat, než si jej budete moci přidat do přátel.
+ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Komunikujte a přizpůsobte si svého mazlíčka Genistar. Zaměřte se na své vejce, abyste o něj pečovali, dejte svému dospělému společníkovi vlastní jméno, usměrňujte jeho emoce a vyzbrojte jej do bitvy správou jeho viditelného bojového vybavení.
+ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Zobrazí informace a aktuální skóre probíhající PvP relace.
+ServerRPGMessage.CmdRvR:				/rvr info: Zobrazí informace a aktuální skóre probíhající RvR kampaně.
+ServerRPGMessage.GuildCommandsHeader:	--------- NOVÉ GILDNÍ PŘÍKAZY ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Zobrazí mapy a stavy GvG.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Otevře portál přímo do vašich nárokovaných zemí.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Vytvoří dočasnou PvP bojovou zónu.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Zaplatí kauci za propuštění člena gildy z vězení.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Přepne automatické platby nájmu za dům gildy.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Kupte a rozviňte taktické prapory, které posílí vaše členy nebo stráže území.
+ServerRPGMessage.Outro:					Hodně štěstí a ať je váš odkaz v Arcanu legendární!

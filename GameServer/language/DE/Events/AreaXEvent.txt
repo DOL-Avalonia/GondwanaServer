@@ -1,0 +1,8 @@
+Area.Event.Timer.Start:				Ein Ereignis wird ausgelöst, du hast {0} Sekunden Zeit zum Handeln.
+Area.Event.Timer.Stop:				Die Zeit für das Ereignis ist abgelaufen! Versuche es noch einmal!
+Area.Event.CannotUseItemAgain:		Du kannst diesen Gegenstand vorerst nicht noch einmal verwenden!
+Area.Event.ConfirmUseItem:			Bist du sicher, dass du [{0}] verwenden möchtest?
+Area.Event.UsedItem:				Du hast [{0}] verwendet.
+Area.Event.ItemNotInBackpack:		Du hast diesen Gegenstand nicht mehr in deinem Rucksack!
+Area.Event.LeftAreaCancelSingle:	Du hast das Gebiet verlassen, daher ist das Ereignis abgebrochen!
+Area.Event.LeftAreaCancelMultiple:	Alle Spieler haben das Gebiet verlassen, daher ist das Ereignis abgebrochen!

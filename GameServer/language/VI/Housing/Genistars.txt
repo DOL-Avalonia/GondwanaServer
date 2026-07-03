@@ -1,0 +1,112 @@
+# /Genistar System
+Genistar.GenistarPet.LevelUp:				Genistar của bạn đã đạt cấp {0}.
+Genistar.GenistarPet.Examine:				Bạn xem xét {0}. {1} là {2} và nó là một thú cưng Genistar. Để đổi tên sinh vật này hoặc ra lệnh biểu cảm, hãy sử dụng lệnh /genistar lên mục tiêu.
+Genistar.GenistarPet.CantEquip:				Vật phẩm này không thể được trang bị cho Genistar.
+Genistar.GenistarPet.PackFull:				Ba lô của bạn đã đầy! Vật chứa của {0} đã rơi xuống đất.
+Genistar.GenistarPet.PackSuccess:			{0} trở về vật chứa di động trong túi đồ của bạn.
+Genistar.GenistarPet.Died:					Genistar của bạn đã chết! Hãy đưa phần còn lại của nó vào buồng ấp trong nhà của bạn trong vòng 1 giờ, nếu không nó sẽ bị mất vĩnh viễn.
+Genistar.GenistarPet.RemainsDropped:		Túi đồ của bạn đã đầy. Phần còn lại đã rơi xuống đất.
+Genistar.GenistarPet.CannotOnMount:			{0} không thể theo kịp thú cưỡi của bạn và trở về túi đồ.
+
+Genistar.SummonGenistar.PvPContested:		Bạn không thể triệu hồi Genistar của mình trong khu vực tranh chấp PvP hoặc RvR.
+Genistar.SummonGenistar.AlreadySummoned:	Bạn đã có một sinh vật được triệu hồi. Hãy thả nó ra trước khi triệu hồi Genistar.
+Genistar.SummonGenistar.Mounted:			Bạn không thể triệu hồi Genistar khi đang cưỡi thú.
+Genistar.SummonGenistar.NeedItem:			Bạn phải có vật phẩm Thú cưng Genistar trong túi đồ để sử dụng lệnh này.
+Genistar.SummonGenistar.NotFoundDB:			Không tìm thấy Genistar của bạn trong cơ sở dữ liệu di truyền.
+Genistar.SummonGenistar.FailedUse:			Sử dụng vật phẩm Genistar thất bại.
+
+Genistar.GenistarNPC.Awakened:				{0} đã tái tạo hoàn toàn ma trận tế bào của nó và thức tỉnh!
+Genistar.GenistarNPC.Examine:				Bạn xem xét {0}. {1} là {2} và nó là một thú cưng Genistar. Để đổi tên sinh vật này hoặc ra lệnh biểu cảm, hãy sử dụng lệnh /genistar lên mục tiêu.
+Genistar.GenistarNPC.DormantComa:			Sinh vật này đang trong trạng thái hôn mê hồi phục tiềm ẩn. Thời gian còn lại: {0} giây.
+Genistar.GenistarNPC.AlreadyCarry:			Bạn đã sở hữu một người bạn đồng hành Genistar trong túi đồ. Bạn không thể nhặt thêm một con khác cùng lúc.
+Genistar.GenistarNPC.PackDialog:			Bạn có muốn đóng gói '{0}' vào túi đồ của mình không?
+Genistar.GenistarNPC.Level20Required:		Chỉ huy một Genistar trưởng thành trong chiến đấu thực tế yêu cầu Cấp độ 20.
+Genistar.GenistarNPC.RenameHint:			Chọn sinh vật này làm mục tiêu và gõ '/genistar rename <TênMới>' để gửi thông số từ xa mới.
+Genistar.GenistarNPC.PackSuccess:			Bạn đã cất an toàn '{0}' vào vật chứa di động của nó.
+Genistar.GenistarNPC.PackFail:				Ba lô của bạn không đủ sức chứa cho vật chứa này.
+Genistar.GenistarNPC.RefuseStrangers:		Sinh vật nhe răng gầm gừ; nó từ chối thức ăn từ người lạ.
+Genistar.GenistarNPC.RejectSpoiled:			{0} phản ứng dữ dội và từ chối tải trọng đã bị hỏng!
+Genistar.GenistarNPC.MorphStatic:			{0} hấp thụ chất gây đột biến, nhưng hình thái của nó ở trạng thái tĩnh. Không có thay đổi thị giác nào xảy ra.
+Genistar.GenistarNPC.MorphShift:			Cấu trúc gen của {0} đang chuyển dịch! Hình dạng vật lý của nó đã thay đổi.
+Genistar.GenistarNPC.StatExpand:			[Tổng Hợp Trao Đổi Chất]: Sinh lý học của {0} mở rộng vĩnh viễn! (+{1} {2})
+Genistar.GenistarNPC.CombatSharpen:			[Tổng Hợp Trao Đổi Chất]: Các thông số chiến đấu của {0} trở nên sắc bén hơn! (+{1} {2})
+Genistar.GenistarNPC.ResistHarden:			[Tổng Hợp Trao Đổi Chất]: Lớp da của {0} trở nên cứng cáp hơn! (+{1}% {2})
+Genistar.GenistarNPC.SkillEvolve:			[Tổng Hợp Thần Kinh]: {0} tiến hóa sự thành thạo {1} của nó!
+Genistar.GenistarNPCBrain.StopFollow:		{0} ngừng theo sau bạn và quay trở lại khu vườn của nó.
+
+Genistar.GenistarEgg.SealRejects:			Phong ấn sinh trắc học của buồng ấp từ chối chữ ký của bạn.
+Genistar.GenistarEgg.StasisCollapsed:		Trường ngưng đọng đã sụp đổ! Sinh vật đã sẵn sàng để phá vỏ!
+Genistar.GenistarEgg.StasisActive:			[Ngưng Đọng Kích Hoạt]: Khả năng sống sót yêu cầu thêm {0} giây chăm sóc /afk trực tiếp.
+Genistar.GenistarEgg.WeaveLocks:			Cấu trúc di truyền được khóa lại! Lớp vỏ bắt đầu nứt rạn!
+Genistar.GenistarEgg.TooFar:				Bạn đã bước đi quá xa buồng ấp và ngừng chăm sóc nó. Trường ngưng đọng tự động kích hoạt lại.
+
+Genistar.Lifecycle.Degraded:				Vật liệu di truyền của Genistar bị đánh bại đã xuống cấp không thể phục hồi. Buồng ấp trong nhà của bạn hiện đã trống.
+Genistar.Lifecycle.EmbryoFailed:			Trình tự di truyền đã sụp đổ! Phôi thai không thể hình thành.
+Genistar.Lifecycle.IncubationBegun:			Quá trình ấp đã bắt đầu. Sử dụng tính năng chăm sóc /afk để định hình phôi thai bằng các thấu kính.
+Genistar.Lifecycle.RecoveryStarted:			Bạn đặt phần còn lại vào trong buồng ấp. Quá trình phục hồi sinh học sẽ mất 24 giờ.
+Genistar.Lifecycle.RemainsInert:			Những phần còn lại này hoàn toàn trơ và không thể hồi sinh.
+Genistar.Lifecycle.Purged:					Bản thiết kế sinh học của '{0}' đã bị xóa bỏ vĩnh viễn khỏi thế giới. Bệ ngưng đọng trong nhà của bạn hiện đang trống.
+
+Genistar.LensMgr.InvalidLens:				Thấu kính kích hoạt của bạn không hợp lệ (DPS_AF bằng 0).
+Genistar.LensMgr.UnknownLens:				Thấu kính kích hoạt (ID: {0}) không có thuật toán di truyền nào được biết đến.
+Genistar.LensMgr.Absorbs:					Phôi thai hấp thụ ma trận thấu kính! (+{0} {1})
+Genistar.LensMgr.Kneel:						Bạn quỳ xuống và mở rộng trường ngưng đọng giả kim thuật bao trùm buồng ấp.
+Genistar.LensMgr.BreakFocus:				Bạn phá vỡ sự tập trung giả kim thuật và bước ra khỏi buồng ấp.
+Genistar.LensMgr.FocusBroken:				Sự tập trung giả kim thuật của bạn vào buồng ấp đã bị phá vỡ.
+
+Genistar.Chimera.Legendary:					[Cộng Hưởng Giả Kim Thuật]: Sự tổng hợp thấu kính chính xác của bạn hiển thị {0} huyền thoại!
+Genistar.Chimera.Collapse:					Cấu trúc di truyền không ổn định bị sụp đổ dưới sự phức tạp của chính nó! Phôi thai tan rã thành bùn hữu cơ trơ.
+Genistar.Chimera.Birth:						[Sinh Ra Thành Công]: Phiên bản trưởng thành '{0}' thực hiện những bước đi đầu tiên trong khu vườn của bạn!
+
+Genistar.Equip.CantEquip:					Vật phẩm này không thể được trang bị cho Genistar.
+Genistar.Equip.ArmorAnimal:					Bộ giáp này được thiết kế theo cấu trúc chỉ dành cho kiểu hình Động vật (Animal).
+Genistar.Equip.ArmorHumanoid:				Bộ giáp này được thiết kế theo cấu trúc chỉ dành cho kiểu hình Người (Humanoid).
+Genistar.Equip.ArmorTitan:					Bộ giáp này được thiết kế theo cấu trúc chỉ dành cho kiểu hình Titan.
+Genistar.Equip.GearAnimal:					Trang bị này được thiết kế theo cấu trúc chỉ dành cho kiểu hình Động vật (Animal).
+Genistar.Equip.GearTitan:					Trang bị này được thiết kế theo cấu trúc chỉ dành cho kiểu hình Titan.
+Genistar.Equip.GearHumanoid:				Trang bị này được thiết kế theo cấu trúc chỉ dành cho kiểu hình Người (Humanoid).
+Genistar.Equip.Duplicate:					Genistar của bạn đã được trang bị một vật phẩm giống hệt trong ô đó.
+Genistar.Equip.Swapped:						Bạn đã hoán đổi trang bị và lấy lại '{0}' từ Genistar.
+Genistar.Equip.Equipped:					Bạn đã trang bị thành công '{0}' cho Genistar.
+Genistar.Equip.NoMods:						Genistar của bạn không có bản sửa đổi trang bị nào.
+Genistar.Equip.InvalidSlot:					Ô không hợp lệ. Sử dụng right, left, shield, two, distance hoặc armor.
+Genistar.Equip.EmptySlot:					Không có vật phẩm nào được trang bị trong ô đó.
+Genistar.Equip.BackpackFull:				Ba lô của bạn đã đầy. Hãy dọn chỗ trước khi lấy lại trang bị.
+Genistar.Equip.Retrieved:					Bạn thu hồi '{0}' từ Genistar.
+
+
+# /Genistar Command Syntax
+Genistar.Command.Help.Desc:					Trung Tâm Chỉ Huy & Đo Đạc Từ Xa cho các dạng sống Genistar.
+Genistar.Command.Help.Care:					/genistar care - Bật/tắt chế độ tập trung ấp trứng giả kim thuật AFK lên một quả trứng gần đó.
+Genistar.Command.Help.Rename:				/genistar rename <CallSign> - Đặt tên hiển thị tùy chỉnh trên đầu (sử dụng dấu cách để đặt lại về mức cơ sở).
+Genistar.Command.Help.Emote:				/genistar emote <Action> - Kích hoạt chuỗi biểu cảm bộ xương vật lý.
+Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Chuyển đổi ô vũ khí hiển thị (Chỉ dành cho hình Người).
+Genistar.Command.Help.Equip:				/genistar equip <từ ô ba lô> - Trang bị một vật phẩm (vũ khí hoặc áo giáp) trực tiếp từ ba lô của bạn cho Genistar.
+Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Thu hồi trang bị từ Genistar.
+Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <số lượng> - [GM] Thao tác trực tiếp với kinh nghiệm của dạng sống mục tiêu.
+
+Genistar.Command.TargetVisual:				Bạn phải thiết lập mục tiêu hiển thị trực tiếp lên một trong các Genistar đang sống của bạn.
+Genistar.Command.RejectsTelemetry:			Dạng sống này từ chối thông số đo đạc từ xa của bạn; nó chỉ tuân theo người chủ di truyền đích thực của nó.
+Genistar.Command.PhysicalState:				Trạng thái vật lý hiện tại của bạn ngăn cản sự tập trung giả kim thuật cường độ cao.
+Genistar.Command.NearIncubator:				Bạn phải đứng gần buồng ấp trong nhà để phóng chiếu trường Chăm sóc AFK.
+Genistar.Command.NameLimit:					Tên gọi vượt quá giới hạn hiển thị trên đầu. Tối đa 20 ký tự.
+Genistar.Command.NameRestricted:			Chữ ký đó bị hạn chế bởi các giao thức liên lạc của Vương quốc. Truy cập bị từ chối.
+Genistar.Command.RenameDialogReset:			Bạn có ủy quyền xóa thông số đo đạc từ xa tùy chỉnh và thiết lập lại '{0}' về cơ sở sinh học của nó: '{1}' không?
+Genistar.Command.RenameDialog:				Bạn có ủy quyền đặt lại tên '{0}' thành chữ ký hiển thị '{1}' không?
+Genistar.Command.RenameResetSuccess:		Cơ sở sinh học đã được khôi phục. Chữ ký hiển thị: '{0}'.
+Genistar.Command.RenameSuccess:				Thông số đo đạc từ xa đã được ghi nhận. Hiển thị hình ảnh đã cập nhật thành: '{0}'.
+Genistar.Command.EmoteSyntax:				Cú pháp: /genistar emote <Action>\nCó sẵn: angry, bang, beckon, beg, bow, charge, cheer, clap, confuse, cry, dance, flex, kiss, laugh, no, point, ponder, roar, salute, shrug, wave, yes
+Genistar.Command.EmoteUnrecognized:			Bộ xương của dạng sống không nhận dạng được chuỗi biểu cảm '{0}'.
+Genistar.Command.EmoteSuccess:				{0} thực hiện chuỗi biểu cảm: {1}.
+Genistar.Command.VisibleSyntax:				Cú pháp: /genistar visibleweapon <right|left|two|distance>
+Genistar.Command.NoWeaponSwap:				Cấu phẫu học của dạng sống này không hỗ trợ chuyển đổi ô vũ khí hiển thị.
+Genistar.Command.VisibleInvalid:			Ô không hợp lệ. Sử dụng right, left, two hoặc distance.
+Genistar.Command.VisibleShifted:			Ô vũ khí hiển thị của Genistar đã được chuyển đổi.
+Genistar.Command.RemoveSyntax:				Cú pháp: /genistar removeweapon <right|left|shield|two|distance|armor>
+Genistar.Command.AddSyntax:					Cú pháp: /genistar equip <từ ô ba lô>
+Genistar.Command.AddBounds:					Ô ba lô phải nằm trong khoảng từ 1 đến 40.
+Genistar.Command.NoItem:					Không có vật phẩm nào trong ô ba lô đó.
+Genistar.Command.ExpSyntax:				Cú pháp: /genistar exp <add|sub|set> <số lượng>
+Genistar.Command.ExpValid:					Hệ số kinh nghiệm phải là một số nguyên dương hợp lệ.
+Genistar.Command.ExpMode:					Không nhận dạng được chế độ. Sử dụng 'add', 'sub' hoặc 'set'.
+Genistar.Command.ExpSuccess:				Đã chuyển {0:+#;-#;0} XP cho '{1}'. Tổng Sổ Cái: {2} XP. Cấp Độ Kích Hoạt: {3}. Kích Thước Kích Hoạt: {4}.

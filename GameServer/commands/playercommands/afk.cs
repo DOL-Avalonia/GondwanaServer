@@ -17,6 +17,7 @@
  *
  */
 
+using System;
 using DOL.GS.PacketHandler;
 using DOL.GS.SkillHandler;
 using DOL.Language;
@@ -42,11 +43,16 @@ namespace DOL.GS.Commands
             {
                 string mode = args[1];
 
-                if (mode.Equals("attack", System.StringComparison.OrdinalIgnoreCase) ||
-                    mode.Equals("xp", System.StringComparison.OrdinalIgnoreCase) ||
-                    mode.Equals("combat", System.StringComparison.OrdinalIgnoreCase))
+                if (mode.Equals("attack", StringComparison.OrdinalIgnoreCase) ||
+                    mode.Equals("xp", StringComparison.OrdinalIgnoreCase) ||
+                    mode.Equals("combat", StringComparison.OrdinalIgnoreCase))
                 {
                     HandleAfkAttack(client, p);
+                    return;
+                }
+                else if (mode.Equals("care", StringComparison.OrdinalIgnoreCase))
+                {
+                    HandleAfkCare(client, p);
                     return;
                 }
             }
@@ -54,6 +60,12 @@ namespace DOL.GS.Commands
             // ORIGINAL SIMPLE TOGGLE (/afk with no args)
             if (p.IsAfkActive() && args.Length == 1)
             {
+                if (p.TempProperties.getProperty<bool>("IsAfkCareMode", false))
+                {
+                    GenistarLensMgr.DisengageCareMode(p, voluntary: true);
+                    return;
+                }
+
                 p.ClearAFK(showMessage: true);
                 p.DisableSkill(SkillBase.GetAbility(Abilities.Vol), VolAbilityHandler.DISABLE_DURATION_PLAYER);
                 return;
@@ -239,6 +251,40 @@ namespace DOL.GS.Commands
             {
                 p.StartAfkAttackMode(dummy);
             }
+        }
+
+        /// <summary>
+        /// Handles /afk care: Starts the caring cycle on a targeted Genistar Egg 
+        /// to allow incremental pet leveling and growth while remaining stationary.
+        /// </summary>
+        private static void HandleAfkCare(GameClient client, GamePlayer p)
+        {
+            if (!CheckAfkCommonRestrictions(client, p))
+                return;
+
+            if (p.TempProperties.getProperty<bool>("IsAfkCareMode", false))
+            {
+                GenistarLensMgr.DisengageCareMode(p, voluntary: true);
+                return;
+            }
+
+            GenistarEgg eggTarget = null;
+            foreach (GameNPC npc in p.GetNPCsInRadius(300))
+            {
+                if (npc is GenistarEgg e && e.DBRecord != null && e.DBRecord.OwnerID == p.InternalID)
+                {
+                    eggTarget = e;
+                    break;
+                }
+            }
+
+            if (eggTarget == null)
+            {
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Genistar.Command.NearIncubator"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            GenistarLensMgr.EngageCareMode(p, eggTarget);
         }
     }
 }

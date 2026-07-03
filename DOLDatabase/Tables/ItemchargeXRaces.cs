@@ -34,6 +34,17 @@ namespace DOL.Database
         private double m_midgardMinotaurRace;
         private double m_hiberniaMinotaurRace;
         private bool m_isDurationMultiplied;
+        private int m_foodAnimal;
+        private int m_foodDemon;
+        private int m_foodDragon;
+        private int m_foodElemental;
+        private int m_foodGiant;
+        private int m_foodHumanoid;
+        private int m_foodInsect;
+        private int m_foodMagical;
+        private int m_foodReptile;
+        private int m_foodPlant;
+        private int m_foodUndead;
 
         [DataElement(AllowDbNull = false)]
         public string ItemTemplate
@@ -298,5 +309,17 @@ namespace DOL.Database
                 m_isDurationMultiplied = value;
             }
         }
+
+        [DataElement(AllowDbNull = false)] public int FoodAnimal { get { return m_foodAnimal; } set { Dirty = true; m_foodAnimal = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodDemon { get { return m_foodDemon; } set { Dirty = true; m_foodDemon = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodDragon { get { return m_foodDragon; } set { Dirty = true; m_foodDragon = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodElemental { get { return m_foodElemental; } set { Dirty = true; m_foodElemental = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodGiant { get { return m_foodGiant; } set { Dirty = true; m_foodGiant = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodHumanoid { get { return m_foodHumanoid; } set { Dirty = true; m_foodHumanoid = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodInsect { get { return m_foodInsect; } set { Dirty = true; m_foodInsect = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodMagical { get { return m_foodMagical; } set { Dirty = true; m_foodMagical = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodReptile { get { return m_foodReptile; } set { Dirty = true; m_foodReptile = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodPlant { get { return m_foodPlant; } set { Dirty = true; m_foodPlant = value; } }
+        [DataElement(AllowDbNull = false)] public int FoodUndead { get { return m_foodUndead; } set { Dirty = true; m_foodUndead = value; } }
     }
 }

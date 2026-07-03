@@ -6006,6 +6006,17 @@ namespace DOL.GS
 
             base.GainExperience(xpSource, expTotal, expCampBonus, expGroupBonus, expOutpostBonus, sendMessage, allowMultiply, notify, eventMultiplicator);
 
+            if (this.ControlledBrain is ControlledNpcBrain npcBrain && npcBrain.Body is GenistarPet gPet)
+            {
+                double xpFactor = Properties.GENISTAR_XP_RATE;
+                long petExp = (long)(expTotal * 0.10 * xpFactor);
+
+                if (petExp > 0)
+                {
+                    gPet.AddGenistarExperience(petExp);
+                }
+            }
+
             if (IsLevelSecondStage)
             {
                 if (Experience + expTotal < ExperienceForCurrentLevelSecondStage)
@@ -8901,10 +8912,10 @@ namespace DOL.GS
 
             switch (CharacterClass)
             {
-                case PlayerClass.ClassVampiir vampiir:
-                case PlayerClass.ClassMaulerAlb maulerAlb:
-                case PlayerClass.ClassMaulerMid maulerMid:
-                case PlayerClass.ClassMaulerHib maulerHib:
+                case ClassVampiir vampiir:
+                case ClassMaulerAlb maulerAlb:
+                case ClassMaulerMid maulerMid:
+                case ClassMaulerHib maulerHib:
                     return true;
             }
 
@@ -9075,7 +9086,7 @@ namespace DOL.GS
 
             if (bowWeapon)
             {
-                if (ServerProperties.Properties.ALLOW_OLD_ARCHERY)
+                if (Properties.ALLOW_OLD_ARCHERY)
                 {
                     //Draw Time formulas, there are very many ...
                     //Formula 2: y = iBowDelay * ((100 - ((iQuickness - 50) / 5 + iMasteryofArcheryLevel * 3)) / 100)
@@ -12041,7 +12052,7 @@ namespace DOL.GS
                 }
             }
 
-            bool isParchment = useItem.Id_nb.Contains("PARCH", StringComparison.InvariantCultureIgnoreCase);
+            bool isParchment = useItem.Id_nb.Contains("PARCH", StringComparison.InvariantCultureIgnoreCase) || (useItem.Template != null && useItem.Template.Flags == 28) || (useItem.Template != null && useItem.Template.Flags == 4);
             bool isPotion = !isParchment;
             // For potions most can be used by any player level except a few higher level ones.
             // So for the case of potions we will only restrict the level of usage if LevelRequirement is >0 for the item
@@ -13816,6 +13827,15 @@ namespace DOL.GS
 
             CheckForGenistarEggProximity();
 
+            // Break AFK Care mode if active
+            if (TempProperties.getProperty<bool>("IsAfkCareMode", false))
+            {
+                TempProperties.removeProperty("IsAfkCareMode");
+                TempProperties.removeProperty("AfkCareTarget");
+                GenistarLensMgr.DisengageCareMode(this, voluntary: false);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+
             if (IsSitting)
             {
                 Sit(false);
@@ -13972,48 +13992,128 @@ namespace DOL.GS
         /// </summary>
         private void CheckForGenistarEggProximity()
         {
-            InventoryItem eggItem = null;
+            // Collect any genistar-related items from the player's inventory
+            List<InventoryItem> genistarItems = new List<InventoryItem>();
             lock (Inventory)
             {
                 foreach (InventoryItem item in Inventory.AllItems)
                 {
-                    if (item.Template != null && item.Template.Flags == 26)
+                    if (item.Template != null)
                     {
-                        eggItem = item;
-                        break;
+                        if (item.Template.Flags == 26) genistarItems.Add(item); // Egg
+                        else if (item.Id_nb.StartsWith("genistar_pet")) genistarItems.Add(item); // Adult Pet Item
+                        else if (item.Id_nb.StartsWith("genistar_remains")) genistarItems.Add(item); // Dead Remains
                     }
                 }
             }
 
-            if (eggItem != null)
+            if (genistarItems.Count == 0) return;
+
+            foreach (House house in HouseMgr.GetHousesByPlayer(this))
             {
-                foreach (House house in HouseMgr.GetHousesByPlayer(this))
+                if (house.RegionID != this.CurrentRegionID) continue;
+
+                // Load all DBGenistars belonging to this house to see which placeholders are reserved!
+                var houseGenistars = GameServer.Database.SelectObjects<DBGenistar>(DB.Column("HouseNumber").IsEqualTo(house.HouseNumber));
+
+                foreach (var kvp in house.GenistarVisuals)
                 {
-                    if (house.RegionID != this.CurrentRegionID) continue;
+                    int dictKey = kvp.Key;
+                    GameStaticItem visual = kvp.Value;
 
-                    foreach (var kvp in house.GenistarVisuals)
+                    if (visual == null || !this.IsWithinRadius(visual, 200)) continue;
+                    DBGenistar assignedGenistar = houseGenistars.FirstOrDefault(g => g.PlaceholderKey == dictKey);
+
+                    if (assignedGenistar == null)
                     {
-                        int dictKey = kvp.Key;
-                        GameStaticItem visual = kvp.Value;
-
-                        if (visual != null && visual.Model == 1293)
+                        InventoryItem egg = genistarItems.FirstOrDefault(i => i.Template != null && i.Template.Flags == 26);
+                        if (egg != null && visual.Model == 1293)
                         {
-                            if (this.IsWithinRadius(visual, 250))
+                            string rawEggId = egg.Id_nb;
+                            string pureTemplateId = rawEggId.Split('#')[0];
+
+                            bool consumed = false;
+                            bool wasStackFullyDepleted = (egg.Count <= 1);
+
+                            if (egg.Count > 1) consumed = Inventory.RemoveCountFromStack(egg, 1);
+                            else consumed = Inventory.RemoveItem(egg);
+
+                            if (consumed)
                             {
-                                if (Inventory.RemoveItem(eggItem))
+                                if (wasStackFullyDepleted && egg.Template is ItemUnique uniqueEgg)
                                 {
-                                    visual.Model = 3739;
-                                    visual.SaveIntoDatabase();
+                                    var dbUnique = GameServer.Database.FindObjectByKey<ItemUnique>(uniqueEgg.Id_nb);
+                                    if (dbUnique != null) GameServer.Database.DeleteObject(dbUnique);
+                                }
 
-                                    if (house.OutdoorItems.TryGetValue(dictKey, out OutdoorItem outdoorItem))
+                                visual.Model = 3739;
+                                if (house.OutdoorItems.TryGetValue(dictKey, out OutdoorItem outdoorItem))
+                                {
+                                    outdoorItem.BaseItem = egg.Template;
+                                    outdoorItem.DatabaseItem.BaseItemID = pureTemplateId;
+                                    GameServer.Database.SaveObject(outdoorItem.DatabaseItem);
+                                }
+
+                                GenistarLifecycleManager.ProcessEmbryoCreation(this, house.HouseNumber, pureTemplateId, this.EruditionLevel, dictKey);
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.GenistarEggPlaced"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        InventoryItem matchItem = genistarItems.FirstOrDefault(i => i.PackageID == assignedGenistar.GenistarID);
+                        if (matchItem != null)
+                        {
+                            if (matchItem.Id_nb.StartsWith("genistar_remains"))
+                            {
+                                if (Inventory.RemoveItem(matchItem))
+                                {
+                                    if (matchItem.Template is ItemUnique uRemains)
                                     {
-                                        outdoorItem.BaseItem = eggItem.Template;
-                                        outdoorItem.DatabaseItem.BaseItemID = eggItem.Id_nb;
+                                        var dbRemains = GameServer.Database.FindObjectByKey<ItemUnique>(uRemains.Id_nb);
+                                        if (dbRemains != null) GameServer.Database.DeleteObject(dbRemains);
+                                    }
+                                    GenistarLifecycleManager.ProcessRemainsRecovery(this, assignedGenistar.GenistarID, house, dictKey);
+                                }
+                                return;
+                            }
+                            else if (matchItem.Id_nb.StartsWith("genistar_pet"))
+                            {
+                                bool isSummoned = false;
+                                foreach (GameNPC pet in this.GetNPCsInRadius(5000))
+                                {
+                                    if (pet is GenistarPet gpet && gpet.DBRecord?.GenistarID == assignedGenistar.GenistarID)
+                                    {
+                                        isSummoned = true;
+                                        break;
+                                    }
+                                }
+                                if (isSummoned)
+                                {
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.MustReleaseGenistar"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
 
-                                        GameServer.Database.SaveObject(outdoorItem.DatabaseItem);
+                                if (Inventory.RemoveItem(matchItem))
+                                {
+                                    if (matchItem.Template is ItemUnique uPet)
+                                    {
+                                        var dbPet = GameServer.Database.FindObjectByKey<ItemUnique>(uPet.Id_nb);
+                                        if (dbPet != null) GameServer.Database.DeleteObject(dbPet);
                                     }
 
-                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.GenistarEggPlaced"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    assignedGenistar.State = (int)eGenistarState.Hatched;
+                                    GameServer.Database.SaveObject(assignedGenistar);
+
+                                    house.UpdateGenistarVisual(dictKey, 1682);
+
+                                    GenistarNPC adultNpc = new GenistarNPC();
+                                    adultNpc.Position = visual.Position;
+                                    adultNpc.LoadFromGenistarDB(assignedGenistar);
+                                    adultNpc.AddToWorld();
+
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.YouReleaseGenistar", adultNpc.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     return;
                                 }
                             }

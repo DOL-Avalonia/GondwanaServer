@@ -333,9 +333,11 @@ SpellHandler.Occultist.CastCondition4:			Trebuie să părăsești forma actuală
 SpellHandler.Occultist.Self.AbsorbToPower:		Sifonezi {0} mană din atacul primit.
 SpellHandler.Occultist.ArawnsLegion.PetAnswer:			{0} răspunde chemării tale!
 SpellHandler.Occultist.ArawnsLegion.NoTemplateFound:	Șablonul NPC {0} nu a fost găsit.
+SpellHandler.Occultist.ArawnsLegion.GenistarRetreat:	Genistar-ul tău se retrage în inventar în timp ce legiunea este invocată.
 
 SpellHandler.SummonMonster.Target.Resist:			{0} a fost adus din Limbus ca zombie și rămâne insensibil la această vrajă!
 SpellHandler.IllusionSpell.Target.Resist:			{0} a invocat o iluzie și nu poate fi afectat de această vrajă!
+SpellHandler.IllusionSpell.GenistarRetreat:			Genistar-ul tău se retrage în inventar pe măsură ce iluzia prinde efect.
 SpellHandler.Morphed.Target.Resist:			{0} a suferit o metamorfoză și nu poate fi afectat de această vrajă!
 
 SpellHandler.DelveInfo.Sec:			sec

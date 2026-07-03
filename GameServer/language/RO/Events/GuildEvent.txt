@@ -1,0 +1,6 @@
+﻿GuildEvent.EarnedMeritPoints:		Ai câștigat {0} puncte de merit pentru breasla ta!
+GuildEvent.MeritPointsAward:		Breslei tale i se acordă {0} puncte de merit!
+GuildEvent.GuildbonusXP:			Câștigi încă {0} experiență datorită bonusului breslei tale!
+GuildEvent.GuildbonusRP:			Primești încă {0} puncte de tărâm datorită bonusului breslei tale!
+GuildEvent.GuildbonusBP:			Primești încă {0} puncte de recompensă datorită bonusului breslei tale!
+GuildEvent.GuildBuffEnd:			[Bonus de Breaslă] Bonusul breslei tale a expirat!

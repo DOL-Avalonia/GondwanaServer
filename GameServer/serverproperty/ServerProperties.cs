@@ -1233,8 +1233,14 @@ namespace DOL.GS.ServerProperties
         /// <summary>
         /// The percentage of additional base Realm Points earned per Erudition Level
         /// </summary>
-        [ServerProperty("system", "erudition_rp_bonus_percent", "Percentage of additional base RP earned per Erudition Level (e.g. 20 for 20%)", 20)]
+        [ServerProperty("rates", "erudition_rp_bonus_percent", "Percentage of additional base RP earned per Erudition Level (e.g. 20 for 20%)", 20)]
         public static int ERUDITION_RP_BONUS_PERCENT;
+
+        /// <summary>
+        /// The Genistar Experience Rate Modifier
+        /// </summary>
+        [ServerProperty("rates", "genistar_xp_rate", "The Genistar XP Rate Modifier - default 1.0 (means the pet gets 10% of the player's total XP). 0.1 = 1%, 10.0 = 100%.", 1.0)]
+        public static double GENISTAR_XP_RATE = 1.0;
 
         #endregion
 

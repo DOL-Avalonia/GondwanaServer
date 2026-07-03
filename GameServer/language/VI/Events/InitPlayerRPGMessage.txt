@@ -1,0 +1,61 @@
+﻿
+# Server Intro RPG message
+ServerRPGMessage.ShortDescription:		Chào mừng đến với Arcanum, một thế giới được rèn giũa từ tro tàn của Cuộc Đại Chiến Phép Thuật! Trong vương quốc RP/PvP nhập vai này, các vương quốc bị chia cắt tranh giành sự sinh tồn trong khi các Bang hội thiết lập luật lệ. Vui lòng tham khảo các nguyên lý thiêng liêng và luật lệ của máy chủ tại www.arcanum-server.com. Hãy mài sắc lưỡi kiếm, chuẩn bị phép thuật và tận hưởng hành trình của bạn tại Arcanum!
+ServerRPGMessage.Lore1:					Chào mừng đến với Arcanum!
+ServerRPGMessage.Lore2:					Hai ngàn năm trước, Arcanum là một mạng lưới tỏa sáng của các thành trì nổi và lò rèn năng lượng mana. Rồi Cuộc Đại Chiến Phép Thuật nổ ra. Các lục địa bị xé toạc, để lại một thế giới đầy sẹo và suy tàn. Từ đống đổ nát này, ba vương quốc đã trỗi dậy: Valeria, Skeldheim và Sylvaris. Ngày nay, các vị vua chỉ cai trị trên giấy tờ, còn các Bang hội mới là những kẻ thực sự thống trị các vùng đất bị chia cắt, trong khi những kẻ sống ngoài vòng pháp luật tự tạo dựng nên những đế chế riêng trong Thế Giới Ngầm tăm tối. Hãy lựa chọn con đường của bạn một cách khôn ngoan.
+ServerRPGMessage.FeaturesHeader:		--------- TÍNH NĂNG MÁY CHỦ ---------
+ServerRPGMessage.FeatureEvents1:		[Sự kiện Động & Nhiệm vụ]
+ServerRPGMessage.FeatureEvents2:		Tham gia vào các sự kiện làm thay đổi thế giới và các cuộc săn lùng trùm huyền thoại.
+ServerRPGMessage.FeatureTasks1:			[Nhiệm vụ & Danh hiệu]
+ServerRPGMessage.FeatureTasks2:			Gõ '/task' để xem tất cả các nhiệm vụ hiện có. Hoàn thành các nhiệm vụ đặc biệt để kiếm huy hiệu cho Bậc Thầy Nhiệm Vụ và mở khóa các danh hiệu mới. Sử dụng '/title' để xem thống kê của bạn và chọn danh hiệu đang kích hoạt.
+ServerRPGMessage.FeatureGvG1:			[Bang hội vs Bang hội (GvG)]
+ServerRPGMessage.FeatureGvG2:			Chiếm lĩnh các Lãnh thổ và Lãnh thổ phụ. Đoạt lấy các Thánh tích hùng mạnh để ban cho bang hội của bạn những phần thưởng khổng lồ.
+ServerRPGMessage.FeatureRvR1:			[Vương quốc vs Vương quốc (RvR)]
+ServerRPGMessage.FeatureRvR2:			Chiến đấu cho vương quốc của bạn trên các chiến trường cổ điển bắt đầu từ cấp 20! Tham gia vào 4 hạng mục khác nhau dựa trên cấp độ của bạn (Người mới, Tiêu chuẩn, Chuyên gia, Bậc thầy) để đánh chiếm pháo đài. Sử dụng '/rvr info' để xem thông tin toàn cầu và điểm số.
+ServerRPGMessage.FeatureDungeons1:		[Khám phá Hầm ngục]
+ServerRPGMessage.FeatureDungeons2:		Đương đầu với Thế Giới Ngầm sâu thẳm, mê cung DarkSpire hoặc Vết Nứt Màn Sương nguy hiểm.
+ServerRPGMessage.FeaturePvP1:			[Người chơi vs Người chơi (PvP)]
+ServerRPGMessage.FeaturePvP2:			Bắt đầu từ cấp độ {0}, hãy tham gia vào các chế độ PvP hoành tráng bao gồm Tử Chiến, Cướp Cờ, Vua Ngọn Đồi, Core Run và Biohazard. Sử dụng lệnh '/pvp info' và '/pvp scores' để xem chi tiết phiên đấu.
+ServerRPGMessage.FeatureRenaissance1:	[Thời Kỳ Phục Hưng]
+ServerRPGMessage.FeatureRenaissance2:	Truyền thuyết kể rằng những ai đạt đến đỉnh cao của cuộc hành trình có thể thực hiện một thử thách hiểm nghèo để tái sinh. Bắt đầu lại từ đầu, nhưng thức tỉnh với sức mạnh tiềm ẩn, giống như một vị thần để chinh phục những kẻ thù to lớn hơn nữa.
+ServerRPGMessage.FeatureAFK1:			[Huấn luyện AFK Động]
+ServerRPGMessage.FeatureAFK2:			Bạn bận rộn trong thế giới thực? Hãy sử dụng các huy hiệu đặc biệt kiếm được từ PvP và nhiệm vụ để huấn luyện nhân vật của bạn trong lúc đi vắng. Đứng trước một hình nhân tập luyện ở bất kỳ thành phố nào và gõ '/afk xp' hoặc '/afk combat' để nhận kinh nghiệm chiến đấu!
+ServerRPGMessage.FeatureBanker1:		[Nhân Viên Ngân Hàng]
+ServerRPGMessage.FeatureBanker2:		Nhắm mục tiêu vào một nhân viên ngân hàng và thì thầm các lệnh 'withdraw money', 'write a check', 'cash a check' hoặc 'term deposits' để quản lý tài sản của bạn. Bạn cũng có thể tự động hóa việc thanh toán tiền thuê nhà.
+ServerRPGMessage.FeatureAltCraft1:		[Chế tạo Thay thế]
+ServerRPGMessage.FeatureAltCraft2:		Thay vì dựa vào các danh sách công thức cố định, bạn có thể kết hợp ngẫu nhiên nhiều thành phần khác nhau để khám phá những vật phẩm mới! Sử dụng lệnh '/combine list' để xem các công thức bạn đã khám phá thành công. Người chơi có thể viết sách để bán công thức hoặc tìm những 'cuốn ma đạo thư' hiếm trong lúc làm nhiệm vụ để hé lộ những cách kết hợp bí mật.
+ServerRPGMessage.FeatureReputation1:	[Hệ Thống Danh Tiếng]
+ServerRPGMessage.FeatureReputation2:	Việc giết người chơi liên tục bên ngoài các khu vực PvP sẽ làm giảm danh tiếng của bạn. Những kẻ sống ngoài vòng pháp luật với danh tiếng âm không thể giao dịch với người chơi trung lập hoặc thương nhân, và sẽ bị lính gác thành phố chủ động săn lùng. Những người chơi khác cũng có thể săn lùng những tên tội phạm bên ngoài thành phố để tống chúng vào tù, kiếm được vàng và điểm tiền thưởng khi giao nộp thủ cấp của chúng cho lính canh thành phố!
+ServerRPGMessage.FeatureGuildCreation1:	[Hệ Thống Thành Lập Bang Hội Mới]
+ServerRPGMessage.FeatureGuildCreation2:	Hãy mua một cuộn giấy da trống, sử dụng '/book create <Name>' và '/book write' để tập hợp những người sáng lập, sau đó mang nó đến Thư Ký Kho Bạc Hoàng Gia để đóng dấu.
+ServerRPGMessage.FeatureGuildLeveling1:	[Tăng cấp Bang hội]
+ServerRPGMessage.FeatureGuildLeveling2:	Các bang hội tăng cấp một cách linh hoạt! Mở khóa các lệnh mới khi bạn phát triển và củng cố lãnh thổ của mình.
+ServerRPGMessage.FeatureAdrenaline1:	[Adrenaline]
+ServerRPGMessage.FeatureAdrenaline2:	Xây dựng sự căng thẳng trong chiến đấu ở cả PvE và PvP để giải phóng những lợi thế chiến thuật tàn phá.
+ServerRPGMessage.FeatureAutotranslate1:	[Dịch Tự Động Động]
+ServerRPGMessage.FeatureAutotranslate2:	Phá vỡ rào cản ngôn ngữ! Hãy cài đặt ngôn ngữ cho tài khoản của bạn bằng lệnh '/language set', sau đó kích hoạt lệnh '/autotranslate' (hoặc '/at') để tự động dịch tất cả các đoạn hội thoại của người chơi, văn bản nhiệm vụ và sách trong thư viện sang ngôn ngữ bạn đã chọn.
+ServerRPGMessage.FeatureLibrarian1:		[Thủ thư & Phần thưởng Nhập vai]
+ServerRPGMessage.FeatureLibrarian2:		Tham gia vào các hoạt động nhập vai ý nghĩa với những người khác để kiếm được Điểm Uyên Bác và Điểm Vương Quốc. Vốn từ vựng phong phú và các cuộc trò chuyện kéo dài sẽ mang lại phần thưởng lớn hơn, trong khi những lời lẽ thô tục sẽ triệu hồi lính gác thành phố! Bạn cũng có thể viết và xuất bản sách tại chỗ Thủ thư để đạt được Sự Uyên Bác và kiếm tiền bản quyền khi những người chơi khác mua tác phẩm của bạn.
+ServerRPGMessage.FeatureGenistar1:		[Genistar Nuôi Trong Nhà]
+ServerRPGMessage.FeatureGenistar2:		Hãy nhận một quả trứng Genistar thông qua nhiệm vụ và nuôi nấng nó trong khu vườn nhà bạn! Sử dụng các thấu kính tập trung đặc biệt và điểm Uyên Bác của bạn để định hình sự phát triển của nó và xác định khả năng chiến đấu cuối cùng của nó. Nhắm mục tiêu vào Genistar của bạn và gõ lệnh '/genistar care' hoặc '/afk care' để nuôi dưỡng nó. Khi nó đã trưởng thành hoàn toàn, hãy triệu hồi nó từ túi đồ của bạn để sát cánh chiến đấu cùng bạn!
+ServerRPGMessage.ServerCommandsHeader:	--------- CÁC LỆNH MÁY CHỦ MỚI ---------
+ServerRPGMessage.CmdHelp:				/cmdhelp: Hiển thị danh sách tất cả các lệnh có sẵn trong trò chơi.
+ServerRPGMessage.CmdLanguage:			/language set <EN | FR | DE | ES | IT | NL | CS | RO | VI>: Cài đặt ngôn ngữ tài khoản của bạn để tất cả văn bản, mô tả và thông tin sẽ được dịch.
+ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (hoặc /at): Bật trình dịch tự động để tự động dịch các đoạn hội thoại của người chơi khác, nhiệm vụ và sách sang ngôn ngữ của bạn.
+ServerRPGMessage.CmdMarket:				/market <open|close|name>: Triển khai, đổi tên hoặc đóng khu chợ cá nhân của bạn.
+ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Tự động hóa hàng đợi chế tạo của bạn và dễ dàng mua các nguyên liệu công thức còn thiếu trực tiếp từ các thương gia.
+ServerRPGMessage.CmdCombineList:		/combine list: Hiển thị các sự kết hợp vật phẩm chế tạo thay thế mà bạn đã khám phá thành công.
+ServerRPGMessage.CmdVol:				/vol hoặc /steal <player>: Đánh cắp tiền hoặc các Thánh tích Lãnh thổ quý giá từ người chơi đối thủ! Nó cũng cho phép bạn chôm chỉa những kho báu bị cướp từ rương của một bang hội đối lập trong PvP.
+ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Quay người về hướng có chứa quái vật (mob) được chỉ định trong khu vực của bạn. Rất hữu ích cho các nhiệm vụ!
+ServerRPGMessage.CmdAskName:			/askname: Hỏi tên mục tiêu của bạn để hiển thị nó. Bạn phải thực hiện việc này trước khi có thể kết bạn với họ.
+ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Tương tác và tùy chỉnh thú cưng Genistar của bạn. Nhắm mục tiêu vào quả trứng để chăm sóc, đặt một cái tên tùy chỉnh cho người bạn đồng hành trưởng thành, điều khiển biểu cảm của nó và trang bị vũ khí cho nó để chiến đấu bằng cách quản lý trang bị chiến đấu hiển thị.
+ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Hiển thị thông tin và điểm số hiện tại cho phiên đấu PvP đang diễn ra.
+ServerRPGMessage.CmdRvR:				/rvr info: Hiển thị thông tin và điểm số hiện tại cho chiến dịch RvR đang diễn ra.
+ServerRPGMessage.GuildCommandsHeader:	--------- LỆNH BANG HỘI MỚI ---------
+ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Xem bản đồ và trạng thái GvG.
+ServerRPGMessage.GCPortal:				/gc territoryportal : Mở một cổng không gian trực tiếp đến các vùng đất đã được bạn chiếm lĩnh.
+ServerRPGMessage.GCCombatZone:			/gc combatzone : Tạo một khu vực chiến đấu PvP tạm thời.
+ServerRPGMessage.GCJail:				/gc jailrelease <name> : Trả tiền bảo lãnh để giải phóng một thành viên trong bang hội khỏi nhà tù.
+ServerRPGMessage.GCRent:				/gc houserent <on|off> : Bật/tắt thanh toán tiền thuê nhà tự động của bang hội.
+ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Mua và triển khai các lá cờ chiến thuật để buff cho các thành viên hoặc lính gác lãnh thổ của bạn.
+ServerRPGMessage.Outro:					Chúc may mắn, và mong rằng di sản của bạn tại Arcanum sẽ trở thành huyền thoại!

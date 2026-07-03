@@ -259,6 +259,7 @@ GameObjects.GamePlayer.Guild.MeritPoints.Earned:			¡Has obtenido {0} puntos de 
 GameObjects.GamePlayer.OnPlayerMove.CannotCallMount:  ¡Te estás moviendo y no puedes llamar a tu montura!
 GameObjects.GamePlayer.OnPlayerMove.InterruptCrafting: Te mueves e interrumpes tu fabricación.
 GameObjects.GamePlayer.OnPlayerMove.InterruptRangedAttack:	Te mueves e interrumpes tu {0}.
+GameObjects.GamePlayer.OnPlayerMove.StopCareGenistarEgg:	Te mueves y dejas de cuidar el huevo de Genistar.
 
 GameObjects.GamePlayer.OnSkillTrained.TrainsInVarious: {0} entrena en varias especializaciones.
 GameObjects.GamePlayer.OnSkillTrained.YouHave:         Te quedan {0} puntos de especialización en este nivel.
@@ -522,6 +523,8 @@ GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  El efecto de carga c
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   No se encontró el efecto de carga con ID {0}.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Este marcador de posición de Genistar debe colocarse en un espacio del jardín.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Tu huevo de Genistar ha sido colocado en tu jardín. ¡Ahora es tuyo para cuidarlo y moldearlo según tus deseos!
+GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Debes liberar a tu Genistar invocado antes de volver a colocarlo en el jardín.
+GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Liberas a {0} de vuelta en tu jardín para que deambule.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} grita: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} grita algo en un idioma que no entiendes.

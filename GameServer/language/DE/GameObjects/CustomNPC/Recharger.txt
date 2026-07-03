@@ -8,5 +8,7 @@ Scripts.Recharger.RechargerDialogResponse.Decline:	Ihr gebt {0} zum wieder aufla
 Scripts.Recharger.RechargerDialogResponse.FullyCharged:	Hier, bitte, es ist nun wieder voll aufgeladen!
 Scripts.Recharger.RechargerDialogResponse.GiveMoney:	{0} erhält von Euch {1}.
 Scripts.Recharger.RechargerDialogResponse.InvalidItem:	Falscher Gegenstand.
-Scripts.Recharger.RechargerDialogResponse.NotMoney:	Ihr habt dafür nicht genug Geld!
+Scripts.Recharger.RechargerDialogResponse.NotMoney:		Ihr habt dafür nicht genug Geld!
+Scripts.Recharger.Genistar.AreadyHealthy:				Dein Genistar ist bereits bei bester Gesundheit.
+Scripts.Recharger.Genistar.FullyHealed:					Die Gesundheit deines Genistars wurde vollständig wiederhergestellt.
 
