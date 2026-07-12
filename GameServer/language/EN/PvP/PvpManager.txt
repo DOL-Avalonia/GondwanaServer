@@ -26,6 +26,7 @@ PvPManager.Group:						(Group)
 PvPManager.NotEnoughPlayers:				You did not score points because there are not enough players in this PvP session.
 PvPManager.LevelTooLow:						You must be at least level {0} to participate in PvP!
 PvPManager.GroupMemberLevelTooLow:			Your group cannot join! {0} must be at least level {1} to participate in PvP.
+PvPManager.ChestsHaveSpawned:				Congratulations! You ranked in PvP. Three reward chests have spawned at the PvP Teleporter. You may pick ONE.
 
 PvPManager.BossHunt.ScoredPoints:			You scored {0} points on {1}!
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} slew the {2} for {3} points!
@@ -89,6 +90,19 @@ PvPManager.Journal.KotHDesc:				Move to the marked location and secure the area 
 
 PvPManager.Score.Points:					{0} points
 PvPManager.Score.Pts:						{0} pts
+PvPManager.Score.Title:						--- PvP Ending scores for the {1} ---
+PvPManager.Score.NoWinner:					No winner for this session.
+PvPManager.Score.Rank.1:					First
+PvPManager.Score.Rank.2:					Second
+PvPManager.Score.Rank.3:					Third
+PvPManager.Score.Rank.N:					{0}th
+PvPManager.Score.Dialog.Fallback:			- {3} winner {0}: {2} points.
+PvPManager.Score.Dialog.Player.1:			- First winner {0}: {2} points.
+PvPManager.Score.Dialog.Player.2:			- Second winner {0}: {2} points.
+PvPManager.Score.Dialog.Player.3:			- Third winner {0}: {2} points.
+PvPManager.Score.Dialog.Guild.1:			- First winning guild {0}: {2} points.
+PvPManager.Score.Dialog.Guild.2:			- Second winning guild {0}: {2} points.
+PvPManager.Score.Dialog.Guild.3:			- Third winning guild {0}: {2} points.
 PvPManager.Score.Announce.Guild.1:			[PvP] The guild {0} has won first place in {1} with {2} points!
 PvPManager.Score.Announce.Guild.2:			[PvP] The guild {0} has won second place in {1} with {2} points!
 PvPManager.Score.Announce.Guild.3:			[PvP] The guild {0} has won third place in {1} with {2} points!

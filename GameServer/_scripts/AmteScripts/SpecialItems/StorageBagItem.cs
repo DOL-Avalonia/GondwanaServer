@@ -4,9 +4,7 @@ using DOL.GS.PacketHandler;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DOL.GS.ServerProperties;
 
 namespace DOL.GS.Scripts
 {
@@ -17,6 +15,7 @@ namespace DOL.GS.Scripts
     /// </summary>
     public class StorageBagItem : GameInventoryItem
     {
+        private int _cachedFilledSlots = -1;
         public StorageBagItem()
             : base()
         {
@@ -84,6 +83,40 @@ namespace DOL.GS.Scripts
             BagVault = null;
 
             base.OnLose(player);
+        }
+
+        /// <summary>
+        /// Gets the amount of slots actively filled in the bag's vault.
+        /// </summary>
+        public int GetFilledSlotsCount()
+        {
+            if (_cachedFilledSlots == -1)
+            {
+                if (string.IsNullOrEmpty(ObjectId))
+                    return 0;
+
+                _cachedFilledSlots = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("OwnerID").IsEqualTo(ObjectId)
+                    .And(DB.Column("SlotPosition").IsGreaterOrEqualTo((int)eInventorySlot.HouseVault_First))
+                    .And(DB.Column("SlotPosition").IsLessOrEqualTo((int)eInventorySlot.HouseVault_Last))).Count;
+            }
+
+            return _cachedFilledSlots;
+        }
+
+        /// <summary>
+        /// Retrieves the extra weight dynamically based on slots filled in the database.
+        /// </summary>
+        public int GetAdditionalWeight()
+        {
+            return GetFilledSlotsCount() * Properties.STORAGE_BAG_WEIGHT_PER_SLOT;
+        }
+
+        /// <summary>
+        /// Invalidates the cache so the DB is re-queried next time encumbrance is checked.
+        /// </summary>
+        public void InvalidateWeightCache()
+        {
+            _cachedFilledSlots = -1;
         }
     }
 
@@ -238,13 +271,29 @@ namespace DOL.GS.Scripts
             return true;
         }
 
+        public override bool OnAddItem(GamePlayer player, InventoryItem item)
+        {
+            BagItem.InvalidateWeightCache();
+            player.UpdateEncumberance();
+            return base.OnAddItem(player, item);
+        }
+
+        public override bool OnRemoveItem(GamePlayer player, InventoryItem item)
+        {
+            BagItem.InvalidateWeightCache();
+            player.UpdateEncumberance();
+            return base.OnRemoveItem(player, item);
+        }
+
         public void DoMoveItem(GamePlayer player, ushort fromSlot, ushort toSlot, ushort count)
         {
-
             lock (m_vaultSync)
             {
                 this.NotifyPlayers(this, player, _observers, this.MoveItem(player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot, count));
             }
+
+            BagItem.InvalidateWeightCache();
+            player.UpdateEncumberance();
         }
 
         /// <inheritdoc />

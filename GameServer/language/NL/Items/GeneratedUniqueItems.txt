@@ -1,0 +1,556 @@
+ROG.ItemFormat: {0} {1}
+ROG.ItemFormat.Tiered: {0} {1} {2}
+ROG.MobDropFormat: {0}'s {1}
+ROG.ItemFormat.CustomTiered: {1} {0} {2}
+
+# ================================
+# PREFIXES
+# ================================
+ROG.Prefix.Mighty: Machtig
+ROG.Prefix.Adroit: Behendig
+ROG.Prefix.Fortifying: Versterkend
+ROG.Prefix.Speedy: Snel
+ROG.Prefix.Insightful: Inzichtelijk
+ROG.Prefix.Willful: Wilskrachtig
+ROG.Prefix.Attuned: Afgestemd
+ROG.Prefix.Glib: Welbespraakt
+ROG.Prefix.Sturdy: Stevig
+ROG.Prefix.Arcane: Arcaan
+ROG.Prefix.Brilliant: Briljant
+ROG.Prefix.Bodybender: Lichaamsbuiger
+ROG.Prefix.Icebender: IJsbuiger
+ROG.Prefix.Bluntbender: Stompbuiger
+ROG.Prefix.Energybender: Energiebuiger
+ROG.Prefix.Heatbender: Hittebuiger
+ROG.Prefix.Matterbender: Materiebuiger
+ROG.Prefix.Edgebender: Randenbuiger
+ROG.Prefix.Spiritbender: Geestenbuiger
+ROG.Prefix.Thrustbender: Steekbuiger
+ROG.Prefix.Essencebender: Essentiebuiger
+ROG.Prefix.Skillful: Vaardig
+ROG.Prefix.Mystical: Mystiek
+ROG.Prefix.Gladiator: Gladiator
+ROG.Prefix.Duelist: Duellist
+ROG.Prefix.Bowmaster: Boogmeester
+ROG.Prefix.Focused: Gefocust
+ROG.Prefix.Honed: Geslepen
+ROG.Prefix.Battering: Beukend
+ROG.Prefix.Perforator: Perforerend
+ROG.Prefix.Sundering: Klievend
+ROG.Prefix.Decimator: Decimerend
+ROG.Prefix.Tensile: Rekbaar
+ROG.Prefix.Razored: Vlijmscherp
+ROG.Prefix.Crushing: Verpletterend
+ROG.Prefix.Lancenator: Lansier
+ROG.Prefix.Whirling: Wervelend
+ROG.Prefix.Impaling: Spietsend
+ROG.Prefix.Serrated: Gekarteld
+ROG.Prefix.Demolishing: Slopend
+ROG.Prefix.SwatheCutters: Snijdend
+ROG.Prefix.Cleaving: Klievend
+ROG.Prefix.Reapers: Maaier
+ROG.Prefix.Thunderer: Donderend
+ROG.Prefix.Martial: Martiaal
+ROG.Prefix.Lifetaker: Levensnemer
+ROG.Prefix.Truefire: Waarvuur
+ROG.Prefix.Winged: Gevleugeld
+ROG.Prefix.Hawk: Havik
+ROG.Prefix.Dragon: Draken
+ROG.Prefix.Catapult: Katapult
+ROG.Prefix.Snipers: Sluipschutters
+ROG.Prefix.Earthsplitter: Aardsplijter
+ROG.Prefix.SoulCrusher: Zielenbreker
+ROG.Prefix.Spiritbound: Geestgebonden
+ROG.Prefix.Dominating: Dominerend
+ROG.Prefix.Earthborn: Aardegeboren
+ROG.Prefix.Iceborn: IJsgeboren
+ROG.Prefix.Flameborn: Vlamgeboren
+ROG.Prefix.Airy: Luchtig
+ROG.Prefix.Minionbound: Dienaargebonden
+ROG.Prefix.DeathBinder: Doodsbinder
+ROG.Prefix.Painbound: Pijngebonden
+ROG.Prefix.SoulTaker: Zielennemer
+ROG.Prefix.Earthshaker: Aardschokker
+ROG.Prefix.Fervent: Vurig
+ROG.Prefix.Rejuvenating: Verjongend
+ROG.Prefix.Lightbender: Lichtbuiger
+ROG.Prefix.Voidbender: Leegtebuiger
+ROG.Prefix.Starbinder: Sterrenbinder
+ROG.Prefix.Chanter: Zangers
+ROG.Prefix.Mindbinder: Geestbinder
+ROG.Prefix.Forestbound: Woudgebonden
+ROG.Prefix.Plantbound: Plantengebonden
+ROG.Prefix.Animalbound: Diergezind
+ROG.Prefix.Withering: Verdorrend
+ROG.Prefix.ArborDefender: Boomverdediger
+ROG.Prefix.ValeDefender: Valbehoeder
+ROG.Prefix.Shadowbender: Schaduwbuiger
+ROG.Prefix.Spiritbinder: Geestenbinder
+ROG.Prefix.Runebender: Runenbuiger
+ROG.Prefix.Stormcaller: Stormroeper
+ROG.Prefix.Soulbinder: Zielenbinder
+ROG.Prefix.Blighted: Verdorven
+ROG.Prefix.Bodymender: Lichaamsheler
+ROG.Prefix.Empowering: Bekrachtigend
+ROG.Prefix.Ancestral: Voorouderlijk
+ROG.Prefix.Shadowwalker: Schaduwloper
+ROG.Prefix.Venomous: Giftig
+ROG.Prefix.Melodic: Melodieus
+ROG.Prefix.Resonant: Resonerend
+ROG.Prefix.Motivating: Motiverend
+ROG.Prefix.Bladeblocker: Zwaardblokkeerder
+ROG.Prefix.Protectors: Beschermers
+ROG.Prefix.Courageous: Moedig
+ROG.Prefix.Pacifying: Pacificerend
+ROG.Prefix.Savage: Wild
+ROG.Prefix.Nightshade: Nachtschade
+ROG.Prefix.Trail: Spoorzoeker
+ROG.Prefix.Lifebender: Levensbuiger
+ROG.Prefix.Ardent: Vurig
+ROG.Prefix.Deathly: Dodelijk
+ROG.Prefix.Feverish: Koortsig
+ROG.Prefix.Ominous: Onheilspellend
+ROG.Prefix.Tormentbound: Kwellingengebonden
+ROG.Prefix.Wraithbound: Geestgebonden
+ROG.Prefix.VoidBinder: Leegtebinder
+ROG.Prefix.Shrill: Schel
+ROG.Prefix.Keening: Klaaglijk
+ROG.Prefix.Uncanny: Griezelig
+ROG.Prefix.Infernal: Hels
+ROG.Prefix.Bedeviled: Bezeten
+ROG.Prefix.Diabolic: Diabolisch
+ROG.Prefix.Aural: Aura
+ROG.Prefix.Brawling: Knokkend
+ROG.Prefix.Maulers: Beukers
+ROG.Prefix.Magnetic: Magnetisch
+ROG.Prefix.Striking: Opvallend
+ROG.Prefix.Hardened: Gehard
+ROG.Prefix.Impenetrable: Ondoordringbaar
+ROG.Prefix.Swift: Vlug
+ROG.Prefix.Devastating: Verwoestend
+ROG.Prefix.Masterful: Meesterlijk
+ROG.Prefix.Fatal: Fataal
+ROG.Prefix.Unerring: Feilloos
+ROG.Prefix.Accurate: Accuraat
+ROG.Prefix.Vengeful: Wraakzuchtig
+ROG.Prefix.Phalanx: Falanx
+ROG.Prefix.Guarding: Wakend
+ROG.Prefix.Retaliators: Vergeldend
+ROG.Prefix.Tireless: Onvermoeibaar
+ROG.Prefix.Far-Reaching: Verstrekkend
+ROG.Prefix.Piercing: Doordringend
+ROG.Prefix.Projecting: Projecterend
+ROG.Prefix.Transcendent: Transcendent
+ROG.Prefix.Efficient: Efficiënt
+ROG.Prefix.Flawless: Vlekkeloos
+ROG.Prefix.Cataclysmic: Cataclysmisch
+ROG.Prefix.Elusive: Ongrijpbaar
+ROG.Prefix.Deflecting: Afwerend
+ROG.Prefix.Parrying: Parerend
+ROG.Prefix.Troll-blood: Trollenbloed
+ROG.Prefix.Invigorating: Verkwikkend
+ROG.Prefix.Relentless: Meedogenloos
+ROG.Prefix.Awakening: Ontwakend
+ROG.Prefix.Unshaken: Ongebroken
+ROG.Prefix.Unfettered: Ontketend
+ROG.Prefix.Cleansing: Zuiverend
+ROG.Prefix.Fleet: Vlugvoetig
+ROG.Prefix.Amphibious: Amfibisch
+ROG.Prefix.Sure-Strike: Zekere Slag
+ROG.Prefix.Exalted: Verheven
+ROG.Prefix.Apex: Apex
+ROG.Prefix.Ablative: Ablatief
+ROG.Prefix.Volleying: Salverend
+ROG.Prefix.Scavengers: Aaseter
+ROG.Prefix.Augmenting: Vergrotend
+ROG.Prefix.Alacritous: Bereidwillig
+ROG.Prefix.Redeeming: Verlossend
+ROG.Prefix.Enfeebling: Verzwakkend
+ROG.Prefix.Vigorous: Krachtig
+ROG.Prefix.Restorative: Herstellend
+ROG.Prefix.Expansive: Expansief
+ROG.Prefix.Penetrating: Penetrerend
+ROG.Prefix.Ruinous: Ruïneus
+ROG.Prefix.Lingering: Slepend
+ROG.Prefix.Vicious: Vilein
+ROG.Prefix.Unleashed: Losgelaten
+ROG.Prefix.Corporeal: Lichamelijk
+ROG.Prefix.Frost-warded: Vorstbeschermd
+ROG.Prefix.Unshatterable: Onbreekbaar
+ROG.Prefix.Grounded: Geaard
+ROG.Prefix.Fire-forged: Vuurgesmeed
+ROG.Prefix.Immutable: Onveranderlijk
+ROG.Prefix.Unseverable: Onscheidbaar
+ROG.Prefix.Inviolate: Ongeschonden
+ROG.Prefix.Unpierceable: Ondoordringbaar
+ROG.Prefix.Grandiose: Grandioos
+ROG.Prefix.Slaughtering: Slachtend
+ROG.Prefix.Colossal: Kolossaal
+ROG.Prefix.Nullifying: Tenietdoend
+ROG.Prefix.Glancing: Schampend
+ROG.Prefix.Transmuting: Transmuterend
+ROG.Prefix.Siphoning: Hevelend
+ROG.Prefix.Purging: Zuiverend
+ROG.Prefix.Untouchable: Onaantastbaar
+ROG.Prefix.Miraculous: Wonderbaarlijk
+ROG.Prefix.Agonizing: Kwellend
+ROG.Prefix.Ambidextrous: Tweehandig
+ROG.Prefix.Twin-Striking: Tweelingslag
+ROG.Prefix.Flurrying: Vlagen
+ROG.Prefix.Corrosive: Bijtend
+ROG.Prefix.Composed: Beheerst
+ROG.Prefix.Weightless: Gewichtloos
+ROG.Prefix.Unburdened: Ontlast
+ROG.Prefix.Oppressive: Beklemmend
+ROG.Prefix.Everlasting: Eeuwig
+ROG.Prefix.Aegis: Aegis
+ROG.Prefix.Mirroring: Spiegelend
+ROG.Prefix.Titans: Titanen
+ROG.Prefix.Serpents: Slangen
+ROG.Prefix.Leviathans: Leviathan
+ROG.Prefix.Zephyrs: Zefier
+ROG.Prefix.Omniscient: Alwetend
+ROG.Prefix.Divine: Goddelijk
+ROG.Prefix.Harmonic: Harmonisch
+ROG.Prefix.Sovereigns: Soeverein
+ROG.Prefix.Ascendant: Ascendant
+
+# ================================
+# BASE ITEM NAMES (Armor)
+# ================================
+ROG.BaseName.ClothCap: Stoffen Muts
+ROG.BaseName.ClothCoif: Stoffen Kap
+ROG.BaseName.ClothHelm: Stoffen Helm
+ROG.BaseName.ClothSleeves: Stoffen Mouwen
+ROG.BaseName.ClothArms: Stoffen Armen
+ROG.BaseName.ClothBoots: Stoffen Laarzen
+ROG.BaseName.ClothGloves: Stoffen Handschoenen
+ROG.BaseName.ClothGauntlets: Stoffen Pantserhandschoenen
+ROG.BaseName.ClothPants: Stoffen Broek
+ROG.BaseName.ClothLegs: Stoffen Benen
+ROG.BaseName.ClothLeggings: Stoffen Beenstukken
+ROG.BaseName.ClothHauberk: Stoffen Maliënkolder
+ROG.BaseName.ClothBreastplate: Stoffen Borstplaat
+ROG.BaseName.ClothJerkin: Stoffen Wambuis
+ROG.BaseName.ClothVest: Stoffen Vest
+ROG.BaseName.ClothRobe: Stoffen Gewaad
+ROG.BaseName.LeatherCap: Leren Muts
+ROG.BaseName.LeatherCoif: Leren Kap
+ROG.BaseName.LeatherHelm: Leren Helm
+ROG.BaseName.LeatherSleeves: Leren Mouwen
+ROG.BaseName.LeatherArms: Leren Armen
+ROG.BaseName.LeatherBoots: Leren Laarzen
+ROG.BaseName.LeatherGloves: Leren Handschoenen
+ROG.BaseName.LeatherGauntlets: Leren Pantserhandschoenen
+ROG.BaseName.LeatherPants: Leren Broek
+ROG.BaseName.LeatherLegs: Leren Benen
+ROG.BaseName.LeatherLeggings: Leren Beenstukken
+ROG.BaseName.LeatherHauberk: Leren Maliënkolder
+ROG.BaseName.LeatherBreastplate: Leren Borstplaat
+ROG.BaseName.LeatherJerkin: Leren Wambuis
+ROG.BaseName.LeatherVest: Leren Vest
+ROG.BaseName.StuddedCap: Beslagen Muts
+ROG.BaseName.StuddedCoif: Beslagen Kap
+ROG.BaseName.StuddedHelm: Beslagen Helm
+ROG.BaseName.StuddedSleeves: Beslagen Mouwen
+ROG.BaseName.StuddedArms: Beslagen Armen
+ROG.BaseName.StuddedBoots: Beslagen Laarzen
+ROG.BaseName.StuddedGloves: Beslagen Handschoenen
+ROG.BaseName.StuddedGauntlets: Beslagen Pantserhandschoenen
+ROG.BaseName.StuddedPants: Beslagen Broek
+ROG.BaseName.StuddedLegs: Beslagen Benen
+ROG.BaseName.StuddedLeggings: Beslagen Beenstukken
+ROG.BaseName.StuddedHauberk: Beslagen Maliënkolder
+ROG.BaseName.StuddedBreastplate: Beslagen Borstplaat
+ROG.BaseName.StuddedJerkin: Beslagen Wambuis
+ROG.BaseName.StuddedVest: Beslagen Vest
+ROG.BaseName.ChainCap: Maliën Muts
+ROG.BaseName.ChainCoif: Maliën Kap
+ROG.BaseName.ChainHelm: Maliën Helm
+ROG.BaseName.ChainSleeves: Maliën Mouwen
+ROG.BaseName.ChainArms: Maliën Armen
+ROG.BaseName.ChainBoots: Maliën Laarzen
+ROG.BaseName.ChainGloves: Maliën Handschoenen
+ROG.BaseName.ChainGauntlets: Maliën Pantserhandschoenen
+ROG.BaseName.ChainPants: Maliën Broek
+ROG.BaseName.ChainLegs: Maliën Benen
+ROG.BaseName.ChainLeggings: Maliën Beenstukken
+ROG.BaseName.ChainHauberk: Maliënkolder
+ROG.BaseName.ChainBreastplate: Maliën Borstplaat
+ROG.BaseName.ChainJerkin: Maliën Wambuis
+ROG.BaseName.ChainVest: Maliën Vest
+ROG.BaseName.PlateCap: Platen Muts
+ROG.BaseName.PlateCoif: Platen Kap
+ROG.BaseName.PlateHelm: Platen Helm
+ROG.BaseName.PlateFullHelm: Platen Volhelm
+ROG.BaseName.PlateSleeves: Platen Mouwen
+ROG.BaseName.PlateArms: Platen Armen
+ROG.BaseName.PlateBoots: Platen Laarzen
+ROG.BaseName.PlateGloves: Platen Handschoenen
+ROG.BaseName.PlateGauntlets: Platen Pantserhandschoenen
+ROG.BaseName.PlatePants: Platen Broek
+ROG.BaseName.PlateLegs: Platen Benen
+ROG.BaseName.PlateLeggings: Platen Beenstukken
+ROG.BaseName.PlateHauberk: Platen Maliënkolder
+ROG.BaseName.PlateBreastplate: Platen Borstplaat
+ROG.BaseName.PlateJerkin: Platen Wambuis
+ROG.BaseName.PlateVest: Platen Vest
+ROG.BaseName.ReinforcedCap: Versterkte Muts
+ROG.BaseName.ReinforcedCoif: Versterkte Kap
+ROG.BaseName.ReinforcedHelm: Versterkte Helm
+ROG.BaseName.ReinforcedSleeves: Versterkte Mouwen
+ROG.BaseName.ReinforcedArms: Versterkte Armen
+ROG.BaseName.ReinforcedBoots: Versterkte Laarzen
+ROG.BaseName.ReinforcedGloves: Versterkte Handschoenen
+ROG.BaseName.ReinforcedGauntlets: Versterkte Pantserhandschoenen
+ROG.BaseName.ReinforcedPants: Versterkte Broek
+ROG.BaseName.ReinforcedLegs: Versterkte Benen
+ROG.BaseName.ReinforcedLeggings: Versterkte Beenstukken
+ROG.BaseName.ReinforcedHauberk: Versterkte Maliënkolder
+ROG.BaseName.ReinforcedBreastplate: Versterkte Borstplaat
+ROG.BaseName.ReinforcedJerkin: Versterkt Wambuis
+ROG.BaseName.ReinforcedVest: Versterkt Vest
+ROG.BaseName.ScaleCap: Schubben Muts
+ROG.BaseName.ScaleCoif: Schubben Kap
+ROG.BaseName.ScaleHelm: Schubben Helm
+ROG.BaseName.ScaleSleeves: Schubben Mouwen
+ROG.BaseName.ScaleArms: Schubben Armen
+ROG.BaseName.ScaleBoots: Schubben Laarzen
+ROG.BaseName.ScaleGloves: Schubben Handschoenen
+ROG.BaseName.ScaleGauntlets: Schubben Pantserhandschoenen
+ROG.BaseName.ScalePants: Schubben Broek
+ROG.BaseName.ScaleLegs: Schubben Benen
+ROG.BaseName.ScaleLeggings: Schubben Beenstukken
+ROG.BaseName.ScaleHauberk: Schubbenkolder
+ROG.BaseName.ScaleBreastplate: Schubben Borstplaat
+ROG.BaseName.ScaleJerkin: Schubben Wambuis
+ROG.BaseName.ScaleVest: Schubben Vest
+
+# ================================
+# BASE ITEM NAMES (Weapons)
+# ================================
+ROG.BaseName.Dagger: Dolk
+ROG.BaseName.Dirk: Mes
+ROG.BaseName.Gladius: Gladius
+ROG.BaseName.Stiletto: Stiletto
+ROG.BaseName.Axe: Bijl
+ROG.BaseName.Cleaver: Hakmes
+ROG.BaseName.Rapier: Rapier
+ROG.BaseName.Sword: Zwaard
+ROG.BaseName.HookedSword: Haakzwaard
+ROG.BaseName.Falcata: Falcata
+ROG.BaseName.Scimitar: Kromzwaard
+ROG.BaseName.Jambiya: Jambiya
+ROG.BaseName.Sabre: Sabel
+ROG.BaseName.Khopesh: Khopesh
+ROG.BaseName.Wakazashi: Wakizashi
+ROG.BaseName.Greatsword: Grootzwaard
+ROG.BaseName.WarCleaver: Oorlogshakmes
+ROG.BaseName.GreatFalcata: Grote Falcata
+ROG.BaseName.GreatFalchion: Grote Falchion
+ROG.BaseName.TrollSplitter: Trollensplijter
+ROG.BaseName.Katana: Katana
+ROG.BaseName.Greave: Scheenplaat
+ROG.BaseName.Claw: Klauw
+ROG.BaseName.Fang: Hoektand
+ROG.BaseName.Greataxe: Grote Bijl
+ROG.BaseName.GreatHammer: Grote Hamer
+ROG.BaseName.Shillelagh: Knuppel
+ROG.BaseName.WarMattock: Oorlogshouweel
+ROG.BaseName.Mace: Strijdknots
+ROG.BaseName.Hammer: Hamer
+ROG.BaseName.Adze: Dissel
+ROG.BaseName.Club: Knots
+ROG.BaseName.Sickle: Sikkel
+ROG.BaseName.Lute: Luit
+ROG.BaseName.Mandolin: Mandoline
+ROG.BaseName.Drum: Trommel
+ROG.BaseName.Flute: Fluit
+ROG.BaseName.Harp: Harp
+ROG.BaseName.Spear: Speer
+ROG.BaseName.Harpoon: Harpoen
+ROG.BaseName.Trident: Drietand
+ROG.BaseName.ShortSpear: Korte Speer
+ROG.BaseName.LongSpear: Lange Speer
+ROG.BaseName.WarSpear: Oorlogsspeer
+ROG.BaseName.CompositeBow: Samengestelde Boog
+ROG.BaseName.GreatCompositeBow: Grote Samengestelde Boog
+ROG.BaseName.HuntingBow: Jachtboog
+ROG.BaseName.Longbow: Handboog
+ROG.BaseName.HeavyLongbow: Zware Handboog
+ROG.BaseName.RecurveBow: Recurveboog
+ROG.BaseName.GreatRecurveBow: Grote Recurveboog
+ROG.BaseName.ShortBow: Korte Boog
+ROG.BaseName.Crossbow: Kruisboog
+ROG.BaseName.MorningStar: Goedendag
+ROG.BaseName.Flail: Vlegel
+ROG.BaseName.WeightedFlail: Verzwaarde Vlegel
+ROG.BaseName.Whip: Zweep
+ROG.BaseName.Chain: Ketting
+ROG.BaseName.WarChain: Oorlogsketting
+ROG.BaseName.BigShillelagh: Grote Knuppel
+ROG.BaseName.HandAxe: Handbijl
+ROG.BaseName.BeardedAxe: Baardbijl
+ROG.BaseName.WarAxe: Oorlogsbijl
+ROG.BaseName.LochaberAxe: Lochaberbijl
+ROG.BaseName.Pike: Piek
+ROG.BaseName.LucerneHammer: Luzerner Hamer
+ROG.BaseName.Scythe: Zeis
+ROG.BaseName.MartialScythe: Vechtzeis
+ROG.BaseName.WarScythe: Oorlogszeis
+ROG.BaseName.SmallShield: Klein Schild
+ROG.BaseName.MediumShield: Gemiddeld Schild
+ROG.BaseName.LargeShield: Groot Schild
+ROG.BaseName.MaulerStaff: Ranselstaf
+ROG.BaseName.Quarterstaff: Vechtstok
+ROG.BaseName.ShodQuarterstaff: Beslagen Vechtstok
+ROG.BaseName.HeavyShodQuarterstaff: Zware Beslagen Vechtstok
+ROG.BaseName.FistWrap: Vuistwikkel
+ROG.BaseName.HandWrap: Handwikkel
+ROG.BaseName.StuddedFistWrap: Beslagen Vuistwikkel
+ROG.BaseName.StuddedHandWrap: Beslagen Handwikkel
+ROG.BaseName.SpikedFistWrap: Gepunte Vuistwikkel
+
+# ================================
+# BASE ITEM NAMES (Magical)
+# ================================
+ROG.BaseName.Mantle: Mantel
+ROG.BaseName.Cloak: Omslagdoek
+ROG.BaseName.Belt: Riem
+ROG.BaseName.Girdle: Gordel
+ROG.BaseName.Choker: Halsband
+ROG.BaseName.Pendant: Hanger
+ROG.BaseName.Gem: Edelsteen
+ROG.BaseName.Jewel: Juweel
+ROG.BaseName.Bracelet: Armband
+ROG.BaseName.Bracer: Armbeschermer
+ROG.BaseName.Ring: Ring
+ROG.BaseName.Wrap: Wikkeldoek
+ROG.BaseName.Mythirian: Mythiriaan
+
+# ================================================================
+# TIER 1 PREFIXES (Level 36-48) - Commonality / Base Thematics
+# ================================================================
+ROG.TierPrefix.1_ClassicOverworld_Global: Ruig
+ROG.TierPrefix.1_ClassicDungeons_Global: Stoffig
+ROG.TierPrefix.1_ClassicDungeons_CryptsAndUndead: Griezelig
+ROG.TierPrefix.1_ClassicDungeons_CavesAndNature: Mossig
+ROG.TierPrefix.1_ClassicDungeons_VolcanicAndEarth: Verkoolde
+ROG.TierPrefix.1_ClassicDungeons_GlacialAndAquatic: Kille
+ROG.TierPrefix.1_ClassicDungeons_MagicalAndEthereal: Gloeiend
+ROG.TierPrefix.1_ClassicDungeons_DemonicAndAbyss: Bezoedeld
+ROG.TierPrefix.1_ClassicDungeons_BeastAndGoblinoid: Stam
+ROG.TierPrefix.1_AtlantisOverworld_Global: Getijgespoeld
+ROG.TierPrefix.1_AtlantisDungeons_CryptsAndUndead: Gezonken
+ROG.TierPrefix.1_AtlantisDungeons_VolcanicAndEarth: Kokend
+ROG.TierPrefix.1_AtlantisDungeons_GlacialAndAquatic: Pelagisch
+ROG.TierPrefix.1_AtlantisDungeons_MagicalAndEthereal: Parelmoer
+ROG.TierPrefix.1_Catacombs_CryptsAndUndead: Begraven
+ROG.TierPrefix.1_Catacombs_CavesAndNature: Ondergronds
+ROG.TierPrefix.1_Catacombs_VolcanicAndEarth: Smeulend
+ROG.TierPrefix.1_Catacombs_GlacialAndAquatic: Vochtig
+ROG.TierPrefix.1_Catacombs_MagicalAndEthereal: Gesluierd
+ROG.TierPrefix.1_Catacombs_DemonicAndAbyss: Gecorrumpeerd
+ROG.TierPrefix.1_Catacombs_BeastAndGoblinoid: Woest
+ROG.TierPrefix.1_DeepCatacombs_CryptsAndUndead: Verlaten
+ROG.TierPrefix.1_DeepCatacombs_CavesAndNature: Diep
+ROG.TierPrefix.1_DeepCatacombs_VolcanicAndEarth: Basalt
+ROG.TierPrefix.1_DeepCatacombs_GlacialAndAquatic: Bevroren
+ROG.TierPrefix.1_DeepCatacombs_MagicalAndEthereal: Lichtgevend
+ROG.TierPrefix.1_DeepCatacombs_DemonicAndAbyss: Kwaadaardig
+ROG.TierPrefix.1_DeepCatacombs_BeastAndGoblinoid: Oer
+ROG.TierPrefix.1_MythicalZones_Global: Legendarisch
+ROG.TierPrefix.1_MythicalZones_CavesAndNature: Ontembare
+ROG.TierPrefix.1_MythicalZones_VolcanicAndEarth: Sintelgeraakt
+ROG.TierPrefix.1_MythicalZones_MagicalAndEthereal: Opstijgend
+ROG.TierPrefix.1_Battlegrounds_Global: Soldaten
+
+# ================================================================
+# TIER 2 PREFIXES (Level 49-64) - High Quality / Rare Thematics
+# ================================================================
+ROG.TierPrefix.2_ClassicOverworld_Global: Superieur
+ROG.TierPrefix.2_ClassicDungeons_Global: Uitzonderlijk
+ROG.TierPrefix.2_ClassicDungeons_CryptsAndUndead: Macaber
+ROG.TierPrefix.2_ClassicDungeons_CavesAndNature: Overwoekerd
+ROG.TierPrefix.2_ClassicDungeons_VolcanicAndEarth: Vuur
+ROG.TierPrefix.2_ClassicDungeons_GlacialAndAquatic: Gletsjer
+ROG.TierPrefix.2_ClassicDungeons_MagicalAndEthereal: Resonerend
+ROG.TierPrefix.2_ClassicDungeons_DemonicAndAbyss: Duivels
+ROG.TierPrefix.2_ClassicDungeons_BeastAndGoblinoid: Verwilderd
+ROG.TierPrefix.2_AtlantisOverworld_Global: Atlantisch
+ROG.TierPrefix.2_AtlantisDungeons_CryptsAndUndead: Verdronken
+ROG.TierPrefix.2_AtlantisDungeons_VolcanicAndEarth: Geothermisch
+ROG.TierPrefix.2_AtlantisDungeons_GlacialAndAquatic: Benthisch
+ROG.TierPrefix.2_AtlantisDungeons_MagicalAndEthereal: Arcaan
+ROG.TierPrefix.2_Catacombs_CryptsAndUndead: Graf
+ROG.TierPrefix.2_Catacombs_CavesAndNature: Hol
+ROG.TierPrefix.2_Catacombs_VolcanicAndEarth: Vulkanisch
+ROG.TierPrefix.2_Catacombs_GlacialAndAquatic: Overstroomd
+ROG.TierPrefix.2_Catacombs_MagicalAndEthereal: Raadselachtig
+ROG.TierPrefix.2_Catacombs_DemonicAndAbyss: Hels
+ROG.TierPrefix.2_Catacombs_BeastAndGoblinoid: Monsterlijk
+ROG.TierPrefix.2_DeepCatacombs_CryptsAndUndead: Gedoemd
+ROG.TierPrefix.2_DeepCatacombs_CavesAndNature: Diepgaand
+ROG.TierPrefix.2_DeepCatacombs_VolcanicAndEarth: Obsidiaan
+ROG.TierPrefix.2_DeepCatacombs_GlacialAndAquatic: Kristallijn
+ROG.TierPrefix.2_DeepCatacombs_MagicalAndEthereal: Numineus
+ROG.TierPrefix.2_DeepCatacombs_DemonicAndAbyss: Sinister
+ROG.TierPrefix.2_DeepCatacombs_BeastAndGoblinoid: Vleesetend
+ROG.TierPrefix.2_MythicalZones_Global: Heroïsch
+ROG.TierPrefix.2_MythicalZones_CavesAndNature: Heilig
+ROG.TierPrefix.2_MythicalZones_VolcanicAndEarth: Zwavel
+ROG.TierPrefix.2_MythicalZones_MagicalAndEthereal: Transcendent
+ROG.TierPrefix.2_Battlegrounds_Global: Veteranen
+
+# ================================================================
+# TIER 3 PREFIXES (Level 65+) - Exceptional / Epic Thematics
+# ================================================================
+ROG.TierPrefix.3_ClassicOverworld_Global: Voortreffelijk
+ROG.TierPrefix.3_ClassicDungeons_Global: Eerbiedwaardig
+ROG.TierPrefix.3_ClassicDungeons_CryptsAndUndead: Necrotisch
+ROG.TierPrefix.3_ClassicDungeons_CavesAndNature: Bos
+ROG.TierPrefix.3_ClassicDungeons_VolcanicAndEarth: Magmatisch
+ROG.TierPrefix.3_ClassicDungeons_GlacialAndAquatic: Cryogeen
+ROG.TierPrefix.3_ClassicDungeons_MagicalAndEthereal: Etherisch
+ROG.TierPrefix.3_ClassicDungeons_DemonicAndAbyss: Abyssaal
+ROG.TierPrefix.3_ClassicDungeons_BeastAndGoblinoid: Bestiaal
+ROG.TierPrefix.3_AtlantisOverworld_Global: Leviathan
+ROG.TierPrefix.3_AtlantisDungeons_CryptsAndUndead: Onpeilbaar
+ROG.TierPrefix.3_AtlantisDungeons_VolcanicAndEarth: Tektonisch
+ROG.TierPrefix.3_AtlantisDungeons_GlacialAndAquatic: Hadal
+ROG.TierPrefix.3_AtlantisDungeons_MagicalAndEthereal: Oer
+ROG.TierPrefix.3_Catacombs_CryptsAndUndead: Onsterfelijk
+ROG.TierPrefix.3_Catacombs_CavesAndNature: Tellurisch
+ROG.TierPrefix.3_Catacombs_VolcanicAndEarth: Kernessen
+ROG.TierPrefix.3_Catacombs_GlacialAndAquatic: Zondvloed
+ROG.TierPrefix.3_Catacombs_MagicalAndEthereal: Ley-doordrenkt
+ROG.TierPrefix.3_Catacombs_DemonicAndAbyss: Diabolisch
+ROG.TierPrefix.3_Catacombs_BeastAndGoblinoid: Apex
+ROG.TierPrefix.3_DeepCatacombs_CryptsAndUndead: Apocalyptisch
+ROG.TierPrefix.3_DeepCatacombs_CavesAndNature: Geomancer's
+ROG.TierPrefix.3_DeepCatacombs_VolcanicAndEarth: Mantel-geboren
+ROG.TierPrefix.3_DeepCatacombs_GlacialAndAquatic: Absoluut
+ROG.TierPrefix.3_DeepCatacombs_MagicalAndEthereal: Stergesmeed
+ROG.TierPrefix.3_DeepCatacombs_DemonicAndAbyss: Neder
+ROG.TierPrefix.3_DeepCatacombs_BeastAndGoblinoid: Roofdier
+ROG.TierPrefix.3_MythicalZones_Global: Hemels
+ROG.TierPrefix.3_MythicalZones_CavesAndNature: Yggdrasils
+ROG.TierPrefix.3_MythicalZones_VolcanicAndEarth: Tartaars
+ROG.TierPrefix.3_MythicalZones_MagicalAndEthereal: Kosmisch
+ROG.TierPrefix.3_Battlegrounds_Global: Krijgsheer
+
+# ================================
+# PVP / RVR CUSTOM TIER PREFIXES
+# ================================
+ROG.TierPrefix.Mythical: Mythisch
+ROG.TierPrefix.Exalted: Verheven
+ROG.TierPrefix.Fabled: Fabelachtig
+ROG.TierPrefix.Legendary: Legendarisch
+ROG.TierPrefix.Eminent: Eminent
+ROG.TierPrefix.Illustrious: Doorluchtig
+ROG.TierPrefix.Epic: Episch
+ROG.TierPrefix.Superior: Superieur
+ROG.TierPrefix.Flawless: Vlekkeloos
+ROG.TierPrefix.Rare: Zeldzaam
+ROG.TierPrefix.Fine: Verfijnd
+ROG.TierPrefix.Uncommon: Ongewoon

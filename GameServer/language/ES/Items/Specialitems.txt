@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					Los fuegos artificiales comenzarán en {0} segundos.
+
+Items.Specialitems.BeerAlreadyDrinking:				¡Ya estás bebiendo!
+Items.Specialitems.BeerDrinkDistance:				bebidas
+
+Items.Specialitems.PlaceAssiseTooFar:				Estás demasiado lejos para sentarte.
+Items.Specialitems.PlaceAssiseTaken:				El sitio ya está ocupado.
+
+Items.Specialitems.GuarkRingListened:				Tu petición ha sido escuchada.
+Items.Specialitems.GuarkRingUsed:					Sientes un aura poderosa que te inmoviliza.
+Items.Specialitems.GuarkRingNoPower:				No tienes suficiente energía vital en tus venas para usar el anillo.
+Items.Specialitems.GuarkAmuletNoPower:				No tienes suficiente energía vital en tus venas para usar el amuleto.
+Items.Specialitems.GuarkRingTPCancelMoved:			Te has movido, la petición mágica ha fallado y no puedes teletransportarte.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Te has quitado el anillo del dedo, la petición mágica ha fallado y no puedes teletransportarte.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Te has quitado el amuleto del cuello, la petición mágica ha fallado y no puedes teletransportarte.
+Items.Specialitems.GuarkRingTPFailed:				La magia celestial ha fallado, destino desconocido.
+Items.Specialitems.GuarkRingTPNone:					No se ha hecho ninguna petición, tu destino es desconocido.
+Items.Specialitems.GuarkRingUsageCombat:			¡No puedes usar magia celestial mientras estás en combate!
+Items.Specialitems.GuarkRingUsageHere:				La magia celestial no existe en este lugar.
+Items.Specialitems.GuarkRingUsageJailed:			¡No puedes usar magia celestial mientras estás encarcelado!
+Items.Specialitems.GuarkRingUsageMounted:			¡No puedes usar magia celestial desde una montura!
+Items.Specialitems.GuarkRingUsageStealthed:			No puedes usar magia celestial mientras estás en sigilo.
+Items.Specialitems.GuarkRingUsagePetrified:			¡No puedes usar magia celestial mientras estás petrificado!
+Items.Specialitems.GuarkRingUsageDamned:			¡No puedes usar magia celestial mientras estás maldito!
+Items.Specialitems.GuarkRingUsageCantThisForm:		¡No puedes usar magia celestial mientras estás en esta forma!
+Items.Specialitems.GuarkRingUsageMorphed:			¡No puedes usar magia celestial mientras estás bajo un encantamiento de "{0}"!
+Items.Specialitems.GuarkRingUsageCrafting:			¡No puedes usar magia celestial mientras estás fabricando!
+Items.Specialitems.GuarkRingUsageDuel:				¡No puedes usar magia celestial mientras estás en un duelo!
+Items.Specialitems.GuarkRingUsageStealing:			¡No puedes usar magia celestial mientras robas a otro jugador!
+Items.Specialitems.GuarkRingUsageAFK:				¡No puedes usar magia celestial mientras estás AFK!
+Items.Specialitems.GuarkRingUsageClimbing:			¡No puedes usar magia celestial mientras escalas!
+Items.Specialitems.GuarkRingUsageRelic:				No puedes usar magia celestial mientras llevas una reliquia de territorio.
+Items.Specialitems.GuarkRingCannotUseHere:			No puedes usar este objeto aquí.
+Items.Specialitems.GuarkRingDoNotMove:				Debes permanecer en el mismo lugar para usar este objeto.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Has estado en combate recientemente, por lo que debes esperar para poder usar este objeto de nuevo.
+
+Items.Specialitems.MiniPetNoCast:					¡No puedes lanzar este hechizo aquí!
+
+Items.Specialitems.FirecampNoSit:					No te sientes cerca de una hoguera para eliminar este efecto.
+Items.Specialitems.FirecampHeatRegen:				El calor de la hoguera te permite recuperar salud más rápido.
+
+Items.Specialitems.StorageBag.NoBag:				¡No estás viendo una bolsa!
+Items.Specialitems.StorageBag.BadItem:				¡No puedes poner este objeto en esta bolsa!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		¡Tu {0} se hace añicos tras activarse al morir!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		¡Fallo al destruir el objeto por alguna razón!
+Items.Specialitems.DieTriggerSpell.FailRez:			La maldición que afecta a tu cadáver es demasiado fuerte aquí, ¡el hechizo de resurrección fracasa!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		Tu {0} se ha agotado y ha sido eliminado de tu inventario.

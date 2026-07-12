@@ -41,7 +41,7 @@ namespace DOL.GS.Commands
             if (IsSpammingCommand(client.Player, "language"))
                 return;
 
-            if (client.Account.PrivLevel == (uint)ePrivLevel.Player && !DOL.GS.ServerProperties.Properties.ALLOW_CHANGE_LANGUAGE)
+            if (client.Account.PrivLevel == (uint)ePrivLevel.Player && !ServerProperties.Properties.ALLOW_CHANGE_LANGUAGE)
             {
                 DisplayMessage(
                     client,

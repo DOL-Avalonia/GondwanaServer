@@ -59,6 +59,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Timers;
+using static AmteScripts.PvP.PvPScore;
 using static DOL.GS.Spells.SpellHandler;
 
 namespace DOL.GS
@@ -12208,6 +12209,272 @@ namespace DOL.GS
             return true;
         }
 
+        public bool TryAddToStorageBagTemplate(InventoryItem template, int count)
+        {
+            List<StorageBagItem> bags = new List<StorageBagItem>();
+            lock (Inventory)
+            {
+                foreach (InventoryItem invItem in Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                {
+                    if (invItem is StorageBagItem sbi && sbi.CanHoldItem(template))
+                        bags.Add(sbi);
+                }
+            }
+
+            if (bags.Count == 0) return false;
+
+            int totalSpace = 0;
+            foreach (var bag in bags)
+            {
+                StorageBagVault vault = new StorageBagVault(this, bag);
+                var dbItems = vault.DBItems(this);
+
+                int emptySlots = vault.VaultSize - dbItems.Count;
+                if (template.IsStackable)
+                {
+                    foreach (var vItem in dbItems)
+                    {
+                        if (vItem.Id_nb == template.Id_nb && vItem.Count < vItem.MaxCount)
+                            totalSpace += vItem.MaxCount - vItem.Count;
+                    }
+                }
+                totalSpace += emptySlots * (template.MaxCount > 0 ? template.MaxCount : 1);
+            }
+
+            if (totalSpace < count) return false;
+
+            int remaining = count;
+            bool addedToBag = false;
+
+            foreach (var bag in bags)
+            {
+                if (remaining <= 0) break;
+
+                StorageBagVault vault = new StorageBagVault(this, bag);
+                var dbItems = vault.DBItems(this);
+                Dictionary<int, InventoryItem> updatedItems = new Dictionary<int, InventoryItem>();
+
+                lock (vault.LockObject())
+                {
+                    if (template.IsStackable)
+                    {
+                        foreach (var vItem in dbItems)
+                        {
+                            if (vItem.Id_nb == template.Id_nb && vItem.Count < vItem.MaxCount)
+                            {
+                                int space = vItem.MaxCount - vItem.Count;
+                                int toAdd = Math.Min(space, remaining);
+                                vItem.Count += toAdd;
+                                GameServer.Database.SaveObject(vItem);
+                                updatedItems[vItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = vItem;
+                                remaining -= toAdd;
+
+                                if (remaining <= 0) break;
+                            }
+                        }
+                    }
+
+                    if (remaining > 0)
+                    {
+                        int startSlot = vault.FirstDBSlot;
+                        int endSlot = vault.LastDBSlot;
+                        bool[] usedSlots = new bool[endSlot - startSlot + 1];
+
+                        foreach (var vItem in dbItems)
+                        {
+                            if (vItem.SlotPosition >= startSlot && vItem.SlotPosition <= endSlot)
+                                usedSlots[vItem.SlotPosition - startSlot] = true;
+                        }
+
+                        for (int i = 0; i < usedSlots.Length && remaining > 0; i++)
+                        {
+                            if (!usedSlots[i])
+                            {
+                                int toAdd = Math.Min(remaining, template.MaxCount > 0 ? template.MaxCount : 1);
+                                InventoryItem newDbItem;
+
+                                if (template.Template is ItemUnique unique)
+                                {
+                                    ItemUnique newUnique = new ItemUnique(unique);
+                                    GameServer.Database.AddObject(newUnique);
+                                    newDbItem = GameInventoryItem.Create(newUnique);
+                                }
+                                else
+                                {
+                                    newDbItem = GameInventoryItem.Create(template.Template);
+                                }
+
+                                newDbItem.IsCrafted = template.IsCrafted;
+                                newDbItem.Creator = template.Creator;
+                                newDbItem.Quality = template.Quality;
+                                newDbItem.Count = toAdd;
+                                newDbItem.SlotPosition = startSlot + i;
+                                newDbItem.OwnerID = vault.GetOwner(this);
+
+                                GameServer.Database.AddObject(newDbItem);
+
+                                updatedItems[newDbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = newDbItem;
+                                usedSlots[i] = true;
+                                remaining -= toAdd;
+                            }
+                        }
+                    }
+                }
+
+                if (updatedItems.Count > 0)
+                {
+                    bag.InvalidateWeightCache();
+                    addedToBag = true;
+
+                    if (ActiveInventoryObject is StorageBagVault activeVault && activeVault.GetOwner(this) == vault.GetOwner(this))
+                    {
+                        Out.SendInventoryItemsUpdate(updatedItems, eInventoryWindowType.Update);
+                    }
+                }
+            }
+
+            if (addedToBag)
+            {
+                UpdateEncumberance();
+            }
+
+            return true;
+        }
+
+        public bool TryAddToStorageBag(InventoryItem item)
+        {
+            List<StorageBagItem> bags = new List<StorageBagItem>();
+            lock (Inventory)
+            {
+                foreach (InventoryItem invItem in Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                {
+                    if (invItem is StorageBagItem sbi && sbi.CanHoldItem(item))
+                        bags.Add(sbi);
+                }
+            }
+
+            if (bags.Count == 0) return false;
+
+            int originalCount = item.Count;
+            int remaining = item.Count;
+            bool addedToBag = false;
+
+            foreach (var bag in bags)
+            {
+                if (remaining <= 0) break;
+
+                StorageBagVault vault = new StorageBagVault(this, bag);
+                var dbItems = vault.DBItems(this);
+                Dictionary<int, InventoryItem> updatedItems = new Dictionary<int, InventoryItem>();
+
+                lock (vault.LockObject())
+                {
+                    if (item.IsStackable)
+                    {
+                        foreach (var vItem in dbItems)
+                        {
+                            if (vItem.Id_nb == item.Id_nb && vItem.Count < vItem.MaxCount)
+                            {
+                                int space = vItem.MaxCount - vItem.Count;
+                                int toAdd = Math.Min(space, remaining);
+                                vItem.Count += toAdd;
+                                GameServer.Database.SaveObject(vItem);
+                                updatedItems[vItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = vItem;
+                                remaining -= toAdd;
+
+                                if (remaining <= 0) break;
+                            }
+                        }
+                    }
+
+                    if (remaining > 0)
+                    {
+                        int startSlot = vault.FirstDBSlot;
+                        int endSlot = vault.LastDBSlot;
+                        bool[] usedSlots = new bool[endSlot - startSlot + 1];
+
+                        foreach (var vItem in dbItems)
+                        {
+                            if (vItem.SlotPosition >= startSlot && vItem.SlotPosition <= endSlot)
+                                usedSlots[vItem.SlotPosition - startSlot] = true;
+                        }
+
+                        for (int i = 0; i < usedSlots.Length && remaining > 0; i++)
+                        {
+                            if (!usedSlots[i])
+                            {
+                                int toAdd = Math.Min(remaining, item.MaxCount > 0 ? item.MaxCount : 1);
+                                InventoryItem newDbItem;
+
+                                if (remaining == item.Count && string.IsNullOrEmpty(item.ObjectId))
+                                {
+                                    newDbItem = item;
+                                }
+                                else if (item.Template is ItemUnique unique)
+                                {
+                                    ItemUnique newUnique = new ItemUnique(unique);
+                                    GameServer.Database.AddObject(newUnique);
+                                    newDbItem = GameInventoryItem.Create(newUnique);
+                                }
+                                else
+                                {
+                                    newDbItem = GameInventoryItem.Create(item.Template);
+                                }
+
+                                newDbItem.IsCrafted = item.IsCrafted;
+                                newDbItem.Creator = item.Creator;
+                                newDbItem.Quality = item.Quality;
+                                newDbItem.PoisonCharges = item.PoisonCharges;
+                                newDbItem.PoisonMaxCharges = item.PoisonMaxCharges;
+                                newDbItem.PoisonSpellID = item.PoisonSpellID;
+                                newDbItem.Charges = item.Charges;
+                                newDbItem.Charges1 = item.Charges1;
+                                newDbItem.Condition = item.Condition;
+                                newDbItem.Durability = item.Durability;
+
+                                newDbItem.Count = toAdd;
+                                newDbItem.SlotPosition = startSlot + i;
+                                newDbItem.OwnerID = vault.GetOwner(this);
+
+                                if (string.IsNullOrEmpty(newDbItem.ObjectId))
+                                    GameServer.Database.AddObject(newDbItem);
+                                else
+                                    GameServer.Database.SaveObject(newDbItem);
+
+                                updatedItems[newDbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = newDbItem;
+                                usedSlots[i] = true;
+                                remaining -= toAdd;
+                            }
+                        }
+                    }
+                }
+
+                if (updatedItems.Count > 0)
+                {
+                    bag.InvalidateWeightCache();
+                    addedToBag = true;
+
+                    if (ActiveInventoryObject is StorageBagVault activeVault && activeVault.GetOwner(this) == vault.GetOwner(this))
+                    {
+                        Out.SendInventoryItemsUpdate(updatedItems, eInventoryWindowType.Update);
+                    }
+                }
+            }
+
+            if (addedToBag)
+            {
+                UpdateEncumberance();
+            }
+
+            if (remaining < originalCount)
+            {
+                item.Count = remaining;
+                return true;
+            }
+
+            return false;
+        }
+
         #endregion
 
         #region Send/Say/Yell/Whisper/Messages
@@ -14911,7 +15178,22 @@ namespace DOL.GS
             if (item == null) return false;
 
             if (!Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, item))
+            {
+                if (TryAddToStorageBag(item))
+                {
+                    if (item.Count == 0)
+                    {
+                        Out.SendMessage(String.Format(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", item.GetName(0, false))), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return true;
+                    }
+                    else
+                    {
+                        Out.SendMessage(String.Format(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag", item.GetName(0, false))), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+                }
                 return false;
+            }
 
             if (source == null)
             {
@@ -14974,7 +15256,7 @@ namespace DOL.GS
                     // Prevent genistar items from being dropped on the ground
                     if (item.Template != null && (item.Template.Flags == 25 || item.Template.Flags == 26))
                     {
-                        Out.SendMessage("You cannot drop a Genistar on the ground. It must be placed in a garden slot.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.CannotDropGenistar"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                     }
 
@@ -15061,7 +15343,7 @@ namespace DOL.GS
                 return false;
             }
 
-            if ((floorObject is GameBoat == false) && !checkRange && !floorObject.IsWithinRadius2D(this, GS.ServerProperties.Properties.WORLD_PICKUP_DISTANCE))
+            if ((floorObject is GameBoat == false) && !checkRange && !floorObject.IsWithinRadius2D(this, Properties.WORLD_PICKUP_DISTANCE))
             {
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.ObjectTooFarAway", floorObject.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 try
@@ -15112,8 +15394,18 @@ namespace DOL.GS
 
                             if (!good)
                             {
-                                theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                return false;
+                                if (floorItem.Item.IsStackable) good = TryAddToStorageBagTemplate(floorItem.Item, floorItem.Item.Count);
+                                else good = TryAddToStorageBag(floorItem.Item) && floorItem.Item.Count == 0;
+
+                                if (good)
+                                {
+                                    theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", floorItem.Item.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                }
+                                else
+                                {
+                                    theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return false;
+                                }
                             }
                             theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouGet", floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
@@ -15167,8 +15459,18 @@ namespace DOL.GS
 
                             if (!good)
                             {
-                                eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                return false;
+                                if (floorItem.Item.IsStackable) good = TryAddToStorageBagTemplate(floorItem.Item, floorItem.Item.Count);
+                                else good = TryAddToStorageBag(floorItem.Item) && floorItem.Item.Count == 0;
+
+                                if (good)
+                                {
+                                    eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", floorItem.Item.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                }
+                                else
+                                {
+                                    eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return false;
+                                }
                             }
                             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                             {
@@ -15192,8 +15494,18 @@ namespace DOL.GS
 
                         if (!good)
                         {
-                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                            return false;
+                            if (floorItem.Item.IsStackable) good = TryAddToStorageBagTemplate(floorItem.Item, floorItem.Item.Count);
+                            else good = TryAddToStorageBag(floorItem.Item) && floorItem.Item.Count == 0;
+
+                            if (good)
+                            {
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", floorItem.Item.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            }
+                            else
+                            {
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
                         }
                         Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouGet", floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))

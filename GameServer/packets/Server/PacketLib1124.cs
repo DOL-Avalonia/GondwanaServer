@@ -1161,7 +1161,7 @@ namespace DOL.GS.PacketHandler
                 pak.WritePascalString(spell_name2);
             }
             pak.WriteShort((ushort)item.Effect); // item effect changed to short
-            string name = item.Name;
+            string name = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name);
             if (item.Count > 1)
                 name = item.Count + " " + name;
             if (item.SellPrice > 0)
@@ -1260,6 +1260,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)template.Color);
             pak.WriteByte((byte)template.Flags);
             pak.WriteShort((ushort)template.Effect);
+            string name = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, template.Name);
             if (count > 1)
                 pak.WritePascalString(String.Format("{0} {1}", count, template.Name));
             else

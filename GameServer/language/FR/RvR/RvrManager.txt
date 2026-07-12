@@ -1,4 +1,4 @@
-RvrManager.Score.Title:		--- Fin du RvR ---
+RvrManager.Score.Title:		--- Scores finaux pour le RvR du {0} ---
 RvrManager.Score.NoWinner:	Vainqueur: Aucun - Pas assez de joueur ayant participé !
 RvrManager.Score.Winner:	Vainqueur
 
@@ -21,6 +21,7 @@ RvRManager.CurrentChampion:			- Champion RvR actuel :
 RvRManager.Status:					Le rvr est 
 RvRManager.UpdateFrequency:			(Mise à jour des stats toutes les 30 secondes)
 RvRManager.CannotAttackRealmMember:	Vous ne pouvez pas attaquer un membre de votre royaume !
+RvRManager.ChestsHaveSpawned:		Vous êtes le Champion du Jour ! Trois coffres de récompenses sont apparus près du Téléporteur RvR. Vous pouvez en choisir UN.
 RvRManager.Players:					joueurs
 RvRManager.RealmPoints:				PR
 RvRManager.Open:					ouvert

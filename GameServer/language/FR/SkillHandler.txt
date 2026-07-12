@@ -83,6 +83,7 @@ SkillBase.RegisterPropertyNames.EtherealShriekFocus:   Focus : Cri Ethéré
 SkillBase.RegisterPropertyNames.EvadeChance:         Chance d'Esquive
 SkillBase.RegisterPropertyNames.ExperienceLoss:         Réduction de perte d'Experience
 SkillBase.RegisterPropertyNames.Fatigue:            Endurance
+SkillBase.RegisterPropertyNames.FatigueConsumption:		Réduction de conso. d'Endurance
 SkillBase.RegisterPropertyNames.FireMagic:            Voie du Feu
 SkillBase.RegisterPropertyNames.FireMagicFocus:         Focus : Voie du Feu
 SkillBase.RegisterPropertyNames.FistWraps:            Bandages
@@ -376,6 +377,7 @@ SkillBase.Property.EtherealShriekFocus:   la compétence de Focus : Cri Ethéré
 SkillBase.Property.EvadeChance:         la Chance d'Esquive
 SkillBase.Property.ExperienceLoss:         la Réduction de perte d'Experience
 SkillBase.Property.Fatigue:            l'Endurance
+SkillBase.Property.FatigueConsumption:		la Réduction de consommation d'Endurance
 SkillBase.Property.FireMagic:            la compétence de Voie du Feu
 SkillBase.Property.FireMagicFocus:         la compétence de Focus : Voie du Feu
 SkillBase.Property.FistWraps:            la compétence de Bandages

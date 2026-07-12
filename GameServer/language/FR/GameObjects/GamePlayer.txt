@@ -322,6 +322,8 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:				Vous ne pouvez pas quitter, vous 
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:			Royaume inconnu.
 
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Votre inventaire est plein mais {0} a été placé dans ton sac de rangement !
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Votre inventaire est plein mais une partie de {0} a été placée dans ton sac de rangement !
 GameObjects.GamePlayer.ReceiveItem.Receive:				Vous recevez {0}.
 GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:			Vous recevez {0} de la part de {1}.
 
@@ -527,6 +529,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			Cet espace réservé Géni
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Votre œuf de Genistar a été placé dans votre jardin. Prenez-en soin et modelez-le selon vos désirs !
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Vous devez relâcher votre Genistar invoqué avant de le replacer dans le jardin.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Vous relâchez {0} dans votre jardin pour qu'il s'y promène.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			Tu ne peux pas jeter un Genistar au sol. Il doit être placé dans un emplacement de jardin.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} hurle : « {1} »
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} hurle dans une langue qui vous est inconnue.
@@ -543,8 +546,10 @@ GameObjects.GamePlayer.Jailed:                              {0} a été mis en p
 GameObjects.GamePlayer.Jailed.Unknown:                      {0} a été mis en prison par les gardes.
 GameObjects.GamePlayer.Released:                            {0} a été relâché(e) de prison.
 
-GameObjects.GamePlayer.RvR:                                 - Nombre total de joueurs tués : {0} -
-GameObjects.GamePlayer.RvR.Champion:                        - Nombre total de joueurs tués : {0} - Champion du jour : {1} ( {2} attaquants ennemis tués )
+GameObjects.GamePlayer.RvR:								[RvR] Nombre total de joueurs tués : {0} -
+GameObjects.GamePlayer.RvR.Champion:					[RvR] Nombre total de joueurs tués : {0} - Champion du jour : {1} ({2} attaquants ennemis tués)
+GameObjects.GamePlayer.RvRDialog:						Nombre total de joueurs tués : {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:				Champion du jour : {0} ({1} attaquants ennemis tués)
 GameObjects.GamePlayer.RvR.Control:                         Le Rvr {1} est sous le contrôle de {0} !
 GameObjects.GamePlayer.RvR.Open.Claimable:              Voulez vous [prendre le contrôle] du fort?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:             Vous devez attendre {0} secondes avant de pouvoir pretendre au contrôle du fort.

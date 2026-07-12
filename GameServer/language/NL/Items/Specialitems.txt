@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					Het vuurwerk begint over {0} seconden.
+
+Items.Specialitems.BeerAlreadyDrinking:				Je bent al aan het drinken!
+Items.Specialitems.BeerDrinkDistance:				drankjes
+
+Items.Specialitems.PlaceAssiseTooFar:				Je bent te ver weg om te gaan zitten.
+Items.Specialitems.PlaceAssiseTaken:				De plek is al bezet.
+
+Items.Specialitems.GuarkRingListened:				Je verzoek is gehoord.
+Items.Specialitems.GuarkRingUsed:					Je voelt een krachtige aura die je verlamt.
+Items.Specialitems.GuarkRingNoPower:				Je hebt niet genoeg levensenergie in je aderen om de ring te gebruiken.
+Items.Specialitems.GuarkAmuletNoPower:				Je hebt niet genoeg levensenergie in je aderen om het amulet te gebruiken.
+Items.Specialitems.GuarkRingTPCancelMoved:			Je hebt bewogen, het magische verzoek is mislukt en je kunt niet worden geteleporteerd.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Je hebt de ring van je vinger gehaald, het magische verzoek is mislukt en je kunt niet worden geteleporteerd.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Je hebt het amulet van je nek gehaald, het magische verzoek is mislukt en je kunt niet worden geteleporteerd.
+Items.Specialitems.GuarkRingTPFailed:				Hemelse magie is mislukt, onbekende bestemming.
+Items.Specialitems.GuarkRingTPNone:					Er is geen verzoek ingediend, je bestemming is onbekend.
+Items.Specialitems.GuarkRingUsageCombat:			Je kunt geen hemelse magie gebruiken tijdens een gevecht!
+Items.Specialitems.GuarkRingUsageHere:				Hemelse magie bestaat niet op deze plek.
+Items.Specialitems.GuarkRingUsageJailed:			Je kunt geen hemelse magie gebruiken terwijl je gevangen zit!
+Items.Specialitems.GuarkRingUsageMounted:			Je kunt geen hemelse magie gebruiken vanaf een rijdier!
+Items.Specialitems.GuarkRingUsageStealthed:			Je kunt geen hemelse magie gebruiken terwijl je onzichtbaar bent.
+Items.Specialitems.GuarkRingUsagePetrified:			Je kunt geen hemelse magie gebruiken terwijl je versteend bent!
+Items.Specialitems.GuarkRingUsageDamned:			Je kunt geen hemelse magie gebruiken terwijl je verdoemd bent!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Je kunt geen hemelse magie gebruiken in deze vorm!
+Items.Specialitems.GuarkRingUsageMorphed:			Je kunt geen hemelse magie gebruiken terwijl je onder een "{0}" betovering bent!
+Items.Specialitems.GuarkRingUsageCrafting:			Je kunt geen hemelse magie gebruiken tijdens het craften!
+Items.Specialitems.GuarkRingUsageDuel:				Je kunt geen hemelse magie gebruiken tijdens een duel!
+Items.Specialitems.GuarkRingUsageStealing:			Je kunt geen hemelse magie gebruiken terwijl je een andere speler besteelt!
+Items.Specialitems.GuarkRingUsageAFK:				Je kunt geen hemelse magie gebruiken terwijl je AFK bent!
+Items.Specialitems.GuarkRingUsageClimbing:			Je kunt geen hemelse magie gebruiken tijdens het klimmen!
+Items.Specialitems.GuarkRingUsageRelic:				Je kunt geen hemelse magie gebruiken terwijl je een territorium-relikwie draagt.
+Items.Specialitems.GuarkRingCannotUseHere:			Je kunt dit voorwerp hier niet gebruiken.
+Items.Specialitems.GuarkRingDoNotMove:				Je moet op dezelfde plek blijven om dit voorwerp te gebruiken.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Je bent onlangs in gevecht geweest, je moet wachten voordat je dit voorwerp weer kunt gebruiken.
+
+Items.Specialitems.MiniPetNoCast:					Je kunt deze spreuk hier niet gebruiken!
+
+Items.Specialitems.FirecampNoSit:					Ga niet in de buurt van een kampvuur zitten om dit effect te verwijderen.
+Items.Specialitems.FirecampHeatRegen:				De warmte van het kampvuur zorgt ervoor dat je gezondheid sneller herstelt.
+
+Items.Specialitems.StorageBag.NoBag:				Je bekijkt geen tas!
+Items.Specialitems.StorageBag.BadItem:				Je kunt dit voorwerp niet in deze tas stoppen!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		Je {0} versplintert nadat het bij de dood is geactiveerd!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		Het voorwerp kon om de een of andere reden niet worden vernietigd!
+Items.Specialitems.DieTriggerSpell.FailRez:			De vloek die op je lijk rust is hier te sterk, de opwekkingsspreuk mislukt!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		Je {0} is uitgeput en is uit je inventaris verwijderd.

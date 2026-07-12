@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					I fuochi d'artificio inizieranno in {0} secondi.
+
+Items.Specialitems.BeerAlreadyDrinking:				Stai già bevendo!
+Items.Specialitems.BeerDrinkDistance:				bevande
+
+Items.Specialitems.PlaceAssiseTooFar:				Sei troppo lontano per sederti.
+Items.Specialitems.PlaceAssiseTaken:				Il posto è già occupato.
+
+Items.Specialitems.GuarkRingListened:				La tua richiesta è stata ascoltata.
+Items.Specialitems.GuarkRingUsed:					Senti un'aura potente che ti immobilizza.
+Items.Specialitems.GuarkRingNoPower:				Non hai abbastanza energia vitale nelle tue vene per usare l'anello.
+Items.Specialitems.GuarkAmuletNoPower:				Non hai abbastanza energia vitale nelle tue vene per usare l'amuleto.
+Items.Specialitems.GuarkRingTPCancelMoved:			Ti sei mosso, la richiesta magica è fallita e non puoi essere teletrasportato.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Hai rimosso l'anello dal dito, la richiesta magica è fallita e non puoi essere teletrasportato.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Hai rimosso l'amuleto dal collo, la richiesta magica è fallita e non puoi essere teletrasportato.
+Items.Specialitems.GuarkRingTPFailed:				La magia celeste è fallita, destinazione sconosciuta.
+Items.Specialitems.GuarkRingTPNone:					Non è stata fatta alcuna richiesta, la tua destinazione è sconosciuta.
+Items.Specialitems.GuarkRingUsageCombat:			Non puoi usare la magia celeste mentre sei in combattimento!
+Items.Specialitems.GuarkRingUsageHere:				La magia celeste non esiste in questo luogo.
+Items.Specialitems.GuarkRingUsageJailed:			Non puoi usare la magia celeste mentre sei imprigionato!
+Items.Specialitems.GuarkRingUsageMounted:			Non puoi usare la magia celeste da una cavalcatura!
+Items.Specialitems.GuarkRingUsageStealthed:			Non puoi usare la magia celeste mentre sei in modalità furtiva.
+Items.Specialitems.GuarkRingUsagePetrified:			Non puoi usare la magia celeste mentre sei pietrificato!
+Items.Specialitems.GuarkRingUsageDamned:			Non puoi usare la magia celeste mentre sei dannato!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Non puoi usare la magia celeste mentre sei in questa forma!
+Items.Specialitems.GuarkRingUsageMorphed:			Non puoi usare la magia celeste mentre sei sotto un incantesimo di "{0}"!
+Items.Specialitems.GuarkRingUsageCrafting:			Non puoi usare la magia celeste mentre crei oggetti!
+Items.Specialitems.GuarkRingUsageDuel:				Non puoi usare la magia celeste mentre sei in un duello!
+Items.Specialitems.GuarkRingUsageStealing:			Non puoi usare la magia celeste mentre derubi un altro giocatore!
+Items.Specialitems.GuarkRingUsageAFK:				Non puoi usare la magia celeste mentre sei AFK!
+Items.Specialitems.GuarkRingUsageClimbing:			Non puoi usare la magia celeste mentre ti arrampichi!
+Items.Specialitems.GuarkRingUsageRelic:				Non puoi usare la magia celeste mentre trasporti una reliquia del territorio.
+Items.Specialitems.GuarkRingCannotUseHere:			Non puoi usare questo oggetto qui.
+Items.Specialitems.GuarkRingDoNotMove:				Devi rimanere nello stesso posto per usare questo oggetto.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Sei stato in combattimento di recente, quindi devi aspettare per poter usare di nuovo questo oggetto.
+
+Items.Specialitems.MiniPetNoCast:					Non puoi lanciare questo incantesimo qui!
+
+Items.Specialitems.FirecampNoSit:					Non sederti vicino a un falò per rimuovere questo effetto.
+Items.Specialitems.FirecampHeatRegen:				Il calore del falò ti permette di recuperare salute più velocemente.
+
+Items.Specialitems.StorageBag.NoBag:				Non stai guardando una borsa!
+Items.Specialitems.StorageBag.BadItem:				Non puoi mettere questo oggetto in questa borsa!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		Il tuo {0} si frantuma dopo essersi attivato alla morte!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		Impossibile distruggere l'oggetto per qualche motivo!
+Items.Specialitems.DieTriggerSpell.FailRez:			La maledizione che affligge il tuo cadavere è troppo forte qui, l'incantesimo di resurrezione fallisce!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		Il tuo {0} è esaurito ed è stato rimosso dall'inventario.

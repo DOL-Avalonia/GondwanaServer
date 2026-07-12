@@ -322,6 +322,9 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:	Du kannst nicht ausloggen, du schlä
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:	Unbekanntes Reich
 
+
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Ihr Rucksack ist voll, aber {0} wurde in deiner Aufbewahrungstasche abgelegt!
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Ihr Rucksack ist voll, aber ein Teil von {0} wurde in deiner Aufbewahrungstasche abgelegt!
 GameObjects.GamePlayer.ReceiveItem.Receive:	Ihr erhaltet "{0}"!
 GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:	Ihr bekommt "{0}" von {1}!
 
@@ -527,6 +530,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Dieser Genistar-Platzhalter
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Dein Genistar-Ei wurde in deinem Garten platziert. Es liegt nun an dir, es zu pflegen und nach deinen Wünschen zu formen!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Du musst deinen beschworenen Genistar freilassen, bevor du ihn wieder im Garten platzieren kannst.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Du lässt {0} wieder in deinen Garten frei, damit er dort umherstreifen kann.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			Du kannst einen Genistar nicht auf den Boden werfen. Er muss in einem Gartenplatz platziert werden.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} ruft: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} ruft etwas in einer Sprache, die Ihr nicht versteht.
@@ -543,8 +547,10 @@ GameObjects.GamePlayer.Jailed:	{0} wurde von {1} ins Gefängnis geworfen.
 GameObjects.GamePlayer.Jailed.Unknown:	{0} wurde von den Wachen ins Gefängnis geworfen.
 GameObjects.GamePlayer.Released:	{0} wurde aus dem Gefängnis entlassen.
 
-GameObjects.GamePlayer.RvR:	– Insgesamt getötete Spieler: {0} –
-GameObjects.GamePlayer.RvR.Champion:	– Insgesamt getötete Spieler: {0} – Champion des Tages: {1} ({2} getötete feindliche Angreifer)
+GameObjects.GamePlayer.RvR:						[RvR] Insgesamt getötete Spieler: {0}
+GameObjects.GamePlayer.RvR.Champion:			[RvR] Insgesamt getötete Spieler: {0} – Champion des Tages: {1} ({2} getötete feindliche Angreifer)
+GameObjects.GamePlayer.RvRDialog:				Insgesamt getötete Spieler: {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:		Champion des Tages: {0} ({1} getötete feindliche Angreifer)
 GameObjects.GamePlayer.RvR.Control:	Das RvR {1} steht unter der Kontrolle von {0}!
 GameObjects.GamePlayer.RvR.Open.Claimable:	Möchtest du die [Kontrolle übernehmen]?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:	Du musst {0} Sekunden warten, bevor du den Anspruch auf die Kontrolle erheben kannst.

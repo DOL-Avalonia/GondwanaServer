@@ -906,6 +906,77 @@ namespace DOL.AI.Brain
                         }
                     }
                     break;
+
+                case "ZOMBIEHEAL":
+                    {
+                        string zhSpellTarget = spell.Target.ToUpper();
+                        int zhBodyPercent = Body.HealthPercent;
+
+                        if (zhSpellTarget == "SELF")
+                        {
+                            if (zhBodyPercent < GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD && IsValidZombieHealRecipient(Body))
+                                Body.TargetObject = Body;
+                            break;
+                        }
+
+                        int zhEmergencyThreshold = GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD / 2;
+
+                        owner = Owner;
+                        int zhOwnerPercent = owner != null ? owner.HealthPercent : 100;
+                        if (owner != null && zhOwnerPercent < zhEmergencyThreshold && GameMath.IsWithinRadius(Body, owner, spell.Range) && IsValidZombieHealRecipient(owner))
+                        {
+                            Body.TargetObject = owner;
+                            break;
+                        }
+
+                        if (zhBodyPercent < zhEmergencyThreshold && IsValidZombieHealRecipient(Body))
+                        {
+                            Body.TargetObject = Body;
+                            break;
+                        }
+
+                        player = Body.GetPlayerOwner();
+                        ICollection<GamePlayer> zhPlayerGroup = null;
+                        if (player != null && player.Group != null && (zhSpellTarget == "REALM" || zhSpellTarget == "GROUP"))
+                        {
+                            zhPlayerGroup = player.Group.GetPlayersInTheGroup();
+
+                            foreach (GamePlayer p in zhPlayerGroup)
+                            {
+                                if (p.HealthPercent < zhEmergencyThreshold && GameMath.IsWithinRadius(Body, p, spell.Range) && IsValidZombieHealRecipient(p))
+                                {
+                                    Body.TargetObject = p;
+                                    break;
+                                }
+                            }
+                        }
+                        if (Body.TargetObject != null) break;
+
+                        if (owner != null && zhOwnerPercent < GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD && GameMath.IsWithinRadius(Body, owner, spell.Range) && IsValidZombieHealRecipient(owner))
+                        {
+                            Body.TargetObject = owner;
+                            break;
+                        }
+
+                        if (zhBodyPercent < GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD && IsValidZombieHealRecipient(Body))
+                        {
+                            Body.TargetObject = Body;
+                            break;
+                        }
+
+                        if (zhPlayerGroup != null)
+                        {
+                            foreach (GamePlayer p in zhPlayerGroup)
+                            {
+                                if (p.HealthPercent < GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD && GameMath.IsWithinRadius(Body, p, spell.Range) && IsValidZombieHealRecipient(p))
+                                {
+                                    Body.TargetObject = p;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
                 #endregion
 
                 default:
@@ -936,6 +1007,9 @@ namespace DOL.AI.Brain
         protected override bool CheckOffensiveSpells(Spell spell)
         {
             if (spell == null || spell.IsHelpful || !(Body.TargetObject is GameLiving living) || !living.IsAlive)
+                return false;
+
+            if (spell.SpellType.Equals("ZombieHeal", StringComparison.OrdinalIgnoreCase) && IsValidZombieHealRecipient(living))
                 return false;
 
             // Make sure we're currently able to cast the spell

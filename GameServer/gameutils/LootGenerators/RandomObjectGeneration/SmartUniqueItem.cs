@@ -1,6 +1,7 @@
-﻿using System;
-using DOL.Database;
+﻿using DOL.Database;
 using DOL.GS.ServerProperties;
+using DOL.Language;
+using System;
 
 namespace DOL.GS
 {
@@ -11,6 +12,11 @@ namespace DOL.GS
         /// </summary>
         public static ItemTemplate CreateFromMobItem(GameNPC mob, InventoryItem sourceItem, GamePlayer player)
         {
+            if (mob != null && RegionMapper.GetCategoryFromRegionID(mob.CurrentRegionID) == eRegionCategory.Restricted)
+            {
+                return null;
+            }
+
             // 1. Identify the item definition (Name, Slot, Type) from the Model Mapper
             LootModelMapper.ModelDefinition def;
             if (!LootModelMapper.TryGetDefinition(sourceItem.Model, out def))
@@ -18,8 +24,8 @@ namespace DOL.GS
                 return null;
             }
 
-            // Initializes the dummy base item
             SmartUniqueItem item = new SmartUniqueItem();
+            item.TargetLanguage = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
 
             // 2. Set Lifecycle & Level Properties
             item.Level = mob.Level;
@@ -36,16 +42,8 @@ namespace DOL.GS
             // Retain original weight if known, otherwise standard fallback
             item.Weight = sourceItem.Weight > 0 ? sourceItem.Weight : 10;
 
-            // Generate Quality
-            item.GenerateItemQuality(0.0);
-
-            // Calculate Exponential Custom Pricing
-            // Curve: (Level / 51)^4.2 * 550,000 * Quality Modifier
-            // Results in ~8 copper at Level 4, and ~50 Gold at Level 51
-            double priceCurve = Math.Pow((double)item.Level / 51.0, 4.2);
-            double maxPrice = 550000.0;
-            item.Price = (long)(priceCurve * maxPrice * ((double)item.Quality / 100.0));
-            if (item.Price < 1) item.Price = 1;
+            // Generate Quality (Assign base stats)
+            item.GenerateItemQuality(0);
 
             // Set Condition/Durability
             int condition = item.Level * 1000;
@@ -72,7 +70,6 @@ namespace DOL.GS
             // 4. Generate Stats
             item.charClass = (eCharacterClass)player.CharacterClass.ID;
 
-            // Clear dummy base stats
             item.Bonus1 = item.Bonus2 = item.Bonus3 = item.Bonus4 = item.Bonus5 =
             item.Bonus6 = item.Bonus7 = item.Bonus8 = item.Bonus9 = item.Bonus10 = item.ExtraBonus = 0;
             item.Bonus1Type = item.Bonus2Type = item.Bonus3Type = item.Bonus4Type = item.Bonus5Type =
@@ -89,7 +86,23 @@ namespace DOL.GS
 
             item.CapUtility(item.Level, 15);
 
-            // 5. Naming Logic
+            // 5. Smart Pricing
+            double priceCurve = Math.Pow((double)item.Level / 51.0, 3.82);
+            double maxPrice = 290000.0;
+            long calculatedBasePrice = (long)(priceCurve * maxPrice * ((double)item.Quality / 100.0));
+            calculatedBasePrice = Math.Max(2, calculatedBasePrice);
+
+            double expectedBaseUtility = Math.Max(15.0, item.Level - 5.0);
+            double utilityFactor = Math.Max(1.0, item.GetTotalUtility() / expectedBaseUtility);
+
+            item.Price = (long)(calculatedBasePrice * 5.0 * utilityFactor);
+
+            if (item.Price <= 0)
+            {
+                item.Price = 2;
+            }
+
+            // 6. Naming Logic
             string mobName = mob.Name ?? "Unknown";
             if (mobName.StartsWith("The ", StringComparison.OrdinalIgnoreCase)) mobName = mobName.Substring(4);
             else if (mobName.StartsWith("A ", StringComparison.OrdinalIgnoreCase)) mobName = mobName.Substring(2);
@@ -107,22 +120,25 @@ namespace DOL.GS
                 baseItemName = baseItemName.Replace("Reinforced", "Studded");
             }
 
-            item.Name = $"{mobName}'s {baseItemName}".Trim();
+            // Create safe BaseNameKey
+            string baseNameKey = baseItemName.Replace(" ", "").Replace("-", "").Replace("'", "");
 
-            // Add Magical Prefix
+            // Get Prefix Key
+            string prefixKey = "";
             int bestBonusLine = item.GetHighestUtilitySingleLine();
             eProperty bestProperty = GetPropertyFromBonusLine_Wrapper(item, bestBonusLine);
 
             if (hPropertyToMagicPrefix.ContainsKey(bestProperty))
             {
-                string prefix = hPropertyToMagicPrefix[bestProperty];
-                if (!string.IsNullOrEmpty(prefix))
-                {
-                    item.Name = $"{prefix} {item.Name}".Trim();
-                }
+                prefixKey = hPropertyToMagicPrefix[bestProperty].Replace(" ", "").Replace("'", "");
             }
 
-            // 6. Allow core DB insertion on pickup
+            string tierKey = item.GetQualityTierPrefixKey();
+
+            // Build the 4-part Dynamic ROG tag
+            // Structure: Prefix | Tier | BaseName | MobName
+            item.Name = $"[ROG]{prefixKey}|{tierKey}|{baseNameKey}|{mobName}";
+
             item.AllowAdd = true;
 
             return item;

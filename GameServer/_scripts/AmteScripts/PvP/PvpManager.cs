@@ -75,6 +75,7 @@ namespace AmteScripts.Managers
         private DateTime _startedTime = DateTime.Now;
         private RegionTimer _ctfMapUpdateTimer;
         private int _playersInPvP = 0;
+        public int PeakPlayerCount { get; private set; } = 0;
 
         private static readonly int[] _randomEmblems = { 5061, 6645, 84471, 6272, 55302, 64792, 111402, 39859, 21509, 123019 };
 
@@ -147,8 +148,8 @@ namespace AmteScripts.Managers
         private const int MODEL_RED_LIGHT = 3498;
         private const int SPELL_GREEN_LIGHT = 25318;
         private const int SPELL_RED_LIGHT = 25317;
-        private const int CORE_RUN_EFFECT_AMOUNT = 200;
-        private const int CORE_RUN_EFFECT_FREQ = 500;
+        private const int CORE_RUN_EFFECT_AMOUNT = 2;
+        private const int CORE_RUN_EFFECT_FREQ = 2000;
         private const int CORE_RUN_STORM_LEVEL = 60;
         private const int CORE_RUN_STORM_SIZE = 80;
         private const int CORE_RUN_EFFECT_VARIANCE = 20;
@@ -453,6 +454,8 @@ namespace AmteScripts.Managers
             lock (_sessionLock)
             {
                 ++_playersInPvP;
+                if (_playersInPvP > PeakPlayerCount) PeakPlayerCount = _playersInPvP;
+
                 if (IsOpen && _activeSession?.SessionID == rec.PvPSession)
                 {
                     if (TryRestorePlayer(player, rec))
@@ -1137,6 +1140,10 @@ namespace AmteScripts.Managers
             }
             else
             {
+                int currentPvPCount = WorldMgr.GetAllPlayingClients().Count(c => c?.Player != null && c.Player.IsInPvP);
+                if (currentPvPCount > PeakPlayerCount)
+                    PeakPlayerCount = currentPvPCount;
+
                 if (!_isForcedOpen && (DateTime.Now.TimeOfDay < _startTime || DateTime.Now.TimeOfDay > _endTime))
                 {
                     Close();
@@ -1198,7 +1205,30 @@ namespace AmteScripts.Managers
                 _isForcedOpen = force;
                 if (_isOpen)
                     return true;
-            
+
+                PeakPlayerCount = 0;
+
+                try
+                {
+                    foreach (var region in WorldMgr.GetAllRegions())
+                    {
+                        var oldChests = region.Objects.OfType<PvP.Rewards.RewardChest>()
+                                                      .Where(c => c.Tier == PvP.Rewards.eRewardTier.PvPTier1 ||
+                                                                  c.Tier == PvP.Rewards.eRewardTier.PvPTier2 ||
+                                                                  c.Tier == PvP.Rewards.eRewardTier.PvPTier3)
+                                                      .ToList();
+                        foreach (var chest in oldChests)
+                        {
+                            chest.RemoveFromWorld();
+                            chest.Delete();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Error clearing old PvP reward chests: ", ex);
+                }
+
                 // Reset scoreboard, queues, oldInfos
                 ResetScores();
                 _soloQueue.Clear();
@@ -1494,23 +1524,77 @@ namespace AmteScripts.Managers
             return WorldMgr.GetAllPlayingClients().Select(c => c.Player).Where(p => p is { IsInPvP: true });
         }
 
-        private async Task DoAnnouncements(IList<IGrouping<int, HighScore>> scores)
+        private async Task DoAnnouncements(IList<IGrouping<int, HighScore>> scores, List<GamePlayer> pvpPlayers, eSessionTypes sessionType)
         {
-            if (scores.Count <= 0)
-                return;
+            if (scores.Count <= 0) return;
 
-            const int BROADCAST_MAX_RANK = 2;
-            var sessionTranslator = new KeyTranslator("PvPManager.Session." + CurrentSessionType);
-            var toBroadcast = scores
-                .Where(group => group.Key > 0)
-                .Select((group, i) => (group, i))
-                .Take(BROADCAST_MAX_RANK);
+            const int BROADCAST_MAX_RANK = 3;
+            var sessionTranslator = new KeyTranslator("PvPManager.Session." + sessionType);
+            var toBroadcast = scores.Where(group => group.Key > 0).Select((group, i) => (group, i)).Take(BROADCAST_MAX_RANK).ToList();
+            string dateStr = DateTime.Now.Date.ToString("MM/dd/yyyy");
+
+            // Announce message for winners sent to all participating PvP Players
+            foreach (var p in pvpPlayers)
+            {
+                if (p == null || p.Client == null) continue;
+
+                string sessionName = LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.Session." + sessionType);
+                string titleTemplate = LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.Score.Title");
+                string dialogMessage = string.Format(titleTemplate, sessionName, dateStr) + "\n\n";
+
+                if (toBroadcast.Count == 0)
+                {
+                    dialogMessage += (LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.Score.NoWinner")) + "\n";
+                }
+                else
+                {
+                    foreach (var (scoreGroup, i) in toBroadcast)
+                    {
+                        int total = scoreGroup.Key;
+                        string iString = (i + 1).ToString();
+
+                        string rankKey = i == 0 ? "PvPManager.Score.Rank.1" :
+                                         i == 1 ? "PvPManager.Score.Rank.2" :
+                                         i == 2 ? "PvPManager.Score.Rank.3" :
+                                         "PvPManager.Score.Rank.N";
+
+                        string translatedRank = LanguageMgr.GetTranslation(p.Client.Account.Language, rankKey);
+                        if (string.IsNullOrEmpty(translatedRank))
+                        {
+                            translatedRank = i == 0 ? "First" : i == 1 ? "Second" : i == 2 ? "Third" : $"{i + 1}th";
+                        }
+                        else if (i > 2)
+                        {
+                            translatedRank = string.Format(translatedRank, i + 1);
+                        }
+
+                        foreach (var score in scoreGroup)
+                        {
+                            string tKey = score.IsGroup ? "PvPManager.Score.Dialog.Guild." + iString : "PvPManager.Score.Dialog.Player." + iString;
+                            string lineTemplate = LanguageMgr.GetTranslation(p.Client.Account.Language, tKey);
+
+                            if (string.IsNullOrEmpty(lineTemplate))
+                            {
+                                string fallbackKey = "PvPManager.Score.Dialog.Fallback";
+                                lineTemplate = LanguageMgr.GetTranslation(p.Client.Account.Language, fallbackKey) ?? "- {3} winner {0}: {2} points.";
+                            }
+
+                            dialogMessage += string.Format(lineTemplate, score.Score.PlayerName, sessionName, total, translatedRank) + "\n";
+                        }
+                    }
+                }
+
+                p.Out.SendMessage(dialogMessage, eChatType.CT_Help, eChatLoc.CL_SystemWindow);
+            }
+
+            // Winners News Broadcasts
             foreach (var (scoreGroup, i) in toBroadcast)
             {
                 int total = scoreGroup.Key;
                 var iString = (i + 1).ToString();
                 var playerKey = new KeyTranslator("PvPManager.Score.Announce.Player." + iString);
                 var guildKey = new KeyTranslator("PvPManager.Score.Announce.Guild." + iString);
+
                 await Task.WhenAll(scoreGroup.Select(score =>
                 {
                     var key = score.IsGroup ? guildKey : playerKey;
@@ -1519,13 +1603,13 @@ namespace AmteScripts.Managers
                         NewsMgr.CreateNews(key, eRealm.None, eNewsType.RvRGlobal, false, args),
                         Task.Run(async () =>
                         {
-                            if (DOL.GS.ServerProperties.Properties.DISCORD_ACTIVE)
+                            if (Properties.DISCORD_ACTIVE)
                             {
-                                DolWebHook hook = new DolWebHook(DOL.GS.ServerProperties.Properties.DISCORD_WEBHOOK_ID);
+                                DolWebHook hook = new DolWebHook(Properties.DISCORD_WEBHOOK_ID);
                                 hook.SendMessage(await key.Translate(Properties.SERV_LANGUAGE, Properties.AUTOTRANSLATE_ENABLE, args));
                             }
                         }),
-                        Task.WhenAll(GetPlayersInPvP().Select(async p =>
+                        Task.WhenAll(pvpPlayers.Select(async p =>
                         {
                             p.Out.SendMessage(await key.Translate(p, args), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }))
@@ -1534,13 +1618,74 @@ namespace AmteScripts.Managers
             }
         }
 
-        public void RewardPlayers()
+        private void SpawnRewardChests(List<IGrouping<int, HighScore>> scores, List<GamePlayer> pvpPlayers, int peakPlayers)
         {
-            var scores = GetHighScores().ToList();
-            if (scores.Count == 0)
-                return;
+            int rank = 1;
+            int neededPlayers = _activeSession?.MinPlayersForScore ?? 10;
 
-            DoAnnouncements(scores);
+            foreach (var scoreGroup in scores.Where(g => g.Key > 0).Take(3))
+            {
+                PvP.Rewards.eRewardTier tier = rank == 1 ? PvP.Rewards.eRewardTier.PvPTier1 :
+                                               rank == 2 ? PvP.Rewards.eRewardTier.PvPTier2 : PvP.Rewards.eRewardTier.PvPTier3;
+
+                foreach (var score in scoreGroup)
+                {
+                    int killCount = 0;
+                    if (score.IsGroup && score.Score is PvPGroupScore groupScore)
+                    {
+                        killCount = groupScore.Totals.PvP_GroupKills + groupScore.Totals.PvP_SoloKills;
+                    }
+                    else
+                    {
+                        killCount = score.Score.PvP_SoloKills + score.Score.PvP_GroupKills;
+                    }
+
+                    if (score.IsGroup && score.Score is PvPGroupScore gScore)
+                    {
+                        foreach (var memberId in gScore.Scores.Keys)
+                        {
+                            var player = pvpPlayers.FirstOrDefault(p => p.InternalID == memberId);
+                            if (player != null) SpawnChestsForPvPPlayer(player, tier, peakPlayers, killCount, neededPlayers);
+                        }
+                    }
+                    else
+                    {
+                        var player = pvpPlayers.FirstOrDefault(p => p.InternalID == score.OwnerId);
+                        if (player != null) SpawnChestsForPvPPlayer(player, tier, peakPlayers, killCount, neededPlayers);
+                    }
+                }
+                rank++;
+            }
+        }
+
+        private void SpawnChestsForPvPPlayer(GamePlayer player, PvP.Rewards.eRewardTier tier, int peakPlayers, int score, int neededPlayers)
+        {
+            try
+            {
+                var teleporters = WorldMgr.GetNPCsByType(typeof(TeleporterPvP), player.Realm);
+                if (teleporters.Count == 0)
+                    teleporters = WorldMgr.GetNPCsByType(typeof(TeleporterPvP), eRealm.None);
+
+                // Prioritize the teleporter in the region the player is currently in
+                var teleporter = teleporters.Cast<GameNPC>().Where(t => t.CurrentRegionID == player.CurrentRegionID).OrderBy(t => t.Coordinate.DistanceTo(player.Coordinate)).FirstOrDefault();
+
+                if (teleporter != null)
+                {
+                    bool spawned = PvP.Rewards.RewardChestSpawner.SpawnChestsForPlayer(player, tier, teleporter, peakPlayers, score, neededPlayers);
+                    if (spawned)
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPManager.ChestsHaveSpawned"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    }
+                }
+                else
+                {
+                    log.Warn($"Could not find TeleporterPvP to spawn reward chests for PvP player {player.Name}");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error spawning PvP reward chests: ", ex);
+            }
         }
 
         private void Stop()
@@ -1596,14 +1741,14 @@ namespace AmteScripts.Managers
                     return false;
 
                 eSessionTypes closingSessionType = (eSessionTypes)(_activeSession?.SessionType ?? 0);
+                log.InfoFormat("PvpManager: Closing session [{0}].", _activeSession?.SessionID);
+                Stop();
+
+                var scores = GetHighScores().ToList();
+                var pvpPlayers = GetPlayersInPvP().ToList();
 
                 _isOpen = false;
                 _isForcedOpen = false;
-
-                log.InfoFormat("PvpManager: Closing session [{0}].", _activeSession?.SessionID);
-
-                Stop();
-                RewardPlayers();
 
                 switch (closingSessionType)
                 {
@@ -1675,6 +1820,12 @@ namespace AmteScripts.Managers
                 foreach (var player in GetPlayersInPvP())
                 {
                     KickPlayer(player, false);
+                }
+
+                if (scores.Count > 0)
+                {
+                    _ = DoAnnouncements(scores, pvpPlayers, closingSessionType);
+                    SpawnRewardChests(scores, pvpPlayers, PeakPlayerCount);
                 }
 
                 foreach (var pad in _allBasePads)
@@ -2489,6 +2640,8 @@ namespace AmteScripts.Managers
             // }
             
             ++_playersInPvP;
+            if (_playersInPvP > PeakPlayerCount) PeakPlayerCount = _playersInPvP;
+
             if (!TeleportSoloPlayer(player))
             {
                 _cleanupPlayer(player);
@@ -2533,6 +2686,8 @@ namespace AmteScripts.Managers
             }
 
             _playersInPvP += group.MemberCount;
+            if (_playersInPvP > PeakPlayerCount) PeakPlayerCount = _playersInPvP;
+
             if (!TeleportEntireGroup(groupLeader))
             {
                 _cleanupGroup(group, false);
@@ -4902,6 +5057,7 @@ namespace AmteScripts.Managers
                         ScoreType.Malus => $"{translated}={Points.Count}(-{LanguageMgr.GetTranslation(language, "PvPManager.Score.Pts", Points.Points)})",
                         ScoreType.BonusPoints => $"{translated}={LanguageMgr.GetTranslation(language, "PvPManager.Score.Pts", Points.Points)}",
                         ScoreType.MalusPoints => $"{translated}=-{LanguageMgr.GetTranslation(language, "PvPManager.Score.Pts", Points.Points)}",
+                        _ => string.Empty
                     };
                 }
                 else
@@ -4913,6 +5069,7 @@ namespace AmteScripts.Managers
                         ScoreType.Malus => $"  {translated}: {Points.Count} - -{LanguageMgr.GetTranslation(language, "PvPManager.Score.Points", Points.Points)}",
                         ScoreType.BonusPoints => $"  {translated}: {LanguageMgr.GetTranslation(language, "PvPManager.Score.Points", Points.Points)}",
                         ScoreType.MalusPoints => $"  {translated}: -{LanguageMgr.GetTranslation(language, "PvPManager.Score.Points", Points.Points)}",
+                        _ => string.Empty
                     };
                 }
             }

@@ -289,6 +289,12 @@ namespace DOL.GS.ServerProperties
         public static int MAX_ITEMS_PER_PACKET;
 
         /// <summary>
+        /// Additional weight added to a StorageBagItem per filled slot.
+        /// </summary>
+        [ServerProperty("system", "storage_bag_weight_per_slot", "The additional weight added to a StorageBag per filled slot in its vault. (10 = 1.0 lbs)", 2)]
+        public static int STORAGE_BAG_WEIGHT_PER_SLOT = 2;
+
+        /// <summary>
         /// Number of times speed hack detected before banning.  Must be multiples of 5 (20, 25, 30, etc)
         /// </summary>
         [ServerProperty("system", "speedhack_tolerance", "Number of times speed hack detected before banning.  Multiples of 5 (20, 25, 30, etc)", 20)]
@@ -695,6 +701,12 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("guild", "server_is_cross_realm", "Is the server cross realm?", false)]
         public static bool SERVER_IS_CROSS_REALM;
 
+        /// <summary>
+        /// Prefix for the ROG item description (E.g. Global ROG, Gondwana ROG)
+        /// </summary>
+        [ServerProperty("server", "rog_server_name", "Prefix for ROG item descriptions", "Global ROG")]
+        public static string ROG_SERVER_NAME = "Global ROG";
+
         #endregion
 
         #region WORLD
@@ -1019,6 +1031,12 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("rvr", "rvr_number_of_needed_players", "The number of needed players to count points in RvR", 10)]
         public static int RvR_NUMBER_OF_NEEDED_PLAYERS;
+
+        /// <summary>
+        /// Enable dynamic reward sub-tiers based on player frequentation and scores in RvR/PvP.
+        /// </summary>
+        [ServerProperty("pvp", "pvp_rewards_use_subtiers", "Enable dynamic reward sub-tiers based on player frequentation and scores in RvR/PvP.", false)]
+        public static bool PVP_REWARDS_USE_SUBTIERS;
 
         /// <summary>
         /// The Realm Points Rate

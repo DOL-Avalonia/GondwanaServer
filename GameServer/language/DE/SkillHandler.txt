@@ -83,6 +83,7 @@ SkillBase.RegisterPropertyNames.EtherealShriekFocus:	Ätherisches Kreischen
 SkillBase.RegisterPropertyNames.EvadeChance:		- Ausweichchance: {0}% (Nur PvM)
 SkillBase.RegisterPropertyNames.ExperienceLoss:		Erfahrungsverlustreduzierung
 SkillBase.RegisterPropertyNames.Fatigue:		Ausdauer
+SkillBase.RegisterPropertyNames.FatigueConsumption:		Reduzierung des Ausdauerverbrauchs
 SkillBase.RegisterPropertyNames.FireMagic:		Feuermagie
 SkillBase.RegisterPropertyNames.FireMagicFocus:		Feuermagie
 SkillBase.RegisterPropertyNames.FistWraps:		Faustbandagen

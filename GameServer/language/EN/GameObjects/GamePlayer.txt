@@ -322,6 +322,9 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:				You cannot quit, you're mezzed.
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:			Unknown realm
 
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Your backpack is full but the {0} has been dropped in your storage bag!
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Your backpack is full but some of the {0} has been dropped in your storage bag!
+GameObjects.GamePlayer.ReceiveItem.Receive:				You receive {0}!
 GameObjects.GamePlayer.ReceiveItem.Receive:				You receive {0}!
 GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:			You receive {0} from {1}!
 
@@ -527,6 +530,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			This Genistar placeholder 
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Your Genistar egg has been placed in your garden. It is now yours to nurture and mold it according to your desires!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			You must release your summoned Genistar before placing it back in the garden.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			You release {0} back into your garden to roam.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			You cannot drop a Genistar on the ground. It must be placed in a garden slot.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} yells, "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} yells something in a language you don't understand.
@@ -543,9 +547,11 @@ GameObjects.GamePlayer.Jailed:                              {0} has been put in 
 GameObjects.GamePlayer.Jailed.Unknown:                      {0} has been put in jail by the guards.
 GameObjects.GamePlayer.Released:                            {0} has been released from jail.
 
-GameObjects.GamePlayer.RvR:                                 - Total players killed : {0} -
-GameObjects.GamePlayer.RvR.Champion:                        - Total players killed : {0} - Champion of the day : {1} ( {2} enemy players killed )
-GameObjects.GamePlayer.RvR.Control:                         The Rvr {1} is under the control of {0}!
+GameObjects.GamePlayer.RvR:								[RvR] Total players killed : {0}
+GameObjects.GamePlayer.RvR.Champion:					[RvR] Total players killed : {0} - Champion of the day : {1} ({2} enemy players killed)
+GameObjects.GamePlayer.RvRDialog:						Total players killed : {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:				Champion of the day : {0} ({1} enemy players killed)
+GameObjects.GamePlayer.RvR.Control:						The Rvr {1} is under the control of {0}!
 GameObjects.GamePlayer.RvR.Open.Claimable:              Do you want to [seize control] of the keep?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:             You must wait {0} seconds before beeing able to claim control of the keep.
 GameObjects.GamePlayer.RvR.Closed:                      Keep capture is temporarily unavailable.

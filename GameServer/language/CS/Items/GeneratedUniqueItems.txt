@@ -1,0 +1,556 @@
+ROG.ItemFormat: {0} {1}
+ROG.ItemFormat.Tiered: {0} {1} {2}
+ROG.MobDropFormat: {1} od {0}
+ROG.ItemFormat.CustomTiered: {1} {0} {2}
+
+# ================================
+# PREFIXES
+# ================================
+ROG.Prefix.Mighty: Mocný
+ROG.Prefix.Adroit: Obratný
+ROG.Prefix.Fortifying: Posilující
+ROG.Prefix.Speedy: Rychlý
+ROG.Prefix.Insightful: Bystrý
+ROG.Prefix.Willful: Odhodlaný
+ROG.Prefix.Attuned: Sladěný
+ROG.Prefix.Glib: Výmluvný
+ROG.Prefix.Sturdy: Bytelný
+ROG.Prefix.Arcane: Tajemný
+ROG.Prefix.Brilliant: Brilantní
+ROG.Prefix.Bodybender: Ohýbač Těla
+ROG.Prefix.Icebender: Ohýbač Ledu
+ROG.Prefix.Bluntbender: Ohýbač Úderů
+ROG.Prefix.Energybender: Ohýbač Energie
+ROG.Prefix.Heatbender: Ohýbač Tepla
+ROG.Prefix.Matterbender: Ohýbač Hmoty
+ROG.Prefix.Edgebender: Ohýbač Ostří
+ROG.Prefix.Spiritbender: Ohýbač Duchů
+ROG.Prefix.Thrustbender: Ohýbač Bodnutí
+ROG.Prefix.Essencebender: Ohýbač Esence
+ROG.Prefix.Skillful: Zručný
+ROG.Prefix.Mystical: Mystický
+ROG.Prefix.Gladiator: Gladiátorský
+ROG.Prefix.Duelist: Duelantský
+ROG.Prefix.Bowmaster: Lukostřelecký
+ROG.Prefix.Focused: Soustředěný
+ROG.Prefix.Honed: Vybroušený
+ROG.Prefix.Battering: Tlučící
+ROG.Prefix.Perforator: Prorážející
+ROG.Prefix.Sundering: Rozdělující
+ROG.Prefix.Decimator: Decimující
+ROG.Prefix.Tensile: Pružný
+ROG.Prefix.Razored: Ostrý
+ROG.Prefix.Crushing: Drtivý
+ROG.Prefix.Lancenator: Kopínecký
+ROG.Prefix.Whirling: Vířící
+ROG.Prefix.Impaling: Nabodávající
+ROG.Prefix.Serrated: Zoubkovaný
+ROG.Prefix.Demolishing: Demoliční
+ROG.Prefix.SwatheCutters: Sekající
+ROG.Prefix.Cleaving: Rozsekávající
+ROG.Prefix.Reapers: Smrtonosný
+ROG.Prefix.Thunderer: Hřmící
+ROG.Prefix.Martial: Bojový
+ROG.Prefix.Lifetaker: Život Beroucí
+ROG.Prefix.Truefire: Pravého Ohně
+ROG.Prefix.Winged: Okřídlený
+ROG.Prefix.Hawk: Jestřábí
+ROG.Prefix.Dragon: Dračí
+ROG.Prefix.Catapult: Katapultový
+ROG.Prefix.Snipers: Ostrostřelecký
+ROG.Prefix.Earthsplitter: Zemětříštivý
+ROG.Prefix.SoulCrusher: Duši Drtící
+ROG.Prefix.Spiritbound: Duchem Spoutaný
+ROG.Prefix.Dominating: Dominantní
+ROG.Prefix.Earthborn: Ze Země Zrozený
+ROG.Prefix.Iceborn: Z Ledu Zrozený
+ROG.Prefix.Flameborn: Z Plamenů Zrozený
+ROG.Prefix.Airy: Vzdušný
+ROG.Prefix.Minionbound: K Přisluhovači Spoutaný
+ROG.Prefix.DeathBinder: Smrt Vážící
+ROG.Prefix.Painbound: Bolestí Spoutaný
+ROG.Prefix.SoulTaker: Duše Beroucí
+ROG.Prefix.Earthshaker: Zemi Třesoucí
+ROG.Prefix.Fervent: Vroucí
+ROG.Prefix.Rejuvenating: Omlazující
+ROG.Prefix.Lightbender: Ohýbač Světla
+ROG.Prefix.Voidbender: Ohýbač Prázdnoty
+ROG.Prefix.Starbinder: Hvězdy Vážící
+ROG.Prefix.Chanter: Pěvecký
+ROG.Prefix.Mindbinder: Mysl Vážící
+ROG.Prefix.Forestbound: K Lesu Spoutaný
+ROG.Prefix.Plantbound: K Rostlinám Spoutaný
+ROG.Prefix.Animalbound: K Zvířatům Spoutaný
+ROG.Prefix.Withering: Chřadnoucí
+ROG.Prefix.ArborDefender: Obránce Stromů
+ROG.Prefix.ValeDefender: Obránce Údolí
+ROG.Prefix.Shadowbender: Ohýbač Stínů
+ROG.Prefix.Spiritbinder: Duchy Vážící
+ROG.Prefix.Runebender: Ohýbač Run
+ROG.Prefix.Stormcaller: Vyvolávač Bouří
+ROG.Prefix.Soulbinder: Duše Vážící
+ROG.Prefix.Blighted: Nakažený
+ROG.Prefix.Bodymender: Tělo Lékoucí
+ROG.Prefix.Empowering: Zmocňující
+ROG.Prefix.Ancestral: Předků
+ROG.Prefix.Shadowwalker: Stínem Kráčející
+ROG.Prefix.Venomous: Jedovatý
+ROG.Prefix.Melodic: Melodický
+ROG.Prefix.Resonant: Rezonující
+ROG.Prefix.Motivating: Motivující
+ROG.Prefix.Bladeblocker: Čepele Blokující
+ROG.Prefix.Protectors: Ochráncův
+ROG.Prefix.Courageous: Odvážný
+ROG.Prefix.Pacifying: Uklidňující
+ROG.Prefix.Savage: Divoký
+ROG.Prefix.Nightshade: Lulkový
+ROG.Prefix.Trail: Stopařův
+ROG.Prefix.Lifebender: Ohýbač Života
+ROG.Prefix.Ardent: Horlivý
+ROG.Prefix.Deathly: Smrtelný
+ROG.Prefix.Feverish: Horečnatý
+ROG.Prefix.Ominous: Zlověstný
+ROG.Prefix.Tormentbound: Muka Spoutávající
+ROG.Prefix.Wraithbound: Přízrak Spoutávající
+ROG.Prefix.VoidBinder: Prázdnotu Vážící
+ROG.Prefix.Shrill: Pronikavý
+ROG.Prefix.Keening: Kvílící
+ROG.Prefix.Uncanny: Podivný
+ROG.Prefix.Infernal: Pekelný
+ROG.Prefix.Bedeviled: Posedlý
+ROG.Prefix.Diabolic: Ďábelský
+ROG.Prefix.Aural: Aurický
+ROG.Prefix.Brawling: Rváčský
+ROG.Prefix.Maulers: Tlučivý
+ROG.Prefix.Magnetic: Magnetický
+ROG.Prefix.Striking: Úderný
+ROG.Prefix.Hardened: Tvrzený
+ROG.Prefix.Impenetrable: Neproniknutelný
+ROG.Prefix.Swift: Svižný
+ROG.Prefix.Devastating: Devastující
+ROG.Prefix.Masterful: Mistrovský
+ROG.Prefix.Fatal: Fatální
+ROG.Prefix.Unerring: Neomylný
+ROG.Prefix.Accurate: Přesný
+ROG.Prefix.Vengeful: Pomstychtivý
+ROG.Prefix.Phalanx: Falangový
+ROG.Prefix.Guarding: Strážící
+ROG.Prefix.Retaliators: Odvetný
+ROG.Prefix.Tireless: Neúnavný
+ROG.Prefix.Far-Reaching: Dalekosáhlý
+ROG.Prefix.Piercing: Pronikavý
+ROG.Prefix.Projecting: Promítající
+ROG.Prefix.Transcendent: Transcendentní
+ROG.Prefix.Efficient: Účinný
+ROG.Prefix.Flawless: Bezchybný
+ROG.Prefix.Cataclysmic: Kataklyzmatický
+ROG.Prefix.Elusive: Neuchopitelný
+ROG.Prefix.Deflecting: Odrážející
+ROG.Prefix.Parrying: Vykryvácí
+ROG.Prefix.Troll-blood: Trolí Krve
+ROG.Prefix.Invigorating: Osvěžující
+ROG.Prefix.Relentless: Neúprosný
+ROG.Prefix.Awakening: Probouzející
+ROG.Prefix.Unshaken: Neochvějný
+ROG.Prefix.Unfettered: Nespoutaný
+ROG.Prefix.Cleansing: Očišťující
+ROG.Prefix.Fleet: Rychlonohý
+ROG.Prefix.Amphibious: Obojživelný
+ROG.Prefix.Sure-Strike: Jistého Úderu
+ROG.Prefix.Exalted: Vznešený
+ROG.Prefix.Apex: Vrcholný
+ROG.Prefix.Ablative: Ochranný
+ROG.Prefix.Volleying: Pálící
+ROG.Prefix.Scavengers: Mrchožroutův
+ROG.Prefix.Augmenting: Zvětšující
+ROG.Prefix.Alacritous: Čiperný
+ROG.Prefix.Redeeming: Vykupující
+ROG.Prefix.Enfeebling: Oslabující
+ROG.Prefix.Vigorous: Rázný
+ROG.Prefix.Restorative: Obnovující
+ROG.Prefix.Expansive: Rozpínavý
+ROG.Prefix.Penetrating: Pronikající
+ROG.Prefix.Ruinous: Zničující
+ROG.Prefix.Lingering: Přetrvávající
+ROG.Prefix.Vicious: Zlomyslný
+ROG.Prefix.Unleashed: Utržený ze řetězu
+ROG.Prefix.Corporeal: Tělesný
+ROG.Prefix.Frost-warded: Před Mrazem Chráněný
+ROG.Prefix.Unshatterable: Nerozbitný
+ROG.Prefix.Grounded: Uzemněný
+ROG.Prefix.Fire-forged: Ohněm Kovaný
+ROG.Prefix.Immutable: Neměnný
+ROG.Prefix.Unseverable: Neoddělitelný
+ROG.Prefix.Inviolate: Nedotčený
+ROG.Prefix.Unpierceable: Nepropíchnutelný
+ROG.Prefix.Grandiose: Velkolepý
+ROG.Prefix.Slaughtering: Masakrující
+ROG.Prefix.Colossal: Kolosální
+ROG.Prefix.Nullifying: Nulující
+ROG.Prefix.Glancing: Letmý
+ROG.Prefix.Transmuting: Přeměňující
+ROG.Prefix.Siphoning: Vysávající
+ROG.Prefix.Purging: Očišťující
+ROG.Prefix.Untouchable: Nedotknutelný
+ROG.Prefix.Miraculous: Zázračný
+ROG.Prefix.Agonizing: Trýznivý
+ROG.Prefix.Ambidextrous: Obouruký
+ROG.Prefix.Twin-Striking: Dvojitého Úderu
+ROG.Prefix.Flurrying: Zběsilý
+ROG.Prefix.Corrosive: Korozivní
+ROG.Prefix.Composed: Klidný
+ROG.Prefix.Weightless: Stav Beztíže
+ROG.Prefix.Unburdened: Nezatížený
+ROG.Prefix.Oppressive: Tísnivý
+ROG.Prefix.Everlasting: Věčný
+ROG.Prefix.Aegis: Záštita
+ROG.Prefix.Mirroring: Zrcadlící
+ROG.Prefix.Titans: Titánský
+ROG.Prefix.Serpents: Hadí
+ROG.Prefix.Leviathans: Leviatanův
+ROG.Prefix.Zephyrs: Zefýrův
+ROG.Prefix.Omniscient: Vševědoucí
+ROG.Prefix.Divine: Božský
+ROG.Prefix.Harmonic: Harmonický
+ROG.Prefix.Sovereigns: Panovníkův
+ROG.Prefix.Ascendant: Vzestupný
+
+# ================================
+# BASE ITEM NAMES (Armor)
+# ================================
+ROG.BaseName.ClothCap: Plátěná čapka
+ROG.BaseName.ClothCoif: Plátěná kukla
+ROG.BaseName.ClothHelm: Plátěná helma
+ROG.BaseName.ClothSleeves: Plátěné rukávy
+ROG.BaseName.ClothArms: Plátěné nátepníky
+ROG.BaseName.ClothBoots: Plátěné boty
+ROG.BaseName.ClothGloves: Plátěné rukavice
+ROG.BaseName.ClothGauntlets: Plátěné obrněné rukavice
+ROG.BaseName.ClothPants: Plátěné kalhoty
+ROG.BaseName.ClothLegs: Plátěné nohavice
+ROG.BaseName.ClothLeggings: Plátěné kamaše
+ROG.BaseName.ClothHauberk: Plátěná košile
+ROG.BaseName.ClothBreastplate: Plátěný kyrys
+ROG.BaseName.ClothJerkin: Plátěná kazajka
+ROG.BaseName.ClothVest: Plátěná vesta
+ROG.BaseName.ClothRobe: Plátěná róba
+ROG.BaseName.LeatherCap: Kožená čapka
+ROG.BaseName.LeatherCoif: Kožená kukla
+ROG.BaseName.LeatherHelm: Kožená helma
+ROG.BaseName.LeatherSleeves: Kožené rukávy
+ROG.BaseName.LeatherArms: Kožené nátepníky
+ROG.BaseName.LeatherBoots: Kožené boty
+ROG.BaseName.LeatherGloves: Kožené rukavice
+ROG.BaseName.LeatherGauntlets: Kožené obrněné rukavice
+ROG.BaseName.LeatherPants: Kožené kalhoty
+ROG.BaseName.LeatherLegs: Kožené nohavice
+ROG.BaseName.LeatherLeggings: Kožené kamaše
+ROG.BaseName.LeatherHauberk: Kožená košile
+ROG.BaseName.LeatherBreastplate: Kožený kyrys
+ROG.BaseName.LeatherJerkin: Kožená kazajka
+ROG.BaseName.LeatherVest: Kožená vesta
+ROG.BaseName.StuddedCap: Cvočkovaná čapka
+ROG.BaseName.StuddedCoif: Cvočkovaná kukla
+ROG.BaseName.StuddedHelm: Cvočkovaná helma
+ROG.BaseName.StuddedSleeves: Cvočkované rukávy
+ROG.BaseName.StuddedArms: Cvočkované nátepníky
+ROG.BaseName.StuddedBoots: Cvočkované boty
+ROG.BaseName.StuddedGloves: Cvočkované rukavice
+ROG.BaseName.StuddedGauntlets: Cvočkované obrněné rukavice
+ROG.BaseName.StuddedPants: Cvočkované kalhoty
+ROG.BaseName.StuddedLegs: Cvočkované nohavice
+ROG.BaseName.StuddedLeggings: Cvočkované kamaše
+ROG.BaseName.StuddedHauberk: Cvočkovaná košile
+ROG.BaseName.StuddedBreastplate: Cvočkovaný kyrys
+ROG.BaseName.StuddedJerkin: Cvočkovaná kazajka
+ROG.BaseName.StuddedVest: Cvočkovaná vesta
+ROG.BaseName.ChainCap: Kroužková čapka
+ROG.BaseName.ChainCoif: Kroužková kukla
+ROG.BaseName.ChainHelm: Kroužková helma
+ROG.BaseName.ChainSleeves: Kroužkové rukávy
+ROG.BaseName.ChainArms: Kroužkové nátepníky
+ROG.BaseName.ChainBoots: Kroužkové boty
+ROG.BaseName.ChainGloves: Kroužkové rukavice
+ROG.BaseName.ChainGauntlets: Kroužkové obrněné rukavice
+ROG.BaseName.ChainPants: Kroužkové kalhoty
+ROG.BaseName.ChainLegs: Kroužkové nohavice
+ROG.BaseName.ChainLeggings: Kroužkové kamaše
+ROG.BaseName.ChainHauberk: Kroužková košile
+ROG.BaseName.ChainBreastplate: Kroužkový kyrys
+ROG.BaseName.ChainJerkin: Kroužková kazajka
+ROG.BaseName.ChainVest: Kroužková vesta
+ROG.BaseName.PlateCap: Plátová čapka
+ROG.BaseName.PlateCoif: Plátová kukla
+ROG.BaseName.PlateHelm: Plátová helma
+ROG.BaseName.PlateFullHelm: Plátová plná helma
+ROG.BaseName.PlateSleeves: Plátové rukávy
+ROG.BaseName.PlateArms: Plátové nátepníky
+ROG.BaseName.PlateBoots: Plátové boty
+ROG.BaseName.PlateGloves: Plátové rukavice
+ROG.BaseName.PlateGauntlets: Plátové obrněné rukavice
+ROG.BaseName.PlatePants: Plátové kalhoty
+ROG.BaseName.PlateLegs: Plátové nohavice
+ROG.BaseName.PlateLeggings: Plátové kamaše
+ROG.BaseName.PlateHauberk: Plátová košile
+ROG.BaseName.PlateBreastplate: Plátový kyrys
+ROG.BaseName.PlateJerkin: Plátová kazajka
+ROG.BaseName.PlateVest: Plátová vesta
+ROG.BaseName.ReinforcedCap: Zesílená čapka
+ROG.BaseName.ReinforcedCoif: Zesílená kukla
+ROG.BaseName.ReinforcedHelm: Zesílená helma
+ROG.BaseName.ReinforcedSleeves: Zesílené rukávy
+ROG.BaseName.ReinforcedArms: Zesílené nátepníky
+ROG.BaseName.ReinforcedBoots: Zesílené boty
+ROG.BaseName.ReinforcedGloves: Zesílené rukavice
+ROG.BaseName.ReinforcedGauntlets: Zesílené obrněné rukavice
+ROG.BaseName.ReinforcedPants: Zesílené kalhoty
+ROG.BaseName.ReinforcedLegs: Zesílené nohavice
+ROG.BaseName.ReinforcedLeggings: Zesílené kamaše
+ROG.BaseName.ReinforcedHauberk: Zesílená košile
+ROG.BaseName.ReinforcedBreastplate: Zesílený kyrys
+ROG.BaseName.ReinforcedJerkin: Zesílená kazajka
+ROG.BaseName.ReinforcedVest: Zesílená vesta
+ROG.BaseName.ScaleCap: Šupinová čapka
+ROG.BaseName.ScaleCoif: Šupinová kukla
+ROG.BaseName.ScaleHelm: Šupinová helma
+ROG.BaseName.ScaleSleeves: Šupinové rukávy
+ROG.BaseName.ScaleArms: Šupinové nátepníky
+ROG.BaseName.ScaleBoots: Šupinové boty
+ROG.BaseName.ScaleGloves: Šupinové rukavice
+ROG.BaseName.ScaleGauntlets: Šupinové obrněné rukavice
+ROG.BaseName.ScalePants: Šupinové kalhoty
+ROG.BaseName.ScaleLegs: Šupinové nohavice
+ROG.BaseName.ScaleLeggings: Šupinové kamaše
+ROG.BaseName.ScaleHauberk: Šupinová košile
+ROG.BaseName.ScaleBreastplate: Šupinový kyrys
+ROG.BaseName.ScaleJerkin: Šupinová kazajka
+ROG.BaseName.ScaleVest: Šupinová vesta
+
+# ================================
+# BASE ITEM NAMES (Weapons)
+# ================================
+ROG.BaseName.Dagger: Dýka
+ROG.BaseName.Dirk: Nůž
+ROG.BaseName.Gladius: Gladius
+ROG.BaseName.Stiletto: Stiletto
+ROG.BaseName.Axe: Sekera
+ROG.BaseName.Cleaver: Sekáček
+ROG.BaseName.Rapier: Rapír
+ROG.BaseName.Sword: Meč
+ROG.BaseName.HookedSword: Hákovitý Meč
+ROG.BaseName.Falcata: Falkata
+ROG.BaseName.Scimitar: Šamšir
+ROG.BaseName.Jambiya: Džambíja
+ROG.BaseName.Sabre: Šavle
+ROG.BaseName.Khopesh: Chopeš
+ROG.BaseName.Wakazashi: Wakizaši
+ROG.BaseName.Greatsword: Obouruční Meč
+ROG.BaseName.WarCleaver: Válečný Sekáček
+ROG.BaseName.GreatFalcata: Velká Falkata
+ROG.BaseName.GreatFalchion: Velký Tesák
+ROG.BaseName.TrollSplitter: Rozparovač Trolů
+ROG.BaseName.Katana: Katana
+ROG.BaseName.Greave: Holenice
+ROG.BaseName.Claw: Dráp
+ROG.BaseName.Fang: Tesák
+ROG.BaseName.Greataxe: Velká Sekera
+ROG.BaseName.GreatHammer: Velké Kladivo
+ROG.BaseName.Shillelagh: Kyj
+ROG.BaseName.WarMattock: Válečný Krumpáč
+ROG.BaseName.Mace: Palcát
+ROG.BaseName.Hammer: Kladivo
+ROG.BaseName.Adze: Teslice
+ROG.BaseName.Club: Obušek
+ROG.BaseName.Sickle: Srp
+ROG.BaseName.Lute: Loutna
+ROG.BaseName.Mandolin: Mandolína
+ROG.BaseName.Drum: Buben
+ROG.BaseName.Flute: Flétna
+ROG.BaseName.Harp: Harfa
+ROG.BaseName.Spear: Kopí
+ROG.BaseName.Harpoon: Harpuna
+ROG.BaseName.Trident: Trojzubec
+ROG.BaseName.ShortSpear: Krátké Kopí
+ROG.BaseName.LongSpear: Dlouhé Kopí
+ROG.BaseName.WarSpear: Válečné Kopí
+ROG.BaseName.CompositeBow: Skládaný Luk
+ROG.BaseName.GreatCompositeBow: Velký Skládaný Luk
+ROG.BaseName.HuntingBow: Lovecký Luk
+ROG.BaseName.Longbow: Dlouhý Luk
+ROG.BaseName.HeavyLongbow: Těžký Dlouhý Luk
+ROG.BaseName.RecurveBow: Reflexní Luk
+ROG.BaseName.GreatRecurveBow: Velký Reflexní Luk
+ROG.BaseName.ShortBow: Krátký Luk
+ROG.BaseName.Crossbow: Kuše
+ROG.BaseName.MorningStar: Řemdih
+ROG.BaseName.Flail: Cep
+ROG.BaseName.WeightedFlail: Těžký Cep
+ROG.BaseName.Whip: Bič
+ROG.BaseName.Chain: Řetěz
+ROG.BaseName.WarChain: Válečný Řetěz
+ROG.BaseName.BigShillelagh: Velký Kyj
+ROG.BaseName.HandAxe: Ruční Sekera
+ROG.BaseName.BeardedAxe: Bradatice
+ROG.BaseName.WarAxe: Válečná Sekera
+ROG.BaseName.LochaberAxe: Lochaberská Sekera
+ROG.BaseName.Pike: Píka
+ROG.BaseName.LucerneHammer: Lucernské Kladivo
+ROG.BaseName.Scythe: Kosa
+ROG.BaseName.MartialScythe: Bojová Kosa
+ROG.BaseName.WarScythe: Válečná Kosa
+ROG.BaseName.SmallShield: Malý Štít
+ROG.BaseName.MediumShield: Střední Štít
+ROG.BaseName.LargeShield: Velký Štít
+ROG.BaseName.MaulerStaff: Rváčova Hůl
+ROG.BaseName.Quarterstaff: Bojová Hůl
+ROG.BaseName.ShodQuarterstaff: Kovaná Bojová Hůl
+ROG.BaseName.HeavyShodQuarterstaff: Těžká Kovaná Bojová Hůl
+ROG.BaseName.FistWrap: Pěstní Omotávka
+ROG.BaseName.HandWrap: Ruční Omotávka
+ROG.BaseName.StuddedFistWrap: Cvočkovaná Pěstní Omotávka
+ROG.BaseName.StuddedHandWrap: Cvočkovaná Ruční Omotávka
+ROG.BaseName.SpikedFistWrap: Ostnitá Pěstní Omotávka
+
+# ================================
+# BASE ITEM NAMES (Magical)
+# ================================
+ROG.BaseName.Mantle: Přehoz
+ROG.BaseName.Cloak: Plášť
+ROG.BaseName.Belt: Opasek
+ROG.BaseName.Girdle: Pás
+ROG.BaseName.Choker: Obojek
+ROG.BaseName.Pendant: Přívěsek
+ROG.BaseName.Gem: Drahokam
+ROG.BaseName.Jewel: Klenot
+ROG.BaseName.Bracelet: Náramek
+ROG.BaseName.Bracer: Nátepník
+ROG.BaseName.Ring: Prsten
+ROG.BaseName.Wrap: Omotávka
+ROG.BaseName.Mythirian: Mytirián
+
+# ================================================================
+# TIER 1 PREFIXES (Level 36-48) - Commonality / Base Thematics
+# ================================================================
+ROG.TierPrefix.1_ClassicOverworld_Global: Drsný
+ROG.TierPrefix.1_ClassicDungeons_Global: Zaprášený
+ROG.TierPrefix.1_ClassicDungeons_CryptsAndUndead: Strašidelný
+ROG.TierPrefix.1_ClassicDungeons_CavesAndNature: Mechový
+ROG.TierPrefix.1_ClassicDungeons_VolcanicAndEarth: Ohořelý
+ROG.TierPrefix.1_ClassicDungeons_GlacialAndAquatic: Chladný
+ROG.TierPrefix.1_ClassicDungeons_MagicalAndEthereal: Zářící
+ROG.TierPrefix.1_ClassicDungeons_DemonicAndAbyss: Poskvrněný
+ROG.TierPrefix.1_ClassicDungeons_BeastAndGoblinoid: Kmenový
+ROG.TierPrefix.1_AtlantisOverworld_Global: Přílivem Opraný
+ROG.TierPrefix.1_AtlantisDungeons_CryptsAndUndead: Potopený
+ROG.TierPrefix.1_AtlantisDungeons_VolcanicAndEarth: Vroucí
+ROG.TierPrefix.1_AtlantisDungeons_GlacialAndAquatic: Pelagický
+ROG.TierPrefix.1_AtlantisDungeons_MagicalAndEthereal: Perleťový
+ROG.TierPrefix.1_Catacombs_CryptsAndUndead: Pohřbený
+ROG.TierPrefix.1_Catacombs_CavesAndNature: Podzemní
+ROG.TierPrefix.1_Catacombs_VolcanicAndEarth: Doutnající
+ROG.TierPrefix.1_Catacombs_GlacialAndAquatic: Vlhký
+ROG.TierPrefix.1_Catacombs_MagicalAndEthereal: Zahalený
+ROG.TierPrefix.1_Catacombs_DemonicAndAbyss: Zkažený
+ROG.TierPrefix.1_Catacombs_BeastAndGoblinoid: Surový
+ROG.TierPrefix.1_DeepCatacombs_CryptsAndUndead: Opuštěný
+ROG.TierPrefix.1_DeepCatacombs_CavesAndNature: Hlubinný
+ROG.TierPrefix.1_DeepCatacombs_VolcanicAndEarth: Čedičový
+ROG.TierPrefix.1_DeepCatacombs_GlacialAndAquatic: Zmrzlý
+ROG.TierPrefix.1_DeepCatacombs_MagicalAndEthereal: Světélkující
+ROG.TierPrefix.1_DeepCatacombs_DemonicAndAbyss: Zlomyslný
+ROG.TierPrefix.1_DeepCatacombs_BeastAndGoblinoid: Prvotní
+ROG.TierPrefix.1_MythicalZones_Global: Bájný
+ROG.TierPrefix.1_MythicalZones_CavesAndNature: Nezkrocený
+ROG.TierPrefix.1_MythicalZones_VolcanicAndEarth: Jiskrou Dotčený
+ROG.TierPrefix.1_MythicalZones_MagicalAndEthereal: Vzestupující
+ROG.TierPrefix.1_Battlegrounds_Global: Vojenský
+
+# ================================================================
+# TIER 2 PREFIXES (Level 49-64) - High Quality / Rare Thematics
+# ================================================================
+ROG.TierPrefix.2_ClassicOverworld_Global: Nadřazený
+ROG.TierPrefix.2_ClassicDungeons_Global: Výjimečný
+ROG.TierPrefix.2_ClassicDungeons_CryptsAndUndead: Makabrózní
+ROG.TierPrefix.2_ClassicDungeons_CavesAndNature: Zarostlý
+ROG.TierPrefix.2_ClassicDungeons_VolcanicAndEarth: Ohnivý
+ROG.TierPrefix.2_ClassicDungeons_GlacialAndAquatic: Ledovcový
+ROG.TierPrefix.2_ClassicDungeons_MagicalAndEthereal: Rezonující
+ROG.TierPrefix.2_ClassicDungeons_DemonicAndAbyss: Ďábelský
+ROG.TierPrefix.2_ClassicDungeons_BeastAndGoblinoid: Zuřivý
+ROG.TierPrefix.2_AtlantisOverworld_Global: Atlantský
+ROG.TierPrefix.2_AtlantisDungeons_CryptsAndUndead: Utopený
+ROG.TierPrefix.2_AtlantisDungeons_VolcanicAndEarth: Geotermální
+ROG.TierPrefix.2_AtlantisDungeons_GlacialAndAquatic: Benthický
+ROG.TierPrefix.2_AtlantisDungeons_MagicalAndEthereal: Arkánový
+ROG.TierPrefix.2_Catacombs_CryptsAndUndead: Hrobkový
+ROG.TierPrefix.2_Catacombs_CavesAndNature: Jeskynní
+ROG.TierPrefix.2_Catacombs_VolcanicAndEarth: Vulkanický
+ROG.TierPrefix.2_Catacombs_GlacialAndAquatic: Zatopený
+ROG.TierPrefix.2_Catacombs_MagicalAndEthereal: Záhadný
+ROG.TierPrefix.2_Catacombs_DemonicAndAbyss: Pekařský
+ROG.TierPrefix.2_Catacombs_BeastAndGoblinoid: Monstrózní
+ROG.TierPrefix.2_DeepCatacombs_CryptsAndUndead: Zatracený
+ROG.TierPrefix.2_DeepCatacombs_CavesAndNature: Hluboký
+ROG.TierPrefix.2_DeepCatacombs_VolcanicAndEarth: Obsidiánový
+ROG.TierPrefix.2_DeepCatacombs_GlacialAndAquatic: Krystalický
+ROG.TierPrefix.2_DeepCatacombs_MagicalAndEthereal: Duchovní
+ROG.TierPrefix.2_DeepCatacombs_DemonicAndAbyss: Zlověstný
+ROG.TierPrefix.2_DeepCatacombs_BeastAndGoblinoid: Masožravý
+ROG.TierPrefix.2_MythicalZones_Global: Hrdinský
+ROG.TierPrefix.2_MythicalZones_CavesAndNature: Posvátný
+ROG.TierPrefix.2_MythicalZones_VolcanicAndEarth: Sirný
+ROG.TierPrefix.2_MythicalZones_MagicalAndEthereal: Transcendentní
+ROG.TierPrefix.2_Battlegrounds_Global: Veteránský
+
+# ================================================================
+# TIER 3 PREFIXES (Level 65+) - Exceptional / Epic Thematics
+# ================================================================
+ROG.TierPrefix.3_ClassicOverworld_Global: Vynikající
+ROG.TierPrefix.3_ClassicDungeons_Global: Ctihodný
+ROG.TierPrefix.3_ClassicDungeons_CryptsAndUndead: Nekrotický
+ROG.TierPrefix.3_ClassicDungeons_CavesAndNature: Lesní
+ROG.TierPrefix.3_ClassicDungeons_VolcanicAndEarth: Magmatický
+ROG.TierPrefix.3_ClassicDungeons_GlacialAndAquatic: Kryogenní
+ROG.TierPrefix.3_ClassicDungeons_MagicalAndEthereal: Éterický
+ROG.TierPrefix.3_ClassicDungeons_DemonicAndAbyss: Hlubinný
+ROG.TierPrefix.3_ClassicDungeons_BeastAndGoblinoid: Bestiální
+ROG.TierPrefix.3_AtlantisOverworld_Global: Leviatanův
+ROG.TierPrefix.3_AtlantisDungeons_CryptsAndUndead: Neprozkoumaný
+ROG.TierPrefix.3_AtlantisDungeons_VolcanicAndEarth: Tektonický
+ROG.TierPrefix.3_AtlantisDungeons_GlacialAndAquatic: Hadální
+ROG.TierPrefix.3_AtlantisDungeons_MagicalAndEthereal: Prvotní
+ROG.TierPrefix.3_Catacombs_CryptsAndUndead: Nesmrtelný
+ROG.TierPrefix.3_Catacombs_CavesAndNature: Telurický
+ROG.TierPrefix.3_Catacombs_VolcanicAndEarth: V Jádru Kovaný
+ROG.TierPrefix.3_Catacombs_GlacialAndAquatic: Potopní
+ROG.TierPrefix.3_Catacombs_MagicalAndEthereal: Ley Propůjčený
+ROG.TierPrefix.3_Catacombs_DemonicAndAbyss: Ďábelský
+ROG.TierPrefix.3_Catacombs_BeastAndGoblinoid: Vrcholový
+ROG.TierPrefix.3_DeepCatacombs_CryptsAndUndead: Apokalyptický
+ROG.TierPrefix.3_DeepCatacombs_CavesAndNature: Geomantský
+ROG.TierPrefix.3_DeepCatacombs_VolcanicAndEarth: Z Pláště Zrozený
+ROG.TierPrefix.3_DeepCatacombs_GlacialAndAquatic: Absolutní
+ROG.TierPrefix.3_DeepCatacombs_MagicalAndEthereal: Ve Hvězdách Kovaný
+ROG.TierPrefix.3_DeepCatacombs_DemonicAndAbyss: Podsvětní
+ROG.TierPrefix.3_DeepCatacombs_BeastAndGoblinoid: Predátorský
+ROG.TierPrefix.3_MythicalZones_Global: Nebeský
+ROG.TierPrefix.3_MythicalZones_CavesAndNature: Yggdrasilův
+ROG.TierPrefix.3_MythicalZones_VolcanicAndEarth: Tartarský
+ROG.TierPrefix.3_MythicalZones_MagicalAndEthereal: Kosmický
+ROG.TierPrefix.3_Battlegrounds_Global: Vojevůdcův
+
+# ================================
+# PVP / RVR CUSTOM TIER PREFIXES
+# ================================
+ROG.TierPrefix.Mythical: Mýtický
+ROG.TierPrefix.Exalted: Vznešený
+ROG.TierPrefix.Fabled: Bájný
+ROG.TierPrefix.Legendary: Legendární
+ROG.TierPrefix.Eminent: Význačný
+ROG.TierPrefix.Illustrious: Slavný
+ROG.TierPrefix.Epic: Epický
+ROG.TierPrefix.Superior: Vynikající
+ROG.TierPrefix.Flawless: Bezchybný
+ROG.TierPrefix.Rare: Vzácný
+ROG.TierPrefix.Fine: Kvalitní
+ROG.TierPrefix.Uncommon: Neobvyklý

@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					Ohňostroj začne za {0} sekund.
+
+Items.Specialitems.BeerAlreadyDrinking:				Už piješ!
+Items.Specialitems.BeerDrinkDistance:				nápoje
+
+Items.Specialitems.PlaceAssiseTooFar:				Jsi příliš daleko na to, aby ses posadil.
+Items.Specialitems.PlaceAssiseTaken:				Místo je již obsazeno.
+
+Items.Specialitems.GuarkRingListened:				Tvá žádost byla vyslyšena.
+Items.Specialitems.GuarkRingUsed:					Cítíš mocnou auru, která tě znehybňuje.
+Items.Specialitems.GuarkRingNoPower:				V žilách ti neproudí dostatek životní síly k použití prstenu.
+Items.Specialitems.GuarkAmuletNoPower:				V žilách ti neproudí dostatek životní síly k použití amuletu.
+Items.Specialitems.GuarkRingTPCancelMoved:			Pohnul jsi se, magická žádost selhala a nemůžeš být teleportován.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Sundal jsi prsten z prstu, magická žádost selhala a nemůžeš být teleportován.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Sundal jsi amulet z krku, magická žádost selhala a nemůžeš být teleportován.
+Items.Specialitems.GuarkRingTPFailed:				Nebeská magie selhala, neznámá destinace.
+Items.Specialitems.GuarkRingTPNone:					Nebyla vznesena žádná žádost, tvá destinace je neznámá.
+Items.Specialitems.GuarkRingUsageCombat:			Nebeskou magii nemůžeš používat v boji!
+Items.Specialitems.GuarkRingUsageHere:				Na tomto místě nebeská magie neexistuje.
+Items.Specialitems.GuarkRingUsageJailed:			Nebeskou magii nemůžeš používat, když jsi uvězněn!
+Items.Specialitems.GuarkRingUsageMounted:			Nebeskou magii nemůžeš používat z jízdního zvířete!
+Items.Specialitems.GuarkRingUsageStealthed:			Nebeskou magii nemůžeš používat, když jsi neviditelný.
+Items.Specialitems.GuarkRingUsagePetrified:			Nebeskou magii nemůžeš používat, když jsi zkamenělý!
+Items.Specialitems.GuarkRingUsageDamned:			Nebeskou magii nemůžeš používat, když jsi prokletý!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Nebeskou magii nemůžeš používat v této podobě!
+Items.Specialitems.GuarkRingUsageMorphed:			Nebeskou magii nemůžeš používat pod vlivem okouzlení "{0}"!
+Items.Specialitems.GuarkRingUsageCrafting:			Nebeskou magii nemůžeš používat při výrobě!
+Items.Specialitems.GuarkRingUsageDuel:				Nebeskou magii nemůžeš používat během duelu!
+Items.Specialitems.GuarkRingUsageStealing:			Nebeskou magii nemůžeš používat, když okrádáš jiného hráče!
+Items.Specialitems.GuarkRingUsageAFK:				Nebeskou magii nemůžeš používat, když jsi AFK!
+Items.Specialitems.GuarkRingUsageClimbing:			Nebeskou magii nemůžeš používat při šplhání!
+Items.Specialitems.GuarkRingUsageRelic:				Nebeskou magii nemůžeš používat, když neseš relikvii území.
+Items.Specialitems.GuarkRingCannotUseHere:			Tento předmět zde nemůžeš použít.
+Items.Specialitems.GuarkRingDoNotMove:				Pro použití tohoto předmětu musíš zůstat na stejném místě.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Nedávno jsi byl v boji, takže musíš počkat, než budeš moci tento předmět znovu použít.
+
+Items.Specialitems.MiniPetNoCast:					Zde nemůžeš seslat toto kouzlo!
+
+Items.Specialitems.FirecampNoSit:					Nesedej si blízko táboráku, abys odstranil tento efekt.
+Items.Specialitems.FirecampHeatRegen:				Teplo z táboráku ti umožňuje rychleji obnovit zdraví.
+
+Items.Specialitems.StorageBag.NoBag:				Neprohlížíš si žádnou tašku!
+Items.Specialitems.StorageBag.BadItem:				Tento předmět do této tašky vložit nemůžeš!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		Tvůj {0} se roztříštil po spuštění při smrti!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		Z nějakého důvodu se předmět nepodařilo zničit!
+Items.Specialitems.DieTriggerSpell.FailRez:			Kletba sužující tvou mrtvolu je zde příliš silná, kouzlo oživení selhalo!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		Tvůj {0} je vyčerpán a byl odstraněn z tvého inventáře.

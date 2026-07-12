@@ -320,8 +320,10 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:            No puedes desconectarte; 
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:        Reino desconocido.
 
-GameObjects.GamePlayer.ReceiveItem.Receive:            Recibes {0}.
-GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:        Recibes {0} de {1}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Tu mochila está llena, ¡pero {0} se ha guardado en tu bolsa de almacenamiento!
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Tu mochila está llena, ¡pero una parte de {0} se ha guardado en tu bolsa de almacenamiento!
+GameObjects.GamePlayer.ReceiveItem.Receive:				Recibes {0}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:			Recibes {0} de {1}.
 
 GameObjects.GamePlayer.ReceiveTradeItem.CantTrade:         No puedes comerciar con este objeto.
 GameObjects.GamePlayer.ReceiveTradeItem.StillSelfcrafting: Aún estás encantando.
@@ -525,6 +527,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Este marcador de posición 
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Tu huevo de Genistar ha sido colocado en tu jardín. ¡Ahora es tuyo para cuidarlo y moldearlo según tus deseos!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Debes liberar a tu Genistar invocado antes de volver a colocarlo en el jardín.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Liberas a {0} de vuelta en tu jardín para que deambule.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			No puedes tirar un Genistar al suelo. Debe colocarse en un espacio de jardín.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} grita: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} grita algo en un idioma que no entiendes.
@@ -541,8 +544,10 @@ GameObjects.GamePlayer.Jailed:                         {0} ha sido encarcelado p
 GameObjects.GamePlayer.Jailed.Unknown:                 {0} ha sido encarcelado por los guardias.
 GameObjects.GamePlayer.Released:                       {0} ha sido liberado de la cárcel.
 
-GameObjects.GamePlayer.RvR:                            – Jugadores asesinados en total: {0} –
-GameObjects.GamePlayer.RvR.Champion:                   – Jugadores asesinados en total: {0} – Campeón del día: {1} ({2} atacantes enemigos asesinados)
+GameObjects.GamePlayer.RvR:								[RvR] Jugadores asesinados en total: {0}
+GameObjects.GamePlayer.RvR.Champion:					[RvR] Jugadores asesinados en total: {0} – Campeón del día: {1} ({2} atacantes enemigos asesinados)
+GameObjects.GamePlayer.RvRDialog:						Jugadores asesinados en total: {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:				Campeón del día: {0} ({1} atacantes enemigos asesinados)
 GameObjects.GamePlayer.RvR.Control:                    ¡El RvR {1} está bajo el control de {0}!
 GameObjects.GamePlayer.RvR.Open.Claimable:             ¿Deseas [reclamar el control]?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:            Debes esperar {0} segundos antes de poder reclamar el control.

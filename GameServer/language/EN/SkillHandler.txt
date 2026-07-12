@@ -85,6 +85,7 @@ SkillBase.RegisterPropertyNames.EtherealShriekFocus:	Ethereal Shriek Focus
 SkillBase.RegisterPropertyNames.EvadeChance:			Evade chance
 SkillBase.RegisterPropertyNames.ExperienceLoss:			Death Experience Loss Reduction
 SkillBase.RegisterPropertyNames.Fatigue:				Fatigue
+SkillBase.RegisterPropertyNames.FatigueConsumption:		Fatigue Consumption Reduction
 SkillBase.RegisterPropertyNames.FireMagic:				Fire Magic
 SkillBase.RegisterPropertyNames.FireMagicFocus:			Fire Magic Focus
 SkillBase.RegisterPropertyNames.FistWraps:				Fist Wraps
@@ -378,6 +379,7 @@ SkillBase.Property.EtherealShriekFocus:	Ethereal Shriek Focus
 SkillBase.Property.EvadeChance:			Evade chance
 SkillBase.Property.ExperienceLoss:			Death Experience Loss Reduction
 SkillBase.Property.Fatigue:				Fatigue
+SkillBase.Property.FatigueConsumption:		Fatigue Consumption Reduction
 SkillBase.Property.FireMagic:				Fire Magic
 SkillBase.Property.FireMagicFocus:			Fire Magic Focus
 SkillBase.Property.FistWraps:				Fist Wraps

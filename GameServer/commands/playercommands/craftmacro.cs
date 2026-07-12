@@ -267,15 +267,30 @@ namespace DOL.GS.Commands
                         }
 
                         var playerItems = new List<InventoryItem>();
+                        List<Scripts.StorageBagItem> bags = new List<Scripts.StorageBagItem>();
 
                         lock (client.Player.Inventory)
                         {
                             foreach (var pItem in client.Player.Inventory.AllItems)
                             {
-                                if (pItem.SlotPosition < (int)eInventorySlot.FirstBackpack ||
-                                    pItem.SlotPosition > (int)eInventorySlot.LastBackpack)
-                                    continue;
-                                playerItems.Add(pItem);
+                                if (pItem.SlotPosition >= (int)eInventorySlot.FirstBackpack &&
+                                    pItem.SlotPosition <= (int)eInventorySlot.LastBackpack)
+                                {
+                                    playerItems.Add(pItem);
+
+                                    // Make bag contents readable to the CraftMacro checker
+                                    if (pItem is Scripts.StorageBagItem sbi)
+                                        bags.Add(sbi);
+                                }
+                            }
+                        }
+
+                        foreach (var bag in bags)
+                        {
+                            Scripts.StorageBagVault vault = new Scripts.StorageBagVault(client.Player, bag);
+                            foreach (var vItem in vault.DBItems(client.Player))
+                            {
+                                if (vItem != null) playerItems.Add(vItem);
                             }
                         }
 

@@ -1,8 +1,10 @@
 ﻿using DOL.AI.Brain;
+using DOL.Database;
+using DOL.Language;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DOL.Database;
+using static DOL.GS.NpcTemplateMgr;
 
 namespace DOL.GS
 {
@@ -13,10 +15,8 @@ namespace DOL.GS
     /// </summary>
     public class ROGMobGenerator : LootGeneratorBase
     {
-
         //base chance in %
         public static ushort BASE_ROG_CHANCE = 13;
-
 
         /// <summary>
         /// Generate loot for given mob
@@ -27,6 +27,11 @@ namespace DOL.GS
         public override LootList GenerateLoot(GameObject mob, GameObject killer)
         {
             LootList loot = base.GenerateLoot(mob, killer);
+
+            if (mob != null && RegionMapper.GetCategoryFromRegionID(mob.CurrentRegionID) == eRegionCategory.Restricted)
+            {
+                return loot;
+            }
 
             try
             {
@@ -39,6 +44,12 @@ namespace DOL.GS
                 if (killedcon <= -3)
                 {
                     return loot;
+                }
+
+                int bodyType = 0;
+                if (mob is GameNPC npc)
+                {
+                    bodyType = (int)npc.BodyType;
                 }
 
                 eCharacterClass classForLoot = (eCharacterClass)player.CharacterClass.ID;
@@ -74,7 +85,7 @@ namespace DOL.GS
                         if (Util.Chance(chance) && numDrops < maxDropCap)
                         {
                             classForLoot = GetRandomClassFromBattlegroup(bg);
-                            var item = GenerateItemTemplate(player, classForLoot, (byte)(mob.Level + 1), killedcon);
+                            var item = GenerateItemTemplate(player, classForLoot, (byte)(mob.Level + 1), killedcon, mob.CurrentRegionID, bodyType);
                             loot.AddFixed(item, 1);
                             numDrops++;
                         }
@@ -113,7 +124,7 @@ namespace DOL.GS
                         if (Util.Chance(finalChance) && numDrops < MaxDropCap)
                         {
                             classForLoot = GetRandomClassFromGroup(player.Group);
-                            var item = GenerateItemTemplate(player, classForLoot, (byte)(mob.Level + 1), killedcon);
+                            var item = GenerateItemTemplate(player, classForLoot, (byte)(mob.Level + 1), killedcon, mob.CurrentRegionID, bodyType);
                             loot.AddFixed(item, 1);
                             numDrops++;
                         }
@@ -123,13 +134,13 @@ namespace DOL.GS
                     if (numDrops < MaxDropCap && guaranteedDrop > 0)
                     {
                         classForLoot = GetRandomClassFromGroup(player.Group);
-                        var item = GenerateItemTemplate(player, classForLoot, (byte)(mob.Level + 1), killedcon);
+                        var item = GenerateItemTemplate(player, classForLoot, (byte)(mob.Level + 1), killedcon, mob.CurrentRegionID, bodyType);
                         loot.AddFixed(item, 1);
                     }
 
                     if (player.Level < 50 || mob.Level < 50)
                     {
-                        var item = AtlasROGManager.GenerateBeadOfRegeneration();
+                        var item = GlobalROGManager.GenerateBeadOfRegeneration();
                         loot.AddRandom(2, item, 1);
                     }
                     //classForLoot = GetRandomClassFromGroup(player.Group);
@@ -156,7 +167,7 @@ namespace DOL.GS
 
                     if (Util.Chance(finalChance))
                     {
-                        GeneratedUniqueItem tmp = AtlasROGManager.GenerateMonsterLootROG(player.Realm, classForLoot, (byte)(mob.Level + 1), false);
+                        GeneratedUniqueItem tmp = GlobalROGManager.GenerateMonsterLootROG(player.Realm, classForLoot, (byte)(mob.Level + 1), false, mob.CurrentRegionID);
                         item = tmp;
                         item.MaxCount = 1;
                         loot.AddFixed(item, 1);
@@ -179,7 +190,7 @@ namespace DOL.GS
 
                     if (player.Level < 50 || mob.Level < 50)
                     {
-                        item = AtlasROGManager.GenerateBeadOfRegeneration();
+                        item = GlobalROGManager.GenerateBeadOfRegeneration();
                         loot.AddRandom(2, item, 1);
                     }
                 }
@@ -198,12 +209,13 @@ namespace DOL.GS
         }
 
 
-        private ItemTemplate GenerateItemTemplate(GamePlayer player, eCharacterClass classForLoot, byte lootLevel, int killedcon)
+        private ItemTemplate GenerateItemTemplate(GamePlayer player, eCharacterClass classForLoot, byte lootLevel, int killedcon, int regionID, int bodyType)
         {
             ItemTemplate item = null;
+            string lang = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
 
-
-            GeneratedUniqueItem tmp = AtlasROGManager.GenerateMonsterLootROG(player.Realm, classForLoot, lootLevel, false);
+            GeneratedUniqueItem tmp = GlobalROGManager.GenerateMonsterLootROG(player.Realm, classForLoot, lootLevel, false, regionID, bodyType, lang);
+            if (tmp == null) return null;
             tmp.GenerateItemQuality(killedcon);
             //tmp.CapUtility(mob.Level + 1);
             item = tmp;

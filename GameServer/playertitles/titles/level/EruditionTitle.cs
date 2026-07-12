@@ -13,7 +13,15 @@ namespace DOL.GS.PlayerTitles
         protected EruditionTitle(int level)
         {
             Level = level;
-            CastingSpeedBonus = level;
+
+            if (level <= 5)
+            {
+                CastingSpeedBonus = level;
+            }
+            else
+            {
+                CastingSpeedBonus = 5 + ((level - 5) * 2);
+            }
 
             if (level >= 5)
             {

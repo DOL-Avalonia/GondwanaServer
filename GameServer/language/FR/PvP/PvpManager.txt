@@ -26,6 +26,7 @@ PvPManager.Group:						(Groupe)
 PvPManager.NotEnoughPlayers:				Vous n'avez pas gagné de points car il n'y a pas assez de joueurs dans cette session PvP.
 PvPManager.LevelTooLow:						Vous devez être au moins niveau {0} pour participer au PvP !
 PvPManager.GroupMemberLevelTooLow:			Votre groupe ne peut pas rejoindre ! {0} doit être au moins niveau {1} pour participer au PvP.
+PvPManager.ChestsHaveSpawned:				Félicitations ! Vous vous êtes classé parmi les premiers en PvP. Trois coffres de récompenses sont apparus près du Téléporteur PvP. Vous pouvez en choisir UN.
 
 PvPManager.BossHunt.ScoredPoints:			Vous avez marqué {0} points sur {1} !
 PvPManager.BossHunt.SlewBoss:				[PvP] {0} {1} a terrassé {2} pour {3} points !
@@ -93,6 +94,19 @@ PvP.Predator.PreyLost:						Vous avez perdu votre proie... Une nouvelle proie vo
 
 PvPManager.Score.Points:					{0} points
 PvPManager.Score.Pts:						{0} pts
+PvPManager.Score.Title:						--- Scores finaux pour le PvP du {1} ---
+PvPManager.Score.NoWinner:					Aucun vainqueur pour cette session.
+PvPManager.Score.Rank.1:					Premier
+PvPManager.Score.Rank.2:					Deuxième
+PvPManager.Score.Rank.3:					Troisième
+PvPManager.Score.Rank.N:					{0}ème
+PvPManager.Score.Dialog.Fallback:			- {3} gagnant(s) {0} : {2} points.
+PvPManager.Score.Dialog.Player.1:			- Premier gagnant {0} : {2} points.
+PvPManager.Score.Dialog.Player.2:			- Deuxième gagnant {0} : {2} points.
+PvPManager.Score.Dialog.Player.3:			- Troisième gagnant {0} : {2} points.
+PvPManager.Score.Dialog.Guild.1:			- Première guilde {0} : {2} points.
+PvPManager.Score.Dialog.Guild.2:			- Deuxième guilde {0} : {2} points.
+PvPManager.Score.Dialog.Guild.3:			- Troisième guilde {0} : {2} points.
 PvPManager.Score.Announce.Guild.1:			[PvP] La guilde {0} a gagné la première place dans {1} avec {2} points!
 PvPManager.Score.Announce.Guild.2:			[PvP] La guilde {0} a gagné la deuxième place dans {1} avec {2} points!
 PvPManager.Score.Announce.Guild.3:			[PvP] La guilde {0} a gagné la troisième place dans {1} avec {2} points!

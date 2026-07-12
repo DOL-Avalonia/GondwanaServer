@@ -1,4 +1,4 @@
-RvrManager.Score.Title:		--- RvR End ---
+RvrManager.Score.Title:		--- RvR Ending scores for the {0} ---
 RvrManager.Score.NoWinner:	Winner: No winner - no sufficient participation!
 RvrManager.Score.Winner:	Winner
 
@@ -21,6 +21,7 @@ RvRManager.CurrentChampion:			- Current RvR champion:
 RvRManager.Status:					The rvr is 
 RvRManager.UpdateFrequency:			(Statistics updated 30 seconds)
 RvRManager.CannotAttackRealmMember:	You cannot attack a member of your own realm!
+RvRManager.ChestsHaveSpawned:		You are the Champion of the Day! Three reward chests have spawned at the RvR Teleporter. You may pick ONE.
 RvRManager.Players:					players
 RvRManager.RealmPoints:				RP
 RvRManager.Open:					open

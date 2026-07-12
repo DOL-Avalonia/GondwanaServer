@@ -1990,7 +1990,7 @@ namespace DOL.GS.PacketHandler
                             //Item Price
                             pak.WriteInt((uint)entry.GetCurrencyFor(m_gameClient.Player));
                             pak.WriteShort((ushort)item.Model);
-                            pak.WritePascalString(item.Name);
+                            pak.WritePascalString(LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name));
                         }
                         else
                         {
@@ -2073,6 +2073,7 @@ namespace DOL.GS.PacketHandler
                             pak.WriteShort((ushort)item.Model); //model
                             pak.WriteShort((ushort)item.Color); //color
                             pak.WriteShort((ushort)item.Effect); //weaponproc
+                            string name = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name);
                             if (item.Count > 1)
                                 pak.WritePascalString(item.Count + " " + item.Name);
                             else
@@ -4343,12 +4344,12 @@ namespace DOL.GS.PacketHandler
                         else
                             pak.WriteShort((ushort)item.Color);
                         pak.WriteShort((ushort)item.Effect);
-                        string name = item.Name;
+                        string name = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name);
                         if (item.Count > 1)
                             name = item.Count + " " + name;
                         if (item.SellPrice > 0)
                         {
-                            if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
+                            if (Properties.CONSIGNMENT_USE_BP)
                                 name += "[" + item.SellPrice + " BP]";
                             else
                                 name += "[" + Money.GetString(item.SellPrice) + "]";

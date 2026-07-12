@@ -321,8 +321,10 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:            Bạn không thể thoát
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:        Vương quốc không xác định.
 
-GameObjects.GamePlayer.ReceiveItem.Receive:            Bạn nhận {0}.
-GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:        Bạn nhận {0} từ {1}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Ba lô của bạn đã đầy nhưng {0} đã được cất vào túi lưu trữ của bạn!
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Ba lô của bạn đã đầy nhưng một phần của {0} đã được cất vào túi lưu trữ của bạn!
+GameObjects.GamePlayer.ReceiveItem.Receive:				Bạn nhận {0}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:			Bạn nhận {0} từ {1}.
 
 GameObjects.GamePlayer.ReceiveTradeItem.CantTrade:         Bạn không thể giao dịch vật phẩm này.
 GameObjects.GamePlayer.ReceiveTradeItem.StillSelfcrafting: Bạn vẫn đang phù phép.
@@ -526,6 +528,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Vật giữ chỗ Genistar 
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Trứng Genistar của bạn đã được đặt trong vườn. Giờ đây, bạn có quyền chăm sóc và nuôi dưỡng nó theo mong muốn của mình!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Bạn phải thả Genistar đã triệu hồi của mình trước khi đặt nó trở lại khu vườn.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Bạn thả {0} trở lại khu vườn của mình để nó tự do đi lại.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			Bạn không thể vứt Genistar xuống đất. Nó phải được đặt vào một ô vườn.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} hét: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} hét điều gì đó bằng ngôn ngữ bạn không hiểu.
@@ -542,8 +545,10 @@ GameObjects.GamePlayer.Jailed:                         {0} bị {1} tống vào 
 GameObjects.GamePlayer.Jailed.Unknown:                 {0} bị lính gác tống vào ngục.
 GameObjects.GamePlayer.Released:                       {0} được thả khỏi ngục.
 
-GameObjects.GamePlayer.RvR:                            – Tổng số người chơi đã hạ: {0} –
-GameObjects.GamePlayer.RvR.Champion:                   – Tổng số người chơi đã hạ: {0} – Nhà vô địch trong ngày: {1} ({2} kẻ tấn công địch bị hạ)
+GameObjects.GamePlayer.RvR:								[RvR] Tổng số người chơi đã hạ: {0}
+GameObjects.GamePlayer.RvR.Champion:					[RvR] Tổng số người chơi đã hạ: {0} – Nhà vô địch trong ngày: {1} ({2} kẻ tấn công địch bị hạ)
+GameObjects.GamePlayer.RvRDialog:						Tổng số người chơi đã hạ: {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:				Nhà vô địch trong ngày: {1} ({2} kẻ tấn công địch bị hạ)
 GameObjects.GamePlayer.RvR.Control:                    Khu vực RvR {1} hiện do {0} kiểm soát!
 GameObjects.GamePlayer.RvR.Open.Claimable:             Bạn có muốn [giành quyền kiểm soát]?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:            Bạn phải chờ {0} giây trước khi có thể giành quyền kiểm soát.

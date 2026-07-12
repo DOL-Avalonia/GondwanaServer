@@ -321,8 +321,10 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:            Je kunt niet uitloggen; j
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:        Onbekend rijk.
 
-GameObjects.GamePlayer.ReceiveItem.Receive:            Je ontvangt {0}.
-GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:        Je ontvangt {0} van {1}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Je rugzak is vol, maar {0} is in je opbergtas geplaatst!
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Je rugzak is vol, maar een deel van {0} is in je opbergtas geplaatst!
+GameObjects.GamePlayer.ReceiveItem.Receive:				Je ontvangt {0}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:			Je ontvangt {0} van {1}.
 
 GameObjects.GamePlayer.ReceiveTradeItem.CantTrade:         Je kunt dit voorwerp niet verhandelen.
 GameObjects.GamePlayer.ReceiveTradeItem.StillSelfcrafting: Je bent nog steeds aan het betoveren.
@@ -526,6 +528,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Deze Genistar-placeholder m
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Je Genistar-ei is in je tuin geplaatst. Het is nu aan jou om het te verzorgen en te vormen naar jouw wensen!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Je moet je opgeroepen Genistar vrijlaten voordat je hem terug in de tuin kunt plaatsen.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Je laat {0} weer los in je tuin om rond te dwalen.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			Je kunt een Genistar niet op de grond laten vallen. Het moet in een tuinslot worden geplaatst.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} roept: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} roept iets in een taal die je niet begrijpt.
@@ -542,8 +545,10 @@ GameObjects.GamePlayer.Jailed:                         {0} is door {1} in de gev
 GameObjects.GamePlayer.Jailed.Unknown:                 {0} is door de wachters in de gevangenis gegooid.
 GameObjects.GamePlayer.Released:                       {0} is uit de gevangenis vrijgelaten.
 
-GameObjects.GamePlayer.RvR:                            – Totaal gedode spelers: {0} –
-GameObjects.GamePlayer.RvR.Champion:                   – Totaal gedode spelers: {0} – Kampioen van de dag: {1} ({2} gedode vijandelijke aanvallers)
+GameObjects.GamePlayer.RvR:								[RvR] Totaal gedode spelers: {0}
+GameObjects.GamePlayer.RvR.Champion:					[RvR] Totaal gedode spelers: {0} – Kampioen van de dag: {1} ({2} gedode vijandelijke aanvallers)
+GameObjects.GamePlayer.RvRDialog:						Totaal gedode spelers: {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:				Kampioen van de dag: {0} ({1} gedode vijandelijke aanvallers)
 GameObjects.GamePlayer.RvR.Control:                    De RvR {1} staat onder de controle van {0}!
 GameObjects.GamePlayer.RvR.Open.Claimable:             Wil je [de controle opeisen]?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:            Je moet {0} seconden wachten voordat je de controle kunt opeisen.

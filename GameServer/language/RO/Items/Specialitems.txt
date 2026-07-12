@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					Artificiile vor începe în {0} secunde.
+
+Items.Specialitems.BeerAlreadyDrinking:				Bei deja!
+Items.Specialitems.BeerDrinkDistance:				băuturi
+
+Items.Specialitems.PlaceAssiseTooFar:				Ești prea departe pentru a te așeza.
+Items.Specialitems.PlaceAssiseTaken:				Locul este deja ocupat.
+
+Items.Specialitems.GuarkRingListened:				Cererea ta a fost ascultată.
+Items.Specialitems.GuarkRingUsed:					Simți o aură puternică ce te imobilizează.
+Items.Specialitems.GuarkRingNoPower:				Nu ai suficientă energie vitală în vene pentru a folosi inelul.
+Items.Specialitems.GuarkAmuletNoPower:				Nu ai suficientă energie vitală în vene pentru a folosi amuleta.
+Items.Specialitems.GuarkRingTPCancelMoved:			Te-ai mișcat, cererea magică a eșuat și nu poți fi teleportat.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Ai scos inelul de pe deget, cererea magică a eșuat și nu poți fi teleportat.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Ai scos amuleta de la gât, cererea magică a eșuat și nu poți fi teleportat.
+Items.Specialitems.GuarkRingTPFailed:				Magia celestă a eșuat, destinație necunoscută.
+Items.Specialitems.GuarkRingTPNone:					Nu a fost făcută nicio cerere, destinația ta este necunoscută.
+Items.Specialitems.GuarkRingUsageCombat:			Nu poți folosi magia celestă în timpul luptei!
+Items.Specialitems.GuarkRingUsageHere:				Magia celestă nu există în acest loc.
+Items.Specialitems.GuarkRingUsageJailed:			Nu poți folosi magia celestă cât timp ești întemnițat!
+Items.Specialitems.GuarkRingUsageMounted:			Nu poți folosi magia celestă de pe o montură!
+Items.Specialitems.GuarkRingUsageStealthed:			Nu poți folosi magia celestă în timp ce ești ascuns.
+Items.Specialitems.GuarkRingUsagePetrified:			Nu poți folosi magia celestă în timp ce ești pietrificat!
+Items.Specialitems.GuarkRingUsageDamned:			Nu poți folosi magia celestă în timp ce ești blestemat!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Nu poți folosi magia celestă cât timp te afli sub această formă!
+Items.Specialitems.GuarkRingUsageMorphed:			Nu poți folosi magia celestă în timp ce te afli sub o vrajă de "{0}"!
+Items.Specialitems.GuarkRingUsageCrafting:			Nu poți folosi magia celestă în timp ce creezi obiecte!
+Items.Specialitems.GuarkRingUsageDuel:				Nu poți folosi magia celestă în timp ce ești într-un duel!
+Items.Specialitems.GuarkRingUsageStealing:			Nu poți folosi magia celestă în timp ce furi de la alt jucător!
+Items.Specialitems.GuarkRingUsageAFK:				Nu poți folosi magia celestă în timp ce ești AFK!
+Items.Specialitems.GuarkRingUsageClimbing:			Nu poți folosi magia celestă în timp ce te cațeri!
+Items.Specialitems.GuarkRingUsageRelic:				Nu poți folosi magia celestă în timp ce porți o relicvă a teritoriului.
+Items.Specialitems.GuarkRingCannotUseHere:			Nu poți folosi acest obiect aici.
+Items.Specialitems.GuarkRingDoNotMove:				Trebuie să rămâi în același loc pentru a folosi acest obiect.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Ai fost în luptă recent, așa că trebuie să aștepți pentru a putea folosi acest obiect din nou.
+
+Items.Specialitems.MiniPetNoCast:					Nu poți arunca această vrajă aici!
+
+Items.Specialitems.FirecampNoSit:					Nu te așeza lângă un foc de tabără pentru a elimina acest efect.
+Items.Specialitems.FirecampHeatRegen:				Căldura focului de tabără îți permite să îți recuperezi viața mai repede.
+
+Items.Specialitems.StorageBag.NoBag:				Nu te uiți la o geantă!
+Items.Specialitems.StorageBag.BadItem:				Nu poți pune acest obiect în această geantă!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		Obiectul tău {0} se sparge după ce a fost declanșat la moarte!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		Nu s-a putut distruge obiectul din anumite motive!
+Items.Specialitems.DieTriggerSpell.FailRez:			Blestemul care îți afectează cadavrul este prea puternic aici, vraja de înviere a eșuat!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		Obiectul tău {0} este epuizat și a fost eliminat din inventar.

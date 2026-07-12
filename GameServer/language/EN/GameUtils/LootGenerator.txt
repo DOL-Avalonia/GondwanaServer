@@ -1,3 +1,12 @@
 
 Lootgenerator.OneTimeDrop.ReceiveItem:		You receive {0} from {1}!
 Lootgenerator.OneTimeDrop.InventoryFull:	Your inventory is full and a one time drop cannot be added!
+
+Lootgenerator.GlobalROGManager.InventoryFull:	Your inventory is full, your {0}s have been placed on the ground.
+
+Lootgenerator.RewardChests.NotYourChest:	This reward chest does not belong to you.
+Lootgenerator.RewardChests.InventoryFull:	Your backpack is full! Make some room before opening this chest.
+Lootgenerator.RewardChests.YouGetScroll:	You unsealed the Magic Scrolls chest! You received: {0}
+Lootgenerator.RewardChests.ChestEmpty:		This chest is mysteriously empty...
+Lootgenerator.RewardChests.YouGetJewel:		You unsealed the Magical Jewellery chest! You received a unique {0} tailored to your class!
+Lootgenerator.RewardChests.YouGetArmament:	You unsealed the Armaments chest! You received a unique {0} tailored to your class!

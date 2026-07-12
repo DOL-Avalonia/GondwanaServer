@@ -150,7 +150,21 @@ namespace DOL.Language
             try
             {
                 if (args.Length > 0)
+                {
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        if (args[i] is string strArg && strArg.Contains("[ROG]"))
+                        {
+                            int rogIndex = strArg.IndexOf("[ROG]");
+                            string prefix = strArg.Substring(0, rogIndex);
+                            string rogString = strArg.Substring(rogIndex);
+
+                            args[i] = prefix + GetItemNameMessage(language, rogString);
+                        }
+                    }
+
                     translation = string.Format(translation, args);
+                }
             }
             catch (Exception ex)
             {
@@ -1851,6 +1865,125 @@ namespace DOL.Language
         {
             if (string.IsNullOrEmpty(messageKey))
                 return string.Empty;
+
+            if (messageKey.StartsWith("[ROG]"))
+            {
+                string[] parts = messageKey.Substring(5).Split('|');
+                if (parts.Length >= 2)
+                {
+                    string prefixKey = parts[0];
+                    string tierKey = "";
+                    string baseNameKey = "";
+                    string mobName = null;
+
+                    bool isCustomTier = false;
+                    if (parts.Length >= 3 && !string.IsNullOrEmpty(parts[1]))
+                    {
+                        string t = parts[1];
+                        if (t.Equals("Mythical", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Exalted", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Fabled", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Legendary", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Eminent", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Illustrious", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Epic", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Superior", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Flawless", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Rare", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Fine", StringComparison.OrdinalIgnoreCase) ||
+                            t.Equals("Uncommon", StringComparison.OrdinalIgnoreCase))
+                        {
+                            isCustomTier = true;
+                        }
+                    }
+
+                    // New format parts[1] will be empty or start with "1_", "2_", "3_"
+                    bool isNewFormat = parts.Length >= 3 &&
+                   (string.IsNullOrEmpty(parts[1]) ||
+                    parts[1].StartsWith("1_") ||
+                    parts[1].StartsWith("2_") ||
+                    parts[1].StartsWith("3_") ||
+                    isCustomTier);
+
+                    if (isNewFormat)
+                    {
+                        tierKey = parts[1];
+                        baseNameKey = parts[2];
+                        if (parts.Length >= 4) mobName = string.IsNullOrEmpty(parts[3]) ? null : parts[3];
+                    }
+                    else
+                    {
+                        baseNameKey = parts[1];
+                        if (parts.Length >= 3) mobName = string.IsNullOrEmpty(parts[2]) ? null : parts[2];
+                    }
+
+                    // Translate Base Name
+                    string translatedBaseName = baseNameKey;
+                    if (TryGetTranslation(out string tBase, language, "ROG.BaseName." + baseNameKey))
+                        translatedBaseName = tBase;
+
+                    // Translate Tier Prefix
+                    string translatedTier = "";
+                    if (!string.IsNullOrEmpty(tierKey))
+                    {
+                        if (TryGetTranslation(out string tTier, language, "ROG.TierPrefix." + tierKey))
+                            translatedTier = tTier;
+                        else if (isCustomTier)
+                            translatedTier = tierKey;
+                    }
+
+                    // Translate Magic Prefix
+                    string translatedPrefix = "";
+                    if (!string.IsNullOrEmpty(prefixKey))
+                    {
+                        if (TryGetTranslation(out string tPrefix, language, "ROG.Prefix." + prefixKey))
+                            translatedPrefix = tPrefix;
+                    }
+
+                    // Combine them depending on the language's grammar
+                    string combinedName = translatedBaseName;
+
+                    if (!string.IsNullOrEmpty(translatedTier) || !string.IsNullOrEmpty(translatedPrefix))
+                    {
+                        string formatKey;
+                        string format;
+
+                        if (isCustomTier)
+                        {
+                            formatKey = string.IsNullOrEmpty(translatedTier) ? "ROG.ItemFormat" : "ROG.ItemFormat.CustomTiered";
+                            format = string.IsNullOrEmpty(translatedTier) ? "{0} {1}" : "{1} {0} {2}";
+                        }
+                        else
+                        {
+                            formatKey = string.IsNullOrEmpty(translatedTier) ? "ROG.ItemFormat" : "ROG.ItemFormat.Tiered";
+                            format = string.IsNullOrEmpty(translatedTier) ? "{0} {1}" : "{0} {1} {2}";
+                        }
+
+                        if (TryGetTranslation(out string tFormat, language, formatKey))
+                            format = tFormat;
+
+                        if (string.IsNullOrEmpty(translatedTier))
+                            combinedName = string.Format(format, translatedPrefix, translatedBaseName).Trim();
+                        else
+                            combinedName = string.Format(format, translatedPrefix, translatedTier, translatedBaseName).Trim();
+
+                        combinedName = combinedName.Replace("  ", " ").Trim();
+                    }
+
+                    // Apply Mob Name formatting if present
+                    if (!string.IsNullOrEmpty(mobName))
+                    {
+                        string mobFormatKey = "ROG.MobDropFormat";
+                        string mobFormat = "{0}'s {1}";
+                        if (TryGetTranslation(out string tMobFormat, language, mobFormatKey))
+                            mobFormat = tMobFormat;
+
+                        return string.Format(mobFormat, mobName, combinedName).Trim();
+                    }
+
+                    return combinedName;
+                }
+            }
 
             if (messageKey.StartsWith("Languages.DBItemName.", StringComparison.OrdinalIgnoreCase))
             {

@@ -1,0 +1,556 @@
+ROG.ItemFormat: {1} {0}
+ROG.ItemFormat.Tiered: {2} {1} {0}
+ROG.MobDropFormat: {1} de {0}
+ROG.ItemFormat.CustomTiered: {2} {0} {1}
+
+# ================================
+# PREFIXES
+# ================================
+ROG.Prefix.Mighty: Poderoso
+ROG.Prefix.Adroit: Hábil
+ROG.Prefix.Fortifying: Fortificante
+ROG.Prefix.Speedy: Veloz
+ROG.Prefix.Insightful: Perspicaz
+ROG.Prefix.Willful: Voluntarioso
+ROG.Prefix.Attuned: Sintonizado
+ROG.Prefix.Glib: Elocuente
+ROG.Prefix.Sturdy: Robusto
+ROG.Prefix.Arcane: Arcano
+ROG.Prefix.Brilliant: Brillante
+ROG.Prefix.Bodybender: Dobla-cuerpos
+ROG.Prefix.Icebender: Dobla-hielo
+ROG.Prefix.Bluntbender: Dobla-golpes
+ROG.Prefix.Energybender: Dobla-energía
+ROG.Prefix.Heatbender: Dobla-calor
+ROG.Prefix.Matterbender: Dobla-materia
+ROG.Prefix.Edgebender: Dobla-filos
+ROG.Prefix.Spiritbender: Dobla-espíritus
+ROG.Prefix.Thrustbender: Dobla-estoques
+ROG.Prefix.Essencebender: Dobla-esencias
+ROG.Prefix.Skillful: Diestro
+ROG.Prefix.Mystical: Místico
+ROG.Prefix.Gladiator: de Gladiador
+ROG.Prefix.Duelist: de Duelista
+ROG.Prefix.Bowmaster: de Arquero
+ROG.Prefix.Focused: Enfocado
+ROG.Prefix.Honed: Afilado
+ROG.Prefix.Battering: Contundente
+ROG.Prefix.Perforator: Perforador
+ROG.Prefix.Sundering: Hendidor
+ROG.Prefix.Decimator: Diezmador
+ROG.Prefix.Tensile: Tenso
+ROG.Prefix.Razored: Rasurador
+ROG.Prefix.Crushing: Aplastante
+ROG.Prefix.Lancenator: de Lancero
+ROG.Prefix.Whirling: Giratorio
+ROG.Prefix.Impaling: Empalador
+ROG.Prefix.Serrated: Dentado
+ROG.Prefix.Demolishing: Demoledor
+ROG.Prefix.SwatheCutters: Cortador
+ROG.Prefix.Cleaving: Tajante
+ROG.Prefix.Reapers: de Segador
+ROG.Prefix.Thunderer: Atronador
+ROG.Prefix.Martial: Marcial
+ROG.Prefix.Lifetaker: Quita-vidas
+ROG.Prefix.Truefire: de Fuego Verdadero
+ROG.Prefix.Winged: Alado
+ROG.Prefix.Hawk: de Halcón
+ROG.Prefix.Dragon: de Dragón
+ROG.Prefix.Catapult: de Catapulta
+ROG.Prefix.Snipers: de Francotirador
+ROG.Prefix.Earthsplitter: Parte-tierras
+ROG.Prefix.SoulCrusher: Aplasta-almas
+ROG.Prefix.Spiritbound: Ligas-espíritus
+ROG.Prefix.Dominating: Dominante
+ROG.Prefix.Earthborn: Nacido de la Tierra
+ROG.Prefix.Iceborn: Nacido del Hielo
+ROG.Prefix.Flameborn: Nacido de la Llama
+ROG.Prefix.Airy: Aireado
+ROG.Prefix.Minionbound: Liga-siervos
+ROG.Prefix.DeathBinder: Liga-muertes
+ROG.Prefix.Painbound: Liga-dolor
+ROG.Prefix.SoulTaker: Toma-almas
+ROG.Prefix.Earthshaker: Sacude-tierras
+ROG.Prefix.Fervent: Ferviente
+ROG.Prefix.Rejuvenating: Rejuvenecedor
+ROG.Prefix.Lightbender: Dobla-luz
+ROG.Prefix.Voidbender: Dobla-vacío
+ROG.Prefix.Starbinder: Liga-estrellas
+ROG.Prefix.Chanter: de Cantor
+ROG.Prefix.Mindbinder: Liga-mentes
+ROG.Prefix.Forestbound: del Bosque
+ROG.Prefix.Plantbound: de Plantas
+ROG.Prefix.Animalbound: de Animales
+ROG.Prefix.Withering: Marchito
+ROG.Prefix.ArborDefender: Defensor del Árbol
+ROG.Prefix.ValeDefender: Defensor del Valle
+ROG.Prefix.Shadowbender: Dobla-sombras
+ROG.Prefix.Spiritbinder: Liga-espíritus
+ROG.Prefix.Runebender: Dobla-runas
+ROG.Prefix.Stormcaller: Llama-tormentas
+ROG.Prefix.Soulbinder: Liga-almas
+ROG.Prefix.Blighted: Arruinado
+ROG.Prefix.Bodymender: Cura-cuerpos
+ROG.Prefix.Empowering: Empoderador
+ROG.Prefix.Ancestral: Ancestral
+ROG.Prefix.Shadowwalker: Camina-sombras
+ROG.Prefix.Venomous: Venenoso
+ROG.Prefix.Melodic: Melódico
+ROG.Prefix.Resonant: Resonante
+ROG.Prefix.Motivating: Motivador
+ROG.Prefix.Bladeblocker: Bloquea-hojas
+ROG.Prefix.Protectors: de Protector
+ROG.Prefix.Courageous: Valiente
+ROG.Prefix.Pacifying: Pacificador
+ROG.Prefix.Savage: Salvaje
+ROG.Prefix.Nightshade: de Belladona
+ROG.Prefix.Trail: de Sendero
+ROG.Prefix.Lifebender: Dobla-vidas
+ROG.Prefix.Ardent: Ardiente
+ROG.Prefix.Deathly: Mortal
+ROG.Prefix.Feverish: Febril
+ROG.Prefix.Ominous: Ominoso
+ROG.Prefix.Tormentbound: Liga-tormentos
+ROG.Prefix.Wraithbound: Liga-espectros
+ROG.Prefix.VoidBinder: Liga-vacíos
+ROG.Prefix.Shrill: Estridente
+ROG.Prefix.Keening: Plañidero
+ROG.Prefix.Uncanny: Misterioso
+ROG.Prefix.Infernal: Infernal
+ROG.Prefix.Bedeviled: Endemoniado
+ROG.Prefix.Diabolic: Diabólico
+ROG.Prefix.Aural: Aural
+ROG.Prefix.Brawling: de Pelea
+ROG.Prefix.Maulers: de Magullador
+ROG.Prefix.Magnetic: Magnético
+ROG.Prefix.Striking: Impactante
+ROG.Prefix.Hardened: Endurecido
+ROG.Prefix.Impenetrable: Impenetrable
+ROG.Prefix.Swift: Presto
+ROG.Prefix.Devastating: Devastador
+ROG.Prefix.Masterful: Magistral
+ROG.Prefix.Fatal: Fatal
+ROG.Prefix.Unerring: Infalible
+ROG.Prefix.Accurate: Preciso
+ROG.Prefix.Vengeful: Vengativo
+ROG.Prefix.Phalanx: de Falange
+ROG.Prefix.Guarding: Guardián
+ROG.Prefix.Retaliators: de Vengador
+ROG.Prefix.Tireless: Incansable
+ROG.Prefix.Far-Reaching: de Largo Alcance
+ROG.Prefix.Piercing: Penetrante
+ROG.Prefix.Projecting: Proyectable
+ROG.Prefix.Transcendent: Trascendente
+ROG.Prefix.Efficient: Eficiente
+ROG.Prefix.Flawless: Impecable
+ROG.Prefix.Cataclysmic: Cataclísmico
+ROG.Prefix.Elusive: Esquivo
+ROG.Prefix.Deflecting: Desviador
+ROG.Prefix.Parrying: de Parada
+ROG.Prefix.Troll-blood: de Sangre de Trol
+ROG.Prefix.Invigorating: Vigorizante
+ROG.Prefix.Relentless: Implacable
+ROG.Prefix.Awakening: Despertador
+ROG.Prefix.Unshaken: Inquebrantable
+ROG.Prefix.Unfettered: Libre
+ROG.Prefix.Cleansing: Purificador
+ROG.Prefix.Fleet: Veloz
+ROG.Prefix.Amphibious: Anfibio
+ROG.Prefix.Sure-Strike: de Golpe Seguro
+ROG.Prefix.Exalted: Exaltado
+ROG.Prefix.Apex: Cúspide
+ROG.Prefix.Ablative: Ablativo
+ROG.Prefix.Volleying: de Ráfaga
+ROG.Prefix.Scavengers: de Carroñero
+ROG.Prefix.Augmenting: Aumentador
+ROG.Prefix.Alacritous: Presto
+ROG.Prefix.Redeeming: Redentor
+ROG.Prefix.Enfeebling: Debilitador
+ROG.Prefix.Vigorous: Vigoroso
+ROG.Prefix.Restorative: Restaurador
+ROG.Prefix.Expansive: Expansivo
+ROG.Prefix.Penetrating: Penetrante
+ROG.Prefix.Ruinous: Ruinoso
+ROG.Prefix.Lingering: Persistente
+ROG.Prefix.Vicious: Vicioso
+ROG.Prefix.Unleashed: Desatado
+ROG.Prefix.Corporeal: Corpóreo
+ROG.Prefix.Frost-warded: Guarda-escarcha
+ROG.Prefix.Unshatterable: Inastillable
+ROG.Prefix.Grounded: Conectado a Tierra
+ROG.Prefix.Fire-forged: Forjado en Fuego
+ROG.Prefix.Immutable: Inmutable
+ROG.Prefix.Unseverable: Inseparable
+ROG.Prefix.Inviolate: Inviolable
+ROG.Prefix.Unpierceable: Imperforable
+ROG.Prefix.Grandiose: Grandioso
+ROG.Prefix.Slaughtering: Carnicero
+ROG.Prefix.Colossal: Colosal
+ROG.Prefix.Nullifying: Anulador
+ROG.Prefix.Glancing: de Refilón
+ROG.Prefix.Transmuting: Transmutador
+ROG.Prefix.Siphoning: Sifón
+ROG.Prefix.Purging: Purgador
+ROG.Prefix.Untouchable: Intocable
+ROG.Prefix.Miraculous: Milagroso
+ROG.Prefix.Agonizing: Agonizante
+ROG.Prefix.Ambidextrous: Ambidiestro
+ROG.Prefix.Twin-Striking: de Golpe Gemelo
+ROG.Prefix.Flurrying: Alborotado
+ROG.Prefix.Corrosive: Corrosivo
+ROG.Prefix.Composed: Compuesto
+ROG.Prefix.Weightless: Ingrávido
+ROG.Prefix.Unburdened: Sin Carga
+ROG.Prefix.Oppressive: Opresivo
+ROG.Prefix.Everlasting: Eterno
+ROG.Prefix.Aegis: Égida
+ROG.Prefix.Mirroring: Espejado
+ROG.Prefix.Titans: de Titán
+ROG.Prefix.Serpents: de Serpiente
+ROG.Prefix.Leviathans: de Leviatán
+ROG.Prefix.Zephyrs: de Céfiro
+ROG.Prefix.Omniscient: Omnisciente
+ROG.Prefix.Divine: Divino
+ROG.Prefix.Harmonic: Armónico
+ROG.Prefix.Sovereigns: de Soberano
+ROG.Prefix.Ascendant: Ascendente
+
+# ================================
+# BASE ITEM NAMES (Armor)
+# ================================
+ROG.BaseName.ClothCap: Gorro de Tela
+ROG.BaseName.ClothCoif: Cofia de Tela
+ROG.BaseName.ClothHelm: Yelmo de Tela
+ROG.BaseName.ClothSleeves: Mangas de Tela
+ROG.BaseName.ClothArms: Brazos de Tela
+ROG.BaseName.ClothBoots: Botas de Tela
+ROG.BaseName.ClothGloves: Guantes de Tela
+ROG.BaseName.ClothGauntlets: Guanteletes de Tela
+ROG.BaseName.ClothPants: Pantalones de Tela
+ROG.BaseName.ClothLegs: Piernas de Tela
+ROG.BaseName.ClothLeggings: Grebas de Tela
+ROG.BaseName.ClothHauberk: Cota de Tela
+ROG.BaseName.ClothBreastplate: Peto de Tela
+ROG.BaseName.ClothJerkin: Jubón de Tela
+ROG.BaseName.ClothVest: Chaleco de Tela
+ROG.BaseName.ClothRobe: Túnica de Tela
+ROG.BaseName.LeatherCap: Gorro de Cuero
+ROG.BaseName.LeatherCoif: Cofia de Cuero
+ROG.BaseName.LeatherHelm: Yelmo de Cuero
+ROG.BaseName.LeatherSleeves: Mangas de Cuero
+ROG.BaseName.LeatherArms: Brazos de Cuero
+ROG.BaseName.LeatherBoots: Botas de Cuero
+ROG.BaseName.LeatherGloves: Guantes de Cuero
+ROG.BaseName.LeatherGauntlets: Guanteletes de Cuero
+ROG.BaseName.LeatherPants: Pantalones de Cuero
+ROG.BaseName.LeatherLegs: Piernas de Cuero
+ROG.BaseName.LeatherLeggings: Grebas de Cuero
+ROG.BaseName.LeatherHauberk: Cota de Cuero
+ROG.BaseName.LeatherBreastplate: Peto de Cuero
+ROG.BaseName.LeatherJerkin: Jubón de Cuero
+ROG.BaseName.LeatherVest: Chaleco de Cuero
+ROG.BaseName.StuddedCap: Gorro Tachonado
+ROG.BaseName.StuddedCoif: Cofia Tachonada
+ROG.BaseName.StuddedHelm: Yelmo Tachonado
+ROG.BaseName.StuddedSleeves: Mangas Tachonadas
+ROG.BaseName.StuddedArms: Brazos Tachonados
+ROG.BaseName.StuddedBoots: Botas Tachonadas
+ROG.BaseName.StuddedGloves: Guantes Tachonados
+ROG.BaseName.StuddedGauntlets: Guanteletes Tachonados
+ROG.BaseName.StuddedPants: Pantalones Tachonados
+ROG.BaseName.StuddedLegs: Piernas Tachonadas
+ROG.BaseName.StuddedLeggings: Grebas Tachonadas
+ROG.BaseName.StuddedHauberk: Cota Tachonada
+ROG.BaseName.StuddedBreastplate: Peto Tachonado
+ROG.BaseName.StuddedJerkin: Jubón Tachonado
+ROG.BaseName.StuddedVest: Chaleco Tachonado
+ROG.BaseName.ChainCap: Gorro de Malla
+ROG.BaseName.ChainCoif: Cofia de Malla
+ROG.BaseName.ChainHelm: Yelmo de Malla
+ROG.BaseName.ChainSleeves: Mangas de Malla
+ROG.BaseName.ChainArms: Brazos de Malla
+ROG.BaseName.ChainBoots: Botas de Malla
+ROG.BaseName.ChainGloves: Guantes de Malla
+ROG.BaseName.ChainGauntlets: Guanteletes de Malla
+ROG.BaseName.ChainPants: Pantalones de Malla
+ROG.BaseName.ChainLegs: Piernas de Malla
+ROG.BaseName.ChainLeggings: Grebas de Malla
+ROG.BaseName.ChainHauberk: Cota de Malla
+ROG.BaseName.ChainBreastplate: Peto de Malla
+ROG.BaseName.ChainJerkin: Jubón de Malla
+ROG.BaseName.ChainVest: Chaleco de Malla
+ROG.BaseName.PlateCap: Gorro de Placas
+ROG.BaseName.PlateCoif: Cofia de Placas
+ROG.BaseName.PlateHelm: Yelmo de Placas
+ROG.BaseName.PlateFullHelm: Gran Yelmo de Placas
+ROG.BaseName.PlateSleeves: Mangas de Placas
+ROG.BaseName.PlateArms: Brazos de Placas
+ROG.BaseName.PlateBoots: Botas de Placas
+ROG.BaseName.PlateGloves: Guantes de Placas
+ROG.BaseName.PlateGauntlets: Guanteletes de Placas
+ROG.BaseName.PlatePants: Pantalones de Placas
+ROG.BaseName.PlateLegs: Piernas de Placas
+ROG.BaseName.PlateLeggings: Grebas de Placas
+ROG.BaseName.PlateHauberk: Cota de Placas
+ROG.BaseName.PlateBreastplate: Peto de Placas
+ROG.BaseName.PlateJerkin: Jubón de Placas
+ROG.BaseName.PlateVest: Chaleco de Placas
+ROG.BaseName.ReinforcedCap: Gorro Reforzado
+ROG.BaseName.ReinforcedCoif: Cofia Reforzada
+ROG.BaseName.ReinforcedHelm: Yelmo Reforzado
+ROG.BaseName.ReinforcedSleeves: Mangas Reforzadas
+ROG.BaseName.ReinforcedArms: Brazos Reforzados
+ROG.BaseName.ReinforcedBoots: Botas Reforzadas
+ROG.BaseName.ReinforcedGloves: Guantes Reforzados
+ROG.BaseName.ReinforcedGauntlets: Guanteletes Reforzados
+ROG.BaseName.ReinforcedPants: Pantalones Reforzados
+ROG.BaseName.ReinforcedLegs: Piernas Reforzadas
+ROG.BaseName.ReinforcedLeggings: Grebas Reforzadas
+ROG.BaseName.ReinforcedHauberk: Cota Reforzada
+ROG.BaseName.ReinforcedBreastplate: Peto Reforzado
+ROG.BaseName.ReinforcedJerkin: Jubón Reforzado
+ROG.BaseName.ReinforcedVest: Chaleco Reforzado
+ROG.BaseName.ScaleCap: Gorro de Escamas
+ROG.BaseName.ScaleCoif: Cofia de Escamas
+ROG.BaseName.ScaleHelm: Yelmo de Escamas
+ROG.BaseName.ScaleSleeves: Mangas de Escamas
+ROG.BaseName.ScaleArms: Brazos de Escamas
+ROG.BaseName.ScaleBoots: Botas de Escamas
+ROG.BaseName.ScaleGloves: Guantes de Escamas
+ROG.BaseName.ScaleGauntlets: Guanteletes de Escamas
+ROG.BaseName.ScalePants: Pantalones de Escamas
+ROG.BaseName.ScaleLegs: Piernas de Escamas
+ROG.BaseName.ScaleLeggings: Grebas de Escamas
+ROG.BaseName.ScaleHauberk: Cota de Escamas
+ROG.BaseName.ScaleBreastplate: Peto de Escamas
+ROG.BaseName.ScaleJerkin: Jubón de Escamas
+ROG.BaseName.ScaleVest: Chaleco de Escamas
+
+# ================================
+# BASE ITEM NAMES (Weapons)
+# ================================
+ROG.BaseName.Dagger: Daga
+ROG.BaseName.Dirk: Puñal
+ROG.BaseName.Gladius: Gladius
+ROG.BaseName.Stiletto: Estilete
+ROG.BaseName.Axe: Hacha
+ROG.BaseName.Cleaver: Cuchilla
+ROG.BaseName.Rapier: Estoque
+ROG.BaseName.Sword: Espada
+ROG.BaseName.HookedSword: Espada Ganchuda
+ROG.BaseName.Falcata: Falcata
+ROG.BaseName.Scimitar: Cimitarra
+ROG.BaseName.Jambiya: Jambiya
+ROG.BaseName.Sabre: Sable
+ROG.BaseName.Khopesh: Khopesh
+ROG.BaseName.Wakazashi: Wakizashi
+ROG.BaseName.Greatsword: Espadón
+ROG.BaseName.WarCleaver: Cuchilla de Guerra
+ROG.BaseName.GreatFalcata: Gran Falcata
+ROG.BaseName.GreatFalchion: Gran Bracamante
+ROG.BaseName.TrollSplitter: Parte-Troles
+ROG.BaseName.Katana: Katana
+ROG.BaseName.Greave: Greba
+ROG.BaseName.Claw: Garra
+ROG.BaseName.Fang: Colmillo
+ROG.BaseName.Greataxe: Gran Hacha
+ROG.BaseName.GreatHammer: Gran Martillo
+ROG.BaseName.Shillelagh: Garrote
+ROG.BaseName.WarMattock: Picacha de Guerra
+ROG.BaseName.Mace: Maza
+ROG.BaseName.Hammer: Martillo
+ROG.BaseName.Adze: Azuela
+ROG.BaseName.Club: Porra
+ROG.BaseName.Sickle: Hoz
+ROG.BaseName.Lute: Laúd
+ROG.BaseName.Mandolin: Mandolina
+ROG.BaseName.Drum: Tambor
+ROG.BaseName.Flute: Flauta
+ROG.BaseName.Harp: Arpa
+ROG.BaseName.Spear: Lanza
+ROG.BaseName.Harpoon: Arpón
+ROG.BaseName.Trident: Tridente
+ROG.BaseName.ShortSpear: Lanza Corta
+ROG.BaseName.LongSpear: Lanza Larga
+ROG.BaseName.WarSpear: Lanza de Guerra
+ROG.BaseName.CompositeBow: Arco Compuesto
+ROG.BaseName.GreatCompositeBow: Gran Arco Compuesto
+ROG.BaseName.HuntingBow: Arco de Caza
+ROG.BaseName.Longbow: Arco Largo
+ROG.BaseName.HeavyLongbow: Arco Largo Pesado
+ROG.BaseName.RecurveBow: Arco Recurvo
+ROG.BaseName.GreatRecurveBow: Gran Arco Recurvo
+ROG.BaseName.ShortBow: Arco Corto
+ROG.BaseName.Crossbow: Ballesta
+ROG.BaseName.MorningStar: Lucero del Alba
+ROG.BaseName.Flail: Mayal
+ROG.BaseName.WeightedFlail: Mayal Pesado
+ROG.BaseName.Whip: Látigo
+ROG.BaseName.Chain: Cadena
+ROG.BaseName.WarChain: Cadena de Guerra
+ROG.BaseName.BigShillelagh: Gran Garrote
+ROG.BaseName.HandAxe: Hacha de Mano
+ROG.BaseName.BeardedAxe: Hacha Barbuda
+ROG.BaseName.WarAxe: Hacha de Guerra
+ROG.BaseName.LochaberAxe: Hacha de Lochaber
+ROG.BaseName.Pike: Pica
+ROG.BaseName.LucerneHammer: Martillo de Lucerna
+ROG.BaseName.Scythe: Guadaña
+ROG.BaseName.MartialScythe: Guadaña Marcial
+ROG.BaseName.WarScythe: Guadaña de Guerra
+ROG.BaseName.SmallShield: Escudo Pequeño
+ROG.BaseName.MediumShield: Escudo Mediano
+ROG.BaseName.LargeShield: Escudo Grande
+ROG.BaseName.MaulerStaff: Bastón de Magullador
+ROG.BaseName.Quarterstaff: Bastón
+ROG.BaseName.ShodQuarterstaff: Bastón Herrado
+ROG.BaseName.HeavyShodQuarterstaff: Bastón Herrado Pesado
+ROG.BaseName.FistWrap: Venda de Puño
+ROG.BaseName.HandWrap: Venda de Mano
+ROG.BaseName.StuddedFistWrap: Venda de Puño Tachonada
+ROG.BaseName.StuddedHandWrap: Venda de Mano Tachonada
+ROG.BaseName.SpikedFistWrap: Venda de Puño con Púas
+
+# ================================
+# BASE ITEM NAMES (Magical)
+# ================================
+ROG.BaseName.Mantle: Manto
+ROG.BaseName.Cloak: Capa
+ROG.BaseName.Belt: Cinturón
+ROG.BaseName.Girdle: Ceñidor
+ROG.BaseName.Choker: Gargantilla
+ROG.BaseName.Pendant: Colgante
+ROG.BaseName.Gem: Gema
+ROG.BaseName.Jewel: Joya
+ROG.BaseName.Bracelet: Brazalete
+ROG.BaseName.Bracer: Brazal
+ROG.BaseName.Ring: Anillo
+ROG.BaseName.Wrap: Envoltura
+ROG.BaseName.Mythirian: Mitiriano
+
+# ================================================================
+# TIER 1 PREFIXES (Level 36-48) - Commonality / Base Thematics
+# ================================================================
+ROG.TierPrefix.1_ClassicOverworld_Global: Rústico
+ROG.TierPrefix.1_ClassicDungeons_Global: Polvoriento
+ROG.TierPrefix.1_ClassicDungeons_CryptsAndUndead: Macabro
+ROG.TierPrefix.1_ClassicDungeons_CavesAndNature: Musgoso
+ROG.TierPrefix.1_ClassicDungeons_VolcanicAndEarth: Chamuscado
+ROG.TierPrefix.1_ClassicDungeons_GlacialAndAquatic: Helado
+ROG.TierPrefix.1_ClassicDungeons_MagicalAndEthereal: Brillante
+ROG.TierPrefix.1_ClassicDungeons_DemonicAndAbyss: Manchado
+ROG.TierPrefix.1_ClassicDungeons_BeastAndGoblinoid: Tribal
+ROG.TierPrefix.1_AtlantisOverworld_Global: Lavado por la marea
+ROG.TierPrefix.1_AtlantisDungeons_CryptsAndUndead: Hundido
+ROG.TierPrefix.1_AtlantisDungeons_VolcanicAndEarth: Hirviente
+ROG.TierPrefix.1_AtlantisDungeons_GlacialAndAquatic: Pelágico
+ROG.TierPrefix.1_AtlantisDungeons_MagicalAndEthereal: Nacarado
+ROG.TierPrefix.1_Catacombs_CryptsAndUndead: Entubado
+ROG.TierPrefix.1_Catacombs_CavesAndNature: Subterráneo
+ROG.TierPrefix.1_Catacombs_VolcanicAndEarth: Humeante
+ROG.TierPrefix.1_Catacombs_GlacialAndAquatic: Húmedo
+ROG.TierPrefix.1_Catacombs_MagicalAndEthereal: Velado
+ROG.TierPrefix.1_Catacombs_DemonicAndAbyss: Corrupto
+ROG.TierPrefix.1_Catacombs_BeastAndGoblinoid: Salvaje
+ROG.TierPrefix.1_DeepCatacombs_CryptsAndUndead: Abandonado
+ROG.TierPrefix.1_DeepCatacombs_CavesAndNature: Profundo
+ROG.TierPrefix.1_DeepCatacombs_VolcanicAndEarth: Basáltico
+ROG.TierPrefix.1_DeepCatacombs_GlacialAndAquatic: Congelado
+ROG.TierPrefix.1_DeepCatacombs_MagicalAndEthereal: Luminoso
+ROG.TierPrefix.1_DeepCatacombs_DemonicAndAbyss: Malévolo
+ROG.TierPrefix.1_DeepCatacombs_BeastAndGoblinoid: Primordial
+ROG.TierPrefix.1_MythicalZones_Global: Legendario
+ROG.TierPrefix.1_MythicalZones_CavesAndNature: Indómito
+ROG.TierPrefix.1_MythicalZones_VolcanicAndEarth: Tocado por ascuas
+ROG.TierPrefix.1_MythicalZones_MagicalAndEthereal: Ascendente
+ROG.TierPrefix.1_Battlegrounds_Global: de Soldado
+
+# ================================================================
+# TIER 2 PREFIXES (Level 49-64) - High Quality / Rare Thematics
+# ================================================================
+ROG.TierPrefix.2_ClassicOverworld_Global: Superior
+ROG.TierPrefix.2_ClassicDungeons_Global: Excepcional
+ROG.TierPrefix.2_ClassicDungeons_CryptsAndUndead: Macabro
+ROG.TierPrefix.2_ClassicDungeons_CavesAndNature: Cubierto de maleza
+ROG.TierPrefix.2_ClassicDungeons_VolcanicAndEarth: Ígneo
+ROG.TierPrefix.2_ClassicDungeons_GlacialAndAquatic: Glacial
+ROG.TierPrefix.2_ClassicDungeons_MagicalAndEthereal: Resonante
+ROG.TierPrefix.2_ClassicDungeons_DemonicAndAbyss: Diabólico
+ROG.TierPrefix.2_ClassicDungeons_BeastAndGoblinoid: Feroz
+ROG.TierPrefix.2_AtlantisOverworld_Global: Atlante
+ROG.TierPrefix.2_AtlantisDungeons_CryptsAndUndead: Ahogado
+ROG.TierPrefix.2_AtlantisDungeons_VolcanicAndEarth: Geotérmico
+ROG.TierPrefix.2_AtlantisDungeons_GlacialAndAquatic: Béntico
+ROG.TierPrefix.2_AtlantisDungeons_MagicalAndEthereal: Arcano
+ROG.TierPrefix.2_Catacombs_CryptsAndUndead: Sepulcral
+ROG.TierPrefix.2_Catacombs_CavesAndNature: Cavernoso
+ROG.TierPrefix.2_Catacombs_VolcanicAndEarth: Volcánico
+ROG.TierPrefix.2_Catacombs_GlacialAndAquatic: Inundado
+ROG.TierPrefix.2_Catacombs_MagicalAndEthereal: Enigmático
+ROG.TierPrefix.2_Catacombs_DemonicAndAbyss: Infernal
+ROG.TierPrefix.2_Catacombs_BeastAndGoblinoid: Monstruoso
+ROG.TierPrefix.2_DeepCatacombs_CryptsAndUndead: Condenado
+ROG.TierPrefix.2_DeepCatacombs_CavesAndNature: Profundo
+ROG.TierPrefix.2_DeepCatacombs_VolcanicAndEarth: Obsidiana
+ROG.TierPrefix.2_DeepCatacombs_GlacialAndAquatic: Cristalino
+ROG.TierPrefix.2_DeepCatacombs_MagicalAndEthereal: Numinoso
+ROG.TierPrefix.2_DeepCatacombs_DemonicAndAbyss: Siniestro
+ROG.TierPrefix.2_DeepCatacombs_BeastAndGoblinoid: Carnívoro
+ROG.TierPrefix.2_MythicalZones_Global: Heroico
+ROG.TierPrefix.2_MythicalZones_CavesAndNature: Sagrado
+ROG.TierPrefix.2_MythicalZones_VolcanicAndEarth: Azufre
+ROG.TierPrefix.2_MythicalZones_MagicalAndEthereal: Trascendente
+ROG.TierPrefix.2_Battlegrounds_Global: de Veterano
+
+# ================================================================
+# TIER 3 PREFIXES (Level 65+) - Exceptional / Epic Thematics
+# ================================================================
+ROG.TierPrefix.3_ClassicOverworld_Global: Exquisito
+ROG.TierPrefix.3_ClassicDungeons_Global: Venerable
+ROG.TierPrefix.3_ClassicDungeons_CryptsAndUndead: Necrótico
+ROG.TierPrefix.3_ClassicDungeons_CavesAndNature: Silvano
+ROG.TierPrefix.3_ClassicDungeons_VolcanicAndEarth: Magmático
+ROG.TierPrefix.3_ClassicDungeons_GlacialAndAquatic: Criogénico
+ROG.TierPrefix.3_ClassicDungeons_MagicalAndEthereal: Etéreo
+ROG.TierPrefix.3_ClassicDungeons_DemonicAndAbyss: Abismal
+ROG.TierPrefix.3_ClassicDungeons_BeastAndGoblinoid: Bestial
+ROG.TierPrefix.3_AtlantisOverworld_Global: Leviatán
+ROG.TierPrefix.3_AtlantisDungeons_CryptsAndUndead: Insondable
+ROG.TierPrefix.3_AtlantisDungeons_VolcanicAndEarth: Tectónico
+ROG.TierPrefix.3_AtlantisDungeons_GlacialAndAquatic: Hadal
+ROG.TierPrefix.3_AtlantisDungeons_MagicalAndEthereal: Primordial
+ROG.TierPrefix.3_Catacombs_CryptsAndUndead: Inmortal
+ROG.TierPrefix.3_Catacombs_CavesAndNature: Telúrico
+ROG.TierPrefix.3_Catacombs_VolcanicAndEarth: Forjado en el núcleo
+ROG.TierPrefix.3_Catacombs_GlacialAndAquatic: Diluviano
+ROG.TierPrefix.3_Catacombs_MagicalAndEthereal: Infundido de Ley
+ROG.TierPrefix.3_Catacombs_DemonicAndAbyss: Diabólico
+ROG.TierPrefix.3_Catacombs_BeastAndGoblinoid: Cúspide
+ROG.TierPrefix.3_DeepCatacombs_CryptsAndUndead: Apocalíptico
+ROG.TierPrefix.3_DeepCatacombs_CavesAndNature: Geomante
+ROG.TierPrefix.3_DeepCatacombs_VolcanicAndEarth: Nacido del manto
+ROG.TierPrefix.3_DeepCatacombs_GlacialAndAquatic: Absoluto
+ROG.TierPrefix.3_DeepCatacombs_MagicalAndEthereal: Forjado en estrellas
+ROG.TierPrefix.3_DeepCatacombs_DemonicAndAbyss: Inframundo
+ROG.TierPrefix.3_DeepCatacombs_BeastAndGoblinoid: Depredador
+ROG.TierPrefix.3_MythicalZones_Global: Celestial
+ROG.TierPrefix.3_MythicalZones_CavesAndNature: de Yggdrasil
+ROG.TierPrefix.3_MythicalZones_VolcanicAndEarth: Tartáreo
+ROG.TierPrefix.3_MythicalZones_MagicalAndEthereal: Cósmico
+ROG.TierPrefix.3_Battlegrounds_Global: de Señor de la Guerra
+
+# ================================
+# PVP / RVR CUSTOM TIER PREFIXES
+# ================================
+ROG.TierPrefix.Mythical: Mítico
+ROG.TierPrefix.Exalted: Exaltado
+ROG.TierPrefix.Fabled: Fabuloso
+ROG.TierPrefix.Legendary: Legendario
+ROG.TierPrefix.Eminent: Eminente
+ROG.TierPrefix.Illustrious: Ilustre
+ROG.TierPrefix.Epic: Épico
+ROG.TierPrefix.Superior: Superior
+ROG.TierPrefix.Flawless: Impecable
+ROG.TierPrefix.Rare: Raro
+ROG.TierPrefix.Fine: Refinado
+ROG.TierPrefix.Uncommon: Poco Común

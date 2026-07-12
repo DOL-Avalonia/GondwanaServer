@@ -1,3 +1,12 @@
 
 Lootgenerator.OneTimeDrop.ReceiveItem:		Vous recevez {0} de {1} !
 Lootgenerator.OneTimeDrop.InventoryFull:	Votre inventaire est plein, la récompense unique n'a pas pu y être ajoutée !
+
+Lootgenerator.GlobalROGManager.InventoryFull:	Votre inventaire est plein, vos {0}s ont été déposés au sol.
+
+Lootgenerator.RewardChests.NotYourChest:	Ce coffre de récompenses ne vous appartient pas.
+Lootgenerator.RewardChests.InventoryFull:	Votre inventaire est plein ! Faites de la place avant d'ouvrir ce coffre.
+Lootgenerator.RewardChests.YouGetScroll:	Vous avez descellé le coffre de Parchemins Magiques ! Vous avez reçu : {0}
+Lootgenerator.RewardChests.ChestEmpty:		Ce coffre est mystérieusement vide...
+Lootgenerator.RewardChests.YouGetJewel:		Vous avez descellé le coffre de Bijoux Magiques ! Vous avez reçu un(e) {0} unique adapté(e) à votre classe !
+Lootgenerator.RewardChests.YouGetArmament:	Vous avez descellé le coffre d'Armements ! Vous avez reçu un(e) {0} unique adapté(e) à votre classe !

@@ -51,7 +51,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region State/Random/Type
 
@@ -650,38 +650,46 @@ namespace DOL.GS
              * - Instances where objects that began with a vowel but were prefixed by the article "a" (a orb of animation) have been corrected.
              */
 
-            if (Name.Length < 1)
+            string actualName = Name ?? "";
+
+            // ALWAYS translate [ROG] items before checking Grammar!
+            if (actualName.StartsWith("[ROG]"))
+            {
+                actualName = LanguageMgr.GetItemNameMessage(ServerProperties.Properties.DB_LANGUAGE, actualName);
+            }
+
+            if (actualName.Length < 1)
                 return "";
 
             // actually this should be only for Named mobs (like dragon, legion) but there is no way to find that out
-            if (char.IsUpper(Name[0]) && this is GameLiving) // proper noun
+            if (char.IsUpper(actualName[0]) && this is GameLiving) // proper noun
             {
-                return Name;
+                return actualName;
             }
 
             if (article == 0)
             {
                 if (firstLetterUppercase)
-                    return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article1", Name);
+                    return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article1", actualName);
                 else
-                    return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article2", Name);
+                    return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article2", actualName);
             }
             else
             {
                 // if first letter is a vowel
-                if (m_vowels.IndexOf(Name[0]) != -1)
+                if (m_vowels.IndexOf(char.ToLower(actualName[0])) != -1)
                 {
                     if (firstLetterUppercase)
-                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article3", Name);
+                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article3", actualName);
                     else
-                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article4", Name);
+                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article4", actualName);
                 }
                 else
                 {
                     if (firstLetterUppercase)
-                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article5", Name);
+                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article5", actualName);
                     else
-                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article6", Name);
+                        return LanguageMgr.GetTranslation(ServerProperties.Properties.DB_LANGUAGE, "GameObject.GetName.Article6", actualName);
                 }
             }
         }

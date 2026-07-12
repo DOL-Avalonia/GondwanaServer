@@ -321,8 +321,10 @@ GameObjects.GamePlayer.Quit.CanTQuitMezzed:            Nemůžeš se odhlásit; 
 
 GameObjects.GamePlayer.RealmTitle.UnknownRealm:        Neznámá říše.
 
-GameObjects.GamePlayer.ReceiveItem.Receive:            Získáváš {0}.
-GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:        Získáváš {0} od {1}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag:		Tvůj batoh je plný, ale {0} byl uložen do tvého úložného vaku!
+GameObjects.GamePlayer.ReceiveItem.ReceivePartlyInBag:	Tvůj batoh je plný, ale část z {0} byla uložena do tvého úložného vaku!
+GameObjects.GamePlayer.ReceiveItem.Receive:				Získáváš {0}.
+GameObjects.GamePlayer.ReceiveItem.ReceiveFrom:			Získáváš {0} od {1}.
 
 GameObjects.GamePlayer.ReceiveTradeItem.CantTrade:         Tento předmět nemůžeš obchodovat.
 GameObjects.GamePlayer.ReceiveTradeItem.StillSelfcrafting: Pořád očarováváš.
@@ -526,6 +528,7 @@ GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Tento zástupce Genistaru m
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Vaše vejce Genistaru bylo umístěno na vaší zahradě. Nyní je jen na vás, abyste ho vychovali a formovali podle svých představ!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Předtím, než svůj vyvolaný Genistar umístíš zpět do zahrady, ho musíš propustit.
 GameObjects.GamePlayer.UseSlot.YouReleaseGenistar:			Propouštíš {0} zpět do své zahrady, aby se mohl volně potulovat.
+GameObjects.GamePlayer.UseSlot.CannotDropGenistar:			Nemůžeš vyhodit Genistar na zem. Musí být umístěn do zahradního slotu.
 
 GameObjects.GamePlayer.YellReceive.Yells:					{0} křičí: "{1}"
 GameObjects.GamePlayer.YellReceive.FalseLanguage:			{0} křičí něco v jazyce, kterému nerozumíš.
@@ -542,8 +545,10 @@ GameObjects.GamePlayer.Jailed:                         {0} byl/a uvržen/a do v�
 GameObjects.GamePlayer.Jailed.Unknown:                 {0} byl/a uvržen/a do vězení strážemi.
 GameObjects.GamePlayer.Released:                       {0} byl/a propuštěn/a z vězení.
 
-GameObjects.GamePlayer.RvR:                            – Celkem zabitých hráčů: {0} –
-GameObjects.GamePlayer.RvR.Champion:                   – Celkem zabitých hráčů: {0} – Šampión dne: {1} ({2} zabitých nepřátelských útočníků)
+GameObjects.GamePlayer.RvR:								[RvR] Celkem zabitých hráčů: {0}
+GameObjects.GamePlayer.RvR.Champion:					[RvR] Celkem zabitých hráčů: {0} – Šampión dne: {1} ({2} zabitých nepřátelských útočníků)
+GameObjects.GamePlayer.RvRDialog:						Celkem zabitých hráčů: {0}
+GameObjects.GamePlayer.RvR.ChampionDialog:				Šampión dne: {0} ({1} zabitých nepřátelských útočníků)
 GameObjects.GamePlayer.RvR.Control:                    RvR {1} je pod kontrolou {0}!
 GameObjects.GamePlayer.RvR.Open.Claimable:             Chceš [převzít kontrolu]?
 GameObjects.GamePlayer.RvR.Open.UnClaimble:            Před nárokováním kontroly musíš počkat {0} sekund.

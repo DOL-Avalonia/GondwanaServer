@@ -1,0 +1,556 @@
+ROG.ItemFormat: {1} {0}
+ROG.ItemFormat.Tiered: {2} {0} {1}
+ROG.MobDropFormat: {1} của {0}
+ROG.ItemFormat.CustomTiered: {0} {2} {1}
+
+# ================================
+# PREFIXES
+# ================================
+ROG.Prefix.Mighty: Hùng Mạnh
+ROG.Prefix.Adroit: Khéo Léo
+ROG.Prefix.Fortifying: Kiên Cố
+ROG.Prefix.Speedy: Thần Tốc
+ROG.Prefix.Insightful: Thấu Suốt
+ROG.Prefix.Willful: Quật Cường
+ROG.Prefix.Attuned: Đồng Điệu
+ROG.Prefix.Glib: Lưu Loát
+ROG.Prefix.Sturdy: Vững Chắc
+ROG.Prefix.Arcane: Huyền Bí
+ROG.Prefix.Brilliant: Rực Rỡ
+ROG.Prefix.Bodybender: Khống Thể
+ROG.Prefix.Icebender: Khống Băng
+ROG.Prefix.Bluntbender: Khống Lực
+ROG.Prefix.Energybender: Khống Năng
+ROG.Prefix.Heatbender: Khống Nhiệt
+ROG.Prefix.Matterbender: Khống Vật
+ROG.Prefix.Edgebender: Ngự Nhẫn
+ROG.Prefix.Spiritbender: Ngự Hồn
+ROG.Prefix.Thrustbender: Ngự Xuyên
+ROG.Prefix.Essencebender: Ngự Khí
+ROG.Prefix.Skillful: Tài Ba
+ROG.Prefix.Mystical: Thần Bí
+ROG.Prefix.Gladiator: Đấu Sĩ
+ROG.Prefix.Duelist: Quyết Đấu
+ROG.Prefix.Bowmaster: Xạ Thủ
+ROG.Prefix.Focused: Tập Trung
+ROG.Prefix.Honed: Sắc Bén
+ROG.Prefix.Battering: Va Đập
+ROG.Prefix.Perforator: Xuyên Thấu
+ROG.Prefix.Sundering: Phá Giáp
+ROG.Prefix.Decimator: Tàn Sát
+ROG.Prefix.Tensile: Căng Cứng
+ROG.Prefix.Razored: Sắc Lẹm
+ROG.Prefix.Crushing: Nghiền Nát
+ROG.Prefix.Lancenator: Kỵ Binh
+ROG.Prefix.Whirling: Xoáy Nước
+ROG.Prefix.Impaling: Xuyên Tâm
+ROG.Prefix.Serrated: Răng Cưa
+ROG.Prefix.Demolishing: Hủy Diệt
+ROG.Prefix.SwatheCutters: Tảo Thanh
+ROG.Prefix.Cleaving: Bổ Đôi
+ROG.Prefix.Reapers: Tử Thần
+ROG.Prefix.Thunderer: Sấm Sét
+ROG.Prefix.Martial: Võ Thuật
+ROG.Prefix.Lifetaker: Đoạt Mạng
+ROG.Prefix.Truefire: Chân Hỏa
+ROG.Prefix.Winged: Chắp Cánh
+ROG.Prefix.Hawk: Chim Ưng
+ROG.Prefix.Dragon: Cuồng Long
+ROG.Prefix.Catapult: Máy Phóng
+ROG.Prefix.Snipers: Bắn Tỉa
+ROG.Prefix.Earthsplitter: Nứt Đất
+ROG.Prefix.SoulCrusher: Nghiền Hồn
+ROG.Prefix.Spiritbound: Trói Hồn
+ROG.Prefix.Dominating: Thống Trị
+ROG.Prefix.Earthborn: Sinh Từ Đất
+ROG.Prefix.Iceborn: Sinh Từ Băng
+ROG.Prefix.Flameborn: Sinh Từ Lửa
+ROG.Prefix.Airy: Thanh Phong
+ROG.Prefix.Minionbound: Triệu Hồi
+ROG.Prefix.DeathBinder: Ràng Buộc Tử Thần
+ROG.Prefix.Painbound: Ràng Buộc Nỗi Đau
+ROG.Prefix.SoulTaker: Đoạt Hồn
+ROG.Prefix.Earthshaker: Động Đất
+ROG.Prefix.Fervent: Sôi Sục
+ROG.Prefix.Rejuvenating: Hồi Xuân
+ROG.Prefix.Lightbender: Ngự Sáng
+ROG.Prefix.Voidbender: Ngự Hư Không
+ROG.Prefix.Starbinder: Kết Tinh Sao
+ROG.Prefix.Chanter: Ngâm Xướng
+ROG.Prefix.Mindbinder: Khống Trí
+ROG.Prefix.Forestbound: Thuộc Về Rừng
+ROG.Prefix.Plantbound: Thuộc Về Cây
+ROG.Prefix.Animalbound: Thuộc Về Thú
+ROG.Prefix.Withering: Héo Úa
+ROG.Prefix.ArborDefender: Vệ Binh Cây
+ROG.Prefix.ValeDefender: Vệ Binh Thung Lũng
+ROG.Prefix.Shadowbender: Ngự Bóng Tối
+ROG.Prefix.Spiritbinder: Ràng Buộc Tinh Linh
+ROG.Prefix.Runebender: Ngự Cổ Ngữ
+ROG.Prefix.Stormcaller: Gọi Bão
+ROG.Prefix.Soulbinder: Kết Hồn
+ROG.Prefix.Blighted: Tàn Lụi
+ROG.Prefix.Bodymender: Hồi Thể
+ROG.Prefix.Empowering: Tăng Cường
+ROG.Prefix.Ancestral: Viễn Cổ
+ROG.Prefix.Shadowwalker: Bước Chân Bóng Tối
+ROG.Prefix.Venomous: Kịch Độc
+ROG.Prefix.Melodic: Giai Điệu
+ROG.Prefix.Resonant: Vang Dội
+ROG.Prefix.Motivating: Khích Lệ
+ROG.Prefix.Bladeblocker: Đỡ Kiếm
+ROG.Prefix.Protectors: Hộ Vệ
+ROG.Prefix.Courageous: Quả Cảm
+ROG.Prefix.Pacifying: Xoa Dịu
+ROG.Prefix.Savage: Man Rợ
+ROG.Prefix.Nightshade: Dạ Ảnh
+ROG.Prefix.Trail: Vết Tích
+ROG.Prefix.Lifebender: Ngự Sinh Mệnh
+ROG.Prefix.Ardent: Mãnh Liệt
+ROG.Prefix.Deathly: Chết Chóc
+ROG.Prefix.Feverish: Cuồng Nhiệt
+ROG.Prefix.Ominous: Điềm Gở
+ROG.Prefix.Tormentbound: Khổ Đau
+ROG.Prefix.Wraithbound: Oán Linh
+ROG.Prefix.VoidBinder: Liên Kết Hư Không
+ROG.Prefix.Shrill: Chói Tai
+ROG.Prefix.Keening: Than Khóc
+ROG.Prefix.Uncanny: Kỳ Dị
+ROG.Prefix.Infernal: Địa Ngục
+ROG.Prefix.Bedeviled: Ma Ám
+ROG.Prefix.Diabolic: Ác Quỷ
+ROG.Prefix.Aural: Hào Quang
+ROG.Prefix.Brawling: Loạn Đả
+ROG.Prefix.Maulers: Áp Đảo
+ROG.Prefix.Magnetic: Từ Tính
+ROG.Prefix.Striking: Kích Trúng
+ROG.Prefix.Hardened: Cứng Cáp
+ROG.Prefix.Impenetrable: Bất Xâm
+ROG.Prefix.Swift: Nhạy Bén
+ROG.Prefix.Devastating: Tàn Phá
+ROG.Prefix.Masterful: Tuyệt Đỉnh
+ROG.Prefix.Fatal: Chí Mạng
+ROG.Prefix.Unerring: Chuẩn Xác
+ROG.Prefix.Accurate: Chính Xác
+ROG.Prefix.Vengeful: Báo Thù
+ROG.Prefix.Phalanx: Phương Trận
+ROG.Prefix.Guarding: Canh Gác
+ROG.Prefix.Retaliators: Phản Kích
+ROG.Prefix.Tireless: Bền Bỉ
+ROG.Prefix.Far-Reaching: Vươn Xa
+ROG.Prefix.Piercing: Xuyên Thấu
+ROG.Prefix.Projecting: Phóng Phóng
+ROG.Prefix.Transcendent: Siêu Việt
+ROG.Prefix.Efficient: Hiệu Quả
+ROG.Prefix.Flawless: Hoàn Mỹ
+ROG.Prefix.Cataclysmic: Đại Hồng Thủy
+ROG.Prefix.Elusive: Lảng Tránh
+ROG.Prefix.Deflecting: Đánh Bật
+ROG.Prefix.Parrying: Đỡ Đòn
+ROG.Prefix.Troll-blood: Máu Quỷ
+ROG.Prefix.Invigorating: Sinh Lực
+ROG.Prefix.Relentless: Không Khoan Nhượng
+ROG.Prefix.Awakening: Thức Tỉnh
+ROG.Prefix.Unshaken: Bất Khuất
+ROG.Prefix.Unfettered: Tự Do
+ROG.Prefix.Cleansing: Thanh Tẩy
+ROG.Prefix.Fleet: Lướt Gió
+ROG.Prefix.Amphibious: Thủy Bộ
+ROG.Prefix.Sure-Strike: Quyết Định
+ROG.Prefix.Exalted: Tôn Dã
+ROG.Prefix.Apex: Đỉnh Cao
+ROG.Prefix.Ablative: Tiêu Dung
+ROG.Prefix.Volleying: Loạt Tên
+ROG.Prefix.Scavengers: Nhặt Mót
+ROG.Prefix.Augmenting: Gia Tăng
+ROG.Prefix.Alacritous: Mau Lẹ
+ROG.Prefix.Redeeming: Cứu Rỗi
+ROG.Prefix.Enfeebling: Suy Yếu
+ROG.Prefix.Vigorous: Cường Tráng
+ROG.Prefix.Restorative: Phục Hồi
+ROG.Prefix.Expansive: Mở Rộng
+ROG.Prefix.Penetrating: Thâm Nhập
+ROG.Prefix.Ruinous: Đổ Nát
+ROG.Prefix.Lingering: Âm Ỉ
+ROG.Prefix.Vicious: Tàn Nhẫn
+ROG.Prefix.Unleashed: Tháo Cũi
+ROG.Prefix.Corporeal: Thực Thể
+ROG.Prefix.Frost-warded: Hộ Băng
+ROG.Prefix.Unshatterable: Bất Hoại
+ROG.Prefix.Grounded: Tiếp Đất
+ROG.Prefix.Fire-forged: Rèn Trong Lửa
+ROG.Prefix.Immutable: Bất Biến
+ROG.Prefix.Unseverable: Không Thể Cắt
+ROG.Prefix.Inviolate: Bất Khả Xâm Phạm
+ROG.Prefix.Unpierceable: Không Thể Đâm
+ROG.Prefix.Grandiose: Hùng Tráng
+ROG.Prefix.Slaughtering: Sát Lục
+ROG.Prefix.Colossal: Khổng Lồ
+ROG.Prefix.Nullifying: Triệt Tiêu
+ROG.Prefix.Glancing: Lướt Qua
+ROG.Prefix.Transmuting: Biến Đổi
+ROG.Prefix.Siphoning: Hút Máu
+ROG.Prefix.Purging: Thanh Trừng
+ROG.Prefix.Untouchable: Bất Khả Xâm
+ROG.Prefix.Miraculous: Nhiệm Màu
+ROG.Prefix.Agonizing: Đau Đớn
+ROG.Prefix.Ambidextrous: Song Thủ
+ROG.Prefix.Twin-Striking: Song Kích
+ROG.Prefix.Flurrying: Dồn Dập
+ROG.Prefix.Corrosive: Ăn Mòn
+ROG.Prefix.Composed: Điềm Tĩnh
+ROG.Prefix.Weightless: Vô Trọng Lực
+ROG.Prefix.Unburdened: Nhẹ Tênh
+ROG.Prefix.Oppressive: Ngột Ngạt
+ROG.Prefix.Everlasting: Bất Diệt
+ROG.Prefix.Aegis: Che Chở
+ROG.Prefix.Mirroring: Phản Chiếu
+ROG.Prefix.Titans: Khổng Lồ
+ROG.Prefix.Serpents: Xà Thần
+ROG.Prefix.Leviathans: Thủy Quái
+ROG.Prefix.Zephyrs: Gió Tây
+ROG.Prefix.Omniscient: Toàn Tri
+ROG.Prefix.Divine: Thần Thánh
+ROG.Prefix.Harmonic: Hài Hòa
+ROG.Prefix.Sovereigns: Quân Vương
+ROG.Prefix.Ascendant: Thăng Hoa
+
+# ================================
+# BASE ITEM NAMES (Armor)
+# ================================
+ROG.BaseName.ClothCap: Mũ Vải
+ROG.BaseName.ClothCoif: Trùm Đầu Vải
+ROG.BaseName.ClothHelm: Mũ Trụ Vải
+ROG.BaseName.ClothSleeves: Bọc Tay Vải
+ROG.BaseName.ClothArms: Ống Tay Vải
+ROG.BaseName.ClothBoots: Giày Vải
+ROG.BaseName.ClothGloves: Găng Tay Vải
+ROG.BaseName.ClothGauntlets: Bao Tay Vải
+ROG.BaseName.ClothPants: Quần Vải
+ROG.BaseName.ClothLegs: Ống Chân Vải
+ROG.BaseName.ClothLeggings: Xà Cạp Vải
+ROG.BaseName.ClothHauberk: Áo Lưới Vải
+ROG.BaseName.ClothBreastplate: Áo Giáp Ngực Vải
+ROG.BaseName.ClothJerkin: Áo Khoác Vải
+ROG.BaseName.ClothVest: Áo Gilê Vải
+ROG.BaseName.ClothRobe: Áo Choàng Vải
+ROG.BaseName.LeatherCap: Mũ Da
+ROG.BaseName.LeatherCoif: Trùm Đầu Da
+ROG.BaseName.LeatherHelm: Mũ Trụ Da
+ROG.BaseName.LeatherSleeves: Bọc Tay Da
+ROG.BaseName.LeatherArms: Ống Tay Da
+ROG.BaseName.LeatherBoots: Giày Da
+ROG.BaseName.LeatherGloves: Găng Tay Da
+ROG.BaseName.LeatherGauntlets: Bao Tay Da
+ROG.BaseName.LeatherPants: Quần Da
+ROG.BaseName.LeatherLegs: Ống Chân Da
+ROG.BaseName.LeatherLeggings: Xà Cạp Da
+ROG.BaseName.LeatherHauberk: Áo Lưới Da
+ROG.BaseName.LeatherBreastplate: Áo Giáp Ngực Da
+ROG.BaseName.LeatherJerkin: Áo Khoác Da
+ROG.BaseName.LeatherVest: Áo Gilê Da
+ROG.BaseName.StuddedCap: Mũ Đinh Tán
+ROG.BaseName.StuddedCoif: Trùm Đầu Đinh Tán
+ROG.BaseName.StuddedHelm: Mũ Trụ Đinh Tán
+ROG.BaseName.StuddedSleeves: Bọc Tay Đinh Tán
+ROG.BaseName.StuddedArms: Ống Tay Đinh Tán
+ROG.BaseName.StuddedBoots: Giày Đinh Tán
+ROG.BaseName.StuddedGloves: Găng Tay Đinh Tán
+ROG.BaseName.StuddedGauntlets: Bao Tay Đinh Tán
+ROG.BaseName.StuddedPants: Quần Đinh Tán
+ROG.BaseName.StuddedLegs: Ống Chân Đinh Tán
+ROG.BaseName.StuddedLeggings: Xà Cạp Đinh Tán
+ROG.BaseName.StuddedHauberk: Áo Lưới Đinh Tán
+ROG.BaseName.StuddedBreastplate: Áo Giáp Ngực Đinh Tán
+ROG.BaseName.StuddedJerkin: Áo Khoác Đinh Tán
+ROG.BaseName.StuddedVest: Áo Gilê Đinh Tán
+ROG.BaseName.ChainCap: Mũ Lưới
+ROG.BaseName.ChainCoif: Trùm Đầu Lưới
+ROG.BaseName.ChainHelm: Mũ Trụ Lưới
+ROG.BaseName.ChainSleeves: Bọc Tay Lưới
+ROG.BaseName.ChainArms: Ống Tay Lưới
+ROG.BaseName.ChainBoots: Giày Lưới
+ROG.BaseName.ChainGloves: Găng Tay Lưới
+ROG.BaseName.ChainGauntlets: Bao Tay Lưới
+ROG.BaseName.ChainPants: Quần Lưới
+ROG.BaseName.ChainLegs: Ống Chân Lưới
+ROG.BaseName.ChainLeggings: Xà Cạp Lưới
+ROG.BaseName.ChainHauberk: Áo Lưới Cứng
+ROG.BaseName.ChainBreastplate: Áo Giáp Ngực Lưới
+ROG.BaseName.ChainJerkin: Áo Khoác Lưới
+ROG.BaseName.ChainVest: Áo Gilê Lưới
+ROG.BaseName.PlateCap: Mũ Thép
+ROG.BaseName.PlateCoif: Trùm Đầu Thép
+ROG.BaseName.PlateHelm: Mũ Trụ Thép
+ROG.BaseName.PlateFullHelm: Mũ Kín Thép
+ROG.BaseName.PlateSleeves: Bọc Tay Thép
+ROG.BaseName.PlateArms: Ống Tay Thép
+ROG.BaseName.PlateBoots: Giày Thép
+ROG.BaseName.PlateGloves: Găng Tay Thép
+ROG.BaseName.PlateGauntlets: Bao Tay Thép
+ROG.BaseName.PlatePants: Quần Thép
+ROG.BaseName.PlateLegs: Ống Chân Thép
+ROG.BaseName.PlateLeggings: Xà Cạp Thép
+ROG.BaseName.PlateHauberk: Áo Lưới Thép
+ROG.BaseName.PlateBreastplate: Áo Giáp Ngực Thép
+ROG.BaseName.PlateJerkin: Áo Khoác Thép
+ROG.BaseName.PlateVest: Áo Gilê Thép
+ROG.BaseName.ReinforcedCap: Mũ Cường Hóa
+ROG.BaseName.ReinforcedCoif: Trùm Đầu Cường Hóa
+ROG.BaseName.ReinforcedHelm: Mũ Trụ Cường Hóa
+ROG.BaseName.ReinforcedSleeves: Bọc Tay Cường Hóa
+ROG.BaseName.ReinforcedArms: Ống Tay Cường Hóa
+ROG.BaseName.ReinforcedBoots: Giày Cường Hóa
+ROG.BaseName.ReinforcedGloves: Găng Tay Cường Hóa
+ROG.BaseName.ReinforcedGauntlets: Bao Tay Cường Hóa
+ROG.BaseName.ReinforcedPants: Quần Cường Hóa
+ROG.BaseName.ReinforcedLegs: Ống Chân Cường Hóa
+ROG.BaseName.ReinforcedLeggings: Xà Cạp Cường Hóa
+ROG.BaseName.ReinforcedHauberk: Áo Lưới Cường Hóa
+ROG.BaseName.ReinforcedBreastplate: Áo Giáp Ngực Cường Hóa
+ROG.BaseName.ReinforcedJerkin: Áo Khoác Cường Hóa
+ROG.BaseName.ReinforcedVest: Áo Gilê Cường Hóa
+ROG.BaseName.ScaleCap: Mũ Vảy
+ROG.BaseName.ScaleCoif: Trùm Đầu Vảy
+ROG.BaseName.ScaleHelm: Mũ Trụ Vảy
+ROG.BaseName.ScaleSleeves: Bọc Tay Vảy
+ROG.BaseName.ScaleArms: Ống Tay Vảy
+ROG.BaseName.ScaleBoots: Giày Vảy
+ROG.BaseName.ScaleGloves: Găng Tay Vảy
+ROG.BaseName.ScaleGauntlets: Bao Tay Vảy
+ROG.BaseName.ScalePants: Quần Vảy
+ROG.BaseName.ScaleLegs: Ống Chân Vảy
+ROG.BaseName.ScaleLeggings: Xà Cạp Vảy
+ROG.BaseName.ScaleHauberk: Áo Lưới Vảy
+ROG.BaseName.ScaleBreastplate: Áo Giáp Ngực Vảy
+ROG.BaseName.ScaleJerkin: Áo Khoác Vảy
+ROG.BaseName.ScaleVest: Áo Gilê Vảy
+
+# ================================
+# BASE ITEM NAMES (Weapons)
+# ================================
+ROG.BaseName.Dagger: Dao Găm
+ROG.BaseName.Dirk: Đoản Đao
+ROG.BaseName.Gladius: Kiếm Ngắn
+ROG.BaseName.Stiletto: Dao Găm Nhọn
+ROG.BaseName.Axe: Rìu
+ROG.BaseName.Cleaver: Phác Đao
+ROG.BaseName.Rapier: Kiếm Liễu
+ROG.BaseName.Sword: Kiếm
+ROG.BaseName.HookedSword: Kiếm Lưỡi Móc
+ROG.BaseName.Falcata: Khảm Đao
+ROG.BaseName.Scimitar: Mã Tấu
+ROG.BaseName.Jambiya: Dao Cong
+ROG.BaseName.Sabre: Kiếm Cầm Tay
+ROG.BaseName.Khopesh: Loan Đao
+ROG.BaseName.Wakazashi: Phổ Cận
+ROG.BaseName.Greatsword: Trọng Kiếm
+ROG.BaseName.WarCleaver: Đại Đao
+ROG.BaseName.GreatFalcata: Đại Khảm Đao
+ROG.BaseName.GreatFalchion: Trọng Đao
+ROG.BaseName.TrollSplitter: Trảm Cự Ma
+ROG.BaseName.Katana: Kiếm Nhật
+ROG.BaseName.Greave: Giáp Ống Chân
+ROG.BaseName.Claw: Vuốt
+ROG.BaseName.Fang: Răng Nanh
+ROG.BaseName.Greataxe: Trọng Rìu
+ROG.BaseName.GreatHammer: Búa Tạ
+ROG.BaseName.Shillelagh: Thiết Bảng
+ROG.BaseName.WarMattock: Cuốc Chiến
+ROG.BaseName.Mace: Chùy
+ROG.BaseName.Hammer: Búa
+ROG.BaseName.Adze: Rìu Chim
+ROG.BaseName.Club: Gậy
+ROG.BaseName.Sickle: Lưỡi Hái
+ROG.BaseName.Lute: Đàn Lute
+ROG.BaseName.Mandolin: Đàn Mandolin
+ROG.BaseName.Drum: Trống
+ROG.BaseName.Flute: Sáo
+ROG.BaseName.Harp: Hạc Cầm
+ROG.BaseName.Spear: Thương
+ROG.BaseName.Harpoon: Lao Phóng
+ROG.BaseName.Trident: Đinh Ba
+ROG.BaseName.ShortSpear: Đoản Thương
+ROG.BaseName.LongSpear: Trường Thương
+ROG.BaseName.WarSpear: Chiến Thương
+ROG.BaseName.CompositeBow: Cung Hỗn Hợp
+ROG.BaseName.GreatCompositeBow: Trường Cung Hỗn Hợp
+ROG.BaseName.HuntingBow: Cung Đi Săn
+ROG.BaseName.Longbow: Trường Cung
+ROG.BaseName.HeavyLongbow: Trường Cung Nặng
+ROG.BaseName.RecurveBow: Cung Trợ Lực
+ROG.BaseName.GreatRecurveBow: Trường Cung Trợ Lực
+ROG.BaseName.ShortBow: Đoản Cung
+ROG.BaseName.Crossbow: Nỏ
+ROG.BaseName.MorningStar: Chuỳ Gai
+ROG.BaseName.Flail: Côn Vút
+ROG.BaseName.WeightedFlail: Côn Vút Nặng
+ROG.BaseName.Whip: Roi
+ROG.BaseName.Chain: Dây Xích
+ROG.BaseName.WarChain: Xích Chiến Tranh
+ROG.BaseName.BigShillelagh: Cự Thiết Bảng
+ROG.BaseName.HandAxe: Rìu Cầm Tay
+ROG.BaseName.BeardedAxe: Rìu Lưỡi Cong
+ROG.BaseName.WarAxe: Chiến Rìu
+ROG.BaseName.LochaberAxe: Rìu Đâm
+ROG.BaseName.Pike: Giáo Dài
+ROG.BaseName.LucerneHammer: Búa Mỏ Chim
+ROG.BaseName.Scythe: Lưỡi Hái Dài
+ROG.BaseName.MartialScythe: Lưỡi Hái Võ Thuật
+ROG.BaseName.WarScythe: Lưỡi Hái Chiến Tranh
+ROG.BaseName.SmallShield: Khiên Nhỏ
+ROG.BaseName.MediumShield: Khiên Vừa
+ROG.BaseName.LargeShield: Khiên Lớn
+ROG.BaseName.MaulerStaff: Trượng Đập
+ROG.BaseName.Quarterstaff: Quyền Trượng
+ROG.BaseName.ShodQuarterstaff: Quyền Trượng Đúc
+ROG.BaseName.HeavyShodQuarterstaff: Quyền Trượng Nặng
+ROG.BaseName.FistWrap: Băng Đấm
+ROG.BaseName.HandWrap: Băng Tay
+ROG.BaseName.StuddedFistWrap: Băng Đấm Đinh Tán
+ROG.BaseName.StuddedHandWrap: Băng Tay Đinh Tán
+ROG.BaseName.SpikedFistWrap: Băng Đấm Gai
+
+# ================================
+# BASE ITEM NAMES (Magical)
+# ================================
+ROG.BaseName.Mantle: Áo Choàng Ngắn
+ROG.BaseName.Cloak: Áo Choàng
+ROG.BaseName.Belt: Thắt Lưng
+ROG.BaseName.Girdle: Đai Lưng
+ROG.BaseName.Choker: Vòng Cổ
+ROG.BaseName.Pendant: Mặt Dây Chuyền
+ROG.BaseName.Gem: Ngọc
+ROG.BaseName.Jewel: Trang Sức
+ROG.BaseName.Bracelet: Vòng Tay
+ROG.BaseName.Bracer: Đai Bọc Cổ Tay
+ROG.BaseName.Ring: Nhẫn
+ROG.BaseName.Wrap: Dây Quấn
+ROG.BaseName.Mythirian: Kỷ Vật Mythirian
+
+# ================================================================
+# TIER 1 PREFIXES (Level 36-48) - Commonality / Base Thematics
+# ================================================================
+ROG.TierPrefix.1_ClassicOverworld_Global: Thô Kệch
+ROG.TierPrefix.1_ClassicDungeons_Global: Bụi Bặm
+ROG.TierPrefix.1_ClassicDungeons_CryptsAndUndead: Ma Quái
+ROG.TierPrefix.1_ClassicDungeons_CavesAndNature: Phong Rêu
+ROG.TierPrefix.1_ClassicDungeons_VolcanicAndEarth: Cháy Đen
+ROG.TierPrefix.1_ClassicDungeons_GlacialAndAquatic: Lạnh Lẽo
+ROG.TierPrefix.1_ClassicDungeons_MagicalAndEthereal: Lấp Lánh
+ROG.TierPrefix.1_ClassicDungeons_DemonicAndAbyss: U Ám
+ROG.TierPrefix.1_ClassicDungeons_BeastAndGoblinoid: Thô Sơ
+ROG.TierPrefix.1_AtlantisOverworld_Global: Sóng Cuốn
+ROG.TierPrefix.1_AtlantisDungeons_CryptsAndUndead: Ngập Nước
+ROG.TierPrefix.1_AtlantisDungeons_VolcanicAndEarth: Bốc Hơi
+ROG.TierPrefix.1_AtlantisDungeons_GlacialAndAquatic: Nước Mặn
+ROG.TierPrefix.1_AtlantisDungeons_MagicalAndEthereal: Ánh Ngọc
+ROG.TierPrefix.1_Catacombs_CryptsAndUndead: Xương Xẩu
+ROG.TierPrefix.1_Catacombs_CavesAndNature: Nấm Mốc
+ROG.TierPrefix.1_Catacombs_VolcanicAndEarth: Tàn Tro
+ROG.TierPrefix.1_Catacombs_GlacialAndAquatic: Rỏ Giọt
+ROG.TierPrefix.1_Catacombs_MagicalAndEthereal: Thì Thầm
+ROG.TierPrefix.1_Catacombs_DemonicAndAbyss: Đê Tiện
+ROG.TierPrefix.1_Catacombs_BeastAndGoblinoid: Man Rợ
+ROG.TierPrefix.1_DeepCatacombs_CryptsAndUndead: Tàn Tạ
+ROG.TierPrefix.1_DeepCatacombs_CavesAndNature: Đất Đá
+ROG.TierPrefix.1_DeepCatacombs_VolcanicAndEarth: Huyền Vũ Nham
+ROG.TierPrefix.1_DeepCatacombs_GlacialAndAquatic: Phủ Sương
+ROG.TierPrefix.1_DeepCatacombs_MagicalAndEthereal: Huyễn Ảnh
+ROG.TierPrefix.1_DeepCatacombs_DemonicAndAbyss: Bị Nguyền Rủa
+ROG.TierPrefix.1_DeepCatacombs_BeastAndGoblinoid: Đẫm Máu
+ROG.TierPrefix.1_MythicalZones_Global: Cổ Tích
+ROG.TierPrefix.1_MythicalZones_CavesAndNature: Nguyên Sơ
+ROG.TierPrefix.1_MythicalZones_VolcanicAndEarth: Chói Lọi
+ROG.TierPrefix.1_MythicalZones_MagicalAndEthereal: Dệt Phép
+ROG.TierPrefix.1_Battlegrounds_Global: Đột Kích
+
+# ================================================================
+# TIER 2 PREFIXES (Level 49-64) - High Quality / Rare Thematics
+# ================================================================
+ROG.TierPrefix.2_ClassicOverworld_Global: Thượng Phẩm
+ROG.TierPrefix.2_ClassicDungeons_Global: Khám Phá
+ROG.TierPrefix.2_ClassicDungeons_CryptsAndUndead: Ám Ảnh
+ROG.TierPrefix.2_ClassicDungeons_CavesAndNature: Xanh Tươi
+ROG.TierPrefix.2_ClassicDungeons_VolcanicAndEarth: Tàn Lửa
+ROG.TierPrefix.2_ClassicDungeons_GlacialAndAquatic: Tê Buốt
+ROG.TierPrefix.2_ClassicDungeons_MagicalAndEthereal: Chói Lóa
+ROG.TierPrefix.2_ClassicDungeons_DemonicAndAbyss: Khiếp Sợ
+ROG.TierPrefix.2_ClassicDungeons_BeastAndGoblinoid: Tàn Bạo
+ROG.TierPrefix.2_AtlantisOverworld_Global: Sinh Từ Biển
+ROG.TierPrefix.2_AtlantisDungeons_CryptsAndUndead: Hải Tặc
+ROG.TierPrefix.2_AtlantisDungeons_VolcanicAndEarth: Nước Nóng
+ROG.TierPrefix.2_AtlantisDungeons_GlacialAndAquatic: Đáy Rãnh
+ROG.TierPrefix.2_AtlantisDungeons_MagicalAndEthereal: Mỹ Nhân Ngư
+ROG.TierPrefix.2_Catacombs_CryptsAndUndead: Bí Ẩn
+ROG.TierPrefix.2_Catacombs_CavesAndNature: Vang Vọng
+ROG.TierPrefix.2_Catacombs_VolcanicAndEarth: Lưu Huỳnh
+ROG.TierPrefix.2_Catacombs_GlacialAndAquatic: Hắc Thủy
+ROG.TierPrefix.2_Catacombs_MagicalAndEthereal: Cổ Ngữ
+ROG.TierPrefix.2_Catacombs_DemonicAndAbyss: Ác Tính
+ROG.TierPrefix.2_Catacombs_BeastAndGoblinoid: Đói Khát
+ROG.TierPrefix.2_DeepCatacombs_CryptsAndUndead: Lăng Mộ
+ROG.TierPrefix.2_DeepCatacombs_CavesAndNature: Nguyên Khối
+ROG.TierPrefix.2_DeepCatacombs_VolcanicAndEarth: Lò Luyện
+ROG.TierPrefix.2_DeepCatacombs_GlacialAndAquatic: Sương Giá
+ROG.TierPrefix.2_DeepCatacombs_MagicalAndEthereal: Thần Linh
+ROG.TierPrefix.2_DeepCatacombs_DemonicAndAbyss: Phẫn Nộ
+ROG.TierPrefix.2_DeepCatacombs_BeastAndGoblinoid: Khát Máu
+ROG.TierPrefix.2_MythicalZones_Global: Anh Hùng
+ROG.TierPrefix.2_MythicalZones_CavesAndNature: Linh Thiêng
+ROG.TierPrefix.2_MythicalZones_VolcanicAndEarth: Hỏa Ngục
+ROG.TierPrefix.2_MythicalZones_MagicalAndEthereal: Siêu Trần
+ROG.TierPrefix.2_Battlegrounds_Global: Tiên Phong
+
+# ================================================================
+# TIER 3 PREFIXES (Level 65+) - Exceptional / Epic Thematics
+# ================================================================
+ROG.TierPrefix.3_ClassicOverworld_Global: Tuyệt Tác
+ROG.TierPrefix.3_ClassicDungeons_Global: Chinh Phục
+ROG.TierPrefix.3_ClassicDungeons_CryptsAndUndead: Trác Táng
+ROG.TierPrefix.3_ClassicDungeons_CavesAndNature: Tiên Rừng
+ROG.TierPrefix.3_ClassicDungeons_VolcanicAndEarth: Thiên Thạch
+ROG.TierPrefix.3_ClassicDungeons_GlacialAndAquatic: Tuyết Lở
+ROG.TierPrefix.3_ClassicDungeons_MagicalAndEthereal: Tinh Tú
+ROG.TierPrefix.3_ClassicDungeons_DemonicAndAbyss: Lãng Quên
+ROG.TierPrefix.3_ClassicDungeons_BeastAndGoblinoid: Cự Thú
+ROG.TierPrefix.3_AtlantisOverworld_Global: Thủy Triều
+ROG.TierPrefix.3_AtlantisDungeons_CryptsAndUndead: Dưới Vực
+ROG.TierPrefix.3_AtlantisDungeons_VolcanicAndEarth: Động Trời
+ROG.TierPrefix.3_AtlantisDungeons_GlacialAndAquatic: Cuồng Lưu
+ROG.TierPrefix.3_AtlantisDungeons_MagicalAndEthereal: Thủy Thần
+ROG.TierPrefix.3_Catacombs_CryptsAndUndead: Chúa Tể
+ROG.TierPrefix.3_Catacombs_CavesAndNature: Đại Địa
+ROG.TierPrefix.3_Catacombs_VolcanicAndEarth: Cự Đỉnh
+ROG.TierPrefix.3_Catacombs_GlacialAndAquatic: Tạo Lũ
+ROG.TierPrefix.3_Catacombs_MagicalAndEthereal: Mạch Kiều
+ROG.TierPrefix.3_Catacombs_DemonicAndAbyss: Đại Ác Ma
+ROG.TierPrefix.3_Catacombs_BeastAndGoblinoid: Huyễn Thú
+ROG.TierPrefix.3_DeepCatacombs_CryptsAndUndead: Đêm Vĩnh Cửu
+ROG.TierPrefix.3_DeepCatacombs_CavesAndNature: Địa Lý Sư
+ROG.TierPrefix.3_DeepCatacombs_VolcanicAndEarth: Rèn Giới
+ROG.TierPrefix.3_DeepCatacombs_GlacialAndAquatic: Băng Tinh
+ROG.TierPrefix.3_DeepCatacombs_MagicalAndEthereal: Rèn Từ Sao
+ROG.TierPrefix.3_DeepCatacombs_DemonicAndAbyss: Hỗn Loạn
+ROG.TierPrefix.3_DeepCatacombs_BeastAndGoblinoid: Sát Lục
+ROG.TierPrefix.3_MythicalZones_Global: Thiên Đàng
+ROG.TierPrefix.3_MythicalZones_CavesAndNature: Cây Thế Giới
+ROG.TierPrefix.3_MythicalZones_VolcanicAndEarth: Hủy Diệt Cực Đại
+ROG.TierPrefix.3_MythicalZones_MagicalAndEthereal: Vũ Trụ
+ROG.TierPrefix.3_Battlegrounds_Global: Chiến Tướng
+
+# ================================
+# PVP / RVR CUSTOM TIER PREFIXES
+# ================================
+ROG.TierPrefix.Mythical: Thần Thoại
+ROG.TierPrefix.Exalted: Cao Quý
+ROG.TierPrefix.Fabled: Truyền Thuyết
+ROG.TierPrefix.Legendary: Huyền Thoại
+ROG.TierPrefix.Eminent: Xuất Chúng
+ROG.TierPrefix.Illustrious: Lừng Danh
+ROG.TierPrefix.Epic: Sử Thi
+ROG.TierPrefix.Superior: Cao Cấp
+ROG.TierPrefix.Flawless: Hoàn Mỹ
+ROG.TierPrefix.Rare: Hiếm
+ROG.TierPrefix.Fine: Tinh Xảo
+ROG.TierPrefix.Uncommon: Hiếm Có

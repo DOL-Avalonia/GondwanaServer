@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AmteScripts.Managers;
 using DOL.Database;
 using DOL.GS;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AmteScripts.PvP.CoreRun
 {
@@ -87,6 +89,135 @@ namespace AmteScripts.PvP.CoreRun
                     m_boundaryObjects.Add(marker);
                 }
             }
+        }
+
+        protected override int EffectLoopCallback(RegionTimer timer)
+        {
+            if (DbArea == null || Region == null) return 0;
+
+            var pvpMgr = PvpManager.Instance;
+            if (pvpMgr == null || !pvpMgr.IsOpen || pvpMgr.CurrentSessionType != PvpManager.eSessionTypes.CoreRun)
+            {
+                return Math.Max(1000, DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 5000);
+            }
+
+            int activeSpellID = DbArea.SpellID; // Gets toggled between Green and Red spell IDs in UpdateVisuals
+            if (activeSpellID <= 0) return Math.Max(1000, DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 5000);
+
+            int baseAmount = DbArea.EffectAmount;
+            double varFactor = DbArea.EffectVariance / 100.0;
+            int actualLevel = DbArea.StormLevel > 0 ? DbArea.StormLevel : 1;
+
+            if (varFactor > 0)
+            {
+                int rangeLvl = (int)Math.Round(actualLevel * varFactor);
+                actualLevel = Util.Random(actualLevel - rangeLvl, actualLevel + rangeLvl);
+            }
+            actualLevel = Math.Max(1, Math.Min(255, actualLevel));
+
+            var playersInArea = this.Players;
+
+            foreach (var player in playersInArea)
+            {
+                if (player == null || !player.IsInPvP || !player.IsAlive)
+                    continue;
+
+                int actualAmount = baseAmount;
+                if (varFactor > 0)
+                {
+                    int rangeAmt = (int)Math.Round(baseAmount * varFactor);
+                    actualAmount = Util.Random(baseAmount - rangeAmt, baseAmount + rangeAmt);
+                }
+                actualAmount = Math.Max(1, actualAmount);
+
+                // Spawn storms strictly around this player
+                for (int i = 0; i < actualAmount; i++)
+                {
+                    Coordinate randomPoint = GetRandomPointAroundPlayer(player, 900);
+
+                    int attempts = 5;
+                    bool found = false;
+                    for (int j = 0; j < attempts; j++)
+                    {
+                        if (this.IsContaining(randomPoint))
+                        {
+                            found = true;
+                            break;
+                        }
+                        randomPoint = GetRandomPointAroundPlayer(player, 900);
+                    }
+
+                    if (!found || Region.GetZone(randomPoint) == null)
+                        continue;
+
+                    SpawnStorm(randomPoint, actualLevel, activeSpellID);
+                }
+            }
+
+            int baseFreq = DbArea.EffectFrequency;
+            int nextInterval = baseFreq;
+            if (varFactor > 0)
+            {
+                int varMs = (int)(baseFreq * varFactor);
+                nextInterval = Util.Random(baseFreq - varMs, baseFreq + varMs);
+            }
+            return Math.Max(500, nextInterval);
+        }
+
+        private Coordinate GetRandomPointAroundPlayer(GamePlayer player, int maxRadius)
+        {
+            double angle = Util.RandomDouble() * Math.PI * 2;
+            double r = Math.Sqrt(Util.RandomDouble()) * maxRadius;
+            int newX = player.Coordinate.X + (int)(r * Math.Cos(angle));
+            int newY = player.Coordinate.Y + (int)(r * Math.Sin(angle));
+
+            return Coordinate.Create(newX, newY, player.Coordinate.Z);
+        }
+
+        private void SpawnStorm(Coordinate spot, int level, int activeSpellID)
+        {
+            GameNPC stormPoint = new GameNPC();
+            stormPoint.Model = 667;
+            stormPoint.Name = "Storm";
+            stormPoint.Flags = GameNPC.eFlags.CANTTARGET | GameNPC.eFlags.DONTSHOWNAME;
+            stormPoint.Position = Position.Create(Region.ID, spot.X, spot.Y, spot.Z, 0);
+            stormPoint.Level = (byte)level;
+            stormPoint.Size = DbArea.StormSize > 0 ? DbArea.StormSize : (byte)50;
+
+            if (DbArea.StormFaction > 0)
+                stormPoint.Faction = FactionMgr.GetFactionByID(DbArea.StormFaction);
+
+            if (DbArea.NPCImmunToStorm)
+                stormPoint.TempProperties.setProperty("NPCImmunToStorm", true);
+
+            stormPoint.AddToWorld();
+
+            new RegionTimer(stormPoint, (t) =>
+            {
+                if (stormPoint.ObjectState != GameObject.eObjectState.Active) return 0;
+
+                Spell spell = SkillBase.GetSpellByID(activeSpellID);
+                ushort effectID = (ushort)(spell != null ? spell.ClientEffect : activeSpellID);
+
+                foreach (GamePlayer p in Region.GetPlayersInRadius(spot, (ushort)WorldMgr.VISIBILITY_DISTANCE, false, false))
+                {
+                    p.Out.SendSpellEffectAnimation(stormPoint, stormPoint, effectID, 0, false, 1);
+                }
+
+                if (spell != null)
+                {
+                    SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
+                    ISpellHandler handler = ScriptMgr.CreateSpellHandler(stormPoint, spell, line);
+                    if (handler != null)
+                        handler.StartSpell(stormPoint);
+                }
+                return 0;
+            }).Start(250);
+
+            new RegionTimer(stormPoint, t => {
+                if (stormPoint.ObjectState == GameObject.eObjectState.Active) stormPoint.Delete();
+                return 0;
+            }).Start(3000);
         }
     }
 }

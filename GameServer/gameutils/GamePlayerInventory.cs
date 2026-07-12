@@ -20,6 +20,7 @@ using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using DOL.GS.Scripts;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -1532,6 +1533,11 @@ namespace DOL.GS
                         if (m_items.TryGetValue(slot, out item))
                         {
                             weight += item.Weight;
+
+                            if (item is StorageBagItem bagItem)
+                            {
+                                weight += bagItem.GetAdditionalWeight();
+                            }
                         }
                     }
 

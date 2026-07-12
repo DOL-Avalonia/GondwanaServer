@@ -35,6 +35,7 @@ using DOL.GS.Scripts;
 using DOL.MobGroups;
 using DOL.GS.Geometry;
 using System.Linq;
+using DOL.GS.ServerProperties;
 using Vector3 = System.Numerics.Vector3;
 
 namespace DOL.AI.Brain
@@ -227,7 +228,7 @@ namespace DOL.AI.Brain
                 Body.StopAttack();
 
             //If this NPC can randomly walk around, we allow it to walk around
-            if (CanRandomWalk && !Body.IsRoaming && Util.Chance(DOL.GS.ServerProperties.Properties.GAMENPC_RANDOMWALK_CHANCE))
+            if (CanRandomWalk && !Body.IsRoaming && Util.Chance(Properties.GAMENPC_RANDOMWALK_CHANCE))
             {
                 var target = GetRandomWalkTarget();
                 if (Util.IsNearDistance(target, Body.Coordinate, GameNPC.CONST_WALKTOTOLERANCE))
@@ -608,7 +609,7 @@ namespace DOL.AI.Brain
 
             // Check LOS (walls, pits, etc...) before  attacking, player + pet
             // Be sure the aggrocheck is triggered by the brain on Think() method
-            if (DOL.GS.ServerProperties.Properties.ALWAYS_CHECK_LOS && CheckLOS)
+            if (Properties.ALWAYS_CHECK_LOS && CheckLOS)
             {
                 GamePlayer thisLiving = living as GamePlayer ?? living.GetPlayerOwner();
 
@@ -1065,7 +1066,7 @@ namespace DOL.AI.Brain
         /// </summary>
         protected virtual ushort BAFInitialRange
         {
-            get { return DOL.GS.ServerProperties.Properties.INITIAL_BAF_RANGE; }
+            get { return Properties.INITIAL_BAF_RANGE; }
         }
 
         /// <summary>
@@ -1076,7 +1077,7 @@ namespace DOL.AI.Brain
         {
             get
             {
-                return DOL.GS.ServerProperties.Properties.MAX_BAF_RANGE;
+                return Properties.MAX_BAF_RANGE;
             }
         }
 
@@ -1128,12 +1129,12 @@ namespace DOL.AI.Brain
             // Check group first to minimize the number of HashSet.Add() calls
             if (puller.Group is Group group)
             {
-                if (DOL.GS.ServerProperties.Properties.BAF_MOBS_COUNT_BG_MEMBERS && bg != null)
+                if (Properties.BAF_MOBS_COUNT_BG_MEMBERS && bg != null)
                     countedAttackers = new HashSet<String>(); // We have to check for duplicates when counting attackers
 
-                if (!DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_PULLER)
+                if (!Properties.BAF_MOBS_ATTACK_PULLER)
                 {
-                    if (DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_BG_MEMBERS && bg != null)
+                    if (Properties.BAF_MOBS_ATTACK_BG_MEMBERS && bg != null)
                     {
                         // We need a large enough victims list for group and BG, and also need to check for duplicate victims
                         victims = new List<GamePlayer>(group.MemberCount + bg.PlayerCount - 1);
@@ -1162,17 +1163,17 @@ namespace DOL.AI.Brain
             } // if (puller.Group is Group group)
 
             // Do we have to count BG members, or add them to victims list?
-            if ((bg != null) && (DOL.GS.ServerProperties.Properties.BAF_MOBS_COUNT_BG_MEMBERS
-                || (DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_BG_MEMBERS && !DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_PULLER)))
+            if ((bg != null) && (Properties.BAF_MOBS_COUNT_BG_MEMBERS
+                || (Properties.BAF_MOBS_ATTACK_BG_MEMBERS && !Properties.BAF_MOBS_ATTACK_PULLER)))
             {
-                if (victims == null && DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_BG_MEMBERS && !DOL.GS.ServerProperties.Properties.BAF_MOBS_ATTACK_PULLER)
+                if (victims == null && Properties.BAF_MOBS_ATTACK_BG_MEMBERS && !Properties.BAF_MOBS_ATTACK_PULLER)
                     // Puller isn't in a group, so we have to create the victims list for the BG
                     victims = new List<GamePlayer>(bg.PlayerCount);
 
                 foreach (GamePlayer player in bg.GetPlayersInTheBattleGroup())
                     if (player != null && (player.InternalID == puller.InternalID || player.IsWithinRadius2D(puller, BAFPlayerRange)))
                     {
-                        if (DOL.GS.ServerProperties.Properties.BAF_MOBS_COUNT_BG_MEMBERS
+                        if (Properties.BAF_MOBS_COUNT_BG_MEMBERS
                             && (countedAttackers == null || !countedAttackers.Contains(player.InternalID)))
                             numAttackers++;
 
@@ -1185,13 +1186,13 @@ namespace DOL.AI.Brain
                 // Player is alone
                 numAttackers = 1;
 
-            int additionalChance = DOL.GS.ServerProperties.Properties.BAF_ADDITIONAL_CHANCE;
+            int additionalChance = Properties.BAF_ADDITIONAL_CHANCE;
 
-            if (attacker.ControlledBrain is TurretFNFBrain && DOL.GS.ServerProperties.Properties.LIMIT_BAF_ADDITIONAL_CHANCE_TURRET > 0)
+            if (attacker.ControlledBrain is TurretFNFBrain && Properties.LIMIT_BAF_ADDITIONAL_CHANCE_TURRET > 0)
                 // in dungeon LIMIT_BAF_ADDITIONAL_CHANCE_TURRET / 2
-                additionalChance = (int)(additionalChance / DOL.GS.ServerProperties.Properties.LIMIT_BAF_ADDITIONAL_CHANCE_TURRET);
+                additionalChance = (int)(additionalChance / Properties.LIMIT_BAF_ADDITIONAL_CHANCE_TURRET);
 
-            int percentBAF = DOL.GS.ServerProperties.Properties.BAF_INITIAL_CHANCE + ((numAttackers - 1) * additionalChance);
+            int percentBAF = Properties.BAF_INITIAL_CHANCE + ((numAttackers - 1) * additionalChance);
 
             int maxAdds = percentBAF / 100; // Multiple of 100 are guaranteed BAFs
 
@@ -1246,7 +1247,21 @@ namespace DOL.AI.Brain
             Offensive,
             Defensive
         }
+
         public bool waitingForMana = false;
+
+        /// <summary>
+        /// Determines if a living entity is explicitly eligible to be healed by a ZombieHeal spell.
+        /// </summary>
+        public static bool IsValidZombieHealRecipient(GameLiving target)
+        {
+            if (target == null) return false;
+            if (target.IsDamned) return true;
+            if (SpellHandler.FindEffectOnTarget(target, "Damnation") != null) return true;
+            if (target is GameNPC npc && npc.BodyType == (ushort)NpcTemplateMgr.eBodyType.Undead) return true;
+            return false;
+        }
+
         /// <summary>
         /// Checks if any spells need casting
         /// </summary>
@@ -1285,7 +1300,12 @@ namespace DOL.AI.Brain
                     foreach (Spell spell in Body.Spells)
                     {
                         if (Body.GetSkillDisabledDuration(spell) > 0) continue;
-                        if (spell.Target.ToLower() == "enemy" || spell.Target.ToLower() == "area" || spell.Target.ToLower() == "cone") continue;
+
+                        bool isZombieHeal = spell.SpellType.Equals("ZombieHeal", StringComparison.OrdinalIgnoreCase);
+
+                        if (!isZombieHeal && (spell.Target.ToLower() == "enemy" || spell.Target.ToLower() == "area" || spell.Target.ToLower() == "cone"))
+                            continue;
+
                         // If we have no pets
                         if (Body.ControlledBrain == null)
                         {
@@ -1300,11 +1320,19 @@ namespace DOL.AI.Brain
                         {
                             if (Util.Chance(30) && Body.ControlledBrain != null && spell.SpellType.ToLower() == "heal" &&
                                 Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range &&
-                                Body.ControlledBrain.Body.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD
+                                Body.ControlledBrain.Body.HealthPercent < Properties.NPC_HEAL_THRESHOLD
                                 && spell.Target.ToLower() != "self")
                             {
-                                spell_rec.Add(spell);
-                                needheal = true;
+                                if (isZombieHeal && IsValidZombieHealRecipient(Body.ControlledBrain.Body))
+                                {
+                                    spell_rec.Add(spell);
+                                    needheal = true;
+                                }
+                                else if (!isZombieHeal && !IsValidZombieHealRecipient(Body.ControlledBrain.Body))
+                                {
+                                    spell_rec.Add(spell);
+                                    needheal = true;
+                                }
                             }
                             if (LivingHasEffect(Body.ControlledBrain!.Body, spell) && (spell.Target.ToLower() != "self")) continue;
                         }
@@ -1333,7 +1361,9 @@ namespace DOL.AI.Brain
                             continue;
                         }
 
-                        if (spell.Target.ToLower() is not ("enemy" or "area" or "cone"))
+                        bool isZombieHeal = spell.SpellType.Equals("ZombieHeal", StringComparison.OrdinalIgnoreCase);
+
+                        if (!isZombieHeal && (spell.Target.ToLower() != "enemy" && spell.Target.ToLower() != "area" && spell.Target.ToLower() != "cone"))
                         {
                             continue;
                         }
@@ -1607,7 +1637,7 @@ namespace DOL.AI.Brain
                     if (spell.Target.ToLower() == "self")
                     {
                         // if we have a self heal and health is less than 75% then heal, otherwise return false to try another spell or do nothing
-                        if (Body.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD)
+                        if (Body.HealthPercent < Properties.NPC_HEAL_THRESHOLD)
                         {
                             Body.TargetObject = Body;
                         }
@@ -1615,7 +1645,7 @@ namespace DOL.AI.Brain
                     }
 
                     // Chance to heal self when dropping below 30%, do NOT spam it.
-                    if (Body.HealthPercent < (DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD / 2.0)
+                    if (Body.HealthPercent < (Properties.NPC_HEAL_THRESHOLD / 2.0)
                         && Util.Chance(10) && spell.Target.ToLower() != "pet")
                     {
                         Body.TargetObject = Body;
@@ -1624,7 +1654,7 @@ namespace DOL.AI.Brain
 
                     if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null
                         && Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range
-                        && Body.ControlledBrain.Body.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD
+                        && Body.ControlledBrain.Body.HealthPercent < Properties.NPC_HEAL_THRESHOLD
                         && spell.Target.ToLower() != "self")
                     {
                         Body.TargetObject = Body.ControlledBrain.Body;
@@ -1635,7 +1665,7 @@ namespace DOL.AI.Brain
                     {
                         foreach (GameNPC npc in Body.GetNPCsInRadius((ushort)Math.Max(spell.Radius, spell.Range)))
                         {
-                            if (Body.IsFriend(npc) && Util.Chance(60) && npc.HealthPercent < DOL.GS.ServerProperties.Properties.NPC_HEAL_THRESHOLD)
+                            if (Body.IsFriend(npc) && Util.Chance(60) && npc.HealthPercent < Properties.NPC_HEAL_THRESHOLD)
                             {
                                 Body.TargetObject = npc;
                                 break;
@@ -1643,6 +1673,53 @@ namespace DOL.AI.Brain
                         }
                     }
                     break;
+
+                case "ZOMBIEHEAL":
+                    {
+                        // 1. Self Healing checks
+                        if (spell.Target.ToLower() == "self" || spell.Target.ToLower() == "buff")
+                        {
+                            if (Body.HealthPercent < Properties.NPC_HEAL_THRESHOLD && IsValidZombieHealRecipient(Body))
+                            {
+                                Body.TargetObject = Body;
+                            }
+                            break;
+                        }
+
+                        // Emergency heal self bypass
+                        if (Body.HealthPercent < (Properties.NPC_HEAL_THRESHOLD / 2.0) && IsValidZombieHealRecipient(Body) && spell.Target.ToLower() != "pet")
+                        {
+                            Body.TargetObject = Body;
+                            break;
+                        }
+
+                        // 2. Pet Target validation
+                        if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null
+                            && Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range
+                            && Body.ControlledBrain.Body.HealthPercent < Properties.NPC_HEAL_THRESHOLD
+                            && spell.Target.ToLower() != "self"
+                            && IsValidZombieHealRecipient(Body.ControlledBrain.Body))
+                        {
+                            Body.TargetObject = Body.ControlledBrain.Body;
+                            break;
+                        }
+
+                        // 3. Allied Realm Scanning (Filters out Animals, Plants, and living humanoids)
+                        if (spell.Target.ToLower() == "realm")
+                        {
+                            foreach (GameNPC npc in Body.GetNPCsInRadius((ushort)Math.Max(spell.Radius, spell.Range)))
+                            {
+                                if (GameServer.ServerRules.IsAllowedToHelp(Body, npc, true) && Body.IsFriend(npc)
+                                    && npc.HealthPercent < Properties.NPC_HEAL_THRESHOLD
+                                    && IsValidZombieHealRecipient(npc))
+                                {
+                                    Body.TargetObject = npc;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
                 #endregion
 
                 case "SummonWood":
@@ -1711,6 +1788,11 @@ namespace DOL.AI.Brain
 
             if (Body.TargetObject is GameLiving living && GameServer.ServerRules.IsAllowedToAttack(Body, living, true) && (spell.Duration == 0 || !living.HasEffect(spell) || spell.SpellType.ToUpper() == "DIRECTDAMAGEWITHDEBUFF"))
             {
+                if (spell.SpellType.Equals("ZombieHeal", StringComparison.OrdinalIgnoreCase) && IsValidZombieHealRecipient(living))
+                {
+                    return false;
+                }
+
                 if (Body.IsMoving && !spell.IsInstantCast)
                     Body.StopMoving();
 
@@ -1891,7 +1973,7 @@ namespace DOL.AI.Brain
                    >0 means range of roaming
                    defaut roaming range is defined in CanRandomWalk method
                  */
-                if (!DOL.GS.ServerProperties.Properties.ALLOW_ROAM)
+                if (!Properties.ALLOW_ROAM)
                     return false;
                 if (Body.RoamingRange == 0)
                     return false;

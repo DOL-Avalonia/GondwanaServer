@@ -24,15 +24,72 @@ namespace DOL.GS.Spells
         }
 
         /// <summary>
+        /// Checks if the target is Undead or Damned
+        /// </summary>
+        private bool IsUndeadOrDamned(GameLiving target)
+        {
+            if (target == null) return false;
+            if (target.IsDamned) return true;
+            if (SpellHandler.FindEffectOnTarget(target, "Damnation") != null) return true;
+            if (target is GameNPC npc && npc.BodyType == (ushort)NpcTemplateMgr.eBodyType.Undead) return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Is this a GHOST entity that lacks an Undead bodytype?
+        /// </summary>
+        private static bool IsInvalidGhostTarget(GameLiving target)
+        {
+            if (target is GameNPC npc)
+            {
+                bool isGhost = (npc.Flags & GameNPC.eFlags.GHOST) != 0;
+                bool isUndead = npc.BodyType == (ushort)NpcTemplateMgr.eBodyType.Undead;
+
+                if (isGhost && !isUndead) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Intercept pre-cast targeting. If DB defines spell as "enemy", but caster is 
+        /// targeting an allied Undead, we force-approve the cast.
+        /// </summary>
+        public override bool CheckBeginCast(GameLiving selectedTarget, bool quiet)
+        {
+            if (IsInvalidGhostTarget(selectedTarget))
+            {
+                if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.NoEffect", selectedTarget), eChatType.CT_SpellResisted);
+                return false;
+            }
+
+            if (IsUndeadOrDamned(selectedTarget) && !GameServer.ServerRules.IsAllowedToAttack(Caster, selectedTarget, true))
+            {
+                if (!Caster.IsAlive || (selectedTarget != null && !selectedTarget.IsAlive)) return false;
+
+                if (selectedTarget != null && !Caster.IsWithinRadius(selectedTarget, CalculateSpellRange()))
+                {
+                    if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.TargetTooFar"), eChatType.CT_SpellResisted);
+                    return false;
+                }
+
+                if (!CheckHasPower(selectedTarget, quiet)) return false;
+
+                return true;
+            }
+
+            return base.CheckBeginCast(selectedTarget, quiet);
+        }
+
+        /// <summary>
         /// By default, DirectDamage checks for resists. Since this is "Self" cast or intended 
         /// to help a Damned player, we must force the resist chance to 0.
         /// </summary>
         public override int CalculateSpellResistChance(GameLiving target)
         {
-            if (target == Caster || (target != null && SpellHandler.FindEffectOnTarget(target, "Damnation") != null))
-            {
-                return 0;
-            }
+            if (IsInvalidGhostTarget(target)) return 100;
+            if (target == Caster || IsUndeadOrDamned(target)) return 0;
+
             return base.CalculateSpellResistChance(target);
         }
 
@@ -41,11 +98,25 @@ namespace DOL.GS.Spells
         /// </summary>
         public override int CalculateToHitChance(GameLiving target)
         {
-            if (target == Caster || (target != null && SpellHandler.FindEffectOnTarget(target, "Damnation") != null))
-            {
-                return 100;
-            }
+            if (IsInvalidGhostTarget(target)) return 0;
+            if (target == Caster || IsUndeadOrDamned(target)) return 100;
+
             return base.CalculateToHitChance(target);
+        }
+
+        /// <summary>
+        /// Scales base output for both friendly heals and enemy nukes.
+        /// </summary>
+        public override AttackData CalculateDamageToTarget(GameLiving target, double effectiveness)
+        {
+            int damnationEnhancement = Caster.GetModified(eProperty.DamnationEffectEnhancement);
+
+            if (damnationEnhancement > 0)
+            {
+                effectiveness += (damnationEnhancement * 0.01);
+            }
+
+            return base.CalculateDamageToTarget(target, effectiveness);
         }
 
         /// <summary>
@@ -56,9 +127,10 @@ namespace DOL.GS.Spells
             if (target == null || !target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
                 return;
 
-            bool targetIsDamned = SpellHandler.FindEffectOnTarget(target, "Damnation") != null;
+            if (IsInvalidGhostTarget(target))
+                return;
 
-            if (targetIsDamned)
+            if (IsUndeadOrDamned(target))
             {
                 // Calculate Heal Amount based on Spell.Damage for damned players,
                 // but we might want to ignore defensive resists since this is a "friendly" heal.
@@ -86,15 +158,25 @@ namespace DOL.GS.Spells
                 if (Spell.Value > 0)
                 {
                     var damnationEffect = SpellHandler.FindEffectOnTarget(target, "Damnation");
+
                     if (damnationEffect != null)
                     {
-                        int addedTime = (int)Spell.Value * 1000;
-                        damnationEffect.AddRemainingTime(addedTime);
+                        double extendedSeconds = Spell.Value;
+                        int damnationEnhancement = Caster.GetModified(eProperty.DamnationEffectEnhancement);
 
-                        MessageToLiving(target, T(target, "SpellHandler.ZombieHeal.DecayExtendedTarget", Spell.Value), eChatType.CT_Spell);
+                        if (damnationEnhancement > 0)
+                        {
+                            extendedSeconds *= (1.0 + (damnationEnhancement * 0.01));
+                        }
+
+                        int addedTimeMs = (int)(extendedSeconds * 1000);
+                        damnationEffect.AddRemainingTime(addedTimeMs);
+
+                        double displaySecs = Math.Round(extendedSeconds, 1);
+                        MessageToLiving(target, T(target, "SpellHandler.ZombieHeal.DecayExtendedTarget", displaySecs), eChatType.CT_Spell);
                         if (Caster != target)
                         {
-                            MessageToCaster(T(Caster, "SpellHandler.ZombieHeal.DecayExtendedCaster", target.Name, Spell.Value), eChatType.CT_Spell);
+                            MessageToCaster(T(Caster, "SpellHandler.ZombieHeal.DecayExtendedCaster", target.Name, displaySecs), eChatType.CT_Spell);
                         }
                     }
                 }
@@ -117,7 +199,7 @@ namespace DOL.GS.Spells
                 // We call the base DirectDamageSpellHandler to handle damage calculation for non-damned players,
                 // resists, shields, and interaction messages.
                 base.DealDamage(target, effectiveness);
-                bool casterIsDamned = SpellHandler.FindEffectOnTarget(Caster, "Damnation") != null;
+                bool casterIsDamned = Caster.IsDamned || SpellHandler.FindEffectOnTarget(Caster, "Damnation") != null || (Caster is GameNPC cNpc && cNpc.BodyType == (ushort)NpcTemplateMgr.eBodyType.Undead);
 
                 if (!casterIsDamned && Spell.AmnesiaChance > 0)
                 {

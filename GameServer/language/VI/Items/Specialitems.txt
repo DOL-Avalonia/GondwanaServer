@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					Pháo hoa sẽ bắt đầu sau {0} giây.
+
+Items.Specialitems.BeerAlreadyDrinking:				Bạn đang uống rồi!
+Items.Specialitems.BeerDrinkDistance:				đồ uống
+
+Items.Specialitems.PlaceAssiseTooFar:				Bạn ở quá xa để ngồi xuống.
+Items.Specialitems.PlaceAssiseTaken:				Chỗ này đã có người ngồi.
+
+Items.Specialitems.GuarkRingListened:				Yêu cầu của bạn đã được lắng nghe.
+Items.Specialitems.GuarkRingUsed:					Bạn cảm thấy một luồng sức mạnh mạnh mẽ làm bạn bất động.
+Items.Specialitems.GuarkRingNoPower:				Bạn không có đủ sức mạnh sự sống trong huyết quản để sử dụng chiếc nhẫn.
+Items.Specialitems.GuarkAmuletNoPower:				Bạn không có đủ sức mạnh sự sống trong huyết quản để sử dụng bùa hộ mệnh.
+Items.Specialitems.GuarkRingTPCancelMoved:			Bạn đã di chuyển, yêu cầu phép thuật thất bại và bạn không thể dịch chuyển.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Bạn đã tháo nhẫn khỏi ngón tay, yêu cầu phép thuật thất bại và bạn không thể dịch chuyển.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Bạn đã tháo bùa hộ mệnh khỏi cổ, yêu cầu phép thuật thất bại và bạn không thể dịch chuyển.
+Items.Specialitems.GuarkRingTPFailed:				Phép thuật thiên thể đã thất bại, không rõ điểm đến.
+Items.Specialitems.GuarkRingTPNone:					Không có yêu cầu nào được thực hiện, điểm đến của bạn không xác định.
+Items.Specialitems.GuarkRingUsageCombat:			Bạn không thể sử dụng phép thuật thiên thể khi đang trong chiến đấu!
+Items.Specialitems.GuarkRingUsageHere:				Phép thuật thiên thể không tồn tại ở nơi này.
+Items.Specialitems.GuarkRingUsageJailed:			Bạn không thể sử dụng phép thuật thiên thể khi đang bị giam cầm!
+Items.Specialitems.GuarkRingUsageMounted:			Bạn không thể sử dụng phép thuật thiên thể khi đang cưỡi thú!
+Items.Specialitems.GuarkRingUsageStealthed:			Bạn không thể sử dụng phép thuật thiên thể khi đang tàng hình.
+Items.Specialitems.GuarkRingUsagePetrified:			Bạn không thể sử dụng phép thuật thiên thể khi đang bị hóa đá!
+Items.Specialitems.GuarkRingUsageDamned:			Bạn không thể sử dụng phép thuật thiên thể khi bị nguyền rủa!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Bạn không thể sử dụng phép thuật thiên thể khi ở hình dạng này!
+Items.Specialitems.GuarkRingUsageMorphed:			Bạn không thể sử dụng phép thuật thiên thể khi đang chịu bùa chú "{0}"!
+Items.Specialitems.GuarkRingUsageCrafting:			Bạn không thể sử dụng phép thuật thiên thể khi đang chế tạo!
+Items.Specialitems.GuarkRingUsageDuel:				Bạn không thể sử dụng phép thuật thiên thể khi đang quyết đấu!
+Items.Specialitems.GuarkRingUsageStealing:			Bạn không thể sử dụng phép thuật thiên thể khi đang trộm đồ của người chơi khác!
+Items.Specialitems.GuarkRingUsageAFK:				Bạn không thể sử dụng phép thuật thiên thể khi đang AFK!
+Items.Specialitems.GuarkRingUsageClimbing:			Bạn không thể sử dụng phép thuật thiên thể khi đang leo trèo!
+Items.Specialitems.GuarkRingUsageRelic:				Bạn không thể sử dụng phép thuật thiên thể khi đang mang thánh tích lãnh thổ.
+Items.Specialitems.GuarkRingCannotUseHere:			Bạn không thể sử dụng vật phẩm này ở đây.
+Items.Specialitems.GuarkRingDoNotMove:				Bạn phải đứng yên một chỗ để sử dụng vật phẩm này.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Bạn vừa mới chiến đấu gần đây, vì vậy bạn phải đợi một lúc để có thể sử dụng lại vật phẩm này.
+
+Items.Specialitems.MiniPetNoCast:					Bạn không thể niệm phép này ở đây!
+
+Items.Specialitems.FirecampNoSit:					Đừng ngồi gần lửa trại để loại bỏ hiệu ứng này.
+Items.Specialitems.FirecampHeatRegen:				Hơi ấm của lửa trại giúp bạn phục hồi máu nhanh hơn.
+
+Items.Specialitems.StorageBag.NoBag:				Bạn không đang xem một chiếc túi nào!
+Items.Specialitems.StorageBag.BadItem:				Bạn không thể đặt vật phẩm này vào túi này!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		{0} của bạn vỡ nát sau khi được kích hoạt lúc tử vong!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		Không thể phá hủy vật phẩm vì một lý do nào đó!
+Items.Specialitems.DieTriggerSpell.FailRez:			Lời nguyền ảnh hưởng đến xác chết của bạn quá mạnh ở đây, phép thuật hồi sinh thất bại!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		{0} của bạn đã cạn kiệt và bị xóa khỏi túi đồ.

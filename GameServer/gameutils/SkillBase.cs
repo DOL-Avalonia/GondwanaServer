@@ -1987,6 +1987,8 @@ namespace DOL.GS
                     return "BlockChance";
                 case eProperty.ParryChance:
                     return "ParryChance";
+                case eProperty.FatigueConsumption:
+                    return "FatigueConsumption";
                 case eProperty.FumbleChance:
                     return "FumbleChance";
                 case eProperty.MeleeDamage:

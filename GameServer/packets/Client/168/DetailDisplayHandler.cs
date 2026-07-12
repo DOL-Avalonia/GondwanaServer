@@ -1153,6 +1153,16 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (item.Object_Type == (int)eObjectType.Magical && item.Item_Type == 40) // potion
                 WritePotionInfo(objectInfo, item, client);
 
+            if (item is Scripts.StorageBagItem bagItem)
+            {
+                int extraWeight = bagItem.GetAdditionalWeight();
+                int totalBagWeight = item.Weight + extraWeight;
+                int filledSlots = bagItem.GetFilledSlotsCount();
+
+                objectInfo.Add(string.Format("Bag Weight: {0:0.0} lbs ({1} filled slots)", totalBagWeight / 10.0f, filledSlots));
+                objectInfo.Add(" ");
+            }
+
             if (!item.IsPickable)
                 objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotPick"));
 

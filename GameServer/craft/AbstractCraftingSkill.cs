@@ -277,20 +277,39 @@ namespace DOL.GS
         public virtual bool CheckRawMaterials(GamePlayer player, Recipe recipe)
         {
             ArrayList missingMaterials = null;
-
             long totalPrice = 0;
+
+            var availableItems = new List<InventoryItem>();
+            var bags = new List<Scripts.StorageBagItem>();
+
+            lock (player.Inventory)
+            {
+                foreach (InventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                {
+                    if (item != null)
+                    {
+                        availableItems.Add(item);
+                        if (item is Scripts.StorageBagItem sbi) bags.Add(sbi);
+                    }
+                }
+            }
+
+            foreach (var bag in bags)
+            {
+                Scripts.StorageBagVault bagVault = new Scripts.StorageBagVault(player, bag);
+                availableItems.AddRange(bagVault.DBItems(player));
+            }
+
             lock (player.Inventory)
             {
                 foreach (var ingredient in recipe.Ingredients)
                 {
                     ItemTemplate material = ingredient.Material;
-
                     totalPrice += material.Price * ingredient.Count;
-
                     bool result = false;
                     int count = ingredient.Count;
 
-                    foreach (InventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                    foreach (InventoryItem item in availableItems)
                     {
                         if (item != null && item.Name == material.Name)
                         {
@@ -392,40 +411,89 @@ namespace DOL.GS
         public virtual bool RemoveUsedMaterials(GamePlayer player, Recipe recipe)
         {
             Dictionary<int, int?> dataSlots = new Dictionary<int, int?>(10);
+            Dictionary<string, Dictionary<int, int?>> bagDataSlots = new Dictionary<string, Dictionary<int, int?>>();
+
+            var availableItems = new List<InventoryItem>();
+            var bags = new List<Scripts.StorageBagItem>();
+
+            lock (player.Inventory)
+            {
+                foreach (InventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                {
+                    if (item != null)
+                    {
+                        availableItems.Add(item);
+                        if (item is Scripts.StorageBagItem sbi) bags.Add(sbi);
+                    }
+                }
+            }
+
+            foreach (var bag in bags)
+            {
+                Scripts.StorageBagVault bagVault = new Scripts.StorageBagVault(player, bag);
+                availableItems.AddRange(bagVault.DBItems(player));
+            }
 
             lock (player.Inventory)
             {
                 foreach (var ingredient in recipe.Ingredients)
                 {
                     ItemTemplate template = ingredient.Material;
-
                     bool result = false;
                     int count = ingredient.Count;
 
-                    foreach (InventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                    foreach (InventoryItem item in availableItems)
                     {
                         if (item != null && item.Name == template.Name)
                         {
-                            if (item.Count >= count)
+                            bool inBag = item.SlotPosition >= 1000 && item.SlotPosition <= 1399;
+
+                            int itemAvailable = item.Count;
+                            if (inBag && bagDataSlots.ContainsKey(item.OwnerID) && bagDataSlots[item.OwnerID].ContainsKey(item.SlotPosition))
                             {
-                                if (item.Count == count)
+                                if (!bagDataSlots[item.OwnerID][item.SlotPosition].HasValue) continue;
+                                itemAvailable -= bagDataSlots[item.OwnerID][item.SlotPosition]!.Value;
+                            }
+                            else if (!inBag && dataSlots.ContainsKey(item.SlotPosition))
+                            {
+                                if (!dataSlots[item.SlotPosition].HasValue) continue;
+                                itemAvailable -= dataSlots[item.SlotPosition]!.Value;
+                            }
+
+                            if (itemAvailable <= 0) continue;
+
+                            if (itemAvailable >= count)
+                            {
+                                if (inBag)
                                 {
-                                    dataSlots.Add(item.SlotPosition, null);
+                                    if (!bagDataSlots.ContainsKey(item.OwnerID)) bagDataSlots[item.OwnerID] = new Dictionary<int, int?>();
+                                    if (itemAvailable == count) bagDataSlots[item.OwnerID][item.SlotPosition] = null;
+                                    else bagDataSlots[item.OwnerID][item.SlotPosition] = (bagDataSlots[item.OwnerID].ContainsKey(item.SlotPosition) && bagDataSlots[item.OwnerID][item.SlotPosition].HasValue ? bagDataSlots[item.OwnerID][item.SlotPosition]!.Value : 0) + count;
                                 }
                                 else
                                 {
-                                    dataSlots.Add(item.SlotPosition, count);
+                                    if (itemAvailable == count) dataSlots[item.SlotPosition] = null;
+                                    else dataSlots[item.SlotPosition] = (dataSlots.ContainsKey(item.SlotPosition) && dataSlots[item.SlotPosition].HasValue ? dataSlots[item.SlotPosition]!.Value : 0) + count;
                                 }
                                 result = true;
                                 break;
                             }
                             else
                             {
-                                dataSlots.Add(item.SlotPosition, null);
-                                count -= item.Count;
+                                if (inBag)
+                                {
+                                    if (!bagDataSlots.ContainsKey(item.OwnerID)) bagDataSlots[item.OwnerID] = new Dictionary<int, int?>();
+                                    bagDataSlots[item.OwnerID][item.SlotPosition] = null;
+                                }
+                                else
+                                {
+                                    dataSlots[item.SlotPosition] = null;
+                                }
+                                count -= itemAvailable;
                             }
                         }
                     }
+
                     if (result == false)
                     {
                         return false;
@@ -441,20 +509,73 @@ namespace DOL.GS
                 InventoryItem item = player.Inventory.GetItem((eInventorySlot)de.Key);
                 if (item != null)
                 {
-                    if (!de.Value.HasValue)
-                    {
-                        player.Inventory.RemoveItem(item);
-                    }
-                    else
-                    {
-                        player.Inventory.RemoveCountFromStack(item, de.Value.Value);
-                    }
+                    if (!de.Value.HasValue) player.Inventory.RemoveItem(item);
+                    else player.Inventory.RemoveCountFromStack(item, de.Value.Value);
                     InventoryLogging.LogInventoryAction(player, "", "(craft)", eInventoryActionType.Craft, item, de.Value.HasValue ? de.Value.Value : item.Count);
                 }
             }
             player.Inventory.CommitChanges();
 
-            return true;//all raw material removed and item created
+            if (bagDataSlots.Count > 0)
+            {
+                foreach (var bagKvp in bagDataSlots)
+                {
+                    Scripts.StorageBagItem bagItem = null;
+                    foreach (var bag in bags)
+                    {
+                        if (bag.ObjectId == bagKvp.Key)
+                        {
+                            bagItem = bag;
+                            break;
+                        }
+                    }
+
+                    if (bagItem != null)
+                    {
+                        Scripts.StorageBagVault vault = new Scripts.StorageBagVault(player, bagItem);
+                        var dbItems = vault.DBItems(player);
+                        var updatedItems = new Dictionary<int, InventoryItem>();
+
+                        lock (vault.LockObject())
+                        {
+                            foreach (var slotKvp in bagKvp.Value)
+                            {
+                                foreach (InventoryItem dbItem in dbItems)
+                                {
+                                    if (dbItem.SlotPosition == slotKvp.Key)
+                                    {
+                                        int amountRemoved = slotKvp.Value.HasValue ? slotKvp.Value.Value : dbItem.Count;
+                                        if (!slotKvp.Value.HasValue)
+                                        {
+                                            GameServer.Database.DeleteObject(dbItem);
+                                            updatedItems[dbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = null;
+                                        }
+                                        else
+                                        {
+                                            dbItem.Count -= slotKvp.Value.Value;
+                                            GameServer.Database.SaveObject(dbItem);
+                                            updatedItems[dbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = dbItem;
+                                        }
+                                        InventoryLogging.LogInventoryAction(player, "", "(craft_bag)", eInventoryActionType.Craft, dbItem, amountRemoved);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (updatedItems.Count > 0 && player.ActiveInventoryObject is Scripts.StorageBagVault activeVault && activeVault.GetOwner(player) == vault.GetOwner(player))
+                        {
+                            player.Out.SendInventoryItemsUpdate(updatedItems, eInventoryWindowType.Update);
+                        }
+
+                        bagItem.InvalidateWeightCache();
+                    }
+                }
+
+                player.UpdateEncumberance();
+            }
+
+            return true;
         }
 
         public virtual void BuildCraftedItem(GamePlayer player, Recipe recipe)
@@ -547,10 +668,19 @@ namespace DOL.GS
                         player.Inventory.AddItem((eInventorySlot)slot.Key, newItem);
                         InventoryLogging.LogInventoryAction("", "(craft)", player, eInventoryActionType.Craft, newItem, newItem.Count);
                     }
-                    else                    // Create new item on the ground
+                    else                    // Create new item on the ground or in bag
                     {
-                        player.CreateItemOnTheGround(newItem);
-                        player.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, LanguageMgr.GetTranslation(player.Client.Account.Language, "AbstractCraftingSkill.BuildCraftedItem.BackpackFull", product.Name));
+                        newItem.Count = countToAdd; // Set to positive for the bag logic
+                        if (player.TryAddToStorageBagTemplate(newItem, countToAdd))
+                        {
+                            InventoryLogging.LogInventoryAction("", "(craft_bag)", player, eInventoryActionType.Craft, newItem, countToAdd);
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", product.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+                        else
+                        {
+                            player.CreateItemOnTheGround(newItem);
+                            player.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, LanguageMgr.GetTranslation(player.Client.Account.Language, "AbstractCraftingSkill.BuildCraftedItem.BackpackFull", product.Name));
+                        }
                     }
                 }
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DOL.GS
 {
-    public static class AtlasROGManager
+    public static class GlobalROGManager
     {
 
         private static ItemTemplate beadTemplate = null;
@@ -37,11 +37,15 @@ namespace DOL.GS
             if (living != null && living is GamePlayer)
             {
                 GamePlayer player = living as GamePlayer;
+
+                if (RegionMapper.GetCategoryFromRegionID(player!.CurrentRegionID) == eRegionCategory.Restricted)
+                    return;
+
                 eRealm realm = player!.Realm;
                 eCharacterClass charclass = (eCharacterClass)player.CharacterClass.ID;
+                string lang = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
 
-                GeneratedUniqueItem item = null;
-                item = new GeneratedUniqueItem(realm, charclass, itemLevel);
+                GeneratedUniqueItem item = new GeneratedUniqueItem(realm, charclass, itemLevel, 15, player.CurrentRegionID, lang);
                 item.AllowAdd = true;
                 item.IsTradable = true;
 
@@ -51,15 +55,9 @@ namespace DOL.GS
 
                     switch (realm)
                     {
-                        case eRealm.Hibernia:
-                            color = eColor.Green_4;
-                            break;
-                        case eRealm.Albion:
-                            color = eColor.Red_4;
-                            break;
-                        case eRealm.Midgard:
-                            color = eColor.Blue_4;
-                            break;
+                        case eRealm.Hibernia: color = eColor.Green_4; break;
+                        case eRealm.Albion: color = eColor.Red_4; break;
+                        case eRealm.Midgard: color = eColor.Blue_4; break;
                     }
 
                     item.Color = (int)color;
@@ -69,7 +67,7 @@ namespace DOL.GS
                 InventoryItem invitem = GameInventoryItem.Create(item);
                 invitem.IsROG = true;
                 player.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, invitem);
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GamePlayer.PickupObject.YouGet", invitem.Name), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "GamePlayer.PickupObject.YouGet", invitem.Name), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -80,9 +78,9 @@ namespace DOL.GS
                 GamePlayer player = living as GamePlayer;
                 eRealm realm = player!.Realm;
                 eCharacterClass charclass = (eCharacterClass)player.CharacterClass.ID;
+                string lang = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
 
-                GeneratedUniqueItem item = null;
-                item = new GeneratedUniqueItem(realm, charclass, (byte)(living.Level + 1), minimumUtility);
+                GeneratedUniqueItem item = new GeneratedUniqueItem(realm, charclass, (byte)(living.Level + 1), minimumUtility, player.CurrentRegionID, lang);
                 item.AllowAdd = true;
                 item.IsTradable = true;
 
@@ -90,7 +88,7 @@ namespace DOL.GS
                 InventoryItem invitem = GameInventoryItem.Create(item);
                 invitem.IsROG = true;
                 player.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, invitem);
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GamePlayer.PickupObject.YouGet", invitem.Name), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "GamePlayer.PickupObject.YouGet", invitem.Name), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -100,15 +98,20 @@ namespace DOL.GS
             if (living != null && living is GamePlayer)
             {
                 GamePlayer player = living as GamePlayer;
+
+                if (RegionMapper.GetCategoryFromRegionID(player!.CurrentRegionID) == eRegionCategory.Restricted)
+                    return;
+
                 eRealm realm = player!.Realm;
                 eCharacterClass charclass = (eCharacterClass)player.CharacterClass.ID;
+                string lang = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
 
                 GeneratedUniqueItem item = null;
 
                 if (minimumUtility > 0)
-                    item = new GeneratedUniqueItem(realm, charclass, itemLevel, eObjectType.Magical, minimumUtility);
+                    item = new GeneratedUniqueItem(realm, charclass, itemLevel, eObjectType.Magical, minimumUtility, player.CurrentRegionID, lang);
                 else
-                    item = new GeneratedUniqueItem(realm, charclass, itemLevel, eObjectType.Magical);
+                    item = new GeneratedUniqueItem(realm, charclass, itemLevel, eObjectType.Magical, 15, player.CurrentRegionID, lang);
 
                 item.AllowAdd = true;
                 item.IsTradable = true;
@@ -118,7 +121,7 @@ namespace DOL.GS
                 invitem.IsROG = true;
                 player.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, invitem);
                 player.Out.SendMessage(
-                    LanguageMgr.GetTranslation(player.Client.Account.Language, "GamePlayer.PickupObject.YouGet",
+                    LanguageMgr.GetTranslation(player.Client!.Account.Language, "GamePlayer.PickupObject.YouGet",
                         invitem.Name), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
             }
         }
@@ -247,7 +250,7 @@ namespace DOL.GS
                     {
                         item.Count = amount;
                         player.CreateItemOnTheGround(item);
-                        player.Out.SendMessage($"Your inventory is full, your {item.Name}s have been placed on the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Lootgenerator.GlobalROGManager.InventoryFull", item.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
 
                 }
@@ -274,7 +277,7 @@ namespace DOL.GS
                     {
                         item.Count = amount;
                         player.CreateItemOnTheGround(item);
-                        player.Out.SendMessage($"Your inventory is full, your {item.Name}s have been placed on the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Lootgenerator.GlobalROGManager.InventoryFull", item.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
 
                 }
@@ -282,14 +285,17 @@ namespace DOL.GS
             }
         }
 
-        public static GeneratedUniqueItem GenerateMonsterLootROG(eRealm realm, eCharacterClass charClass, byte level, bool isFrontierKill)
+        public static GeneratedUniqueItem GenerateMonsterLootROG(eRealm realm, eCharacterClass charClass, byte level, bool isFrontierKill, int regionID = 0, int bodyType = 0, string language = null)
         {
+            if (RegionMapper.GetCategoryFromRegionID(regionID) == eRegionCategory.Restricted)
+                return null;
+
             GeneratedUniqueItem item = null;
 
             if (isFrontierKill)
-                item = new GeneratedUniqueItem(realm, charClass, level, level - Util.Random(-5, 10));
+                item = new GeneratedUniqueItem(realm, charClass, level, level - Util.Random(-5, 10), regionID, language) { DropMobBodyType = bodyType };
             else
-                item = new GeneratedUniqueItem(realm, charClass, level, level - Util.Random(15, 20));
+                item = new GeneratedUniqueItem(realm, charClass, level, level - Util.Random(15, 20), regionID, language) { DropMobBodyType = bodyType };
 
             item.AllowAdd = true;
             item.IsTradable = true;

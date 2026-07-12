@@ -1,22 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Amte;
 using AmteScripts.Utils;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS;
 using DOL.GS.Geometry;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 using DOL.Territories;
-using DOL.GS.Keeps;
 using log4net;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
 
 namespace AmteScripts.Managers
 {
@@ -81,6 +82,7 @@ namespace AmteScripts.Managers
         private int checkNumberOfPlayer = 0;
         private string winnerName = "";
         private DateTime RvRBonusDate = DateTime.Now.Date;
+        public int PeakPlayerCount { get; private set; } = 0;
 
         private MapType? _currentMasterMap;
         public MapType? CurrentMasterMap => _currentMasterMap;
@@ -388,6 +390,9 @@ namespace AmteScripts.Managers
                     }
                 }
 
+                if (countPlayer > PeakPlayerCount)
+                    PeakPlayerCount = countPlayer;
+
                 if (!_isForcedOpen)
                 {
                     if ((currentTime < _startTime || currentTime > _endTime) && !Close())
@@ -565,6 +570,23 @@ namespace AmteScripts.Managers
                 return true;
             _isOpen = true;
 
+            try
+            {
+                foreach (var region in WorldMgr.GetAllRegions())
+                {
+                    var oldChests = region.Objects.OfType<PvP.Rewards.RewardChest>().Where(c => c.Tier == PvP.Rewards.eRewardTier.RvRFinest).ToList();
+                    foreach (var chest in oldChests)
+                    {
+                        chest.RemoveFromWorld();
+                        chest.Delete();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error clearing old RvR reward chests: ", ex);
+            }
+
             _albion.RealmPoints = 0;
             _midgard.RealmPoints = 0;
             _hibernia.RealmPoints = 0;
@@ -589,6 +611,7 @@ namespace AmteScripts.Managers
                 Scores[realm] = 0;
             
             winnerName = string.Empty;
+            PeakPlayerCount = 0;
 
             MapType? previousPick = _currentMasterMap ?? ReadLastMasterMapFromFile();
             SelectRandomMasterMap(avoidSame: true, previous: previousPick);
@@ -676,15 +699,36 @@ namespace AmteScripts.Managers
             foreach (var map in _maps)
                 map.Value.Realms.Foreach(i => i.KeepHoldingTime = TimeSpan.Zero);
 
+            short countKilledPlayers = 0;
+            short maxKills = 0;
+            string champion = "";
+            foreach (KeyValuePair<GamePlayer, short> killsPerPlayer in Kills)
+            {
+                countKilledPlayers += killsPerPlayer.Value;
+                if (killsPerPlayer.Value > maxKills)
+                {
+                    maxKills = killsPerPlayer.Value;
+                    champion = killsPerPlayer.Key.Name;
+                }
+            }
+
             string messageScore = GetMessageScore();
             WorldMgr.GetAllPlayingClients().Foreach((c) =>
             {
-                string message = LanguageMgr.GetTranslation(c, "RvrManager.Score.Title") + "\n";
+                string message = LanguageMgr.GetTranslation(c, "RvrManager.Score.Title", DateTime.Now.Date.ToString("MM/dd/yyyy")) + "\n";
                 message += messageScore;
+
                 if (string.IsNullOrEmpty(winnerName))
-                    message += LanguageMgr.GetTranslation(c, "RvrManager.Score.NoWinner");
+                    message += LanguageMgr.GetTranslation(c, "RvrManager.Score.NoWinner") + "\n";
                 else
-                    message += LanguageMgr.GetTranslation(c, "RvrManager.Score.Winner") + ": " + winnerName;
+                    message += LanguageMgr.GetTranslation(c, "RvrManager.Score.Winner") + ": " + winnerName + "\n";
+
+                message += "\n" + LanguageMgr.GetTranslation(c, "GameObjects.GamePlayer.RvRDialog", countKilledPlayers);
+                if (!string.IsNullOrEmpty(champion))
+                {
+                    message += "\n" + LanguageMgr.GetTranslation(c, "GameObjects.GamePlayer.RvR.ChampionDialog", champion, maxKills);
+                }
+
                 c.Out.SendMessage(message, eChatType.CT_Help, eChatLoc.CL_SystemWindow);
             });
 
@@ -718,24 +762,51 @@ namespace AmteScripts.Managers
             else
                 message += "Winner: " + winnerName;
 
-            short countKilledPlayers = 0;
-            short maxKills = 0;
-            string champion = "";
-            foreach (KeyValuePair<GamePlayer, short> killsPerPlayer in Kills)
-            {
-                countKilledPlayers += killsPerPlayer.Value;
-                if (killsPerPlayer.Value > maxKills)
-                {
-                    maxKills = killsPerPlayer.Value;
-                    champion = killsPerPlayer.Key.Name;
-                }
-            }
             if (!string.IsNullOrEmpty(champion))
             {
                 var championPlayer = Kills.FirstOrDefault(kvp => kvp.Key.Name == champion).Key;
                 if (championPlayer != null)
                 {
                     TaskManager.UpdateTaskProgress(championPlayer, "RvRChampionOfTheDay", 1);
+                    int maxKillsScore = maxKills;
+                    int peakP = PeakPlayerCount;
+
+                    new RegionTimer(championPlayer, new RegionTimerCallback(timer =>
+                    {
+                        try
+                        {
+                            var teleporters = new List<GameNPC>();
+                            foreach (eRealm r in Enum.GetValues(typeof(eRealm)))
+                            {
+                                var npcs = WorldMgr.GetNPCsByType(typeof(DOL.GS.Scripts.TeleporterRvR), r);
+                                if (npcs != null) teleporters.AddRange(npcs.Cast<GameNPC>());
+                            }
+
+                            var teleporter = teleporters
+                                .Where(t => t.CurrentRegionID == championPlayer.CurrentRegionID)
+                                .OrderBy(t => t.Coordinate.DistanceTo(championPlayer.Coordinate))
+                                .FirstOrDefault() ?? teleporters.FirstOrDefault();
+
+                            if (teleporter != null)
+                            {
+                                bool spawned = PvP.Rewards.RewardChestSpawner.SpawnChestsForPlayer(championPlayer, PvP.Rewards.eRewardTier.RvRFinest, teleporter, peakP, maxKillsScore, Properties.RvR_NUMBER_OF_NEEDED_PLAYERS);
+                                if (spawned)
+                                {
+                                    championPlayer.Out.SendMessage(LanguageMgr.GetTranslation(championPlayer.Client.Account.Language, "RvRManager.ChestsHaveSpawned"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                }
+                            }
+                            else
+                            {
+                                log.Warn($"Could not find any TeleporterRvR to spawn reward chests for Champion {championPlayer.Name}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error("Error spawning Champion chests: ", ex);
+                        }
+
+                        return 0;
+                    })).Start(5000);
                 }
                 NewsMgr.CreateNews("GameObjects.GamePlayer.RvR.Champion", 0, eNewsType.RvRGlobal, false, true, countKilledPlayers, champion, maxKills);
                 message += string.Format(LanguageMgr.GetTranslation("EN", "GameObjects.GamePlayer.RvR.Champion", countKilledPlayers, champion, maxKills));

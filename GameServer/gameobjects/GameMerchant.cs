@@ -188,8 +188,15 @@ namespace DOL.GS
                 item = GameInventoryItem.Create(itemToBuy);
                 if (!player.Inventory.AddTemplate(item, amountToBuy, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.NotInventorySpace"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    return;
+                    if (player.TryAddToStorageBagTemplate(item, amountToBuy))
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", itemToBuy.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    }
+                    else
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.NotInventorySpace"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
                 }
                 InventoryLogging.LogInventoryAction(this, player, eInventoryActionType.Merchant, itemToBuy, amountToBuy);
 
@@ -236,8 +243,15 @@ namespace DOL.GS
                 item = GameInventoryItem.Create(template);
                 if (!player.Inventory.AddTemplate(item, amountToBuy, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.NotInventorySpace"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    return;
+                    if (player.TryAddToStorageBagTemplate(item, amountToBuy))
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", template.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    }
+                    else
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.NotInventorySpace"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
                 }
                 InventoryLogging.LogInventoryAction(TradeItems.ItemsListID, $"(TRADEITEMS;{TradeItems.ItemsListID})", player, eInventoryActionType.Merchant, template, amountToBuy);
                 //Generate the buy message

@@ -1,0 +1,556 @@
+ROG.ItemFormat: {1} {0}
+ROG.ItemFormat.Tiered: {2} {1} {0}
+ROG.MobDropFormat: {1} de la {0}
+ROG.ItemFormat.CustomTiered: {2} {0} {1}
+
+# ================================
+# PREFIXES
+# ================================
+ROG.Prefix.Mighty: Puternic
+ROG.Prefix.Adroit: Dibaci
+ROG.Prefix.Fortifying: Fortifiant
+ROG.Prefix.Speedy: Rapid
+ROG.Prefix.Insightful: Perspicace
+ROG.Prefix.Willful: Voinic
+ROG.Prefix.Attuned: Acordat
+ROG.Prefix.Glib: Elocvent
+ROG.Prefix.Sturdy: Robust
+ROG.Prefix.Arcane: Arcan
+ROG.Prefix.Brilliant: Strălucitor
+ROG.Prefix.Bodybender: Îndoaie-Corp
+ROG.Prefix.Icebender: Îndoaie-Gheață
+ROG.Prefix.Bluntbender: Îndoaie-Lovitură
+ROG.Prefix.Energybender: Îndoaie-Energie
+ROG.Prefix.Heatbender: Îndoaie-Căldură
+ROG.Prefix.Matterbender: Îndoaie-Materie
+ROG.Prefix.Edgebender: Îndoaie-Lame
+ROG.Prefix.Spiritbender: Îndoaie-Spirite
+ROG.Prefix.Thrustbender: Îndoaie-Străpungere
+ROG.Prefix.Essencebender: Îndoaie-Esențe
+ROG.Prefix.Skillful: Iscusit
+ROG.Prefix.Mystical: Mistic
+ROG.Prefix.Gladiator: de Gladiator
+ROG.Prefix.Duelist: de Duelist
+ROG.Prefix.Bowmaster: de Arcaș
+ROG.Prefix.Focused: Concentrat
+ROG.Prefix.Honed: Ascuțit
+ROG.Prefix.Battering: Izbitor
+ROG.Prefix.Perforator: Perforant
+ROG.Prefix.Sundering: Despicător
+ROG.Prefix.Decimator: Decimant
+ROG.Prefix.Tensile: Extensibil
+ROG.Prefix.Razored: Brici
+ROG.Prefix.Crushing: Zdrobitore
+ROG.Prefix.Lancenator: Lăncer
+ROG.Prefix.Whirling: Vârtejos
+ROG.Prefix.Impaling: Împungător
+ROG.Prefix.Serrated: Zimțat
+ROG.Prefix.Demolishing: Demolator
+ROG.Prefix.SwatheCutters: Tăietor
+ROG.Prefix.Cleaving: Despicător
+ROG.Prefix.Reapers: de Secerător
+ROG.Prefix.Thunderer: Tunător
+ROG.Prefix.Martial: Marțial
+ROG.Prefix.Lifetaker: Iei-Viață
+ROG.Prefix.Truefire: de Foc Adevărat
+ROG.Prefix.Winged: Înaripat
+ROG.Prefix.Hawk: de Șoim
+ROG.Prefix.Dragon: de Dragon
+ROG.Prefix.Catapult: de Catapultă
+ROG.Prefix.Snipers: de Lunetist
+ROG.Prefix.Earthsplitter: Despică-Pământ
+ROG.Prefix.SoulCrusher: Zdrobește-Suflete
+ROG.Prefix.Spiritbound: Leagă-Spirite
+ROG.Prefix.Dominating: Dominant
+ROG.Prefix.Earthborn: Născut din Pământ
+ROG.Prefix.Iceborn: Născut din Gheață
+ROG.Prefix.Flameborn: Născut din Flăcări
+ROG.Prefix.Airy: Aerian
+ROG.Prefix.Minionbound: Leagă-Servitori
+ROG.Prefix.DeathBinder: Leagă-Moarte
+ROG.Prefix.Painbound: Leagă-Durere
+ROG.Prefix.SoulTaker: Ia-Suflete
+ROG.Prefix.Earthshaker: Zguduie-Pământ
+ROG.Prefix.Fervent: Fervent
+ROG.Prefix.Rejuvenating: Întineritor
+ROG.Prefix.Lightbender: Îndoaie-Lumină
+ROG.Prefix.Voidbender: Îndoaie-Vid
+ROG.Prefix.Starbinder: Leagă-Stele
+ROG.Prefix.Chanter: de Cântăreț
+ROG.Prefix.Mindbinder: Leagă-Minți
+ROG.Prefix.Forestbound: al Pădurii
+ROG.Prefix.Plantbound: al Plantelor
+ROG.Prefix.Animalbound: al Animalelor
+ROG.Prefix.Withering: Veștejit
+ROG.Prefix.ArborDefender: Apărător de Copaci
+ROG.Prefix.ValeDefender: Apărător de Vale
+ROG.Prefix.Shadowbender: Îndoaie-Umbre
+ROG.Prefix.Spiritbinder: Leagă-Spirite
+ROG.Prefix.Runebender: Îndoaie-Rune
+ROG.Prefix.Stormcaller: Cheamă-Furtuni
+ROG.Prefix.Soulbinder: Leagă-Suflete
+ROG.Prefix.Blighted: Molipsit
+ROG.Prefix.Bodymender: Vindecă-Corpi
+ROG.Prefix.Empowering: Împuternicitor
+ROG.Prefix.Ancestral: Ancestral
+ROG.Prefix.Shadowwalker: Pășește-n Umbre
+ROG.Prefix.Venomous: Veninos
+ROG.Prefix.Melodic: Melodic
+ROG.Prefix.Resonant: Rezonant
+ROG.Prefix.Motivating: Motivant
+ROG.Prefix.Bladeblocker: Blochează-Lame
+ROG.Prefix.Protectors: de Protector
+ROG.Prefix.Courageous: Curajos
+ROG.Prefix.Pacifying: Pacificator
+ROG.Prefix.Savage: Sălbatic
+ROG.Prefix.Nightshade: Umbră Nopții
+ROG.Prefix.Trail: de Potecă
+ROG.Prefix.Lifebender: Îndoaie-Viață
+ROG.Prefix.Ardent: Ardent
+ROG.Prefix.Deathly: Mortal
+ROG.Prefix.Feverish: Febril
+ROG.Prefix.Ominous: Prevestitor
+ROG.Prefix.Tormentbound: Leagă-Chinuială
+ROG.Prefix.Wraithbound: Leagă-Naluci
+ROG.Prefix.VoidBinder: Leagă-Vid
+ROG.Prefix.Shrill: Strident
+ROG.Prefix.Keening: Tânguitor
+ROG.Prefix.Uncanny: Straniu
+ROG.Prefix.Infernal: Infernal
+ROG.Prefix.Bedeviled: Îndrăcit
+ROG.Prefix.Diabolic: Diabolic
+ROG.Prefix.Aural: Aural
+ROG.Prefix.Brawling: de Încăierare
+ROG.Prefix.Maulers: de Bătăuș
+ROG.Prefix.Magnetic: Magnetic
+ROG.Prefix.Striking: Izbitor
+ROG.Prefix.Hardened: Călit
+ROG.Prefix.Impenetrable: Impenetrabil
+ROG.Prefix.Swift: Rapid
+ROG.Prefix.Devastating: Devastator
+ROG.Prefix.Masterful: Magistral
+ROG.Prefix.Fatal: Fatal
+ROG.Prefix.Unerring: Infailibil
+ROG.Prefix.Accurate: Precis
+ROG.Prefix.Vengeful: Răzbunător
+ROG.Prefix.Phalanx: de Falangă
+ROG.Prefix.Guarding: Păzitor
+ROG.Prefix.Retaliators: de Răzbunător
+ROG.Prefix.Tireless: Neobosit
+ROG.Prefix.Far-Reaching: Bate-Departe
+ROG.Prefix.Piercing: Pătrunzător
+ROG.Prefix.Projecting: Proiectant
+ROG.Prefix.Transcendent: Transcendent
+ROG.Prefix.Efficient: Eficient
+ROG.Prefix.Flawless: Impecabil
+ROG.Prefix.Cataclysmic: Cataclismic
+ROG.Prefix.Elusive: Evaziv
+ROG.Prefix.Deflecting: Deviant
+ROG.Prefix.Parrying: de Parare
+ROG.Prefix.Troll-blood: Sânge de Trol
+ROG.Prefix.Invigorating: Revigorant
+ROG.Prefix.Relentless: Implacabil
+ROG.Prefix.Awakening: Trezitor
+ROG.Prefix.Unshaken: Neclintit
+ROG.Prefix.Unfettered: Liber
+ROG.Prefix.Cleansing: Purificator
+ROG.Prefix.Fleet: Iute
+ROG.Prefix.Amphibious: Amfibiu
+ROG.Prefix.Sure-Strike: Lovitură Sigură
+ROG.Prefix.Exalted: Exaltat
+ROG.Prefix.Apex: Suprem
+ROG.Prefix.Ablative: Ablativ
+ROG.Prefix.Volleying: de Voleu
+ROG.Prefix.Scavengers: de Gunoier
+ROG.Prefix.Augmenting: Augmentant
+ROG.Prefix.Alacritous: Agil
+ROG.Prefix.Redeeming: Mântuitor
+ROG.Prefix.Enfeebling: Slăbitor
+ROG.Prefix.Vigorous: Viguros
+ROG.Prefix.Restorative: Restaurator
+ROG.Prefix.Expansive: Expansiv
+ROG.Prefix.Penetrating: Penetrant
+ROG.Prefix.Ruinous: Ruinos
+ROG.Prefix.Lingering: Persistent
+ROG.Prefix.Vicious: Vicios
+ROG.Prefix.Unleashed: Dezlănțuit
+ROG.Prefix.Corporeal: Corporal
+ROG.Prefix.Frost-warded: Păzit de Gheață
+ROG.Prefix.Unshatterable: Ineradicabil
+ROG.Prefix.Grounded: Împământat
+ROG.Prefix.Fire-forged: Făurit în Foc
+ROG.Prefix.Immutable: Imutabil
+ROG.Prefix.Unseverable: Inseparabil
+ROG.Prefix.Inviolate: Inviolabil
+ROG.Prefix.Unpierceable: Neperforabil
+ROG.Prefix.Grandiose: Grandios
+ROG.Prefix.Slaughtering: Măcelăritor
+ROG.Prefix.Colossal: Colosal
+ROG.Prefix.Nullifying: Anulator
+ROG.Prefix.Glancing: de Ricoșeu
+ROG.Prefix.Transmuting: Transmutant
+ROG.Prefix.Siphoning: Sifonier
+ROG.Prefix.Purging: Purificator
+ROG.Prefix.Untouchable: Intangibil
+ROG.Prefix.Miraculous: Miraculos
+ROG.Prefix.Agonizing: Agonizant
+ROG.Prefix.Ambidextrous: Ambidextru
+ROG.Prefix.Twin-Striking: Lovitură Geamănă
+ROG.Prefix.Flurrying: Năvalnic
+ROG.Prefix.Corrosive: Coroziv
+ROG.Prefix.Composed: Calmu
+ROG.Prefix.Weightless: Fără Greutate
+ROG.Prefix.Unburdened: Ușurat
+ROG.Prefix.Oppressive: Opresiv
+ROG.Prefix.Everlasting: Veșnic
+ROG.Prefix.Aegis: Egidă
+ROG.Prefix.Mirroring: Oglindire
+ROG.Prefix.Titans: de Titan
+ROG.Prefix.Serpents: de Șarpe
+ROG.Prefix.Leviathans: de Leviatan
+ROG.Prefix.Zephyrs: de Zefir
+ROG.Prefix.Omniscient: Omniscient
+ROG.Prefix.Divine: Divin
+ROG.Prefix.Harmonic: Armonic
+ROG.Prefix.Sovereigns: de Suveran
+ROG.Prefix.Ascendant: Ascendent
+
+# ================================
+# BASE ITEM NAMES (Armor)
+# ================================
+ROG.BaseName.ClothCap: Șapcă de Pânză
+ROG.BaseName.ClothCoif: Scufie de Pânză
+ROG.BaseName.ClothHelm: Coif de Pânză
+ROG.BaseName.ClothSleeves: Mâneci de Pânză
+ROG.BaseName.ClothArms: Brațe de Pânză
+ROG.BaseName.ClothBoots: Cizme de Pânză
+ROG.BaseName.ClothGloves: Mănuși de Pânză
+ROG.BaseName.ClothGauntlets: Mănuși de Fier de Pânză
+ROG.BaseName.ClothPants: Pantaloni de Pânză
+ROG.BaseName.ClothLegs: Craci de Pânză
+ROG.BaseName.ClothLeggings: Jambiere de Pânză
+ROG.BaseName.ClothHauberk: Cămașă de Pânză
+ROG.BaseName.ClothBreastplate: Platoșă de Pânză
+ROG.BaseName.ClothJerkin: Jiletcă de Pânză
+ROG.BaseName.ClothVest: Vestă de Pânză
+ROG.BaseName.ClothRobe: Robă de Pânză
+ROG.BaseName.LeatherCap: Șapcă de Piele
+ROG.BaseName.LeatherCoif: Scufie de Piele
+ROG.BaseName.LeatherHelm: Coif de Piele
+ROG.BaseName.LeatherSleeves: Mâneci de Piele
+ROG.BaseName.LeatherArms: Brațe de Piele
+ROG.BaseName.LeatherBoots: Cizme de Piele
+ROG.BaseName.LeatherGloves: Mănuși de Piele
+ROG.BaseName.LeatherGauntlets: Mănuși de Fier de Piele
+ROG.BaseName.LeatherPants: Pantaloni de Piele
+ROG.BaseName.LeatherLegs: Craci de Piele
+ROG.BaseName.LeatherLeggings: Jambiere de Piele
+ROG.BaseName.LeatherHauberk: Cămașă de Piele
+ROG.BaseName.LeatherBreastplate: Platoșă de Piele
+ROG.BaseName.LeatherJerkin: Jiletcă de Piele
+ROG.BaseName.LeatherVest: Vestă de Piele
+ROG.BaseName.StuddedCap: Șapcă Țintuită
+ROG.BaseName.StuddedCoif: Scufie Țintuită
+ROG.BaseName.StuddedHelm: Coif Țintuit
+ROG.BaseName.StuddedSleeves: Mâneci Țintuite
+ROG.BaseName.StuddedArms: Brațe Țintuite
+ROG.BaseName.StuddedBoots: Cizme Țintuite
+ROG.BaseName.StuddedGloves: Mănuși Țintuite
+ROG.BaseName.StuddedGauntlets: Mănuși de Fier Țintuite
+ROG.BaseName.StuddedPants: Pantaloni Țintuiți
+ROG.BaseName.StuddedLegs: Craci Țintuiți
+ROG.BaseName.StuddedLeggings: Jambiere Țintuite
+ROG.BaseName.StuddedHauberk: Cămașă Țintuită
+ROG.BaseName.StuddedBreastplate: Platoșă Țintuită
+ROG.BaseName.StuddedJerkin: Jiletcă Țintuită
+ROG.BaseName.StuddedVest: Vestă Țintuită
+ROG.BaseName.ChainCap: Șapcă de Zale
+ROG.BaseName.ChainCoif: Scufie de Zale
+ROG.BaseName.ChainHelm: Coif de Zale
+ROG.BaseName.ChainSleeves: Mâneci de Zale
+ROG.BaseName.ChainArms: Brațe de Zale
+ROG.BaseName.ChainBoots: Cizme de Zale
+ROG.BaseName.ChainGloves: Mănuși de Zale
+ROG.BaseName.ChainGauntlets: Mănuși de Fier de Zale
+ROG.BaseName.ChainPants: Pantaloni de Zale
+ROG.BaseName.ChainLegs: Craci de Zale
+ROG.BaseName.ChainLeggings: Jambiere de Zale
+ROG.BaseName.ChainHauberk: Cămașă de Zale
+ROG.BaseName.ChainBreastplate: Platoșă de Zale
+ROG.BaseName.ChainJerkin: Jiletcă de Zale
+ROG.BaseName.ChainVest: Vestă de Zale
+ROG.BaseName.PlateCap: Șapcă cu Plăci
+ROG.BaseName.PlateCoif: Scufie cu Plăci
+ROG.BaseName.PlateHelm: Coif cu Plăci
+ROG.BaseName.PlateFullHelm: Coif Închis cu Plăci
+ROG.BaseName.PlateSleeves: Mâneci cu Plăci
+ROG.BaseName.PlateArms: Brațe cu Plăci
+ROG.BaseName.PlateBoots: Cizme cu Plăci
+ROG.BaseName.PlateGloves: Mănuși cu Plăci
+ROG.BaseName.PlateGauntlets: Mănuși de Fier cu Plăci
+ROG.BaseName.PlatePants: Pantaloni cu Plăci
+ROG.BaseName.PlateLegs: Craci cu Plăci
+ROG.BaseName.PlateLeggings: Jambiere cu Plăci
+ROG.BaseName.PlateHauberk: Cămașă cu Plăci
+ROG.BaseName.PlateBreastplate: Platoșă cu Plăci
+ROG.BaseName.PlateJerkin: Jiletcă cu Plăci
+ROG.BaseName.PlateVest: Vestă cu Plăci
+ROG.BaseName.ReinforcedCap: Șapcă Întărită
+ROG.BaseName.ReinforcedCoif: Scufie Întărită
+ROG.BaseName.ReinforcedHelm: Coif Întărit
+ROG.BaseName.ReinforcedSleeves: Mâneci Întărite
+ROG.BaseName.ReinforcedArms: Brațe Întărite
+ROG.BaseName.ReinforcedBoots: Cizme Întărite
+ROG.BaseName.ReinforcedGloves: Mănuși Întărite
+ROG.BaseName.ReinforcedGauntlets: Mănuși de Fier Întărite
+ROG.BaseName.ReinforcedPants: Pantaloni Întăriți
+ROG.BaseName.ReinforcedLegs: Craci Întăriți
+ROG.BaseName.ReinforcedLeggings: Jambiere Întărite
+ROG.BaseName.ReinforcedHauberk: Cămașă Întărită
+ROG.BaseName.ReinforcedBreastplate: Platoșă Întărită
+ROG.BaseName.ReinforcedJerkin: Jiletcă Întărită
+ROG.BaseName.ReinforcedVest: Vestă Întărită
+ROG.BaseName.ScaleCap: Șapcă cu Solzi
+ROG.BaseName.ScaleCoif: Scufie cu Solzi
+ROG.BaseName.ScaleHelm: Coif cu Solzi
+ROG.BaseName.ScaleSleeves: Mâneci cu Solzi
+ROG.BaseName.ScaleArms: Brațe cu Solzi
+ROG.BaseName.ScaleBoots: Cizme cu Solzi
+ROG.BaseName.ScaleGloves: Mănuși cu Solzi
+ROG.BaseName.ScaleGauntlets: Mănuși de Fier cu Solzi
+ROG.BaseName.ScalePants: Pantaloni cu Solzi
+ROG.BaseName.ScaleLegs: Craci cu Solzi
+ROG.BaseName.ScaleLeggings: Jambiere cu Solzi
+ROG.BaseName.ScaleHauberk: Cămașă cu Solzi
+ROG.BaseName.ScaleBreastplate: Platoșă cu Solzi
+ROG.BaseName.ScaleJerkin: Jiletcă cu Solzi
+ROG.BaseName.ScaleVest: Vestă cu Solzi
+
+# ================================
+# BASE ITEM NAMES (Weapons)
+# ================================
+ROG.BaseName.Dagger: Pumnal
+ROG.BaseName.Dirk: Șiș
+ROG.BaseName.Gladius: Gladius
+ROG.BaseName.Stiletto: Stilet
+ROG.BaseName.Axe: Topor
+ROG.BaseName.Cleaver: Satar
+ROG.BaseName.Rapier: Rapieră
+ROG.BaseName.Sword: Sabie
+ROG.BaseName.HookedSword: Sabie Cârligată
+ROG.BaseName.Falcata: Falcata
+ROG.BaseName.Scimitar: Iatagan
+ROG.BaseName.Jambiya: Jambiya
+ROG.BaseName.Sabre: Sabie Curbă
+ROG.BaseName.Khopesh: Khopesh
+ROG.BaseName.Wakazashi: Wakizashi
+ROG.BaseName.Greatsword: Sabie Mare
+ROG.BaseName.WarCleaver: Satar de Război
+ROG.BaseName.GreatFalcata: Falcata Mare
+ROG.BaseName.GreatFalchion: Falchion Mare
+ROG.BaseName.TrollSplitter: Despicător de Troli
+ROG.BaseName.Katana: Katana
+ROG.BaseName.Greave: Greavă
+ROG.BaseName.Claw: Gheară
+ROG.BaseName.Fang: Colț
+ROG.BaseName.Greataxe: Topor Mare
+ROG.BaseName.GreatHammer: Ciocan Mare
+ROG.BaseName.Shillelagh: Ghioagă
+ROG.BaseName.WarMattock: Târnăcop de Război
+ROG.BaseName.Mace: Buzdugan
+ROG.BaseName.Hammer: Ciocan
+ROG.BaseName.Adze: Teslă
+ROG.BaseName.Club: Bâtă
+ROG.BaseName.Sickle: Seceră
+ROG.BaseName.Lute: Lăută
+ROG.BaseName.Mandolin: Mandolină
+ROG.BaseName.Drum: Tobă
+ROG.BaseName.Flute: Flaut
+ROG.BaseName.Harp: Harpă
+ROG.BaseName.Spear: Suliță
+ROG.BaseName.Harpoon: Harpon
+ROG.BaseName.Trident: Trident
+ROG.BaseName.ShortSpear: Suliță Scurtă
+ROG.BaseName.LongSpear: Suliță Lungă
+ROG.BaseName.WarSpear: Suliță de Război
+ROG.BaseName.CompositeBow: Arc Compozit
+ROG.BaseName.GreatCompositeBow: Arc Compozit Mare
+ROG.BaseName.HuntingBow: Arc de Vânătoare
+ROG.BaseName.Longbow: Arc Lung
+ROG.BaseName.HeavyLongbow: Arc Lung Greu
+ROG.BaseName.RecurveBow: Arc Recurbat
+ROG.BaseName.GreatRecurveBow: Arc Recurbat Mare
+ROG.BaseName.ShortBow: Arc Scurt
+ROG.BaseName.Crossbow: Arbaletă
+ROG.BaseName.MorningStar: Steaua Dimineții
+ROG.BaseName.Flail: Imblăciu
+ROG.BaseName.WeightedFlail: Imblăciu Îngreunat
+ROG.BaseName.Whip: Bici
+ROG.BaseName.Chain: Lanț
+ROG.BaseName.WarChain: Lanț de Război
+ROG.BaseName.BigShillelagh: Ghioagă Mare
+ROG.BaseName.HandAxe: Toporișcă
+ROG.BaseName.BeardedAxe: Topor Bărbos
+ROG.BaseName.WarAxe: Topor de Război
+ROG.BaseName.LochaberAxe: Topor Lochaber
+ROG.BaseName.Pike: Pică
+ROG.BaseName.LucerneHammer: Ciocan Lucerne
+ROG.BaseName.Scythe: Coasă
+ROG.BaseName.MartialScythe: Coasă Marțială
+ROG.BaseName.WarScythe: Coasă de Război
+ROG.BaseName.SmallShield: Scut Mic
+ROG.BaseName.MediumShield: Scut Mediu
+ROG.BaseName.LargeShield: Scut Mare
+ROG.BaseName.MaulerStaff: Toiag de Bătăuș
+ROG.BaseName.Quarterstaff: Toiag de Luptă
+ROG.BaseName.ShodQuarterstaff: Toiag Ferecat
+ROG.BaseName.HeavyShodQuarterstaff: Toiag Ferecat Greu
+ROG.BaseName.FistWrap: Bandaj de Pumn
+ROG.BaseName.HandWrap: Bandaj de Mână
+ROG.BaseName.StuddedFistWrap: Bandaj de Pumn Țintuit
+ROG.BaseName.StuddedHandWrap: Bandaj de Mână Țintuit
+ROG.BaseName.SpikedFistWrap: Bandaj de Pumn cu Țepi
+
+# ================================
+# BASE ITEM NAMES (Magical)
+# ================================
+ROG.BaseName.Mantle: Manta
+ROG.BaseName.Cloak: Pelerină
+ROG.BaseName.Belt: Curea
+ROG.BaseName.Girdle: Brâu
+ROG.BaseName.Choker: Zgardă
+ROG.BaseName.Pendant: Pandantiv
+ROG.BaseName.Gem: Gemă
+ROG.BaseName.Jewel: Bijuterie
+ROG.BaseName.Bracelet: Brățară
+ROG.BaseName.Bracer: Manșetă
+ROG.BaseName.Ring: Inel
+ROG.BaseName.Wrap: Pânză
+ROG.BaseName.Mythirian: Mitirian
+
+# ================================================================
+# TIER 1 PREFIXES (Level 36-48) - Commonality / Base Thematics
+# ================================================================
+ROG.TierPrefix.1_ClassicOverworld_Global: Rustic
+ROG.TierPrefix.1_ClassicDungeons_Global: Prăfuit
+ROG.TierPrefix.1_ClassicDungeons_CryptsAndUndead: Macabru
+ROG.TierPrefix.1_ClassicDungeons_CavesAndNature: Muschios
+ROG.TierPrefix.1_ClassicDungeons_VolcanicAndEarth: Pârjolit
+ROG.TierPrefix.1_ClassicDungeons_GlacialAndAquatic: Răcoros
+ROG.TierPrefix.1_ClassicDungeons_MagicalAndEthereal: Strălucind
+ROG.TierPrefix.1_ClassicDungeons_DemonicAndAbyss: Întinat
+ROG.TierPrefix.1_ClassicDungeons_BeastAndGoblinoid: Tribal
+ROG.TierPrefix.1_AtlantisOverworld_Global: Spălat de Valuri
+ROG.TierPrefix.1_AtlantisDungeons_CryptsAndUndead: Scufundat
+ROG.TierPrefix.1_AtlantisDungeons_VolcanicAndEarth: Fierbinte
+ROG.TierPrefix.1_AtlantisDungeons_GlacialAndAquatic: Pelagic
+ROG.TierPrefix.1_AtlantisDungeons_MagicalAndEthereal: Perlat
+ROG.TierPrefix.1_Catacombs_CryptsAndUndead: Înmormântat
+ROG.TierPrefix.1_Catacombs_CavesAndNature: Subteran
+ROG.TierPrefix.1_Catacombs_VolcanicAndEarth: Mocnit
+ROG.TierPrefix.1_Catacombs_GlacialAndAquatic: Umed
+ROG.TierPrefix.1_Catacombs_MagicalAndEthereal: Voalat
+ROG.TierPrefix.1_Catacombs_DemonicAndAbyss: Corupt
+ROG.TierPrefix.1_Catacombs_BeastAndGoblinoid: Sălbatic
+ROG.TierPrefix.1_DeepCatacombs_CryptsAndUndead: Părăsit
+ROG.TierPrefix.1_DeepCatacombs_CavesAndNature: Profund
+ROG.TierPrefix.1_DeepCatacombs_VolcanicAndEarth: Bazaltic
+ROG.TierPrefix.1_DeepCatacombs_GlacialAndAquatic: Înghețat
+ROG.TierPrefix.1_DeepCatacombs_MagicalAndEthereal: Luminos
+ROG.TierPrefix.1_DeepCatacombs_DemonicAndAbyss: Rău
+ROG.TierPrefix.1_DeepCatacombs_BeastAndGoblinoid: Primar
+ROG.TierPrefix.1_MythicalZones_Global: Legendar
+ROG.TierPrefix.1_MythicalZones_CavesAndNature: Neîmblânzit
+ROG.TierPrefix.1_MythicalZones_VolcanicAndEarth: Atins de Jăratic
+ROG.TierPrefix.1_MythicalZones_MagicalAndEthereal: Ascendent
+ROG.TierPrefix.1_Battlegrounds_Global: de Soldat
+
+# ================================================================
+# TIER 2 PREFIXES (Level 49-64) - High Quality / Rare Thematics
+# ================================================================
+ROG.TierPrefix.2_ClassicOverworld_Global: Superior
+ROG.TierPrefix.2_ClassicDungeons_Global: Excepțional
+ROG.TierPrefix.2_ClassicDungeons_CryptsAndUndead: Macabru
+ROG.TierPrefix.2_ClassicDungeons_CavesAndNature: Năpădit
+ROG.TierPrefix.2_ClassicDungeons_VolcanicAndEarth: Igneu
+ROG.TierPrefix.2_ClassicDungeons_GlacialAndAquatic: Glacial
+ROG.TierPrefix.2_ClassicDungeons_MagicalAndEthereal: Rezonant
+ROG.TierPrefix.2_ClassicDungeons_DemonicAndAbyss: Diabolic
+ROG.TierPrefix.2_ClassicDungeons_BeastAndGoblinoid: Feroce
+ROG.TierPrefix.2_AtlantisOverworld_Global: Atlant
+ROG.TierPrefix.2_AtlantisDungeons_CryptsAndUndead: Înecat
+ROG.TierPrefix.2_AtlantisDungeons_VolcanicAndEarth: Geotermal
+ROG.TierPrefix.2_AtlantisDungeons_GlacialAndAquatic: Bentic
+ROG.TierPrefix.2_AtlantisDungeons_MagicalAndEthereal: Arcan
+ROG.TierPrefix.2_Catacombs_CryptsAndUndead: Sepulcral
+ROG.TierPrefix.2_Catacombs_CavesAndNature: Cavernos
+ROG.TierPrefix.2_Catacombs_VolcanicAndEarth: Vulcanic
+ROG.TierPrefix.2_Catacombs_GlacialAndAquatic: Inundat
+ROG.TierPrefix.2_Catacombs_MagicalAndEthereal: Enigmatic
+ROG.TierPrefix.2_Catacombs_DemonicAndAbyss: Infernal
+ROG.TierPrefix.2_Catacombs_BeastAndGoblinoid: Monstruos
+ROG.TierPrefix.2_DeepCatacombs_CryptsAndUndead: Osândit
+ROG.TierPrefix.2_DeepCatacombs_CavesAndNature: Profund
+ROG.TierPrefix.2_DeepCatacombs_VolcanicAndEarth: de Obsidian
+ROG.TierPrefix.2_DeepCatacombs_GlacialAndAquatic: Cristalin
+ROG.TierPrefix.2_DeepCatacombs_MagicalAndEthereal: Numinos
+ROG.TierPrefix.2_DeepCatacombs_DemonicAndAbyss: Sinistru
+ROG.TierPrefix.2_DeepCatacombs_BeastAndGoblinoid: Carnivor
+ROG.TierPrefix.2_MythicalZones_Global: Eroica
+ROG.TierPrefix.2_MythicalZones_CavesAndNature: Sacru
+ROG.TierPrefix.2_MythicalZones_VolcanicAndEarth: de Sulf
+ROG.TierPrefix.2_MythicalZones_MagicalAndEthereal: Transcendent
+ROG.TierPrefix.2_Battlegrounds_Global: de Veteran
+
+# ================================================================
+# TIER 3 PREFIXES (Level 65+) - Exceptional / Epic Thematics
+# ================================================================
+ROG.TierPrefix.3_ClassicOverworld_Global: Rafinat
+ROG.TierPrefix.3_ClassicDungeons_Global: Venerabil
+ROG.TierPrefix.3_ClassicDungeons_CryptsAndUndead: Necrotic
+ROG.TierPrefix.3_ClassicDungeons_CavesAndNature: Silvan
+ROG.TierPrefix.3_ClassicDungeons_VolcanicAndEarth: Magmatic
+ROG.TierPrefix.3_ClassicDungeons_GlacialAndAquatic: Criogenic
+ROG.TierPrefix.3_ClassicDungeons_MagicalAndEthereal: Eteric
+ROG.TierPrefix.3_ClassicDungeons_DemonicAndAbyss: Abisal
+ROG.TierPrefix.3_ClassicDungeons_BeastAndGoblinoid: Bestial
+ROG.TierPrefix.3_AtlantisOverworld_Global: de Leviatan
+ROG.TierPrefix.3_AtlantisDungeons_CryptsAndUndead: Prapăstios
+ROG.TierPrefix.3_AtlantisDungeons_VolcanicAndEarth: Tectonic
+ROG.TierPrefix.3_AtlantisDungeons_GlacialAndAquatic: Hadal
+ROG.TierPrefix.3_AtlantisDungeons_MagicalAndEthereal: Primordial
+ROG.TierPrefix.3_Catacombs_CryptsAndUndead: Nemuritor
+ROG.TierPrefix.3_Catacombs_CavesAndNature: Teluric
+ROG.TierPrefix.3_Catacombs_VolcanicAndEarth: Făurit în Nucleu
+ROG.TierPrefix.3_Catacombs_GlacialAndAquatic: Potopnic
+ROG.TierPrefix.3_Catacombs_MagicalAndEthereal: Infuzat de Ley
+ROG.TierPrefix.3_Catacombs_DemonicAndAbyss: Diabolic
+ROG.TierPrefix.3_Catacombs_BeastAndGoblinoid: Suprem
+ROG.TierPrefix.3_DeepCatacombs_CryptsAndUndead: Apocaliptic
+ROG.TierPrefix.3_DeepCatacombs_CavesAndNature: de Geomant
+ROG.TierPrefix.3_DeepCatacombs_VolcanicAndEarth: Născut din Manta
+ROG.TierPrefix.3_DeepCatacombs_GlacialAndAquatic: Absolut
+ROG.TierPrefix.3_DeepCatacombs_MagicalAndEthereal: Făurit în Stele
+ROG.TierPrefix.3_DeepCatacombs_DemonicAndAbyss: de Lumea Apoi
+ROG.TierPrefix.3_DeepCatacombs_BeastAndGoblinoid: Prădător
+ROG.TierPrefix.3_MythicalZones_Global: Ceresc
+ROG.TierPrefix.3_MythicalZones_CavesAndNature: de Yggdrasil
+ROG.TierPrefix.3_MythicalZones_VolcanicAndEarth: Tartaric
+ROG.TierPrefix.3_MythicalZones_MagicalAndEthereal: Cosmic
+ROG.TierPrefix.3_Battlegrounds_Global: de Lord
+
+# ================================
+# PVP / RVR CUSTOM TIER PREFIXES
+# ================================
+ROG.TierPrefix.Mythical: Mitic
+ROG.TierPrefix.Exalted: Exaltat
+ROG.TierPrefix.Fabled: Fabulos
+ROG.TierPrefix.Legendary: Legendar
+ROG.TierPrefix.Eminent: Eminent
+ROG.TierPrefix.Illustrious: Ilustru
+ROG.TierPrefix.Epic: Epic
+ROG.TierPrefix.Superior: Superior
+ROG.TierPrefix.Flawless: Impecabil
+ROG.TierPrefix.Rare: Rar
+ROG.TierPrefix.Fine: Rafinat
+ROG.TierPrefix.Uncommon: Neobișnuit

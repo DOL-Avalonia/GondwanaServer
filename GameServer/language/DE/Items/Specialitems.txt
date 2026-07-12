@@ -1,0 +1,49 @@
+Items.Specialitems.Feuartificetext:					Das Feuerwerk beginnt in {0} Sekunden.
+
+Items.Specialitems.BeerAlreadyDrinking:				Du trinkst bereits!
+Items.Specialitems.BeerDrinkDistance:				Getränke
+
+Items.Specialitems.PlaceAssiseTooFar:				Du bist zu weit weg, um dich hinzusetzen.
+Items.Specialitems.PlaceAssiseTaken:				Der Platz ist bereits besetzt.
+
+Items.Specialitems.GuarkRingListened:				Deine Bitte wurde erhört.
+Items.Specialitems.GuarkRingUsed:					Du spürst eine mächtige Aura, die dich bewegungsunfähig macht.
+Items.Specialitems.GuarkRingNoPower:				Du hast nicht genug Lebensenergie in deinen Adern, um den Ring zu benutzen.
+Items.Specialitems.GuarkAmuletNoPower:				Du hast nicht genug Lebensenergie in deinen Adern, um das Amulett zu benutzen.
+Items.Specialitems.GuarkRingTPCancelMoved:			Du hast dich bewegt, die magische Anfrage ist fehlgeschlagen und du kannst nicht teleportiert werden.
+Items.Specialitems.GuarkRingTPCancelRemoved:		Du hast den Ring abgenommen, die magische Anfrage ist fehlgeschlagen und du kannst nicht teleportiert werden.
+Items.Specialitems.GuarkAmuletTPCancelRemoved:		Du hast das Amulett abgelegt, die magische Anfrage ist fehlgeschlagen und du kannst nicht teleportiert werden.
+Items.Specialitems.GuarkRingTPFailed:				Die himmlische Magie ist fehlgeschlagen, unbekanntes Ziel.
+Items.Specialitems.GuarkRingTPNone:					Es wurde keine Anfrage gestellt, dein Ziel ist unbekannt.
+Items.Specialitems.GuarkRingUsageCombat:			Du kannst keine himmlische Magie im Kampf anwenden!
+Items.Specialitems.GuarkRingUsageHere:				An diesem Ort gibt es keine himmlische Magie.
+Items.Specialitems.GuarkRingUsageJailed:			Du kannst keine himmlische Magie anwenden, während du eingesperrt bist!
+Items.Specialitems.GuarkRingUsageMounted:			Du kannst keine himmlische Magie von einem Reittier aus anwenden!
+Items.Specialitems.GuarkRingUsageStealthed:			Du kannst keine himmlische Magie anwenden, während du getarnt bist.
+Items.Specialitems.GuarkRingUsagePetrified:			Du kannst keine himmlische Magie anwenden, während du versteinert bist!
+Items.Specialitems.GuarkRingUsageDamned:			Du kannst keine himmlische Magie anwenden, während du verdammt bist!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Du kannst keine himmlische Magie anwenden, während du in dieser Form bist!
+Items.Specialitems.GuarkRingUsageMorphed:			Du kannst keine himmlische Magie anwenden, während du unter einer "{0}"-Verzauberung stehst!
+Items.Specialitems.GuarkRingUsageCrafting:			Du kannst keine himmlische Magie beim Handwerken anwenden!
+Items.Specialitems.GuarkRingUsageDuel:				Du kannst keine himmlische Magie anwenden, während du dich in einem Duell befindest!
+Items.Specialitems.GuarkRingUsageStealing:			Du kannst keine himmlische Magie anwenden, während du einen anderen Spieler bestiehlst!
+Items.Specialitems.GuarkRingUsageAFK:				Du kannst keine himmlische Magie anwenden, während du AFK bist!
+Items.Specialitems.GuarkRingUsageClimbing:			Du kannst keine himmlische Magie beim Klettern anwenden!
+Items.Specialitems.GuarkRingUsageRelic:				Du kannst keine himmlische Magie anwenden, während du ein Gebietsrelikt trägst.
+Items.Specialitems.GuarkRingCannotUseHere:			Du kannst diesen Gegenstand hier nicht benutzen.
+Items.Specialitems.GuarkRingDoNotMove:				Du darfst dich nicht bewegen, um diesen Gegenstand zu benutzen.
+Items.Specialitems.GuarkRingWaitBeforeUse:			Du warst vor Kurzem in einen Kampf verwickelt, daher musst du warten, bevor du diesen Gegenstand wieder benutzen kannst.
+
+Items.Specialitems.MiniPetNoCast:					Du kannst diesen Zauber hier nicht wirken!
+
+Items.Specialitems.FirecampNoSit:					Setze dich nicht in die Nähe eines Lagerfeuers, um diesen Effekt zu entfernen.
+Items.Specialitems.FirecampHeatRegen:				Durch die Wärme des Lagerfeuers regenerierst du deine Gesundheit schneller.
+
+Items.Specialitems.StorageBag.NoBag:				Du betrachtest keine Tasche!
+Items.Specialitems.StorageBag.BadItem:				Du kannst diesen Gegenstand nicht in diese Tasche legen!
+
+Items.Specialitems.DieTriggerSpell.Destroyed:		Dein {0} zersplittert, nachdem es durch deinen Tod ausgelöst wurde!
+Items.Specialitems.DieTriggerSpell.FailDestroy:		Gegenstand konnte aus irgendeinem Grund nicht zerstört werden!
+Items.Specialitems.DieTriggerSpell.FailRez:			Der Fluch, der auf deiner Leiche liegt, ist hier zu stark, der Wiederbelebungszauber verpufft!
+
+Items.Specialitems.AfkXpToken.DepletedRemoved:		Dein {0} ist aufgebraucht und wurde aus deinem Inventar entfernt.
