@@ -11,6 +11,7 @@ ConsignmentMerchant.BuyConfirmFee:		Buying directly from the Market Explorer cos
 ConsignmentMerchant.TalkToMerchant:		I'm sorry, you need to be talking to a market explorer or consignment merchant in order to make a purchase.
 ConsignmentMerchant.CannotPurchase:		This item can't be purchased!
 ConsignmentMerchant.HoldsBountyPoints:	Your merchant currently holds {0} BountyPoints.
+ConsignmentMerchant.CannotUnequip:		You cannot unequip {0} directly to a merchant.
 
 # MarketExplorer
 MarketExplorer.MarketUnavailable:		Sorry, the market is not available at this time.

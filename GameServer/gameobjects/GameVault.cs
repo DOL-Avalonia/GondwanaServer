@@ -230,6 +230,26 @@ namespace DOL.GS
                 return false;
             }
 
+            if (!fromHousing && fromSlot >= (ushort)eInventorySlot.MinEquipable && fromSlot <= (ushort)eInventorySlot.MaxEquipable)
+            {
+                InventoryItem checkItem = player.Inventory.GetItem((eInventorySlot)fromSlot);
+                if (checkItem != null && checkItem.Template != null && (checkItem.Template.Flags == 44 || checkItem.Template.Flags == 45))
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.CannotPutUndeequipable", checkItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
+            if (!toHousing && toSlot >= (ushort)eInventorySlot.MinEquipable && toSlot <= (ushort)eInventorySlot.MaxEquipable)
+            {
+                InventoryItem checkItem = player.Inventory.GetItem((eInventorySlot)toSlot);
+                if (checkItem != null && checkItem.Template != null && (checkItem.Template.Flags == 44 || checkItem.Template.Flags == 45))
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameVault.CannotPutUndeequipable", checkItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
             GameVault gameVault = player.ActiveInventoryObject as GameVault;
             if (gameVault == null)
             {

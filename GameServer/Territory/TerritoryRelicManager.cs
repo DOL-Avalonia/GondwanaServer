@@ -2,6 +2,7 @@
 using DOL.Events;
 using DOL.GameEvents;
 using DOL.GS;
+using DOL.Territories;
 using DOL.GS.GameEvents;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
@@ -34,7 +35,7 @@ namespace AmteScripts.Managers
                 if (reg != null)
                 {
                     _mapUpdateTimer = new RegionTimer(reg.TimeManager);
-                    _mapUpdateTimer.Callback = t => { UpdateMapPins(); return 2000; };
+                    _mapUpdateTimer.Callback = new RegionTimerCallback(t => { UpdateMapPins(); return 2000; });
                     _mapUpdateTimer.Start(2000);
                 }
             }
@@ -50,24 +51,67 @@ namespace AmteScripts.Managers
 
         public static void OnServerStarted(DOLEvent e, object sender, EventArgs args)
         {
-            var allDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>()
-                        .Where(r => r.IsTerritoryRelic).ToList();
+            HideAllProtectors();
 
+            var reg = WorldMgr.GetRegion(1) ?? WorldMgr.GetAllRegions().FirstOrDefault();
+            if (reg != null)
+            {
+                RegionTimer startupTimer = new RegionTimer(reg.TimeManager);
+                startupTimer.Callback = new RegionTimerCallback(timer =>
+                {
+                    RestoreRelics();
+                    return 0;
+                });
+                startupTimer.Start(2500);
+            }
+            else
+            {
+                RestoreRelics();
+            }
+        }
+
+        public static void HideAllProtectors()
+        {
+            var allDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>().Where(r => r.IsTerritoryRelic).ToList();
             foreach (var dbRelic in allDbRelics)
             {
                 if (!string.IsNullOrEmpty(dbRelic.ProtectorClassType))
                 {
                     if (MobGroupManager.Instance.Groups.TryGetValue(dbRelic.ProtectorClassType, out MobGroup group))
                     {
-                        foreach (var npc in group.NPCs)
+                        foreach (var npc in group.NPCs.ToList())
                         {
-                            npc.RemoveFromWorld();
+                            if (npc.ObjectState == GameObject.eObjectState.Active)
+                                npc.RemoveFromWorld();
+
+                            if (npc.IsRespawning)
+                                npc.StopRespawn();
                         }
                     }
                 }
             }
+        }
 
-            var activeDbRelics = allDbRelics.Where(r => r.relicTarget != "inactive" && !string.IsNullOrEmpty(r.relicTarget)).ToList();
+        private static void RestoreRelics()
+        {
+            HideAllProtectors();
+
+            /*if (TerritoryManager.Instance.Territories.Count == 0)
+            {
+                TerritoryManager.LoadTerritories(null, null, null);
+            }*/
+
+            var allDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>()
+                        .Where(r => r.IsTerritoryRelic).ToList();
+
+            var activeDbRelics = allDbRelics.Where(r => !string.IsNullOrEmpty(r.relicTarget) && r.relicTarget != "inactive").ToList();
+
+            if (DOL.GS.Scripts.GvGManager.IsOpen && activeDbRelics.Count == 0)
+            {
+                log.Info("[TerritoryRelicManager] GvG is active but 0 relics are deployed. Forcing a new randomizer cycle.");
+                OnGvGOpened();
+                return;
+            }
 
             foreach (var dbRelic in activeDbRelics)
             {
@@ -82,7 +126,6 @@ namespace AmteScripts.Managers
 
                 bool successfullyAttached = false;
 
-                // If it's not at the outpost, it means it's secured on a territory pad!
                 if (dbRelic.relicTarget != "outpost")
                 {
                     var pad = WorldMgr.GetAllRegions()
@@ -92,20 +135,37 @@ namespace AmteScripts.Managers
 
                     if (pad != null)
                     {
-                        var territory = DOL.Territories.TerritoryManager.GetCurrentTerritory(pad);
-                        if (territory != null)
+                        var territory = TerritoryManager.GetCurrentTerritory(pad);
+                        if (territory != null && !territory.IsNeutral())
                         {
                             relic.AttachToTerritory(territory, pad);
                             pad.CurrentRelic = relic;
                             successfullyAttached = true;
+                            log.Info($"[TerritoryRelicManager] Relic '{relic.Name}' restored successfully to pad in territory '{territory.Name}'.");
                         }
+                        else if (territory == null)
+                        {
+                            log.Warn($"[TerritoryRelicManager] Territory for pad {pad.Name} was neutral or null! Returning relic '{relic.Name}' to outpost.");
+                        }
+                        else if (territory.IsNeutral())
+                        {
+                            log.Info($"[TerritoryRelicManager] Territory '{territory.Name}' has become neutral while offline. Relic returning to outpost.");
+                        }
+                    }
+                    else
+                    {
+                        log.Warn($"[TerritoryRelicManager] Relic '{relic.Name}' target pad '{dbRelic.relicTarget}' could not be found! Returning to outpost.");
                     }
                 }
 
-                // If it hasn't been attached to a territory pad yet, spawn it physically at the outpost 
                 if (!successfullyAttached)
                 {
-                    relic.Position = Position.Create((ushort)dbRelic.SpawnRegion, dbRelic.SpawnX, dbRelic.SpawnY, dbRelic.SpawnZ, (ushort)dbRelic.SpawnHeading);
+                    if (dbRelic.relicTarget != "outpost")
+                    {
+                        dbRelic.relicTarget = "outpost";
+                        GameServer.Database.SaveObject(dbRelic);
+                    }
+                    relic.Position = Position.Create((ushort)dbRelic.SpawnRegion, dbRelic.SpawnX, dbRelic.SpawnY, dbRelic.SpawnZ + 100, (ushort)dbRelic.SpawnHeading);
                     relic.AddToWorld();
                 }
             }
@@ -172,12 +232,14 @@ namespace AmteScripts.Managers
             }
             ActiveRelics.Clear();
 
+            HideAllProtectors();
+
             var allDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>()
                                 .Where(r => r.IsTerritoryRelic).ToList();
 
             foreach (var dbRelic in allDbRelics)
             {
-                dbRelic.relicTarget = ""; // Empty string means inactive
+                dbRelic.relicTarget = "inactive";
                 GameServer.Database.SaveObject(dbRelic);
             }
 
@@ -215,7 +277,7 @@ namespace AmteScripts.Managers
 
             foreach (var dbRelic in shuffled)
             {
-                dbRelic.relicTarget = "-"; // "-" means active at outpost
+                dbRelic.relicTarget = "outpost";
                 GameServer.Database.SaveObject(dbRelic);
 
                 var relic = new TerritoryRelicStatic(dbRelic);

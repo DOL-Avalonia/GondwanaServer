@@ -524,6 +524,11 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Nu ești suficient de put
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Nu poți folosi acest inventar.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Efectul de încărcare cu ID {0} nu este încă implementat.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Efectul de încărcare cu ID {0} nu a fost găsit.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr:		{0} al tău a fost complet distrus!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		{0} al tău s-a spart din cauza utilizării excesive!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	{0} al tău a fost dezechipat din cauza energiei insuficiente.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	{0} al tău s-a spart și a căzut pe jos!
+GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Rucsacul tău este plin! {0} al tău a căzut pe jos.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Acest substituent Genistar trebuie plasat într-un slot de grădină.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Oul tău Genistar a fost plasat în grădina ta. Acum este al tău pentru a-l hrăni și a-l modela conform dorințelor tale!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Trebuie să eliberezi Genistar-ul tău invocat înainte de a-l plasa înapoi în grădină.

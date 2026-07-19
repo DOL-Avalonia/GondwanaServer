@@ -51,5 +51,6 @@ namespace DOL.GS
         void Close(GameLiving closer = null);
         void NPCManipulateDoorRequest(GameNPC npc, bool open);
         void LoadFromDatabase(DataObject obj);
+        bool Interact(GamePlayer player);
     }
 }

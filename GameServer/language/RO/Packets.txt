@@ -73,8 +73,12 @@ DetailDisplayHandler.HandlePacket.YouFumble:				Vă împiedicați
 DetailDisplayHandler.HandlePacket.YouHit:				Loviti
 DetailDisplayHandler.HandlePacket.YouMiss:				Ratați
 DetailDisplayHandler.HandlePacket.YouParry:				Parezați
-DetailDisplayHandler.WriteBonusLine.Points:				pct
-DetailDisplayHandler.WriteBonusLine.PowerPool:			% rezervor magic.
+DetailDisplayHandler.HandlePacket.UseEverySec:			Poate fi folosit la fiecare: {0} sec
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Poate fi folosit la fiecare: {0}:{1:00} min
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Poate fi refolosit în: {0} sec
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Poate fi refolosit în: {0}:{1:00} min
+DetailDisplayHandler.WriteBonusLine.Points:				 pct
+DetailDisplayHandler.WriteBonusLine.PowerPool:			% din rezerva de putere.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Absorbție
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:		Modificator de armură:
 DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor:	- {0} Armură de bază
@@ -147,9 +151,34 @@ DetailDisplayHandler.WritePotionInfo.Value:				Valoare: {0}
 DetailDisplayHandler.WritePotionInfo.Target:				Țintă: {0}
 DetailDisplayHandler.WritePotionInfo.Range:				Rază: {0}
 DetailDisplayHandler.WriteUsableClasses.UsableBy:		Utilizabil de către:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Greutate sac: {0:0.0} lbs ({1}/40 sloturi pline)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Nu poți echipa {0} deoarece condiția sa este epuizată.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Trebuie să aștepți {0} secunde înainte de a echipa {1} din nou.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Se distruge la golire)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Se distruge la spargere)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Consumă {0}% Rezistență și {1}% Sănătate pe tick{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Consumă {0}% Mana pe tick{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Consumă {0}% din Condiție pe tick{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Pierde {0}% din Condiție la moarte{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Nu poate fi dezechipat.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Sunteți prea departe de {0}!
+DoorRequestHandler.OnTick.TooFarAway:				{0} este prea departe!
+DoorRequestHandler.GameDoor.NowOpen:				{0} este acum deschis!
+DoorRequestHandler.GameDoor.FailOpen:				Nu ai reușit să deschizi această ușă!
+DoorRequestHandler.GameDoor.NeedKey:				Ai nevoie de o cheie pentru a deschide această ușă!
+DoorRequestHandler.GameDoor.NeedReborn:				Nu ai dobândit puterea Pietrei Filosofale; nu poți intra aici!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		Trebuie să învingi monștrii din apropiere pentru a deschide această ușă!
+DoorRequestHandler.GameDoor.NeedSwitch:				Trebuie să activezi mecanismele conectate pentru a deschide această ușă!
+DoorRequestHandler.YouMezzed:						Ești hipnotizat și nu poți deschide ușa!
+DoorRequestHandler.YouStunned:						Ești amețit și nu poți deschide ușa!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} este sub atac!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			{0} este încuiat!
+DoorRequestHandler.GameKeepDoor.YouSelect:			Ai selectat {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	 Aparține regatului tău.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		 Aparține unui regat inamic și poate fi atacat!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		 Aparține unui regat inamic!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			{0} este distrus!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Bonusuri curente

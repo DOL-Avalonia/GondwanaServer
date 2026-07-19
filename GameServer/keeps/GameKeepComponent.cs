@@ -38,7 +38,7 @@ namespace DOL.GS.Keeps
     /// </summary>
     public class GameKeepComponent : GameLiving, IComparable, IGameKeepComponent
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         protected readonly ushort INVISIBLE_MODEL = 150;
 
@@ -142,7 +142,7 @@ namespace DOL.GS.Keeps
 
         public Dictionary<int, GameKeepHookPoint> HookPoints { get; set; }
 
-        public Hashtable Positions { get; }
+        public Dictionary<string, DBKeepPosition[]> Positions { get; }
 
         protected string m_CreateInfo = "";
         #endregion
@@ -180,10 +180,10 @@ namespace DOL.GS.Keeps
         /// </summary>
         public override void StartHealthRegeneration()
         {
-            m_repairTimer = new RegionTimer(CurrentRegion.TimeManager);
-            m_repairTimer.Callback = new RegionTimerCallback(RepairTimerCallback);
-            m_repairTimer.Interval = repairInterval;
-            m_repairTimer.Start(1);
+            if (m_repairTimer != null && m_repairTimer.IsAlive) return;
+            if (Health >= MaxHealth) return;
+
+            m_repairTimer = new RegionTimer(this, new RegionTimerCallback(RepairTimerCallback), repairInterval);
         }
 
         public virtual void RemoveTimers()
@@ -198,7 +198,7 @@ namespace DOL.GS.Keeps
         public GameKeepComponent()
         {
             HookPoints = new Dictionary<int, GameKeepHookPoint>(41);
-            Positions = new Hashtable();
+            Positions = new Dictionary<string, DBKeepPosition[]>();
         }
 
         /// <summary>
@@ -256,7 +256,8 @@ namespace DOL.GS.Keeps
             this.Positions.Clear();
 
             var whereClause = DB.Column(nameof(DBKeepPosition.ComponentSkin)).IsEqualTo(Skin);
-            if (Skin != (int)eComponentSkin.Keep && Skin != (int)eComponentSkin.Tower && Skin != (int)eComponentSkin.Gate)
+            if (Skin != (int)eComponentSkin.Keep && Skin != (int)eComponentSkin.Tower && Skin != (int)eComponentSkin.Gate
+    && Skin != (int)eComponentSkin.NewSkinKeep && Skin != (int)eComponentSkin.NewSkinTower && Skin != 24)
             {
                 whereClause = whereClause.And(DB.Column(nameof(DBKeepPosition.ComponentRotation)).IsEqualTo(ComponentHeading));
             }
@@ -271,8 +272,7 @@ namespace DOL.GS.Keeps
 
             foreach (DBKeepPosition position in DBPositions)
             {
-                DBKeepPosition[] list = this.Positions[position.TemplateID] as DBKeepPosition[];
-                if (list == null)
+                if (!this.Positions.TryGetValue(position.TemplateID, out DBKeepPosition[] list))
                 {
                     list = new DBKeepPosition[4];
                     this.Positions[position.TemplateID] = list;
@@ -690,7 +690,7 @@ namespace DOL.GS.Keeps
             if (amount > 0)
             {
                 byte oldStatus = Status;
-                Health += amount;
+                Health = Math.Min(Health + amount, MaxHealth);
                 m_oldHealthPercent = HealthPercent;
                 if (oldStatus != Status)
                 {

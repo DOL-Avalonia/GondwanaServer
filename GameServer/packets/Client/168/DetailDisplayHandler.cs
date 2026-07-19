@@ -1140,6 +1140,75 @@ namespace DOL.GS.PacketHandler.Client.v168
             {
                 WriteMagicalBonuses(objectInfo, item, client, true, isGenistar);
             }
+
+            if (flags >= 43 && flags <= 45)
+            {
+                string pkg = item.PackageID ?? item.Template?.PackageID ?? "";
+                double manaPct = 0;
+                int condLoss = 0;
+                int deathCondLoss = 0;
+                bool destroyOnMana = false, destroyOnCond = false, destroyOnDeath = false;
+
+                foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    string[] parts = p.Split('|');
+                    if (parts.Length > 0)
+                    {
+                        if (parts[0] == "MANA" && parts.Length >= 2)
+                        {
+                            double.TryParse(parts[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out manaPct);
+                            if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnMana = true;
+                        }
+                        else if (parts[0] == "COND" && parts.Length >= 2)
+                        {
+                            int.TryParse(parts[1], out condLoss);
+                            if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnCond = true;
+                        }
+                        else if (parts[0] == "DEATHCOND" && parts.Length >= 2)
+                        {
+                            int.TryParse(parts[1], out deathCondLoss);
+                            if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnDeath = true;
+                        }
+                    }
+                }
+
+                if (flags == 44 && deathCondLoss == 0 && condLoss > 0)
+                {
+                    deathCondLoss = condLoss;
+                    destroyOnDeath = destroyOnCond;
+                }
+
+                if (manaPct > 0 && (flags == 43 || flags == 45))
+                {
+                    string destroyEmpty = destroyOnMana ? (" " + LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.DestroysEmpty")) : "";
+
+                    if (client.Player.CharacterClass != null && GamePlayer.IsPureMeleeClass((eCharacterClass)client.Player.CharacterClass.ID))
+                    {
+                        objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth", (manaPct * 2.1).ToString("0.##"), (manaPct * 0.4).ToString("0.##"), destroyEmpty));
+                    }
+                    else
+                    {
+                        objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.ConsumesMana", manaPct.ToString("0.##"), destroyEmpty));
+                    }
+                }
+
+                int maxCond = item.MaxCondition > 0 ? item.MaxCondition : 50000;
+
+                if (condLoss > 0 && (flags == 43 || flags == 45))
+                {
+                    double condPct = (condLoss / (double)maxCond) * 100.0;
+                    string destroyBrokenCond = destroyOnCond ? (" " + LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.DestroysBroken")) : "";
+                    objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.ConsumesCondition", condPct.ToString("0.##"), destroyBrokenCond));
+                }
+
+                if (deathCondLoss > 0 && (flags == 44 || flags == 45))
+                {
+                    double deathCondPct = (deathCondLoss / (double)maxCond) * 100.0;
+                    string destroyBrokenDeath = destroyOnDeath ? (" " + LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.DestroysBroken")) : "";
+                    objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.LosesConditionDeath", deathCondPct.ToString("0.##"), destroyBrokenDeath));
+                }
+            }
+
             if (item.IsCrafted)
             {
                 objectInfo.Add(" ");//empty line
@@ -1159,7 +1228,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 int totalBagWeight = item.Weight + extraWeight;
                 int filledSlots = bagItem.GetFilledSlotsCount();
 
-                objectInfo.Add(string.Format("Bag Weight: {0:0.0} lbs ({1} filled slots)", totalBagWeight / 10.0f, filledSlots));
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteStorageBagInfo.Weight", totalBagWeight / 10.0f, filledSlots));
                 objectInfo.Add(" ");
             }
 
@@ -1175,6 +1244,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                 objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotSold"));
             }
 
+            if (flags == 44 || flags == 45)
+            {
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.CannotUnequip"));
+            }
+
             if (item.IsIndestructible)
                 objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotDestroyed"));
 
@@ -1186,6 +1260,19 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             if (item.Flags == 2)
                 objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.HandlePacket.EffectWhenSitting"));
+
+            if (item.ClassType.Contains("DOL.GS.AfkXpToken"))
+            {
+                var remaininguse = item.Condition * 100 / item.MaxCondition;
+                objectInfo.Add(" ");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.RemainingUse", remaininguse) + "%");
+            }
+
+            if (item.ClassType.Contains("DOL.GS.PvPTreasure"))
+            {
+                objectInfo.Add(" ");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", (int)(item.Condition / 4.0)) + " " + LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.WriteBonusLine.Points"));
+            }
 
             foreach (string s in objectInfo)
                 str += " " + s;

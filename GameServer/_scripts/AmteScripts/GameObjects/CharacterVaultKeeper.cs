@@ -5,6 +5,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
 using DOL.Language;
 using System.Collections.Generic;
+using System.Numerics;
 using static AmteScripts.PvP.PvPScore;
 
 namespace DOL.GS
@@ -142,6 +143,16 @@ namespace DOL.GS
             if (item == null)
             {
                 return false;
+            }
+
+            if (item.SlotPosition >= (int)eInventorySlot.MinEquipable && item.SlotPosition <= (int)eInventorySlot.MaxEquipable)
+            {
+                int flags = item.Template != null ? item.Template.Flags : item.Flags;
+
+                if (flags == 44 || flags == 45)
+                {
+                    return false;
+                }
             }
 
             if (item is StorageBagItem || item is FlagInventoryItem || item is PvPTreasure || item is AmteScripts.Managers.TerritoryRelicInventoryItem || isGenistarItem)

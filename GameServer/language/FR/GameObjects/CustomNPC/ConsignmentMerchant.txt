@@ -11,6 +11,7 @@ ConsignmentMerchant.BuyConfirmFee:		Acheter directement depuis l'Explorateur du 
 ConsignmentMerchant.TalkToMerchant:		Je suis désolé, vous devez parler à un Explorateur du Marché ou à un Marchand Consignataire pour effectuer un achat.
 ConsignmentMerchant.CannotPurchase:		Cet objet ne peut pas être acheté !
 ConsignmentMerchant.HoldsBountyPoints:	Votre marchand détient actuellement {0} points de prime.
+ConsignmentMerchant.CannotUnequip:		Vous ne pouvez pas déséquiper {0} directement chez un marchand.
 
 # MarketExplorer
 MarketExplorer.MarketUnavailable:		Désolé, le marché n'est pas disponible pour le moment.

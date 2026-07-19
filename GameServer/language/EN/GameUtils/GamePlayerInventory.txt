@@ -9,6 +9,8 @@ GameUtils.GamePlayerInventory.ClassCannotUseThisItem:					Your class cannot use 
 GameUtils.GamePlayerInventory.ItemCantGoThere:							{0} can't go there!
 GameUtils.GamePlayerInventory.ItemCantStoreThere:						You can't store this item here.
 GameUtils.GamePlayerInventory.ItemCantSwapThere:						You can't swap this item here.
+GameUtils.GamePlayerInventory.ItemCantUnequip:							You cannot unequip {0}!
+GameUtils.GamePlayerInventory.ItemCantUnequipDestroyed:					The equipped item {0} cannot be unequipped unless it's destroyed.
 GameUtils.GamePlayerInventory.CantUseItemChampionLevel:					You can't use {0}, you should increase your champion level.
 GameUtils.GamePlayerInventory.CantPutItemInActiveBardingSlot:			You can't put {0} in your active barding slot!
 GameUtils.GamePlayerInventory.CantPutItemInActiveHorseArmorSlot:		You can't put {0} in your active horse armor slot!

@@ -523,6 +523,52 @@ namespace DOL.spells
                 {
                     ItemUnique unique = new ItemUnique(combined.Item.Template);
                     unique.IsTradable = true;
+
+                    if (Properties.CRAFTING_ADJUST_PRODUCT_PRICE)
+                    {
+                        bool updatePrice = true;
+
+                        if (unique.Name.EndsWith("metal bars") ||
+                            unique.Name.EndsWith("leather square") ||
+                            unique.Name.EndsWith("cloth square") ||
+                            unique.Name.EndsWith("wooden boards"))
+                        {
+                            updatePrice = false;
+                        }
+
+                        if (unique.PackageID != null && unique.PackageID.Contains("NoPriceUpdate"))
+                        {
+                            updatePrice = false;
+                        }
+
+                        if (updatePrice)
+                        {
+                            long totalPrice = 0;
+
+                            foreach (var matchItem in currentCombine.Matches)
+                            {
+                                long ingredientPrice = matchItem.item.Template != null ? matchItem.item.Template.Price : matchItem.item.Price;
+                                totalPrice += matchItem.Count * ingredientPrice;
+                            }
+
+                            var secondaryCraftingSkills = new List<eCraftingSkill>() {
+                                eCraftingSkill.MetalWorking, eCraftingSkill.LeatherCrafting, eCraftingSkill.ClothWorking, eCraftingSkill.WoodWorking
+                            };
+
+                            long priceToSet = 0;
+
+                            if (secondaryCraftingSkills.Contains(match.CraftingSkill))
+                                priceToSet = Math.Abs((long)(totalPrice * 2 * Properties.CRAFTING_SECONDARYCRAFT_SELLBACK_PERCENT) / 100);
+                            else
+                                priceToSet = Math.Abs(totalPrice * 2 * Properties.CRAFTING_SELLBACK_PERCENT / 100);
+
+                            if (priceToSet > 0 && unique.Price != priceToSet)
+                            {
+                                unique.Price = priceToSet;
+                            }
+                        }
+                    }
+
                     GameServer.Database.AddObject(unique);
                     newItem = GameInventoryItem.Create(unique);
 
@@ -946,9 +992,23 @@ namespace DOL.spells
             }
             foreach (var (item, count) in matches)
             {
-                if (item == null || item.OwnerID != player.InternalID || item.Count < count || !player.Inventory.RemoveItem(item))
+                int toRemove = count;
+
+                if (item == useItem)
                 {
-                    log.Warn($"POSSIBLE DUPE: Failed to remove item \"{item?.Id_nb}\"x{count} for combine {match.DbId} for player {player.Name}");
+                    toRemove -= 1;
+                }
+
+                if (toRemove > 0)
+                {
+                    if (item.Count == toRemove)
+                    {
+                        player.Inventory.RemoveItem(item);
+                    }
+                    else
+                    {
+                        player.Inventory.RemoveCountFromStack(item, toRemove);
+                    }
                 }
             }
             return true;

@@ -127,6 +127,7 @@ namespace DOL.GS.Scripts
             db.Name = string.IsNullOrEmpty(explicitSpeciesName) ? tmpl.Name : explicitSpeciesName;
             db.BodyType = tmpl.BodyType;
             db.CurrentModel = ParseFirstModel(tmpl.Model);
+            db.BaseMaxSpeed = (short)(tmpl != null && tmpl.MaxSpeed > 0 ? tmpl.MaxSpeed : 150);
 
             int trueBaseSize = 50;
             if (tmpl != null && int.TryParse(tmpl.Size, out int parsedSize) && parsedSize > 0)

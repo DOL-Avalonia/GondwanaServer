@@ -6,6 +6,9 @@ namespace DOL.GS
 {
     public interface IPathingMgr
     {
+        bool RegisterDoor(IDoor door);
+        bool UpdateDoorFlags(IDoor door);
+
         /// <summary>
         ///   Initializes the PathingMgr  by loading all available navmeshes
         /// </summary>

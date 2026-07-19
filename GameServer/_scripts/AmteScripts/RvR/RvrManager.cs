@@ -295,6 +295,48 @@ namespace AmteScripts.Managers
                     continue;
                 }
                 map[realm].Spawn = npc.Position;
+
+                foreach (var obj in npc.CurrentRegion.GetDoorsInRadius(npc.Coordinate, 2000, false))
+                {
+                    if (obj is GameKeepDoor keepDoor)
+                    {
+                        var dbDoor = GameServer.Database.SelectObject<DBDoor>(DB.Column("InternalID").IsEqualTo(keepDoor.DoorID));
+                        if (dbDoor == null)
+                        {
+                            dbDoor = new DBDoor
+                            {
+                                InternalID = keepDoor.DoorID,
+                                Name = keepDoor.Name ?? "Keep Door",
+                                Type = keepDoor.DoorID / 100000000,
+                                Realm = (byte)realm,
+                                X = keepDoor.Position.X,
+                                Y = keepDoor.Position.Y,
+                                Z = keepDoor.Position.Z,
+                                Heading = keepDoor.Orientation.InHeading,
+                                Health = keepDoor.MaxHealth,
+                                MaxHealth = keepDoor.MaxHealth,
+                                Locked = 0
+                            };
+                            GameServer.Database.AddObject(dbDoor);
+                        }
+                        else if (dbDoor.Realm != (byte)realm)
+                        {
+                            dbDoor.Realm = (byte)realm;
+                            GameServer.Database.SaveObject(dbDoor);
+                        }
+
+                        keepDoor.DbDoor = dbDoor;
+                        keepDoor.Realm = realm;
+                    }
+                    else if (obj is GameDoor regDoor)
+                    {
+                        if (regDoor.Realm != realm)
+                        {
+                            regDoor.Realm = realm;
+                            regDoor.SaveIntoDatabase();
+                        }
+                    }
+                }
             }
             return map;
         }

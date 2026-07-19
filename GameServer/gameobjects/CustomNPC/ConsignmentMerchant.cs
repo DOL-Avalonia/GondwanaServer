@@ -336,6 +336,16 @@ namespace DOL.GS
                     {
                         // ... player
 
+                        if (toClientSlot >= (ushort)eInventorySlot.MinEquipable && toClientSlot <= (ushort)eInventorySlot.MaxEquipable)
+                        {
+                            InventoryItem checkItem = player.Inventory.GetItem((eInventorySlot)toClientSlot);
+                            if (checkItem != null && checkItem.Template != null && (checkItem.Template.Flags == 44 || checkItem.Template.Flags == 45))
+                            {
+                                player.Client.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.CannotUnequip", checkItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+                        }
+
                         InventoryItem toItem = player.Inventory.GetItem((eInventorySlot)toClientSlot);
 
                         if (toItem != null)
@@ -365,6 +375,16 @@ namespace DOL.GS
                 else if (toClientSlot >= FirstClientSlot && toClientSlot <= LastClientSlot)
                 {
                     InventoryItem itemInFromSlot = player.Inventory.GetItem((eInventorySlot)fromClientSlot);
+
+                    if (fromClientSlot >= (ushort)eInventorySlot.MinEquipable && fromClientSlot <= (ushort)eInventorySlot.MaxEquipable)
+                    {
+                        if (itemInFromSlot != null && itemInFromSlot.Template != null && (itemInFromSlot.Template.Flags == 44 || itemInFromSlot.Template.Flags == 45))
+                        {
+                            player.Out.SendMessage($"You cannot unequip {itemInFromSlot.Name} directly to a merchant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                    }
+
                     if (HasPermissionToMove(player) && CanHoldItem(itemInFromSlot))
                     {
                         if (GetClientInventory(player).TryGetValue(toClientSlot, out _))

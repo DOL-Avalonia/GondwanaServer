@@ -3,6 +3,7 @@ using DOL.GS;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
+using DOL.GS.Scripts;
 using DOL.Language;
 using DOL.GS.Spells;
 using DOL.MobGroups;
@@ -72,9 +73,13 @@ namespace AmteScripts.Managers
         {
             if (MobGroupManager.Instance.Groups.TryGetValue(DbRecord.ProtectorClassType, out MobGroup group))
             {
-                foreach (var protector in group.NPCs)
+                foreach (var protector in group.NPCs.ToList())
                 {
-                    protector.RemoveFromWorld();
+                    if (protector.ObjectState == GameObject.eObjectState.Active)
+                        protector.RemoveFromWorld();
+
+                    if (protector.IsRespawning)
+                        protector.StopRespawn();
 
                     Position newPos = Position.Create(
                         (ushort)DbRecord.SpawnRegion,
@@ -88,7 +93,22 @@ namespace AmteScripts.Managers
                     protector.Home = newPos;
                     protector.SpawnPosition = newPos;
 
-                    protector.AddToWorld();
+                    if (!protector.IsAlive)
+                    {
+                        protector.Spawn();
+                    }
+                    else
+                    {
+                        protector.Health = protector.MaxHealth;
+                        protector.Mana = protector.MaxMana;
+                        protector.Endurance = protector.MaxEndurance;
+                        protector.Tension = 0;
+                        protector.TargetObject = null;
+                        if (protector.AttackState)
+                            protector.StopAttack();
+
+                        protector.AddToWorld();
+                    }
 
                     if (!_activeProtectors.Contains(protector))
                         _activeProtectors.Add(protector);
@@ -108,7 +128,7 @@ namespace AmteScripts.Managers
                 Name = "Outpost Relic Pad",
                 Level = 50,
                 Realm = 0,
-                Position = this.Position.With(z: this.Position.Z - 100)
+                Position = Position.Create((ushort)DbRecord.SpawnRegion, DbRecord.SpawnX, DbRecord.SpawnY, DbRecord.SpawnZ, (ushort)DbRecord.SpawnHeading)
             };
             _visualPad.AddToWorld();
         }
@@ -116,18 +136,32 @@ namespace AmteScripts.Managers
         public void Unlock()
         {
             IsLocked = false;
-            foreach (var p in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>())
-                p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "TerritoryRelics.Static.Unlocked", Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            if (GvGManager.IsOpen)
+            {
+                foreach (var p in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>())
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "TerritoryRelics.Static.Unlocked", Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            }
         }
 
         public override bool Interact(GamePlayer player)
         {
             if (!base.Interact(player)) return false;
 
-            if (!DOL.GS.Scripts.GvGManager.IsOpen)
+            if (!GvGManager.IsOpen)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TerritoryRelics.Static.Truce"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
+            }
+
+            if (!IsLocked && !string.IsNullOrEmpty(DbRecord.ProtectorClassType) && CurrentTerritory == null && !IsDroppedOnGround)
+            {
+                if (MobGroupManager.Instance.Groups.TryGetValue(DbRecord.ProtectorClassType, out MobGroup group))
+                {
+                    if (group.NPCs.Any(n => n.IsAlive && n.ObjectState == eObjectState.Active))
+                    {
+                        IsLocked = true;
+                    }
+                }
             }
 
             if (player.IsDamned)
@@ -285,7 +319,7 @@ namespace AmteScripts.Managers
 
             RemoveFromWorld();
 
-            Position = Position.Create((ushort)DbRecord.SpawnRegion, DbRecord.SpawnX, DbRecord.SpawnY, DbRecord.SpawnZ, (ushort)DbRecord.SpawnHeading);
+            Position = Position.Create((ushort)DbRecord.SpawnRegion, DbRecord.SpawnX, DbRecord.SpawnY, DbRecord.SpawnZ + 100, (ushort)DbRecord.SpawnHeading);
             AddToWorld();
             TerritoryRelicManager.UpdateMapPins();
         }
@@ -300,11 +334,11 @@ namespace AmteScripts.Managers
             Position = Position.Create(region.ID, x, y, z, heading);
             AddToWorld();
 
-            _returnTimer = new RegionTimer(this, t =>
+            _returnTimer = new RegionTimer(this, new RegionTimerCallback(t =>
             {
-                ReturnToSpawn(); // Don't Destroy(), return to spawn instead
+                ReturnToSpawn();
                 return 0;
-            });
+            }));
 
             int dropDuration = Properties.GVG_RELIC_DROP_DURATION > 0 ? Properties.GVG_RELIC_DROP_DURATION : 30;
             _returnTimer.Start(dropDuration * 1000);
@@ -363,8 +397,11 @@ namespace AmteScripts.Managers
 
             foreach (var protector in _activeProtectors)
             {
-                if (protector.ObjectState == eObjectState.Active)
+                if (protector.ObjectState == GameObject.eObjectState.Active)
                     protector.RemoveFromWorld();
+
+                if (protector.IsRespawning)
+                    protector.StopRespawn();
             }
             _activeProtectors.Clear();
 

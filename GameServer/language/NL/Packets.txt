@@ -73,8 +73,12 @@ DetailDisplayHandler.HandlePacket.YouFumble:				Je stuntelt
 DetailDisplayHandler.HandlePacket.YouHit:				Je treft
 DetailDisplayHandler.HandlePacket.YouMiss:				Je mist
 DetailDisplayHandler.HandlePacket.YouParry:				Je pareert
-DetailDisplayHandler.WriteBonusLine.Points:				ptn
-DetailDisplayHandler.WriteBonusLine.PowerPool:			% manareservoir.
+DetailDisplayHandler.HandlePacket.UseEverySec:			Kan item elke: {0} sec gebruiken
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Kan item elke: {0}:{1:00} min gebruiken
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Weer te gebruiken over: {0} sec
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Weer te gebruiken over: {0}:{1:00} min
+DetailDisplayHandler.WriteBonusLine.Points:				 ptn
+DetailDisplayHandler.WriteBonusLine.PowerPool:			% van de krachtreserve.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Absorptie
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:		Pantsermodifier:
 DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor:	- {0} Basispantser
@@ -147,9 +151,34 @@ DetailDisplayHandler.WritePotionInfo.Value:				Waarde: {0}
 DetailDisplayHandler.WritePotionInfo.Target:				Doelwit: {0}
 DetailDisplayHandler.WritePotionInfo.Range:				Bereik: {0}
 DetailDisplayHandler.WriteUsableClasses.UsableBy:		Te gebruiken door:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Tasgewicht: {0:0.0} lbs ({1}/40 volle vakken)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Je kunt {0} niet uitrusten omdat de conditie verbruikt is.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Je moet {0} seconden wachten voordat je {1} weer kunt uitrusten.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Wordt vernietigd als het leeg is)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Wordt vernietigd indien gebroken)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Verbruikt {0}% Uithoudingsvermogen en {1}% Gezondheid per tik{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Verbruikt {0}% Mana per tik{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Verbruikt {0}% Conditie per tik{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Verliest {0}% Conditie bij overlijden{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Kan niet worden afgedaan.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Je bent te ver weg van {0}!
+DoorRequestHandler.OnTick.TooFarAway:				De {0} is te ver weg!
+DoorRequestHandler.GameDoor.NowOpen:				De {0} is nu open!
+DoorRequestHandler.GameDoor.FailOpen:				Het is je niet gelukt deze deur te openen!
+DoorRequestHandler.GameDoor.NeedKey:				Je hebt een sleutel nodig om deze deur te openen!
+DoorRequestHandler.GameDoor.NeedReborn:				Je hebt de kracht van de Steen der Wijzen niet verworven; je mag hier niet naar binnen!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		Je moet de nabijgelegen monsters verslaan om deze deur te openen!
+DoorRequestHandler.GameDoor.NeedSwitch:				Je moet de verbonden mechanismen activeren om deze deur te openen!
+DoorRequestHandler.YouMezzed:						Je bent gehypnotiseerd en kunt de deur niet openen!
+DoorRequestHandler.YouStunned:						Je bent verdoofd en kunt de deur niet openen!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} wordt aangevallen!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			De {0} is op slot!
+DoorRequestHandler.GameKeepDoor.YouSelect:			Je selecteert de {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	 Het behoort tot jouw rijk.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		 Het behoort tot een vijandelijk rijk en kan worden aangevallen!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		 Het behoort tot een vijandelijk rijk!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			De {0} is kapot!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Huidige bonussen

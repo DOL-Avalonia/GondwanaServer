@@ -1,30 +1,9 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System.Collections;
 using System.Collections.Generic;
-using System;
 using System.Reflection;
-
+using System;
 using DOL.Database;
-using DOL.GS.Geometry;
 using DOL.GS.Keeps;
-
+using DOL.GS.Geometry;
 using log4net;
 
 namespace DOL.GS
@@ -34,11 +13,9 @@ namespace DOL.GS
     /// </summary>
     public sealed class DoorMgr
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         private static readonly object Lock = new object();
-
-        private static Dictionary<int, List<IDoor>> m_doors = new Dictionary<int, List<IDoor>>();
+        private static Dictionary<int, IDoor> m_doors = new Dictionary<int, IDoor>();
 
         public const string WANT_TO_ADD_DOORS = "WantToAddDoors";
 
@@ -50,10 +27,14 @@ namespace DOL.GS
             var dbdoors = GameServer.Database.SelectAllObjects<DBDoor>();
             foreach (DBDoor door in dbdoors)
             {
+                int type = door.Type > 0 ? door.Type : door.InternalID / 100000000;
+
+                if (type == 7)
+                    continue;
+
                 if (!LoadDoor(door))
                 {
                     log.Error("Unable to load door id " + door.ObjectId + ", correct your database");
-                    // continue loading, no need to stop server for one bad door!
                 }
             }
             return true;
@@ -67,7 +48,6 @@ namespace DOL.GS
             Zone currentZone = WorldMgr.GetZone(zone);
             if (currentZone == null) return false;
 
-            //check if the door is a keep door
             foreach (AbstractArea area in currentZone.GetAreasOfSpot(Coordinate.Create(door.X, door.Y, door.Z)))
             {
                 if (area is KeepArea)
@@ -78,18 +58,14 @@ namespace DOL.GS
                 }
             }
 
-            //if the door is not a keep door, create a standard door
             if (mydoor == null)
             {
                 mydoor = new GameDoor();
                 mydoor.LoadFromDatabase(door);
             }
 
-            //add to the list of doors
             if (mydoor != null)
-            {
                 RegisterDoor(mydoor);
-            }
 
             return true;
         }
@@ -98,67 +74,74 @@ namespace DOL.GS
         {
             lock (Lock)
             {
-                if (!m_doors.ContainsKey(door.DoorID))
+                if (m_doors.TryGetValue(door.DoorID, out IDoor existingDoor))
                 {
-                    List<IDoor> createDoorList = new List<IDoor>();
-                    m_doors.Add(door.DoorID, createDoorList);
+                    if (existingDoor == door) return;
+
+                    if (log.IsDebugEnabled)
+                        log.Debug($"Door ID {door.DoorID} is already registered. Overwriting.");
                 }
 
-                List<IDoor> addDoorList = m_doors[door.DoorID];
-                addDoorList.Add(door);
+                m_doors[door.DoorID] = door;
+
+                if (PathingMgr.Instance != null && door.ZoneID != 0)
+                {
+                    if (!PathingMgr.Instance.RegisterDoor(door))
+                    {
+                        if (log.IsDebugEnabled)
+                            log.Debug($"Failed to register door in Navmesh. (Id: {door.DoorID} Name: {door.Name})");
+                    }
+                }
             }
         }
 
         public static void UnRegisterDoor(int doorID)
         {
-            if (m_doors.ContainsKey(doorID))
+            lock (Lock)
             {
                 m_doors.Remove(doorID);
             }
         }
 
+        public static IDoor GetDoorByID(int id)
+        {
+            lock (Lock)
+            {
+                return m_doors.TryGetValue(id, out IDoor door) ? door : null;
+            }
+        }
+
         /// <summary>
-        /// This function get the door object by door index
+        /// This function get the door object by door index: DoorRequestHandler expects a List<IDoor>. 
         /// </summary>
-        /// <returns>return the door with the index</returns>
+        [Obsolete("Use GetDoorByID going forward.")]
         public static List<IDoor> getDoorByID(int id)
         {
-            if (m_doors.ContainsKey(id))
-            {
-                return m_doors[id];
-            }
-            else
-            {
-                return new List<IDoor>();
-            }
+            var door = GetDoorByID(id);
+            return door != null ? new List<IDoor> { door } : new List<IDoor>();
         }
 
         public static List<GameDoor> GetDoorsBySwitchFamily(string switchFamily)
         {
             List<GameDoor> doors = new List<GameDoor>();
-
-            foreach (var doorList in m_doors.Values)
+            lock (Lock)
             {
-                foreach (var door in doorList)
+                foreach (var door in m_doors.Values)
                 {
                     if (door is GameDoor gameDoor && gameDoor.SwitchFamily == switchFamily)
-                    {
                         doors.Add(gameDoor);
-                    }
                 }
             }
-
             return doors;
         }
 
         public static void UnlockDoorsBySwitchFamily(string switchFamily)
         {
             var doorsToUnlock = GetDoorsBySwitchFamily(switchFamily);
-            foreach (var door in doorsToUnlock)
-                if (door is GameDoor gameDoor)
-                {
-                    gameDoor.UnlockBySwitch();
-                }
+            foreach (var gameDoor in doorsToUnlock)
+            {
+                gameDoor.UnlockBySwitch();
+            }
         }
     }
 }

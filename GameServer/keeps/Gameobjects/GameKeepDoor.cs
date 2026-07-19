@@ -1,103 +1,50 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System;
-using System.Collections;
-using System.Numerics;
-using System.Reflection;
-
+using Discord;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
-
+using DOL.Language;
 using log4net;
+using System;
+using System.Collections;
+using System.Numerics;
+using static DOL.GS.GameLiving;
+using static DOL.GS.GameSiegeWeapon;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Vector = DOL.GS.Geometry.Vector;
-
 
 namespace DOL.GS.Keeps
 {
     /// <summary>
     /// keep door in world
     /// </summary>
-    public class GameKeepDoor : GameLiving, IDoor, IKeepItem
+    public class GameKeepDoor : GameDoorBase, IKeepItem
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region properties
+        private const int DOOR_CLOSE_THRESHOLD = 15;
+        private const int REPAIR_INTERVAL = 30 * 60 * 1000;
 
         protected int m_oldMaxHealth;
-
         protected byte m_oldHealthPercent;
 
-        protected int m_doorID;
-        /// <summary>
-        /// The door index which is unique
-        /// </summary>
-        public int DoorID
-        {
-            get { return m_doorID; }
-            set { m_doorID = value; }
-        }
+        private bool _relicMessage75, _relicMessage50, _relicMessage25;
 
-        /// <summary>
-        /// Get the ZoneID of this door
-        /// </summary>
-        public ushort ZoneID
-        {
-            get { return (ushort)(DoorID / 1000000); }
-        }
-
-        public int OwnerKeepID
-        {
-            get { return (m_doorID / 100000) % 1000; }
-        }
-
-        public int TowerNum
-        {
-            get { return (m_doorID / 10000) % 10; }
-        }
-
-        public int KeepID
-        {
-            get { return OwnerKeepID + TowerNum * 256; }
-        }
-
-        public int ComponentID
-        {
-            get { return (m_doorID / 100) % 100; }
-        }
-
-        public int DoorIndex
-        {
-            get { return m_doorID % 10; }
-        }
+        public int OwnerKeepID => DoorID / 100000 % 1000;
+        public int TowerNum => DoorID / 10000 % 10;
+        public int KeepID => OwnerKeepID + TowerNum * 256;
+        public int ComponentID => DoorID / 100 % 100;
+        public int DoorIndex => DoorID % 10;
 
         /// <summary>
         /// This flag is send in packet(keep door = 4, regular door = 0)
         /// </summary>
-        public uint Flag
+        public override uint Flag
         {
-            get
-            {
-                return 4;
-            }
+            get => 4;
+            set { }
         }
 
         /// <summary>
@@ -107,34 +54,14 @@ namespace DOL.GS.Keeps
         {
             get
             {
-                if (Component == null || Component.Keep == null)
-                {
-                    return eRealm.None;
-                }
-
-                return Component.Keep.Realm;
+                if (DbDoor != null && DbDoor.Realm != 0 && DbDoor.Realm != 6)
+                    return (eRealm)DbDoor.Realm;
+                return Component == null || Component.Keep == null ? base.Realm : Component.Keep.Realm;
             }
-        }
-
-        /// <summary>
-        /// door state (open or closed)
-        /// </summary>
-        protected eDoorState m_state;
-
-        /// <summary>
-        /// door state (open or closed)
-        /// call the broadcast of state in area
-        /// </summary>
-        public eDoorState State
-        {
-            get { return m_state; }
             set
             {
-                if (m_state != value)
-                {
-                    m_state = value;
-                    BroadcastDoorStatus();
-                }
+                if (DbDoor != null) DbDoor.Realm = (byte)value;
+                base.Realm = value;
             }
         }
 
@@ -145,12 +72,31 @@ namespace DOL.GS.Keeps
         {
             get
             {
-                if (Component == null || Component.Keep == null)
-                {
-                    return 0;
-                }
+                if (DbDoor != null && DbDoor.Level != 0) return DbDoor.Level;
+                return Component == null || Component.Keep == null ? base.Level : Component.Keep.Level;
+            }
+            set
+            {
+                base.Level = value;
+                if (DbDoor != null) DbDoor.Level = value;
+            }
+        }
 
-                return Component.Keep.Level;
+        public bool IsRelic => Component != null && Component.Keep != null && Component.Keep.DBKeep != null && Component.Keep.DBKeep.SkinType == 99;
+
+        /// <summary>
+        /// Get the ZoneID of this door
+        /// </summary>
+        public override ushort ZoneID
+        {
+            get
+            {
+                if (Component?.Keep?.CurrentZone != null)
+                    return Component.Keep.CurrentZone.ID;
+                if (CurrentZone != null)
+                    return CurrentZone.ID;
+
+                return 0;
             }
         }
 
@@ -159,16 +105,13 @@ namespace DOL.GS.Keeps
             if (MaxHealth != m_oldMaxHealth)
             {
                 if (m_oldMaxHealth > 0)
-                {
-                    Health = (int)Math.Ceiling(((double)Health) * ((double)MaxHealth) / ((double)m_oldMaxHealth));
-                }
+                    Health = (int)Math.Ceiling(Health * MaxHealth / (double)m_oldMaxHealth);
                 else
-                {
                     Health = MaxHealth;
-                }
 
                 m_oldMaxHealth = MaxHealth;
             }
+            SaveIntoDatabase();
         }
 
         public override bool IsAttackableDoor
@@ -180,21 +123,17 @@ namespace DOL.GS.Keeps
 
                 if (Component.Keep is GameKeepTower)
                 {
-                    if (DoorIndex == 1)
-                        return true;
+                    if (DoorIndex == 1) return true;
                 }
                 else if (Component.Keep is GameKeep)
                 {
-                    if (Component.Skin == 10 || Component.Skin == 30) //old and new inner keep
+                    if (Component.Skin == 10 || Component.Skin == 30) // inner keep
                     {
-                        if (DoorIndex == 1)
-                            return true;
+                        if (DoorIndex == 1) return true;
                     }
-                    if (Component.Skin == 0 || Component.Skin == 24)//old and new main gate
+                    if (Component.Skin == 0 || Component.Skin == 24) // main gate
                     {
-                        if (DoorIndex == 1 ||
-                            DoorIndex == 2)
-                            return true;
+                        if (DoorIndex == 1 || DoorIndex == 2) return true;
                     }
                 }
                 return false;
@@ -203,69 +142,34 @@ namespace DOL.GS.Keeps
 
         public override int Health
         {
-            get
-            {
-                if (!IsAttackableDoor)
-                    return 0;
-                return base.Health;
-            }
+            get => !IsAttackableDoor ? 0 : base.Health;
             set
             {
                 base.Health = value;
 
-                if (HealthPercent > 15 && m_state == eDoorState.Open)
-                {
+                if (HealthPercent > DOOR_CLOSE_THRESHOLD && State == eDoorState.Open)
                     CloseDoor();
-                }
             }
         }
 
-        public override int RealmPointsValue
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
-        public override long ExperienceValue
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public override int RealmPointsValue => 0;
+        public override long ExperienceValue => 0;
 
         public override string Name
         {
             get
             {
-                string name = "";
+                string name = IsAttackableDoor ? (IsRelic ? "Relic Gate" : "Keep Door") : "Postern Door";
 
-                if (IsAttackableDoor)
-                {
-                    name = "Keep Door";
-                }
-                else
-                {
-                    name = "Postern Door";
-                }
-
-                if (ServerProperties.Properties.ENABLE_DEBUG)
-                {
-                    name += " ( C:" + ComponentID + " T:" + TemplateID + ")";
-
-                }
+                if (Properties.ENABLE_DEBUG)
+                    name += $" ( C:{ComponentID} T:{TemplateID})";
 
                 return name;
             }
         }
 
         protected string m_templateID;
-        public string TemplateID
-        {
-            get { return m_templateID; }
-        }
+        public string TemplateID => m_templateID;
 
         protected GameKeepComponent m_component;
         public GameKeepComponent Component
@@ -274,13 +178,12 @@ namespace DOL.GS.Keeps
             set { m_component = value; }
         }
 
-        protected DBKeepPosition m_dbposition;
+        protected DBKeepPosition m_position;
         public DBKeepPosition DBPosition
         {
-            get { return m_dbposition; }
-            set { m_dbposition = value; }
+            get { return m_position; }
+            set { m_position = value; }
         }
-
         #endregion
 
         #region function override
@@ -293,85 +196,85 @@ namespace DOL.GS.Keeps
         /// <returns></returns>
         public override bool AllowWeaponMagicalEffect(AttackData ad, InventoryItem weapon, Spell weaponSpell)
         {
-            if (weapon.Flags == 10) //Bruiser or any other item needs Itemtemplate "Flags" set to 10 to proc on keep components
-                return true;
-            else return false; // special code goes here
+            return weapon.Flags == 10;
         }
-
 
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
-            if (damageAmount > 0)
+            if (damageAmount > 0 && IsAlive)
             {
                 Component.Keep.LastAttackedByEnemyTick = CurrentRegion.Time;
                 base.TakeDamage(source, damageType, damageAmount, criticalAmount);
 
-                //only on hp change
                 if (m_oldHealthPercent != HealthPercent)
                 {
                     m_oldHealthPercent = HealthPercent;
                     foreach (GameClient client in WorldMgr.GetClientsOfRegion(CurrentRegionID))
-                    {
                         client.Out.SendObjectUpdate(this);
-                    }
+                }
+
+                if (IsRelic)
+                {
+                    if (HealthPercent <= 25 && !_relicMessage25) { _relicMessage25 = true; BroadcastGateDamage(); }
+                    else if (HealthPercent <= 50 && HealthPercent > 25 && !_relicMessage50) { _relicMessage50 = true; BroadcastGateDamage(); }
+                    else if (HealthPercent <= 75 && HealthPercent > 50 && !_relicMessage75) { _relicMessage75 = true; BroadcastGateDamage(); }
                 }
             }
         }
 
+        /// <summary>
+        /// boradcast gate beeing attacked to all players in the world
+        /// </summary>
+        private void BroadcastGateDamage()
+        {
+            foreach (GameClient client in WorldMgr.GetAllPlayingClients())
+            {
+                if (client.Player != null && client.Player.Realm == Realm)
+                {
+                    string msg = LanguageMgr.GetTranslation(client.Account.Language, "DoorRequestHandler.GameKeepDoor.KeepUnderAttack", Component.Keep.Name);
+                    client.Player.Out.SendMessage(msg, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+                    client.Player.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
+        }
 
         public override void ModifyAttack(AttackData attackData)
         {
-            // Allow a GM to use commands to damage components, regardless of toughness setting
             if (attackData.DamageType == eDamageType.GM)
                 return;
 
-            int toughness = Properties.SET_KEEP_DOOR_TOUGHNESS;
+            int toughness = Component.Keep is GameKeepTower ? Properties.SET_TOWER_DOOR_TOUGHNESS : Properties.SET_KEEP_DOOR_TOUGHNESS;
+            GameLiving source = attackData.Attacker;
+
             int baseDamage = attackData.Damage;
             int styleDamage = attackData.StyleDamage;
             int criticalDamage = 0;
 
-            GameLiving source = attackData.Attacker;
-
-            if (Component.Keep is GameKeepTower)
-            {
-                toughness = Properties.SET_TOWER_DOOR_TOUGHNESS;
-            }
-
             if (source is GamePlayer)
             {
-                baseDamage = (baseDamage - (baseDamage * 5 * Component.Keep.Level / 100)) * toughness / 100;
-                styleDamage = (styleDamage - (styleDamage * 5 * Component.Keep.Level / 100)) * toughness / 100;
+                baseDamage = GetAdjustedDamage(baseDamage, toughness, Component.Keep.Level);
+                styleDamage = GetAdjustedDamage(styleDamage, toughness, Component.Keep.Level);
             }
-            else if (source is GameNPC)
+            else if (source is GameNPC npcSource)
             {
                 if (!Properties.DOORS_ALLOWPETATTACK)
                 {
+                    attackData.AttackResult = eAttackResult.NotAllowed_ServerRules;
                     baseDamage = 0;
                     styleDamage = 0;
-                    attackData.AttackResult = eAttackResult.NotAllowed_ServerRules;
                 }
                 else
                 {
-                    baseDamage = (baseDamage - (baseDamage * 5 * Component.Keep.Level / 100)) * toughness / 100;
-                    styleDamage = (styleDamage - (styleDamage * 5 * Component.Keep.Level / 100)) * toughness / 100;
+                    baseDamage = GetAdjustedDamage(baseDamage, toughness, Component.Keep.Level);
+                    styleDamage = GetAdjustedDamage(styleDamage, toughness, Component.Keep.Level);
 
-                    if (((GameNPC)source).Brain is AI.Brain.IControlledBrain)
+                    if (npcSource.Brain is AI.Brain.IControlledBrain brain && brain.Owner is GamePlayer player)
                     {
-                        GamePlayer player = (((AI.Brain.IControlledBrain)((GameNPC)source).Brain).Owner as GamePlayer);
-                        if (player != null)
-                        {
-                            // special considerations for pet spam classes
-                            if (player.CharacterClass.ID == (int)eCharacterClass.Theurgist || player.CharacterClass.ID == (int)eCharacterClass.Animist)
-                            {
-                                baseDamage = (int)(baseDamage * Properties.PET_SPAM_DAMAGE_MULTIPLIER);
-                                styleDamage = (int)(styleDamage * Properties.PET_SPAM_DAMAGE_MULTIPLIER);
-                            }
-                            else
-                            {
-                                baseDamage = (int)(baseDamage * Properties.PET_DAMAGE_MULTIPLIER);
-                                styleDamage = (int)(styleDamage * Properties.PET_DAMAGE_MULTIPLIER);
-                            }
-                        }
+                        double multiplier = (player.CharacterClass.ID == (int)eCharacterClass.Theurgist || player.CharacterClass.ID == (int)eCharacterClass.Animist) ?
+                            Properties.PET_SPAM_DAMAGE_MULTIPLIER : Properties.PET_DAMAGE_MULTIPLIER;
+
+                        baseDamage = (int)(baseDamage * multiplier);
+                        styleDamage = (int)(styleDamage * multiplier);
                     }
                 }
             }
@@ -379,8 +282,12 @@ namespace DOL.GS.Keeps
             attackData.Damage = baseDamage;
             attackData.StyleDamage = styleDamage;
             attackData.CriticalDamage = criticalDamage;
-        }
 
+            static int GetAdjustedDamage(int damage, int toughnessVal, int level)
+            {
+                return (damage - damage * 5 * level / 100) * toughnessVal / 100;
+            }
+        }
 
         /// <summary>
         /// This function is called from the ObjectInteractRequestHandler
@@ -390,131 +297,110 @@ namespace DOL.GS.Keeps
         /// <returns>false if interaction is prevented</returns>
         public override bool Interact(GamePlayer player)
         {
-            if (!base.Interact(player))
-                return false;
+            if (!base.Interact(player)) return false;
 
-            if (player.IsMezzed)
+            bool isEnemy = false;
+
+            if (DbDoor != null && DbDoor.Realm != 0 && DbDoor.Realm != 6)
             {
-                player.Out.SendMessage("You are mesmerized!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                isEnemy = player.Realm != (eRealm)DbDoor.Realm;
+            }
+            else if (Component != null && Component.Keep != null)
+            {
+                isEnemy = GameServer.KeepManager.IsEnemy(this, player);
+            }
+            else
+            {
+                isEnemy = (player.Realm != this.Realm && this.Realm != eRealm.None && this.Realm != eRealm.Door);
+            }
+
+            // If it's an enemy door and the player is not a GM, it is locked.
+            if (isEnemy && player.Client.Account.PrivLevel == 1)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.GameKeepDoor.DoorLocked", Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
-            if (player.IsStunned)
+            int keepz = Position.Z, distance = 0;
+
+            if (Component!.Skin == 10 || Component.Skin == 30)
             {
-                player.Out.SendMessage("You are stunned!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return false;
+                distance = 190;
+            }
+            else
+            {
+                if (DoorIndex == 1) distance = 150;
+                else if (DoorIndex >= 3 && DoorIndex <= 6) distance = 175;
+                else distance = 100;
             }
 
-
-            if (!GameServer.KeepManager.IsEnemy(this, player) || player.Client.Account.PrivLevel != 1)
+            if (Component.Keep is GameKeepTower && !Component.Keep.IsPortalKeep)
             {
-                int keepz = Position.Z, distance = 0;
-
-                //calculate distance
-                //normal door
-                if (DoorIndex == 1)
-                    distance = 150;
-                // side door
-                else if (DoorIndex == 3 || DoorIndex == 4 || DoorIndex == 5 || DoorIndex == 6)
-                    distance = 175;
-                //other internal door
-                else
-                    distance = 100;
-
-                //calculate Z
-                if (Component.Keep is GameKeepTower && !Component.Keep.IsPortalKeep)
+                if (IsObjectInFront(player, 180, false))
                 {
-                    //when entering a tower, we need to raise Z
-                    //portal keeps are considered towers too, so we check component count
-                    if (IsObjectInFront(player, 180, false))
-                    {
-                        if (DoorID == 1)
-                        {
-                            keepz = Position.Z + 83;
-                        }
-                        else
-                        {
-                            distance = 150;
-                        }
-                    }
+                    if (DoorID == 1) keepz = Position.Z + 83;
+                    else distance = 150;
                 }
-                else
-                {
-                    //when entering a keeps inner door, we need to raise Z
-                    if (IsObjectInFront(player, 180, false))
-                    {
-                        //To find out if a door is the keeps inner door, we compare the distance between
-                        //the component for the keep and the component for the gate
-                        var keepdistance = float.MaxValue;
-                        var gatedistance = float.MaxValue;
-                        foreach (GameKeepComponent c in Component.Keep.KeepComponents)
-                        {
-                            if ((GameKeepComponent.eComponentSkin)c.Skin == GameKeepComponent.eComponentSkin.Keep)
-                            {
-                                keepdistance = (float)Coordinate.DistanceTo(c.Position);
-                            }
-                            if ((GameKeepComponent.eComponentSkin)c.Skin == GameKeepComponent.eComponentSkin.Gate)
-                            {
-                                gatedistance = (float)Coordinate.DistanceTo(c.Position);
-                            }
-                            //when these are filled we can stop the search
-                            if (keepdistance != float.MaxValue && gatedistance != float.MaxValue)
-                                break;
-                        }
-                        if (DoorIndex == 1 && keepdistance < gatedistance)
-                            keepz = Position.Z + 92;//checked in game with lvl 1 keep
-                    }
-                }
-
-                Position keepPoint;
-                //calculate x y
-                if (IsObjectInFront(player, 180, false)) keepPoint = Position + Vector.Create(Orientation, -distance);
-                else keepPoint = Position + Vector.Create(Orientation, distance);
-
-                //move player
-                player.MoveTo(keepPoint.With(z: keepz).With(player.Orientation));
             }
-            return base.Interact(player);
+            else
+            {
+                if (IsObjectInFront(player, 180, false))
+                {
+                    var keepdistance = float.MaxValue;
+                    var gatedistance = float.MaxValue;
+                    foreach (GameKeepComponent c in Component.Keep.KeepComponents)
+                    {
+                        if ((GameKeepComponent.eComponentSkin)c.Skin == GameKeepComponent.eComponentSkin.Keep)
+                            keepdistance = (float)Coordinate.DistanceTo(c.Position);
+                        if ((GameKeepComponent.eComponentSkin)c.Skin == GameKeepComponent.eComponentSkin.Gate)
+                            gatedistance = (float)Coordinate.DistanceTo(c.Position);
+
+                        if (keepdistance != float.MaxValue && gatedistance != float.MaxValue) break;
+                    }
+                    if (DoorIndex == 1 && keepdistance < gatedistance)
+                        keepz = Position.Z + 92;
+                }
+            }
+
+            Position keepPoint = IsObjectInFront(player, 180, false)
+                ? Position + Vector.Create(Orientation, -distance)
+                : Position + Vector.Create(Orientation, distance);
+
+            player.MoveTo(keepPoint.With(z: keepz).With(player.Orientation));
+
+            return true;
         }
 
         public override IList GetExamineMessages(GamePlayer player)
         {
-            /*
-			 * You select the Keep Gate. It belongs to your realm.
-			 * You target [the Keep Gate]
-			 * 
-			 * You select the Keep Gate. It belongs to an enemy realm and can be attacked!
-			 * You target [the Keep Gate]
-			 * 
-			 * You select the Postern Door. It belongs to an enemy realm!
-			 * You target [the Postern Door]
-			 */
-
             IList list = base.GetExamineMessages(player);
-            string text = "You select the " + Name + ".";
-            if (!GameServer.KeepManager.IsEnemy(this, player))
+            string lang = player.Client.Account.Language;
+            string text = LanguageMgr.GetTranslation(lang, "DoorRequestHandler.GameKeepDoor.YouSelect", Name);
+
+            bool isEnemy = false;
+
+            if (DbDoor != null && DbDoor.Realm != 0 && DbDoor.Realm != 6)
             {
-                text = text + " It belongs to your realm.";
+                isEnemy = player.Realm != (eRealm)DbDoor.Realm;
+            }
+            else if (Component != null && Component.Keep != null)
+            {
+                isEnemy = GameServer.KeepManager.IsEnemy(this, player);
             }
             else
             {
-                if (IsAttackableDoor)
-                {
-                    text = text + " It belongs to an enemy realm and can be attacked!";
-                }
-                else
-                {
-                    text = text + " It belongs to an enemy realm!";
-                }
+                isEnemy = (player.Realm != this.Realm && this.Realm != eRealm.None && this.Realm != eRealm.Door);
             }
+
+            if (!isEnemy)
+                text += LanguageMgr.GetTranslation(lang, "DoorRequestHandler.GameKeepDoor.BelongsYourRealm");
+            else
+                text += IsAttackableDoor ? LanguageMgr.GetTranslation(lang, "DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable") : LanguageMgr.GetTranslation(lang, "DoorRequestHandler.GameKeepDoor.BelongsEnemy");
 
             list.Add(text);
 
             if (IsAttackableDoor)
             {
-                // Attempt to fix issue where some players see door as closed when it should be broken open
-                // if you target a door it will re-broadcast it's state
-
                 if (Health <= 0 && State != eDoorState.Open)
                 {
                     State = eDoorState.Open;
@@ -535,104 +421,71 @@ namespace DOL.GS.Keeps
         }
 
         /// <summary>
-        /// Starts the power regeneration
+        /// Starts the health regeneration
         /// </summary>
-        public override void StartPowerRegeneration()
-        {
-            //No regeneration for doors
-            return;
-        }
-        /// <summary>
-        /// Starts the endurance regeneration
-        /// </summary>
-        public override void StartEnduranceRegeneration()
-        {
-            //No regeneration for doors
-            return;
-        }
-
         public override void StartHealthRegeneration()
         {
-            if (m_repairTimer != null && m_repairTimer.IsAlive) return;
-            m_repairTimer = new RegionTimer(CurrentRegion.TimeManager);
-            m_repairTimer.Callback = new RegionTimerCallback(RepairTimerCallback);
-            m_repairTimer.Interval = repairInterval;
-            m_repairTimer.Start(repairInterval);
+            if (!IsAttackableDoor || m_healthRegenerationTimer != null && m_healthRegenerationTimer.IsAlive || Health >= MaxHealth)
+                return;
+
+            m_healthRegenerationTimer = new RegionTimer(this, new RegionTimerCallback(HealthRegenerationTimerCallback), REPAIR_INTERVAL);
+        }
+
+        protected override int HealthRegenerationTimerCallback(RegionTimer timer)
+        {
+            if (Component?.Keep == null || HealthPercent >= 100)
+            {
+                timer.Stop();
+                return 0;
+            }
+
+            if (!Component.Keep.InCombat)
+                Repair(MaxHealth / 100 * 5);
+
+            return REPAIR_INTERVAL;
         }
 
         public void DeleteObject()
         {
-            RemoveTimers();
-
+            StopHealthRegeneration();
             if (Component != null)
             {
                 if (Component.Keep != null)
-                {
                     Component.Keep.Doors.Remove(ObjectID.ToString());
-                }
-
                 Component.Delete();
             }
-
             Component = null;
             DBPosition = null;
             base.Delete();
             CurrentRegion = null;
         }
-
-        public virtual void RemoveTimers()
-        {
-            if (m_repairTimer != null)
-            {
-                m_repairTimer.Stop();
-                m_repairTimer = null;
-            }
-
-        }
         #endregion
 
         #region Save/load DB
-
-        /// <summary>
-        /// save the keep door object in DB
-        /// </summary>
         public override void SaveIntoDatabase()
         {
-
+            // Allow DB save only if the door has been manually added to the DB (without beeing spawned by Keepcomponents)
+            if (DbDoor != null)
+            {
+                DbDoor.Health = Health;
+                DbDoor.MaxHealth = MaxHealth;
+                GameServer.Database.SaveObject(DbDoor);
+            }
         }
 
-        /// <summary>
-        /// load the keep door object from DB object
-        /// </summary>
-        /// <param name="obj"></param>
         public override void LoadFromDatabase(DataObject obj)
         {
-            DBDoor door = obj as DBDoor;
-            if (door == null)
-                return;
             base.LoadFromDatabase(obj);
+            if (obj is not DBDoor dbDoor) return;
 
-            Zone curZone = WorldMgr.GetZone((ushort)(door.InternalID / 1000000));
-            if (curZone == null) return;
-            this.CurrentRegion = curZone.ZoneRegion;
-            m_name = door.Name;
-            Position = Position.Create(regionID: CurrentRegion.ID, x: door.X, y: door.Y, z: door.Z, heading: (ushort)door.Heading);
-            m_level = 0;
-            m_model = 0xFFFF;
-            m_doorID = door.InternalID;
-            m_state = eDoorState.Closed;
-            Realm = eRealm.None;
-            this.AddToWorld();
-
-            foreach (AbstractArea area in this.CurrentAreas)
+            foreach (AbstractArea area in CurrentAreas)
             {
                 if (area is KeepArea keepArea)
                 {
-                    string sKey = door.InternalID.ToString();
+                    string sKey = dbDoor.InternalID.ToString();
                     if (!keepArea.Keep.Doors.ContainsKey(sKey))
                     {
-                        Component = new GameKeepComponent();
-                        Component.Keep = keepArea.Keep;
+                        Component = new GameKeepComponent { Keep = keepArea.Keep };
                         keepArea.Keep.Doors.Add(sKey, this);
                         Realm = (eRealm)keepArea.Keep.Realm;
                     }
@@ -640,7 +493,9 @@ namespace DOL.GS.Keeps
                 }
             }
 
-            m_health = MaxHealth;
+            if (!IsAttackableDoor || HealthPercent > DOOR_CLOSE_THRESHOLD)
+                State = eDoorState.Closed;
+
             StartHealthRegeneration();
             DoorMgr.RegisterDoor(this);
         }
@@ -653,13 +508,26 @@ namespace DOL.GS.Keeps
             PositionMgr.LoadKeepItemPosition(pos, this);
             component.Keep.Doors[m_templateID] = this;
 
-            m_oldMaxHealth = MaxHealth;
-            m_health = MaxHealth;
-            m_name = "Keep Door";
+            DoorID = GenerateDoorID();
+
+            var dbDoor = GameServer.Database.SelectObject<DBDoor>(DB.Column("InternalID").IsEqualTo(DoorID));
+            if (dbDoor != null)
+            {
+                DbDoor = dbDoor;
+                InternalID = dbDoor.ObjectId;
+                m_oldMaxHealth = dbDoor.MaxHealth > 0 ? dbDoor.MaxHealth : MaxHealth;
+                Health = dbDoor.Health > 0 ? dbDoor.Health : MaxHealth;
+                Locked = dbDoor.Locked;
+            }
+            else
+            {
+                m_oldMaxHealth = MaxHealth;
+                Health = MaxHealth;
+            }
+
             m_oldHealthPercent = HealthPercent;
-            m_doorID = GenerateDoorID();
-            this.m_model = 0xFFFF;
-            m_state = eDoorState.Closed;
+            Model = 0xFFFF;
+            State = eDoorState.Closed;
 
             if (AddToWorld())
             {
@@ -668,94 +536,55 @@ namespace DOL.GS.Keeps
             }
             else
             {
-                log.Error("Failed to load keep door from keepposition_id =" + pos.ObjectId + ". Component SkinID=" + component.Skin + ". KeepID=" + component.Keep.KeepID);
+                log.Error($"Failed to load keep door from keepposition_id ={pos.ObjectId}. Component SkinID={component.Skin}. KeepID={component.Keep.KeepID}");
             }
-
         }
 
-        public void MoveToPosition(DBKeepPosition position)
-        { }
+        public void MoveToPosition(DBKeepPosition position) { }
 
         public int GenerateDoorID()
         {
             int doortype = 7;
-            int ownerKeepID = 0;
-            int towerIndex = 0;
-
-            if (m_component.Keep is GameKeepTower)
-            {
-                GameKeepTower tower = m_component.Keep as GameKeepTower;
-
-                if (tower.Keep != null)
-                {
-                    ownerKeepID = tower.Keep.KeepID;
-                }
-                else
-                {
-                    ownerKeepID = tower.OwnerKeepID;
-                }
-
-                towerIndex = tower.KeepID >> 8;
-            }
-            else
-            {
-                ownerKeepID = m_component.Keep.KeepID;
-            }
-
-            int componentID = m_component.ID;
-
-            //index not sure yet
-            int doorIndex = this.DBPosition.TemplateType;
-            int id = 0;
-            //add door type
-            id += doortype * 100000000;
-            id += ownerKeepID * 100000;
-            id += towerIndex * 10000;
-            id += componentID * 100;
-            id += doorIndex;
-            return id;
+            int ownerKeepID = Component.Keep is GameKeepTower tower ? (tower.Keep != null ? tower.Keep.KeepID : tower.OwnerKeepID) : Component.Keep.KeepID;
+            int towerIndex = Component.Keep is GameKeepTower ? Component.Keep.KeepID >> 8 : 0;
+            return (doortype * 100000000) + (ownerKeepID * 100000) + (towerIndex * 10000) + (Component.ID * 100) + DBPosition.TemplateType;
         }
         #endregion
 
         /// <summary>
         /// call when player try to open door
         /// </summary>
-        public void Open(GameLiving opener = null)
+        public override void Open(GameLiving opener = null)
         {
-            // GMs can open
-            if (opener is GamePlayer player && player.Client.Account.PrivLevel >= 1 && this.State == eDoorState.Closed)
+            if (opener is GamePlayer player && player.Client.Account.PrivLevel >= 1 && State == eDoorState.Closed)
             {
-                this.State = eDoorState.Open;
-
-                BroadcastDoorStatus();
+                State = eDoorState.Open;
             }
-            // else do nothing because gamekeep must be destroyed to be open
         }
+
         /// <summary>
         /// call when player try to close door
         /// </summary>
-        public void Close(GameLiving closer = null)
+        public override void Close(GameLiving closer = null)
         {
-            // GMs can close
-            if (closer is GamePlayer player && player.Client.Account.PrivLevel >= 1 && this.State == eDoorState.Open)
+            if (closer is GamePlayer player && player.Client.Account.PrivLevel >= 1 && State == eDoorState.Open)
             {
                 CloseDoor();
             }
-            // else do nothing because gamekeep must be destroyed to be open
         }
 
-        /// <summary>
-        /// This function is called when door "die" to open door
-        /// </summary>
         public override void Die(GameObject killer)
         {
             base.Die(killer);
 
-            foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
-                player.Out.SendMessage("The Keep Gate is broken!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.GameKeepDoor.DoorBroken", Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
 
-            m_state = eDoorState.Open;
+            State = eDoorState.Open;
             BroadcastDoorStatus();
+            SaveIntoDatabase();
         }
 
         /// <summary>
@@ -763,35 +592,7 @@ namespace DOL.GS.Keeps
         /// </summary>
         public virtual void CloseDoor()
         {
-            m_state = eDoorState.Closed;
-
-            BroadcastDoorStatus();
-        }
-
-        /// <summary>
-        /// boradcast the door status to all player near the door
-        /// </summary>
-        public virtual void BroadcastDoorStatus()
-        {
-            foreach (GameClient client in WorldMgr.GetClientsOfRegion(CurrentRegionID))
-            {
-                client.Player.SendDoorUpdate(this);
-            }
-        }
-
-        protected RegionTimer m_repairTimer;
-        protected static int repairInterval = 30 * 60 * 1000;
-
-        public int RepairTimerCallback(RegionTimer timer)
-        {
-            if (Component == null || Component.Keep == null)
-                return 0;
-
-            if (HealthPercent == 100 || Component.Keep.InCombat)
-                return repairInterval;
-
-            Repair((MaxHealth / 100) * 5);
-            return repairInterval;
+            State = eDoorState.Closed;
         }
 
         /// <summary>
@@ -800,8 +601,16 @@ namespace DOL.GS.Keeps
         /// <param name="amount">how many HP is repaired</param>
         public void Repair(int amount)
         {
-            Health += amount;
+            Health = Math.Min(Health + amount, MaxHealth);
+
+            if (HealthPercent > 25) _relicMessage25 = false;
+            if (HealthPercent > 50) _relicMessage50 = false;
+            if (HealthPercent > 75) _relicMessage75 = false;
+
+            BroadcastDoorStatus();
+            SaveIntoDatabase();
         }
+
         /// <summary>
         /// This Function is called when keep is taken to repair door
         /// </summary>
@@ -811,72 +620,43 @@ namespace DOL.GS.Keeps
             Realm = realm;
             Health = MaxHealth;
             m_oldHealthPercent = HealthPercent;
+            _relicMessage25 = false;
+            _relicMessage50 = false;
+            _relicMessage75 = false;
             CloseDoor();
+            SaveIntoDatabase();
         }
-
-        /*
-		 * Note that 'enter' and 'exit' commands will also work at these doors.
-		 */
 
         public override bool WhisperReceive(GameLiving source, string str)
         {
-            if (!base.WhisperReceive(source, str))
-                return false;
-
-            if (source is not GamePlayer player)
-                return false;
+            if (!base.WhisperReceive(source, str) || source is not GamePlayer player) return false;
 
             str = str.ToLower();
-
             if (player.Client.Account.PrivLevel > 1)
             {
-                if (str.Contains("open"))
-                {
-                    Open(player);
-                    return true;
-                }
-                if (str.Contains("close"))
-                {
-                    Close(player);
-                    return true;
-                }
+                if (str.Contains("open")) { Open(player); return true; }
+                if (str.Contains("close")) { Close(player); return true; }
             }
 
-            if (str.Contains("enter") || str.Contains("exit"))
-                Interact(source as GamePlayer);
+            if (str.Contains("enter") || str.Contains("exit")) Interact(player);
+
             return true;
         }
 
         public override bool SayReceive(GameLiving source, string str)
         {
-            if (!base.SayReceive(source, str))
-                return false;
-
-            if (source is not GamePlayer player)
-                return false;
+            if (!base.SayReceive(source, str) || source is not GamePlayer player) return false;
 
             str = str.ToLower();
-
             if (player.Client.Account.PrivLevel > 1)
             {
-                if (str.Contains("open"))
-                {
-                    Open(player);
-                    return true;
-                }
-                if (str.Contains("close"))
-                {
-                    Close(player);
-                    return true;
-                }
+                if (str.Contains("open")) { Open(player); return true; }
+                if (str.Contains("close")) { Close(player); return true; }
             }
 
-            if (str.Contains("enter") || str.Contains("exit"))
-                Interact(source as GamePlayer);
+            if (str.Contains("enter") || str.Contains("exit")) Interact(player);
+
             return true;
         }
-
-        public void NPCManipulateDoorRequest(GameNPC npc, bool open)
-        { }
     }
 }

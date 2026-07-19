@@ -599,6 +599,7 @@ namespace DOL.GS.Scripts
     public class GenistarNPCBrain : StandardMobBrain
     {
         private long m_nextRoamTick = 0;
+        private bool m_isFollowing = false;
 
         public override void Think()
         {
@@ -609,14 +610,15 @@ namespace DOL.GS.Scripts
 
             GamePlayer owner = WorldMgr.GetClientByPlayerID(genistar.DBRecord.OwnerID, true, false)?.Player;
 
-            if (owner == null || owner.CurrentRegionID != Body.CurrentRegionID)
+            if (owner == null || owner.CurrentRegionID != Body.CurrentRegionID || !owner.IsAlive)
             {
+                m_isFollowing = false;
                 if (Body.CurrentFollowTarget != null)
                 {
                     Body.StopFollowing();
                     Body.WalkToSpawn();
                 }
-                else
+                else if (!Body.IsReturningHome && !Body.IsMoving && !Body.IsMovingOnPath)
                 {
                     RoamInGarden();
                 }
@@ -626,19 +628,42 @@ namespace DOL.GS.Scripts
             double distToOwner = Body.GetDistanceTo(owner);
             double ownerDistFromHome = owner.Coordinate.DistanceTo(Body.Home.Coordinate);
 
-            if (ownerDistFromHome <= 1000 && distToOwner <= 250)
+            if (ownerDistFromHome <= 1500)
             {
-                if (Body.CurrentFollowTarget != owner) Body.Follow(owner, 100, 1000);
+                if (!m_isFollowing && distToOwner <= 400)
+                {
+                    m_isFollowing = true;
+                }
+
+                if (m_isFollowing)
+                {
+                    if (Body.CurrentFollowTarget != owner)
+                    {
+                        Body.StopMoving();
+                        Body.Follow(owner, 100, 2400);
+                    }
+                }
+                else if (!Body.IsReturningHome && !Body.IsMoving && !Body.IsMovingOnPath)
+                {
+                    RoamInGarden();
+                }
             }
-            else if (ownerDistFromHome > 1100 && Body.CurrentFollowTarget == owner)
+            else
             {
-                Body.StopFollowing();
-                owner.Out.SendMessage(LanguageMgr.GetTranslation(owner.Client.Account.Language, "Genistar.GenistarNPCBrain.StopFollow", Body.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                Body.WalkToSpawn();
-            }
-            else if (Body.CurrentFollowTarget == null)
-            {
-                RoamInGarden();
+                if (m_isFollowing || Body.CurrentFollowTarget == owner)
+                {
+                    m_isFollowing = false;
+                    Body.StopFollowing();
+
+                    string lang = owner.Client?.Account?.Language ?? "EN";
+                    owner.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.GenistarNPCBrain.StopFollow", Body.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                    Body.WalkToSpawn();
+                }
+                else if (!Body.IsReturningHome && !Body.IsMoving && !Body.IsMovingOnPath)
+                {
+                    RoamInGarden();
+                }
             }
         }
 

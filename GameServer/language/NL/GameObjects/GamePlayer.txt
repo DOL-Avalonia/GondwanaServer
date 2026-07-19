@@ -524,6 +524,11 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Je bent niet machtig geno
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Je kunt deze inventaris niet gebruiken.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Laad-effect met ID {0} is nog niet geïmplementeerd.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Laad-effect met ID {0} niet gevonden.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr:		Je {0} is volledig vernietigd!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Je {0} is gebroken door overmatig gebruik!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Je {0} is afgedaan vanwege onvoldoende energie.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Je {0} is gebroken en op de grond gevallen!
+GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Je rugzak zit vol! Je {0} is op de grond gevallen.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Deze Genistar-placeholder moet in een tuinslot worden geplaatst.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Je Genistar-ei is in je tuin geplaatst. Het is nu aan jou om het te verzorgen en te vormen naar jouw wensen!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Je moet je opgeroepen Genistar vrijlaten voordat je hem terug in de tuin kunt plaatsen.

@@ -8,6 +8,9 @@ namespace DOL.GS
     /// </summary>
     public class NullPathingMgr : IPathingMgr
     {
+        public bool RegisterDoor(IDoor door) => false;
+        public bool UpdateDoorFlags(IDoor door) => false;
+
         public bool Init()
         {
             return true;

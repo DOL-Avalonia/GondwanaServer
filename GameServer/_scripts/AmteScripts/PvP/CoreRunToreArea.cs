@@ -117,9 +117,24 @@ namespace AmteScripts.PvP.CoreRun
 
             var playersInArea = this.Players;
 
+            List<GamePlayer> activeCenters = new List<GamePlayer>();
+
             foreach (var player in playersInArea)
             {
                 if (player == null || !player.IsInPvP || !player.IsAlive)
+                    continue;
+
+                bool skipPlayer = false;
+                foreach (var center in activeCenters)
+                {
+                    if (player.Coordinate.DistanceTo(center.Coordinate) < 390)
+                    {
+                        skipPlayer = true;
+                        break;
+                    }
+                }
+
+                if (skipPlayer)
                     continue;
 
                 int actualAmount = baseAmount;
@@ -130,28 +145,45 @@ namespace AmteScripts.PvP.CoreRun
                 }
                 actualAmount = Math.Max(1, actualAmount);
 
-                // Spawn storms strictly around this player
                 for (int i = 0; i < actualAmount; i++)
                 {
                     Coordinate randomPoint = GetRandomPointAroundPlayer(player, 900);
 
                     int attempts = 5;
-                    bool found = false;
+                    bool inTore = false;
                     for (int j = 0; j < attempts; j++)
                     {
                         if (this.IsContaining(randomPoint))
                         {
-                            found = true;
+                            inTore = true;
                             break;
                         }
                         randomPoint = GetRandomPointAroundPlayer(player, 900);
                     }
 
-                    if (!found || Region.GetZone(randomPoint) == null)
+                    if (!inTore)
+                        continue;
+
+                    bool inOverlap = false;
+                    foreach (var center in activeCenters)
+                    {
+                        if (randomPoint.DistanceTo(center.Coordinate) <= 900)
+                        {
+                            inOverlap = true;
+                            break;
+                        }
+                    }
+
+                    if (inOverlap)
+                        continue;
+
+                    if (Region.GetZone(randomPoint) == null)
                         continue;
 
                     SpawnStorm(randomPoint, actualLevel, activeSpellID);
                 }
+
+                activeCenters.Add(player);
             }
 
             int baseFreq = DbArea.EffectFrequency;

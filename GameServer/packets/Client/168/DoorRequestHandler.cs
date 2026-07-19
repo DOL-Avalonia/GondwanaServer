@@ -94,58 +94,11 @@ namespace DOL.GS.PacketHandler.Client.v168
                 }
             }
 
-            if (client.Player.TargetObject is GameDoor target && !client.Player.IsWithinRadius(target, radius))
-            {
-                client.Player.Out.SendMessage("You are too far to open this door", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                return;
-            }
+            // Check if the door exists in memory before firing the missing door dialog
+            var memDoor = DoorMgr.GetDoorByID(doorID);
+            var dbDoor = DOLDB<DBDoor>.SelectObject(DB.Column(nameof(DBDoor.InternalID)).IsEqualTo(doorID));
 
-            var door = DOLDB<DBDoor>.SelectObject(DB.Column(nameof(DBDoor.InternalID)).IsEqualTo(doorID));
-            if (door != null)
-            {
-                if (doorType == 7 || doorType == 9)
-                {
-                    new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
-                    return;
-                }
-
-                if (client.Account.PrivLevel == 1)
-                {
-                    if (door.Locked == 0)
-                    {
-                        if (door.Health == 0)
-                        {
-                            new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
-                            return;
-                        }
-
-                        if (GameServer.Instance.Configuration.ServerType == eGameServerType.GST_PvP ||
-                            GameServer.Instance.Configuration.ServerType == eGameServerType.GST_PvE)
-                        {
-                            if (door.Realm != 0)
-                            {
-                                new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            if (client.Player.Realm == (eRealm)door.Realm || door.Realm == 6)
-                            {
-                                new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
-                                return;
-                            }
-                        }
-                    }
-                }
-                else if (client.Account.PrivLevel > 1)
-                {
-                    client.Out.SendDebugMessage("GM: Forcing locked door open.");
-                    new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
-                    return;
-                }
-            }
-            else // door == null
+            if (memDoor == null && dbDoor == null)
             {
                 if (doorType != 9 && client.Account.PrivLevel > 1 && client.Player.CurrentRegion.IsInstance == false)
                 {
@@ -156,15 +109,13 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
                     else
                     {
-                        client.Player.Out.SendMessage(
-                            "This door is not in the database. Use '/door show' to enable the add door dialog when targeting doors.",
-                            eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        client.Player.Out.SendMessage("This door is not in the database. Use '/door show' to enable the add door dialog when targeting doors.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
                 }
-
-                new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
-                return;
             }
+
+            // Schedule the Door Action unconditionally. We will handle privileges and range directly inside the Tick.
+            new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
         }
 
 
@@ -177,6 +128,8 @@ namespace DOL.GS.PacketHandler.Client.v168
             if (doorType == 7)
             {
                 PositionMgr.CreateDoor(m_handlerDoorID, player);
+                player.Out.SendMessage("Added keep door position to the database!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return;
             }
             var door = new DBDoor();
             door.ObjectId = null;
@@ -193,7 +146,6 @@ namespace DOL.GS.PacketHandler.Client.v168
             door.Z = player.Position.Z;
             door.Heading = player.Orientation.InHeading;
             GameServer.Database.AddObject(door);
-
 
             player.Out.SendMessage("Added door " + m_handlerDoorID + " to the database!", eChatType.CT_Important,
                                    eChatLoc.CL_SystemWindow);
@@ -226,6 +178,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             /// <param name="actionSource">The action source</param>
             /// <param name="doorId">The target door Id</param>
             /// <param name="doorState">The door state</param>
+            /// /// <param name="radius">Interaction radius</param>
             public ChangeDoorAction(GamePlayer actionSource, int doorId, int doorState, int radius)
                 : base(actionSource)
             {
@@ -240,40 +193,52 @@ namespace DOL.GS.PacketHandler.Client.v168
             public override void OnTick()
             {
                 var player = (GamePlayer)m_actionSource;
-                List<IDoor> doorList = DoorMgr.getDoorByID(m_doorId);
+                IDoor mydoor = DoorMgr.GetDoorByID(m_doorId);
 
-                if (doorList.Count > 0)
+                if (mydoor != null)
                 {
-                    bool success = false;
-                    foreach (IDoor mydoor in doorList)
+                    bool isEnemy = false;
+
+                    if (mydoor is GameKeepDoor kDoor)
                     {
-                        if (success)
-                            break;
-                        if (mydoor is GameKeepDoor)
-                        {
-                            var door = mydoor as GameKeepDoor;
-                            //portal keeps left click = right click
-                            if (door.Component.Keep is GameKeepTower && door.Component.Keep.KeepComponents.Count > 1)
-                                door.Interact(player);
-                            success = true;
-                        }
-                        else
-                        {
-                            if (player.IsWithinRadius(mydoor.Position, m_radius))
-                            {
-                                if (m_doorState == 0x01)
-                                    mydoor.Open(player);
-                                else
-                                    mydoor.Close(player);
-                                success = true;
-                            }
-                        }
+                        isEnemy = GameServer.KeepManager.IsEnemy(kDoor, player);
+                    }
+                    else
+                    {
+                        isEnemy = (player.Realm != mydoor.Realm && mydoor.Realm != eRealm.None && mydoor.Realm != (eRealm)6);
                     }
 
-                    if (!success)
-                        player.Out.SendMessage(
-                            LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.OnTick.TooFarAway", doorList[0].Name),
-                            eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    if (isEnemy && player.Client.Account.PrivLevel == 1)
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.GameKeepDoor.DoorLocked", mydoor.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    if (mydoor is GameKeepDoor keepDoor)
+                    {
+                        keepDoor.Interact(player);
+                    }
+                    else
+                    {
+                        if (player.Client.Account.PrivLevel == 1 && !player.IsWithinRadius(mydoor.Position, m_radius))
+                        {
+                            player.Out.SendMessage(
+                                LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.OnTick.TooFarAway", mydoor.Name),
+                                eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                        if (!mydoor.Interact(player))
+                        {
+                            Stop();
+                            return;
+                        }
+
+                        if (m_doorState == 0x01)
+                            mydoor.Open(player);
+                        else
+                            mydoor.Close(player);
+                    }
                 }
                 else
                 {

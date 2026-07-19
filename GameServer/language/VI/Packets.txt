@@ -73,8 +73,12 @@ DetailDisplayHandler.HandlePacket.YouFumble:				Bạn vấp
 DetailDisplayHandler.HandlePacket.YouHit:				Bạn đánh trúng
 DetailDisplayHandler.HandlePacket.YouMiss:				Bạn đánh trượt
 DetailDisplayHandler.HandlePacket.YouParry:				Bạn đỡ đòn
-DetailDisplayHandler.WriteBonusLine.Points:				đ
-DetailDisplayHandler.WriteBonusLine.PowerPool:			% năng lượng.
+DetailDisplayHandler.HandlePacket.UseEverySec:			Có thể dùng vật phẩm mỗi: {0} giây
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Có thể dùng vật phẩm mỗi: {0}:{1:00} phút
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Có thể dùng lại sau: {0} giây
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Có thể dùng lại sau: {0}:{1:00} phút
+DetailDisplayHandler.WriteBonusLine.Points:				 điểm
+DetailDisplayHandler.WriteBonusLine.PowerPool:			% của kho năng lượng.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Hấp thụ
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:		Hệ số giáp:
 DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor:	- {0} Giáp cơ bản
@@ -147,9 +151,34 @@ DetailDisplayHandler.WritePotionInfo.Value:				Giá trị: {0}
 DetailDisplayHandler.WritePotionInfo.Target:				Mục tiêu: {0}
 DetailDisplayHandler.WritePotionInfo.Range:				Tầm: {0}
 DetailDisplayHandler.WriteUsableClasses.UsableBy:		Dùng được bởi:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Trọng lượng túi: {0:0.0} lbs ({1}/40 ô đã chứa)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Bạn không thể trang bị {0} vì độ bền của nó đã cạn kiệt.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Bạn phải đợi {0} giây trước khi trang bị lại {1}.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Phá hủy khi cạn)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Phá hủy khi hỏng)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Tiêu hao {0}% Thể lực và {1}% Máu mỗi tick{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Tiêu hao {0}% Năng lượng mỗi tick{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Tiêu hao {0}% Độ bền mỗi tick{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Mất {0}% Độ bền khi chết{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Không thể gỡ trang bị.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Bạn ở quá xa {0}!
+DoorRequestHandler.OnTick.TooFarAway:				{0} ở quá xa!
+DoorRequestHandler.GameDoor.NowOpen:				{0} bây giờ đã mở!
+DoorRequestHandler.GameDoor.FailOpen:				Bạn không thể mở cánh cửa này!
+DoorRequestHandler.GameDoor.NeedKey:				Bạn cần một chiếc chìa khóa để mở cửa này!
+DoorRequestHandler.GameDoor.NeedReborn:				Bạn chưa đạt được sức mạnh của Hòn Đá Phù Thủy; bạn không thể vào đây!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		Bạn phải đánh bại các quái vật xung quanh để mở cánh cửa này!
+DoorRequestHandler.GameDoor.NeedSwitch:				Bạn phải kích hoạt các cơ chế được liên kết để mở cánh cửa này!
+DoorRequestHandler.YouMezzed:						Bạn đang bị thôi miên và không thể mở cửa!
+DoorRequestHandler.YouStunned:						Bạn đang bị choáng và không thể mở cửa!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} đang bị tấn công!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			{0} đã bị khóa!
+DoorRequestHandler.GameKeepDoor.YouSelect:			Bạn chọn {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	 Nó thuộc về vương quốc của bạn.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		 Nó thuộc về một vương quốc kẻ thù và có thể bị tấn công!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		 Nó thuộc về một vương quốc kẻ thù!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			{0} đã bị phá hỏng!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Thưởng hiện tại

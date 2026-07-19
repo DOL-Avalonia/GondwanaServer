@@ -526,6 +526,11 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:	Du bist nicht mächtig genug, 
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:	Du kannst dieses Inventar nicht benutzen.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Lade‑Effekt mit ID {0} ist noch nicht implementiert.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:	Lade‑Effekt mit ID {0} nicht gefunden.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr:		Dein {0} wurde vollständig zerstört!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Dein {0} ist aufgrund von Überbeanspruchung zerbrochen!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Dein {0} wurde wegen unzureichender Energie abgelegt.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Dein {0} ist zerbrochen und zu Boden gefallen!
+GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Dein Rucksack ist voll! Dein {0} ist zu Boden gefallen.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Dieser Genistar-Platzhalter muss in einem Garten-Slot platziert werden.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Dein Genistar-Ei wurde in deinem Garten platziert. Es liegt nun an dir, es zu pflegen und nach deinen Wünschen zu formen!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Du musst deinen beschworenen Genistar freilassen, bevor du ihn wieder im Garten platzieren kannst.

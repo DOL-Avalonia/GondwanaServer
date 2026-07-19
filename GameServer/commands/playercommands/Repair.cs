@@ -19,6 +19,7 @@
 using System;
 using DOL.Database;
 using DOL.GS.Keeps;
+using DOL.GS.ServerProperties;
 using DOL.Language;
 
 namespace DOL.GS.Commands
@@ -30,7 +31,7 @@ namespace DOL.GS.Commands
         "Commands.Players.Repair.Usage")]
     public class RepairCommandHandler : AbstractCommandHandler, ICommandHandler
     {
-        private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public void OnCommand(GameClient client, string[] args)
         {
@@ -284,8 +285,18 @@ namespace DOL.GS.Commands
 				 * (Note that realm points for repairing a door or outpost piece will not work in the battlegrounds.)
 				 */
                 // tolakram - we have no idea how many hit points a live door has so this code is not accurate
-                int amount = (finish - start) * obj.Level;  // level of non claimed keep is 4
-                player.GainRealmPoints(Math.Min(150, amount));
+                int maxRpReward = Properties.REPAIR_MAX_RP;
+
+                if (maxRpReward > 0)
+                {
+                    int amount = (finish - start) * obj.Level;  // level of non claimed keep is 4
+                    int awardedRP = Math.Min(maxRpReward, amount);
+
+                    if (awardedRP > 0)
+                    {
+                        player.GainRealmPoints(awardedRP, false);
+                    }
+                }
             }
             else
             {

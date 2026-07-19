@@ -149,7 +149,7 @@ namespace AmteScripts.Managers
         private const int SPELL_GREEN_LIGHT = 25318;
         private const int SPELL_RED_LIGHT = 25317;
         private const int CORE_RUN_EFFECT_AMOUNT = 2;
-        private const int CORE_RUN_EFFECT_FREQ = 2000;
+        private const int CORE_RUN_EFFECT_FREQ = 1500;
         private const int CORE_RUN_STORM_LEVEL = 60;
         private const int CORE_RUN_STORM_SIZE = 80;
         private const int CORE_RUN_EFFECT_VARIANCE = 20;

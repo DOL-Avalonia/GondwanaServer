@@ -1,24 +1,6 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
+using System.Collections.Generic;
 using System.Linq;
-
 using DOL.Database;
 using DOL.GS.Geometry;
 using DOL.GS.Keeps;
@@ -35,138 +17,95 @@ namespace DOL.GS.Commands
          "Commands.GM.KeepComponents.Usage.Create.T",
          "Commands.GM.KeepComponents.Usage.Skin",
          "/keepcomponent move - move to your position",
+         "/keepcomponent movex <value> - move step by step on X axis (can be negative)",
+         "/keepcomponent movey <value> - move step by step on Y axis (can be negative)",
          "/keepcomponent rotate [0 - 3]",
          "/keepcomponent reload",
          "'/keepcomponent save' to save the component in the DB",
+         "/keepcomponent info - display detailed component and door info",
          "Commands.GM.KeepComponents.Usage.Delete")]
     public class KeepComponentCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         private readonly ushort INVISIBLE_MODEL = 150;
 
+        private GameKeepComponent GetTargetedComponent(GameObject target)
+        {
+            if (target is GameKeepComponent comp)
+                return comp;
+
+            if (target is IKeepItem keepItem && keepItem.Component is GameKeepComponent parentComp)
+                return parentComp;
+
+            return null;
+        }
+
         public void OnCommand(GameClient client, string[] args)
         {
-            if (args.Length == 1)
-            {
-                DisplaySyntax(client);
-                return;
-            }
+            if (args.Length == 1) { DisplaySyntax(client); return; }
 
             AbstractGameKeep myKeep = GameServer.KeepManager.GetKeepCloseToSpot(client.Player.Position, WorldMgr.OBJ_UPDATE_DISTANCE);
 
             if (myKeep == null)
             {
                 DisplayMessage(client, "You are not near a keep.");
+                return;
             }
 
-            switch (args[1])
+            GameKeepComponent component = GetTargetedComponent(client.Player.TargetObject);
+
+            switch (args[1].ToLower())
             {
-                #region Create
                 case "create":
                     {
-                        if (args.Length < 3)
-                        {
-                            int i = 0;
-                            foreach (string str in Enum.GetNames(typeof(GameKeepComponent.eComponentSkin)))
-                            {
-                                client.Out.SendMessage("#" + i + ": " + str, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                i++;
-                            }
-                            DisplaySyntax(client);
-                            return;
-                        }
-
-                        if (myKeep == null)
-                        {
-                            DisplaySyntax(client);
-                            return;
-                        }
-
+                        if (args.Length < 3) { DisplaySyntax(client); return; }
                         int skin = 0;
-                        try
-                        {
-                            skin = Convert.ToInt32(args[2]);
-                        }
-                        catch
-                        {
-                            int i = 0;
-                            foreach (string str in Enum.GetNames(typeof(GameKeepComponent.eComponentSkin)))
-                            {
-                                client.Out.SendMessage("#" + i + ": " + str, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                i++;
-                            }
-                            DisplaySyntax(client);
-                            return;
-                        }
+                        try { skin = Convert.ToInt32(args[2]); }
+                        catch { DisplaySyntax(client); return; }
 
                         if (args.Length >= 4)
                         {
-                            int keepid = 0;
-                            try
-                            {
-                                keepid = Convert.ToInt32(args[3]);
-                                myKeep = GameServer.KeepManager.GetKeepByID(keepid);
-                            }
-                            catch
-                            {
-                                DisplaySyntax(client);
-                                return;
-                            }
+                            try { myKeep = GameServer.KeepManager.GetKeepByID(Convert.ToInt32(args[3])); }
+                            catch { DisplaySyntax(client); return; }
                         }
 
-                        GameKeepComponent component = new GameKeepComponent();component.Position = client.Player.Position
-                            .With(Angle.Degrees(component.ComponentHeading * 90) + myKeep.Orientation);
-                        component.ComponentHeading = (client.Player.Orientation - myKeep.Orientation).InHeading / 1024;
-                        component.Keep = myKeep;
-                        //todo good formula
-                        //component.ComponentX = (component.X - myKeep.X) / 148;
-                        //component.ComponentY = (component.Y - myKeep.Y) / 148;
+                        GameKeepComponent newComp = new GameKeepComponent();
+                        newComp.ComponentHeading = (client.Player.Orientation - myKeep.Orientation).InHeading / 1024;
+                        newComp.Position = client.Player.Position.With(Angle.Degrees(newComp.ComponentHeading * 90) + myKeep.Orientation);
+                        newComp.Keep = myKeep;
 
                         var angle = myKeep.Orientation.InRadians;
+                        newComp.ComponentX = CalcCX(client.Player, myKeep, angle);
+                        newComp.ComponentY = CalcCY(client.Player, myKeep, angle);
 
-                        //component.ComponentX = (int)((148 * Math.Sin(angle) * myKeep.X - 148 * Math.Sin(angle) * client.Player.X + client.Player.Y - myKeep.Y)
-                        //    / (148 * Math.Sin(angle) - 148 * 148 * 2 * Math.Sin(angle) * Math.Cos(angle)));
-                        //component.ComponentY = (int)((myKeep.Y - client.Player.Y + 148 * Math.Sin(angle) * component.ComponentX) / (148 * Math.Cos(angle)));
+                        newComp.Name = myKeep.Name;
+                        newComp.Model = INVISIBLE_MODEL;
+                        newComp.Skin = skin;
+                        newComp.Level = (byte)myKeep.Level;
+                        newComp.Health = newComp.MaxHealth;
+                        newComp.ID = myKeep.KeepComponents.Count;
+                        newComp.Keep.KeepComponents.Add(newComp);
+                        newComp.SaveInDB = true;
+                        newComp.AddToWorld();
+                        newComp.SaveIntoDatabase();
 
-                        component.ComponentX = CalcCX(client.Player, myKeep, angle);
-                        component.ComponentY = CalcCY(client.Player, myKeep, angle);
-
-                        /*
-						x = (component.X-myKeep.X)/148 = a*cos(t) - b*sin(t)
-						y = (component.Y-myKeep.Y)/148 = a*sin(t) + b*cos(t)
-						a = sqrt((x+b*sin(t))^2 + (y-b*cos(t))^2)
-						a = sqrt(x�+y�+b� +2*x*b*sin(t)-2*y*b*cos(t))
-						b = sqrt((x-a*cos(t))^2 + (y-a*sin(t))^2)
-						b = sqrt(x�+y�+a�-2*x*a*cos(t)-2*y*a*sin(t))
-						0 = 2x�+2y�-2*x*a*cos(t)-2*y*a*sin(t)+2*x*sqrt(x�+y�+a�-2*x*a*cos(t)-2*y*a*sin(t))*sin(t)-2*y*sqrt(x�+y�+a�-2*x*a*cos(t)-2*y*a*sin(t))*cos(t)
-						pfff
-						so must find an other way to find it....
-						*/
-                        component.Name = myKeep.Name;
-                        component.Model = INVISIBLE_MODEL;
-                        component.Skin = skin;
-                        component.Level = (byte)myKeep.Level;
-                        component.Health = component.MaxHealth;
-                        component.ID = myKeep.KeepComponents.Count;
-                        component.Keep.KeepComponents.Add(component);
-                        component.SaveInDB = true;
-                        component.AddToWorld();
-                        component.SaveIntoDatabase();
                         client.Out.SendKeepInfo(myKeep);
-                        client.Out.SendKeepComponentInfo(component);
-                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.KeepComponents.Create.KCCreated"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendKeepComponentInfo(newComp);
+                        client.Out.SendMessage("Keep component created.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
-                #endregion Create
-                #region Move
+
                 case "move":
                     {
-                        var component = client.Player.TargetObject as GameKeepComponent;
+                        if (component == null)
+                        {
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
+                            return;
+                        }
 
-                        component.Position = client.Player.Position
-                            .With(Angle.Heading(component.ComponentHeading * 1024) + myKeep.Orientation);
                         component.ComponentHeading = (client.Player.Orientation - myKeep.Orientation).InDegrees / 90;
+                        component.Position = client.Player.Position.With(Angle.Heading(component.ComponentHeading * 1024) + myKeep.Orientation);
                         component.Keep = myKeep;
-                        
+
                         var angle = myKeep.Orientation.InRadians;
                         component.ComponentX = CalcCX(client.Player, myKeep, angle);
                         component.ComponentY = CalcCY(client.Player, myKeep, angle);
@@ -174,21 +113,81 @@ namespace DOL.GS.Commands
                         client.Out.SendKeepInfo(myKeep);
                         client.Out.SendKeepComponentInfo(component);
                         client.Out.SendKeepComponentDetailUpdate(component);
-                        client.Out.SendMessage("Component moved.  Use /keepcomponent save to save, or reload to reload the original position.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage($"Component moved to X:{component.ComponentX} Y:{component.ComponentY}. Use /keepcomponent save to save.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
-                #endregion
-                #region Rotate
+
+                case "movex":
+                    {
+                        if (component == null)
+                        {
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
+                            return;
+                        }
+                        if (args.Length < 3) { DisplaySyntax(client); return; }
+
+                        try
+                        {
+                            int val = Convert.ToInt32(args[2]);
+                            component.ComponentX += val;
+
+                            // Recalculate World Position using internal Grid offsets
+                            var angle = component.Keep.Orientation;
+                            var offset = Vector.Create(148 * (sbyte)component.ComponentX, -148 * (sbyte)component.ComponentY, 0).RotatedClockwise(angle);
+                            component.Position = component.Keep.Position.With(angle + Angle.Degrees(component.ComponentHeading * 90)) + offset;
+
+                            foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
+                            {
+                                cli.Out.SendKeepComponentInfo(component);
+                                cli.Out.SendKeepComponentDetailUpdate(component);
+                            }
+                            client.Out.SendMessage($"Component moved on X axis by {val}. New CX: {component.ComponentX}. Use /keepcomponent save to save.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        catch { DisplaySyntax(client); return; }
+                    }
+                    break;
+
+                case "movey":
+                    {
+                        if (component == null)
+                        {
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
+                            return;
+                        }
+                        if (args.Length < 3) { DisplaySyntax(client); return; }
+
+                        try
+                        {
+                            int val = Convert.ToInt32(args[2]);
+                            component.ComponentY += val;
+
+                            // Recalculate World Position using internal Grid offsets
+                            var angle = component.Keep.Orientation;
+                            var offset = Vector.Create(148 * (sbyte)component.ComponentX, -148 * (sbyte)component.ComponentY, 0).RotatedClockwise(angle);
+                            component.Position = component.Keep.Position.With(angle + Angle.Degrees(component.ComponentHeading * 90)) + offset;
+
+                            foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
+                            {
+                                cli.Out.SendKeepComponentInfo(component);
+                                cli.Out.SendKeepComponentDetailUpdate(component);
+                            }
+                            client.Out.SendMessage($"Component moved on Y axis by {val}. New CY: {component.ComponentY}. Use /keepcomponent save to save.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        catch { DisplaySyntax(client); return; }
+                    }
+                    break;
+
                 case "rotate":
                     {
+                        if (component == null)
+                        {
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
+                            return;
+                        }
                         try
                         {
                             ushort amount = Convert.ToUInt16(args[2]);
-
-                            if (amount > 3)
-                                amount = 3;
-
-                            GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
+                            if (amount > 3) amount = 3;
 
                             component.ComponentHeading = amount;
                             component.Orientation = Angle.Heading(component.ComponentHeading * 1024) + myKeep.Orientation;
@@ -196,127 +195,140 @@ namespace DOL.GS.Commands
                             client.Out.SendKeepInfo(myKeep);
                             client.Out.SendKeepComponentInfo(component);
                             client.Out.SendKeepComponentDetailUpdate(component);
-                            client.Out.SendMessage("Component rotated.  Use /keepcomponent save to save, or reload to reload the original position.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage($"Component rotated to {amount}. Use /keepcomponent save to save.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         }
-                        catch
-                        {
-                            DisplayMessage(client, "/keepcomponent rotate [0 - 3]");
-                        }
+                        catch { DisplayMessage(client, "/keepcomponent rotate [0 - 3]"); }
                     }
                     break;
-                #endregion
-                #region Skin
+
                 case "skin":
                     {
-                        if (args.Length < 3)
-                        {
-                            int i = 0;
-                            foreach (string str in Enum.GetNames(typeof(GameKeepComponent.eComponentSkin)))
-                            {
-                                client.Out.SendMessage("#" + i + ": " + str, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                i++;
-                            }
-                            DisplaySyntax(client);
-                            return;
-                        }
-
-                        int skin = 0;
-                        try
-                        {
-                            skin = Convert.ToInt32(args[2]);
-                        }
-                        catch
-                        {
-                            DisplaySyntax(client);
-                            return;
-                        }
-                        GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
                         if (component == null)
                         {
-                            DisplaySyntax(client);
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
                             return;
                         }
-                        component.Skin = skin;
+                        if (args.Length < 3) { DisplaySyntax(client); return; }
+
+                        try { component.Skin = Convert.ToInt32(args[2]); }
+                        catch { DisplaySyntax(client); return; }
+
                         foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
                         {
                             cli.Out.SendKeepComponentInfo(component);
                             cli.Out.SendKeepComponentDetailUpdate(component);
                         }
-                        //client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.KeepComponents.Skin.YChangeSkin"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        client.Out.SendMessage("Component skin updated.  Use /keepcomponent save to save, or reload to reload the original skin.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage($"Component skin updated to {component.Skin}. Use /keepcomponent save to save.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
-                #endregion Skin
-                #region Delete
+
                 case "delete":
                     {
-                        GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
                         if (component == null)
                         {
-                            DisplaySyntax(client);
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
                             return;
                         }
                         component.RemoveFromWorld();
                         component.Delete();
                         component.DeleteFromDatabase();
-                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.KeepComponents.Delete.YDeleteKC"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
+                        client.Out.SendMessage("Component deleted.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
-                #endregion Delete
-                #region Save
+
                 case "save":
                     {
-                        GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
                         if (component == null)
                         {
-                            DisplaySyntax(client);
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
                             return;
                         }
                         component.SaveIntoDatabase();
-                        client.Out.SendMessage(string.Format("Saved ComponentID: {0}, KeepID: {1}, Skin: {2}, Health: {3}%",
-                                                            component.ID,
-                                                            (component.Keep == null ? "0" : component.Keep.KeepID.ToString()),
-                                                            component.Skin,
-                                                            component.HealthPercent), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
+                        client.Out.SendMessage($"Saved ComponentID: {component.ID}, KeepID: {(component.Keep == null ? "0" : component.Keep.KeepID.ToString())}, Skin: {component.Skin}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
-                #endregion Save
-                #region Reload
+
                 case "reload":
                     {
-
-                        GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
                         if (component == null)
                         {
-                            DisplaySyntax(client);
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
+                            return;
+                        }
+                        var dbcomponent = DOLDB<DBKeepComponent>.SelectObject(DB.Column(nameof(DBKeepComponent.KeepID)).IsEqualTo(component.Keep.KeepID).And(DB.Column(nameof(DBKeepComponent.ID)).IsEqualTo(component.ID)));
+                        if (dbcomponent != null)
+                        {
+                            component.ComponentX = dbcomponent.X;
+                            component.ComponentY = dbcomponent.Y;
+                            component.ComponentHeading = dbcomponent.Heading;
+                            component.Skin = dbcomponent.Skin;
+
+                            foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
+                            {
+                                cli.Out.SendKeepComponentInfo(component);
+                                cli.Out.SendKeepComponentDetailUpdate(component);
+                            }
+                            client.Out.SendMessage("Component Reloaded", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                    }
+                    break;
+
+                case "info":
+                    {
+                        if (component == null)
+                        {
+                            DisplayMessage(client, "You must target a Keep Component, Door, or Guard first.");
                             return;
                         }
 
-                        var dbcomponent = DOLDB<DBKeepComponent>.SelectObject(DB.Column(nameof(DBKeepComponent.KeepID)).IsEqualTo(component.Keep.KeepID).And(DB.Column(nameof(DBKeepComponent.ID)).IsEqualTo(component.ID)));
-                        component.ComponentX = dbcomponent.X;
-                        component.ComponentY = dbcomponent.Y;
-                        component.ComponentHeading = dbcomponent.Heading;
-                        component.Skin = dbcomponent.Skin;
+                        List<string> text = new List<string>();
+                        text.Add("-- Keep Component Info --");
+                        text.Add($"+ Keep: {component.Keep.Name}");
+                        text.Add($"+ Keep ID: {component.Keep.KeepID}");
+                        text.Add($"+ Component ID: {component.ID}");
+                        text.Add($"+ Internal DB ID: {component.InternalID}");
 
-                        foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
+                        string skinName = Enum.IsDefined(typeof(GameKeepComponent.eComponentSkin), (byte)component.Skin)
+                                            ? ((GameKeepComponent.eComponentSkin)component.Skin).ToString()
+                                            : "Unknown";
+                        text.Add($"+ Skin: {component.Skin} ({skinName})");
+                        text.Add($"+ Health: {component.Health} / {component.MaxHealth} ({component.HealthPercent}%)");
+
+                        text.Add("");
+                        text.Add("-- Positions --");
+                        text.Add($"+ Absolute: X:{component.Position.X}  Y:{component.Position.Y}  Z:{component.Position.Z}");
+                        text.Add($"+ Absolute Heading: {component.Orientation.InHeading}");
+                        text.Add($"+ Relative Grid: CX:{component.ComponentX}  CY:{component.ComponentY}");
+                        text.Add($"+ Relative Heading: {component.ComponentHeading}");
+
+                        // Find all doors linked to this exact component
+                        var linkedDoors = component.Keep.Doors.Values.Where(d => d.Component == component).ToList();
+
+                        text.Add("");
+                        text.Add($"-- Linked Doors ({linkedDoors.Count}) --");
+
+                        if (linkedDoors.Count > 0)
                         {
-                            cli.Out.SendKeepComponentInfo(component);
-                            cli.Out.SendKeepComponentDetailUpdate(component);
+                            for (int i = 0; i < linkedDoors.Count; i++)
+                            {
+                                var door = linkedDoors[i];
+                                text.Add($"Door #{i + 1}: {door.Name}");
+                                text.Add($"  - Internal ID: {door.DoorID}");
+                                text.Add($"  - Position: X:{door.Position.X}  Y:{door.Position.Y}  Z:{door.Position.Z}");
+                                text.Add($"  - Heading: {door.Orientation.InHeading}");
+                                text.Add($"  - Realm: {door.Realm}");
+                                text.Add($"  - Level: {door.Level}");
+                                text.Add($"  - Health: {door.Health} / {door.MaxHealth}");
+                                text.Add($"  - State: {door.State}");
+                                text.Add("");
+                            }
                         }
 
-                        client.Out.SendMessage("Component Reloaded", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        break;
+                        client.Player.Out.SendCustomTextWindow("Keep Component Details", text);
                     }
-                #endregion Reload
-                #region Default
-                default:
-                    {
-                        DisplaySyntax(client);
-                        return;
-                    }
-                    #endregion Default
+                    break;
+
+                default: DisplaySyntax(client); return;
             }
         }
 
@@ -324,31 +336,17 @@ namespace DOL.GS.Commands
         {
             var keepPos = myKeep.Position;
             var playerPos = player.Position;
-            if (Math.Abs(Math.Sin(angle)) < 0.0001) //for approximations, == 0 wont work.
-            {
-                return (playerPos.X - keepPos.X) / 148;
-            }
-            else
-            {
-                return (int)((148 * Math.Sin(angle) * keepPos.X - 148 * Math.Sin(angle) * playerPos.X + playerPos.Y - keepPos.Y)
-                    / (148 * Math.Sin(angle) - 148 * 148 * 2 * Math.Sin(angle) * Math.Cos(angle)));
-            }
+            if (Math.Abs(Math.Sin(angle)) < 0.0001) return (playerPos.X - keepPos.X) / 148;
+            return (int)((148 * Math.Sin(angle) * keepPos.X - 148 * Math.Sin(angle) * playerPos.X + playerPos.Y - keepPos.Y) / (148 * Math.Sin(angle) - 148 * 148 * 2 * Math.Sin(angle) * Math.Cos(angle)));
         }
 
         public int CalcCY(GamePlayer player, AbstractGameKeep myKeep, double angle)
         {
             var keepPos = myKeep.Position;
             var playerPos = player.Position;
-            if (Math.Abs(Math.Sin(angle)) < 0.0001)
-            {
-                return (keepPos.Y - playerPos.Y) / 148;
-            }
-            else
-            {
-                int cx = (int)((148 * Math.Sin(angle) * keepPos.X - 148 * Math.Sin(angle) * playerPos.X + playerPos.Y - keepPos.Y)
-                    / (148 * Math.Sin(angle) - 148 * 148 * 2 * Math.Sin(angle) * Math.Cos(angle)));
-                return (int)((keepPos.Y - playerPos.Y + 148 * Math.Sin(angle) * cx) / (148 * Math.Cos(angle)));
-            }
+            if (Math.Abs(Math.Sin(angle)) < 0.0001) return (keepPos.Y - playerPos.Y) / 148;
+            int cx = CalcCX(player, myKeep, angle);
+            return (int)((keepPos.Y - playerPos.Y + 148 * Math.Sin(angle) * cx) / (148 * Math.Cos(angle)));
         }
     }
 }

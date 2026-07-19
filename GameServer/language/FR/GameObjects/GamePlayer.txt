@@ -525,6 +525,11 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:			Vous n'êtes pas assez puiss
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:			Vous ne pouvez pas utiliser cet inventaire.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	L'effet de charge ID {0} n'est pas encore implémenté.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:		L'effet de charge ID {0} non trouvé.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr:		Votre {0} a été complètement détruit !
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Votre {0} s'est brisé suite à une utilisation excessive !
+GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Votre {0} a été déséquipé en raison d'une énergie insuffisante.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Votre {0} s'est brisé et est tombé par terre !
+GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Votre inventaire est plein ! Votre {0} est tombé par terre.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			Cet espace réservé Génistar ne peut être placé que dans le jardin.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Votre œuf de Genistar a été placé dans votre jardin. Prenez-en soin et modelez-le selon vos désirs !
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Vous devez relâcher votre Genistar invoqué avant de le replacer dans le jardin.

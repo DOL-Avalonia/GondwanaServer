@@ -684,7 +684,6 @@ namespace DOL.Territories
             }
         }
 
-
         public void ToggleBanner(bool add)
         {
             lock (m_lockObject)
@@ -1212,7 +1211,7 @@ namespace DOL.Territories
                 bonuses.Add(this.BonusSpellRange + " SpellRange");
             infos.Add(" Name: " + this.Name);
             infos.Add(" Area IDs:");
-            infos.AddRange(this.Areas.OfType<AbstractArea>().Select(a => "  - " + a.DbArea.ObjectId));
+            infos.AddRange(this.Areas.OfType<AbstractArea>().Where(a => a.DbArea != null).Select(a => "  - " + a.DbArea.ObjectId));
             infos.Add(" Boss Id: " + this.Boss?.InternalID);
             infos.Add(" Boss Name: " + this.Boss.Name);
             if (Boss is TerritoryLord lord)
@@ -1247,7 +1246,7 @@ namespace DOL.Territories
                 db = GameServer.Database.FindObjectByKey<TerritoryDb>(this.ID);
             }
 
-            db.AreaIDs = String.Join('|', this.Areas.OfType<AbstractArea>().Select(a => a.DbArea?.ObjectId));
+            db.AreaIDs = String.Join('|', this.Areas.OfType<AbstractArea>().Where(a => a.DbArea != null).Select(a => a.DbArea.ObjectId));
             db.Name = this.Name;
             db.BossMobId = this.BossId;
             db.GroupId = this.GroupId;

@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-
 using DOL.GS.Keeps;
+using DOL.GS.Spells;
+using System;
 
 namespace DOL.GS.PropertyCalc
 {
@@ -44,10 +44,8 @@ namespace DOL.GS.PropertyCalc
         /// <returns></returns>
         public override int CalcValue(GameLiving living, eProperty property)
         {
-            if (living.IsDiseased)
-                return 0; // no HP regen if diseased
-            if (living is GameKeepDoor)
-                return (int)(living.MaxHealth * 0.05); //5% each time for keep door
+            if (living.IsDiseased || SpellHandler.FindEffectOnTarget(living, "StyleBleeding") != null)
+                return 0; // no HP regen if diseased or bleedng
 
             double regen = 1;
 

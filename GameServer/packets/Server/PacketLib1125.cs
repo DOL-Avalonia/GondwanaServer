@@ -23,6 +23,7 @@ using DOL.GS.Geometry;
 using DOL.GS.Housing;
 using DOL.GS.Profession;
 using DOL.GS.Spells;
+using DOL.Language;
 using log4net;
 using System;
 using System.Collections;
@@ -36,7 +37,7 @@ namespace DOL.GS.PacketHandler
     public class PacketLib1125 : PacketLib1124
     {
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.125
@@ -574,40 +575,42 @@ namespace DOL.GS.PacketHandler
                     pak.WriteShortLowEndian(item.OwnerLot);//lot
                     pak.WriteIntLowEndian((uint)item.SellPrice);
 
+                    string translatedName = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name);
+
                     if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                     {
                         string bpPrice = "";
                         if (item.SellPrice > 0)
                         {
-                            bpPrice = "[" + item.SellPrice.ToString() + " BP";
+                            bpPrice = "[" + item.SellPrice.ToString() + " BP]";
                         }
 
                         if (item.Count > 1)
                         {
-                            pak.WritePascalStringIntLE(item.Count + " " + item.Name, 0x30);
+                            pak.WritePascalStringIntLE(item.Count + " " + translatedName, 0x30);
                         }
                         else if (item.PackSize > 1)
                         {
-                            pak.WritePascalStringIntLE(item.PackSize + " " + item.Name + bpPrice, 0x30);
+                            pak.WritePascalStringIntLE(item.PackSize + " " + translatedName + bpPrice, 0x30);
                         }
                         else
                         {
-                            pak.WritePascalStringIntLE(item.Name + bpPrice, 0x30);
+                            pak.WritePascalStringIntLE(translatedName + bpPrice, 0x30);
                         }
                     }
                     else
                     {
                         if (item.Count > 1)
                         {
-                            pak.WritePascalStringIntLE(item.Count + " " + item.Name, 0x30);
+                            pak.WritePascalStringIntLE(item.Count + " " + translatedName, 0x30);
                         }
                         else if (item.PackSize > 1)
                         {
-                            pak.WritePascalStringIntLE(item.PackSize + " " + item.Name, 0x30);
+                            pak.WritePascalStringIntLE(item.PackSize + " " + translatedName, 0x30);
                         }
                         else
                         {
-                            pak.WritePascalStringIntLE(item.Name, 0x30);
+                            pak.WritePascalStringIntLE(translatedName, 0x30);
                         }
                     }
                 }
@@ -705,7 +708,8 @@ namespace DOL.GS.PacketHandler
                             pak.WriteShortLowEndian((ushort)value2);
                             pak.WriteIntLowEndian((uint)entry.GetCurrencyFor(m_gameClient.Player));
                             pak.WriteShortLowEndian((ushort)item.Model);
-                            pak.WritePascalStringIntLE(item.Name, 0x30);
+                            string translatedName = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name);
+                            pak.WritePascalStringIntLE(translatedName, 0x30);
                         }
                     }
                     SendTCP(pak);

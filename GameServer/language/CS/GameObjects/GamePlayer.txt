@@ -524,6 +524,11 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Nejsi dost mocný/mocná,
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Tento inventář nemůžeš použít.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:	Nabíjecí efekt s ID {0} ještě není implementován.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:	Nabíjecí efekt s ID {0} nebyl nalezen.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr:		Tvůj {0} byl kompletně zničen!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Tvůj {0} se rozbil kvůli nadměrnému používání!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Tvůj {0} byl sundán kvůli nedostatku energie.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Tvůj {0} se rozbil a spadl na zem!
+GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Tvůj batoh je plný! Tvůj {0} spadl na zem.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Tento zástupce Genistaru musí být umístěn do zahradního slotu.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Vaše vejce Genistaru bylo umístěno na vaší zahradě. Nyní je jen na vás, abyste ho vychovali a formovali podle svých představ!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Předtím, než svůj vyvolaný Genistar umístíš zpět do zahrady, ho musíš propustit.

@@ -73,8 +73,12 @@ DetailDisplayHandler.HandlePacket.YouFumble:				Zpackáš útok
 DetailDisplayHandler.HandlePacket.YouHit:				Zasahuješ
 DetailDisplayHandler.HandlePacket.YouMiss:				Míjíš
 DetailDisplayHandler.HandlePacket.YouParry:				Odrážíš
-DetailDisplayHandler.WriteBonusLine.Points:				b.
-DetailDisplayHandler.WriteBonusLine.PowerPool:			% many.
+DetailDisplayHandler.HandlePacket.UseEverySec:			Lze použít každých: {0} sek
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Lze použít každých: {0}:{1:00} min
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Znovu použitelné za: {0} sek
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Znovu použitelné za: {0}:{1:00} min
+DetailDisplayHandler.WriteBonusLine.Points:				 b.
+DetailDisplayHandler.WriteBonusLine.PowerPool:			% z celkové síly.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Absorpce
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:		Modifikátor zbroje:
 DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor:	- {0} Základní zbroj
@@ -147,9 +151,34 @@ DetailDisplayHandler.WritePotionInfo.Value:				Hodnota: {0}
 DetailDisplayHandler.WritePotionInfo.Target:				Cíl: {0}
 DetailDisplayHandler.WritePotionInfo.Range:				Dosah: {0}
 DetailDisplayHandler.WriteUsableClasses.UsableBy:		Použitelné pro:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Hmotnost batohu: {0:0.0} lbs ({1}/40 zaplněných míst)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Nemůžeš si vybavit {0}, protože je jeho stav vyčerpán.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Musíš počkat {0} sekund, než si znovu vybavíš {1}.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Zničí se při vyprázdnění)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Zničí se při rozbití)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Spotřebuje {0}% výdrže a {1}% zdraví za tik{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Spotřebuje {0}% Many za tik{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Spotřebuje {0}% stavu za tik{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Při smrti ztratí {0}% stavu{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Nelze sundat.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Jsi příliš daleko od {0}!
+DoorRequestHandler.OnTick.TooFarAway:				{0} je příliš daleko!
+DoorRequestHandler.GameDoor.NowOpen:				{0} je nyní otevřeno!
+DoorRequestHandler.GameDoor.FailOpen:				Nepodařilo se ti otevřít tyto dveře!
+DoorRequestHandler.GameDoor.NeedKey:				K otevření těchto dveří potřebuješ klíč!
+DoorRequestHandler.GameDoor.NeedReborn:				Neodhalil jsi sílu Kamene mudrců; sem nemůžeš vstoupit!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		K otevření těchto dveří musíš porazit okolní monstra!
+DoorRequestHandler.GameDoor.NeedSwitch:				K otevření těchto dveří musíš aktivovat propojené mechanismy!
+DoorRequestHandler.YouMezzed:						Jsi zhypnotizován a nemůžeš otevřít dveře!
+DoorRequestHandler.YouStunned:						Jsi omráčen a nemůžeš otevřít dveře!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} je pod útokem!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			{0} je zamčeno!
+DoorRequestHandler.GameKeepDoor.YouSelect:			Vybíráš {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	 Patří tvé říši.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		 Patří nepřátelské říši a může být napadeno!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		 Patří nepřátelské říši!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			{0} je zničeno!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Aktuální bonusy

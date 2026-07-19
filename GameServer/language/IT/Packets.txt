@@ -73,6 +73,10 @@ DetailDisplayHandler.HandlePacket.YouFumble:				Inciampi goffamente
 DetailDisplayHandler.HandlePacket.YouHit:				Colpisci
 DetailDisplayHandler.HandlePacket.YouMiss:				Mancchi
 DetailDisplayHandler.HandlePacket.YouParry:				Pari
+DetailDisplayHandler.HandlePacket.UseEverySec:			Utilizzabile ogni: {0} sec
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Utilizzabile ogni: {0}:{1:00} min
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Riutilizzabile tra: {0} sec
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Riutilizzabile tra: {0}:{1:00} min
 DetailDisplayHandler.WriteBonusLine.Points:				pti
 DetailDisplayHandler.WriteBonusLine.PowerPool:			% riserva magica.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Assorbimento
@@ -147,9 +151,34 @@ DetailDisplayHandler.WritePotionInfo.Value:				Valore: {0}
 DetailDisplayHandler.WritePotionInfo.Target:				Bersaglio: {0}
 DetailDisplayHandler.WritePotionInfo.Range:				Raggio: {0}
 DetailDisplayHandler.WriteUsableClasses.UsableBy:		Utilizzabile da:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Peso della Borsa: {0:0.0} lbs ({1}/40 slot pieni)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Non puoi equipaggiare {0} perché la sua condizione è esaurita.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Devi attendere {0} secondi prima di equipaggiare nuovamente {1}.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Si distrugge se svuotato)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Si distrugge se rotto)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Consuma il {0}% di Resistenza e il {1}% di Salute per tick{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Consuma il {0}% di Mana per tick{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Consuma il {0}% di Condizione per tick{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Perde il {0}% di Condizione alla morte{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Non può essere rimosso.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Sei troppo lontano da {0}!
+DoorRequestHandler.OnTick.TooFarAway:				{0} è troppo distante!
+DoorRequestHandler.GameDoor.NowOpen:				{0} è ora aperto!
+DoorRequestHandler.GameDoor.FailOpen:				Non sei riuscito ad aprire questa porta!
+DoorRequestHandler.GameDoor.NeedKey:				Hai bisogno di una chiave per aprire questa porta!
+DoorRequestHandler.GameDoor.NeedReborn:				Non hai acquisito il potere della Pietra Filosofale; non puoi entrare qui!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		Devi sconfiggere i mostri vicini per aprire questa porta!
+DoorRequestHandler.GameDoor.NeedSwitch:				Devi attivare i meccanismi collegati per aprire questa porta!
+DoorRequestHandler.YouMezzed:						Sei ipnotizzato e non puoi aprire la porta!
+DoorRequestHandler.YouStunned:						Sei stordito e non puoi aprire la porta!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} è sotto attacco!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			{0} è chiuso a chiave!
+DoorRequestHandler.GameKeepDoor.YouSelect:			Hai selezionato {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	 Appartiene al tuo reame.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		 Appartiene a un reame nemico e può essere attaccato!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		 Appartiene a un reame nemico!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			{0} è distrutto!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Bonus attuali

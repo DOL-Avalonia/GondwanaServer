@@ -74,6 +74,10 @@ DetailDisplayHandler.HandlePacket.YouFumble:				Vous trébuchez
 DetailDisplayHandler.HandlePacket.YouHit:					Vous touchez
 DetailDisplayHandler.HandlePacket.YouMiss:					Vous ratez
 DetailDisplayHandler.HandlePacket.YouParry:					Vous parez
+DetailDisplayHandler.HandlePacket.UseEverySec:				Utilisable toutes les : {0} sec
+DetailDisplayHandler.HandlePacket.UseEveryMin:				Utilisable toutes les : {0}:{1:00} min
+DetailDisplayHandler.HandlePacket.UseAgainSec:				Réutilisable dans : {0} sec
+DetailDisplayHandler.HandlePacket.UseAgainMin:				Réutilisable dans : {0}:{1:00} min
 DetailDisplayHandler.WriteBonusLine.Points:					pts
 DetailDisplayHandler.WriteBonusLine.PowerPool:				% de réservoir magique.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:		- {0}% Absorption
@@ -147,10 +151,35 @@ DetailDisplayHandler.WritePotionInfo.Type:					Fonction : {0}
 DetailDisplayHandler.WritePotionInfo.Value:					Valeur : {0}
 DetailDisplayHandler.WritePotionInfo.Target:				Cible : {0}
 DetailDisplayHandler.WritePotionInfo.Range:					Portée : {0}
-DetailDisplayHandler.WriteUsableClasses.UsableBy:			Utilisable par : 
+DetailDisplayHandler.WriteUsableClasses.UsableBy:				Utilisable par :
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Poids du sac: {0:0.0} livres ({1}/40 emplacements utilisés)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Vous ne pouvez pas équiper {0} car sa condition est épuisée.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Vous devez attendre {0} secondes avant de pouvoir équiper {1} à nouveau.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Détruit si vide)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Détruit si brisé)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Consomme {0}% d'Endurance et {1}% de Santé par tick{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Consomme {0}% de Mana par tick{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Consomme {0}% de Condition par tick{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Perd {0}% de Condition à la mort{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Ne peut pas être déséquipé.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Vous êtes trop loin de {0} !
+DoorRequestHandler.OnTick.TooFarAway:				Vous êtes trop loin de {0} !
+DoorRequestHandler.GameDoor.NowOpen:				La {0} porte est maintenant ouverte !
+DoorRequestHandler.GameDoor.FailOpen:				Vous échouez à ouvrir cette porte !
+DoorRequestHandler.GameDoor.NeedKey:				Vous avez besoin d'une clé pour ouvrir cette porte !
+DoorRequestHandler.GameDoor.NeedReborn:				Vous n'avez pas aquis le pouvoir de la Pierre Philosophale, vous ne pouvez pas entrer ici !
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		Il faut éliminer les monstres dans les alentours pour ouvrir cette porte !
+DoorRequestHandler.GameDoor.NeedSwitch:				Vous devez activer les mécanismes reliés pour ouvrir cette porte !
+DoorRequestHandler.YouMezzed:						Vous êtes hypnotisé et ne pouvez pas ouvrir la porte !
+DoorRequestHandler.YouStunned:						Vous êtes étourdi et ne pouvez pas ouvrir la porte !
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} est attaqué !
+DoorRequestHandler.GameKeepDoor.DoorLocked:			{0} est verrouillé !
+DoorRequestHandler.GameKeepDoor.YouSelect:			Vous avez sélectionné {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	Il appartient à votre royaume.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		Il appartient à un royaume ennemi et peut être attaqué !
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		Il appartient à un royaume ennemi ! 
+DoorRequestHandler.GameKeepDoor.DoorBroken:			{0} est détruit !
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Bonus actuels

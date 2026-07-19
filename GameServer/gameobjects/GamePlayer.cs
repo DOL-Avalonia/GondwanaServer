@@ -1070,6 +1070,12 @@ namespace DOL.GS
                     Group.RemoveMember(this);
             }
 
+            if (m_consumeTimer != null)
+            {
+                m_consumeTimer.Stop();
+                m_consumeTimer = null;
+            }
+
             BattleGroup mybattlegroup = (BattleGroup)this.TempProperties.getProperty<object>(BattleGroup.BATTLEGROUP_PROPERTY, null);
             if (mybattlegroup != null)
                 mybattlegroup.RemoveBattlePlayer(this);
@@ -1871,7 +1877,7 @@ namespace DOL.GS
 
             if (Realm != eRealm.None)
             {
-                if (Level >= ServerProperties.Properties.PVE_EXP_LOSS_LEVEL)
+                if (Level >= Properties.PVE_EXP_LOSS_LEVEL)
                 {
                     // actual lost exp, needed for 2nd stage deaths
                     long lostExp = Experience;
@@ -1909,7 +1915,7 @@ namespace DOL.GS
                 }
             }
 
-            if (Level >= ServerProperties.Properties.PVE_CON_LOSS_LEVEL)
+            if (Level >= Properties.PVE_CON_LOSS_LEVEL)
             {
                 int deathConLoss = TempProperties.getProperty<int>(DEATH_CONSTITUTION_LOSS_PROPERTY); // get back constitution lost at death
                 if (deathConLoss > 0)
@@ -9915,7 +9921,7 @@ namespace DOL.GS
                     (player != killer) && (
                         (killer != null && killer is GamePlayer && GameServer.ServerRules.IsSameRealm((GamePlayer)killer, player, true))
                         || (GameServer.ServerRules.IsSameRealm(this, player, true))
-                        || ServerProperties.Properties.DEATH_MESSAGES_ALL_REALMS)
+                        || Properties.DEATH_MESSAGES_ALL_REALMS)
                 )
                 {
                     if (publicMessage == "GameObjects.GamePlayer.Die.KilledLocation")
@@ -9956,6 +9962,77 @@ namespace DOL.GS
 
             // then buffs drop messages
             base.Die(killer);
+
+            // Condition loss for un-deequippable items (Flag 44 & 45)
+            List<InventoryItem> brokenItemsToUnequip = new List<InventoryItem>();
+            List<InventoryItem> itemsToDestroy = new List<InventoryItem>();
+            bool condLost = false;
+
+            lock (Inventory)
+            {
+                foreach (InventoryItem item in Inventory.EquippedItems)
+                {
+                    if (item != null && item.Template != null && (item.Template.Flags == 44 || item.Template.Flags == 45))
+                    {
+                        string pkg = item.PackageID ?? item.Template.PackageID ?? "";
+                        if (string.IsNullOrEmpty(pkg)) continue;
+
+                        int deathCondLoss = 0;
+                        int condLoss = 0;
+                        bool destroyOnDeathCond = false;
+                        bool destroyOnCond = false;
+
+                        foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            string[] parts = p.Split('|');
+                            if (parts.Length > 0)
+                            {
+                                if (parts[0] == "DEATHCOND" && parts.Length >= 2)
+                                {
+                                    int.TryParse(parts[1], out deathCondLoss);
+                                    if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnDeathCond = true;
+                                }
+                                else if (parts[0] == "COND" && parts.Length >= 2)
+                                {
+                                    int.TryParse(parts[1], out condLoss);
+                                    if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnCond = true;
+                                }
+                            }
+                        }
+
+                        if (item.Template.Flags == 44 && deathCondLoss == 0 && condLoss > 0)
+                        {
+                            deathCondLoss = condLoss;
+                            destroyOnDeathCond = destroyOnCond;
+                        }
+
+                        if (deathCondLoss > 0)
+                        {
+                            item.Condition -= deathCondLoss;
+                            condLost = true;
+                            if (item.Condition <= 0)
+                            {
+                                item.Condition = 0;
+                                if (destroyOnDeathCond) itemsToDestroy.Add(item);
+                                else brokenItemsToUnequip.Add(item);
+                            }
+                            else
+                            {
+                                Out.SendMessage($"Your {item.Name} lost condition upon your death.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (condLost)
+            {
+                Out.SendUpdateWeaponAndArmorStats();
+                Out.SendInventorySlotsUpdate(Inventory.EquippedItems.Select(i => i.SlotPosition).ToArray());
+            }
+
+            foreach (var item in itemsToDestroy) ForceUnequip(item, true, true);
+            foreach (var item in brokenItemsToUnequip) ForceUnequip(item, true, false);
 
             lock (m_LockObject)
             {
@@ -13066,6 +13143,7 @@ namespace DOL.GS
                 ((BaseInstance)CurrentRegion).OnPlayerEnterInstance(this);
 
             RefreshItemBonuses();
+            CheckConsumeTimer();
 
             return true;
         }
@@ -15246,11 +15324,25 @@ namespace DOL.GS
         public virtual bool DropItem(eInventorySlot slot_pos, out WorldInventoryItem droppedItem)
         {
             droppedItem = null;
-            if (slot_pos >= eInventorySlot.FirstBackpack && slot_pos <= eInventorySlot.LastBackpack)
+            bool bypass = TempProperties.getProperty<bool>("BypassUnequip", false);
+
+            if ((slot_pos >= eInventorySlot.FirstBackpack && slot_pos <= eInventorySlot.LastBackpack) || (bypass && slot_pos >= eInventorySlot.MinEquipable && slot_pos <= eInventorySlot.MaxEquipable))
             {
                 lock (Inventory)
                 {
                     InventoryItem item = Inventory.GetItem(slot_pos);
+
+                    if (item == null) return false;
+
+                    if (!bypass && slot_pos >= eInventorySlot.MinEquipable && slot_pos <= eInventorySlot.MaxEquipable)
+                    {
+                        if (item.Template != null && (item.Template.Flags == 44 || item.Template.Flags == 45))
+                        {
+                            Out.SendMessage($"You cannot drop {item.Name} while it is equipped.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                    }
+
                     bool unauthorized = false;
 
                     // Prevent genistar items from being dropped on the ground
@@ -15260,7 +15352,7 @@ namespace DOL.GS
                         return false;
                     }
 
-                    if (!item.IsDropable)
+                    if (!item.IsDropable && !bypass)
                     {
                         unauthorized = true;
                     }
@@ -15661,6 +15753,243 @@ namespace DOL.GS
         public static bool CanSeeObject(GamePlayer player, GameObject obj)
         {
             return player.IsWithinRadius(obj, WorldMgr.VISIBILITY_DISTANCE);
+        }
+
+        protected RegionTimer m_consumeTimer;
+
+        public static bool IsPureMeleeClass(eCharacterClass characterClass)
+        {
+            return characterClass == eCharacterClass.Armsman ||
+                   characterClass == eCharacterClass.Mercenary ||
+                   characterClass == eCharacterClass.Infiltrator ||
+                   characterClass == eCharacterClass.Blademaster ||
+                   characterClass == eCharacterClass.Hero ||
+                   characterClass == eCharacterClass.Berserker ||
+                   characterClass == eCharacterClass.Savage ||
+                   characterClass == eCharacterClass.Shadowblade ||
+                   characterClass == eCharacterClass.Warrior;
+        }
+
+        public void CheckConsumeTimer()
+        {
+            bool needsTimer = false;
+            lock (Inventory)
+            {
+                foreach (var item in Inventory.EquippedItems)
+                {
+                    if (item.Template != null && (item.Template.Flags == 43 || item.Template.Flags == 44 || item.Template.Flags == 45))
+                    {
+                        needsTimer = true;
+                        break;
+                    }
+                }
+            }
+
+            if (needsTimer && (m_consumeTimer == null || !m_consumeTimer.IsAlive))
+            {
+                bool isPureMelee = CharacterClass != null && IsPureMeleeClass((eCharacterClass)CharacterClass.ID);
+                int tickRate = isPureMelee ? 1200 : 1500;
+
+                m_consumeTimer = new RegionTimer(this, new RegionTimerCallback(ConsumeTimerCallback));
+                m_consumeTimer.Start(tickRate);
+            }
+            else if (!needsTimer && m_consumeTimer != null)
+            {
+                m_consumeTimer.Stop();
+                m_consumeTimer = null;
+            }
+        }
+
+        public void ForceUnequip(InventoryItem item, bool isBroken, bool destroy)
+        {
+            TempProperties.setProperty("BypassUnequip", true);
+            int oldSlot = item.SlotPosition;
+
+            if (destroy)
+            {
+                ItemUnique unique = item.Template as ItemUnique;
+                Inventory.RemoveItem(item);
+
+                if (unique != null)
+                {
+                    GameServer.Database.DeleteObject(unique);
+                }
+
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr", item.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            }
+            else
+            {
+                if (item.Template.Flags == 45 && !isBroken)
+                {
+                    long delay = item.CanUseEvery > 0 ? item.CanUseEvery * 1000L : 60000L;
+                    TempProperties.setProperty("BlockedEquip_" + item.Id_nb, CurrentRegion.Time + delay);
+                }
+
+                eInventorySlot emptySlot = Inventory.FindFirstEmptySlot(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
+                if (emptySlot != eInventorySlot.Invalid)
+                {
+                    Inventory.MoveItem((eInventorySlot)item.SlotPosition, emptySlot, 1);
+                    if (isBroken)
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    else
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+                else
+                {
+                    DropItem((eInventorySlot)item.SlotPosition);
+                    if (isBroken)
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop", item.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    else
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.UndeequipableInvFull", item.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
+
+            Out.SendInventorySlotsUpdate(new int[] { oldSlot });
+            UpdateEquipmentAppearance();
+            TempProperties.removeProperty("BypassUnequip");
+        }
+
+        protected virtual int ConsumeTimerCallback(RegionTimer timer)
+        {
+            bool isPureMelee = CharacterClass != null && IsPureMeleeClass((eCharacterClass)CharacterClass.ID);
+            int nextTick = isPureMelee ? 1200 : 1500;
+
+            if (!IsAlive || ObjectState != eObjectState.Active)
+                return nextTick;
+
+            bool hasConsumingItems = false;
+            List<InventoryItem> itemsToUnequip = new List<InventoryItem>();
+            List<InventoryItem> itemsToBreak = new List<InventoryItem>();
+            List<InventoryItem> itemsToDestroy = new List<InventoryItem>();
+
+            bool statsChanged = false;
+            bool invChanged = false;
+
+            lock (Inventory)
+            {
+                foreach (InventoryItem item in Inventory.EquippedItems)
+                {
+                    if (item == null || item.Template == null) continue;
+                    int flag = item.Template.Flags;
+
+                    if (flag == 43 || flag == 44 || flag == 45)
+                    {
+                        hasConsumingItems = true;
+
+                        double manaPct = 0;
+                        int condLoss = 0;
+                        bool destroyOnCond = false;
+                        bool destroyOnMana = false;
+
+                        string pkg = item.PackageID ?? item.Template.PackageID ?? "";
+                        if (!string.IsNullOrEmpty(pkg))
+                        {
+                            foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                string[] parts = p.Split('|');
+                                if (parts.Length > 0)
+                                {
+                                    if (parts[0] == "MANA" && parts.Length >= 2)
+                                    {
+                                        double.TryParse(parts[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out manaPct);
+                                        if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnMana = true;
+                                    }
+                                    else if (parts[0] == "COND" && parts.Length >= 2)
+                                    {
+                                        int.TryParse(parts[1], out condLoss);
+                                        if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnCond = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        bool unequip = false;
+                        bool broken = false;
+                        bool destroy = false;
+
+                        if (flag == 43 || flag == 45)
+                        {
+                            if (isPureMelee)
+                            {
+                                if (manaPct > 0)
+                                {
+                                    int enduCost = (int)(MaxEndurance * (manaPct * 2.1) / 100.0);
+                                    int hpCost = (int)(MaxHealth * (manaPct * 0.4) / 100.0);
+                                    if (hpCost < 1) hpCost = 1;
+
+                                    if (Endurance >= enduCost && Health > hpCost)
+                                    {
+                                        Endurance -= enduCost;
+                                        Health -= hpCost;
+                                        statsChanged = true;
+                                    }
+                                    else
+                                    {
+                                        unequip = true;
+                                        if (destroyOnMana) destroy = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (manaPct > 0)
+                                {
+                                    int manaCost = (int)(MaxMana * manaPct / 100.0);
+                                    if (Mana >= manaCost)
+                                    {
+                                        Mana -= manaCost;
+                                        statsChanged = true;
+                                    }
+                                    else
+                                    {
+                                        unequip = true;
+                                        if (destroyOnMana) destroy = true;
+                                    }
+                                }
+                            }
+
+                            if (condLoss > 0 && !unequip && !destroy)
+                            {
+                                item.Condition -= condLoss;
+                                invChanged = true;
+                                if (item.Condition <= 0)
+                                {
+                                    item.Condition = 0;
+                                    unequip = true;
+                                    broken = true;
+                                    if (destroyOnCond) destroy = true;
+                                }
+                            }
+                        }
+
+                        if (unequip)
+                        {
+                            if (destroy) itemsToDestroy.Add(item);
+                            else if (broken) itemsToBreak.Add(item);
+                            else itemsToUnequip.Add(item);
+                        }
+                    }
+                }
+            }
+
+            if (statsChanged) Out.SendCharStatsUpdate();
+            if (invChanged)
+            {
+                Out.SendUpdateWeaponAndArmorStats();
+                Out.SendInventorySlotsUpdate(Inventory.EquippedItems.Select(i => i.SlotPosition).ToArray());
+            }
+
+            foreach (InventoryItem item in itemsToDestroy) ForceUnequip(item, false, true);
+            foreach (InventoryItem item in itemsToBreak) ForceUnequip(item, true, false);
+            foreach (InventoryItem item in itemsToUnequip) ForceUnequip(item, false, false);
+
+            if (!hasConsumingItems)
+            {
+                m_consumeTimer = null;
+                return 0;
+            }
+
+            return nextTick;
         }
 
         #endregion

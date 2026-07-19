@@ -21,9 +21,6 @@ namespace DOL.GS.Scripts
                 if (_isOpen != value)
                 {
                     _isOpen = value;
-                    if (_isOpen)
-                        AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();
-
                     OnGvGStatusChanged?.Invoke();
                 }
             }
@@ -61,22 +58,29 @@ namespace DOL.GS.Scripts
         {
             if (ForceOpen)
             {
-                IsOpen = true;
+                if (!_isOpen)
+                {
+                    _isOpen = true;
+                    OnGvGStatusChanged?.Invoke();
+                }
                 return;
             }
 
             DateTime parisTime = GetParisTime();
 
-            // GvG is active from 11:00 until Midnight (0:00 to 10:00 is restricted)
+            // GvG is active from 10:00 until Midnight (0:00 to 10:00 is restricted)
             bool shouldBeOpen = (parisTime.Hour >= 10);
 
             if (_isOpen == false && shouldBeOpen == true)
             {
-                IsOpen = true;
+                _isOpen = true;
+                OnGvGStatusChanged?.Invoke();
+                AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();
             }
             else if (_isOpen == true && shouldBeOpen == false)
             {
-                IsOpen = false;
+                _isOpen = false;
+                OnGvGStatusChanged?.Invoke();
             }
         }
 

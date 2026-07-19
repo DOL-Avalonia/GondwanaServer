@@ -107,24 +107,27 @@ namespace DOL.Territories
                     continue;
                 }
 
-                foreach (var areaID in territoryDb.AreaIDs.Split('|'))
+                if (!string.IsNullOrEmpty(territoryDb.AreaIDs))
                 {
-                    var areaDb = GameServer.Database.SelectObjects<DBArea>(DB.Column("area_id").IsEqualTo(areaID))?.FirstOrDefault();
-
-                    if (areaDb == null)
+                    foreach (var areaID in territoryDb.AreaIDs.Split('|'))
                     {
-                        log.Error($"Cannot find Area in Database with ID {areaID} for territory {territoryDb.Name}");
-                        continue;
-                    }
+                        var areaDb = GameServer.Database.SelectObjects<DBArea>(DB.Column("area_id").IsEqualTo(areaID))?.FirstOrDefault();
 
-                    var area = zone.GetAreas().OfType<AbstractArea>().FirstOrDefault(a => string.Equals(areaID, a.DbArea.ObjectId));
-                    if (area == null)
-                    {
-                        log.Error($"Cannot find Area {areaID} for territory {territoryDb.Name}");
-                        continue;
-                    }
+                        if (areaDb == null)
+                        {
+                            log.Error($"Cannot find Area in Database with ID {areaID} for territory {territoryDb.Name}");
+                            continue;
+                        }
 
-                    areas.Add(area);
+                        var area = zone.GetAreas().OfType<AbstractArea>().FirstOrDefault(a => a.DbArea != null && string.Equals(areaID, a.DbArea.ObjectId));
+                        if (area == null)
+                        {
+                            log.Error($"Cannot find Area {areaID} for territory {territoryDb.Name}");
+                            continue;
+                        }
+
+                        areas.Add(area);
+                    }
                 }
 
                 MobInfo mobInfo = new();

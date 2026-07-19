@@ -39,9 +39,12 @@ namespace DOL.GS
 
         private const int MAX_POLY = 256;    // max vector3 when looking up a path (for straight paths too)
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         private static Dictionary<ushort, IntPtr> _navmeshPtrs = new Dictionary<ushort, IntPtr>();
         private static ThreadLocal<Dictionary<ushort, NavMeshQuery>> _navmeshQueries = new ThreadLocal<Dictionary<ushort, NavMeshQuery>>(() => new Dictionary<ushort, NavMeshQuery>());
+        private static readonly Dictionary<IDoor, uint[]> _doorPolyRefs = new Dictionary<IDoor, uint[]>();
+        private static readonly object _doorPolyRefsLock = new object();
+        private static readonly dtPolyFlags[] _doorMask = new dtPolyFlags[] { dtPolyFlags.DOOR, 0 };
 
         [DllImport("dol_detour", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern bool LoadNavMesh(string file, ref IntPtr meshPtr);
@@ -188,6 +191,7 @@ namespace DOL.GS
             foreach (var ptr in _navmeshPtrs.Values)
                 FreeNavMesh(ptr);
             _navmeshPtrs.Clear();
+            _doorPolyRefs.Clear();
         }
 
         private static float[] ToRecastFloats(Vector3 value)
@@ -299,6 +303,66 @@ namespace DOL.GS
                 result = new Vector3(outVec[0] * INV_FACTOR, outVec[2] * INV_FACTOR, outVec[1] * INV_FACTOR);
 
             return result;
+        }
+
+        public bool RegisterDoor(IDoor door)
+        {
+            Zone zone = WorldMgr.GetZone(door.ZoneID);
+            if (zone == null || !_navmeshPtrs.ContainsKey(zone.ID)) return false;
+
+            NavMeshQuery query;
+            if (!_navmeshQueries.Value!.TryGetValue(zone.ID, out query))
+            {
+                query = new NavMeshQuery(_navmeshPtrs[zone.ID]);
+                _navmeshQueries.Value.Add(zone.ID, query);
+            }
+
+            float[] center = CoordinateToRecastFloatArray(door.Coordinate);
+            float[] extents = new float[] { 128f * CONVERSION_FACTOR, 128f * CONVERSION_FACTOR, 128f * CONVERSION_FACTOR };
+
+            uint[] polyRefs = new uint[24];
+            int polyCount = 0;
+
+            dtStatus status = QueryPolygons(query, center, extents, _doorMask, polyRefs, ref polyCount, 24);
+
+            if ((status & dtStatus.DT_SUCCESS) != 0 && polyCount > 0)
+            {
+                uint[] validRefs = new uint[polyCount];
+                Array.Copy(polyRefs, validRefs, polyCount);
+
+                lock (_doorPolyRefsLock)
+                {
+                    _doorPolyRefs[door] = validRefs;
+                }
+
+                UpdateDoorFlags(door);
+                return true;
+            }
+            return false;
+        }
+
+        public bool UpdateDoorFlags(IDoor door)
+        {
+            Zone zone = WorldMgr.GetZone(door.ZoneID);
+            if (zone == null || !_navmeshPtrs.ContainsKey(zone.ID)) return false;
+
+            uint[] polyRefs;
+            lock (_doorPolyRefsLock)
+            {
+                if (!_doorPolyRefs.TryGetValue(door, out polyRefs)) return false;
+            }
+
+            IntPtr meshPtr = _navmeshPtrs[zone.ID];
+
+            bool isClosed = (door.State == eDoorState.Closed);
+            dtPolyFlags flags = isClosed ? dtPolyFlags.DISABLED : (dtPolyFlags.WALK | dtPolyFlags.DOOR);
+
+            foreach (uint polyRef in polyRefs)
+            {
+                SetPolyFlags(meshPtr, polyRef, flags);
+            }
+
+            return true;
         }
 
         private Vector3[] Vector3ArrayFromRecastFloats(float[] buffer, int numNodes)

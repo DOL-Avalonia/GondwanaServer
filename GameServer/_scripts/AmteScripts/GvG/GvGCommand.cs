@@ -1,6 +1,8 @@
-using DOL.GS.Scripts;
 using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
 using DOL.Language;
+using DOL.Territories;
+using System.Linq;
 
 namespace DOL.GS.Commands
 {
@@ -9,7 +11,8 @@ namespace DOL.GS.Commands
         ePrivLevel.GM,
         "Manage GvG status",
         "/gvg <on|off> - Forces GvG open or reverts to schedule",
-        "/gvg resetrelics - Forces GvG to reset territory relics")]
+        "/gvg resetrelics - Forces GvG to reset territory relics",
+        "/gvg territoryreset <TerritoryID|all> - Forces a specific territory or all territories to become neutral")]
     public class GvGCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -36,6 +39,50 @@ namespace DOL.GS.Commands
                 case "resetrelics":
                     AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();
                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ResetRelics"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    break;
+                case "territoryreset":
+                    if (args.Length < 3)
+                    {
+                        client.Out.SendMessage("Syntax: /gvg territoryreset <TerritoryID|all>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    string target = args[2].ToLower();
+
+                    if (target == "all")
+                    {
+                        int count = 0;
+                        var territories = TerritoryManager.Instance.Territories.ToList();
+                        foreach (var t in territories)
+                        {
+                            if (t.OwnerGuild != null)
+                            {
+                                t.OwnerGuild = null;
+                                count++;
+                            }
+                        }
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ResetAllTerrSuccess", count), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    }
+                    else
+                    {
+                        var t = TerritoryManager.GetTerritoryByID(args[2]);
+                        if (t != null)
+                        {
+                            if (t.OwnerGuild != null)
+                            {
+                                t.OwnerGuild = null;
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ResetOneTerrSuccess", t.Name, t.ID), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            }
+                            else
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ResetTerrNeutral", t.Name, t.ID), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+                        else
+                        {
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.ResetTerrNotFound", args[2]), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                    }
                     break;
                 default:
                     DisplaySyntax(client);

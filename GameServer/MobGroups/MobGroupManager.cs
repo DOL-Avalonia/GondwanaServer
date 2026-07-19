@@ -25,6 +25,9 @@ namespace DOL.MobGroups
         {
             this.Groups = new Dictionary<string, MobGroup>();
             this.GroupsToRemoveOnServerLoad = new List<string>();
+
+            GameEventMgr.AddHandler(PlayerInventoryEvent.ItemEquipped, new DOLEventHandler(OnInventoryChanged));
+            GameEventMgr.AddHandler(PlayerInventoryEvent.ItemUnequipped, new DOLEventHandler(OnInventoryChanged));
         }
 
         public Dictionary<string, MobGroup> Groups
@@ -83,6 +86,77 @@ namespace DOL.MobGroups
                 slave.SaveToDabatase();
                 slave.ApplyGroupInfos(slave.GroupId.StartsWith("spwn_add_"));
                 slave.HasOriginalStatus = false;
+            }
+        }
+
+        protected void OnInventoryChanged(DOLEvent e, object sender, EventArgs args)
+        {
+            GamePlayer player = null;
+            if (sender is GamePlayerInventory inv)
+                player = inv.Player;
+            else if (sender is GamePlayer gp)
+                player = gp;
+
+            if (player == null || !player.IsAlive) return;
+
+            InventoryItem changedItem = null;
+            if (args is ItemEquippedArgs eqArgs)
+                changedItem = eqArgs.Item;
+            else if (args is ItemUnequippedArgs unqArgs)
+                changedItem = unqArgs.Item;
+
+            if (changedItem == null || string.IsNullOrEmpty(changedItem.Id_nb))
+                return;
+
+            string changedItemId = changedItem.Id_nb;
+
+            foreach (GameNPC npc in player.GetNPCsInRadius((ushort)WorldMgr.VISIBILITY_DISTANCE))
+            {
+                if (npc.MobGroups != null && npc.MobGroups.Count > 0)
+                {
+                    foreach (MobGroup group in npc.MobGroups)
+                    {
+                        if (!string.IsNullOrEmpty(group.EquippedItem))
+                        {
+                            string[] requiredItems = group.EquippedItem.Split('|');
+                            bool isRelevantItem = false;
+
+                            foreach (string reqItem in requiredItems)
+                            {
+                                if (changedItemId.Equals(reqItem, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    isRelevantItem = true;
+                                    break;
+                                }
+                            }
+
+                            if (isRelevantItem)
+                            {
+
+                                player.Out.SendObjectRemove(npc);
+                                player.Out.SendNPCCreate(npc);
+
+                                if (e == PlayerInventoryEvent.ItemEquipped && group.EquippedItemClientEffect > 0 && group.HasPlayerCompletedQuests(player))
+                                {
+                                    ushort effectId = group.EquippedItemClientEffect;
+
+                                    Task.Run(async () =>
+                                    {
+                                        await Task.Delay(120);
+
+                                        if (player != null && player.IsAlive && player.ObjectState == GameObject.eObjectState.Active &&
+                                            npc != null && npc.IsAlive && npc.ObjectState == GameObject.eObjectState.Active)
+                                        {
+                                            player.Out.SendSpellEffectAnimation(npc, npc, effectId, 0, false, 5);
+                                        }
+                                    });
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -177,7 +251,6 @@ namespace DOL.MobGroups
 
             return true;
         }
-
 
         public bool LoadFromDatabase()
         {

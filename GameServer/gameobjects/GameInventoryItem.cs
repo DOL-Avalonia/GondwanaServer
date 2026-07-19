@@ -136,6 +136,28 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual bool CanEquip(GamePlayer player)
         {
+            int flags = Template != null ? Template.Flags : Flags;
+
+            if (flags == 43 || flags == 44 || flags == 45)
+            {
+                if (Condition <= 0)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.UndeequippableItem.ConditionDepleted", Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
+            if (flags == 45)
+            {
+                long blockedUntil = player.TempProperties.getProperty<long>("BlockedEquip_" + Id_nb, 0L);
+                if (blockedUntil > player.CurrentRegion.Time)
+                {
+                    long remaining = (blockedUntil - player.CurrentRegion.Time) / 1000;
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.UndeequippableItem.EquipCooldown", remaining, Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
             return GameServer.ServerRules.CheckAbilityToUseItem(player, Template);
         }
 
@@ -316,6 +338,9 @@ namespace DOL.GS
         /// <param name="player"></param>
         public virtual void OnEquipped(GamePlayer player)
         {
+            if (Template != null && (Template.Flags == 43 || Template.Flags == 44 || Template.Flags == 45))
+                player.CheckConsumeTimer();
+
             CheckValid(player);
         }
 
@@ -325,6 +350,9 @@ namespace DOL.GS
         /// <param name="player"></param>
         public virtual void OnUnEquipped(GamePlayer player)
         {
+            if (Template != null && (Template.Flags == 43 || Template.Flags == 44 || Template.Flags == 45))
+                player.CheckConsumeTimer();
+
             CheckValid(player);
         }
 
@@ -464,12 +492,14 @@ namespace DOL.GS
             if (player == null)
                 return;
 
+            string lang = player.Client.Account.Language;
+
             //**********************************
             //show crafter name
             //**********************************
             if (IsCrafted)
             {
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CrafterName", Creator));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CrafterName", Creator));
                 delve.Add(" ");
             }
 
@@ -486,7 +516,7 @@ namespace DOL.GS
                 int totalBagWeight = this.Weight + extraWeight;
                 int filledSlots = bagItem.GetFilledSlotsCount();
 
-                delve.Add(string.Format("Bag Weight: {0:0.0} lbs ({1} filled slots)", totalBagWeight / 10.0f, filledSlots));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.WriteStorageBagInfo.Weight", totalBagWeight / 10.0f, filledSlots));
                 delve.Add(" ");
             }
 
@@ -548,11 +578,11 @@ namespace DOL.GS
 
                 if (minutes == 0)
                 {
-                    delve.Add(String.Format("Can use item every: {0} sec", seconds));
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.UseEverySec", seconds));
                 }
                 else
                 {
-                    delve.Add(String.Format("Can use item every: {0}:{1:00} min", minutes, seconds));
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.UseEveryMin", minutes, seconds));
                 }
 
                 // delve.Add(String.Format("Can use item every: {0:00}:{1:00}", minutes, seconds));
@@ -566,56 +596,137 @@ namespace DOL.GS
 
                     if (minutes == 0)
                     {
-                        delve.Add(String.Format("Can use again in: {0} sec", seconds));
+                        delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.UseAgainSec", seconds));
                     }
                     else
                     {
-                        delve.Add(String.Format("Can use again in: {0}:{1:00} min", minutes, seconds));
+                        delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.UseAgainMin", minutes, seconds));
                     }
                 }
+            }
+
+            //**********************************
+            //special mana/cond consuming items
+            //**********************************
+
+            int flags = Template != null ? Template.Flags : Flags;
+
+            if (flags >= 43 && flags <= 45)
+            {
+                string pkg = PackageID ?? Template?.PackageID ?? "";
+                double manaPct = 0;
+                int condLoss = 0;
+                int deathCondLoss = 0;
+                bool destroyOnMana = false, destroyOnCond = false, destroyOnDeath = false;
+
+                foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    string[] parts = p.Split('|');
+                    if (parts.Length > 0)
+                    {
+                        if (parts[0] == "MANA" && parts.Length >= 2)
+                        {
+                            double.TryParse(parts[1], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out manaPct);
+                            if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnMana = true;
+                        }
+                        else if (parts[0] == "COND" && parts.Length >= 2)
+                        {
+                            int.TryParse(parts[1], out condLoss);
+                            if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnCond = true;
+                        }
+                        else if (parts[0] == "DEATHCOND" && parts.Length >= 2)
+                        {
+                            int.TryParse(parts[1], out deathCondLoss);
+                            if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnDeath = true;
+                        }
+                    }
+                }
+
+                if (flags == 44 && deathCondLoss == 0 && condLoss > 0)
+                {
+                    deathCondLoss = condLoss;
+                    destroyOnDeath = destroyOnCond;
+                }
+
+                if (manaPct > 0 && (flags == 43 || flags == 45))
+                {
+                    string destroyEmpty = destroyOnMana ? (" " + LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.DestroysEmpty")) : "";
+
+                    if (player.CharacterClass != null && GamePlayer.IsPureMeleeClass((eCharacterClass)player.CharacterClass.ID))
+                    {
+                        delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth", (manaPct * 2.1).ToString("0.##"), (manaPct * 0.4).ToString("0.##"), destroyEmpty));
+                    }
+                    else
+                    {
+                        delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.ConsumesMana", manaPct.ToString("0.##"), destroyEmpty));
+                    }
+                }
+
+                int maxCond = MaxCondition > 0 ? MaxCondition : 50000;
+
+                if (condLoss > 0 && (flags == 43 || flags == 45))
+                {
+                    double condPct = (condLoss / (double)maxCond) * 100.0;
+                    string destroyBrokenCond = destroyOnCond ? (" " + LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.DestroysBroken")) : "";
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.ConsumesCondition", condPct.ToString("0.##"), destroyBrokenCond));
+                }
+
+                if (deathCondLoss > 0 && (flags == 44 || flags == 45))
+                {
+                    double deathCondPct = (deathCondLoss / (double)maxCond) * 100.0;
+                    string destroyBrokenDeath = destroyOnDeath ? (" " + LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.DestroysBroken")) : "";
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.LosesConditionDeath", deathCondPct.ToString("0.##"), destroyBrokenDeath));
+                }
+
+                if (manaPct > 0 || condLoss > 0 || deathCondLoss > 0) delve.Add(" ");
             }
 
             if (!IsDropable || !IsPickable || !IsTradable || IsIndestructible || !CanUseInRvR || Flags == 2 || (Flags == 1 && IsDropable))
                 delve.Add(" ");
 
             if (!IsPickable)
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotPick"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CannotPick"));
 
             if (!IsTradable)
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotTraded"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CannotTraded"));
 
             if (!IsDropable)
             {
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.GetShortItemInfo.NoDrop"));
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotSold"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.GetShortItemInfo.NoDrop"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CannotSold"));
             }
 
             if (IsIndestructible)
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotDestroyed"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CannotDestroyed"));
 
             if (!CanUseInRvR)
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotBeUsedInRvR"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CannotBeUsedInRvR"));
 
             if (Flags == 1 && IsDropable)
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.CannotSold"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.CannotSold"));
+
+            if (Flags == 44 || Flags == 45)
+            {
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.CannotUnequip"));
+            }
 
             if (Flags == 2)
             {
                 delve.Add(" ");
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.HandlePacket.EffectWhenSitting"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.HandlePacket.EffectWhenSitting"));
             }
 
             if (this.ClassType.Contains("DOL.GS.AfkXpToken"))
             {
                 var remaininguse = Condition * 100 / MaxCondition;
                 delve.Add(" ");
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DelveInfo.RemainingUse", remaininguse) + "%");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.RemainingUse", remaininguse) + "%");
             }
 
             if (this.ClassType.Contains("DOL.GS.PvPTreasure"))
             {
                 delve.Add(" ");
-                delve.Add(LanguageMgr.GetTranslation(player.Client.Account.Language, "DelveInfo.Value", (int)(Condition / 4.0)) + " " + LanguageMgr.GetTranslation(player.Client.Account.Language, "DetailDisplayHandler.WriteBonusLine.Points"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", (int)(Condition / 4.0)) + " " + LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.WriteBonusLine.Points"));
             }
 
             //Add admin info

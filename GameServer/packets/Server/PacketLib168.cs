@@ -3914,27 +3914,29 @@ namespace DOL.GS.PacketHandler
                     pak.WriteShort(item.OwnerLot);//lot
                     pak.WriteInt((uint)item.SellPrice);
 
-                    if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
+                    string translatedName = LanguageMgr.GetItemNameMessage(m_gameClient.Account.Language, item.Name);
+
+                    if (Properties.CONSIGNMENT_USE_BP)
                     {
                         string bpPrice = "";
                         if (item.SellPrice > 0)
-                            bpPrice = "[" + item.SellPrice.ToString() + " BP";
+                            bpPrice = "[" + item.SellPrice.ToString() + " BP]";
 
                         if (item.Count > 1)
-                            pak.WritePascalString(item.Count + " " + item.Name);
+                            pak.WritePascalString(item.Count + " " + translatedName);
                         else if (item.PackSize > 1)
-                            pak.WritePascalString(item.PackSize + " " + item.Name + bpPrice);
+                            pak.WritePascalString(item.PackSize + " " + translatedName + bpPrice);
                         else
                             pak.WritePascalString(item.Name + bpPrice);
                     }
                     else
                     {
                         if (item.Count > 1)
-                            pak.WritePascalString(item.Count + " " + item.Name);
+                            pak.WritePascalString(item.Count + " " + translatedName);
                         else if (item.PackSize > 1)
-                            pak.WritePascalString(item.PackSize + " " + item.Name);
+                            pak.WritePascalString(item.PackSize + " " + translatedName);
                         else
-                            pak.WritePascalString(item.Name);
+                            pak.WritePascalString(translatedName);
                     }
                 }
 

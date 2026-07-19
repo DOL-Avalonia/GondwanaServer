@@ -671,6 +671,29 @@ namespace DOL.GS
 
                 if (valid)
                 {
+                    bool bypass = m_player.TempProperties.getProperty<bool>("BypassUnequip", false);
+
+                    if (!bypass)
+                    {
+                        bool isFromEquip = fromSlot >= eInventorySlot.MinEquipable && fromSlot <= eInventorySlot.MaxEquipable;
+                        bool isToEquip = toSlot >= eInventorySlot.MinEquipable && toSlot <= eInventorySlot.MaxEquipable;
+
+                        if (isFromEquip && fromItem != null && fromItem.Template != null && (fromItem.Template.Flags == 44 || fromItem.Template.Flags == 45))
+                        {
+                            valid = false;
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemCantUnequip", fromItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+
+                        if (isToEquip && toItem != null && toItem.Template != null && (toItem.Template.Flags == 44 || toItem.Template.Flags == 45))
+                        {
+                            valid = false;
+                            m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ItemCantUnequipDestroyed", toItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                    }
+                }
+
+                if (valid)
+                {
                     bool isFromGenistar = fromItem != null && (fromItem.Id_nb.StartsWith("genistar_pet") || fromItem.Id_nb.StartsWith("genistar_remains"));
                     bool isToGenistar = toItem != null && (toItem.Id_nb.StartsWith("genistar_pet") || toItem.Id_nb.StartsWith("genistar_remains"));
                     bool isToVault = (toSlot >= eInventorySlot.FirstVault && toSlot <= eInventorySlot.LastVault) || (toSlot >= eInventorySlot.FirstBagHorse && toSlot <= eInventorySlot.LastBagHorse);

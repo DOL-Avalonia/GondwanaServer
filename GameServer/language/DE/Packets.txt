@@ -74,7 +74,11 @@ DetailDisplayHandler.HandlePacket.YouFumble:		Ihr verstolpert
 DetailDisplayHandler.HandlePacket.YouHit:		Ihr trefft
 DetailDisplayHandler.HandlePacket.YouMiss:		Ihr trefft nicht
 DetailDisplayHandler.HandlePacket.YouParry:		Ihr pariert
-DetailDisplayHandler.WriteBonusLine.Points:		 Punkte
+DetailDisplayHandler.HandlePacket.UseEverySec:			Nutzbar alle: {0} Sek.
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Nutzbar alle: {0}:{1:00} Min.
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Wieder nutzbar in: {0} Sek.
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Wieder nutzbar in: {0}:{1:00} Min.
+DetailDisplayHandler.WriteBonusLine.Points:				 Pkt.
 DetailDisplayHandler.WriteBonusLine.PowerPool:		% vom Magiekraftvorrat.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Absorption
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:	Rüstungsmodifikator:
@@ -151,10 +155,35 @@ DetailDisplayHandler.WritePotionInfo.Type:		Typ : {0}
 DetailDisplayHandler.WritePotionInfo.Value:		Wert : {0}
 DetailDisplayHandler.WritePotionInfo.Target:		Ziel : {0}
 DetailDisplayHandler.WritePotionInfo.Range:		Reichweite : {0}
-DetailDisplayHandler.WriteUsableClasses.UsableBy:	Geeignet für: 
+DetailDisplayHandler.WriteUsableClasses.UsableBy:	Geeignet für:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Taschengewicht: {0:0.0} lbs ({1}/40 Plätzen belegt)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		Du kannst {0} nicht ausrüsten, da sein Zustand erschöpft ist.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			Du musst {0} Sekunden warten, bevor du {1} wieder ausrüsten kannst.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Wird bei Leerstand zerstört)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Wird bei Bruch zerstört)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Verbraucht {0}% Ausdauer und {1}% Gesundheit pro Tick{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Verbraucht {0}% Mana pro Tick{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Verbraucht {0}% Zustand pro Tick{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Verliert {0}% Zustand bei Tod{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Kann nicht abgelegt werden.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			Ihr seid zu weit weg von {0}!
+DoorRequestHandler.OnTick.TooFarAway:				{0} ist zu weit entfernt!
+DoorRequestHandler.GameDoor.NowOpen:				{0} ist jetzt offen!
+DoorRequestHandler.GameDoor.FailOpen:				Du konntest diese Tür nicht öffnen!
+DoorRequestHandler.GameDoor.NeedKey:				Du benötigst einen Schlüssel, um diese Tür zu öffnen!
+DoorRequestHandler.GameDoor.NeedReborn:				Du hast die Macht des Stein der Weisen nicht erlangt; du kannst hier nicht eintreten!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		Du musst die Monster in der Nähe besiegen, um diese Tür zu öffnen!
+DoorRequestHandler.GameDoor.NeedSwitch:				Du musst die verbundenen Mechanismen aktivieren, um diese Tür zu öffnen!
+DoorRequestHandler.YouMezzed:						Du bist hypnotisiert und kannst die Tür nicht öffnen!
+DoorRequestHandler.YouStunned:						Du bist betäubt und kannst die Tür nicht öffnen!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} wird angegriffen!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			{0} ist verschlossen!
+DoorRequestHandler.GameKeepDoor.YouSelect:			Du wählst {0} aus.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	 Es gehört zu deinem Reich.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		 Es gehört einem feindlichen Reich und kann angegriffen werden!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		 Es gehört einem feindlichen Reich!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			{0} ist zerstört!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Momentane Boni

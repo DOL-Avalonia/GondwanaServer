@@ -2044,6 +2044,12 @@ namespace DOL.GS.ServerProperties
         public static bool DOORS_ALLOWPETATTACK;
 
         /// <summary>
+        /// Maximum Realm Points awarded for successfully repairing a door, component, or siege weapon.
+        /// </summary>
+        [ServerProperty("keeps", "repair_max_rp", "Maximum Realm Points awarded for successfully repairing a door, component, or siege weapon. Set to 0 to disable RP gain.", 150)]
+        public static int REPAIR_MAX_RP;
+
+        /// <summary>
         /// Multiplier used in determining RP reward for claiming towers.
         /// </summary>
         [ServerProperty("keeps", "tower_rp_claim_multiplier", "Integer multiplier used in determining RP reward for claiming towers.", 100)]

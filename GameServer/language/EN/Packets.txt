@@ -74,8 +74,12 @@ DetailDisplayHandler.HandlePacket.YouFumble:		You Fumble
 DetailDisplayHandler.HandlePacket.YouHit:		You Hit
 DetailDisplayHandler.HandlePacket.YouMiss:		You Miss
 DetailDisplayHandler.HandlePacket.YouParry:		You Parry
-DetailDisplayHandler.WriteBonusLine.Points:		 pts
-DetailDisplayHandler.WriteBonusLine.PowerPool:		% of power pool.
+DetailDisplayHandler.HandlePacket.UseEverySec:			Can use item every: {0} sec
+DetailDisplayHandler.HandlePacket.UseEveryMin:			Can use item every: {0}:{1:00} min
+DetailDisplayHandler.HandlePacket.UseAgainSec:			Can use again in: {0} sec
+DetailDisplayHandler.HandlePacket.UseAgainMin:			Can use again in: {0}:{1:00} min
+DetailDisplayHandler.WriteBonusLine.Points:				 pts
+DetailDisplayHandler.WriteBonusLine.PowerPool:			% of power pool.
 DetailDisplayHandler.WriteClassicArmorInfos.Absorption:	- {0}% Absorption
 DetailDisplayHandler.WriteClassicArmorInfos.ArmorMod:	Armor Modifiers:
 DetailDisplayHandler.WriteClassicArmorInfos.BaseFactor:	- {0} Base Factor
@@ -147,10 +151,35 @@ DetailDisplayHandler.WritePotionInfo.Type:		Type : {0}
 DetailDisplayHandler.WritePotionInfo.Value:		Value : {0}
 DetailDisplayHandler.WritePotionInfo.Target:	Target : {0}
 DetailDisplayHandler.WritePotionInfo.Range:		Range : {0}
-DetailDisplayHandler.WriteUsableClasses.UsableBy:	Usable by: 
+DetailDisplayHandler.WriteUsableClasses.UsableBy:				Usable by:
+DetailDisplayHandler.WriteStorageBagInfo.Weight:				Bag Weight: {0:0.0} lbs ({1}/40 filled slots)
+DetailDisplayHandler.UndeequippableItem.ConditionDepleted:		You cannot equip {0} because its condition is depleted.
+DetailDisplayHandler.UndeequippableItem.EquipCooldown:			You must wait {0} seconds before equipping {1} again.
+DetailDisplayHandler.UndeequippableItem.DestroysEmpty:			(Destroys on empty)
+DetailDisplayHandler.UndeequippableItem.DestroysBroken:			(Destroys when broken)
+DetailDisplayHandler.UndeequippableItem.ConsumesEnduHealth:		Consumes {0}% Endurance and {1}% Health per tick{2}.
+DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Consumes {0}% Mana per tick{1}.
+DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Consumes {0}% Condition per tick{1}.
+DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Loses {0}% Condition upon death{1}.
+DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Cannot be unequipped.
 
 # /DoorRequestHandler.cs
-DoorRequestHandler.OnTick.TooFarAway:			The {0} is too far away!
+DoorRequestHandler.OnTick.TooFarAway:				The {0} is too far away!
+DoorRequestHandler.GameDoor.NowOpen:				The {0} is now open!
+DoorRequestHandler.GameDoor.FailOpen:				You fail to open this door!
+DoorRequestHandler.GameDoor.NeedKey:				You need a key to open this door!
+DoorRequestHandler.GameDoor.NeedReborn:				You have not acquired the power of the Philosopher's Stone; you cannot enter here!
+DoorRequestHandler.GameDoor.NeedKillGroupMob:		You must defeat the nearby monsters to open this door!
+DoorRequestHandler.GameDoor.NeedSwitch:				You must activate the connected mechanisms to open this door!
+DoorRequestHandler.YouMezzed:						You are mesmerized and can't open the door!
+DoorRequestHandler.YouStunned:						You are stunned and can't open the door!
+DoorRequestHandler.GameKeepDoor.KeepUnderAttack:	{0} is under attack!
+DoorRequestHandler.GameKeepDoor.DoorLocked:			The {0} is locked!
+DoorRequestHandler.GameKeepDoor.YouSelect:			You select the {0}.
+DoorRequestHandler.GameKeepDoor.BelongsYourRealm:	It belongs to your realm.
+DoorRequestHandler.GameKeepDoor.BelongsEnemyAttackable:		It belongs to an enemy realm and can be attacked!
+DoorRequestHandler.GameKeepDoor.BelongsEnemy:		It belongs to an enemy realm!
+DoorRequestHandler.GameKeepDoor.DoorBroken:			The {0} is broken!
 
 # /PlayerBonusesListRequestHandler
 PlayerBonusesListRequestHandler.HandlePacket.Bonuses:	Bonuses (snapshot)

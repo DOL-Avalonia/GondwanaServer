@@ -524,6 +524,11 @@ GameObjects.GamePlayer.UseSlot.NotPowerfulEnough:      Bạn không đủ mạnh
 GameObjects.GamePlayer.UseSlot.CannotUseInventory:     Bạn không thể dùng kho đồ này.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotImplemented:  Hiệu ứng kích hoạt với ID {0} chưa được triển khai.
 GameObjects.GamePlayer.UseSlot.ChargeEffectNotFound:   Không tìm thấy hiệu ứng kích hoạt với ID {0}.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemDestr:		{0} của bạn đã bị phá hủy hoàn toàn!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		{0} của bạn đã bị hỏng do sử dụng quá mức!
+GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	{0} của bạn đã bị gỡ ra do không đủ năng lượng.
+GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	{0} của bạn đã bị hỏng và rơi xuống đất!
+GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Túi đồ của bạn đã đầy! {0} của bạn đã rơi xuống đất.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Vật giữ chỗ Genistar này phải được đặt vào một ô trong sân vườn.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Trứng Genistar của bạn đã được đặt trong vườn. Giờ đây, bạn có quyền chăm sóc và nuôi dưỡng nó theo mong muốn của mình!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Bạn phải thả Genistar đã triệu hồi của mình trước khi đặt nó trở lại khu vườn.
