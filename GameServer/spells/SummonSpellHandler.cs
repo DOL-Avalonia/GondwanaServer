@@ -43,7 +43,7 @@ namespace DOL.GS.Spells
     /// </summary>
     public abstract class SummonSpellHandler : SpellHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         protected GamePet m_pet = null;
 
@@ -232,9 +232,6 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Called when owner release NPC
         /// </summary>
-        /// <param name="e"></param>
-        /// <param name="sender"></param>
-        /// <param name="arguments"></param>
         protected virtual void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
         {
             if (!(sender is GameNPC) || !((sender as GameNPC)!.Brain is IControlledBrain))

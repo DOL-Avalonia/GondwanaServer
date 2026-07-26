@@ -18,11 +18,9 @@
  */
 
 using DOL.AI.Brain;
-using DOL.GS.PlayerClass;
 using DOL.GS.Quests;
 using DOL.GS.ServerProperties;
 using DOL.Language;
-using System;
 
 namespace DOL.GS.Keeps
 {
@@ -37,8 +35,10 @@ namespace DOL.GS.Keeps
                 return false;
 
             if (Component == null)
-                SayTo(player, "Greetings, " + player.Name + ". We have put out the call far and wide for heroes such as yourself to aid us in our ongoing struggle. It warms my heart good to to see a great " + player.CharacterClass.Name + " such as yourself willing to lay their life on the line in defence of the [realm].");
-            else SayTo(player, "Hail and well met, " + player.Name + "! As the leader of our forces, I am calling upon our finest warriors to aid in the vanquishing of our enemies. Do you wish to do your duty in defence of our [realm]?");
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Interact.Greeting1", player.Name, player.Salutation));
+            else
+                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Interact.Greeting2", player.Name));
+
             return true;
         }
 
@@ -56,59 +56,67 @@ namespace DOL.GS.Keeps
                 return false;
             }
 
-            if (str.ToLower().StartsWith("tower capture"))
+            string lowerText = str.ToLower();
+
+            if (lowerText.StartsWith("tower capture") || lowerText.StartsWith("capture de tour"))
             {
                 if (player.Group == null)
                 {
-                    SayTo(player, "You are not in a group!");
+                    _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                 }
                 else if (player.Group.Leader != player)
                 {
-                    SayTo(player, "You are not the leader of your group!");
+                    _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                 }
                 else
                 {
                     if (player.Group.Mission != null)
                         player.Group.Mission.ExpireMission();
 
-                    player.Group.Mission = new CaptureMission(CaptureMission.eCaptureType.Tower, player.Group, str.ToLower().Replace("tower capture", "").Trim());
+                    string target = lowerText.Replace("tower capture", "").Replace("capture de tour", "").Trim();
+                    player.Group.Mission = new CaptureMission(CaptureMission.eCaptureType.Tower, player.Group, target);
                 }
             }
-            else if (str.ToLower().StartsWith("keep capture"))
+            else if (lowerText.StartsWith("keep capture") || lowerText.StartsWith("capture de fort"))
             {
                 if (player.Group == null)
                 {
-                    SayTo(player, "You are not in a group!");
+                    _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                 }
                 else if (player.Group.Leader != player)
                 {
-                    SayTo(player, "You are not the leader of your group!");
+                    _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                 }
                 else
                 {
                     if (player.Group.Mission != null)
                         player.Group.Mission.ExpireMission();
 
-                    player.Group.Mission = new CaptureMission(CaptureMission.eCaptureType.Keep, player.Group, str.ToLower().Replace("keep capture", "").Trim());
+                    string target = lowerText.Replace("keep capture", "").Replace("capture de fort", "").Trim();
+                    player.Group.Mission = new CaptureMission(CaptureMission.eCaptureType.Keep, player.Group, target);
                 }
             }
             else
             {
-                switch (str.ToLower())
+                switch (lowerText)
                 {
                     case "realm":
+                    case "royaume":
                         {
                             if (Component == null)
-                                SayTo(player, "We all must do our part. How would you like to assist the cause? I have [personal missions], [group missions], and [guild missions] available.");
-                            else SayTo(player, "Excellent! We all must do our part. How would you like to assist the cause? I have [personal missions] and [group missions] available.");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.Realm.ComponentNull"));
+                            else
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.Realm.ComponentNotNull"));
                             break;
                         }
                     case "personal missions":
+                    case "missions personnelles":
                         {
-                            SayTo(player, "We have several personal missions from which to choose. Would you like to claim the bounty on some [realm guards], or claim the bounties on some [enemies of the realm]? Perhaps a frontal assault isn't your style? If so, we also have missions that require you to [reconnoiter] an enemy realm, or elimate the thread of an impending [assassination]?");
+                            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.PersonalMissions"));
                             break;
                         }
                     case "realm guards":
+                    case "gardes du royaume":
                         {
                             if (player.Mission != null)
                                 player.Mission.ExpireMission();
@@ -116,6 +124,7 @@ namespace DOL.GS.Keeps
                             break;
                         }
                     case "enemies of the realm":
+                    case "ennemis du royaume":
                         {
                             if (player.Mission != null)
                                 player.Mission.ExpireMission();
@@ -123,6 +132,7 @@ namespace DOL.GS.Keeps
                             break;
                         }
                     case "reconnoiter":
+                    case "reconnaître":
                         {
                             if (player.Mission != null)
                                 player.Mission.ExpireMission();
@@ -130,78 +140,85 @@ namespace DOL.GS.Keeps
                             break;
                         }
                     case "assassination":
+                    case "assassinat":
                         {
-                            SayTo(player, "This type of mission is not yet implemented");
+                            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotImplemented"));
                             break;
                         }
                     case "group missions":
+                    case "missions de groupe":
                         {
                             if (player.Group == null)
                             {
-                                SayTo(player, "You are not in a group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                                 break;
                             }
 
                             if (player.Group.Leader != player)
                             {
-                                SayTo(player, "You are not the leader of your group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                                 break;
                             }
 
-                            SayTo(player, "Would your group like to help with a [tower capture], a [keep capture], or a [caravan] raid? Should those choices fail to appeal to you, I also have bounty missions on [enemy guards] and [realm enemies] if that is your preference.");
+                            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.GroupMissions"));
                             break;
                         }
                     case "tower raize":
+                    case "raser la tour":
                         {
                             if (player.Group == null)
                             {
-                                SayTo(player, "You are not in a group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                                 break;
                             }
 
                             if (player.Group.Leader != player)
                             {
-                                SayTo(player, "You are not the leader of your group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                                 break;
                             }
                             player.Group.Mission = new RaizeMission(player.Group);
                             break;
                         }
                     case "tower capture":
+                    case "capture de tour":
                         {
                             break;
                         }
                     case "keep capture":
+                    case "capture de fort":
                         {
                             break;
                         }
                     case "caravan":
+                    case "caravane":
                         {
                             if (player.Group == null)
                             {
-                                SayTo(player, "You are not in a group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                                 break;
                             }
 
                             if (player.Group.Leader != player)
                             {
-                                SayTo(player, "You are not the leader of your group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                                 break;
                             }
-                            SayTo(player, "This type of mission is not yet implemented");
+                            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotImplemented"));
                             break;
                         }
                     case "enemy guards":
+                    case "gardes ennemis":
                         {
                             if (player.Group == null)
                             {
-                                SayTo(player, "You are not in a group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                                 break;
                             }
 
                             if (player.Group.Leader != player)
                             {
-                                SayTo(player, "You are not the leader of your group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                                 break;
                             }
                             if (player.Group.Mission != null)
@@ -210,16 +227,17 @@ namespace DOL.GS.Keeps
                             break;
                         }
                     case "realm enemies":
+                    case "ennemis de royaume":
                         {
                             if (player.Group == null)
                             {
-                                SayTo(player, "You are not in a group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotInGroup"));
                                 break;
                             }
 
                             if (player.Group.Leader != player)
                             {
-                                SayTo(player, "You are not the leader of your group!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotGroupLeader"));
                                 break;
                             }
                             if (player.Group.Mission != null)
@@ -228,43 +246,44 @@ namespace DOL.GS.Keeps
                             break;
                         }
                     case "guild missions":
+                    case "missions de guilde":
                         {
                             if (Component != null)
                                 break;
                             if (player.Guild == null)
                             {
-                                SayTo(player, "You have no guild!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.Guild.NoGuild"));
                                 return false;
                             }
 
                             if (!player.Guild.HasRank(player, Guild.eRank.OcSpeak))
                             {
-                                SayTo(player, "You are not high enough rank in your guild!");
+                                _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.Guild.RankTooLow"));
                                 return false;
                             }
                             //TODO: implement guild missions
-                            SayTo(player, "This type of mission is not yet implemented");
-                            SayTo(player, "Outstanding, we can always use help from organized guilds. Would you like to press the attack on the realm of [Albion] or the realm of [Hibernia].");
+                            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.NotImplemented"));
+                            _ = SayTo(player, LanguageMgr.GetTranslation(player.Client, "MissionMaster.Whisper.Guild.Missions"));
                             break;
                         }
                 }
             }
 
             if (player.Mission != null)
-                SayTo(player, player.Mission.Description);
+                _ = SayTo(player, player.Mission.Description);
 
             if (player.Group != null && player.Group.Mission != null)
-                SayTo(player, player.Group.Mission.Description);
+                _ = SayTo(player, player.Group.Mission.Description);
 
             return true;
         }
 
-        protected override ICharacterClass GetClass()
+        protected override CharacterClass GetClass()
         {
-            if (ModelRealm == eRealm.Albion) return new ClassArmsman();
-            else if (ModelRealm == eRealm.Midgard) return new ClassWarrior();
-            else if (ModelRealm == eRealm.Hibernia) return new ClassHero();
-            return new CharacterClassBase();
+            if (ModelRealm == eRealm.Albion) return CharacterClass.Armsman;
+            else if (ModelRealm == eRealm.Midgard) return CharacterClass.Warrior;
+            else if (ModelRealm == eRealm.Hibernia) return CharacterClass.Hero;
+            return CharacterClass.None;
         }
 
         protected override void SetBlockEvadeParryChance()
@@ -288,7 +307,7 @@ namespace DOL.GS.Keeps
 
         protected override void SetAggression()
         {
-            (Brain as KeepGuardBrain).SetAggression(90, 400);
+            (Brain as KeepGuardBrain)!.SetAggression(90, 400);
         }
 
         protected override void SetName()

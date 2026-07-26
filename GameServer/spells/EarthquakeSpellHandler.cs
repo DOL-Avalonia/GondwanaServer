@@ -2,12 +2,9 @@ using DOL.AI.Brain;
 using DOL.GS.Effects;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
-using DOL.GS.PlayerClass;
-using DOL.GS.ServerProperties;
 using DOL.Language;
 using System;
 using System.Linq;
-using static DOL.GS.Region;
 
 namespace DOL.GS.Spells
 {
@@ -363,10 +360,10 @@ namespace DOL.GS.Spells
             {
                 GamePlayer player = target as GamePlayer;
                 if (player!.IsSwimming ||
-                    (player.CharacterClass is ClassVampiir && player.IsSprinting && player.CurrentSpeed == player.MaxSpeed) ||
-                    (player.CharacterClass is ClassBainshee && (player.Model == 1883 || player.Model == 1884 || player.Model == 1885)) ||
-                    (player.CharacterClass is ClassOccultist && (FindEffectOnTarget(player, "SpiritShapeShift") != null || FindEffectOnTarget(player, "CallOfShadows") == null)) ||
-                    (player.CharacterClass is ClassNecromancer && HasNecromancerShade(player)))
+                    (player.CharacterClass.ID == (int)eCharacterClass.Vampiir && player.IsSprinting && player.CurrentSpeed == player.MaxSpeed) ||
+                    (player.CharacterClass.ID == (int)eCharacterClass.Bainshee && (player.Model == 1883 || player.Model == 1884 || player.Model == 1885)) ||
+                    (player.CharacterClass.ID == (int)eCharacterClass.Occultist && (FindEffectOnTarget(player, "SpiritShapeShift") != null || FindEffectOnTarget(player, "CallOfShadows") == null)) ||
+                    (player.CharacterClass.ID == (int)eCharacterClass.Necromancer && HasNecromancerShade(player)))
                 {
                     return 0;
                 }

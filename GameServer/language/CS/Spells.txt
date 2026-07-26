@@ -293,6 +293,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Obnoví {0} zdraví Pr
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prodlouží trvání trýznivé existence Prokletého cíle o {0} sekund. Nemá žádný účinek na neprokleté cíle.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Bonusový efekt (Pouze Prokletý cíl):
 SpellDescription.ZombieHeal.Header.SideEffect:            Vedlejší účinek (Postih pro živé cíle):
+SpellDescription.StormEffect.MainDescription1:				Sesilatel vytvoří {0} bouří v uspořádání: {1}.
+SpellDescription.StormEffect.MainDescription2:				Bouře spustí efekt kouzla ID {0}, budou mít základní velikost {1} a zmizí po {2} sekundách.
+SpellDescription.StormEffect.SubDescription1:				Poloměry a úrovně intenzity bouří budou náhodně kolísat až o {0} %.
+SpellDescription.StormEffect.SubDescription2:				Bouře se budou dynamicky tvořit podél {0} spirálových ramen.
+SpellDescription.StormEffect.SubDescription3:				Tato kaskáda bouří může hromadně zasáhnout maximálně {0} cílů.
+SpellDescription.StormEffect.PulseDescription:				Generování bouří bude pulzovat každých {0} sekund.
+SpellDescription.StormEffect.SubSpellTitle:					Efekt bouře: {0}
 
 
 # ML Spells ShortDescriptions
@@ -427,6 +434,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Humanoid, Zvíře, 
 IllusionSpell.Arrangement.Random:		náhodně
 IllusionSpell.Arrangement.Circle:		v kruhu
 IllusionSpell.Arrangement.Line:			v řadě
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Náhodné
+StormEffect.PatternCircular:		Kruhové
+StormEffect.PatternSpiral:			{0}-ramenná spirála
+StormEffect.PatternLinear:			Lineární
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Žába

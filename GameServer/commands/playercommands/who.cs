@@ -321,7 +321,7 @@ namespace DOL.GS.Commands
             if (player.ClassNameFlag)
             {
                 result.Append(" ");
-                result.Append(player.CharacterClass.Name);
+                result.Append(player.Salutation);
             }
             else if (player.CharacterClass != null)
             {
@@ -491,7 +491,7 @@ namespace DOL.GS.Commands
                     return true;
                 if (GameServer.Instance.Configuration.ServerType == eGameServerType.GST_PvP)
                     return false;
-                if (player.CharacterClass.Name.ToLower().StartsWith(m_filterString))
+                if (player.Salutation.ToLower().StartsWith(m_filterString))
                     return true;
                 if (player.CurrentZone != null && player.CurrentZone.Description.ToLower().Contains(m_filterString))
                     return true;

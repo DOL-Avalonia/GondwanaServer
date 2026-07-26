@@ -2,11 +2,8 @@
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.GS.PlayerClass;
 using DOL.Language;
 using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
 
 namespace DOL.GS.Spells
 {

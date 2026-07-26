@@ -28,6 +28,11 @@ namespace DOL.GS.Realm
         private eLivingModel FemaleModel { get; }
         private eLivingModel MaleModel { get; }
 
+        private PlayerRace()
+        {
+            ID = eRace.Unknown;
+        }
+
         private PlayerRace(eRace race, eRealm realm, eDAoCExpansion expansion, eLivingModel maleModel, eLivingModel femaleModel)
         {
             ID = race;
@@ -36,6 +41,8 @@ namespace DOL.GS.Realm
             MaleModel = maleModel;
             FemaleModel = femaleModel;
         }
+
+        public static PlayerRace Unknown { get; } = new PlayerRace();
 
         private static Dictionary<eRace, PlayerRace> races = new Dictionary<eRace, PlayerRace>()
         {
@@ -65,12 +72,11 @@ namespace DOL.GS.Realm
         /// <summary>
         /// Try to retrieve a PlayerRace based on eRace
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="playerRace"></param>
-        /// <returns></returns>
-        public static bool TryGetRace(eRace key, out PlayerRace playerRace)
+        public static PlayerRace GetRace(int id)
         {
-            return races.TryGetValue(key, out playerRace);
+            races.TryGetValue((eRace)id, out var race);
+            if (race == null) return Unknown;
+            return race;
         }
 
         public eLivingModel GetModel(eGender gender)

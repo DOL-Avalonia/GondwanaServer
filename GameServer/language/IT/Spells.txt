@@ -293,6 +293,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Ripristina {0} salute 
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prolunga la durata della tormentata esistenza di un bersaglio Dannato di {0} secondi. Non ha effetto sui bersagli non Dannati.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Effetto Bonus (Solo bersagli Dannati):
 SpellDescription.ZombieHeal.Header.SideEffect:            Effetto Collaterale (Penalità bersagli viventi):
+SpellDescription.StormEffect.MainDescription1:				L'incantatore genera {0} tempeste in una disposizione {1}.
+SpellDescription.StormEffect.MainDescription2:				Le tempeste attiveranno l'ID effetto incantesimo {0}, avranno una dimensione base di {1} e svaniranno dopo {2} secondi.
+SpellDescription.StormEffect.SubDescription1:				I raggi e i livelli di intensità delle tempeste fluttueranno casualmente fino al {0}%.
+SpellDescription.StormEffect.SubDescription2:				Le tempeste si genereranno dinamicamente lungo {0} bracci a spirale.
+SpellDescription.StormEffect.SubDescription3:				Un massimo di {0} bersagli può essere influenzato collettivamente da questa cascata di tempeste.
+SpellDescription.StormEffect.PulseDescription:				La generazione della tempesta pulserà ogni {0} secondi.
+SpellDescription.StormEffect.SubSpellTitle:					Effetto Tempesta: {0}
 
 
 # ML Spells ShortDescriptions
@@ -427,6 +434,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Umanoide, Animale, 
 IllusionSpell.Arrangement.Random:		casuale
 IllusionSpell.Arrangement.Circle:		in cerchio
 IllusionSpell.Arrangement.Line:			in linea
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Casuale
+StormEffect.PatternCircular:		Circolare
+StormEffect.PatternSpiral:			Spirale a {0} braccia
+StormEffect.PatternLinear:			Lineare
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Rana

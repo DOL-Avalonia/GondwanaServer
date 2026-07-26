@@ -747,3 +747,43 @@ MasterTrainer.Interact.WeaponNotRelated13:		{0} says, "This weapon is not relate
 MasterTrainer.Interact.WeaponNotRelated14:		{0} says, "This weapon is not related to the class you want to train in. Please choose again: [sword], [hammer], [axe] or [hand to hand]."
 MasterTrainer.Interact.WeaponNotRelated15:		{0} says, "This weapon is not related to the class you want to train in. Please choose again: [sword], [hammer] or [axe]."
 MasterTrainer.Interact.WeaponNotRelated16:		{0} says, "This weapon is not related to the class you want to train in. Please choose again: [sword] or [spear]."
+
+MasterTrainer.Interact.RealmRankDeleteAsk:		You want to [delete] ?
+MasterTrainer.Interact.RealmRankDeleted:		Now you can choose your RR again!
+MasterTrainer.Interact.RealmRanksList1:			You can choose for: [RR1]-[RR13]
+MasterTrainer.Interact.RealmRanksList2:			Which Rank you want to be ?
+MasterTrainer.Interact.RealmRank1:				You will not get any Realmpoints for RR1!
+MasterTrainer.Interact.RealmRankSet:			You got RR{0} and cannot change it anymore!
+
+MasterTrainer.Interact.RespecsList1:			You currently have:
+MasterTrainer.Interact.RespecsList2:			{0} Full skill respecs
+MasterTrainer.Interact.RespecsList3:			{1} Single skill respecs
+MasterTrainer.Interact.RespecsList4:			{2} Realm skill respecs
+MasterTrainer.Interact.RespecsList5:			{3} Champion skill respecs
+MasterTrainer.Interact.RespecsAsk1:				Which would you like to buy:
+MasterTrainer.Interact.RespecsAsk2:				[Full], [Single], [Realm], [MasterLevel] or [ChampionLevel]?
+MasterTrainer.Interact.RespecFullMax:			You already have 5 Full skill respecs.
+MasterTrainer.Interact.RespecFullBuy:			Full Skill Respec price is: FREE Do you really want to buy one?
+MasterTrainer.Interact.RespecFullBought1:		You just bought a Full skill respec!
+MasterTrainer.Interact.RespecFullBought2:		Target the trainer and type /respec ALL to use it!
+MasterTrainer.Interact.RespecSingleMax:			You already have 5 Single respecs.
+MasterTrainer.Interact.RespecSingleBuy:			Single Skill Respec price is: FREE Do you really want to buy one?
+MasterTrainer.Interact.RespecSingleBought1:		You just bought a Single skill respec!
+MasterTrainer.Interact.RespecSingleBought2:		Target the trainer and type /respec <line> to use it!
+MasterTrainer.Interact.RespecRealmMax:			You already have 5 Realm respecs.
+MasterTrainer.Interact.RespecRealmBuy:			Realm Skill Respec price is: FREE Do you really want to buy one?
+MasterTrainer.Interact.RespecRealmBought1:		You just bought a Realm skill respec!
+MasterTrainer.Interact.RespecRealmBought2:		Target the trainer and type /respec Realm to use it!
+MasterTrainer.Interact.RespecCLMax:				You already have 5 CL respecs.
+MasterTrainer.Interact.RespecCLBuy:				CL Skill Respec price is: FREE Do you really want to buy one?
+MasterTrainer.Interact.RespecCLBought1:			You just bought a Champion skill respec!
+MasterTrainer.Interact.RespecCLBought2:			Please visit the Champion Level master to use it!
+
+MasterTrainer.TrainSpecLine.NoTrainerTarget:	You must have your trainer targetted to be trained in a specialization line.
+MasterTrainer.TrainSpecLine.InvalidAmount:		An Error occurred, there was an invalid amount to train: {0} points is not valid!
+MasterTrainer.TrainSpecLine.InvalidLine:		An Error occurred, there was an invalid line name: {0}.
+MasterTrainer.TrainSpecLine.MaxTrainedLevel:	You can't train in {0} again this level!
+MasterTrainer.TrainSpecLine.AlreadyTrained:		You have already trained this amount in {0}.
+MasterTrainer.TrainSpecLine.Cost:				That specialization costs {0} specialization points!
+MasterTrainer.TrainSpecLine.NotEnoughPoints:	You don't have that many specialization points left for this level.
+MasterTrainer.TrainSpecLine.Success:			You now have {0} points in the {1} line!

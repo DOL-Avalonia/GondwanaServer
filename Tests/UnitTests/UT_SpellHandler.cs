@@ -43,7 +43,7 @@ namespace DOL.UnitTests.Gameserver
             var actual = caster.lastNotifiedEvent;
             var expected = GameLivingEvent.CastStarting;
             Assert.AreEqual(expected, actual);
-            Assert.AreEqual((caster.lastNotifiedEventArgs as CastingEventArgs).SpellHandler, spellHandler);
+            Assert.AreEqual((caster.lastNotifiedEventArgs as CastingEventArgs)!.SpellHandler, spellHandler);
         }
 
         [Test]
@@ -298,12 +298,12 @@ namespace DOL.UnitTests.Gameserver
         }
 
         [Test]
-        public void CalculateDamageBase_SpellDamageIs100SourceIsAnimistWith100Int_ReturnAround109()
+        public void CalculateDamageBase_SpellDamageIs100SourceIsCasterWith100ManaStat_ReturnCirca109()
         {
             var spell = NewFakeSpell();
             spell.Damage = 100;
             var source = NewFakePlayer();
-            source.fakeCharacterClass = new CharacterClassAnimist();
+            source.fakeCharacterClass = IntCaster;
             source.modifiedIntelligence = 100;
             var target = NewFakePlayer();
             var spellLine = NewSpellLine();
@@ -316,12 +316,12 @@ namespace DOL.UnitTests.Gameserver
         }
 
         [Test]
-        public void CalculateDamageBase_SpellDamageIs100SourceIsAnimistPetWith100IntAndOwnerWith100Int_ReturnAround119()
+        public void CalculateDamageBase_SpellDamageIs100SourceIsCasterPetWith100ManaStatAndOwnerWith100ManaStat_ReturnCirca119()
         {
             var spell = NewFakeSpell();
             spell.Damage = 100;
             var owner = NewFakePlayer();
-            owner.fakeCharacterClass = new CharacterClassAnimist();
+            owner.fakeCharacterClass = IntCaster;
             owner.modifiedIntelligence = 100;
             owner.Level = 50;
             var brain = new FakeControlledBrain();
@@ -482,6 +482,8 @@ namespace DOL.UnitTests.Gameserver
         private static FakeNPC NewFakeNPC() => new FakeNPC();
         private static FakeSpell NewFakeSpell() => new FakeSpell();
         private static SpellLine NewSpellLine() => new SpellLine("", "", "", false);
+        private static CharacterClass IntCaster
+            => CharacterClass.Create(new DBCharacterClass() { ManaStat = (byte)eStat.INT });
 
         private class FakeSpell : Spell
         {
@@ -509,7 +511,7 @@ namespace DOL.UnitTests.Gameserver
 
             public FakePlayerSpy() : base()
             {
-                fakeCharacterClass = new CharacterClassBase();
+                fakeCharacterClass = GS.CharacterClass.None;
                 fakeRegion.fakeElapsedTime = 0;
             }
 

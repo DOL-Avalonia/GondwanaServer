@@ -475,6 +475,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Je zult nu automatisch sc
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:    Je kunt je rijdier niet roepen terwijl je zit.
 GameObjects.GamePlayer.UseSlot.CantFire:               Je kunt dit voorwerp niet werpen of gebruiken.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:        Je bent in gevecht en kunt je rijdier niet roepen.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Je bent een spreuk aan het uitspreken en kunt je rijdier niet oproepen.
 GameObjects.GamePlayer.UseSlot.CantMountHere:          Je kunt hier geen rijdier oproepen!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Je kunt hier geen rijdier oproepen!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Je kunt geen rijdier oproepen in een kerker!

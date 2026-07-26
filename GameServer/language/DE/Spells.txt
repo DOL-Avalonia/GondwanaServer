@@ -12,6 +12,7 @@ DelveInfo.PowerCost:					Magiekraftkosten: {0}
 DelveInfo.HealthCost:                   		Gesundheitskosten: {0}
 DelveInfo.Radius:					Radius: {0}
 DelveInfo.Range:					Reichweite: {0}
+DelveInfo.RangeModified:			Reichweite: {0} {1}
 DelveInfo.RecastTime:					Wiederholungszeit:
 DelveInfo.Target:					Ziel: {0}
 DelveInfo.Value:					Wert: {0}
@@ -292,6 +293,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Stellt bei einem verda
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Verlängert die qualvolle Existenz eines verdammten Ziels um {0} Sekunden. Hat keine Auswirkungen auf nicht verdammte Ziele.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Bonuseffekt (Nur verdammte Ziele):
 SpellDescription.ZombieHeal.Header.SideEffect:            Nebenwirkung (Strafe für lebende Ziele):
+SpellDescription.StormEffect.MainDescription1:				Der Zaubernde erzeugt {0} Stürme in einer {1} Anordnung.
+SpellDescription.StormEffect.MainDescription2:				Stürme lösen den Zaubereffekt-ID {0} aus, haben eine Grundgröße von {1} und verblassen nach {2} Sekunden.
+SpellDescription.StormEffect.SubDescription1:				Die Radien und Intensitätsstufen der Stürme schwanken zufällig um bis zu {0}%.
+SpellDescription.StormEffect.SubDescription2:				Stürme entstehen dynamisch entlang von {0} spiralförmigen Armen.
+SpellDescription.StormEffect.SubDescription3:				Maximal {0} Ziele können kollektiv von dieser Sturmkaskade getroffen werden.
+SpellDescription.StormEffect.PulseDescription:				Die Sturmerzeugung pulsiert alle {0} Sekunden.
+SpellDescription.StormEffect.SubSpellTitle:					Sturmeffekt: {0}
 
 
 # ML Spells ShortDescriptions
@@ -426,6 +434,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Humanoid, Tierisch,
 IllusionSpell.Arrangement.Random:		zufällig
 IllusionSpell.Arrangement.Circle:		im Kreis
 IllusionSpell.Arrangement.Line:			in einer Linie
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Zufällig
+StormEffect.PatternCircular:		Kreisförmig
+StormEffect.PatternSpiral:			{0}-armige Spirale
+StormEffect.PatternLinear:			Linear
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Frosch

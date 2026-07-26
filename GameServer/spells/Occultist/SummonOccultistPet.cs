@@ -3,7 +3,6 @@ using DOL.AI.Brain;
 using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.GS.PlayerClass;
 using DOL.Language;
 
 namespace DOL.GS.Spells
@@ -178,7 +177,7 @@ namespace DOL.GS.Spells
                 case 25163:
                     {
                         var viewer = delveClient?.Player;
-                        if (viewer?.CharacterClass is ClassOccultist)
+                        if (viewer?.CharacterClass.ID == (int)eCharacterClass.Occultist)
                         {
                             mainDesc += "\n\n" + LanguageMgr.GetTranslation(delveClient, "SpellDescription.Occultist.ConditionDescription1");
                         }

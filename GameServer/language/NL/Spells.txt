@@ -293,6 +293,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Herstelt {0} gezondhei
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Verlengt de duur van het gekwelde bestaan van een verdoemd doelwit met {0} seconden. Heeft geen effect op niet-verdoemde doelwitten.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Bonuseffect (Alleen verdoemd doelwit):
 SpellDescription.ZombieHeal.Header.SideEffect:            Bijwerking (Straf voor levend doelwit):
+SpellDescription.StormEffect.MainDescription1:				De werper genereert {0} stormen in een {1} opstelling.
+SpellDescription.StormEffect.MainDescription2:				Stormen activeren spreukeffect ID {0}, hebben een basisgrootte van {1} en verdwijnen na {2} seconden.
+SpellDescription.StormEffect.SubDescription1:				De stralen en intensiteitsniveaus van de stormen zullen willekeurig fluctueren tot {0}%.
+SpellDescription.StormEffect.SubDescription2:				Stormen spawnen dynamisch langs {0} spiraalarmen.
+SpellDescription.StormEffect.SubDescription3:				Maximaal {0} doelen kunnen collectief worden geraakt door deze stormcascade.
+SpellDescription.StormEffect.PulseDescription:				Het genereren van stormen zal elke {0} seconden pulseren.
+SpellDescription.StormEffect.SubSpellTitle:					Stormeffect: {0}
 
 
 # ML Spells ShortDescriptions
@@ -427,6 +434,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Humanoïde, Dier, I
 IllusionSpell.Arrangement.Random:		willekeurig
 IllusionSpell.Arrangement.Circle:		in cirkel
 IllusionSpell.Arrangement.Line:			in lijn
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Willekeurig
+StormEffect.PatternCircular:		Circulair
+StormEffect.PatternSpiral:			{0}-armige spiraal
+StormEffect.PatternLinear:			Lineair
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Kikker

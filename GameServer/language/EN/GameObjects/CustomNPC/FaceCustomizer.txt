@@ -1,0 +1,3 @@
+FaceCustomizer.Interact.Step2:					{0}, I have discovered a secret spell that will allow you to change your appearance. I can cast this spell upon you if you wish. All you must do is say the word and I will [change your appearance].
+FaceCustomizer.Interact.Step3:					You have already been granted the ability to change your appearance. You must leave this world to make the changes. (Log out to change your appearance.)
+FaceCustomizer.Whisper.SpellCast:				There it is done! Now, you must leave this world for a short time for the magic to work. (You must log out to change your appearance.)

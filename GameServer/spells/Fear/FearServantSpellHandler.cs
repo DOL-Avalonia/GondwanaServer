@@ -5,7 +5,6 @@ using System.Linq;
 using DOL.AI.Brain;
 using DOL.GS;
 using DOL.GS.Effects;
-using DOL.GS.PlayerClass;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 
@@ -256,9 +255,9 @@ namespace DOL.GS.Spells
                 case 25265:
                     {
                         var viewer = delveClient?.Player;
-                        if (viewer?.CharacterClass is ClassOccultist)
+                        if (viewer?.CharacterClass.ID == (int)eCharacterClass.Occultist)
                         {
-                            main += "\n\n" + "Can't be cast under Chtonic form.";
+                            main += "\n\n" + LanguageMgr.GetTranslation(delveClient, "SpellDescription.Occultist.ConditionDescription1");
                         }
                         break;
                     }

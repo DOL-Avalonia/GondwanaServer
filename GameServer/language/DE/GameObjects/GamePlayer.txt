@@ -477,6 +477,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:	Eurer Schuss wird nun auto
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:	Ihr könnt nicht auf Euer Reittier steigen, während Ihr dasitzt.
 GameObjects.GamePlayer.UseSlot.CantFire:	Ihr könnt diesen Gegenstand weder abschießen noch benutzen!
 GameObjects.GamePlayer.UseSlot.CantMountCombat:	Ihr könnt Euer Pferd nicht während eines Kampfes rufen.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Du wirkst einen Zauber und kannst dein Reittier nicht rufen.
 GameObjects.GamePlayer.UseSlot.CantMountHere:	Ihr könnt Euer Pferd in einem Dungeon nicht rufen!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:	Du kannst hier kein Reittier beschwören!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:	Du kannst in einem Dungeon kein Reittier beschwören!

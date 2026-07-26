@@ -290,10 +290,17 @@ SpellDescription.OffProcShear.Main2:				Applies a cursed replacement proc whose 
 SpellDescription.OffProcShear.ReplacementHeader:		Replacement proc:
 SpellDescription.RewindTime.MainDescription:			Teleports the target back to the position they occupied {0} seconds ago.
 SpellDescription.ZombieHeal.MainDescription.HealAndDecay: Restores {0} health to a Damned target and extends their tormented existence by {1} seconds. Inflicts {0} {2} damage to non-Damned targets.
-SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restores {0} health to a Damned target. Inflicts {0} {1} damage to non-Damned targets.
-SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Extends the duration of a Damned target's tormented existence by {0} seconds. Has no effect on non-Damned targets.
-SpellDescription.ZombieHeal.Header.BonusEffect:           Bonus Effect (Damned Target Only):
-SpellDescription.ZombieHeal.Header.SideEffect:            Side Effect (Living Target Penalty):
+SpellDescription.ZombieHeal.MainDescription.HealOnly:		Restores {0} health to a Damned target. Inflicts {0} {1} damage to non-Damned targets.
+SpellDescription.ZombieHeal.MainDescription.DecayOnly:		Extends the duration of a Damned target's tormented existence by {0} seconds. Has no effect on non-Damned targets.
+SpellDescription.ZombieHeal.Header.BonusEffect:				Bonus Effect (Damned Target Only):
+SpellDescription.ZombieHeal.Header.SideEffect:				Side Effect (Living Target Penalty):
+SpellDescription.StormEffect.MainDescription1:				The caster generates {0} storms in a {1} arrangement.
+SpellDescription.StormEffect.MainDescription2:				Storms will trigger spell effect ID {0}, have a base size of {1}, and fade after {2} seconds.
+SpellDescription.StormEffect.SubDescription1:				Storm radii and intensity levels will randomly fluctuate by up to {0}%.
+SpellDescription.StormEffect.SubDescription2:				Storms will dynamically spawn along {0} spiraling arms.
+SpellDescription.StormEffect.SubDescription3:				A maximum of {0} targets can be affected collectively by this storm cascade.
+SpellDescription.StormEffect.PulseDescription:				The storm generation will pulse every {0} seconds.
+SpellDescription.StormEffect.SubSpellTitle:					Storm Effect: {0}
 
 
 # ML Spells ShortDescriptions
@@ -428,6 +435,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	humanoid, animal, i
 IllusionSpell.Arrangement.Random:		randomly
 IllusionSpell.Arrangement.Circle:		in a circle
 IllusionSpell.Arrangement.Line:			in a line
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Random
+StormEffect.PatternCircular:		Circular
+StormEffect.PatternSpiral:			{0}-Arm Spiral
+StormEffect.PatternLinear:			Linear
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Frog

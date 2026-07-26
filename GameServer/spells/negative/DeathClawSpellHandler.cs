@@ -1,6 +1,5 @@
 using DOL.AI.Brain;
 using DOL.GS.Effects;
-using DOL.GS.PlayerClass;
 using DOL.Language;
 
 namespace DOL.GS.Spells
@@ -81,9 +80,9 @@ namespace DOL.GS.Spells
                 || FindEffectOnTarget<DamnationSpellHandler>(target) != null
                 || FindEffectOnTarget<SummonMonster>(target) != null;
             bool isSpecialClass = target is GamePlayer player
-                && ((player.CharacterClass is ClassNecromancer && player.IsShade && FindEffectOnTarget(target, e => e is NecromancerShadeEffect) != null)
-                    || (player.CharacterClass is ClassBainshee && player.Model is 1883 or 1884 or 1885)
-                    || (player.CharacterClass is ClassVampiir));
+                && ((player.CharacterClass.ID == (int)eCharacterClass.Necromancer && player.IsShade && FindEffectOnTarget(target, e => e is NecromancerShadeEffect) != null)
+                    || (player.CharacterClass.ID == (int)eCharacterClass.Bainshee && player.Model is 1883 or 1884 or 1885)
+                    || (player.CharacterClass.ID == (int)eCharacterClass.Vampiir));
             bool isBoss = target is GameNPC { IsBoss: true };
 
             return isShapeShifted || isGhostOrUndead || isSpecialClass || isBoss;

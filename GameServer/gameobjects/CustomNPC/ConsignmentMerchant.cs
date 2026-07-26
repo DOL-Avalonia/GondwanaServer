@@ -380,7 +380,7 @@ namespace DOL.GS
                     {
                         if (itemInFromSlot != null && itemInFromSlot.Template != null && (itemInFromSlot.Template.Flags == 44 || itemInFromSlot.Template.Flags == 45))
                         {
-                            player.Out.SendMessage($"You cannot unequip {itemInFromSlot.Name} directly to a merchant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.CannotUnequip", itemInFromSlot.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return false;
                         }
                     }

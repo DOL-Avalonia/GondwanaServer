@@ -121,7 +121,7 @@ namespace DOL.GS.Scripts
                 {
                     if (unfollowEntry != null)
                     {
-                        string text = string.Format(unfollowEntry, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                        string text = string.Format(unfollowEntry, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
                         player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     }
                     Notify(GameNPCEvent.FollowLostTarget, this, new FollowLostTargetEventArgs(player));
@@ -142,7 +142,7 @@ namespace DOL.GS.Scripts
                     
                     if (followEntry != null)
                     {
-                        string text = string.Format(followEntry, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                        string text = string.Format(followEntry, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
                         player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     }
                     Follow(player);

@@ -294,6 +294,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restaure {0} points de
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prolonge la durée de la Damnation de la cible de {0} secondes. Sans effet sur les cibles non-Damnées.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Effet Bonus (Cible Damnée Uniquement):
 SpellDescription.ZombieHeal.Header.SideEffect:            Pénalité (Cible Vivante Uniquement):
+SpellDescription.StormEffect.MainDescription1:				Le lanceur génère {0} tempêtes selon une disposition {1}.
+SpellDescription.StormEffect.MainDescription2:				Les tempêtes déclencheront l'effet de sort ID {0}, auront une taille de base de {1} et se dissiperont après {2} secondes.
+SpellDescription.StormEffect.SubDescription1:				Les rayons et les niveaux d'intensité des tempêtes fluctueront de manière aléatoire jusqu'à {0} %.
+SpellDescription.StormEffect.SubDescription2:				Les tempêtes apparaîtront dynamiquement le long de {0} bras en spirale.
+SpellDescription.StormEffect.SubDescription3:				Un maximum de {0} cibles peut être affecté collectivement par cette cascade de tempêtes.
+SpellDescription.StormEffect.PulseDescription:				La génération de tempêtes s'activera toutes les {0} secondes.
+SpellDescription.StormEffect.SubSpellTitle:					Effet de tempête : {0}
 
 
 # ML Spells ShortDescriptions
@@ -428,6 +435,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	humanoïde, animale
 IllusionSpell.Arrangement.Random:		aléatoirement
 IllusionSpell.Arrangement.Circle:		en cercle
 IllusionSpell.Arrangement.Line:			en ligne
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Aléatoire
+StormEffect.PatternCircular:		Circulaire
+StormEffect.PatternSpiral:			Spirale à {0} bras
+StormEffect.PatternLinear:			Linéaire
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Grenouille

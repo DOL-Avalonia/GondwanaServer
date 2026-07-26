@@ -474,6 +474,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Ahora dispararás y recar
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:    No puedes llamar a tu montura mientras estás sentado.
 GameObjects.GamePlayer.UseSlot.CantFire:               No puedes lanzar ni usar este objeto.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:        Estás en combate y no puedes llamar a tu montura.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Estás lanzando un hechizo y no puedes llamar a tu montura.
 GameObjects.GamePlayer.UseSlot.CantMountHere:          ¡No puedes invocar una montura aquí!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       ¡No puedes invocar una montura aquí!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     ¡No puedes invocar una montura en una mazmorra!

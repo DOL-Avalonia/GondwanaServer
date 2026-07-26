@@ -1736,7 +1736,7 @@ namespace DOL.GameEvents
             }
             if (Owner != null)
             {
-                message = message.Replace("<class>", Owner.CharacterClass.Name);
+                message = message.Replace("<class>", Owner.Salutation);
             }
             return message;
         }

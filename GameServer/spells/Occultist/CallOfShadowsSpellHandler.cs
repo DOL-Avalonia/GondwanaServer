@@ -134,7 +134,7 @@ namespace DOL.GS.Spells
             {
                 new RegionTimerAction<GamePlayer>(pl, p =>
                 {
-                    _tempParryLevel = GS.CharacterClassOccultist.ModTempParry(p, apply, _tempParryLevel);
+                    _tempParryLevel = CharacterClass.ModTempParry(p, apply, _tempParryLevel);
                     return 0;
                 }).Start(1);
             }

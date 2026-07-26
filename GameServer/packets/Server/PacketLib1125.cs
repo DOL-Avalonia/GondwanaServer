@@ -428,7 +428,7 @@ namespace DOL.GS.PacketHandler
                     foreach (GameLiving living in group.GetMembersInTheGroup())
                     {
                         pak.WritePascalString(m_gameClient.Player.GetPersonalizedName(living));
-                        pak.WritePascalString(living is GamePlayer ? ((GamePlayer)living).CharacterClass.Name : "NPC");
+                        pak.WritePascalString(living is GamePlayer ? ((GamePlayer)living).Salutation : "NPC");
                         pak.WriteShort((ushort)living.ObjectID); //or session id?
                         pak.WriteByte(living.Level);
                     }
@@ -457,7 +457,7 @@ namespace DOL.GS.PacketHandler
 
             var player = living as GamePlayer;
 
-            pak.WriteByte(player?.CharacterClass?.HealthPercentGroupWindow ?? living.HealthPercent);
+            pak.WriteByte(player?.HealthPercentGroupWindow ?? living.HealthPercent);
             pak.WriteByte(living.ManaPercent);
             pak.WriteByte(living.EndurancePercent); // new in 1.69
 

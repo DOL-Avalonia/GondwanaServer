@@ -16,14 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
-using DOL.GS.Effects;
 using DOL.AI.Brain;
+using DOL.Events;
+using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.GS.PropertyCalc;
 using DOL.GS.RealmAbilities;
 using DOL.Language;
+using System;
+using System.Collections.Generic;
 
 namespace DOL.GS.Spells
 {
@@ -83,13 +84,12 @@ namespace DOL.GS.Spells
                 return false;
 
             if (Caster is GamePlayer player)
-                player.CharacterClass.EnterShade();
+                player.Shade(true);
 
             // Cancel RR5 Call of Darkness if on caster.
 
             IGameEffect callOfDarkness = SpellHelper.FindEffectOnTarget(Caster, typeof(CallOfDarknessSpellHandler));
-            if (callOfDarkness != null)
-                callOfDarkness.Cancel(false);
+            if (callOfDarkness != null) callOfDarkness.Cancel(false);
             return true;
         }
 
@@ -117,6 +117,21 @@ namespace DOL.GS.Spells
         protected override GamePet GetGamePet(INpcTemplate template)
         {
             return new NecromancerPet(template, m_summonConBonus, m_summonHitsBonus);
+        }
+
+        protected override void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
+        {
+            var ownerHealthPointsAfterRelease = (Caster.ControlledBrain != null) ? (int)Caster.ControlledBrain.Body.HealthPercent : 0;
+
+            if (Caster is GamePlayer playerCaster && playerCaster.IsShade)
+            {
+                playerCaster.Health = Math.Min(playerCaster.Health, playerCaster.MaxHealth * Math.Max(10, ownerHealthPointsAfterRelease) / 100);
+                playerCaster.Shade(false);
+            }
+
+            base.OnNpcReleaseCommand(e, sender, arguments);
+
+            Caster.InitControlledBrainArray(0);
         }
     }
 }

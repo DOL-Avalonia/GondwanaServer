@@ -475,6 +475,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Nyní budeš automaticky 
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:    Nemůžeš přivolat své jízdní zvíře při sezení.
 GameObjects.GamePlayer.UseSlot.CantFire:               Tento předmět nemůžeš hodit ani použít.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:        Jsi v boji a nemůžeš přivolat jízdní zvíře.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Sesíláš kouzlo a nemůžeš přivolat své jízdní zvíře.
 GameObjects.GamePlayer.UseSlot.CantMountHere:          Zde nemůžeš přivolat jízdní zvíře!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Zde nemůžeš přivolat jízdní zvíře!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     V kobce nemůžeš přivolat jízdní zvíře!

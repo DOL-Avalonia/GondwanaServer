@@ -3118,7 +3118,7 @@ namespace DOL.GS
 
             // Cancel all negative pulsing concentration effects cast by the caster (whew)
             rider.ConcentrationEffects.CancelAll(e => e is PulsingSpellEffect { SpellHandler: { HasPositiveEffect: false, Spell.IsPulsing: true, Spell.Radius: >0 } spell } && spell.Caster == rider);
-            rider.CharacterClass.CancelClassStates(); // Cancel bainshee, shade, etc
+            rider.CancelClassStates(); // Cancel bainshee, shade, etc
             rider.MoveTo(Position);
             Riders[slot] = rider;
             rider.Steed = this;

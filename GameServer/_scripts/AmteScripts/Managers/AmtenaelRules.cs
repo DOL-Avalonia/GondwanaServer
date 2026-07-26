@@ -12,7 +12,6 @@ using DOL.GS.Scripts;
 using log4net;
 using System.Reflection;
 using DOL.Events;
-using DOL.GS.PlayerClass;
 using DOL.gameobjects.CustomNPC;
 using DOL.GS.Finance;
 using DOL.Language;
@@ -762,7 +761,7 @@ namespace DOL.GS.ServerRules
             var plc = caster as GamePlayer;
             var plt = target as GamePlayer;
             // player on horse cant heal, cure or cast a pet spell
-            if (plc != null && plc.IsOnHorse && (spell.SpellType.Contains("Heal") || spell.SpellType.Contains("Cure") || spell.SpellType.Contains("Summon") || (plc.CharacterClass is ClassHeretic && spell.Pulse != 0)))
+            if (plc != null && plc.IsOnHorse && (spell.SpellType.Contains("Heal") || spell.SpellType.Contains("Cure") || spell.SpellType.Contains("Summon") || (plc.CharacterClass.ID == (int)eCharacterClass.Heretic && spell.Pulse != 0)))
                 return false;
             if ((plc != null && JailMgr.IsPrisoner(plc)) || (plt != null && JailMgr.IsPrisoner(plt)))
                 return false;

@@ -29,10 +29,7 @@ using DOL.GS.PacketHandler;
 using DOL.GS.Quests;
 using DOL.GS.Friends;
 using DOL.GS.Finance;
-using GameServerScripts.Amtescripts.Managers;
 using DOL.Language;
-using System.Numerics;
-using AmteScripts.Managers;
 
 namespace DOL.GS.Commands
 {
@@ -2294,7 +2291,7 @@ namespace DOL.GS.Commands
 
                         foreach (GamePlayer p in player.Group.GetPlayersInTheGroup())
                         {
-                            text.Add(p.Name + " " + p.Level + " " + p.CharacterClass.Name);
+                            text.Add(p.Name + " " + p.Level + " " + p.Salutation);
                         }
 
                         client.Out.SendCustomTextWindow("Group Members", text);
@@ -2644,7 +2641,7 @@ namespace DOL.GS.Commands
             var text = new List<string>();
             text.Add("  - Name Lastname : " + player.Name + " " + player.LastName);
             text.Add("  - Realm Level Class : " + GlobalConstants.RealmToName(player.Realm) + " " + player.Level + " " +
-                     player.CharacterClass.Name);
+                     player.Salutation);
             text.Add(" ");
             text.Add(Money.GetShortString(player.CopperBalance));
             text.Add(" ");
@@ -2734,7 +2731,7 @@ namespace DOL.GS.Commands
             text.Add(" ");
             text.Add("PLAYER INFORMATION (Client # " + player.Client.SessionID + ", " + player.GetType().FullName + ")");
             text.Add("  - Name Lastname : " + player.Name + " " + player.LastName);
-            text.Add("  - Realm Level Gender Class : " + GlobalConstants.RealmToName(player.Realm) + " " + player.Level + " " + player.Gender + " " + player.CharacterClass.Name + " (" + player.CharacterClass.ID + ")");
+            text.Add("  - Realm Level Gender Class : " + GlobalConstants.RealmToName(player.Realm) + " " + player.Level + " " + player.Gender + " " + player.Salutation + " (" + player.CharacterClass.ID + ")");
             text.Add("  - Realm Level: " + player.RealmLevel);
             text.Add("  - Guild : " + player.GuildName + " " + (player.GuildRank != null ? "Rank: " + player.GuildRank.RankLevel.ToString() : ""));
             text.Add("  - XPs/RPs/BPs : " + player.Experience + " xp, " + player.RealmPoints + " rp, " + player.BountyPointBalance + " bp");
@@ -2905,12 +2902,13 @@ namespace DOL.GS.Commands
 
             //reset before, and after changing the class.
             target.Reset();
-            target.SetCharacterClass(classID);
+            target.SetCharacterClass(CharacterClass.GetClass(classID));
             target.Reset();
 
             //this is just for additional updates
             //that add all the new class changes.
             target.OnLevelUp(0);
+            target.LoadClassSpecializations(false);
             target.RefreshUsableSkills(true);
             
             target.Out.SendUpdatePlayer();

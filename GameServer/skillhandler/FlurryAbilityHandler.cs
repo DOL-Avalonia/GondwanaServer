@@ -35,7 +35,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// The reuse time in milliseconds for flurry ability
@@ -121,7 +121,7 @@ namespace DOL.GS.SkillHandler
 
             GameLiving target = (GameLiving)player.TargetObject;
             int damage = 0;
-            int specc = (player.CharacterClass is PlayerClass.ClassBlademaster) ?
+            int specc = (player.CharacterClass.Equals(CharacterClass.Blademaster)) ?
                 player.GetModifiedSpecLevel(Specs.Celtic_Dual) : player.GetModifiedSpecLevel(Specs.Dual_Wield);
 
             //damage = base HP / 100 * DWspec / 2.7 that would be the original calculation
@@ -162,7 +162,7 @@ namespace DOL.GS.SkillHandler
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Skill.Ability.Flurry.YouHit", target.GetName(0, false), damage), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
 
             if (target is GamePlayer)
-                (target as GamePlayer).Out.SendMessage(LanguageMgr.GetTranslation((target as GamePlayer).Client, "Skill.Ability.Flurry.HitYou", player.Name, damage), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
+                (target as GamePlayer)!.Out.SendMessage(LanguageMgr.GetTranslation((target as GamePlayer)!.Client, "Skill.Ability.Flurry.HitYou", player.Name, damage), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
 
             player.LastAttackTickPvP = player.CurrentRegion.Time;
             target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;

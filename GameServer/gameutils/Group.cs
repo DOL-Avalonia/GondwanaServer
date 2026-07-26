@@ -707,7 +707,7 @@ namespace DOL.GS
                             text.Append("<Leader> ");
                         }
                     }
-                    text.Append("(" + plr.CharacterClass.Name + ")");
+                    text.Append("(" + plr.Salutation + ")");
                     text.Append(player.GetPersonalizedName(plr) + " ");
                 }
                 return text.ToString();

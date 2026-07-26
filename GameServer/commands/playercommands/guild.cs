@@ -3016,9 +3016,9 @@ namespace DOL.GS.Commands
                                     string zoneName = (ply.CurrentZone == null ? "(null)" : ply.CurrentZone.Description);
                                     string mesg;
                                     if (ply.GuildRank.Title != null)
-                                        mesg = ind.ToString() + ") " + ply.Name + " <" + ply.GuildRank.Title + "> the Level " + ply.Level.ToString() + " " + ply.CharacterClass.Name + " in " + zoneName;
+                                        mesg = ind.ToString() + ") " + ply.Name + " <" + ply.GuildRank.Title + "> the Level " + ply.Level.ToString() + " " + ply.Salutation + " in " + zoneName;
                                     else
-                                        mesg = ind.ToString() + ") " + ply.Name + " <" + ply.GuildRank.RankLevel.ToString() + "> the Level " + ply.Level.ToString() + " " + ply.CharacterClass.Name + " in " + zoneName;
+                                        mesg = ind.ToString() + ") " + ply.Name + " <" + ply.GuildRank.RankLevel.ToString() + "> the Level " + ply.Level.ToString() + " " + ply.Salutation + " in " + zoneName;
                                     if (ServerProperties.Properties.ALLOW_CHANGE_LANGUAGE)
                                         mesg += " <" + ply.Client.Account.Language + ">";
                                     if (ind >= startInd)

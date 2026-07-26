@@ -1,0 +1,3 @@
+FaceCustomizer.Interact.Step2:					{0}, j'ai découvert un sort secret qui vous permettra de changer d'apparence. Je peux lancer ce sort sur vous si vous le souhaitez. Tout ce que vous avez à faire est de dire le mot et je vais [changer votre apparence].
+FaceCustomizer.Interact.Step3:					Vous avez déjà reçu la capacité de changer d'apparence. Vous devez quitter ce monde pour effectuer les modifications. (Déconnectez-vous pour changer votre apparence.)
+FaceCustomizer.Whisper.SpellCast:				Et voilà, c'est fait ! Maintenant, vous devez quitter ce monde pour un court instant afin que la magie opère. (Vous devez vous déconnecter pour changer votre apparence.)

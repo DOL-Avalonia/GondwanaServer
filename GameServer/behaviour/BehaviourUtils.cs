@@ -166,7 +166,7 @@ namespace DOL.GS.Behaviour
             }
 
             message = message.Replace(RACE, player.RaceName);
-            message = message.Replace(CLASS, player.CharacterClass.Name);
+            message = message.Replace(CLASS, player.Salutation);
             message = message.Replace("<RealmTitle>", player.RealmTitle);
 
             if (message.Contains("<Guild>") || message.Contains("<guild>"))
@@ -198,7 +198,7 @@ namespace DOL.GS.Behaviour
             {
                 string pleyerClass = "";
                 if (player.CharacterClass != null)
-                    pleyerClass = player.CharacterClass.Name;
+                    pleyerClass = player.Salutation;
 
                 message = message.Replace("<Class>", pleyerClass);
                 message = message.Replace("<class>", pleyerClass);

@@ -45,6 +45,12 @@ namespace DOL.Database
             this.AccountSlot = character.AccountSlot;
             this.ActiveWeaponSlot = character.ActiveWeaponSlot;
             this.ActiveSaddleBags = character.ActiveSaddleBags;
+            this.MaxTension = character.MaxTension;
+            this.Tension = 0;
+            this.EruditionPoints = character.EruditionPoints;
+            this.EruditionLevel = character.EruditionLevel;
+            this.TaskTitleFlags = character.TaskTitleFlags;
+            this.EnableAutoTranslate = character.EnableAutoTranslate;
             this.Advisor = character.Advisor;
             this.Autoloot = character.Autoloot;
             this.BindHeading = character.BindHeading;

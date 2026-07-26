@@ -292,6 +292,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restabilește {0} via�
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prelungește durata existenței chinuite a unei ținte Blestemate cu {0} secunde. Nu are efect asupra țintelor care nu sunt Blestemate.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Efect Bonus (Doar ținte Blestemate):
 SpellDescription.ZombieHeal.Header.SideEffect:            Efect Secundar (Penalizare pentru ținte vii):
+SpellDescription.StormEffect.MainDescription1:				Invocatorul generează {0} furtuni într-un aranjament {1}.
+SpellDescription.StormEffect.MainDescription2:				Furtunile vor declanșa efectul de vrajă cu ID-ul {0}, vor avea o dimensiune de bază de {1} și se vor risipi după {2} secunde.
+SpellDescription.StormEffect.SubDescription1:				Razele și nivelurile de intensitate ale furtunilor vor fluctua aleatoriu cu până la {0}%.
+SpellDescription.StormEffect.SubDescription2:				Furtunile vor apărea dinamic de-a lungul a {0} brațe în spirală.
+SpellDescription.StormEffect.SubDescription3:				Un maxim de {0} ținte pot fi afectate în mod colectiv de această cascadă de furtuni.
+SpellDescription.StormEffect.PulseDescription:				Generarea furtunilor va pulsa la fiecare {0} secunde.
+SpellDescription.StormEffect.SubSpellTitle:					Efect de Furtună: {0}
 
 
 # ML Spells ShortDescriptions
@@ -426,6 +433,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Umanoid, Animal, In
 IllusionSpell.Arrangement.Random:		aleator
 IllusionSpell.Arrangement.Circle:		în cerc
 IllusionSpell.Arrangement.Line:			în linie
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Aleatoriu
+StormEffect.PatternCircular:		Circular
+StormEffect.PatternSpiral:			Spirală cu {0} brațe
+StormEffect.PatternLinear:			Liniar
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Broască

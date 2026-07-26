@@ -477,6 +477,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:		You will now automaticall
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:			You cannot call your mount while seated.		
 GameObjects.GamePlayer.UseSlot.CantFire:					You can't fire or use this item!	
 GameObjects.GamePlayer.UseSlot.CantMountCombat:				You are in combat and cannot call your mount.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:				You are casting a spell and cannot call your mount.
 GameObjects.GamePlayer.UseSlot.CantMountHere:		    	You cannot summon a mount here!		
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:			You cannot summon a mount here!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:		    You cannot call your mount while in a dungeon!

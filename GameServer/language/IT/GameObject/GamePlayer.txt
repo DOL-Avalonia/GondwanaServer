@@ -475,6 +475,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Ora sparerai e ricaricher
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:    Non puoi richiamare la tua cavalcatura mentre sei seduto.
 GameObjects.GamePlayer.UseSlot.CantFire:               Non puoi lanciare né usare questo oggetto.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:        Sei in combattimento e non puoi richiamare la tua cavalcatura.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Stai lanciando un incantesimo e non puoi richiamare la tua cavalcatura.
 GameObjects.GamePlayer.UseSlot.CantMountHere:          Non puoi evocare una cavalcatura qui!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Non puoi evocare una cavalcatura qui!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Non puoi evocare una cavalcatura in un dungeon!

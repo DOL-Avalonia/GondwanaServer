@@ -476,6 +476,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:	Vous allez maintenant tire
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:		Vous ne pouvez pas appeler votre monture si vous êtes assis·e.
 GameObjects.GamePlayer.UseSlot.CantFire:				Vous ne pouvez pas lancer ou utiliser cet objet.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:			Vous êtes en combat, et ne pouvez pas appeler votre monture.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Vous êtes en train de lancer un sort et ne pouvez pas appeler votre monture.
 GameObjects.GamePlayer.UseSlot.CantMountHere:			Vous ne pouvez pas invoquer de monture ici !
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:		Vous ne pouvez pas invoquer de monture ici !
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:		Vous ne pouvez pas invoquer de monture dans un donjon !

@@ -475,6 +475,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Bạn sẽ bắn và nạ
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:    Bạn không thể gọi thú cưỡi khi đang ngồi.
 GameObjects.GamePlayer.UseSlot.CantFire:               Bạn không thể ném hay dùng vật phẩm này.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:        Bạn đang giao tranh và không thể gọi thú cưỡi.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Bạn đang niệm chú và không thể gọi thú cưỡi.
 GameObjects.GamePlayer.UseSlot.CantMountHere:          Không thể gọi thú cưỡi ở đây!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Không thể gọi thú cưỡi ở đây!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Không thể gọi thú cưỡi trong hầm ngục!

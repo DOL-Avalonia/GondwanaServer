@@ -44,7 +44,6 @@ using DOL.GS.Styles;
 using DOL.Territories;
 using static Grpc.Core.Metadata;
 using System.Collections;
-using DOL.GS.PlayerClass;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
@@ -240,7 +239,7 @@ namespace DOL.GS.Spells
             private static readonly HashSet<int> ForbiddenInChtonicIDs = new() { 25075, 25076, 25077, 25078, 25079, 25259, 25260, 25261, 25264, 25265, 25191, 25192, 25193, 25194, 25195, 25159, 25160, 25161, 25162, 25163 };
             private static readonly HashSet<int> ForbiddenInDecrepitSpiritIDs = new() { 25206, 25207, 25208, 25209, 25210 };
 
-            private static bool IsOccultist(GamePlayer p) => p?.CharacterClass is ClassOccultist;
+            private static bool IsOccultist(GamePlayer p) => p?.CharacterClass.ID == (int)eCharacterClass.Occultist;
 
             private static bool IsChtonic(GameLiving l) => l?.TempProperties.getProperty<bool>(OccultistForms.KEY_CHTONIC, false) == true;
             private static bool IsSpirit(GameLiving l) => l?.TempProperties.getProperty<bool>(OccultistForms.KEY_SPIRIT, false) == true;
@@ -2208,9 +2207,64 @@ namespace DOL.GS.Spells
         /// <returns>effective casting time in milliseconds</returns>
         public virtual int CalculateCastingTime()
         {
-            return m_caster.CalculateCastingTime(m_spellLine, m_spell);
-        }
+            int ticks = Spell.CastTime;
 
+            if (Spell.IsCastTimeFixed ||
+                SpellLine.KeyName == GlobalSpellsLines.Item_Spells ||
+                SpellLine.KeyName.StartsWith(GlobalSpellsLines.Champion_Lines_StartWith))
+            {
+                return ticks;
+            }
+
+            if (Spell.SpellType == "Chamber")
+                return ticks;
+
+            if ((SpellLine.KeyName == "Cursing"
+                 || SpellLine.KeyName == "Cursing Spec"
+                 || SpellLine.KeyName == "Hexing"
+                 || SpellLine.KeyName == "Witchcraft")
+                && (Spell.SpellType != "ArmorFactorBuff"
+                    && Spell.SpellType != "Bladeturn"
+                    && Spell.SpellType != "ArmorAbsorptionBuff"
+                    && Spell.SpellType != "MatterResistDebuff"
+                    && Spell.SpellType != "Uninterruptable"
+                    && Spell.SpellType != "Powerless"
+                    && Spell.SpellType != "Range"
+                    && Spell.Name != "Lesser Twisting Curse"
+                    && Spell.Name != "Twisting Curse"
+                    && Spell.Name != "Lesser Winding Curse"
+                    && Spell.Name != "Winding Curse"
+                    && Spell.Name != "Lesser Wrenching Curse"
+                    && Spell.Name != "Wrenching Curse"
+                    && Spell.Name != "Lesser Warping Curse"
+                    && Spell.Name != "Warping Curse"))
+            {
+                return ticks;
+            }
+
+            if (Caster.EffectList.GetOfType<QuickCastEffect>() != null)
+            {
+                // Most casters have access to the Quickcast ability (or the Necromancer equivalent, Facilitate Painworking).
+                // This ability will allow you to cast a spell without interruption.
+                // http://support.darkageofcamelot.com/kb/article.php?id=022
+
+                // A: You're right. The answer I should have given was that Quick Cast reduces the time needed to cast to a flat two seconds,
+                // and that a spell that has been quick casted cannot be interrupted. ...
+                // http://www.camelotherald.com/news/news_article.php?storyid=1383
+
+                return 2000;
+            }
+
+            double percent = Caster.DexterityCastTimeReduction;
+            percent *= 1.0 - Caster.GetModified(eProperty.CastingSpeed) * 0.01;
+
+            ticks = (int)(ticks * Math.Max(Caster.CastingSpeedReductionCap, percent));
+            
+            if (ticks < Caster.MinimumCastingSpeed)
+                ticks = Caster.MinimumCastingSpeed;
+
+            return ticks;
+        }
 
         #region animations
 

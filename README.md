@@ -158,3 +158,67 @@ eProperty.MythicalCrowdDuration == Crowd Control Spell Resist Chance
 eProperty.MagicAbsorption == Spell Damage Absorption
 eProperty.MeleeSpeed == Weapon Speed
 eProperty.PieceAblative == Ablative Shield Modifier
+
+
+
+ITEM FLAGS TO DISPLAY SPECIAL PROPERTIES
+----
+
+/////// General & Base Mechanics ///////
+-Flag 1: Unsellable. Marks an item so it cannot be sold to merchants (delves as "Cannot be sold" if the item is otherwise droppable).
+
+-Flag 2: Sitting Effect. Indicates the item triggers a special effect or bonus only when the player is sitting.
+
+-Flag 3: Stackable Potion. Characterizes the item as a potion that can be combined and stacked with identical potions to pool their charges.
+
+-Flag 4: Spell Perchment/Scroll items. Characterizes the item as a scroll that can be used to cast special magical spells.
+
+-Flag 5: Patterned Item. This is a status flag. It indicates that a target item currently has a custom pattern applied to its appearance.
+
+
+/////// Dyes ///////
+-Flag 11: Cloth/Cloak/Barding Dye. Can only be applied to cloth armor, magical cloaks, or horse barding.
+
+-Flag 12: Leather Dye. Can only be applied to leather armor.
+
+-Flag 13: Metal/Shield/Saddle Dye. Can be applied to studded, chain, plate, reinforced, and scale armor, as well as shields, instruments, and horse saddles.
+
+-Flag 14: Weapon/Basic Item Dye. Can be applied to standard weaponry and basic items.
+
+-Flag 15: Omnidye. A universal dye that bypasses material restrictions and can color any dyeable item.
+
+
+/////// Patterns (Reskinning Items) ///////
+-Flag 16: Weapon Pattern. Blank or filled patterns exclusively for weapons. Checks for two-handed vs. one-handed and damage-type compatibility.
+
+-Flag 17: Shield Pattern. Blank or filled patterns exclusively for shields. Ensures shield sizes match.
+
+-Flag 18: Cloth/Cloak Pattern. Blank or filled patterns for cloth gear or cloaks. Prevents mixing cloth patterns with cloak items.
+
+-Flag 19: Armor Pattern. Blank or filled patterns for armor (leather, studded, chain, plate, etc.).
+
+-Flag 20: Mask Pattern. Blank or filled patterns explicitly for head slot masks.
+
+-Flag 21: Pattern Removal Tool. Used to scrub a pattern off an item and revert it to its original database template/stats, or to empty a "Filled" pattern back into a "Blank" pattern.
+
+-Flag 22: Smart Pattern. A specialized pattern that bypasses the standard copy/paste logic and instead assigns predefined models strictly determined by an internal ArmorPatternMgr.
+
+
+/////// Genistar & Pet Equipment ///////
+-Flag 25 to 28: Genistar House/Garden Item. Explicitly blocks players from manually right-clicking or "using" the item from their inventory. (Genistar Placeholder / Genistar Egg / etc...)
+
+-Flags 30, 31, 33, 34, 35, 36: Genistar/Pet Weapons. Classifies the item as a weapon meant for pets/Genistar mechanics.
+
+-Flag 32: Genistar/Pet Shield. Classifies the item as a shield meant for pets.
+
+-Flags 38, 39, 40: Genistar/Pet Armor. Classifies the item as armor meant for pets.
+
+
+/////// Cursed, Undeequippable & Consuming Items ///////
+These flags read a special PackageID string format (e.g., MANA|10;COND|5;DEATHCOND|10) to penalize the player equipping the item.
+
+-Flag 43: Consuming Item. When equipped, this item consumes a percentage of the player's mana, endurance, or health, or drains its own condition over time.
+
+-Flag 44: Death-Penalty Undeequippable. Once equipped, the player cannot unequip it. The item strictly loses its condition (durability) when the player dies. If condition reaches 0, it may be destroyed (if DESTROY is flagged in its package).
+
+-Flag 45: Cooldown Undeequippable. A hybrid curse. It cannot be unequipped, applies an equip-cooldown timer preventing immediate re-equipping if somehow removed, and actively consumes mana/endurance and condition while worn.

@@ -35,7 +35,6 @@ using DOL.GS.Housing;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.PacketHandler.Client.v168;
-using DOL.GS.PlayerClass;
 using DOL.GS.PlayerTitles;
 using DOL.GS.PropertyCalc;
 using DOL.GS.Quests;
@@ -953,7 +952,7 @@ namespace DOL.GS
                 log.InfoFormat("Player {0}({1}) went linkdead!", Name, Client.Account.Name);
 
             // LD Necros need to be "Unshaded"
-            Client.Player.CharacterClass.LeaveShade();
+            Client.Player.Shade(false);
 
             // Dead link-dead players release on live servers
             if (!IsAlive)
@@ -2849,7 +2848,10 @@ namespace DOL.GS
         {
             get
             {
-                return CharacterClass.HealthPercentGroupWindow;
+                var necroWithPet = CharacterClass.ID == (int)eCharacterClass.Necromancer && ControlledBrain != null;
+                if (necroWithPet) return ControlledBrain!.Body.HealthPercent;
+
+                return HealthPercent;
             }
         }
 
@@ -3204,38 +3206,28 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Players class
-        /// </summary>
-        protected ICharacterClass m_characterClass;
-
-        /// <summary>
         /// Gets the player's character class
         /// </summary>
-        public virtual ICharacterClass CharacterClass
-        {
-            get { return m_characterClass; }
-        }
+        public virtual CharacterClass CharacterClass { get; protected set; }
+        public string Salutation => CharacterClass.GetSalutation(Gender);
 
         /// <summary>
         /// Set the character class to a specific one
         /// </summary>
         /// <param name="id">id of the character class</param>
         /// <returns>success</returns>
-        public virtual bool SetCharacterClass(int id)
+        public bool SetCharacterClass(CharacterClass charClass)
         {
-            ICharacterClass cl = ScriptMgr.FindCharacterClass(id);
-
-            if (cl == null)
+            if (charClass.Equals(GS.CharacterClass.None))
             {
-                if (log.IsErrorEnabled)
-                    log.ErrorFormat("No CharacterClass with ID {0} found", id);
+                if (log.IsErrorEnabled) log.ErrorFormat($"Unknown CharacterClass has been set for Player {Name}.");
                 return false;
             }
 
-            m_characterClass = cl;
-            m_characterClass.Init(this);
+            if (charClass.ID == (int)eCharacterClass.Bainshee) BainsheeEffect = new BainsheeMorphEffect(this);
 
-            DBCharacter.Class = m_characterClass.ID;
+            CharacterClass = charClass;
+            DBCharacter.Class = CharacterClass.ID;
 
             float maxTension = Properties.PLAYER_BASE_MAXTENSION;
             Race race = GameServer.Database.SelectObject<Race>(DB.Column(nameof(Database.Race.ID)).IsEqualTo(Race));
@@ -3246,13 +3238,13 @@ namespace DOL.GS
             maxTension *= CharacterClass.MaxTensionFactor;
             DBCharacter.MaxTension = (int)maxTension;
             MaxTension = DBCharacter.MaxTension;
-            AdrenalineSpell = CharacterClass.AdrenalineSpell;
+            AdrenalineSpell = CharacterClass.GetAdrenalineSpell(this);
 
-            _counterAttackStyles = SkillBase.GetStyleList("CounterAttack", m_characterClass.ID)?.ToList() ?? new List<Style>();
+            _counterAttackStyles = SkillBase.GetStyleList("CounterAttack", CharacterClass.ID)?.ToList() ?? new List<Style>();
 
             if (_counterAttackStyles.Count == 0)
             {
-                var whereClause = DB.Column("SpecKeyName").IsEqualTo("CounterAttack").And(DB.Column("ClassId").IsEqualTo(m_characterClass.ID));
+                var whereClause = DB.Column("SpecKeyName").IsEqualTo("CounterAttack").And(DB.Column("ClassId").IsEqualTo(CharacterClass.ID));
                 var dbStyles = GameServer.Database.SelectObjects<DBStyle>(whereClause);
 
                 foreach (var dbStyle in dbStyles)
@@ -3268,6 +3260,12 @@ namespace DOL.GS
                 Group.UpdateMember(this, false, true);
             }
             return true;
+        }
+
+        [Obsolete("Use SetCharacterClass(CharacterClass) instead.")]
+        public virtual bool SetCharacterClass(int id)
+        {
+            return SetCharacterClass(GS.CharacterClass.GetClass(id));
         }
 
         /// <summary>
@@ -3638,8 +3636,6 @@ namespace DOL.GS
                     }
                 }
             }
-
-            CharacterClass.OnLevelUp(this, originalLevel);
         }
 
         public virtual bool RespecAll()
@@ -3727,9 +3723,9 @@ namespace DOL.GS
 
             // If BD subpet spells scaled and capped by BD spec, respecing a spell line
             //	requires re-scaling the spells for all subpets from that line.
-            if (CharacterClass is CharacterClassBoneDancer
-                && DOL.GS.ServerProperties.Properties.PET_SCALE_SPELL_MAX_LEVEL > 0
-                && DOL.GS.ServerProperties.Properties.PET_CAP_BD_MINION_SPELL_SCALING_BY_SPEC
+            if (CharacterClass.Equals(CharacterClass.Bonedancer)
+                && Properties.PET_SCALE_SPELL_MAX_LEVEL > 0
+                && Properties.PET_CAP_BD_MINION_SPELL_SCALING_BY_SPEC
                 && ControlledBody is GamePet pet && pet.ControlledNpcList != null)
                 foreach (ABrain subBrain in pet.ControlledNpcList)
                     if (subBrain != null && subBrain.Body is BDSubPet subPet && subPet.PetSpecLine == specLine.KeyName)
@@ -4682,9 +4678,45 @@ namespace DOL.GS
                         player.GetPersonalizedName(this)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
-            CharacterClass.OnSkillTrained(this, skill);
-            RefreshSpecDependantSkills(true);
 
+            if (skill.KeyName == Specs.Longbow || skill.KeyName == Specs.RecurveBow || skill.KeyName == Specs.CompositeBow)
+            {
+                if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
+                {
+                    if (skill.Level >= 27) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 9));
+                    else if (skill.Level >= 24) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 8));
+                    else if (skill.Level >= 21) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 7));
+                    else if (skill.Level >= 18) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 6));
+                    else if (skill.Level >= 15) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 5));
+                    else if (skill.Level >= 12) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 4));
+                    else if (skill.Level >= 9) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 3));
+                    else if (skill.Level >= 6) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 2));
+                    else if (skill.Level >= 3) AddAbility(SkillBase.GetAbility(Abilities.Critical_Shot, 1));
+
+                    if (skill.Level >= 45) AddAbility(SkillBase.GetAbility(Abilities.RapidFire, 2));
+                    else if (skill.Level >= 35) AddAbility(SkillBase.GetAbility(Abilities.RapidFire, 1));
+
+                    if (skill.Level >= 45) AddAbility(SkillBase.GetAbility(Abilities.SureShot));
+
+                    if (skill.Level >= 50) AddAbility(SkillBase.GetAbility(Abilities.PenetratingArrow, 3));
+                    else if (skill.Level >= 40) AddAbility(SkillBase.GetAbility(Abilities.PenetratingArrow, 2));
+                    else if (skill.Level >= 30) AddAbility(SkillBase.GetAbility(Abilities.PenetratingArrow, 1));
+                }
+            }
+
+            // BD minion dynamic scaling
+            if (CharacterClass.ID == (int)eCharacterClass.Bonedancer
+                && Properties.PET_SCALE_SPELL_MAX_LEVEL > 0
+                && Properties.PET_CAP_BD_MINION_SPELL_SCALING_BY_SPEC
+                && ControlledBrain != null && ControlledBrain.Body is GamePet pet
+                && pet.ControlledNpcList != null)
+            {
+                foreach (ABrain subBrain in pet.ControlledNpcList)
+                    if (subBrain != null && subBrain.Body is BDSubPet subPet && subPet.PetSpecLine == skill.KeyName)
+                        subPet.SortSpells();
+            }
+
+            RefreshSpecDependantSkills(true);
             Out.SendUpdatePlayerSkills();
         }
 
@@ -4766,9 +4798,7 @@ namespace DOL.GS
             get { return DBCharacter != null ? DBCharacter.RealmLevel : 0; }
             set
             {
-                if (DBCharacter != null)
-                    DBCharacter.RealmLevel = value;
-                CharacterClass.OnRealmLevelUp(this);
+                if (DBCharacter != null) DBCharacter.RealmLevel = value;
             }
         }
 
@@ -6926,11 +6956,6 @@ namespace DOL.GS
                 StopAfkAttackMode(showMessage: false);
             }
 
-            if (CharacterClass.StartAttack(attackTarget) == false)
-            {
-                return;
-            }
-
             if (!IsAlive)
             {
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.StartAttack.YouCantCombat"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
@@ -7015,7 +7040,7 @@ namespace DOL.GS
 
             if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
             {
-                if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == false)
+                if (Properties.ALLOW_OLD_ARCHERY == false)
                 {
                     if ((eCharacterClass)CharacterClass.ID == eCharacterClass.Scout || (eCharacterClass)CharacterClass.ID == eCharacterClass.Hunter || (eCharacterClass)CharacterClass.ID == eCharacterClass.Ranger)
                     {
@@ -7096,7 +7121,7 @@ namespace DOL.GS
                 }
             }
 
-            if (CharacterClass is PlayerClass.ClassVampiir)
+            if (CharacterClass.Equals(GS.CharacterClass.Vampiir))
             {
                 GameSpellEffect removeEffect = SpellHandler.FindEffectOnTarget(this, "VampiirSpeedEnhancement");
                 if (removeEffect != null)
@@ -7640,7 +7665,7 @@ namespace DOL.GS
                             ad.StyleDamage += keepstyle;
                         }
                         // vampiir
-                        if (CharacterClass is PlayerClass.ClassVampiir
+                        if (CharacterClass.Equals(GS.CharacterClass.Vampiir)
                             && target is GameKeepComponent == false
                             && target is GameKeepDoor == false
                             && target is GameSiegeWeapon == false)
@@ -8310,7 +8335,7 @@ namespace DOL.GS
             }
 
             // vampiir
-            if (CharacterClass is ClassVampiir)
+            if (CharacterClass.Equals(GS.CharacterClass.Vampiir))
             {
                 GameSpellEffect removeEffect = SpellHandler.FindEffectOnTarget(this, "VampiirSpeedEnhancement");
                 if (removeEffect != null)
@@ -8765,7 +8790,8 @@ namespace DOL.GS
             if (weapon == null)
                 return 0;
 
-            int classBaseWeaponSkill = (eInventorySlot) weapon.SlotPosition is eInventorySlot.DistanceWeapon ? CharacterClass.WeaponSkillRangedBase : CharacterClass.WeaponSkillBase;
+            var baseRangedWeaponRange = 440;
+            int classBaseWeaponSkill = (eInventorySlot) weapon.SlotPosition is eInventorySlot.DistanceWeapon ? baseRangedWeaponRange : CharacterClass.WeaponSkillBase;
             double weaponSkill = Level * classBaseWeaponSkill / 200.0 * (1 + 0.01 * GetWeaponStat(weapon) / 2) * Effectiveness;
             return Math.Max(1, weaponSkill * GetModified(eProperty.WeaponSkill) * 0.01);
         }
@@ -8917,13 +8943,9 @@ namespace DOL.GS
             if (spell == null || spell.IsInstantCast)
                 return true;
 
-            switch (CharacterClass)
+            if ((CharacterClass.Equals(GS.CharacterClass.Vampiir) || CharacterClass.Equals(GS.CharacterClass.MaulerAlb) || CharacterClass.Equals(GS.CharacterClass.MaulerHib) || CharacterClass.Equals(GS.CharacterClass.MaulerMid)))
             {
-                case ClassVampiir vampiir:
-                case ClassMaulerAlb maulerAlb:
-                case ClassMaulerMid maulerMid:
-                case ClassMaulerHib maulerHib:
-                    return true;
+                return true;
             }
 
             return false;
@@ -9185,9 +9207,9 @@ namespace DOL.GS
 
             if (style != null)
             {
-                if (CharacterClass is ClassSavage && string.Equals(style.Spec, "Hand to Hand"))
+                if (CharacterClass.ID == (int)eCharacterClass.Savage && string.Equals(style.Spec, "Hand to Hand"))
                     effectiveness *= Properties.HANDTOHAND_RESOLVE_DAMAGES;
-                else if (CharacterClass is ClassHunter or ClassValkyrie && style.Spec.Equals("Spear"))
+                else if ((CharacterClass.ID == (int)eCharacterClass.Hunter || CharacterClass.ID == (int)eCharacterClass.Valkyrie) && style.Spec.Equals("Spear"))
                     effectiveness *= Properties.SPEARS_RESOLVE_DAMAGES;
             }
 
@@ -9662,8 +9684,6 @@ namespace DOL.GS
             // ambiant talk
             if (killer is GameNPC)
                 (killer as GameNPC)!.FireAmbientSentence(GameNPC.eAmbientTrigger.killing, this);
-
-            CharacterClass.Die(killer);
 
             bool realmDeath = killer != null && killer.Realm != eRealm.None;
 
@@ -11126,51 +11146,6 @@ namespace DOL.GS
 
             return casted;
         }
-
-        /// <summary>
-        /// Calculate how fast this player can cast a given spell
-        /// </summary>
-        /// <param name="spell"></param>
-        /// <returns></returns>
-        public override int CalculateCastingTime(SpellLine line, Spell spell)
-        {
-            int ticks = spell.CastTime;
-
-            if (spell.IsCastTimeFixed ||
-                line.KeyName == GlobalSpellsLines.Item_Spells ||
-                line.KeyName.StartsWith(GlobalSpellsLines.Champion_Lines_StartWith))
-            {
-                return ticks;
-            }
-
-            if (CharacterClass.CanChangeCastingSpeed(line, spell) == false)
-                return ticks;
-
-            if (EffectList.GetOfType<QuickCastEffect>() != null)
-            {
-                // Most casters have access to the Quickcast ability (or the Necromancer equivalent, Facilitate Painworking).
-                // This ability will allow you to cast a spell without interruption.
-                // http://support.darkageofcamelot.com/kb/article.php?id=022
-
-                // A: You're right. The answer I should have given was that Quick Cast reduces the time needed to cast to a flat two seconds,
-                // and that a spell that has been quick casted cannot be interrupted. ...
-                // http://www.camelotherald.com/news/news_article.php?storyid=1383
-
-                return 2000;
-            }
-
-
-            double percent = DexterityCastTimeReduction;
-
-            percent *= 1.0 - GetModified(eProperty.CastingSpeed) * 0.01;
-
-            ticks = (int)(ticks * Math.Max(CastingSpeedReductionCap, percent));
-            if (ticks < MinimumCastingSpeed)
-                ticks = MinimumCastingSpeed;
-
-            return ticks;
-        }
-
 
         #endregion
 
@@ -12959,6 +12934,16 @@ namespace DOL.GS
             if (GameServer.ServerRules.ReasonForDisallowMounting(this) != string.Empty && !forced)
                 return false;
 
+            CancelClassStates();
+
+            if (ControlledBrain != null)
+            {
+                GameObject oldTarget = TargetObject;
+                TargetObject = null;
+                CommandNpcRelease();
+                TargetObject = oldTarget;
+            }
+
             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 if (player == null) continue;
@@ -13155,11 +13140,6 @@ namespace DOL.GS
         /// <returns>true if removed, false if removing failed</returns>
         public override bool RemoveFromWorld()
         {
-            if (CharacterClass.RemoveFromWorld() == false)
-            {
-                return false;
-            }
-
             if (ObjectState == eObjectState.Active)
             {
                 DismountSteed(true);
@@ -16264,9 +16244,6 @@ namespace DOL.GS
                     }
                 }
             }
-
-            CharacterClass.OnLevelUp(this, Level); // load all skills from DB first to keep the order
-            CharacterClass.OnRealmLevelUp(this);
         }
 
         /// <summary>
@@ -16466,7 +16443,7 @@ namespace DOL.GS
             m_charStat[eStat.EMP - eStat._First] = (short)DBCharacter.Empathy;
             m_charStat[eStat.CHR - eStat._First] = (short)DBCharacter.Charisma;
 
-            SetCharacterClass(DBCharacter.Class);
+            SetCharacterClass(CharacterClass.GetClass(DBCharacter.Class));
 
             m_currentSpeed = 0;
             if (MaxSpeedBase == 0)
@@ -16555,7 +16532,7 @@ namespace DOL.GS
             foreach (DOLCharacters plr in Client.Account.Characters)
             {
                 //where the level of one of the characters if 50
-                if (plr.Level == ServerProperties.Properties.SLASH_LEVEL_REQUIREMENT && GameServer.ServerRules.CountsTowardsSlashLevel(plr))
+                if (plr.Level == Properties.SLASH_LEVEL_REQUIREMENT && GameServer.ServerRules.CountsTowardsSlashLevel(plr))
                 {
                     m_canUseSlashLevel = true;
                     break;
@@ -16750,7 +16727,7 @@ namespace DOL.GS
                 case eGameServerType.GST_Normal:
                     {
                         if (Realm == player.Realm || Client.Account.PrivLevel > 1 || player.Client.Account.PrivLevel > 1)
-                            message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.RealmMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), CharacterClass.Name);
+                            message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.RealmMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), Salutation);
                         else
                             message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.EnemyRealmMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true));
                         break;
@@ -16759,11 +16736,11 @@ namespace DOL.GS
                 case eGameServerType.GST_PvP:
                     {
                         if (Client.Account.PrivLevel > 1 || player.Client.Account.PrivLevel > 1)
-                            message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.YourGuildMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), CharacterClass.Name);
+                            message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.YourGuildMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), Salutation);
                         else if (Guild == null)
                             message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.NeutralMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true));
                         else if (Guild == player.Guild || Client.Account.PrivLevel > 1 || player.Client.Account.PrivLevel > 1)
-                            message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.YourGuildMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), CharacterClass.Name);
+                            message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.YourGuildMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), Salutation);
                         else
                             message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.GetExamineMessages.OtherGuildMember", player.GetPersonalizedName(this), GetPronoun(Client, 0, true), GuildName);
                         break;
@@ -17385,7 +17362,6 @@ namespace DOL.GS
         #region Notify
         public override void Notify(DOLEvent e, object sender, EventArgs args)
         {
-            CharacterClass.Notify(e, sender, args);
             base.Notify(e, sender, args);
 
             // player forwards every single notify message to all active quests
@@ -18902,7 +18878,29 @@ namespace DOL.GS
         /// <param name="controlledNpc"></param>
         public override void SetControlledBrain(IControlledBrain controlledBrain)
         {
-            CharacterClass.SetControlledBrain(controlledBrain);
+            if (controlledBrain == ControlledBrain) return;
+            if (controlledBrain == null)
+            {
+                Out.SendPetWindow(null, ePetWindowAction.Close, 0, 0);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SetControlledNpc.ReleaseTarget2", ControlledBrain.Body.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.SetControlledNpc.ReleaseTarget"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+            else
+            {
+                if (controlledBrain.Owner != this)
+                    throw new ArgumentException("ControlledNpc with wrong owner is set (player=" + Name + ", owner=" + controlledBrain.Owner.Name + ")", "controlledNpc");
+                if (ControlledBrain == null)
+                    InitControlledBrainArray(1);
+                Out.SendPetWindow(controlledBrain.Body, ePetWindowAction.Open, controlledBrain.AggressionState, controlledBrain.WalkState);
+                if (controlledBrain.Body != null)
+                {
+                    Out.SendNPCCreate(controlledBrain.Body); 
+                    if (controlledBrain.Body.Inventory != null)
+                        Out.SendLivingEquipmentUpdate(controlledBrain.Body);
+                }
+            }
+
+            ControlledBrain = controlledBrain;
         }
 
         /// <summary>
@@ -18911,7 +18909,35 @@ namespace DOL.GS
         /// </summary>
         public virtual void CommandNpcRelease()
         {
-            CharacterClass.CommandNpcRelease();
+            if (TargetObject is TurretPet turretFnF && turretFnF.Brain is TurretFNFBrain && IsControlledNPC(turretFnF))
+            {
+                turretFnF.StripBuffs();
+                Notify(GameLivingEvent.PetReleased, turretFnF);
+                return;
+            }
+
+            if (TargetObject is BDPet subpet && subpet.Brain is BDPetBrain && ControlledBrain is CommanderBrain commander && commander.FindPet(subpet.Brain as IControlledBrain))
+            {
+                subpet.StripBuffs();
+                Notify(GameLivingEvent.PetReleased, subpet);
+                return;
+            }
+
+            var targetIsPet = TargetObject is GameNPC npc && IsControlledNPC(npc);
+            if (targetIsPet)
+            {
+                if (TargetObject is GamePet pet1) pet1.StripBuffs();
+                Notify(GameLivingEvent.PetReleased, TargetObject);
+            }
+            else
+            {
+                var hasMainPet = ControlledBrain != null && ControlledBrain.Body != null;
+                if (hasMainPet)
+                {
+                    if (ControlledBrain!.Body is GamePet pet2) pet2.StripBuffs();
+                    Notify(GameLivingEvent.PetReleased, ControlledBrain.Body);
+                }
+            }
         }
 
         /// <summary>
@@ -19094,6 +19120,7 @@ namespace DOL.GS
         #region Shade
 
         protected ShadeEffect m_ShadeEffect = null;
+        public BainsheeMorphEffect BainsheeEffect { get; set; }
 
         /// <summary>
         /// The shade effect of this player
@@ -19114,6 +19141,52 @@ namespace DOL.GS
                 bool shadeModel = Model == ShadeModel;
                 return m_ShadeEffect != null ? true : shadeModel;
             }
+        }
+
+        public virtual void Shade(bool makeShade)
+        {
+            if (IsShade == makeShade)
+            {
+                if (makeShade && (ObjectState == GameObject.eObjectState.Active))
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Shade.AlreadyShade"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (makeShade)
+            {
+                var isNecro = CharacterClass.ID == (int)eCharacterClass.Necromancer;
+                if (isNecro) ShadeEffect = new NecromancerShadeEffect();
+                else ShadeEffect = new ShadeEffect();
+                ShadeEffect.Start(this);
+            }
+            else ShadeEffect?.Cancel(false);
+        }
+
+        /// <summary>
+        /// Cancels active class-specific forms (like Shade or Wraith)
+        /// </summary>
+        public virtual bool CancelClassStates()
+        {
+            bool changed = false;
+
+            // Cancel Necromancer Shade
+            if (IsShade)
+            {
+                Shade(false);
+                changed = true;
+            }
+
+            // Cancel Bainshee Wraith Form
+            if (CharacterClass.ID == (int)eCharacterClass.Bainshee && BainsheeEffect != null)
+            {
+                if (Model == 1883 || Model == 1884 || Model == 1885)
+                {
+                    BainsheeEffect.TurnOutOfWraith(true);
+                    changed = true;
+                }
+            }
+
+            return changed;
         }
 
         public bool IsRenaissance
@@ -19168,8 +19241,8 @@ namespace DOL.GS
                             }
                         }
 
-                        if (ServerProperties.Properties.REPUTATION_THRESHOLD_AUTOMATIC_WANTED < 0 &&
-                            m_reputation <= ServerProperties.Properties.REPUTATION_THRESHOLD_AUTOMATIC_WANTED && !WantedUnsafe)
+                        if (Properties.REPUTATION_THRESHOLD_AUTOMATIC_WANTED < 0 &&
+                            m_reputation <= Properties.REPUTATION_THRESHOLD_AUTOMATIC_WANTED && !WantedUnsafe)
                         {
                             WantedUnsafe = true;
                         }
@@ -19236,15 +19309,6 @@ namespace DOL.GS
                     WantedUnsafe = value;
                 }
             }
-        }
-
-        /// <summary>
-        /// Create a shade effect for this player.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual ShadeEffect CreateShadeEffect()
-        {
-            return CharacterClass.CreateShadeEffect();
         }
 
         /// <summary>
@@ -19865,6 +19929,20 @@ namespace DOL.GS
                     StopWhistleTimers();
                 if (value == m_isOnHorse)
                     return;
+
+                if (value)
+                {
+                    CancelClassStates();
+
+                    if (ControlledBrain != null)
+                    {
+                        GameObject oldTarget = TargetObject;
+                        TargetObject = null;
+                        CommandNpcRelease();
+                        TargetObject = oldTarget;
+                    }
+                }
+
                 m_isOnHorse = value;
                 Out.SendControlledHorse(this, value); // fix very rare bug when this player not in GetPlayersInRadius;
                 foreach (GamePlayer plr in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
@@ -20674,7 +20752,7 @@ namespace DOL.GS
         public override string ToString()
         {
             return new StringBuilder(base.ToString())
-                .Append(" class=").Append(CharacterClass.Name)
+                .Append(" class=").Append(Salutation)
                 .Append('(').Append(CharacterClass.ID.ToString()).Append(')')
                 .ToString();
         }
@@ -20682,7 +20760,7 @@ namespace DOL.GS
         public static GamePlayer CreateDummy()
         {
             var player = new GamePlayer();
-            player.m_characterClass = new CharacterClassBase();
+            player.CharacterClass = GS.CharacterClass.None;
             player.m_dbCharacter = new DOLCharacters();
             return player;
         }
@@ -20730,7 +20808,7 @@ namespace DOL.GS
             m_customDialogCallback = null;
             m_sitting = false;
             m_isWireframe = false;
-            m_characterClass = new CharacterClassBase();
+            CharacterClass = GS.CharacterClass.None;
             m_groupIndex = 0xFF;
 
             m_saveInDB = true;

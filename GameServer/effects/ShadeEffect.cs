@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using DOL.GS.PlayerClass;
+
 using System;
 using System.Collections.Generic;
+using DOL.GS.PacketHandler;
 using DOL.Language;
 
 namespace DOL.GS.Effects
@@ -47,6 +48,7 @@ namespace DOL.GS.Effects
 
                 player.EffectList.Add(this);
                 player.Out.SendUpdatePlayer();
+                player.Model = player.ShadeModel;
             }
         }
 
@@ -67,7 +69,16 @@ namespace DOL.GS.Effects
         /// </summary>
         public override bool Cancel(bool playerCancel, bool force = false)
         {
-            m_player.CharacterClass.LeaveShade();
+            if (m_player != null)
+            {
+                if (m_player.ShadeEffect != null)
+                {
+                    m_player.ShadeEffect.Stop();
+                    m_player.ShadeEffect = null;
+                }
+                m_player.Model = m_player.CreationModel;
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GamePlayer.Shade.NoLongerShade"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
             return true;
         }
 

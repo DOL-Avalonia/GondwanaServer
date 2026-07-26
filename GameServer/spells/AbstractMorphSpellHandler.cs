@@ -128,7 +128,7 @@ namespace DOL.GS.Spells
             {
                 if (effect.Owner is GamePlayer playerOwner)
                 {
-                    playerOwner.CharacterClass.CancelClassStates();
+                    playerOwner.CancelClassStates();
                 }
                 effect.Owner.Model = model;
             }

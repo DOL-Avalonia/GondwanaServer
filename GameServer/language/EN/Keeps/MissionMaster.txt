@@ -1,0 +1,12 @@
+MissionMaster.Interact.Greeting1:			Greetings, {0}. We have put out the call far and wide for heroes such as yourself to aid us in our ongoing struggle. It warms my heart good to to see a great {1} such as yourself willing to lay their life on the line in defence of the [realm].
+MissionMaster.Interact.Greeting2:			Hail and well met, {0}! As the leader of our forces, I am calling upon our finest warriors to aid in the vanquishing of our enemies. Do you wish to do your duty in defence of our [realm]?
+MissionMaster.Whisper.NotInGroup:			You are not in a group!
+MissionMaster.Whisper.NotGroupLeader:			You are not the leader of your group!
+MissionMaster.Whisper.Realm.ComponentNull:		We all must do our part. How would you like to assist the cause? I have [personal missions], [group missions], and [guild missions] available.
+MissionMaster.Whisper.Realm.ComponentNotNull:		Excellent! We all must do our part. How would you like to assist the cause? I have [personal missions] and [group missions] available.
+MissionMaster.Whisper.PersonalMissions:			We have several personal missions from which to choose. Would you like to claim the bounty on some [realm guards], or claim the bounties on some [enemies of the realm]? Perhaps a frontal assault isn't your style? If so, we also have missions that require you to [reconnoiter] an enemy realm, or elimate the thread of an impending [assassination]?
+MissionMaster.Whisper.NotImplemented:			This type of mission is not yet implemented.
+MissionMaster.Whisper.GroupMissions:			Would your group like to help with a [tower capture], a [keep capture], or a [caravan] raid? Should those choices fail to appeal to you, I also have bounty missions on [enemy guards] and [realm enemies] if that is your preference.
+MissionMaster.Whisper.Guild.NoGuild:			You have no guild!
+MissionMaster.Whisper.Guild.RankTooLow:			You are not high enough rank in your guild!
+MissionMaster.Whisper.Guild.Missions:			Outstanding, we can always use help from organized guilds. Would you like to press the attack on the realm of [Albion] or the realm of [Hibernia]?

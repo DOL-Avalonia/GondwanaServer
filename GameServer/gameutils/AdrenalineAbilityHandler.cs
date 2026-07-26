@@ -45,7 +45,7 @@ namespace DOL.GS
 
             // If this is a Necromancer in shade form with an active pet,
             // also apply the tank adrenaline to the pet.
-            if (player.CharacterClass is CharacterClassNecromancer &&
+            if (player.CharacterClass.ID == (int)eCharacterClass.Necromancer &&
                 player.IsShade &&
                 player.ControlledBrain is IControlledBrain controlledBrain &&
                 controlledBrain.Body is GameLiving pet &&
@@ -63,13 +63,8 @@ namespace DOL.GS
 
         private static Spell ResolveAdrenalineSpell(GamePlayer player)
         {
-            if (player.CharacterClass is CharacterClassBase ccb)
-            {
-                var dyn = ccb.GetAdrenalineSpell(player);
-                if (dyn != null) return dyn;
-
-                if (ccb.AdrenalineSpell != null) return ccb.AdrenalineSpell;
-            }
+            var dyn = player.CharacterClass.GetAdrenalineSpell(player);
+            if (dyn != null) return dyn;
 
             return player.CharacterClass.AdrenalineSpell;
         }

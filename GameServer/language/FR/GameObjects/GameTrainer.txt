@@ -8,6 +8,7 @@ GameTrainer.GetExamineMessages.YouTarget:			Vous ciblez [{0}].
 GameTrainer.Interact.CaseRespecialize:				respécialiser
 GameTrainer.Interact.RegainPoints:					Vous obtenez {0} points de specialisations !
 GameTrainer.Interact.Respecialize:					{0} dit, "{1}, si vous le souhaitez, je peux annuler l'entraînement que vous avez suivi jusqu'à présent et vous donner la possibilité de vous entraîner à nouveau. Cela vous permettrait de [respécialiser] vos compétences. Si vous êtes intéressé, faites-le moi savoir."
+GameTrainer.Interact.ArmorUpgradeHint:				{0} dit, "Donnez-moi {1} et je vous l'échangerai contre une meilleure armure !"
 GameTrainer.PromotePlayer.Accepted:					Vous avez été accepté(e) par le {0} !
 GameTrainer.PromotePlayer.Says:						{0} dit, "{1}"
 GameTrainer.PromotePlayer.Upgraded:					Vous avez été promu(e) à la classe de {0} !

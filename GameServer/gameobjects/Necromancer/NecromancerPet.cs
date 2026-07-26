@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
@@ -27,6 +25,9 @@ using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
 using DOL.GS.Styles;
 using DOL.Language;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace DOL.GS
 {
@@ -229,7 +230,7 @@ namespace DOL.GS
 
                         if (Brain is IControlledBrain cb && cb.Owner is GamePlayer gp)
                         {
-                            bool isNecro = gp.CharacterClass is CharacterClassNecromancer;
+                            bool isNecro = gp.CharacterClass.ID == (int)eCharacterClass.Necromancer;
 
                             if (isNecro && gp.IsShade)
                             {
@@ -431,7 +432,7 @@ namespace DOL.GS
             if (!(controlledBrain.Owner is GamePlayer owner))
                 return;
 
-            if (!(owner.CharacterClass is CharacterClassNecromancer))
+            if (!(owner.CharacterClass.ID == (int)eCharacterClass.Necromancer))
                 return;
 
             if (!owner.IsShade)

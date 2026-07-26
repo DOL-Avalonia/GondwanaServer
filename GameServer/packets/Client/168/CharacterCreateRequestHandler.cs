@@ -42,7 +42,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Max Points to allow on player creation
@@ -470,9 +470,9 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                     if (flagChangedStats)
                     {
-                        ICharacterClass charClass = ScriptMgr.FindCharacterClass(character.Class);
+                        var charClass = CharacterClass.GetClass(character.Class);
 
-                        if (charClass != null)
+                        if (!charClass.Equals(CharacterClass.None))
                         {
                             int points;
                             bool valid = IsCustomPointsDistributionValid(character, stats, out points);
@@ -680,9 +680,9 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <returns></returns>
         public static bool IsCustomPointsDistributionValid(DOLCharacters character, IDictionary<eStat, int> stats, out int points)
         {
-            ICharacterClass charClass = ScriptMgr.FindCharacterClass(character.Class);
+            var charClass = CharacterClass.GetClass(character.Class);
 
-            if (charClass != null)
+            if (!charClass.Equals(CharacterClass.None))
             {
                 points = 0;
 
@@ -728,7 +728,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <returns>True if valid</returns>
         public static bool IsCharacterValid(DOLCharacters ch)
         {
-            ICharacterClass charClass = ScriptMgr.FindCharacterClass(ch.Class);
+            var charClass = CharacterClass.GetClass(ch.Class);
 
             bool valid = true;
             try
@@ -1136,9 +1136,9 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         if (flagChangedStats)
                         {
-                            ICharacterClass charClass = ScriptMgr.FindCharacterClass(character.Class);
+                            var charClass = CharacterClass.GetClass(character.Class);
 
-                            if (charClass != null)
+                            if (!charClass.Equals(CharacterClass.None))
                             {
                                 bool valid = IsCustomPointsDistributionValid(character, stats, out int points);
 

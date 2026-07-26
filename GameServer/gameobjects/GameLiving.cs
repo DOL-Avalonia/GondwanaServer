@@ -40,7 +40,6 @@ using DOL.GS.Utils;
 using DOL.Language;
 using DOL.GS.RealmAbilities;
 using System.Numerics;
-using DOL.GS.PlayerClass;
 using DOL.GS.ServerProperties;
 using static DOL.GS.ScriptMgr;
 using System.Threading.Tasks;
@@ -930,35 +929,6 @@ namespace DOL.GS
         {
             // by default npc's can start casting spells while in combat
             return true;
-        }
-
-
-        /// <summary>
-        /// Calculate how fast this living can cast a given spell
-        /// </summary>
-        /// <param name="spell"></param>
-        /// <returns></returns>
-        public virtual int CalculateCastingTime(SpellLine line, Spell spell)
-        {
-            int ticks = spell.CastTime;
-
-            if (spell.IsCastTimeFixed ||
-                line.KeyName == GlobalSpellsLines.Item_Spells ||
-                line.KeyName.StartsWith(GlobalSpellsLines.Champion_Lines_StartWith))
-            {
-                return ticks;
-            }
-
-            if (EffectList.GetOfType<QuickCastEffect>() != null)
-                return 2000;
-
-            double percent = DexterityCastTimeReduction;
-            percent *= 1.0 - GetModified(eProperty.CastingSpeed) * 0.01;
-            ticks = (int)(ticks * Math.Max(CastingSpeedReductionCap, percent));
-            if (ticks < MinimumCastingSpeed)
-                ticks = MinimumCastingSpeed;
-
-            return ticks;
         }
 
         /// <summary>

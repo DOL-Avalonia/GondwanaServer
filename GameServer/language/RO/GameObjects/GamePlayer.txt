@@ -475,6 +475,7 @@ GameObjects.GamePlayer.UseSlot.AutoReleaseShotReload:  Vei trage și reîncărca
 GameObjects.GamePlayer.UseSlot.CantCallMountSeated:    Nu îți poți chema montura în timp ce stai jos.
 GameObjects.GamePlayer.UseSlot.CantFire:               Nu poți arunca sau folosi acest obiect.
 GameObjects.GamePlayer.UseSlot.CantMountCombat:        Ești în luptă și nu îți poți chema montura.
+GameObjects.GamePlayer.UseSlot.CantMountSpell:			Arunci o vrajă și nu îți poți chema montura.
 GameObjects.GamePlayer.UseSlot.CantMountHere:          Nu poți invoca o montură aici!
 GameObjects.GamePlayer.UseSlot.CantCallMountRVR:       Nu poți invoca o montură aici!
 GameObjects.GamePlayer.UseSlot.CantMountInDungeon:     Nu poți invoca o montură într-un dungeon!

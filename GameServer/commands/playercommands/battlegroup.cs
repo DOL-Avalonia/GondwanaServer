@@ -299,7 +299,7 @@ namespace DOL.GS.Commands
                                 text.Append(" ");
                                 text.Append(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlegroup.Leader"));
                             }
-                            text.Append("(" + nongrouped.CharacterClass.Name + ")");
+                            text.Append("(" + nongrouped.Salutation + ")");
                             client.Out.SendMessage(text.ToString() + client.Player.GetPersonalizedName(nongrouped) + "\n", eChatType.CT_BattleGroup, eChatLoc.CL_SystemWindow);
                         }
                     }

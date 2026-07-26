@@ -293,6 +293,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Restaura {0} de salud 
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Prolonga la duración de la atormentada existencia de un objetivo Condenado {0} segundos. No tiene efecto en objetivos no Condenados.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Efecto de Bonificación (Solo objetivo Condenado):
 SpellDescription.ZombieHeal.Header.SideEffect:            Efecto Secundario (Penalización para objetivos vivos):
+SpellDescription.StormEffect.MainDescription1:				El lanzador genera {0} tormentas en una disposición {1}.
+SpellDescription.StormEffect.MainDescription2:				Las tormentas activarán el ID de efecto de hechizo {0}, tendrán un tamaño base de {1} y se desvanecerán después de {2} segundos.
+SpellDescription.StormEffect.SubDescription1:				Los radios y niveles de intensidad de las tormentas fluctuarán aleatoriamente hasta en un {0}%.
+SpellDescription.StormEffect.SubDescription2:				Las tormentas aparecerán dinámicamente a lo largo de {0} brazos en espiral.
+SpellDescription.StormEffect.SubDescription3:				Un máximo de {0} objetivos pueden ser afectados colectivamente por esta cascada de tormentas.
+SpellDescription.StormEffect.PulseDescription:				La generación de tormentas pulsará cada {0} segundos.
+SpellDescription.StormEffect.SubSpellTitle:					Efecto de Tormenta: {0}
 
 
 # ML Spells ShortDescriptions
@@ -427,6 +434,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Humanoide, Animal, 
 IllusionSpell.Arrangement.Random:		aleatorio
 IllusionSpell.Arrangement.Circle:		en círculo
 IllusionSpell.Arrangement.Line:			en línea
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Aleatoria
+StormEffect.PatternCircular:		Circular
+StormEffect.PatternSpiral:			Espiral de {0} brazos
+StormEffect.PatternLinear:			Lineal
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Rana

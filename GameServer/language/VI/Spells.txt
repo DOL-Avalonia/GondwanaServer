@@ -293,6 +293,13 @@ SpellDescription.ZombieHeal.MainDescription.HealOnly:     Hồi phục {0} máu 
 SpellDescription.ZombieHeal.MainDescription.DecayOnly:    Kéo dài thời gian tồn tại khổ đau của mục tiêu bị Nguyền Rủa thêm {0} giây. Không có tác dụng với mục tiêu không bị Nguyền Rủa.
 SpellDescription.ZombieHeal.Header.BonusEffect:           Hiệu ứng Thưởng (Chỉ mục tiêu bị Nguyền Rủa):
 SpellDescription.ZombieHeal.Header.SideEffect:            Tác dụng phụ (Hình phạt mục tiêu Sống):
+SpellDescription.StormEffect.MainDescription1:				Người niệm phép tạo ra {0} cơn bão theo bố cục {1}.
+SpellDescription.StormEffect.MainDescription2:				Các cơn bão sẽ kích hoạt ID hiệu ứng phép thuật {0}, có kích thước cơ bản là {1} và biến mất sau {2} giây.
+SpellDescription.StormEffect.SubDescription1:				Bán kính và mức cường độ của bão sẽ dao động ngẫu nhiên lên đến {0}%.
+SpellDescription.StormEffect.SubDescription2:				Bão sẽ xuất hiện động dọc theo {0} nhánh xoắn ốc.
+SpellDescription.StormEffect.SubDescription3:				Tối đa {0} mục tiêu có thể bị ảnh hưởng tập thể bởi chuỗi bão này.
+SpellDescription.StormEffect.PulseDescription:				Việc tạo bão sẽ dao động mỗi {0} giây.
+SpellDescription.StormEffect.SubSpellTitle:					Hiệu Ứng Bão: {0}
 
 
 # ML Spells ShortDescriptions
@@ -427,6 +434,12 @@ CharmSpellHandler.Species.HumanoidAnimalInsectMagicalUndead:	Người hình, Th�
 IllusionSpell.Arrangement.Random:		ngẫu nhiên
 IllusionSpell.Arrangement.Circle:		theo vòng tròn
 IllusionSpell.Arrangement.Line:			theo hàng
+
+#StormEffect SpellHandler
+StormEffect.PatternRandom:			Ngẫu nhiên
+StormEffect.PatternCircular:		Tròn
+StormEffect.PatternSpiral:			Xoắn ốc {0} nhánh
+StormEffect.PatternLinear:			Tuyến tính
 
 #WarlockSpeedDecrease SpellHandler Appearances
 WarlockSpeedDecrease.Appearance.Frog:			Ếch

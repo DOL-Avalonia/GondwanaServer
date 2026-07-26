@@ -51,6 +51,26 @@ namespace DOL.GS
             InitializeHashtables();
         }
 
+        private static readonly HashSet<eProperty> MeleeOnlyProperties = new HashSet<eProperty> 
+        { 
+            eProperty.AllArcherySkills, eProperty.AllDualWieldingSkills, eProperty.AllMeleeWeaponSkills, 
+            eProperty.RangedDamage, eProperty.CriticalArcheryHitChance, eProperty.StyleDamage, 
+            eProperty.ReactionaryStyleDamage, eProperty.StyleCostReduction, eProperty.MeleeSpeed, 
+            eProperty.CriticalMeleeHitChance, eProperty.OffhandDamageAndChanceBonus, 
+            eProperty.OffhandDamageBonus, eProperty.OffhandChanceBonus, eProperty.ArrowRecovery 
+        };
+
+        private static readonly HashSet<eProperty> MageOnlyProperties = new HashSet<eProperty> 
+        { 
+            eProperty.SpellRange, eProperty.SpellFumbleChance, eProperty.AllMagicSkills, 
+            eProperty.AllFocusLevels, eProperty.CastingSpeed, eProperty.MaxMana, 
+            eProperty.PowerPool, eProperty.SpellDamage, eProperty.SpellDuration, 
+            eProperty.PowerPoolCapBonus, eProperty.SpellLevel, eProperty.SpellPowerCost, 
+            eProperty.CriticalSpellHitChance, eProperty.Conversion, eProperty.ArcaneSyphon, 
+            eProperty.DotDurationDecrease, eProperty.CriticalHealHitChance, 
+            eProperty.CriticalDotHitChance, eProperty.DotDamageBonus 
+        };
+
         public GeneratedUniqueItem()
             : this((eRealm)Util.Random(1, 3), (eCharacterClass)Util.Random(1, 32), (byte)Util.Random(1, 50))
         {
@@ -1042,7 +1062,7 @@ namespace DOL.GS
                 if (this.Bonus1Type != 0)
                     return false;
 
-                if (this.Realm == (int)eRealm.Albion && this.Description == "friar")
+                if (this.Realm == (int)eRealm.Albion && this.charClass == eCharacterClass.Friar)
                     return false;
 
                 return true;
@@ -3779,7 +3799,7 @@ namespace DOL.GS
                 case eProperty.Skill_Rejuvenation:
                     {
                         if (realm != eRealm.Albion || (charClass != eCharacterClass.Cleric && charClass != eCharacterClass.Friar && charClass != eCharacterClass.Heretic)) { return false; }
-                        if ((type == eObjectType.Staff && this.Description == "friar") || (type == eObjectType.Shield && this.Type_Damage < 3) || type == eObjectType.CrushingWeapon)
+                        if ((type == eObjectType.Staff && this.charClass == eCharacterClass.Friar) || (type == eObjectType.Shield && this.Type_Damage < 3) || type == eObjectType.CrushingWeapon)
                             return true;
                         break;
                     }
@@ -3843,7 +3863,7 @@ namespace DOL.GS
                 //other specifics
                 case eProperty.Skill_Staff:
                     {
-                        if (type == eObjectType.Staff && this.Description == "friar")
+                        if (type == eObjectType.Staff && this.charClass == eCharacterClass.Friar)
                             return true;
                         break;
                     }
@@ -4413,7 +4433,7 @@ namespace DOL.GS
                         }
                         if (type == eObjectType.Staff && realm != eRealm.Albion)
                             return false;
-                        else if (type == eObjectType.Staff && this.Description != "friar") // do not add if caster staff
+                        else if (type == eObjectType.Staff && this.charClass != eCharacterClass.Friar) // do not add if caster staff
                             return false;
                         else if (type == eObjectType.Longbow || type == eObjectType.CompositeBow || type == eObjectType.RecurvedBow || type == eObjectType.Crossbow || type == eObjectType.Fired || type == eObjectType.Instrument)
                             return false;
@@ -4648,11 +4668,11 @@ namespace DOL.GS
                     {
                         if ((property == eProperty.Piety || property == eProperty.PieCapBonus) && realm == eRealm.Hibernia)
                             return false;
-                        else if ((property == eProperty.Piety || property == eProperty.PieCapBonus) && realm == eRealm.Albion && this.Description != "friar")
+                        else if ((property == eProperty.Piety || property == eProperty.PieCapBonus) && realm == eRealm.Albion && this.charClass != eCharacterClass.Friar)
                             return false; // caster staff
                         else if (property == eProperty.Charisma || property == eProperty.Empathy || property == eProperty.ChaCapBonus || property == eProperty.EmpCapBonus)
                             return false;
-                        else if ((property == eProperty.Intelligence || property == eProperty.IntCapBonus || property == eProperty.AcuCapBonus) && this.Description == "friar")
+                        else if ((property == eProperty.Intelligence || property == eProperty.IntCapBonus || property == eProperty.AcuCapBonus) && this.charClass == eCharacterClass.Friar)
                             return false;
                         break;
                     }
@@ -7563,19 +7583,20 @@ namespace DOL.GS
 
                                 if (Util.Chance(20))
                                 {
-                                    this.Description = "friar";
-
-                                    if (this.SPD_ABS < 40)
+                                    if (this.charClass == eCharacterClass.Friar)
                                     {
-                                        name = "Quarterstaff";
-                                    }
-                                    else if (this.SPD_ABS < 50)
-                                    {
-                                        name = "Shod Quarterstaff";
-                                    }
-                                    else
-                                    {
-                                        name = "Heavy Shod Quarterstaff";
+                                        if (this.SPD_ABS < 40)
+                                        {
+                                            name = "Quarterstaff";
+                                        }
+                                        else if (this.SPD_ABS < 50)
+                                        {
+                                            name = "Shod Quarterstaff";
+                                        }
+                                        else
+                                        {
+                                            name = "Heavy Shod Quarterstaff";
+                                        }
                                     }
                                 }
                                 else
@@ -11222,12 +11243,13 @@ namespace DOL.GS
 
         private bool IsStatAllowedForClass(eProperty prop)
         {
-            string className = charClass.ToString();
+            CharacterClass cClass = CharacterClass.GetClass((int)this.charClass);
 
-            bool isIntClass = className == "Cabalist" || className == "Mauler" || className == "MaulerAlb" || className == "MaulerHib" || className == "Necromancer" || className == "Occultist" || className == "Scout" || className == "Sorcerer" || className == "Theurgist" || className == "Wizard" || className == "Animist" || className == "Banshee" || className == "Bainshee" || className == "Champion" || className == "Eldritch" || className == "Enchanter" || className == "Mentalist" || className == "Nightshade" || className == "Ranger" || className == "Valewalker" || className == "Acolyte" || className == "Disciple" || className == "Elementalist" || className == "Forester" || className == "Magician" || className == "Mage" || className == "Mystic";
-            bool isEmpClass = className == "Druid" || className == "Warden" || className == "Naturalist";
-            bool isPieClass = className == "MaulerMid" || className == "Cleric" || className == "Friar" || className == "Heretic" || className == "Paladin" || className == "Reaver" || className == "Bonedancer" || className == "Healer" || className == "Hunter" || className == "Runemaster" || className == "Shaman" || className == "Spiritmaster" || className == "Thane" || className == "Valkyrie" || className == "Warlock" || className == "Seer";
-            bool isCharismaClass = className == "Bard" || className == "Minstrel" || className == "Skald";
+            // Dynamically check stat eligibility based on the Database configurations!
+            bool isIntClass = cClass.ManaStat == eStat.INT;
+            bool isEmpClass = cClass.ManaStat == eStat.EMP;
+            bool isPieClass = cClass.ManaStat == eStat.PIE;
+            bool isCharismaClass = cClass.ManaStat == eStat.CHR;
 
             // Restrict base casting stats & caps
             if (prop == eProperty.Intelligence || prop == eProperty.IntCapBonus || prop == eProperty.MythicalIntCapBonus) return isIntClass;
@@ -11243,15 +11265,13 @@ namespace DOL.GS
 
         private bool IsAllowedForMeleeMageHybrid(eProperty prop)
         {
-            var meleeOnly = new HashSet<eProperty> { eProperty.AllArcherySkills, eProperty.AllDualWieldingSkills, eProperty.AllMeleeWeaponSkills, eProperty.RangedDamage, eProperty.CriticalArcheryHitChance, eProperty.StyleDamage, eProperty.ReactionaryStyleDamage, eProperty.StyleCostReduction, eProperty.MeleeSpeed, eProperty.CriticalMeleeHitChance, eProperty.OffhandDamageAndChanceBonus, eProperty.OffhandDamageBonus, eProperty.OffhandChanceBonus, eProperty.ArrowRecovery };
-            var mageOnly = new HashSet<eProperty> { eProperty.SpellRange, eProperty.SpellFumbleChance, eProperty.AllMagicSkills, eProperty.AllFocusLevels, eProperty.CastingSpeed, eProperty.MaxMana, eProperty.PowerPool, eProperty.SpellDamage, eProperty.SpellDuration, eProperty.PowerPoolCapBonus, eProperty.SpellLevel, eProperty.SpellPowerCost, eProperty.CriticalSpellHitChance, eProperty.Conversion, eProperty.ArcaneSyphon, eProperty.DotDurationDecrease, eProperty.CriticalHealHitChance, eProperty.CriticalDotHitChance, eProperty.DotDamageBonus };
+            CharacterClass cClass = CharacterClass.GetClass((int)this.charClass);
+            
+            bool isPureMelee = cClass.ClassType == eClassType.PureTank;
+            bool isPureMage = cClass.ClassType == eClassType.ListCaster;
 
-            string className = charClass.ToString();
-            bool isPureMelee = className == "Armsman" || className == "Mercenary" || className == "Infiltrator" || className == "Blademaster" || className == "Hero" || className == "Berserker" || className == "Savage" || className == "Shadowblade" || className == "Warrior";
-            bool isPureMage = className == "Cabalist" || className == "Necromancer" || className == "Occultist" || className == "Sorcerer" || className == "Theurgist" || className == "Wizard" || className == "Animist" || className == "Eldritch" || className == "Enchanter" || className == "Mentalist" || className == "Bainshee" || className == "Warlock" || className == "Bonedancer" || className == "Runemaster" || className == "Spiritmaster";
-
-            if (isPureMelee && mageOnly.Contains(prop)) return false;
-            if (isPureMage && meleeOnly.Contains(prop)) return false;
+            if (isPureMelee && MageOnlyProperties.Contains(prop)) return false;
+            if (isPureMage && MeleeOnlyProperties.Contains(prop)) return false;
 
             return true;
         }

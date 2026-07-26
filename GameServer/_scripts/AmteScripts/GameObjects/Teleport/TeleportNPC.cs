@@ -118,7 +118,7 @@ namespace DOL.GS.Scripts
                 var list = GetList(player);
                 if (!string.IsNullOrEmpty(list))
                 {
-                    var text = string.Format(m_Text, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName, GetList(player));
+                    var text = string.Format(m_Text, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName, GetList(player));
                     player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 }
             }
@@ -702,7 +702,7 @@ namespace DOL.GS.Scripts
                     }
                 }
                 else
-                    player.Out.SendMessage(string.Format(m_Text_Refuse, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(string.Format(m_Text_Refuse, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
         #endregion

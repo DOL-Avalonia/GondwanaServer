@@ -16,17 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
-using DOL.GS;
-using System.Collections;
-using System.Reflection;
-using log4net;
 using DOL.Events;
-using DOL.GS.PacketHandler;
+using DOL.GS;
 using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
 using DOL.Language;
+using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 
 namespace DOL.AI.Brain
 {
@@ -201,6 +202,18 @@ namespace DOL.AI.Brain
                 if (spellArgs != null && spellArgs.Spell != null)
                     DebugMessageToOwner(String.Format("Now casting '{0}'", spellArgs.Spell.Name));
 
+                if (Owner is GamePlayer ownerPlayer)
+                {
+                    ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(ownerPlayer, spellArgs!.Spell, spellLine);
+                    if (spellHandler != null)
+                    {
+                        int powerCost = spellHandler.CalculatePowerCost(ownerPlayer);
+                        if (powerCost > 0)
+                        {
+                            ownerPlayer.ChangeMana(ownerPlayer, GameLiving.eManaChangeType.Spell, -powerCost);
+                        }
+                    }
+                }
 
                 // This message is for spells from the spell queue only, so suppress
                 // it for insta cast buffs coming from the pet itself.

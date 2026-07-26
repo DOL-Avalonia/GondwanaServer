@@ -1,5 +1,4 @@
 using DOL.AI.Brain;
-using DOL.GS.PlayerClass;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 
@@ -39,11 +38,6 @@ namespace DOL.GS.Spells
             }
             DamageTarget(ad, true);
             return true;
-        }
-
-        private bool HasNecromancerShade(GamePlayer p)
-        {
-            return FindEffectOnTarget(p, "NecromancerShadeEffect") != null || p?.IsShade == true;
         }
 
         public override int CalculateSpellResistChance(GameLiving target)

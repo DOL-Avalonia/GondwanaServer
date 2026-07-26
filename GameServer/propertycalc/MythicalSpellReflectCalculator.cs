@@ -22,7 +22,6 @@ using DOL.AI.Brain;
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.GS.PlayerClass;
 using DOL.GS.Spells;
 using DOL.GS.Utils;
 using DOL.Language;

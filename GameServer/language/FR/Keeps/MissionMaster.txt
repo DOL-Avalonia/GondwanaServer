@@ -1,0 +1,12 @@
+MissionMaster.Interact.Greeting1:			Salutations, {0}. Nous avons lancé un appel général aux héros de votre trempe pour nous aider dans notre lutte acharnée. Cela me fait chaud au cœur de voir un grand {1} comme vous prêt à risquer sa vie pour défendre le [royaume].
+MissionMaster.Interact.Greeting2:			Salutations et bienvenue, {0} ! En tant que chef de nos forces, je fais appel à nos meilleurs guerriers pour nous aider à vaincre nos ennemis. Souhaitez-vous faire votre devoir et défendre notre [royaume] ?
+MissionMaster.Whisper.NotInGroup:			Vous n'êtes pas dans un groupe !
+MissionMaster.Whisper.NotGroupLeader:			Vous n'êtes pas le chef de votre groupe !
+MissionMaster.Whisper.Realm.ComponentNull:		Nous devons tous faire notre part. Comment souhaitez-vous soutenir notre cause ? J'ai des [missions personnelles], des [missions de groupe] et des [missions de guilde] disponibles.
+MissionMaster.Whisper.Realm.ComponentNotNull:		Excellent ! Nous devons tous faire notre part. Comment souhaitez-vous soutenir notre cause ? J'ai des [missions personnelles] et des [missions de groupe] disponibles.
+MissionMaster.Whisper.PersonalMissions:			Nous avons plusieurs missions personnelles parmi lesquelles choisir. Souhaitez-vous réclamer la prime sur certains [gardes du royaume], ou réclamer les primes sur certains [ennemis du royaume] ? Peut-être qu'un assaut frontal n'est pas votre style ? Si tel est le cas, nous avons également des missions qui vous obligent à [reconnaître] un royaume ennemi, ou à éliminer la menace d'un [assassinat] imminent ?
+MissionMaster.Whisper.NotImplemented:			Ce type de mission n'est pas encore implémenté.
+MissionMaster.Whisper.GroupMissions:			Votre groupe aimerait-il participer à une [capture de tour], une [capture de fort] ou une attaque de [caravane] ? Si ces choix ne vous attirent pas, j'ai également des missions de prime sur les [gardes ennemis] et les [ennemis de royaume] si c'est votre préférence.
+MissionMaster.Whisper.Guild.NoGuild:			Vous n'avez pas de guilde !
+MissionMaster.Whisper.Guild.RankTooLow:			Vous n'avez pas un rang suffisant dans votre guilde !
+MissionMaster.Whisper.Guild.Missions:			Excellent, nous avons toujours besoin de l'aide de guildes organisées. Souhaitez-vous mener l'attaque sur le royaume d'[Albion] ou le royaume d'[Hibernia] ?

@@ -24,7 +24,6 @@ using DOL.GS.Effects;
 using DOL.GS.SkillHandler;
 using DOL.Language;
 using DOL.GS.ServerProperties;
-using DOL.GS.PlayerClass;
 
 namespace DOL.GS.Spells
 {
@@ -350,7 +349,7 @@ namespace DOL.GS.Spells
                 case 25195:
                     {
                         var viewer = delveClient?.Player;
-                        if (viewer?.CharacterClass is ClassOccultist)
+                        if (viewer?.CharacterClass.ID == (int)eCharacterClass.Occultist)
                         {
                             description += "\n\n" + LanguageMgr.GetTranslation(delveClient, "SpellDescription.Occultist.ConditionDescription1");
                         }

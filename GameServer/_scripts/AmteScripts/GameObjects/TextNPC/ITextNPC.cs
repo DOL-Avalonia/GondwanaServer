@@ -158,7 +158,7 @@ namespace DOL.GS.Scripts
                     ? QuestTexts[QuestReponses[QuestReponseKey]]
                     : "";
 
-                text = string.Format(text, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                text = string.Format(text, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
 
                 if (!string.IsNullOrEmpty(text))
                 {
@@ -172,7 +172,7 @@ namespace DOL.GS.Scripts
             }
             else if (!string.IsNullOrEmpty(Interact_Text))
             {
-                string text = string.Format(Interact_Text, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                string text = string.Format(Interact_Text, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
 
                 if (!string.IsNullOrEmpty(text))
                 {
@@ -219,7 +219,7 @@ namespace DOL.GS.Scripts
             //Message
             if (Reponses != null && Reponses.TryGetValue(normalizedKey, out string response))
             {
-                string text = string.Format(response, player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                string text = string.Format(response, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
                 if (!string.IsNullOrEmpty(text))
                 {
                     AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
@@ -762,7 +762,7 @@ namespace DOL.GS.Scripts
 
             if (Reponses != null && Reponses.ContainsKey(echItem.ItemRecvID))
             {
-                string text = string.Format(Reponses[echItem.ItemRecvID], player.Name, player.LastName, player.GuildName, player.CharacterClass.Name, player.RaceName);
+                string text = string.Format(Reponses[echItem.ItemRecvID], player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
                 if (text != "")
                     player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }

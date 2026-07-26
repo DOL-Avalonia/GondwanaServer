@@ -138,7 +138,7 @@ namespace DOL.GS.Spells
                 // TODO: Why is this a timer?
                 new RegionTimerAction<GamePlayer>(player, p =>
                 {
-                    m_tempParryLevel = GS.CharacterClassOccultist.ModTempParry(p, apply, m_tempParryLevel);
+                    m_tempParryLevel = CharacterClass.ModTempParry(p, apply, m_tempParryLevel);
                     return 0;
                 }).Start(1);
             }
