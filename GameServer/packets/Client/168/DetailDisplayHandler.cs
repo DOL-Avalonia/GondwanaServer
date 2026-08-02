@@ -1148,6 +1148,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                 int condLoss = 0;
                 int deathCondLoss = 0;
                 bool destroyOnMana = false, destroyOnCond = false, destroyOnDeath = false;
+                bool hasPassword = false, stopHealRegen = false;
+                int spellId = 0;
 
                 foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
@@ -1168,6 +1170,21 @@ namespace DOL.GS.PacketHandler.Client.v168
                         {
                             int.TryParse(parts[1], out deathCondLoss);
                             if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnDeath = true;
+                        }
+                        else if (parts[0] == "PASSWORD")
+                        {
+                            hasPassword = true;
+                        }
+                        else if (parts[0] == "STOPHEALREGEN")
+                        {
+                            stopHealRegen = true;
+                        }
+                        else if (parts[0] == "SPELL")
+                        {
+                            if (parts.Length >= 2)
+                                int.TryParse(parts[1], out spellId);
+                            else
+                                spellId = item.SpellID;
                         }
                     }
                 }
@@ -1207,6 +1224,49 @@ namespace DOL.GS.PacketHandler.Client.v168
                     string destroyBrokenDeath = destroyOnDeath ? (" " + LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.DestroysBroken")) : "";
                     objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.LosesConditionDeath", deathCondPct.ToString("0.##"), destroyBrokenDeath));
                 }
+
+                if (hasPassword)
+                {
+                    objectInfo.Add("- Requires a spoken formula to activate the curse and effects.");
+                }
+
+                if (stopHealRegen)
+                {
+                    objectInfo.Add("- Halts all health regeneration while equipped.");
+                }
+
+                if (spellId > 0 && !hasPassword)
+                {
+                    objectInfo.Add($"- Periodically casts a specific Spell.");
+                }
+            }
+
+            if (flags == 46)
+            {
+                objectInfo.Add(" ");
+                objectInfo.Add("Personal Loan Coupon.");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", item.MaxCondition) + " Gold.");
+                objectInfo.Add("Hand this to any standard merchant when you are short on funds to cash it.");
+
+                long minPrice = 80;
+                if (item.MaxCondition == 600 || item.MaxCondition == 800) minPrice = 120;
+
+                objectInfo.Add($"Cannot be used for items under {minPrice}g.");
+                objectInfo.Add(" ");
+            }
+            else if (flags == 47)
+            {
+                objectInfo.Add(" ");
+                objectInfo.Add("House Loan Coupon.");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", item.MaxCondition) + " Gold.");
+                objectInfo.Add("Hand this to a housing merchant or lot marker when short on funds to cash it.");
+
+                long minPrice = 900;
+                if (item.MaxCondition == 3000 || item.MaxCondition == 6000) minPrice = 1000;
+                else if (item.MaxCondition == 10000 || item.MaxCondition == 25000) minPrice = 4000;
+
+                objectInfo.Add($"Only usable for housing purchases of {minPrice}g or more.");
+                objectInfo.Add(" ");
             }
 
             if (item.IsCrafted)

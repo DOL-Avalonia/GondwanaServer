@@ -16,12 +16,14 @@ ServerRPGMessage.FeatureDungeons1:		[Khám phá Hầm ngục]
 ServerRPGMessage.FeatureDungeons2:		Đương đầu với Thế Giới Ngầm sâu thẳm, mê cung DarkSpire hoặc Vết Nứt Màn Sương nguy hiểm.
 ServerRPGMessage.FeaturePvP1:			[Người chơi vs Người chơi (PvP)]
 ServerRPGMessage.FeaturePvP2:			Bắt đầu từ cấp độ {0}, hãy tham gia vào các chế độ PvP hoành tráng bao gồm Tử Chiến, Cướp Cờ, Vua Ngọn Đồi, Core Run và Biohazard. Sử dụng lệnh '/pvp info' và '/pvp scores' để xem chi tiết phiên đấu.
+ServerRPGMessage.FeatureArena1:			[Các Cuộc Thi Đấu Trường]
+ServerRPGMessage.FeatureArena2:			Tham gia vào các trận đấu Đấu Trường 'Solo vs Solo' hoặc 'Đội vs Đội' được tổ chức. Khán giả có thể đặt cược (sử dụng lệnh '/bet') cho các đội yêu thích của họ trong giai đoạn chuẩn bị!
 ServerRPGMessage.FeatureRenaissance1:	[Thời Kỳ Phục Hưng]
 ServerRPGMessage.FeatureRenaissance2:	Truyền thuyết kể rằng những ai đạt đến đỉnh cao của cuộc hành trình có thể thực hiện một thử thách hiểm nghèo để tái sinh. Bắt đầu lại từ đầu, nhưng thức tỉnh với sức mạnh tiềm ẩn, giống như một vị thần để chinh phục những kẻ thù to lớn hơn nữa.
 ServerRPGMessage.FeatureAFK1:			[Huấn luyện AFK Động]
 ServerRPGMessage.FeatureAFK2:			Bạn bận rộn trong thế giới thực? Hãy sử dụng các huy hiệu đặc biệt kiếm được từ PvP và nhiệm vụ để huấn luyện nhân vật của bạn trong lúc đi vắng. Đứng trước một hình nhân tập luyện ở bất kỳ thành phố nào và gõ '/afk xp' hoặc '/afk combat' để nhận kinh nghiệm chiến đấu!
 ServerRPGMessage.FeatureBanker1:		[Nhân Viên Ngân Hàng]
-ServerRPGMessage.FeatureBanker2:		Nhắm mục tiêu vào một nhân viên ngân hàng và thì thầm các lệnh 'withdraw money', 'write a check', 'cash a check' hoặc 'term deposits' để quản lý tài sản của bạn. Bạn cũng có thể tự động hóa việc thanh toán tiền thuê nhà.
+ServerRPGMessage.FeatureBanker2:		Chọn một nhân viên ngân hàng và thì thầm 'rút tiền', 'viết séc', 'nhận tiền séc', 'khoản vay ngân hàng', hoặc 'tiền gửi có kỳ hạn' để quản lý tài sản của bạn. Bạn cũng có thể tự động hóa việc trả tiền thuê nhà, nhưng hãy cẩn thận với những khoản nợ chưa thanh toán nếu không tài sản của bạn sẽ bị tịch thu!
 ServerRPGMessage.FeatureAltCraft1:		[Chế tạo Thay thế]
 ServerRPGMessage.FeatureAltCraft2:		Thay vì dựa vào các danh sách công thức cố định, bạn có thể kết hợp ngẫu nhiên nhiều thành phần khác nhau để khám phá những vật phẩm mới! Sử dụng lệnh '/combine list' để xem các công thức bạn đã khám phá thành công. Người chơi có thể viết sách để bán công thức hoặc tìm những 'cuốn ma đạo thư' hiếm trong lúc làm nhiệm vụ để hé lộ những cách kết hợp bí mật.
 ServerRPGMessage.FeatureReputation1:	[Hệ Thống Danh Tiếng]
@@ -51,6 +53,7 @@ ServerRPGMessage.CmdAskName:			/askname: Hỏi tên mục tiêu của bạn đ�
 ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Tương tác và tùy chỉnh thú cưng Genistar của bạn. Nhắm mục tiêu vào quả trứng để chăm sóc, đặt một cái tên tùy chỉnh cho người bạn đồng hành trưởng thành, điều khiển biểu cảm của nó và trang bị vũ khí cho nó để chiến đấu bằng cách quản lý trang bị chiến đấu hiển thị.
 ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Hiển thị thông tin và điểm số hiện tại cho phiên đấu PvP đang diễn ra.
 ServerRPGMessage.CmdRvR:				/rvr info: Hiển thị thông tin và điểm số hiện tại cho chiến dịch RvR đang diễn ra.
+ServerRPGMessage.CmdBet:				/bet <Đội1 hoặc Đội2> <số lượng>: Đặt cược cho các chiến binh trong các vòng Đấu Trường đang diễn ra (Đội1 vs Đội2), tối đa {0} đồng Vàng. Kiểm tra các đội và quỹ thưởng đang hoạt động bằng lệnh '/bet list'.
 ServerRPGMessage.GuildCommandsHeader:	--------- LỆNH BANG HỘI MỚI ---------
 ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Xem bản đồ và trạng thái GvG.
 ServerRPGMessage.GCPortal:				/gc territoryportal : Mở một cổng không gian trực tiếp đến các vùng đất đã được bạn chiếm lĩnh.

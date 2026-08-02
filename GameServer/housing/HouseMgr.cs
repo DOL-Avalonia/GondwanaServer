@@ -538,7 +538,7 @@ namespace DOL.GS.Housing
                     var orphanedUniques = GameServer.Database.SelectObjects<ItemUnique>(DB.Column("PackageID").IsEqualTo(gen.GenistarID));
                     foreach (var uT in orphanedUniques)
                     {
-                        var invItems = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("ItemTemplate_ID").IsEqualTo(uT.Id_nb));
+                        var invItems = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("Id_nb").IsEqualTo(uT.Id_nb));
                         foreach (var invItm in invItems) GameServer.Database.DeleteObject(invItm);
                         GameServer.Database.DeleteObject(uT);
                     }

@@ -32,6 +32,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using DOL.GS.Geometry;
+using DOL.GS.Housing;
 
 namespace DOL.GS
 {
@@ -160,6 +162,7 @@ namespace DOL.GS
 
         public virtual void OnPlayerBuy(GamePlayer player, int slotPosition, int pageNumber, int amountToBuy)
         {
+            bool inHousing = player.CurrentRegionID == ServerRules.AmtenaelRules.HousingRegionID;
             var page = Catalog.GetPage(pageNumber);
             var articleToBuy = page.GetEntry((byte)slotPosition);
             var itemToBuy = articleToBuy.Item;
@@ -179,6 +182,16 @@ namespace DOL.GS
                 var price = currency.Mint(cost);
                 var costToText = price.ToText();
                 var playerHasNotEnoughBalance = player.GetBalance(price.Currency).Amount < price.Amount;
+
+                if (playerHasNotEnoughBalance && price.Currency.Equals(Currency.Copper))
+                {
+                    bool isHouseMerchant = (this is GameLotMarker) || inHousing;
+                    if (BankLoanMgr.TryUseCoupon(player, cost, isHouseMerchant))
+                    {
+                        playerHasNotEnoughBalance = player.GetBalance(price.Currency).Amount < price.Amount;
+                    }
+                }
+
                 if (playerHasNotEnoughBalance)
                 {
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.YouNeedGeneric", costToText), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -219,6 +232,7 @@ namespace DOL.GS
                 return;
             }
 
+            bool inHousing = player.CurrentRegionID == ServerRules.AmtenaelRules.HousingRegionID;
             ItemTemplate template = TradeItems.GetItem(page, (eMerchantWindowSlot)item_slot);
             if (template == null) return;
 
@@ -233,8 +247,18 @@ namespace DOL.GS
             GameInventoryItem item;
             lock (player.Inventory)
             {
+                bool playerHasNotEnoughBalance = player.CopperBalance < totalCost.Amount;
 
-                if (player.CopperBalance < totalCost.Amount)
+                if (playerHasNotEnoughBalance && totalCost.Currency.Equals(Currency.Copper))
+                {
+                    bool isHouseMerchant = player.TargetObject is GameLotMarker || inHousing;
+                    if (BankLoanMgr.TryUseCoupon(player, totalCost.Amount, isHouseMerchant))
+                    {
+                        playerHasNotEnoughBalance = player.CopperBalance < totalCost.Amount;
+                    }
+                }
+
+                if (playerHasNotEnoughBalance)
                 {
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.YouNeed", totalCost.ToText()), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;

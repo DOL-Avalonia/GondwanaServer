@@ -42,6 +42,7 @@ namespace DOL.GS.Quests
         int ChoiceOf { get; }
         long Money { get; }
         long Experience { get; }
+        int Erudition { get; }
     }
 
     public enum eQuestGoalType

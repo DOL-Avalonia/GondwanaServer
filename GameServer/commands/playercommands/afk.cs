@@ -160,6 +160,12 @@ namespace DOL.GS.Commands
                 return false;
             }
 
+            if (p.TempProperties.getProperty<bool>("ArenaParticipant", false) || p.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                p.Out.SendMessage("You cannot be AFK while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+            
             var wsdSrc = SpellHandler.FindEffectOnTarget(p, "WarlockSpeedDecrease");
             if (wsdSrc != null)
             {

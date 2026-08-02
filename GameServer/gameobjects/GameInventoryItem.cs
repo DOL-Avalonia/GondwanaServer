@@ -467,6 +467,12 @@ namespace DOL.GS
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.UseSlot.GenistarHouseGarden"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true; 
             }
+
+            if (Template != null && (Template.Flags == 46 || Template.Flags == 47))
+            {
+                player.Out.SendMessage("This loan coupon can only be activated automatically when making an expensive purchase at a merchant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return true;
+            }
             return false;
         }
 
@@ -606,6 +612,38 @@ namespace DOL.GS
             }
 
             //**********************************
+            //Bank loan coupon items
+            //**********************************
+
+            if (Flags == 46)
+            {
+                delve.Add(" ");
+                delve.Add("Personal Loan Coupon");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", MaxCondition) + " Gold");
+                delve.Add("Hand this to any standard merchant when you are short on funds to cash it.");
+
+                long minPrice = 80;
+                if (MaxCondition == 600 || MaxCondition == 800) minPrice = 120;
+
+                delve.Add($"Cannot be used for items under {minPrice}g.");
+                delve.Add(" ");
+            }
+            else if (Flags == 47)
+            {
+                delve.Add(" ");
+                delve.Add("House Loan Coupon");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", MaxCondition) + " Gold");
+                delve.Add("Hand this to a housing merchant or lot marker when short on funds to cash it.");
+
+                long minPrice = 900;
+                if (MaxCondition == 3000 || MaxCondition == 6000) minPrice = 1000;
+                else if (MaxCondition == 10000 || MaxCondition == 25000) minPrice = 4000;
+
+                delve.Add($"Only usable for housing purchases of {minPrice}g or more.");
+                delve.Add(" ");
+            }
+
+            //**********************************
             //special mana/cond consuming items
             //**********************************
 
@@ -618,6 +656,10 @@ namespace DOL.GS
                 int condLoss = 0;
                 int deathCondLoss = 0;
                 bool destroyOnMana = false, destroyOnCond = false, destroyOnDeath = false;
+                bool hasPassword = false;
+                bool stopHealRegen = false;
+                int spellId = 0;
+                int effectId = 0;
 
                 foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                 {
@@ -638,6 +680,25 @@ namespace DOL.GS
                         {
                             int.TryParse(parts[1], out deathCondLoss);
                             if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnDeath = true;
+                        }
+                        else if (parts[0] == "PASSWORD")
+                        {
+                            hasPassword = true;
+                        }
+                        else if (parts[0] == "STOPHEALREGEN")
+                        {
+                            stopHealRegen = true;
+                        }
+                        else if (parts[0] == "SPELL")
+                        {
+                            if (parts.Length >= 2)
+                                int.TryParse(parts[1], out spellId);
+                            else
+                                spellId = SpellID;
+                        }
+                        else if (parts[0] == "EFFECT" && parts.Length >= 2)
+                        {
+                            int.TryParse(parts[1], out effectId);
                         }
                     }
                 }
@@ -678,7 +739,27 @@ namespace DOL.GS
                     delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.LosesConditionDeath", deathCondPct.ToString("0.##"), destroyBrokenDeath));
                 }
 
-                if (manaPct > 0 || condLoss > 0 || deathCondLoss > 0) delve.Add(" ");
+                if (hasPassword)
+                {
+                    delve.Add("- Requires a spoken formula to activate the curse and effects.");
+                }
+
+                if (stopHealRegen)
+                {
+                    delve.Add("- Halts all health regeneration while equipped.");
+                }
+
+                if (spellId > 0 && !hasPassword)
+                {
+                    delve.Add($"- Periodically casts a specific Spell.");
+                }
+
+                if (effectId > 0 && !hasPassword)
+                {
+                    delve.Add($"- Periodically applies a visual aura.");
+                }
+
+                if (manaPct > 0 || condLoss > 0 || deathCondLoss > 0 || hasPassword || stopHealRegen || spellId > 0 || effectId > 0) delve.Add(" ");
             }
 
             if (!IsDropable || !IsPickable || !IsTradable || IsIndestructible || !CanUseInRvR || Flags == 2 || (Flags == 1 && IsDropable))

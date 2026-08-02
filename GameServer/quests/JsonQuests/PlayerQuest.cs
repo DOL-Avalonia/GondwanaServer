@@ -225,6 +225,7 @@ namespace DOL.GS.Quests
             public int ChoiceOf => Quest.NbChooseOptionalItems;
             public long Money => Quest.RewardMoney;
             public long Experience => Quest.RewardXP;
+            public int Erudition => Quest.RewardErudition;
 
             public QuestRewards(DataQuestJson quest)
             {

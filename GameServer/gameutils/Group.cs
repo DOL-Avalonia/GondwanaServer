@@ -285,6 +285,12 @@ namespace DOL.GS
         public virtual bool RemoveMember(GameLiving living)
         {
             var player = living as GamePlayer;
+
+            if (living.TempProperties.getProperty<bool>("ArenaParticipant", false) || living.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                if (living is GamePlayer p) p.Out.SendMessage("You cannot leave your group while queued for or participating in an Arena Contest.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return false;
+            }
             
             if (!m_groupMembers.TryRemove(living))
                 return false;

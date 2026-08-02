@@ -39,6 +39,12 @@ namespace DOL.GS.Commands
                 return;
             }
 
+            if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false) || client.Player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                client.Out.SendMessage("You cannot disband your group while queued for or participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             if (args.Length < 2)//disband myslef
             {
                 client.Player.Group.MemberDisband(client.Player);

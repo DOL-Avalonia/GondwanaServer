@@ -46,6 +46,12 @@ namespace DOL.GS.Commands
             if (IsSpammingCommand(client.Player, "invite"))
                 return;
 
+            if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false) || client.Player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                client.Out.SendMessage("You cannot invite players in your group while queued for or participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             string targetName = string.Join(" ", args, 1, args.Length - 1);
             GamePlayer target;
 

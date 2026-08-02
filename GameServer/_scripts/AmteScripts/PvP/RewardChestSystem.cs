@@ -266,7 +266,9 @@ namespace AmteScripts.PvP.Rewards
         private static void SpawnWithConfig(GamePlayer player, eRewardTier tier, GameNPC teleporter, int targetSlots, double targetMaxUti, int regionID, string rarityPrefix, int color)
         {
             GameObject refObj = teleporter != null ? (GameObject)teleporter : (GameObject)player;
-            ushort baseHeading = refObj.Heading;
+            ushort baseHeading = refObj is GameNPC npc
+                ? (ushort)npc.SpawnPosition.Orientation.InHeading
+                : refObj.Heading;
 
             ushort angle45 = 512;
             ushort angle25 = 284;

@@ -358,6 +358,11 @@ namespace DOL.GS.Scripts
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingUsageDuel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false))
+            {
+                player.Out.SendMessage("You can't use celestial magic while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
             if (player.TempProperties.getProperty<object>(StealCommandHandlerBase.PLAYER_VOL_TIMER, null) != null)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingUsageStealing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);

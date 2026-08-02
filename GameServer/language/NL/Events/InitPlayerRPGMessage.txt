@@ -16,12 +16,14 @@ ServerRPGMessage.FeatureDungeons1:		[Kerkerverkenning]
 ServerRPGMessage.FeatureDungeons2:		Trotseer de diepe Onderwereld, de labyrintische DarkSpire of de gevaarlijke Sluierkloof (Veil Rift).
 ServerRPGMessage.FeaturePvP1:			[Speler vs Speler (PvP)]
 ServerRPGMessage.FeaturePvP2:			Vanaf level {0} kun je deelnemen aan epische PvP-modi, waaronder Deathmatch, Capture the Flag, King of the Hill, Core Run en Biohazard. Gebruik '/pvp info' en '/pvp scores' om sessiedetails te bekijken.
+ServerRPGMessage.FeatureArena1:			[Arena Wedstrijden]
+ServerRPGMessage.FeatureArena2:			Neem deel aan georganiseerde 'Solo vs Solo' of 'Team vs Team' Arena wedstrijden. Toeschouwers kunnen tijdens de voorbereidingsfase weddenschappen plaatsen (met '/bet') op hun favoriete teams!
 ServerRPGMessage.FeatureRenaissance1:	[Renaissance]
 ServerRPGMessage.FeatureRenaissance2:	Volgens de legendes kunnen degenen die het hoogtepunt van hun reis bereiken een gevaarlijke beproeving ondergaan om herboren te worden. Begin opnieuw, maar ontwaak met latente, goddelijke kracht om nog grotere vijanden te verslaan.
 ServerRPGMessage.FeatureAFK1:			[Dynamische AFK-training]
 ServerRPGMessage.FeatureAFK2:			Druk in de echte wereld? Gebruik speciale tokens verdiend met PvP en missies om je personage te trainen terwijl je weg bent. Ga voor een oefenpop staan in een willekeurige stad en typ '/afk xp' of '/afk combat' om gevechtservaring op te doen!
 ServerRPGMessage.FeatureBanker1:		[De Bankier]
-ServerRPGMessage.FeatureBanker2:		Selecteer een bankier en fluister 'withdraw money', 'write a check', 'cash a check' of 'term deposits' om je rijkdom te beheren. Je kunt ook de huurbetalingen voor je huis automatiseren.
+ServerRPGMessage.FeatureBanker2:		Selecteer een bankier en fluister 'geld opnemen', 'een cheque uitschrijven', 'een cheque innen', 'banklening' of 'termijndeposito's' om je rijkdom te beheren. Je kunt ook de huurbetalingen voor je huis automatiseren, maar pas op voor onbetaalde schulden, anders worden je bezittingen in beslag genomen!
 ServerRPGMessage.FeatureAltCraft1:		[Alternatief Knutselen]
 ServerRPGMessage.FeatureAltCraft2:		In plaats van te vertrouwen op vaste receptenlijsten, kun je willekeurig verschillende ingrediënten combineren om nieuwe voorwerpen te ontdekken! Gebruik '/combine list' om je succesvol ontdekte formules te zien. Spelers kunnen boeken schrijven om formules te verkopen, of zeldzame 'grimoires' vinden tijdens missies die verborgen combinaties onthullen.
 ServerRPGMessage.FeatureReputation1:	[Reputatiesysteem]
@@ -51,6 +53,7 @@ ServerRPGMessage.CmdAskName:			/askname: Vraag om de naam van je doelwit om deze
 ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Communiceer met en pas je Genistar-huisdier aan. Selecteer je ei als doelwit om ervoor te zorgen, geef je volwassen metgezel een eigen naam, stuur zijn emotes aan en bewapen hem voor de strijd door zijn zichtbare gevechtsuitrusting te beheren.
 ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Toon informatie en huidige scores voor de actieve PvP-sessie.
 ServerRPGMessage.CmdRvR:				/rvr info: Toon informatie en huidige scores voor de actieve RvR-campagne.
+ServerRPGMessage.CmdBet:				/bet <Team1 of Team2> <bedrag>: Plaats weddenschappen op vechters in actieve Arena rondes (Team1 vs Team2), tot een maximum van {0} Gouden munten. Bekijk actieve teams en prijzenpotten met '/bet list'.
 ServerRPGMessage.GuildCommandsHeader:	--------- NIEUWE GILDECOMMANDO'S ---------
 ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Bekijk GvG-kaarten en statussen.
 ServerRPGMessage.GCPortal:				/gc territoryportal : Open een portaal direct naar je geclaimde gebieden.

@@ -46,7 +46,30 @@ namespace DOL.GS.Scripts
                 }
                 InventoryLogging.LogInventoryAction(source, this, eInventoryActionType.Other, money);
             }
+
+            if (bank.Debt > 0)
+            {
+                if (money >= bank.Debt)
+                {
+                    money -= bank.Debt;
+                    bank.Debt = 0;
+                    bank.IsDebtor = false;
+                    bank.NegativeMoneySince = DateTime.MinValue;
+                }
+                else
+                {
+                    bank.Debt -= money;
+                    money = 0;
+                }
+            }
+
             bank.Money = money + bank.Money;
+
+            if (bank.Debt <= 0 && bank.Money >= 0 && bank.IsDebtor)
+            {
+                bank.IsDebtor = false;
+                bank.NegativeMoneySince = DateTime.MinValue;
+            }
 
             GameServer.Database.SaveObject(bank);
 
@@ -107,15 +130,45 @@ namespace DOL.GS.Scripts
                 ? LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.On")
                 : LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.AutoRent.Off");
 
-            string formattedMoney = Currency.Copper.Mint(bank.Money).ToText();
-            string message = LanguageMgr.GetTranslation(player.Client.Account.Language,"Banker.Greetings1", player.Name, Money.GetString(bank.Money)) + " " + "\r\n";
+            string formattedMoney = Currency.Copper.Mint(bank.Money).ToText(player.Client.Account.Language);
+            string message = "";
+
+            if (bank.Debt > 0 || bank.Money < 0)
+            {
+                TimeSpan elapsed = DateTime.Now - bank.NegativeMoneySince;
+                int timeRemaining;
+                string timeUnit;
+
+                if (Properties.BANK_LOAN_DEBUG)
+                {
+                    timeRemaining = Math.Max(0, 90 - (int)elapsed.TotalSeconds);
+                    timeUnit = "seconds";
+                }
+                else
+                {
+                    timeRemaining = Math.Max(0, Properties.DEBTOR_GRACE_PERIOD_HOURS - (int)elapsed.TotalHours);
+                    timeUnit = timeRemaining == 1 ? "hour" : "hours";
+                }
+
+                long displayDebt = bank.Debt + (bank.Money < 0 ? Math.Abs(bank.Money) : 0);
+                string formattedDebt = Currency.Copper.Mint(displayDebt).ToText(player.Client.Account.Language);
+
+                message += $"Greetings {player.Name}! You currently have no money and an unpaid debt of {formattedDebt}.\n";
+                message += $"[Warning] You have {timeRemaining} {timeUnit} left to pay it off before your assets are seized!\n\n";
+            }
+            else
+            {
+                message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings1", player.Name, formattedMoney) + " \r\n";
+            }
+
             message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings2") + "\n\n";
             message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings3") + "\n";
             message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings4") + "\n";
             message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings5") + "\n";
             message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings6") + "\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings7") + "\n\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings8", autoRentToggle);
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings7") + "\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings8") + "\n\n";
+            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings9", autoRentToggle) + "\n\n";
             player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             return true;
         }
@@ -218,6 +271,55 @@ namespace DOL.GS.Scripts
                 case "ouvrir un dépôt trimestriel":
                     PromptTermDeposit(player, "Banker.Term.Quarterly", "quarterly", 7);
                     break;
+                case "bank loan":
+                case "prêt bancaire":
+                    string msg = "Available Loans:\n\n";
+                    msg += "Personal Loans (15% interest, 1 week):\n";
+                    msg += "[personal loan 400g] - Requires 50g balance\n";
+                    msg += "[personal loan 600g] - Requires 80g balance\n";
+                    msg += "[personal loan 800g] - Requires 80g balance\n\n";
+                    msg += "House Loans (10% interest, 1 month):\n";
+                    msg += "[house loan 1500g] - Requires 250g balance\n";
+                    msg += "[house loan 3000g] - Requires 500g balance\n";
+                    msg += "[house loan 6000g] - Requires 500g balance\n";
+
+                    // Display higher tier house loans only if the player has >= 2000 gold (2 platinum)
+                    if (bank.Money >= 20000000)
+                    {
+                        msg += "[house loan 10000g] - Requires 2000g balance\n";
+                        msg += "[house loan 25000g] - Requires 2000g balance\n";
+                    }
+                    msg += "\n";
+
+                    if (bank.LoanType > 0)
+                        msg += "You have an active loan. You can [repay loan] early to save on interest rates.\n";
+
+                    player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    break;
+                case "repay loan":
+                case "rembourser prêt":
+                    BankLoanMgr.RepayLoanEarly(player, bank);
+                    break;
+                case "personal loan 400g":
+                case "prêt personnel 400g": BankLoanMgr.IssueCoupon(player, bank, 1, 400); break;
+                case "personal loan 600g":
+                case "prêt personnel 600g": BankLoanMgr.IssueCoupon(player, bank, 1, 600); break;
+                case "personal loan 800g":
+                case "prêt personnel 800g": BankLoanMgr.IssueCoupon(player, bank, 1, 800); break;
+                case "house loan 1500g":
+                case "prêt immobilier 1500g": BankLoanMgr.IssueCoupon(player, bank, 2, 1500); break;
+                case "house loan 3000g":
+                case "prêt immobilier 3000g": BankLoanMgr.IssueCoupon(player, bank, 2, 3000); break;
+                case "house loan 6000g":
+                case "prêt immobilier 6000g": BankLoanMgr.IssueCoupon(player, bank, 2, 6000); break;
+                case "house loan 10000g":
+                case "prêt immobilier 10000g":
+                    if (bank.Money >= 20000000) BankLoanMgr.IssueCoupon(player, bank, 2, 10000);
+                    break;
+                case "house loan 25000g":
+                case "prêt immobilier 25000g":
+                    if (bank.Money >= 20000000) BankLoanMgr.IssueCoupon(player, bank, 2, 25000);
+                    break;
             }
             return true;
         }
@@ -238,7 +340,7 @@ namespace DOL.GS.Scripts
                         ? LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Days", remaining.Days)
                         : LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Hours", remaining.Hours);
 
-                    msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Contract", Currency.Copper.Mint(d.Amount).ToText(), d.InterestRate, timeStr) + "\n";
+                    msg += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Contract", Currency.Copper.Mint(d.Amount).ToText(player.Client.Account.Language), d.InterestRate, timeStr) + "\n";
                 }
                 msg += "\n";
             }
@@ -278,7 +380,7 @@ namespace DOL.GS.Scripts
                     GameServer.Database.SaveObject(bank);
                     GameServer.Database.DeleteObject(d);
 
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Matured", Currency.Copper.Mint(totalReturn).ToText(), d.InterestRate), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Term.Matured", Currency.Copper.Mint(totalReturn).ToText(player.Client.Account.Language), d.InterestRate), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
         }

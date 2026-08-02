@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using DOL.GS.Keeps;
+using DOL.Database;
 using DOL.GS.Spells;
 using System;
 
@@ -46,6 +46,32 @@ namespace DOL.GS.PropertyCalc
         {
             if (living.IsDiseased || SpellHandler.FindEffectOnTarget(living, "StyleBleeding") != null)
                 return 0; // no HP regen if diseased or bleedng
+
+            if (living is GamePlayer player)
+            {
+                lock (player.Inventory)
+                {
+                    foreach (InventoryItem item in player.Inventory.EquippedItems)
+                    {
+                        if (item == null || item.Template == null) continue;
+                        int flag = item.Template.Flags;
+                        if (flag == 43 || flag == 44 || flag == 45)
+                        {
+                            string pkg = item.PackageID ?? item.Template.PackageID ?? "";
+                            if (!string.IsNullOrEmpty(pkg))
+                            {
+                                foreach (string p in pkg.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    if (p == "STOPHEALREGEN")
+                                    {
+                                        return 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             double regen = 1;
 

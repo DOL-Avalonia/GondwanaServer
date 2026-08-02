@@ -127,6 +127,12 @@ namespace DOL.GS
                         return false;
                     }
 
+                    if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
+                    {
+                        player.Out.SendMessage("You cannot embark while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
                     foreach (GameNPC npc in GetNPCsInRadius(1500))
                     {
                         if (npc is GameTaxiBoat)

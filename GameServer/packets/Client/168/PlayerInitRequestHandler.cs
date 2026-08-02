@@ -17,6 +17,7 @@
  *
  */
 
+using DOL.Database;
 using DOL.Events;
 using DOL.GS.Housing;
 using DOL.GS.Keeps;
@@ -113,7 +114,10 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     SendGuildMessagesToPlayer(player);
                 }
+
                 SendHouseRentRemindersToPlayer(player);
+                CheckDebtorStatus(player);
+
                 if (player.Level > 1 && Properties.MOTD != "")
                 {
                     player.Out.SendMessage(Properties.MOTD, eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -205,6 +209,31 @@ namespace DOL.GS.PacketHandler.Client.v168
                 #endregion TempPropertiesManager LookUp
             }
 
+            private static void CheckDebtorStatus(GamePlayer player)
+            {
+                DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(player.InternalID);
+                if (bank != null && (bank.Debt > 0 || bank.Money < 0))
+                {
+                    bool debug = Properties.BANK_LOAN_DEBUG;
+                    TimeSpan elapsed = DateTime.Now - bank.NegativeMoneySince;
+                    int timeRemaining;
+                    string timeUnit;
+
+                    if (debug)
+                    {
+                        timeRemaining = Math.Max(0, 90 - (int)elapsed.TotalSeconds);
+                        timeUnit = "seconds";
+                    }
+                    else
+                    {
+                        timeRemaining = Math.Max(0, Properties.DEBTOR_GRACE_PERIOD_HOURS - (int)elapsed.TotalHours);
+                        timeUnit = timeRemaining == 1 ? "hour" : "hours";
+                    }
+
+                    player.Out.SendMessage($"WARNING: Your bank account is in debt. You have {timeRemaining} {timeUnit} to reimburse your debt or your assets will be seized!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
+
             private void SendServerRPGMessage(GamePlayer player)
             {
                 string lang = player.Client.Account.Language;
@@ -231,6 +260,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP2", Properties.PVP_MIN_LEVEL);
 
                 string features2 =
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureArena1") + "\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureArena2") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance1") + "\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance2") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK1") + "\n" +
@@ -269,7 +300,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAskName") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdGenistar") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdPvP") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdRvR");
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdRvR") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdBet", Properties.ARENA_MAX_BET_GOLD);
 
                 string guildcommands =
                     "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GuildCommandsHeader") + "\n\n" +

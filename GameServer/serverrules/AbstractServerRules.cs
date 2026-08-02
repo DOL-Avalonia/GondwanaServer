@@ -233,7 +233,7 @@ namespace DOL.GS.ServerRules
         /// <param name="args"></param>
         public virtual void OnGameEntered(DOLEvent e, object sender, EventArgs args)
         {
-            StartImmunityTimer((GamePlayer)sender, ServerProperties.Properties.TIMER_GAME_ENTERED * 1000);
+            StartImmunityTimer((GamePlayer)sender, Properties.TIMER_GAME_ENTERED * 1000);
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace DOL.GS.ServerRules
         /// <param name="args"></param>
         public virtual void OnRegionChanged(DOLEvent e, object sender, EventArgs args)
         {
-            StartImmunityTimer((GamePlayer)sender, ServerProperties.Properties.TIMER_REGION_CHANGED * 1000);
+            StartImmunityTimer((GamePlayer)sender, Properties.TIMER_REGION_CHANGED * 1000);
         }
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace DOL.GS.ServerRules
         public virtual void OnReleased(DOLEvent e, object sender, EventArgs args)
         {
             GamePlayer player = (GamePlayer)sender;
-            StartImmunityTimer(player, ServerProperties.Properties.TIMER_KILLED_BY_MOB * 1000);//When Killed by a Mob
+            StartImmunityTimer(player, Properties.TIMER_KILLED_BY_MOB * 1000);//When Killed by a Mob
         }
         
         /// <summary>
@@ -387,6 +387,47 @@ namespace DOL.GS.ServerRules
             if (source == null || target == null)
                 return false;
             
+            GamePlayer pSource = source as GamePlayer ?? source.GetPlayerOwner();
+            GamePlayer pTarget = target as GamePlayer ?? target.GetPlayerOwner();
+
+            if (pSource != null && pTarget != null)
+            {
+                bool sourceInArena = pSource.TempProperties.getProperty<bool>("ArenaParticipant", false);
+                bool targetInArena = pTarget.TempProperties.getProperty<bool>("ArenaParticipant", false);
+
+                if (sourceInArena || targetInArena)
+                {
+                    if (sourceInArena != targetInArena)
+                    {
+                        if (!quiet && source is GamePlayer p) p.Out.SendMessage("You cannot interfere with Arena participants.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
+                    var session = ArenaManager.Instance.GetSession(pSource.CurrentRegionID);
+                    if (session != null && session.State == ArenaManager.eArenaState.Running)
+                    {
+                        if (session.CurrentTeamA != null && session.CurrentTeamB != null)
+                        {
+                            bool sourceInA = session.CurrentTeamA.Members.Contains(pSource);
+                            bool sourceInB = session.CurrentTeamB.Members.Contains(pSource);
+                            bool targetInA = session.CurrentTeamA.Members.Contains(pTarget);
+                            bool targetInB = session.CurrentTeamB.Members.Contains(pTarget);
+
+                            if ((sourceInA && targetInB) || (sourceInB && targetInA))
+                            {
+                                if (!quiet && source is GamePlayer p) p.Out.SendMessage("You cannot assist the enemy team.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return false;
+                            }
+
+                            if ((sourceInA && targetInA) || (sourceInB && targetInB))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
             return IsSameRealm(source, target, quiet);
         }
 
@@ -425,10 +466,46 @@ namespace DOL.GS.ServerRules
             GamePlayer playerAttacker = attacker as GamePlayer ?? attacker.GetPlayerOwner();
             GamePlayer playerDefender = defender as GamePlayer ?? defender.GetPlayerOwner();
 
+            if (attacker != null && defender != null)
+            {
+                bool attInArena = playerAttacker != null && playerAttacker.TempProperties.getProperty<bool>("ArenaParticipant", false);
+                bool defInArena = playerDefender != null && playerDefender.TempProperties.getProperty<bool>("ArenaParticipant", false);
+
+                if (attInArena || defInArena)
+                {
+                    if (attInArena != defInArena)
+                    {
+                        if (!quiet) MessageToLiving(attacker, "You cannot interfere with Arena participants.");
+                        return false;
+                    }
+
+                    var session = ArenaManager.Instance.GetSession(playerAttacker!.CurrentRegionID);
+                    if (session != null && session.State == ArenaManager.eArenaState.Running)
+                    {
+                        if (session.CurrentTeamA != null && session.CurrentTeamB != null)
+                        {
+                            bool attInA = session.CurrentTeamA.Members.Contains(playerAttacker);
+                            bool attInB = session.CurrentTeamB.Members.Contains(playerAttacker);
+                            bool defInA = session.CurrentTeamA.Members.Contains(playerDefender);
+                            bool defInB = session.CurrentTeamB.Members.Contains(playerDefender);
+
+                            if ((attInA && defInB) || (attInB && defInA))
+                                return true;
+
+                            if ((attInA && defInA) || (attInB && defInB))
+                                return false;
+                        }
+                    }
+
+                    // If they are queued or resting between rounds, explicitly block attacks.
+                    return false;
+                }
+            }
+
             if (playerDefender != null && (playerDefender.Client.ClientState == GameClient.eClientState.WorldEnter || playerDefender.IsInvulnerableToAttack))
             {
                 if (!quiet)
-                    MessageToLiving(attacker, LanguageMgr.GetTranslation((attacker as GamePlayer)?.Client, "ServerRules.AbstractServerRules.PvpDefenderEntering", defender.Name));
+                    MessageToLiving(attacker, LanguageMgr.GetTranslation((attacker as GamePlayer)?.Client, "ServerRules.AbstractServerRules.PvpDefenderEntering", defender!.Name));
                 return false;
             }
 
@@ -444,7 +521,7 @@ namespace DOL.GS.ServerRules
                 // Defender immunity
                 if (playerDefender.IsInvulnerableToAttack)
                 {
-                    if (quiet == false) MessageToLiving(attacker, LanguageMgr.GetTranslation((attacker as GamePlayer)?.Client, "ServerRules.AbstractServerRules.PvpDefenderImmuneName", defender.Name));
+                    if (quiet == false) MessageToLiving(attacker, LanguageMgr.GetTranslation((attacker as GamePlayer)?.Client, "ServerRules.AbstractServerRules.PvpDefenderImmuneName", defender!.Name));
                     return false;
                 }
             }
@@ -467,7 +544,7 @@ namespace DOL.GS.ServerRules
                 }
             }
             // Your pet can only attack stealthed players you have selected
-            if (defender!.IsStealthed && attacker.GetController() is GamePlayer controller)
+            if (defender!.IsStealthed && attacker!.GetController() is GamePlayer controller)
                 if (controller.TargetObject != defender) // TODO: should this really be the case for AOEs?
                     return false;
 
@@ -489,7 +566,7 @@ namespace DOL.GS.ServerRules
             }
 
             //safe area support for attacker
-            foreach (AbstractArea area in attacker.CurrentAreas.OfType<AbstractArea>())
+            foreach (AbstractArea area in attacker!.CurrentAreas.OfType<AbstractArea>())
             {
                 if ((area.IsSafeArea) && (defender is GamePlayer) && (attacker is GamePlayer))
                 {
@@ -733,6 +810,7 @@ namespace DOL.GS.ServerRules
             if (player?.Client.Account.PrivLevel > (uint)ePrivLevel.Player) return string.Empty;
 
             // player restrictions
+            if (player != null && (player.TempProperties.getProperty<bool>("ArenaParticipant", false))) return "You cannot mount while participating in an Arena Contest.";
             if (SpellHandler.FindEffectOnTarget(living, "Petrify") != null) return "GameObjects.GamePlayer.UseSlot.CantMountPetrified";
             if (living.IsMoving) return "GameObjects.GamePlayer.UseSlot.CantMountMoving";
             if (living.IsMezzed) return "GameObjects.GamePlayer.UseSlot.CantMountMezzed";
@@ -1719,14 +1797,22 @@ namespace DOL.GS.ServerRules
                 noExpSeconds /= Properties.RP_WORTH_SECONDS_PVPDIVIDER;
             }
 
-            if (killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
+            bool isArenaMatch = killedPlayer.TempProperties.getProperty<bool>("ArenaParticipant", false) && 
+                                killer is GamePlayer kp && kp.TempProperties.getProperty<bool>("ArenaParticipant", false);
+
+            if (isArenaMatch)
+            {
+                noExpSeconds = 0;
+            }
+
+            if (!isArenaMatch && killedPlayer.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
             {
                 foreach (var de in gainers)
                 {
-                    if (de.Key is GamePlayer player)
+                    if (de.Key is GamePlayer pl)
                     {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoRP", player.GetPersonalizedName(killedPlayer)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoXP", player.GetPersonalizedName(killedPlayer)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        pl.Out.SendMessage(LanguageMgr.GetTranslation(pl.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoRP", pl.GetPersonalizedName(killedPlayer)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        pl.Out.SendMessage(LanguageMgr.GetTranslation(pl.Client.Account.Language, "ServerRules.AbstractServerRules.RecentPlayerKillNoXP", pl.GetPersonalizedName(killedPlayer)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
                 }
                 return;
@@ -1841,6 +1927,21 @@ namespace DOL.GS.ServerRules
                             }
                         }
                     }
+
+                    if (isArenaMatch)
+                    {
+                        var session = AmteScripts.Managers.ArenaManager.Instance.GetSession(killerPlayer.CurrentRegionID);
+                        if (session != null && session.State == AmteScripts.Managers.ArenaManager.eArenaState.Running)
+                        {
+                            if (session.RoundNumber >= 2)
+                            {
+                                int arenaBonusPct = (session.RoundNumber - 1) * 5 + 5; // Round 2 = 10%, 3 = 15%, etc.
+                                realmPoints += (realmPoints * arenaBonusPct) / 100;
+                                killerPlayer.Out.SendMessage($"Arena Round {session.RoundNumber} Bonus: +{arenaBonusPct}% RP!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
+                        }
+                    }
+
                     if (realmPoints > rpCap)
                         realmPoints = rpCap;
                     if (realmPoints > 0)

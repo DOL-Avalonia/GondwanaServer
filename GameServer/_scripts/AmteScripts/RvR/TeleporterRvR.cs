@@ -39,6 +39,12 @@ namespace DOL.GS.Scripts
 
         private bool _BaseSay(GamePlayer player, string str = "Partir")
         {
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                player.Out.SendMessage("You cannot enter RvR while registered for an Arena Contest.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                return true;
+            }
+
             if (_isBusy)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.Busy"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
@@ -130,9 +136,15 @@ namespace DOL.GS.Scripts
             else
             {
                 if (!RvrManager.Instance.IsOpen || RvrManager.Instance.IsInRvr(player))
+                {
                     RvrManager.Instance.RemovePlayer(player, true);
+                    RoleplayReward.ResetRPChain(player);
+                }
                 else
+                {
                     RvrManager.Instance.AddPlayer(player);
+                    RoleplayReward.ResetRPChain(player);
+                }
             }
             return 0;
         }

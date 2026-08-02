@@ -138,6 +138,12 @@ namespace DOL.GS
                 return false;
             }
 
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false))
+            {
+                player.Out.SendMessage("You cannot ride a horse while participating in an Arena Contest!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
             var morph = player.FindMorph(cancel: true);
             if (morph != null)
             {

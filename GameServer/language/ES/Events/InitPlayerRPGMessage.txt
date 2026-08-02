@@ -16,12 +16,14 @@ ServerRPGMessage.FeatureDungeons1:		[Exploración de Mazmorras]
 ServerRPGMessage.FeatureDungeons2:		Atrévete con el profundo Subsuelo, la laberíntica Espira Oscura (DarkSpire) o la peligrosa Grieta del Velo (Veil Rift).
 ServerRPGMessage.FeaturePvP1:			[Jugador contra Jugador (JcJ)]
 ServerRPGMessage.FeaturePvP2:			A partir del nivel {0}, participa en modos épicos de JcJ que incluyen Combate a Muerte, Captura la Bandera, Rey de la Colina, Carrera del Núcleo (Core Run) y Riesgo Biológico (Biohazard). Usa '/pvp info' y '/pvp scores' para ver los detalles de la sesión.
+ServerRPGMessage.FeatureArena1:			[Combates de Arena]
+ServerRPGMessage.FeatureArena2:			Participa en combates organizados de Arena 'Solo vs Solo' o 'Equipo vs Equipo'. ¡Los espectadores pueden apostar (usando '/bet') por sus equipos favoritos durante la fase de preparación!
 ServerRPGMessage.FeatureRenaissance1:	[Renacimiento]
 ServerRPGMessage.FeatureRenaissance2:	Las leyendas dicen que aquellos que alcanzan la cima de su viaje pueden emprender una peligrosa prueba para renacer. Comienza de nuevo, pero despierta con un poder latente similar al de un dios para conquistar a enemigos aún mayores.
 ServerRPGMessage.FeatureAFK1:			[Entrenamiento AFK Dinámico]
 ServerRPGMessage.FeatureAFK2:			¿Estás ocupado en el mundo real? Usa fichas especiales ganadas en JcJ y misiones para entrenar a tu personaje mientras estás ausente. ¡Párate frente a un maniquí de entrenamiento en cualquier ciudad y escribe '/afk xp' o '/afk combat' para ganar experiencia de combate!
 ServerRPGMessage.FeatureBanker1:		[El Banquero]
-ServerRPGMessage.FeatureBanker2:		Apunta a un banquero y susurra 'withdraw money', 'write a check', 'cash a check' o 'term deposits' para administrar tu riqueza. También puedes automatizar los pagos del alquiler de tu casa.
+ServerRPGMessage.FeatureBanker2:		Selecciona a un banquero y susúrrale 'retirar dinero', 'escribir un cheque', 'cobrar un cheque', 'préstamo bancario' o 'depósitos a plazo' para gestionar tu riqueza. También puedes automatizar los pagos del alquiler de tu casa, ¡pero ten cuidado con las deudas impagadas o tus bienes serán embargados!
 ServerRPGMessage.FeatureAltCraft1:		[Elaboración Alternativa]
 ServerRPGMessage.FeatureAltCraft2:		En lugar de depender de listas de recetas fijas, ¡puedes combinar varios ingredientes al azar para descubrir nuevos objetos! Usa '/combine list' para ver tus fórmulas descubiertas con éxito. Los jugadores pueden escribir libros para vender fórmulas o encontrar raros 'grimorios' durante las misiones que revelan combinaciones ocultas.
 ServerRPGMessage.FeatureReputation1:	[Sistema de Reputación]
@@ -51,6 +53,7 @@ ServerRPGMessage.CmdAskName:			/askname: Pregunta por el nombre de tu objetivo p
 ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Interactúa y personaliza a tu mascota Genistar. Apunta a tu huevo para cuidarlo, otorga a tu compañero adulto un nombre personalizado, dirige sus gestos y ármalo para la batalla administrando su equipo de combate visible.
 ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Muestra información y los puntajes actuales para la sesión de JcJ activa.
 ServerRPGMessage.CmdRvR:				/rvr info: Muestra información y los puntajes actuales para la campaña de RvR activa.
+ServerRPGMessage.CmdBet:				/bet <Equipo1 o Equipo2> <cantidad>: Haz apuestas sobre los luchadores en las rondas activas de la Arena (Equipo1 vs Equipo2), hasta {0} monedas de Oro. Comprueba los equipos y botes activos con '/bet list'.
 ServerRPGMessage.GuildCommandsHeader:	--------- NUEVOS COMANDOS DE GREMIO ---------
 ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Ver mapas y estados de GvG.
 ServerRPGMessage.GCPortal:				/gc territoryportal : Abre un portal directamente a tus tierras reclamadas.

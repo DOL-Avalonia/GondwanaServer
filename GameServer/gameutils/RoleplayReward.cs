@@ -330,6 +330,9 @@ namespace DOL.GS
 
             if (!(sender is GamePlayer player)) return;
 
+            if (player.IsInPvP || player.IsInRvR || player.TempProperties.getProperty<bool>("ArenaParticipant", false))
+                return;
+
             string text = "";
             if (args is SayEventArgs sayArgs) text = sayArgs.Text;
             else if (args is YellEventArgs yellArgs) text = yellArgs.Text;
@@ -387,6 +390,15 @@ namespace DOL.GS
                 return;
 
             CalculateAndGiveReward(player, text, wordCount, now, lastTalk);
+        }
+
+        public static void ResetRPChain(GamePlayer player)
+        {
+            if (player == null) return;
+            long now = player.CurrentRegion != null ? player.CurrentRegion.Time : 0;
+
+            player.TempProperties.setProperty("RP_Chain", 0);
+            player.TempProperties.setProperty("RP_LastTalk", now);
         }
 
         private static void HandleBadWord(GamePlayer player, long now)

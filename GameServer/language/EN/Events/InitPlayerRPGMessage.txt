@@ -16,12 +16,14 @@ ServerRPGMessage.FeatureDungeons1:		[Dungeon Exploration]
 ServerRPGMessage.FeatureDungeons2:		Brave the deep Underground, the labyrinthine DarkSpire, or the perilous Veil Rift.
 ServerRPGMessage.FeaturePvP1:			[Player vs Player (PvP)]
 ServerRPGMessage.FeaturePvP2:			Starting at level {0}, engage in epic PvP modes including Deathmatch, Capture the Flag, King of the Hill, Core Run, and Biohazard. Use '/pvp info' and '/pvp scores' to see session details.
+ServerRPGMessage.FeatureArena1:			[Arena Contests]
+ServerRPGMessage.FeatureArena2:			Engage in organized 'Solo vs Solo' or 'Team vs Team' Arena matches. Spectators can place bets (using '/bet') on their favorite teams during the preparation phase!
 ServerRPGMessage.FeatureRenaissance1:	[Renaissance]
 ServerRPGMessage.FeatureRenaissance2:	Legends say those who reach the pinnacle of their journey may undertake a perilous trial to be reborn. Start anew, but awaken with latent, god-like power to conquer even greater foes.
 ServerRPGMessage.FeatureAFK1:			[Dynamic AFK Training]
 ServerRPGMessage.FeatureAFK2:			Busy in the real world? Use special tokens earned from PvP and quests to train your character while away. Stand before a training dummy in any city and type '/afk xp' or '/afk combat' to gain combat experience!
 ServerRPGMessage.FeatureBanker1:		[The Banker]
-ServerRPGMessage.FeatureBanker2:		Target a banker and whisper 'withdraw money', 'write a check', 'cash a check', or 'term deposits' to manage your wealth. You can also automate house rent payments.
+ServerRPGMessage.FeatureBanker2:		Target a banker and whisper 'withdraw money', 'write a check', 'cash a check', 'bank loan', or 'term deposits' to manage your wealth. You can also automate house rent payments, but beware of unpaid debts or your assets will be seized!
 ServerRPGMessage.FeatureAltCraft1:		[Alternative Crafting]
 ServerRPGMessage.FeatureAltCraft2:		Instead of relying on fixed recipe lists, you can combine various ingredients randomly to discover new items! Use '/combine list' to see your successfully discovered formulas. Players can write books to sell formulas, or find rare 'grimoires' during quests that reveal hidden combinations.
 ServerRPGMessage.FeatureReputation1:	[Reputation System]
@@ -51,6 +53,7 @@ ServerRPGMessage.CmdAskName:			/askname: Ask for your target's name in order to 
 ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Interact with and customize your Genistar pet. Target your egg to care for it, grant your grown companion a custom name, direct its emotes, and arm it for battle by managing its visible combat gear.
 ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Display information and current scores for the active PvP session.
 ServerRPGMessage.CmdRvR:				/rvr info: Display information and current scores for the active RvR campaign.
+ServerRPGMessage.CmdBet:				/bet <Team1 or Team2> <amount>: Place bets on fighters within active Arena rounds (Team1 vs Team2), up to {0} Gold coins. Check active teams and pools with '/bet list'.
 ServerRPGMessage.GuildCommandsHeader:	--------- NEW GUILD COMMANDS ---------
 ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : View GvG maps and statuses.
 ServerRPGMessage.GCPortal:				/gc territoryportal : Open a portal directly to your claimed lands.

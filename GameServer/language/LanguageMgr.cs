@@ -1122,10 +1122,39 @@ namespace DOL.Language
 
             return await AutoTranslateManager.TranslatePlaceholderText(player, staticTranslation, translatePlaceholders, regex);
         }
-        
+
         #endregion Auto Translations
-        
+
         #region Miscellaneous Translations
+
+        public static string GetCurrencyString(string language, string currencyType)
+        {
+            string translationKey = currencyType.ToLower() switch
+            {
+                "zero" => "Money.GetString.Text1",
+                "mithril" => "Money.GetString.Text2",
+                "platinum" => "Money.GetString.Text3",
+                "gold" => "Money.GetString.Text4",
+                "silver" => "Money.GetString.Text5",
+                "copper" => "Money.GetString.Text6",
+                _ => "Money.GetString.Text6"
+            };
+
+            if (!TryGetTranslation(out string translation, language, translationKey))
+            {
+                return currencyType switch
+                {
+                    "zero" => "0 copper coins",
+                    "mithril" => "mithril",
+                    "platinum" => "platinum",
+                    "gold" => "gold",
+                    "silver" => "silver",
+                    "copper" => "copper",
+                    _ => currencyType
+                };
+            }
+            return translation;
+        }
 
         public static string GetDamageTypeNoun(string language, eDamageType resist)
         {
@@ -1343,6 +1372,16 @@ namespace DOL.Language
             }
 
             return translation;
+        }
+
+        public static string GetCurrencyString(GameClient client, string currencyType)
+        {
+            return GetCurrencyString(client?.Account?.Language ?? Properties.SERV_LANGUAGE, currencyType);
+        }
+
+        public static string GetCurrencyString(GamePlayer player, string currencyType)
+        {
+            return GetCurrencyString(player?.Client, currencyType);
         }
 
         public static string GetDamageOfType(GameClient client, eDamageType type)
@@ -1980,6 +2019,53 @@ namespace DOL.Language
 
                         return string.Format(mobFormat, mobName, combinedName).Trim();
                     }
+
+                    return combinedName;
+                }
+            }
+
+            if (messageKey.StartsWith("[ROG]BloodVial|"))
+            {
+                string[] parts = messageKey.Substring(15).Split('|');
+                if (parts.Length >= 4)
+                {
+                    string prefixKey = parts[0];
+                    string bloodTypeKey = parts[1];
+                    string mobName = parts[2];
+                    string pctString = parts[3];
+
+                    string translatedPrefix = "";
+                    if (!string.IsNullOrEmpty(prefixKey))
+                    {
+                        if (TryGetTranslation(out string tPrefix, language, "ROG.BloodVial.Prefix." + prefixKey))
+                            translatedPrefix = tPrefix + " ";
+                        else
+                            translatedPrefix = prefixKey + " ";
+                    }
+
+                    string translatedBloodType = bloodTypeKey;
+                    if (TryGetTranslation(out string tBlood, language, "ROG.BloodVial.Type." + bloodTypeKey.Replace(" ", "")))
+                        translatedBloodType = tBlood;
+
+                    string formatKey = "ROG.BloodVial.Format";
+
+                    // Allows specific format for saps/resins if desired
+                    if (bloodTypeKey.Contains("Sap") || bloodTypeKey.Contains("Resin"))
+                    {
+                        if (TryGetTranslation(out string sapFormat, language, "ROG.BloodVial.Format.Sap"))
+                            formatKey = "ROG.BloodVial.Format.Sap";
+                    }
+
+                    // EN Format: "Vial of {0}'s {1}{2}" 
+                    // FR Format Example: "Fiole de {2} {1} de {0}"
+                    string format = "Vial of {0}'s {1}{2}";
+                    if (TryGetTranslation(out string tFormat, language, formatKey))
+                        format = tFormat;
+
+                    string combinedName = string.Format(format, mobName, translatedPrefix, translatedBloodType).Replace("  ", " ").Trim();
+
+                    if (!string.IsNullOrEmpty(pctString) && pctString != "100")
+                        combinedName += $" ({pctString}%)";
 
                     return combinedName;
                 }

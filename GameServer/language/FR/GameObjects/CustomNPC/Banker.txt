@@ -12,7 +12,8 @@ Banker.Greetings4:				[faire un chèque]
 Banker.Greetings5:				[encaisser un chèque]
 Banker.Greetings6:				[transférer de l'argent]
 Banker.Greetings7:				[dépôts à terme]
-Banker.Greetings8:				[paiement automatique du loyer ({0})]
+Banker.Greetings8:				[prêt bancaire]
+Banker.Greetings9:				[paiement automatique du loyer ({0})]
 Banker.AutoRent.On:				ACTIVÉ
 Banker.AutoRent.Off:			DÉSACTIVÉ
 Banker.AutoRent.Prompt:			Voulez-vous que le loyer de votre maison soit automatiquement prélevé sur votre compte bancaire ? [Oui] [Non]

@@ -16,12 +16,14 @@ ServerRPGMessage.FeatureDungeons1:		[Explorarea Temnițelor]
 ServerRPGMessage.FeatureDungeons2:		Înfruntă adâncurile Subteranului, labirinticul DarkSpire sau periculoasa Ruptură a Vălului.
 ServerRPGMessage.FeaturePvP1:			[Jucător contra Jucător (PvP)]
 ServerRPGMessage.FeaturePvP2:			Începând cu nivelul {0}, angajează-te în moduri PvP epice, inclusiv Deathmatch, Capturarea Steagului, Regele Dealului, Core Run și Biohazard. Folosește '/pvp info' și '/pvp scores' pentru a vedea detaliile sesiunii.
+ServerRPGMessage.FeatureArena1:			[Concursuri în Arenă]
+ServerRPGMessage.FeatureArena2:			Participă la meciuri organizate în Arenă, 'Solo vs Solo' sau 'Echipă vs Echipă'. Spectatorii pot plasa pariuri (folosind '/bet') pe echipele lor favorite în timpul fazei de pregătire!
 ServerRPGMessage.FeatureRenaissance1:	[Renaștere]
 ServerRPGMessage.FeatureRenaissance2:	Legendele spun că cei care ating culmea călătoriei lor pot întreprinde o încercare periculoasă pentru a renaște. Începe din nou, dar trezește-te cu o putere latentă, divină, pentru a cuceri inamici și mai mari.
 ServerRPGMessage.FeatureAFK1:			[Antrenament AFK Dinamic]
 ServerRPGMessage.FeatureAFK2:			Ești ocupat în lumea reală? Folosește jetoane speciale câștigate din PvP și misiuni pentru a-ți antrena personajul în timp ce ești plecat. Stai în fața unui manechin de antrenament în orice oraș și tastează '/afk xp' sau '/afk combat' pentru a câștiga experiență de luptă!
 ServerRPGMessage.FeatureBanker1:		[Bancherul]
-ServerRPGMessage.FeatureBanker2:		Selectează un bancher și șoptește 'withdraw money', 'write a check', 'cash a check' sau 'term deposits' pentru a-ți gestiona averea. De asemenea, poți automatiza plățile pentru chiria casei.
+ServerRPGMessage.FeatureBanker2:		Selectează un bancher și șoptește-i 'retrage bani', 'scrie un cec', 'încasează un cec', 'împrumut bancar' sau 'depozite la termen' pentru a-ți gestiona averea. De asemenea, poți automatiza plățile pentru chiria casei, dar ai grijă la datoriile neplătite, altfel bunurile tale vor fi confiscate!
 ServerRPGMessage.FeatureAltCraft1:		[Meșteșug Alternativ]
 ServerRPGMessage.FeatureAltCraft2:		În loc să te bazezi pe liste fixe de rețete, poți combina diverse ingrediente la întâmplare pentru a descoperi obiecte noi! Folosește '/combine list' pentru a-ți vedea formulele descoperite cu succes. Jucătorii pot scrie cărți pentru a vinde formule sau pot găsi 'grimoare' rare în timpul misiunilor care dezvăluie combinații ascunse.
 ServerRPGMessage.FeatureReputation1:	[Sistem de Reputație]
@@ -51,6 +53,7 @@ ServerRPGMessage.CmdAskName:			/askname: Cere numele țintei tale pentru a-l afi
 ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Interacționează și personalizează-ți animalul de companie Genistar. Țintește-ți oul pentru a-l îngriji, acordă-i tovarășului tău matur un nume personalizat, direcționează-i expresiile (emotes) și înarmează-l pentru luptă gestionându-i echipamentul de luptă vizibil.
 ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Afișează informații și scorurile curente pentru sesiunea PvP activă.
 ServerRPGMessage.CmdRvR:				/rvr info: Afișează informații și scorurile curente pentru campania RvR activă.
+ServerRPGMessage.CmdBet:				/bet <Echipa1 sau Echipa2> <sumă>: Pariază pe luptători în rundele active din Arenă (Echipa1 vs Echipa2), până la {0} monede de Aur. Verifică echipele active și fondurile de premiere cu '/bet list'.
 ServerRPGMessage.GuildCommandsHeader:	--------- NOI COMENZI DE BREASLĂ ---------
 ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Vizualizează hărțile și statusurile GvG.
 ServerRPGMessage.GCPortal:				/gc territoryportal : Deschide un portal direct către terenurile revendicate de tine.

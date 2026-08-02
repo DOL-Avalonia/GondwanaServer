@@ -957,6 +957,13 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("world", "facemob_required_itemtemplate", "ItemTemplateID required in inventory to use /facemob (leave empty to disable requirement).", "")]
         public static string FACEMOB_REQUIRED_ITEMTEMPLATE;
+
+        /// <summary>
+        /// Mobs that are restricted from dropping blood items.
+        /// </summary>
+        [ServerProperty("world", "no_blood_drop_mobs", "List of mob names separated by ';' that will never drop blood items.", "")]
+        public static string NO_BLOOD_DROP_MOBS;
+
         #endregion
 
         #region RATES
@@ -1007,36 +1014,6 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("rates", "xp_copper_rate", "The Rate at which experience gains will be converted to copper at max level", 0.000001)]
         public static double XP_TO_COPPER_RATE;
-
-        /// <summary>
-        /// RvR RARIUS AREA DEFAULT
-        /// </summary>
-        [ServerProperty("rvr", "rvr_area_radius", "The RvR radius area default value", 6000)]
-        public static int RvR_AREA_RADIUS;
-
-        /// <summary>
-        /// RvR INSIDE AREA RP BONUS PERCENTAGE
-        /// </summary>
-        [ServerProperty("rvr", "rvr_inside_area_rp_bonus", "The RvR RP bonus inside the area in percentage", 30)]
-        public static int RvR_INSIDE_AREA_RP_BONUS;
-
-        /// <summary>
-        /// RvR OUTSIDE AREA RP BONUS PERCENTAGE
-        /// </summary>
-        [ServerProperty("rvr", "rvr_outside_area_rp_bonus", "The RvR RP bonus outside the area in percentage", 5)]
-        public static int RvR_OUTSIDE_AREA_RP_BONUS;
-
-        /// <summary>
-        /// The number of needed players to count points in RvR (default 10)
-        /// </summary>
-        [ServerProperty("rvr", "rvr_number_of_needed_players", "The number of needed players to count points in RvR", 10)]
-        public static int RvR_NUMBER_OF_NEEDED_PLAYERS;
-
-        /// <summary>
-        /// Enable dynamic reward sub-tiers based on player frequentation and scores in RvR/PvP.
-        /// </summary>
-        [ServerProperty("pvp", "pvp_rewards_use_subtiers", "Enable dynamic reward sub-tiers based on player frequentation and scores in RvR/PvP.", false)]
-        public static bool PVP_REWARDS_USE_SUBTIERS;
 
         /// <summary>
         /// The Realm Points Rate
@@ -1784,6 +1761,72 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("pvp", "pvp_death_con_loss", "Loose con on pvp death on PvP servertype", true)]
         public static bool PVP_DEATH_CON_LOSS;
+
+        /// <summary>
+        /// Enable dynamic reward sub-tiers based on player frequentation and scores in RvR/PvP.
+        /// </summary>
+        [ServerProperty("pvp", "pvp_rewards_use_subtiers", "Enable dynamic reward sub-tiers based on player frequentation and scores in RvR/PvP.", false)]
+        public static bool PVP_REWARDS_USE_SUBTIERS;
+
+        /// <summary>
+        /// How many minutes does the arena queue last?
+        /// </summary>
+        [ServerProperty("arena", "arena_queue_minutes", "How many minutes does the arena queue last?", 45)]
+        public static int ARENA_QUEUE_MINUTES;
+
+        /// <summary>
+        /// Minimum solo players required to start a solo arena match.
+        /// </summary>
+        [ServerProperty("arena", "arena_min_solo", "Minimum players required to start a solo arena session.", 8)]
+        public static int ARENA_MIN_SOLO;
+
+        /// <summary>
+        /// Minimum teams required to start a team arena match.
+        /// </summary>
+        [ServerProperty("arena", "arena_min_teams", "Minimum teams required to start a team arena session.", 6)]
+        public static int ARENA_MIN_TEAMS;
+
+        /// <summary>
+        /// Cooldown minutes after an arena tournament finishes before a new one can be started.
+        /// </summary>
+        [ServerProperty("arena", "arena_cooldown_minutes", "Cooldown minutes after an arena tournament finishes.", 60)]
+        public static int ARENA_COOLDOWN_MINUTES;
+
+        /// <summary>
+        /// Allow potions (Flag 3) in arena?
+        /// </summary>
+        [ServerProperty("arena", "arena_allow_potions", "Allow potions in arena?", false)]
+        public static bool ARENA_ALLOW_POTIONS;
+
+        /// <summary>
+        /// Maximum amount of gold a player can bet in the Arena.
+        /// </summary>
+        [ServerProperty("arena", "arena_max_bet_gold", "Maximum amount of gold a player can bet in the Arena.", 1000)]
+        public static int ARENA_MAX_BET_GOLD;
+
+        /// <summary>
+        /// RvR RARIUS AREA DEFAULT
+        /// </summary>
+        [ServerProperty("rvr", "rvr_area_radius", "The RvR radius area default value", 6000)]
+        public static int RvR_AREA_RADIUS;
+
+        /// <summary>
+        /// RvR INSIDE AREA RP BONUS PERCENTAGE
+        /// </summary>
+        [ServerProperty("rvr", "rvr_inside_area_rp_bonus", "The RvR RP bonus inside the area in percentage", 30)]
+        public static int RvR_INSIDE_AREA_RP_BONUS;
+
+        /// <summary>
+        /// RvR OUTSIDE AREA RP BONUS PERCENTAGE
+        /// </summary>
+        [ServerProperty("rvr", "rvr_outside_area_rp_bonus", "The RvR RP bonus outside the area in percentage", 5)]
+        public static int RvR_OUTSIDE_AREA_RP_BONUS;
+
+        /// <summary>
+        /// The number of needed players to count points in RvR (default 10)
+        /// </summary>
+        [ServerProperty("rvr", "rvr_number_of_needed_players", "The number of needed players to count points in RvR", 10)]
+        public static int RvR_NUMBER_OF_NEEDED_PLAYERS;
 
         /// <summary>
         /// Base reward in gold for giving an outlaw's head to a guard
@@ -2671,6 +2714,18 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("banking", "max_term_deposits", "Maximum number of term deposit contracts a player can have at once.", 3)]
         public static int MAX_TERM_DEPOSITS;
+
+        /// <summary>
+        /// Accelerate loan payments for debugging purposes.
+        /// </summary>
+        [ServerProperty("banking", "bank_loan_debug", "Accelerate loan payments for debugging (every 30s for personal, 15s for house)", false)]
+        public static bool BANK_LOAN_DEBUG;
+
+        /// <summary>
+        /// Grace period in hours before a debtor's assets are seized.
+        /// </summary>
+        [ServerProperty("banking", "debtor_grace_period_hours", "Grace period in hours before a debtor's assets are seized.", 48)]
+        public static int DEBTOR_GRACE_PERIOD_HOURS;
 
         #endregion
 

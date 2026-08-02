@@ -16,12 +16,14 @@ ServerRPGMessage.FeatureDungeons1:		[Průzkum Dungeonů]
 ServerRPGMessage.FeatureDungeons2:		Postavte se temnému Podzemí, labyrintu DarkSpire nebo nebezpečné Trhlině v závoji.
 ServerRPGMessage.FeaturePvP1:			[Hráč proti Hráči (PvP)]
 ServerRPGMessage.FeaturePvP2:			Od úrovně {0} se zapojte do epických režimů PvP, jako jsou Deathmatch, Capture the Flag, King of the Hill, Core Run a Biohazard. K zobrazení podrobností relace použijte '/pvp info' a '/pvp scores'.
+ServerRPGMessage.FeatureArena1:			[Zápasy v Aréně]
+ServerRPGMessage.FeatureArena2:			Zapojte se do organizovaných zápasů v Aréně 'Solo vs Solo' nebo 'Tým vs Tým'. Diváci mohou během přípravné fáze sázet (pomocí '/bet') na své oblíbené týmy!
 ServerRPGMessage.FeatureRenaissance1:	[Renesance]
 ServerRPGMessage.FeatureRenaissance2:	Legendy vyprávějí, že ti, kteří dosáhnou vrcholu své cesty, mohou podstoupit nebezpečnou zkoušku, aby se znovu zrodili. Začněte znovu, ale probuďte se se skrytou, božskou mocí, abyste mohli dobýt ještě mocnější nepřátele.
 ServerRPGMessage.FeatureAFK1:			[Dynamický AFK trénink]
 ServerRPGMessage.FeatureAFK2:			Jste zaneprázdněni v reálném světě? Využijte speciální žetony získané z PvP a úkolů k tréninku své postavy během nepřítomnosti. Postavte se před tréninkového panáka v jakémkoli městě a napište '/afk xp' nebo '/afk combat', abyste získali bojové zkušenosti!
 ServerRPGMessage.FeatureBanker1:		[Bankéř]
-ServerRPGMessage.FeatureBanker2:		Zamiřte na bankéře a zašeptejte 'withdraw money', 'write a check', 'cash a check' nebo 'term deposits' pro správu vašeho bohatství. Můžete také automatizovat platby nájmu za dům.
+ServerRPGMessage.FeatureBanker2:		Vezměte bankéře do cíle a pošeptejte mu 'vybrat peníze', 'vypsat šek', 'proplatit šek', 'bankovní půjčka' nebo 'termínované vklady' pro správu svého bohatství. Můžete také automatizovat platby nájmu za dům, ale dejte si pozor na nezaplacené dluhy, jinak bude váš majetek zabaven!
 ServerRPGMessage.FeatureAltCraft1:		[Alternativní výroba]
 ServerRPGMessage.FeatureAltCraft2:		Namísto spoléhání se na pevné seznamy receptů můžete náhodně kombinovat různé ingredience a objevovat nové předměty! Použijte '/combine list' k zobrazení svých úspěšně objevených receptur. Hráči mohou psát knihy k prodeji receptur nebo během úkolů nacházet vzácné 'grimoáry', které odhalují skryté kombinace.
 ServerRPGMessage.FeatureReputation1:	[Systém reputace]
@@ -51,6 +53,7 @@ ServerRPGMessage.CmdAskName:			/askname: Zeptá se na jméno vašeho cíle za ú
 ServerRPGMessage.CmdGenistar:			/genistar <care|rename|emote|visibleweapon|addweapon|removeweapon>: Komunikujte a přizpůsobte si svého mazlíčka Genistar. Zaměřte se na své vejce, abyste o něj pečovali, dejte svému dospělému společníkovi vlastní jméno, usměrňujte jeho emoce a vyzbrojte jej do bitvy správou jeho viditelného bojového vybavení.
 ServerRPGMessage.CmdPvP:				/pvp info & /pvp scores: Zobrazí informace a aktuální skóre probíhající PvP relace.
 ServerRPGMessage.CmdRvR:				/rvr info: Zobrazí informace a aktuální skóre probíhající RvR kampaně.
+ServerRPGMessage.CmdBet:				/bet <Tým1 nebo Tým2> <částka>: Vsaďte si na bojovníky v aktivních kolech Arény (Tým1 vs Tým2), a to až do výše {0} zlaťáků. Zkontrolujte aktivní týmy a banky pomocí '/bet list'.
 ServerRPGMessage.GuildCommandsHeader:	--------- NOVÉ GILDNÍ PŘÍKAZY ---------
 ServerRPGMessage.GCMap:					/gc territories & /gc subterritories : Zobrazí mapy a stavy GvG.
 ServerRPGMessage.GCPortal:				/gc territoryportal : Otevře portál přímo do vašich nárokovaných zemí.

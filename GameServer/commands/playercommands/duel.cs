@@ -33,6 +33,12 @@ namespace DOL.GS.Commands
             if (IsSpammingCommand(player, "duel"))
                 return;
 
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                player.Out.SendMessage("You cannot duel while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             if (inHousing)
             {
                 DisplayMessage(client, LanguageMgr.GetTranslation(client!.Account.Language, "Commands.Players.Duel.InHousing"));
@@ -313,6 +319,13 @@ namespace DOL.GS.Commands
                     actionSource.Out.SendMessage(LanguageMgr.GetTranslation(actionSource.Client, "Commands.Players.Duel.PvPImmunityTarget", actionSource.GetPersonalizedName(actionTarget)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
+            }
+
+            // Is Arena Participant
+            if (actionTarget.TempProperties.getProperty<bool>("ArenaParticipant", false) || actionTarget.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                actionSource.Out.SendMessage($"{actionTarget.Name} is busy participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
             }
 
             // SafeArea

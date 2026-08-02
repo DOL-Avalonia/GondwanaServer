@@ -114,6 +114,12 @@ namespace DOL.GS.Housing
                 }
 
                 var totalCost = Currency.Copper.Mint(HouseTemplateMgr.GetLotPrice(DatabaseItem));
+
+                if (player.CopperBalance < totalCost.Amount)
+                {
+                    Scripts.BankLoanMgr.TryUseCoupon(player, totalCost.Amount, true);
+                }
+
                 if (player.RemoveMoney(totalCost))
                 {
                     player.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.YouJustBoughtThisLotFor", totalCost.ToText()), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);

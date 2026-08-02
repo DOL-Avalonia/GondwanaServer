@@ -69,7 +69,7 @@ namespace DOL.GS
     /// </summary>
     public class GamePlayer : GameLiving
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static long reputationDaysDurationInSeconds = Properties.REPUTATION_DAYS_INTERVAL * 86400;
 
@@ -9764,6 +9764,7 @@ namespace DOL.GS
             if (killer is GamePlayer killerPlayer && killer != this)
             {
                 bool canAwardTaskPoints = !killerPlayer.IsInSafeArea() && !killerPlayer.IsPlayerGreyCon(this);
+                bool isArenaMatch = this.TempProperties.getProperty<bool>("ArenaParticipant", false) && killerPlayer.TempProperties.getProperty<bool>("ArenaParticipant", false);
 
                 GameSpellEffect damnationEffect = SpellHandler.FindEffectOnTarget(killerPlayer, "Damnation");
                 bool targetIsNotDamned = SpellHandler.FindEffectOnTarget(this, "Damnation") == null;
@@ -9827,12 +9828,58 @@ namespace DOL.GS
                     TaskManager.UpdateTaskProgress(killerPlayer, "EnemiesKilledInAdrenalineMode", 1);
                 }
 
-                if (canAwardTaskPoints && deathWasDuel)
+                if (canAwardTaskPoints)
                 {
-                    TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
-                    if (!IsInRvR && !IsInPvP && !IsInPvPArea())
+                    // 1. Standard /duel command logic
+                    if (deathWasDuel)
                     {
-                        TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
+                        TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
+                        if (!IsInRvR && !IsInPvP && !IsInPvPArea())
+                        {
+                            TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
+                        }
+                    }
+                    // 2. Arena Contest Logic
+                    else if (isArenaMatch)
+                    {
+                        var session = ArenaManager.Instance.GetSession(killerPlayer.CurrentRegionID);
+                        if (session != null && session.State == ArenaManager.eArenaState.Running)
+                        {
+                            if (session.Mode == ArenaManager.eArenaMode.Solo)
+                            {
+                                TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
+
+                                if (!IsInRvR && !IsInPvP && !IsInPvPArea())
+                                {
+                                    TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
+                                }
+                            }
+                            else if (session.CurrentTeamA != null && session.CurrentTeamB != null)
+                            {
+                                // Group vs Group: Identify teams
+                                var dyingTeam = session.CurrentTeamA.Members.Contains(this) ? session.CurrentTeamA : (session.CurrentTeamB.Members.Contains(this) ? session.CurrentTeamB : null);
+                                var killerTeam = session.CurrentTeamA.Members.Contains(killerPlayer) ? session.CurrentTeamA : (session.CurrentTeamB.Members.Contains(killerPlayer) ? session.CurrentTeamB : null);
+
+                                if (dyingTeam != null && killerTeam != null && dyingTeam != killerTeam)
+                                {
+                                    if (dyingTeam.IsEliminated(session.RegionID))
+                                    {
+                                        foreach (var winningMember in killerTeam.Members)
+                                        {
+                                            if (winningMember != null)
+                                            {
+                                                TaskManager.UpdateTaskProgress(winningMember, "EnemyKilledInDuel", 1);
+
+                                                if (!IsInRvR && !IsInPvP && !IsInPvPArea())
+                                                {
+                                                    TaskManager.UpdateTaskProgress(winningMember, "KillEnemyPlayersGroup", 1);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -11478,6 +11525,23 @@ namespace DOL.GS
                     unauthorized = true;
                 }
 
+                if (this.TempProperties.getProperty<bool>("ArenaParticipant", false))
+                {
+                    bool isScroll = useItem.Id_nb.Contains("PARCH", StringComparison.InvariantCultureIgnoreCase) || useItem.Flags == 4;
+                    bool isPotion = useItem.Item_Type == 41 || useItem.Object_Type == (int)eObjectType.Poison || useItem.Flags == 3;
+
+                    if (isPotion && !Properties.ARENA_ALLOW_POTIONS)
+                    {
+                        Out.SendMessage("You cannot use potions during an Arena Contest.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                    if (isScroll)
+                    {
+                        Out.SendMessage("You cannot use scrolls during an Arena Contest.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                }
+
                 if (unauthorized)
                 {
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.CantUseHere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -12916,6 +12980,12 @@ namespace DOL.GS
         /// <returns>true if mounted successfully or false if not</returns>
         public virtual bool MountSteed(GameNPC steed, bool forced)
         {
+            if (this.TempProperties.getProperty<bool>("ArenaParticipant", false) || this.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                this.Out.SendMessage("You cannot mount while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
             // Sanity 'coherence' checks
             if (Steed != null)
                 if (!DismountSteed(forced))
@@ -15837,6 +15907,11 @@ namespace DOL.GS
             if (!IsAlive || ObjectState != eObjectState.Active)
                 return nextTick;
 
+            int tickCount = TempProperties.getProperty<int>("ConsumeTickCount", 0);
+            tickCount++;
+            TempProperties.setProperty("ConsumeTickCount", tickCount);
+            bool isSecondTick = (tickCount % 2 == 0);
+
             bool hasConsumingItems = false;
             List<InventoryItem> itemsToUnequip = new List<InventoryItem>();
             List<InventoryItem> itemsToBreak = new List<InventoryItem>();
@@ -15860,6 +15935,9 @@ namespace DOL.GS
                         int condLoss = 0;
                         bool destroyOnCond = false;
                         bool destroyOnMana = false;
+                        bool hasPassword = false;
+                        int spellId = 0;
+                        int effectId = 0;
 
                         string pkg = item.PackageID ?? item.Template.PackageID ?? "";
                         if (!string.IsNullOrEmpty(pkg))
@@ -15879,6 +15957,21 @@ namespace DOL.GS
                                         int.TryParse(parts[1], out condLoss);
                                         if (parts.Length >= 3 && parts[2] == "DESTROY") destroyOnCond = true;
                                     }
+                                    else if (parts[0] == "PASSWORD")
+                                    {
+                                        hasPassword = true;
+                                    }
+                                    else if (parts[0] == "SPELL")
+                                    {
+                                        if (parts.Length >= 2)
+                                            int.TryParse(parts[1], out spellId);
+                                        else
+                                            spellId = item.SpellID;
+                                    }
+                                    else if (parts[0] == "EFFECT" && parts.Length >= 2)
+                                    {
+                                        int.TryParse(parts[1], out effectId);
+                                    }
                                 }
                             }
                         }
@@ -15887,7 +15980,7 @@ namespace DOL.GS
                         bool broken = false;
                         bool destroy = false;
 
-                        if (flag == 43 || flag == 45)
+                        if (!hasPassword && (flag == 43 || flag == 45))
                         {
                             if (isPureMelee)
                             {
@@ -15938,6 +16031,24 @@ namespace DOL.GS
                                     unequip = true;
                                     broken = true;
                                     if (destroyOnCond) destroy = true;
+                                }
+                            }
+
+                            if (!unequip && !destroy && isSecondTick)
+                            {
+                                if (spellId > 0 && Util.Chance(item.ProcChance))
+                                {
+                                    Spell spell = SkillBase.GetSpellByID(spellId);
+                                    if (spell != null)
+                                    {
+                                        ISpellHandler handler = ScriptMgr.CreateSpellHandler(this, spell, SkillBase.GetSpellLine(GlobalSpellsLines.Item_Effects));
+                                        if (handler != null) handler.StartSpell(this);
+                                    }
+                                }
+
+                                if (effectId > 0)
+                                {
+                                    Out.SendSpellEffectAnimation(this, this, (ushort)effectId, 0, false, 1);
                                 }
                             }
                         }

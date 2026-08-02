@@ -135,6 +135,15 @@ namespace DOL.GS.Scripts
         /// <returns></returns>
         public bool WillTalkTo(GamePlayer player, bool silent = false)
         {
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                if (!silent)
+                {
+                    player.Out.SendMessage("You cannot teleport while registered for an Arena Contest.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
+                return false;
+            }
+
             if (IsTerritoryLinked == true)
             {
                 var territory = CurrentTerritory ?? TerritoryManager.GetCurrentTerritory(this);
@@ -707,7 +716,7 @@ namespace DOL.GS.Scripts
         }
         #endregion
 
-        #region NEW: Boundary ring spawn/cleanup
+        #region Boundary ring spawn/cleanup
         private void ClearBoundary()
         {
             foreach (var o in _boundaryObjects)

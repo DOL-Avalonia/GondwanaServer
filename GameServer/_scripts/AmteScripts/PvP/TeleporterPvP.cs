@@ -25,6 +25,12 @@ namespace DOL.GS.Scripts
         /// </summary>
         private bool _BaseSay(GamePlayer player, string str = "Partir")
         {
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            {
+                player.Out.SendMessage("You cannot enter PvP while registered for an Arena Contest.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                return true;
+            }
+
             if (_isBusy)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,
@@ -229,7 +235,10 @@ namespace DOL.GS.Scripts
                     if (session.GroupCompoOption == 2)
                     {
                         if (player.IsInPvP)
+                        {
                             PvpManager.Instance.KickPlayer(player);
+                            RoleplayReward.ResetRPChain(player);
+                        }
                     }
                     else
                     {
@@ -397,7 +406,11 @@ namespace DOL.GS.Scripts
             if (session.GroupCompoOption == 2)
             {
                 if (player.Group != null && player.Group.Leader == player)
+                {
                     PvpManager.Instance.AddGroup(player);
+                    foreach (var m in player.Group.GetPlayersInTheGroup())
+                        RoleplayReward.ResetRPChain(m);
+                }
                 else
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,
                         "TeleporterPvP.NotLeaderOrNoGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -406,9 +419,15 @@ namespace DOL.GS.Scripts
             {
                 // otherwise treat it as a solo join or leaving scenario
                 if (player.IsInPvP)
+                {
                     PvpManager.Instance.KickPlayer(player);
+                    RoleplayReward.ResetRPChain(player);
+                }
                 else
+                {
                     PvpManager.Instance.AddPlayer(player);
+                    RoleplayReward.ResetRPChain(player);
+                }
             }
             return 0;
         }
@@ -488,14 +507,22 @@ namespace DOL.GS.Scripts
                     return 0;
                 }
                 PvpManager.Instance.AddGroup(leader);
+                foreach (var m in leader.Group!.GetPlayersInTheGroup())
+                    RoleplayReward.ResetRPChain(m);
             }
             else
             {
                 // fallback => solo or leaving
                 if (leader.IsInPvP)
+                {
                     PvpManager.Instance.KickPlayer(leader);
+                    RoleplayReward.ResetRPChain(leader);
+                }
                 else
+                {
                     PvpManager.Instance.AddPlayer(leader);
+                    RoleplayReward.ResetRPChain(leader);
+                }
             }
 
             return 0;

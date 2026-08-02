@@ -63,6 +63,7 @@ namespace DOL.Database
         private int m_rewardCLXP;
         private int m_rewardRP;
         private int m_rewardBP;
+        private int m_rewardErudition;
         private int m_nbChooseOptionalItems;
         private string m_optionalRewardItemTemplates;
         private string m_finalRewardItemTemplates;
@@ -225,6 +226,16 @@ namespace DOL.Database
         {
             get { return m_rewardBP; }
             set { m_rewardBP = value; Dirty = true; }
+        }
+
+        /// <summary>
+        /// Reward Erudition points to give upon completion, 0 for none
+        /// </summary>
+        [DataElement(AllowDbNull = false)]
+        public int RewardErudition
+        {
+            get { return m_rewardErudition; }
+            set { m_rewardErudition = value; Dirty = true; }
         }
 
         [DataElement(AllowDbNull = false)]

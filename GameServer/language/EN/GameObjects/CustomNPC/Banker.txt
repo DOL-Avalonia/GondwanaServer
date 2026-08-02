@@ -12,7 +12,8 @@ Banker.Greetings4:				[write a check]
 Banker.Greetings5:				[cash a check]
 Banker.Greetings6:				[transfer money]
 Banker.Greetings7:				[term deposits]
-Banker.Greetings8:				[automatic house rental payment ({0})]
+Banker.Greetings8:				[bank loan]
+Banker.Greetings9:				[automatic house rental payment ({0})]
 Banker.AutoRent.On:				ON
 Banker.AutoRent.Off:			OFF
 Banker.AutoRent.Prompt:			Would you like your house rental to be automatically withdrawn from your bank account? [Yes] [No]

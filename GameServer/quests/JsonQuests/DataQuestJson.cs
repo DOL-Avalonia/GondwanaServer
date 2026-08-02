@@ -53,6 +53,7 @@ namespace DOL.GS.Quests
         public int RewardCLXP;
         public int RewardRP;
         public int RewardBP;
+        public int RewardErudition;
         public int RewardReputation;
         public int NbChooseOptionalItems;
         public List<ItemTemplate> OptionalRewardItemTemplates = new();
@@ -249,6 +250,9 @@ namespace DOL.GS.Quests
             else if (RewardRP < 0)
                 player.GainRealmPoints(player.CalculateRPsToGainRealmRank(RewardRP * -1));
 
+            if (RewardErudition > 0)
+                player.GainEruditionPoints(RewardErudition);
+
             foreach (var item in FinalRewardItemTemplates)
                 GiveItem(this, player, item);
             foreach (var item in chosenItems)
@@ -318,6 +322,7 @@ namespace DOL.GS.Quests
             _db.RewardCLXP = RewardCLXP;
             _db.RewardRP = RewardRP;
             _db.RewardBP = RewardBP;
+            _db.RewardErudition = RewardErudition;
             _db.RewardReputation = RewardReputation;
             _db.NbChooseOptionalItems = NbChooseOptionalItems;
             _db.OptionalRewardItemTemplates = string.Join("|", OptionalRewardItemTemplates.Select(i => i.Id_nb));
@@ -386,6 +391,7 @@ namespace DOL.GS.Quests
             RewardCLXP = db.RewardCLXP;
             RewardRP = db.RewardRP;
             RewardBP = db.RewardBP;
+            RewardErudition = db.RewardErudition;
             RewardReputation = db.RewardReputation;
             NbChooseOptionalItems = db.NbChooseOptionalItems;
 
