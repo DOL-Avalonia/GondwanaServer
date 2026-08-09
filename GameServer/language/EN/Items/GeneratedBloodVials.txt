@@ -1,0 +1,49 @@
+
+ROG.PlayerVial.Format: {0} {1} Vial
+ROG.PlayerVial.Format.Sap: {0} {1} Sap Vial
+ROG.PlayerVial.Prefix.Vigorous: Vigorous
+ROG.PlayerVial.Prefix.Illustrous: Illustrous
+ROG.PlayerVial.Prefix.Exalted: Exalted
+
+ROG.BloodVial.Format: Vial of {0}'s {1}{2}
+ROG.BloodVial.Format.Sap: Vial of {0}'s {2}
+
+ROG.BloodVial.Prefix.Minor: Minor
+ROG.BloodVial.Prefix.Lesser: Lesser
+ROG.BloodVial.Prefix.Flimsy: Flimsy
+ROG.BloodVial.Prefix.Average: Average
+ROG.BloodVial.Prefix.Greater: Greater
+ROG.BloodVial.Prefix.Major: Major
+ROG.BloodVial.Prefix.Superior: Superior
+ROG.BloodVial.Prefix.Exceptional: Exceptional
+ROG.BloodVial.Prefix.Legendary: Legendary
+
+ROG.BloodVial.Type.Blood: Blood
+ROG.BloodVial.Type.ColdBlood: Cold Blood
+ROG.BloodVial.Type.RabidBlood: Rabid Blood
+ROG.BloodVial.Type.DemonicIchor: Demonic Ichor
+ROG.BloodVial.Type.LiquidHellfire: Liquid Hellfire
+ROG.BloodVial.Type.BoilingDragonblood: Boiling Dragonblood
+ROG.BloodVial.Type.MineralSlurry: Mineral Slurry
+ROG.BloodVial.Type.LiquidMagma: Liquid Magma
+ROG.BloodVial.Type.LiquidFrost: Liquid Frost
+ROG.BloodVial.Type.PureElementalWater: Pure Elemental Water
+ROG.BloodVial.Type.CorrosiveAcid: Corrosive Acid
+ROG.BloodVial.Type.Venom: Venom
+ROG.BloodVial.Type.InsectoidIchor: Insectoid Ichor
+ROG.BloodVial.Type.AcidicSlime: Acidic Slime
+ROG.BloodVial.Type.FaerieDew: Faerie Dew
+ROG.BloodVial.Type.MachineOil: Machine Oil
+ROG.BloodVial.Type.MagicalBlood: Magical Blood
+ROG.BloodVial.Type.StickySap: Sticky Sap
+ROG.BloodVial.Type.PlantNectar: Plant Nectar
+ROG.BloodVial.Type.SporeExtract: Spore Extract
+ROG.BloodVial.Type.DeadlyVenom: Deadly Venom
+ROG.BloodVial.Type.PutrefiedBlood: Putrefied Blood
+ROG.BloodVial.Type.Ectoplasm: Ectoplasm
+
+ROG.BloodVial.Type.PaleSap: Pale Sap
+ROG.BloodVial.Type.AmberResin: Amber Resin
+ROG.BloodVial.Type.GlowingSap: Glowing Sap
+ROG.BloodVial.Type.PetrifiedResin: Petrified Resin
+ROG.BloodVial.Type.VoidSap: Void Sap

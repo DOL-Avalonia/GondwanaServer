@@ -53,6 +53,13 @@ namespace DOL.GS.GameEvents
                         return;
                     }
 
+                    // Ignore kills on Arena
+                    if (playerKiller.TempProperties.getProperty<bool>("ArenaParticipant", false) &&
+                        playerVictim.TempProperties.getProperty<bool>("ArenaParticipant", false))
+                    {
+                        return;
+                    }
+
                     // Ignore kills on Outlaws
                     if (playerVictim.Reputation < 0)
                     {

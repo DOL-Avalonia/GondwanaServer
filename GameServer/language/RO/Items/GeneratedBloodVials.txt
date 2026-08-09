@@ -1,0 +1,43 @@
+
+ROG.BloodVial.Format: Fiolă cu {2} {1}de la {0}
+ROG.BloodVial.Format.Sap: Fiolă cu {2} de la {0}
+
+ROG.BloodVial.Prefix.Minor: de Rang Minor
+ROG.BloodVial.Prefix.Lesser: de Rang Inferior
+ROG.BloodVial.Prefix.Flimsy: de Rang Slab
+ROG.BloodVial.Prefix.Average: de Rang Mediu
+ROG.BloodVial.Prefix.Greater: de Rang Superior
+ROG.BloodVial.Prefix.Major: de Rang Major
+ROG.BloodVial.Prefix.Superior: de Rang Excelent
+ROG.BloodVial.Prefix.Exceptional: de Rang Excepțional
+ROG.BloodVial.Prefix.Legendary: de Rang Legendar
+
+ROG.BloodVial.Type.Blood: Sânge
+ROG.BloodVial.Type.ColdBlood: Sânge Rece
+ROG.BloodVial.Type.RabidBlood: Sânge Turbat
+ROG.BloodVial.Type.DemonicIchor: Icor Demonic
+ROG.BloodVial.Type.LiquidHellfire: Foc Infernal Lichid
+ROG.BloodVial.Type.BoilingDragonblood: Sânge de Dragon Fiert
+ROG.BloodVial.Type.MineralSlurry: Nămol Mineral
+ROG.BloodVial.Type.LiquidMagma: Magmă Lichidă
+ROG.BloodVial.Type.LiquidFrost: Îngheț Lichid
+ROG.BloodVial.Type.PureElementalWater: Apă Elementală Pură
+ROG.BloodVial.Type.CorrosiveAcid: Acid Coroziv
+ROG.BloodVial.Type.Venom: Venin
+ROG.BloodVial.Type.InsectoidIchor: Icor Insectoid
+ROG.BloodVial.Type.AcidicSlime: Mâzgă Acidă
+ROG.BloodVial.Type.FaerieDew: Rouă de Zână
+ROG.BloodVial.Type.MachineOil: Ulei de Mașină
+ROG.BloodVial.Type.MagicalBlood: Sânge Magic
+ROG.BloodVial.Type.StickySap: Sevă Lipicioasă
+ROG.BloodVial.Type.PlantNectar: Nectar de Plante
+ROG.BloodVial.Type.SporeExtract: Extract de Spori
+ROG.BloodVial.Type.DeadlyVenom: Venin Mortal
+ROG.BloodVial.Type.PutrefiedBlood: Sânge Putrefiat
+ROG.BloodVial.Type.Ectoplasm: Ectoplasmă
+
+ROG.BloodVial.Type.PaleSap: Sevă Palidă
+ROG.BloodVial.Type.AmberResin: Rășină de Chihlimbar
+ROG.BloodVial.Type.GlowingSap: Sevă Strălucitoare
+ROG.BloodVial.Type.PetrifiedResin: Rășină Pietrificată
+ROG.BloodVial.Type.VoidSap: Sevă a Vidului

@@ -39,6 +39,12 @@ namespace DOL.GS.Commands
             if (IsSpammingCommand(client.Player, "battlechat"))
                 return;
 
+            if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false) || client.Player.IsInPvP)
+            {
+                client.Player.Out.SendMessage("You cannot use battlegroup commands while in an Arena or PvP.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             BattleGroup mybattlegroup = client.Player.TempProperties.getProperty<BattleGroup>(BattleGroup.BATTLEGROUP_PROPERTY, null);
             if (mybattlegroup == null)
             {
@@ -95,6 +101,12 @@ namespace DOL.GS.Commands
         {
             if (IsSpammingCommand(client.Player, "battlegroup"))
                 return;
+
+            if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false) || client.Player.IsInPvP)
+            {
+                client.Player.Out.SendMessage("You cannot use battlegroup commands while in an Arena or PvP.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                return;
+            }
 
             if (args.Length < 2)
             {

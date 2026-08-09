@@ -1,0 +1,49 @@
+
+ROG.PlayerVial.Format: Fiole de {1} {0}
+ROG.PlayerVial.Format.Sap: Fiole de Sève de {1} {0}
+ROG.PlayerVial.Prefix.Vigorous: Vigoureux
+ROG.PlayerVial.Prefix.Illustrous: Illustre
+ROG.PlayerVial.Prefix.Exalted: Exalté
+
+ROG.BloodVial.Format: Fiole de {2} {1}de {0}
+ROG.BloodVial.Format.Sap: Fiole de {2} de {0}
+
+ROG.BloodVial.Prefix.Minor: Mineur
+ROG.BloodVial.Prefix.Lesser: Moindre
+ROG.BloodVial.Prefix.Flimsy: Fragile
+ROG.BloodVial.Prefix.Average: Moyen
+ROG.BloodVial.Prefix.Greater: Supérieur
+ROG.BloodVial.Prefix.Major: Majeur
+ROG.BloodVial.Prefix.Superior: Parfait
+ROG.BloodVial.Prefix.Exceptional: Exceptionnel
+ROG.BloodVial.Prefix.Legendary: Légendaire
+
+ROG.BloodVial.Type.Blood: Sang
+ROG.BloodVial.Type.ColdBlood: Sang Froid
+ROG.BloodVial.Type.RabidBlood: Sang Enragé
+ROG.BloodVial.Type.DemonicIchor: Ichor Démoniaque
+ROG.BloodVial.Type.LiquidHellfire: Feu de l'Enfer Liquide
+ROG.BloodVial.Type.BoilingDragonblood: Sang de Dragon Bouillant
+ROG.BloodVial.Type.MineralSlurry: Boue Minérale
+ROG.BloodVial.Type.LiquidMagma: Magma Liquide
+ROG.BloodVial.Type.LiquidFrost: Givre Liquide
+ROG.BloodVial.Type.PureElementalWater: Eau Élémentaire Pure
+ROG.BloodVial.Type.CorrosiveAcid: Acide Corrosif
+ROG.BloodVial.Type.Venom: Venin
+ROG.BloodVial.Type.InsectoidIchor: Ichor Insectoïde
+ROG.BloodVial.Type.AcidicSlime: Bave Acide
+ROG.BloodVial.Type.FaerieDew: Rosée Féérique
+ROG.BloodVial.Type.MachineOil: Huile de Machine
+ROG.BloodVial.Type.MagicalBlood: Sang Magique
+ROG.BloodVial.Type.StickySap: Sève Collante
+ROG.BloodVial.Type.PlantNectar: Nectar de Plante
+ROG.BloodVial.Type.SporeExtract: Extrait de Spore
+ROG.BloodVial.Type.DeadlyVenom: Venin Mortel
+ROG.BloodVial.Type.PutrefiedBlood: Sang Putréfié
+ROG.BloodVial.Type.Ectoplasm: Ectoplasme
+
+ROG.BloodVial.Type.PaleSap: Sève Pâle
+ROG.BloodVial.Type.AmberResin: Résine Ambrée
+ROG.BloodVial.Type.GlowingSap: Sève Luminescente
+ROG.BloodVial.Type.PetrifiedResin: Résine Pétrifiée
+ROG.BloodVial.Type.VoidSap: Sève du Vide

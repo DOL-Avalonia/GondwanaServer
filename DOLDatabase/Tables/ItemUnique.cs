@@ -37,15 +37,26 @@ namespace DOL.Database
 
         public ItemUnique(ItemTemplate template) : base()
         {
+            string prefix = "Unique_";
+            if (template != null && template.Id_nb != null)
+            {
+                if (template.Id_nb.StartsWith("vt_")) prefix = "vt_";
+                else if (template.Id_nb.StartsWith("vf_")) prefix = "vf_";
+            }
+
             if (template is ItemUnique)
             {
-                m_id_nb = "Unique_" + UniqueID.IDGenerator.GenerateID();
+                m_id_nb = prefix + UniqueID.IDGenerator.GenerateID();
             }
             else
             {
-                m_id_nb = template.Id_nb + UNIQUE_SEPARATOR + UniqueID.IDGenerator.GenerateID();
+                if (prefix != "Unique_")
+                    m_id_nb = prefix + UniqueID.IDGenerator.GenerateID();
+                else
+                    m_id_nb = template!.Id_nb + UNIQUE_SEPARATOR + UniqueID.IDGenerator.GenerateID();
             }
-            Name = template.Name;
+
+            Name = template!.Name;
             Bonus = template.Bonus;
             Bonus1 = template.Bonus1;
             Bonus2 = template.Bonus2;

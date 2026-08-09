@@ -11,6 +11,7 @@ namespace DOL.GS.Commands
         ePrivLevel.GM,
         "Manage GvG status",
         "/gvg <on|off> - Forces GvG open or reverts to schedule",
+        "/gvg debug - Toggles a 5m ON / 2m OFF fast cycle",
         "/gvg resetrelics - Forces GvG to reset territory relics",
         "/gvg territoryreset <TerritoryID|all> - Forces a specific territory or all territories to become neutral")]
     public class GvGCommandHandler : AbstractCommandHandler, ICommandHandler
@@ -35,6 +36,10 @@ namespace DOL.GS.Commands
                     GvGManager.ForceOpen = false;
                     GvGManager.EvaluateSchedule();
                     client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.TimeSchedule"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    break;
+                case "debug":
+                    GvGManager.ToggleDebugMode();
+                    client.Out.SendMessage($"GvG Debug Mode is now {(GvGManager.DebugMode ? "ON (fast cycle)" : "OFF (Reverted to schedule)")}.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     break;
                 case "resetrelics":
                     AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();

@@ -458,8 +458,11 @@ namespace DOL.GS
                         // scope copy for thread safety
                         var regionId = region.ID;
 
-                        RegionsWeather.Add(regionId, new RegionWeather(region));
-                        RegionsTasks.Add(regionId, Scheduler.Start(() => OnWeatherTick(regionId), 1));
+                        if (region.Zones.Any())
+                        {
+                            RegionsWeather.Add(regionId, new RegionWeather(region));
+                            RegionsTasks.Add(regionId, Scheduler.Start(() => OnWeatherTick(regionId), 1));
+                        }
 
                     }
                     catch (Exception ex)

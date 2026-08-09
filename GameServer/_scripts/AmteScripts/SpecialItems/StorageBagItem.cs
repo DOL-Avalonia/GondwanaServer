@@ -185,8 +185,9 @@ namespace DOL.GS.Scripts
 
             bool isStandardIngredientPackage = item.PackageID is "craft_ingredient" or "Bountyrecipe" or "combine_ingredient" or "loot_ingredient";
             bool isCraftRealmUpdateAllowed = item.PackageID == "craft_realm_update" && (item.Item_Type == 24 || item.Item_Type == 40);
+            bool isBloodVial = item.Id_nb != null && (item.Id_nb.StartsWith("vt_") || item.Id_nb.StartsWith("vf_"));
 
-            return isStandardIngredientPackage || isCraftRealmUpdateAllowed;
+            return isStandardIngredientPackage || isCraftRealmUpdateAllowed || isBloodVial;
         }
     }
 

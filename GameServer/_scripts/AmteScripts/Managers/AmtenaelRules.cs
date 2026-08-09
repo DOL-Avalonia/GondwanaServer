@@ -217,7 +217,7 @@ namespace DOL.GS.ServerRules
             {
                 if (sourceInArena != targetInArena)
                 {
-                    if (!quiet) MessageToLiving(source, Lang(source, "You cannot interfere with Arena participants."));
+                    if (!quiet && source is GamePlayer p) MessageToLiving(source, Lang(source, "You cannot interfere with Arena participants."));
                     return false;
                 }
 
@@ -494,7 +494,7 @@ namespace DOL.GS.ServerRules
                 {
                     if (attackerInArena != defenderInArena)
                     {
-                        if (!quiet) MessageToLiving(attacker, Lang(attacker, "You cannot interfere with Arena participants."));
+                        if (!quiet && attacker is GamePlayer) MessageToLiving(attacker, Lang(attacker, "You cannot interfere with Arena participants."));
                         return false;
                     }
 

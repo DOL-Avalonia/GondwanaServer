@@ -1905,6 +1905,88 @@ namespace DOL.Language
             if (string.IsNullOrEmpty(messageKey))
                 return string.Empty;
 
+            if (messageKey.StartsWith("[ROG]BloodVial|"))
+            {
+                string[] parts = messageKey.Substring(15).Split('|');
+                if (parts.Length >= 4)
+                {
+                    string prefixKey = parts[0];
+                    string bloodTypeKey = parts[1];
+                    string mobName = parts[2];
+                    string pctString = parts[3];
+
+                    string translatedPrefix = "";
+                    if (!string.IsNullOrEmpty(prefixKey))
+                    {
+                        if (TryGetTranslation(out string tPrefix, language, "ROG.BloodVial.Prefix." + prefixKey))
+                            translatedPrefix = tPrefix + " ";
+                        else
+                            translatedPrefix = prefixKey + " ";
+                    }
+
+                    string translatedBloodType = bloodTypeKey;
+                    if (TryGetTranslation(out string tBloodType, language, "ROG.BloodVial.Type." + bloodTypeKey.Replace(" ", "")))
+                        translatedBloodType = tBloodType;
+
+                    string formatKey = "ROG.BloodVial.Format";
+                    if (bloodTypeKey.Contains("Sap") || bloodTypeKey.Contains("Resin"))
+                    {
+                        if (TryGetTranslation(out string sapFormat, language, "ROG.BloodVial.Format.Sap"))
+                            formatKey = "ROG.BloodVial.Format.Sap";
+                    }
+
+                    string format = "Vial of {0}'s {1}{2}";
+                    if (TryGetTranslation(out string tFormat, language, formatKey))
+                        format = tFormat;
+
+                    string combinedName = string.Format(format, mobName, translatedPrefix, translatedBloodType).Replace("  ", " ").Trim();
+
+                    // Append percentage for temporary vials
+                    if (!string.IsNullOrEmpty(pctString) && pctString != "100")
+                    {
+                        combinedName += $" ({pctString}%)";
+                    }
+
+                    return combinedName;
+                }
+            }
+
+            else if (messageKey.StartsWith("[ROG]PlayerVial|"))
+            {
+                string[] parts = messageKey.Substring(16).Split('|');
+                if (parts.Length >= 3)
+                {
+                    string prefixKey = parts[0];
+                    string raceIdStr = parts[1];
+                    string isSapStr = parts[2];
+
+                    if (int.TryParse(raceIdStr, out int raceId) && bool.TryParse(isSapStr, out bool isSap))
+                    {
+                        string translatedPrefix = "";
+                        if (!string.IsNullOrEmpty(prefixKey))
+                        {
+                            if (TryGetTranslation(out string tPrefix, language, "ROG.PlayerVial.Prefix." + prefixKey))
+                                translatedPrefix = tPrefix + " ";
+                            else
+                                translatedPrefix = prefixKey + " ";
+                        }
+
+                        string raceName = ((eRace)raceId).ToString();
+                        string raceTranslationKey = "GamePlayer.PlayerRace.Male." + raceName;
+                        if (TryGetTranslation(out string tRace, language, raceTranslationKey))
+                            raceName = tRace;
+
+                        string formatKey = isSap ? "ROG.PlayerVial.Format.Sap" : "ROG.PlayerVial.Format";
+                        string format = "{0}{1} Vial";
+                        if (TryGetTranslation(out string tFormat, language, formatKey))
+                            format = tFormat;
+
+                        string combinedName = string.Format(format, translatedPrefix, raceName).Replace("  ", " ").Trim();
+                        return combinedName;
+                    }
+                }
+            }
+
             if (messageKey.StartsWith("[ROG]"))
             {
                 string[] parts = messageKey.Substring(5).Split('|');
@@ -2019,53 +2101,6 @@ namespace DOL.Language
 
                         return string.Format(mobFormat, mobName, combinedName).Trim();
                     }
-
-                    return combinedName;
-                }
-            }
-
-            if (messageKey.StartsWith("[ROG]BloodVial|"))
-            {
-                string[] parts = messageKey.Substring(15).Split('|');
-                if (parts.Length >= 4)
-                {
-                    string prefixKey = parts[0];
-                    string bloodTypeKey = parts[1];
-                    string mobName = parts[2];
-                    string pctString = parts[3];
-
-                    string translatedPrefix = "";
-                    if (!string.IsNullOrEmpty(prefixKey))
-                    {
-                        if (TryGetTranslation(out string tPrefix, language, "ROG.BloodVial.Prefix." + prefixKey))
-                            translatedPrefix = tPrefix + " ";
-                        else
-                            translatedPrefix = prefixKey + " ";
-                    }
-
-                    string translatedBloodType = bloodTypeKey;
-                    if (TryGetTranslation(out string tBlood, language, "ROG.BloodVial.Type." + bloodTypeKey.Replace(" ", "")))
-                        translatedBloodType = tBlood;
-
-                    string formatKey = "ROG.BloodVial.Format";
-
-                    // Allows specific format for saps/resins if desired
-                    if (bloodTypeKey.Contains("Sap") || bloodTypeKey.Contains("Resin"))
-                    {
-                        if (TryGetTranslation(out string sapFormat, language, "ROG.BloodVial.Format.Sap"))
-                            formatKey = "ROG.BloodVial.Format.Sap";
-                    }
-
-                    // EN Format: "Vial of {0}'s {1}{2}" 
-                    // FR Format Example: "Fiole de {2} {1} de {0}"
-                    string format = "Vial of {0}'s {1}{2}";
-                    if (TryGetTranslation(out string tFormat, language, formatKey))
-                        format = tFormat;
-
-                    string combinedName = string.Format(format, mobName, translatedPrefix, translatedBloodType).Replace("  ", " ").Trim();
-
-                    if (!string.IsNullOrEmpty(pctString) && pctString != "100")
-                        combinedName += $" ({pctString}%)";
 
                     return combinedName;
                 }

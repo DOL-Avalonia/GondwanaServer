@@ -1885,7 +1885,7 @@ namespace DOL.GS
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternClothCloakOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                     }
-                    if (isCloth && tItem == 21 && IsMaskModel(target.Model))
+                    if (isCloth && tItem == 21 && ItemModelManager.IsMaskModel(target.Model))
                     {
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMaskNeededCloth"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
@@ -1911,7 +1911,7 @@ namespace DOL.GS
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternArmorOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                     }
-                    if (tItem == 21 && IsMaskModel(target.Model))
+                    if (tItem == 21 && ItemModelManager.IsMaskModel(target.Model))
                     {
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMaskNeededArmor"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
@@ -1939,7 +1939,7 @@ namespace DOL.GS
                     }
                     if (patternData == null)
                     {
-                        if (!IsMaskModel(target.Model))
+                        if (!ItemModelManager.IsMaskModel(target.Model))
                         {
                             m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternMaskValidNeeded"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return false;
@@ -1955,16 +1955,6 @@ namespace DOL.GS
             }
 
             return true;
-        }
-
-        private bool IsMaskModel(int model)
-        {
-            if (model >= 4653 && model <= 4688) return true;
-            if (model >= 4779 && model <= 4794) return true;
-            if (model >= 4809 && model <= 4820) return true;
-            if (model >= 4829 && model <= 4834) return true;
-            if (model >= 4837 && model <= 4842) return true;
-            return false;
         }
 
         /// <summary>
@@ -2118,7 +2108,7 @@ namespace DOL.GS
         /// </summary>
         protected virtual bool ApplySmartPattern(InventoryItem pattern, InventoryItem targetItem)
         {
-            if (targetItem.Item_Type == 21 && IsMaskModel(targetItem.Model))
+            if (targetItem.Item_Type == 21 && ItemModelManager.IsMaskModel(targetItem.Model))
             {
                 m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternNoMask"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
@@ -2137,21 +2127,21 @@ namespace DOL.GS
                 return false;
             }
 
-            var patternType = ArmorPatternMgr.GetPatternType(pattern.Id_nb);
-            if (patternType == ArmorPatternMgr.PatternType.None)
+            var patternType = ItemModelManager.GetPatternType(pattern.Id_nb);
+            if (patternType == PatternType.None)
             {
                 m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternNotRecognized"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
-            int newModel = ArmorPatternMgr.GetModel(patternType, targetItem);
+            int newModel = ItemModelManager.GetPatternModelForTargetItem(patternType, targetItem);
 
             if (newModel <= 0)
             {
                 m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternInvalidForType"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
-
+            
             bool wasOriginallyUnique = (targetItem.Template is ItemUnique);
             string originalIdRef = targetItem.Template.Id_nb;
 

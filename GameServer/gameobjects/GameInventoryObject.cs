@@ -132,6 +132,26 @@ namespace DOL.GS
             {
                 Dictionary<int, InventoryItem> updatedItems = new(2);
 
+                // Blood Vials Combination across all Inventory Objects (bags, vaults, etc.)
+                if (fromItem != null && toItem != null &&
+                    fromItem.Id_nb != null && fromItem.Id_nb.StartsWith("vt_") &&
+                    toItem.Id_nb != null && toItem.Id_nb.StartsWith("vt_"))
+                {
+                    if (LootGeneratorBloodVials.CombineVials(player, fromItem, toItem))
+                    {
+                        if (thisObject.IsVaultInventorySlot((ushort)fromClientSlot))
+                            updatedItems[(int)fromClientSlot] = null;
+
+                        if (thisObject.IsVaultInventorySlot((ushort)toClientSlot))
+                        {
+                            thisObject.GetClientInventory(player).TryGetValue((int)toClientSlot, out InventoryItem refreshedToItem);
+                            updatedItems[(int)toClientSlot] = refreshedToItem ?? toItem;
+                        }
+
+                        return updatedItems;
+                    }
+                }
+
                 if (toItem == null)
                     MoveItemToEmptySlot(thisObject, player, fromClientSlot, toClientSlot, fromItem, count, updatedItems);
                 else if (toItem.IsStackable && fromItem.Count < toItem.MaxCount && toItem.Count < toItem.MaxCount && toItem.Name.Equals(fromItem.Name))

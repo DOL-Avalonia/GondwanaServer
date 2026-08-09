@@ -1,708 +1,345 @@
-﻿//===============================================
-// '/ngg' command fixed to work with latest revision - Trick
-// added custom save command - Unty
-// Color chart http://herald.uthgard.net/daoc/list.php?view=item%20colors
-// thanks to original author :)
-//===============================================
-using System;
+﻿using System;
 using System.Linq;
+using System.Text;
 using DOL.Events;
+using DOL.GS.PacketHandler;
 using DOL.Database;
-using System.Collections.Generic;
 
 namespace DOL.GS.Commands
 {
-    [Cmd("&ngg", //command to handle
-       ePrivLevel.GM, //minimum privelege level
-       "NPC Gear Generator", //command description
-       "'/ngg random [color]' Create a completely random equipment template",
-       "'/ngg cloth [color]' Create a random set of cloth",
-       "'/ngg leather [color]' Create a random set of leather",
-       "'/ngg studded [color]' Create a random set of studded",
-       "'/ngg chain [color]' Create a random set of chain",
-       "'/ngg scale [color]' Create a random set of scale",
-       "'/ngg plate [color]' Create a random set of plate",
-       "'/ngg cloak [color]' Add a random cloak to the NPC",
-       "'/ngg epic [class] [color]' create the class epic armor to the NPC",
+    [Cmd("&ngg", ePrivLevel.GM, "NPC Gear Generator",
+       "'/ngg random [color] [pattern]' Create a completely random equipment template and weapon set",
+       "'/ngg cloth [color] [pattern]' Create a random set of cloth",
+       "'/ngg leather [color] [pattern]' Create a random set of leather",
+       "'/ngg studded [color] [pattern]' Create a random set of studded",
+       "'/ngg chain [color] [pattern]' Create a random set of chain",
+       "'/ngg scale [color] [pattern]' Create a random set of scale",
+       "'/ngg plate [color] [pattern]' Create a random set of plate",
+       "'/ngg cloak [color] [category]' Add a cloak (Categories: ToA, Class, Regular, Guard, Realm, Otherworldly, Special)",
+       "'/ngg mask [maskType] [color]' Apply a specific mask to the head slot",
+       "'/ngg epic [class] [color] [DF]' create the class epic set (armor+wep+cloak) to the NPC",
+       "'/ngg weapon [class] [template] [color]' create a class weapon set to the NPC (templates: epic, epicdf, classic)",
        "'/ngg equip [slotNumber] [color]' Add a random equipement to the NPC slot",
+       "'/ngg colors' Display all available armor colors and IDs",
        "'/ngg save' Save the template and NPC to database",
        "---------------------------------",
-       "[class] : class name",
-       "exemple : '/ngg epic shadowblade'",
+       "|class| : class name - exemple : '/ngg epic shadowblade'",
        "---------------------------------",
-       "[color] : one number to select the same color for all the item's parts (if empty : colors random for each item's parts)",
-       "or [CloakColor] [HeadColor] [HandsColor] [ArmsColor] [TorsoColor] [LegsColor] [BootsColor] to choose the color of each part (all arguments needed).",
-       "exemple : '/ngg random 43' all the armor parts are in radom and take the black cloth color.",
-       "or : '/ngg plate 0 1 2 3 4 5 6' all the armor is in plate and each part take a fixed color",
-       "or : '/ngg plate' all the armor is in plate and each part take a random color",
+       "'|color| : ID or Name (e.g. 43 or Cloth_Black) to select the same color for all parts (if empty : random)'",
+       "or |Cloak| |Head| |Hands| |Arms| |Torso| |Legs| |Boots| to choose the color of each part.",
+       "exemple : '/ngg plate Metal_Red Metal_Gold Metal_Gold Metal_Gold Metal_Red Metal_Gold Metal_Gold'",
        "---------------------------------",
-       "[slotNumber] :",
+       "|slotNumber| :",
        "- for weapons : 10 = 'right hand', 11 = 'left hand', 12 = 'two handed', 13 = 'distance'",
        "- for armors : 21 = 'head', 22 = 'hands', 23 = 'boots', 25 = 'torso', 26 = 'cloak', 27 = 'legs', 28 = 'arms'",
        "exemple : '/ngg equip 12 ' Add a two handed weapon to the NPC with a random color.",
        "---------------------------------",
-       "don't forget to use '/ngg save' when you have finish the npc template."
-       )]
+       "|pattern| : pattern type",
+       "'Possessed, Good, Corrupt, Minotaur, Oceanus, Stygia, Volcanus, Aerus, or Class[Name] (e.g. ClassHealer)'",
+       "---------------------------------",
+       "|category| : cloak category type",
+       "'toa, regular, guard, realm, otherworldly, special, class (Class[Name] (e.g. ClassHealer))'",
+       "---------------------------------",
+       "|mask| : mask type",
+       "eye, horned, slitted, skull, plague, beast, devour, satyr, death, ornatedplague, ornatedbeast, ornatedsatyr, ornatedskull, yule, demon, pumpkin, angel, midona, tentacled, hothead, sunburst, headorbit, eyesfire, eyesblue, eyesgreen",
+       "---------------------------------",
+       "don't forget to use '/ngg save' when you have finish the npc template.")]
+
     public class NGGCommandHandler : AbstractCommandHandler, ICommandHandler
     {
-        /*
-           armor[0][][] = cloth;
-           armor[1][][] = leather;
-           armor[2][][] = studded;
-           armor[3][][] = chain;
-           armor[4][][] = scale;
-           armor[5][][] = plate;
-             
-           armor[][0][] = head;
-           armor[][1][] = hands;
-           armor[][2][] = arms;
-           armor[][3][] = torso;
-           armor[][4][] = legs;
-           armor[][5][] = boots;
-           equip[0][]  = head;
-           equip[1][]  = hands;
-           equip[2][]  = arms;
-           equip[3][]  = torso;
-           equip[4][]  = legs;
-           equip[5][]  = boots;
-           equip[6][]  = cloak;
-           equip[7][]  = right;
-           equip[8][]  = left;
-           equip[9][]  = 2h;
-           equip[10][] = distance;
-             
-           armor[][][x] = Model IDs;
-           equip[][x] = Model IDs;
-           cloak[x] = Model IDs;
-        */
-        private static ushort[][][] armor = new ushort[6][][];
-        private static ushort[][] equip = new ushort[11][];
-        private static ushort[] cloak;
-
-        //private static String[] slots = {"head", "hands", "arms", "torso", "legs", "boots", "cloak", "right", "left", "2H", "distance"};
         private static byte[] slots = { 0x15, 0x16, 0x1C, 0x19, 0x1B, 0x17, 0x1A, 0x0A, 0x0B, 0x0C, 0x0D };
+        private static ushort[] validColors;
 
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
-            IList<ItemTemplate> temp;
-            int[] ot = { 32, 33, 34, 35, 38, 36 };
-            int x;
-
-            for (int a = 0; a < 6; a++)
-            {
-                armor[a] = new ushort[6][];
-                for (int b = 0; b < 6; b++)
-                {
-                    x = 0;
-                    // temp = GameServer.Database.SelectObjects<ItemTemplate>("Object_Type = " + ot[a] + " AND Item_Type = " + slots[b]);
-                    temp = GameServer.Database.SelectObjects<ItemTemplate>(DB.Column("Object_Type").IsEqualTo(ot[a]).And(DB.Column("Item_Type").IsEqualTo(slots[b])));
-                    armor[a][b] = new ushort[temp.Count];
-                    foreach (DataObject item in temp)
-                    {
-                        armor[a][b][x++] = (ushort)(item as ItemTemplate).Model;
-                    }
-                }
-            }
-
-            x = 0;
-            temp = GameServer.Database.SelectObjects<ItemTemplate>(DB.Column("Item_Type").IsEqualTo(slots[6]));
-            cloak = new ushort[temp.Count];
-            foreach (DataObject item in temp)
-            {
-                cloak[x++] = (ushort)(item as ItemTemplate).Model;
-            }
-
-            for (int a = 0; a < 11; a++)
-            {
-                x = 0;
-                temp = GameServer.Database.SelectObjects<ItemTemplate>(DB.Column("Item_Type").IsEqualTo(slots[a]));
-                equip[a] = new ushort[temp.Count];
-                foreach (DataObject item in temp)
-                {
-                    equip[a][x++] = (ushort)(item as ItemTemplate).Model;
-                }
-            }
+            Array colorArray = Enum.GetValues(typeof(eColor));
+            validColors = new ushort[colorArray.Length];
+            int cIdx = 0;
+            foreach (byte c in colorArray) validColors[cIdx++] = (ushort)c;
         }
+
+        private void DisplayColors(GameClient client)
+        {
+            client.Player.Out.SendMessage("--- Available NGG Colors ---", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            Array colorValues = Enum.GetValues(typeof(eColor));
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
+
+            foreach (eColor color in colorValues)
+            {
+                sb.AppendFormat("{0} ({1}), ", color.ToString(), (int)color);
+                count++;
+                if (count % 4 == 0)
+                {
+                    client.Player.Out.SendMessage(sb.ToString().TrimEnd(',', ' '), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    sb.Clear();
+                }
+            }
+            if (sb.Length > 0) client.Player.Out.SendMessage(sb.ToString().TrimEnd(',', ' '), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            client.Player.Out.SendMessage("----------------------------", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+        }
+
+        private ushort ParseColor(string input)
+        {
+            if (ushort.TryParse(input, out ushort colorId)) return colorId;
+            try { return (ushort)(byte)Enum.Parse(typeof(eColor), input, true); }
+            catch { return 999; } // 999 acts as an invalid flag
+        }
+
+        private static ushort GetRandomColor() => validColors[Util.Random(validColors.Length - 1)];
 
         public void OnCommand(GameClient client, string[] args)
         {
-            bool getcloak;
-            if (Util.Random(1) == 0) getcloak = false;
-            else getcloak = true;
-
             if (args.Length < 2)
             {
-                DisplaySyntax(client);
+                DisplaySyntax(client); return;
+            }
+
+            if (args[1].Equals("colors", StringComparison.OrdinalIgnoreCase))
+            {
+                DisplayColors(client);
                 return;
             }
 
-            string ClasseEpic = "";
-            ushort color = 0;
-            ushort color1 = 0;
-            ushort color2 = 0;
-            ushort color3 = 0;
-            ushort color4 = 0;
-            ushort color5 = 0;
-            ushort color6 = 0;
-            ushort sloti = 999;
-            byte slotb = 0x00;
-
-            if (args.Length >= 2)
+            GameNPC npc = client.Player.TargetObject as GameNPC;
+            if (npc == null && !args[1].Equals("save", StringComparison.OrdinalIgnoreCase))
             {
-                // Epic Argument
-                if (args[1] == "epic")
+                client.Out.SendMessage("You must target an NPC.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (args[1].Equals("save", StringComparison.OrdinalIgnoreCase))
+            {
+                if (npc == null) return;
+                string tn;
+                do { tn = args.Length >= 3 ? args[2] : Guid.NewGuid().ToString(); } 
+                while (!npc.Inventory.SaveIntoDatabase(tn));
+                
+                npc.EquipmentTemplateID = tn;
+                npc.SaveIntoDatabase();
+                client.Player.Out.SendMessage($"Equipment saved as: {tn}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            // PATTERN / COLOR / MASK / DF PARSER
+            string patternStr = "None";
+            string cloakCategory = "Regular";
+            string maskTypeStr = "Random";
+            ushort color = 0;
+            bool colorSet = false;
+            bool isDF = false;
+            eCharacterClass targetClass = eCharacterClass.Unknown;
+            string[] validCloakCategories = { "toa", "regular", "guard", "realm", "otherworldly", "special", "class" };
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                string arg = args[i];
+                ushort parsedColorId;
+
+                bool isNumber = ushort.TryParse(arg, out parsedColorId);
+                bool isCloakCategory = args[1].Equals("cloak", StringComparison.OrdinalIgnoreCase) && validCloakCategories.Contains(arg.ToLower());
+
+                if (arg.Equals("DF", StringComparison.OrdinalIgnoreCase)) isDF = true;
+                else if (isCloakCategory) cloakCategory = arg;
+                else if (!isNumber && Enum.TryParse(arg, true, out PatternType pType) && pType != PatternType.None) patternStr = pType.ToString();
+                else if (!isNumber && Enum.TryParse(arg, true, out eMaskType mType)) maskTypeStr = mType.ToString();
+                else if (!isNumber && Enum.TryParse(arg, true, out eCharacterClass cClass)) targetClass = cClass;
+                else if (arg.StartsWith("Class", StringComparison.OrdinalIgnoreCase)) patternStr = arg;
+                else
                 {
-                    if (args.Length < 3)
-                    {
-                        DisplaySyntax(client);
-                        return;
-                    }
-                    if (args.Length > 4 && args.Length < 10)
-                    {
-                        DisplaySyntax(client);
-                        return;
-                    }
-                    ClasseEpic = args[2];
-                    if (args.Length >= 4)
-                    {
-                        color = Convert.ToUInt16(args[3]);
-                    }
-                    if (args.Length > 4)
-                    {
-                        color1 = Convert.ToUInt16(args[4]);
-                        color2 = Convert.ToUInt16(args[5]);
-                        color3 = Convert.ToUInt16(args[6]);
-                        color4 = Convert.ToUInt16(args[7]);
-                        color5 = Convert.ToUInt16(args[8]);
-                        color6 = Convert.ToUInt16(args[9]);
-                    }
+                    ushort c = ParseColor(arg);
+                    if (c != 999 || arg == "0" || arg.Equals("White", StringComparison.OrdinalIgnoreCase)) { color = c; colorSet = true; }
+                    else if (i > 1 && args[1].Equals("cloak", StringComparison.OrdinalIgnoreCase)) cloakCategory = arg;
                 }
-                else if (args[1] == "equip")
+            }
+
+            if (!colorSet) color = GetRandomColor();
+
+            GameNpcInventoryTemplate template = npc?.Inventory as GameNpcInventoryTemplate ?? new GameNpcInventoryTemplate();
+            eRealm npcRealm = npc!.Realm == eRealm.None ? eRealm.Albion : npc.Realm;
+            int level = npc.Level > 0 ? npc.Level : 50;
+
+            if (args[1].Equals("mask", StringComparison.OrdinalIgnoreCase))
+            {
+                if (maskTypeStr.Equals("Random", StringComparison.OrdinalIgnoreCase) || maskTypeStr.Equals("None", StringComparison.OrdinalIgnoreCase))
+                    maskTypeStr = ItemModelManager.GetRandomMaskType();
+
+                template.RemoveNPCEquipment(eInventorySlot.HeadArmor);
+
+                int maskModel = ItemModelManager.GetMaskModel(maskTypeStr, npc.Model);
+                int effect = ItemModelManager.GetMaskEffect(maskTypeStr);
+
+                template.AddNPCEquipment(eInventorySlot.HeadArmor, (ushort)maskModel, color, effect);
+                npc.Inventory = template;
+                npc.BroadcastLivingEquipmentUpdate();
+                return;
+            }
+
+            if (args[1].Equals("weapon", StringComparison.OrdinalIgnoreCase))
+            {
+                if (targetClass == eCharacterClass.Unknown)
                 {
-                    // equip Argument
-                    if (args.Length < 3)
+                    client.Out.SendMessage("Invalid class name.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+
+                string wTemplate = "epic"; // default
+                if (args.Any(a => a.Equals("epicdf", StringComparison.OrdinalIgnoreCase))) wTemplate = "epicdf";
+                else if (args.Any(a => a.Equals("classic", StringComparison.OrdinalIgnoreCase))) wTemplate = "classic";
+
+                // Clean the weapon slots first to avoid overlap issues
+                template.RemoveNPCEquipment(eInventorySlot.RightHandWeapon);
+                template.RemoveNPCEquipment(eInventorySlot.LeftHandWeapon);
+                template.RemoveNPCEquipment(eInventorySlot.TwoHandWeapon);
+                template.RemoveNPCEquipment(eInventorySlot.DistanceWeapon);
+
+                ItemModelManager.EquipClassWeapons(npc, template, targetClass, wTemplate, color);
+
+                npc.Inventory = template;
+                npc.BroadcastLivingEquipmentUpdate();
+                return;
+            }
+
+            if (args[1].Equals("epic", StringComparison.OrdinalIgnoreCase) && args.Length >= 3)
+            {
+                Clear(npc);
+                template = new GameNpcInventoryTemplate();
+                targetClass = eCharacterClass.Unknown;
+
+                foreach (string arg in args)
+                {
+                    if (Enum.TryParse(arg, true, out eCharacterClass parsedClass)) { targetClass = parsedClass; break; }
+                }
+
+                if (targetClass != eCharacterClass.Unknown)
+                {
+                    // 1. Equip Armor (Slots 0 to 5)
+                    for (int i = 0; i < 6; i++)
                     {
-                        DisplaySyntax(client);
-                        return;
+                        int aModel = ItemModelManager.GetClassEpicArmor(targetClass, (eInventorySlot)slots[i]);
+                        int headEffect = 0;
+
+                        if (aModel <= 0)
+                        {
+                            eObjectType baseMat = ItemModelManager.GetDefaultArmorMaterialForClass(targetClass, level);
+                            ItemModelManager.GetArmorData(baseMat, (eInventorySlot)slots[i], level, npcRealm, "None", npc.Model, out aModel, out _, out _, out headEffect);
+                        }
+
+                        if (aModel > 0) template.AddNPCEquipment((eInventorySlot)slots[i], (ushort)aModel, color, headEffect);
                     }
-                    slotb = Convert.ToByte(Convert.ToUInt16(args[2]));
-                    ushort z = 0;
-                    foreach (byte finded in slots)
-                    {
-                        if (finded == slotb) { sloti = z; }
-                        z++;
-                    }
-                    if (sloti == 999)
-                    {
-                        DisplaySyntax(client);
-                        return;
-                    }
-                    if (args.Length > 3)
-                    {
-                        color = Convert.ToUInt16(args[3]);
-                    }
+
+                    // 2. Equip Weapon
+                    ItemModelManager.EquipClassWeapons(npc, template, targetClass, isDF ? "epicdf" : "epic", color);
+
+                    // 3. Equip Cloak
+                    int cloakModel = ItemModelManager.GetCloakModel("class", targetClass);
+                    if (cloakModel <= 0) cloakModel = ItemModelManager.GetCloakModel("Regular");
+                    template.AddNPCEquipment(eInventorySlot.Cloak, (ushort)cloakModel, color, 0);
                 }
                 else
                 {
-                    // Armor and Claok Argument
-                    if (args.Length > 3 && args.Length < 9)
-                    {
-                        DisplaySyntax(client);
-                        return;
-                    }
-                    if (args.Length >= 3 && args[1] != "save")
-                    {
-                        color = Convert.ToUInt16(args[2]);
-                    }
-                    if (args.Length > 3)
-                    {
-                        color1 = Convert.ToUInt16(args[3]);
-                        color2 = Convert.ToUInt16(args[4]);
-                        color3 = Convert.ToUInt16(args[5]);
-                        color4 = Convert.ToUInt16(args[6]);
-                        color5 = Convert.ToUInt16(args[7]);
-                        color6 = Convert.ToUInt16(args[8]);
-                    }
+                    client.Out.SendMessage($"Invalid class name.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+                
+                npc.Inventory = template;
+                npc.BroadcastLivingEquipmentUpdate();
+                return;
+            }
+
+            // CLOAK COMMAND HANDLING
+            if (args[1].Equals("cloak", StringComparison.OrdinalIgnoreCase))
+            {
+                template.RemoveNPCEquipment(eInventorySlot.Cloak);
+                int clkModel = ItemModelManager.GetCloakModel(cloakCategory);
+                template.AddNPCEquipment(eInventorySlot.Cloak, (ushort)clkModel, color, 0);
+                npc.Inventory = template;
+                npc.BroadcastLivingEquipmentUpdate();
+                return;
+            }
+
+            if (args[1].Equals("equip", StringComparison.OrdinalIgnoreCase) && args.Length >= 3)
+            {
+                byte slotb = Convert.ToByte(Convert.ToUInt16(args[2]));
+                int sloti = Array.IndexOf(slots, slotb);
+                if (sloti >= 7) {
+                    template.RemoveNPCEquipment((eInventorySlot)slotb);
+                    ushort wpnModel = (ushort)ItemModelManager.GetRandomWeaponModelForNgg(sloti, npcRealm);
+                    if (wpnModel > 0) template.AddNPCEquipment((eInventorySlot)slotb, wpnModel, color, 0);
+                    
+                    if (sloti == 7 || sloti == 8) npc.SwitchWeapon(GameLiving.eActiveWeaponSlot.Standard);
+                    else if (sloti == 9) npc.SwitchWeapon(GameLiving.eActiveWeaponSlot.TwoHanded);
+                    else if (sloti == 10) npc.SwitchWeapon(GameLiving.eActiveWeaponSlot.Distance);
+                }
+                npc.Inventory = template;
+                npc.BroadcastLivingEquipmentUpdate();
+                return;
+            }
+
+            eObjectType objType = eObjectType.GenericArmor;
+            bool isRandom = false;
+
+            switch (args[1].ToLower())
+            {
+                case "cloth": objType = eObjectType.Cloth; break;
+                case "leather": objType = eObjectType.Leather; break;
+                case "studded": objType = eObjectType.Studded; break;
+                case "chain": objType = eObjectType.Chain; break;
+                case "scale": objType = eObjectType.Scale; break;
+                case "plate": objType = eObjectType.Plate; break;
+                case "random": objType = eObjectType.GenericArmor; isRandom = true; break;
+                default: DisplaySyntax(client); return;
+            }
+
+            Clear(npc);
+            template = new GameNpcInventoryTemplate();
+
+            for (int i = 0; i < 6; i++)
+            {
+                eObjectType currentType = objType;
+                if (currentType == eObjectType.GenericArmor)
+                {
+                    eObjectType[] randomMats = { eObjectType.Cloth, eObjectType.Leather, eObjectType.Studded, eObjectType.Chain, eObjectType.Scale, eObjectType.Plate };
+                    currentType = randomMats[Util.Random(randomMats.Length - 1)];
+                }
+
+                ItemModelManager.GetArmorData(currentType, (eInventorySlot)slots[i], level, npcRealm, patternStr, npc.Model, out int model, out _, out bool ext, out int effect);
+
+                if (model > 0)
+                {
+                    template.AddNPCEquipment((eInventorySlot)slots[i], (ushort)model, color, effect);
+                    if (ext) template.GetItem((eInventorySlot)slots[i]).Extension = 5; // Give visual extension
                 }
             }
-            int[] colorArray = { color1, color2, color3, color4, color5, color6 };
 
-            GameNPC npc = null;
-            if (client.Player.TargetObject is GameNPC)
-                npc = (GameNPC)client.Player.TargetObject;
-
-            GameNpcInventoryTemplate template = npc.Inventory as GameNpcInventoryTemplate;
-            if (template == null) template = new GameNpcInventoryTemplate();
-
-            if (args[1] != "epic")
+            if (Util.Chance(50))
             {
-                switch (args[1])
-                {
-                    case "random":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            for (int i = 0; i < 6; i++)
-                            {
-                                if (args.Length > 2)
-                                {
-                                    if (args.Length == 3)
-                                    {
-                                        switch (Util.Random(5))
-                                        {
-                                            case 0:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[0][i][Util.Random(armor[0][i].Length - 1)], color, 0);
-                                                break;
-                                            case 1:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[1][i][Util.Random(armor[1][i].Length - 1)], color, 0);
-                                                break;
-                                            case 2:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[2][i][Util.Random(armor[2][i].Length - 1)], color, 0);
-                                                break;
-                                            case 3:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[3][i][Util.Random(armor[3][i].Length - 1)], color, 0);
-                                                break;
-                                            case 4:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[4][i][Util.Random(armor[4][i].Length - 1)], color, 0);
-                                                break;
-                                            case 5:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[5][i][Util.Random(armor[5][i].Length - 1)], color, 0);
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        switch (Util.Random(5))
-                                        {
-                                            case 0:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[0][i][Util.Random(armor[0][i].Length - 1)], colorArray[i], 0);
-                                                break;
-                                            case 1:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[1][i][Util.Random(armor[1][i].Length - 1)], colorArray[i], 0);
-                                                break;
-                                            case 2:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[2][i][Util.Random(armor[2][i].Length - 1)], colorArray[i], 0);
-                                                break;
-                                            case 3:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[3][i][Util.Random(armor[3][i].Length - 1)], colorArray[i], 0);
-                                                break;
-                                            case 4:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[4][i][Util.Random(armor[4][i].Length - 1)], colorArray[i], 0);
-                                                break;
-                                            case 5:
-                                                template.AddNPCEquipment((eInventorySlot)slots[i], armor[5][i][Util.Random(armor[5][i].Length - 1)], colorArray[i], 0);
-                                                break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    switch (Util.Random(5))
-                                    {
-                                        case 0:
-                                            template.AddNPCEquipment((eInventorySlot)slots[i], armor[0][i][Util.Random(armor[0][i].Length - 1)], Util.Random(86), 0);
-                                            break;
-                                        case 1:
-                                            template.AddNPCEquipment((eInventorySlot)slots[i], armor[1][i][Util.Random(armor[1][i].Length - 1)], Util.Random(86), 0);
-                                            break;
-                                        case 2:
-                                            template.AddNPCEquipment((eInventorySlot)slots[i], armor[2][i][Util.Random(armor[2][i].Length - 1)], Util.Random(86), 0);
-                                            break;
-                                        case 3:
-                                            template.AddNPCEquipment((eInventorySlot)slots[i], armor[3][i][Util.Random(armor[3][i].Length - 1)], Util.Random(86), 0);
-                                            break;
-                                        case 4:
-                                            template.AddNPCEquipment((eInventorySlot)slots[i], armor[4][i][Util.Random(armor[4][i].Length - 1)], Util.Random(86), 0);
-                                            break;
-                                        case 5:
-                                            template.AddNPCEquipment((eInventorySlot)slots[i], armor[5][i][Util.Random(armor[5][i].Length - 1)], Util.Random(86), 0);
-                                            break;
-                                    }
-                                }
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "cloth":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            if (args.Length > 2)
-                            {
-                                if (args.Length == 3)
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[0][0][Util.Random(armor[0][0].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[0][1][Util.Random(armor[0][1].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[0][2][Util.Random(armor[0][2].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[0][3][Util.Random(armor[0][3].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[0][4][Util.Random(armor[0][4].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[0][5][Util.Random(armor[0][5].Length - 1)], color, 0);
-                                }
-                                else
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[0][0][Util.Random(armor[0][0].Length - 1)], color1, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[0][1][Util.Random(armor[0][1].Length - 1)], color2, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[0][2][Util.Random(armor[0][2].Length - 1)], color3, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[0][3][Util.Random(armor[0][3].Length - 1)], color4, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[0][4][Util.Random(armor[0][4].Length - 1)], color5, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[0][5][Util.Random(armor[0][5].Length - 1)], color6, 0);
-                                }
-                            }
-                            else
-                            {
-                                template.AddNPCEquipment((eInventorySlot)slots[0], armor[0][0][Util.Random(armor[0][0].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[1], armor[0][1][Util.Random(armor[0][1].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[2], armor[0][2][Util.Random(armor[0][2].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[3], armor[0][3][Util.Random(armor[0][3].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[4], armor[0][4][Util.Random(armor[0][4].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[5], armor[0][5][Util.Random(armor[0][5].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "leather":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            if (args.Length > 2)
-                            {
-                                if (args.Length == 3)
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[1][0][Util.Random(armor[1][0].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[1][1][Util.Random(armor[1][1].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[1][2][Util.Random(armor[1][2].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[1][3][Util.Random(armor[1][3].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[1][4][Util.Random(armor[1][4].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[1][5][Util.Random(armor[1][5].Length - 1)], color, 0);
-                                }
-                                else
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[1][0][Util.Random(armor[1][0].Length - 1)], color1, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[1][1][Util.Random(armor[1][1].Length - 1)], color2, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[1][2][Util.Random(armor[1][2].Length - 1)], color3, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[1][3][Util.Random(armor[1][3].Length - 1)], color4, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[1][4][Util.Random(armor[1][4].Length - 1)], color5, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[1][5][Util.Random(armor[1][5].Length - 1)], color6, 0);
-                                }
-                            }
-                            else
-                            {
-                                template.AddNPCEquipment((eInventorySlot)slots[0], armor[1][0][Util.Random(armor[1][0].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[1], armor[1][1][Util.Random(armor[1][1].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[2], armor[1][2][Util.Random(armor[1][2].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[3], armor[1][3][Util.Random(armor[1][3].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[4], armor[1][4][Util.Random(armor[1][4].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[5], armor[1][5][Util.Random(armor[1][5].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "studded":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            if (args.Length > 2)
-                            {
-                                if (args.Length == 3)
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[2][0][Util.Random(armor[2][0].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[2][1][Util.Random(armor[2][1].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[2][2][Util.Random(armor[2][2].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[2][3][Util.Random(armor[2][3].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[2][4][Util.Random(armor[2][4].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[2][5][Util.Random(armor[2][5].Length - 1)], color, 0);
-                                }
-                                else
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[2][0][Util.Random(armor[2][0].Length - 1)], color1, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[2][1][Util.Random(armor[2][1].Length - 1)], color2, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[2][2][Util.Random(armor[2][2].Length - 1)], color3, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[2][3][Util.Random(armor[2][3].Length - 1)], color4, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[2][4][Util.Random(armor[2][4].Length - 1)], color5, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[2][5][Util.Random(armor[2][5].Length - 1)], color6, 0);
-                                }
-                            }
-                            else
-                            {
-                                template.AddNPCEquipment((eInventorySlot)slots[0], armor[2][0][Util.Random(armor[2][0].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[1], armor[2][1][Util.Random(armor[2][1].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[2], armor[2][2][Util.Random(armor[2][2].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[3], armor[2][3][Util.Random(armor[2][3].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[4], armor[2][4][Util.Random(armor[2][4].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[5], armor[2][5][Util.Random(armor[2][5].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "chain":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            if (args.Length > 2)
-                            {
-                                if (args.Length == 3)
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[3][0][Util.Random(armor[3][0].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[3][1][Util.Random(armor[3][1].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[3][2][Util.Random(armor[3][2].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[3][3][Util.Random(armor[3][3].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[3][4][Util.Random(armor[3][4].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[3][5][Util.Random(armor[3][5].Length - 1)], color, 0);
-                                }
-                                else
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[3][0][Util.Random(armor[3][0].Length - 1)], color1, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[3][1][Util.Random(armor[3][1].Length - 1)], color2, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[3][2][Util.Random(armor[3][2].Length - 1)], color3, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[3][3][Util.Random(armor[3][3].Length - 1)], color4, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[3][4][Util.Random(armor[3][4].Length - 1)], color5, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[3][5][Util.Random(armor[3][5].Length - 1)], color6, 0);
-                                }
-                            }
-                            else
-                            {
-                                template.AddNPCEquipment((eInventorySlot)slots[0], armor[3][0][Util.Random(armor[3][0].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[1], armor[3][1][Util.Random(armor[3][1].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[2], armor[3][2][Util.Random(armor[3][2].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[3], armor[3][3][Util.Random(armor[3][3].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[4], armor[3][4][Util.Random(armor[3][4].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[5], armor[3][5][Util.Random(armor[3][5].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "scale":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            if (args.Length > 2)
-                            {
-                                if (args.Length == 3)
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[4][0][Util.Random(armor[4][0].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[4][1][Util.Random(armor[4][1].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[4][2][Util.Random(armor[4][2].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[4][3][Util.Random(armor[4][3].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[4][4][Util.Random(armor[4][4].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[4][5][Util.Random(armor[4][5].Length - 1)], color, 0);
-                                }
-                                else
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[4][0][Util.Random(armor[4][0].Length - 1)], color1, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[4][1][Util.Random(armor[4][1].Length - 1)], color2, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[4][2][Util.Random(armor[4][2].Length - 1)], color3, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[4][3][Util.Random(armor[4][3].Length - 1)], color4, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[4][4][Util.Random(armor[4][4].Length - 1)], color5, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[4][5][Util.Random(armor[4][5].Length - 1)], color6, 0);
-                                }
-                            }
-                            else
-                            {
-                                template.AddNPCEquipment((eInventorySlot)slots[0], armor[4][0][Util.Random(armor[4][0].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[1], armor[4][1][Util.Random(armor[4][1].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[2], armor[4][2][Util.Random(armor[4][2].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[3], armor[4][3][Util.Random(armor[4][3].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[4], armor[4][4][Util.Random(armor[4][4].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[5], armor[4][5][Util.Random(armor[4][5].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "plate":
-                        {
-                            Clear(npc);
-                            template = new GameNpcInventoryTemplate();
-                            if (args.Length > 2)
-                            {
-                                if (args.Length == 3)
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[5][0][Util.Random(armor[5][0].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[5][1][Util.Random(armor[5][1].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[5][2][Util.Random(armor[5][2].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[5][3][Util.Random(armor[5][3].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[5][4][Util.Random(armor[5][4].Length - 1)], color, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[5][5][Util.Random(armor[5][5].Length - 1)], color, 0);
-                                }
-                                else
-                                {
-                                    template.AddNPCEquipment((eInventorySlot)slots[0], armor[5][0][Util.Random(armor[5][0].Length - 1)], color1, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[1], armor[5][1][Util.Random(armor[5][1].Length - 1)], color2, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[2], armor[5][2][Util.Random(armor[5][2].Length - 1)], color3, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[3], armor[5][3][Util.Random(armor[5][3].Length - 1)], color4, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[4], armor[5][4][Util.Random(armor[5][4].Length - 1)], color5, 0);
-                                    template.AddNPCEquipment((eInventorySlot)slots[5], armor[5][5][Util.Random(armor[5][5].Length - 1)], color6, 0);
-                                }
-                            }
-                            else
-                            {
-                                template.AddNPCEquipment((eInventorySlot)slots[0], armor[5][0][Util.Random(armor[5][0].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[1], armor[5][1][Util.Random(armor[5][1].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[2], armor[5][2][Util.Random(armor[5][2].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[3], armor[5][3][Util.Random(armor[5][3].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[4], armor[5][4][Util.Random(armor[5][4].Length - 1)], Util.Random(86), 0);
-                                template.AddNPCEquipment((eInventorySlot)slots[5], armor[5][5][Util.Random(armor[5][5].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (getcloak)
-                                goto case "cloak";
-                            else
-                                break;
-                        }
-                    case "cloak":
-                        {
-                            if (args.Length > 2)
-                            {
-                                template.RemoveNPCEquipment((eInventorySlot)slots[6]);
-                                template.AddNPCEquipment((eInventorySlot)slots[6], cloak[Util.Random(cloak.Length - 1)], color, 0);
-                            }
-                            else
-                            {
-                                template.RemoveNPCEquipment((eInventorySlot)slots[6]);
-                                template.AddNPCEquipment((eInventorySlot)slots[6], cloak[Util.Random(cloak.Length - 1)], Util.Random(86), 0);
-                            }
-                            break;
-                        }
-                    case "equip":
-                        {
-                            if (args.Length > 3)
-                            {
-                                template.RemoveNPCEquipment((eInventorySlot)slots[sloti]);
-                                template.AddNPCEquipment((eInventorySlot)slots[sloti], equip[sloti][Util.Random(equip[sloti].Length - 1)], color, 0);
-                            }
-                            else
-                            {
-                                template.RemoveNPCEquipment((eInventorySlot)slots[sloti]);
-                                template.AddNPCEquipment((eInventorySlot)slots[sloti], equip[sloti][Util.Random(equip[sloti].Length - 1)], Util.Random(86), 0);
-                            }
-                            if (sloti == 7 || sloti == 8)
-                            {
-                                npc.SwitchWeapon(GameLiving.eActiveWeaponSlot.Standard);
-                            }
-                            if (sloti == 9)
-                            {
-                                npc.SwitchWeapon(GameLiving.eActiveWeaponSlot.TwoHanded);
-                            }
-                            if (sloti == 10)
-                            {
-                                npc.SwitchWeapon(GameLiving.eActiveWeaponSlot.Distance);
-                            }
-                            break;
-                        }
-                    case "save":
-                        {
-                            if (args.Length == 3)
-                            {
-                                Save(client, npc, args[2]);
-                                break;
-                            }
-                            if (args.Length == 2)
-                            {
-                                Save(npc);
-                                break;
-                            }
-                            DisplaySyntax(client); break;
-                        }
-                    default: DisplaySyntax(client); break;
-                }
+                template.AddNPCEquipment(eInventorySlot.Cloak, (ushort)ItemModelManager.GetCloakModel("Regular"), GetRandomColor(), 0);
+            }
+
+            if (isRandom)
+            {
+                // Assigns random weapon set with classic template
+                eCharacterClass[] validClasses = {
+                    eCharacterClass.Armsman, eCharacterClass.Mercenary, eCharacterClass.Paladin, eCharacterClass.Cleric, eCharacterClass.Sorcerer, eCharacterClass.Minstrel, eCharacterClass.Theurgist, eCharacterClass.Cabalist, eCharacterClass.Infiltrator, eCharacterClass.Scout, eCharacterClass.Wizard, eCharacterClass.Heretic, eCharacterClass.MaulerAlb,
+                    eCharacterClass.Warrior, eCharacterClass.Shadowblade, eCharacterClass.Skald, eCharacterClass.Berserker, eCharacterClass.Savage, eCharacterClass.Thane, eCharacterClass.Healer, eCharacterClass.Shaman, eCharacterClass.Hunter, eCharacterClass.Runemaster, eCharacterClass.Bonedancer, eCharacterClass.Spiritmaster, eCharacterClass.Warlock, eCharacterClass.Valkyrie, eCharacterClass.MaulerMid,
+                    eCharacterClass.Hero, eCharacterClass.Blademaster, eCharacterClass.Champion, eCharacterClass.Warden, eCharacterClass.Druid, eCharacterClass.Bard, eCharacterClass.Nightshade, eCharacterClass.Ranger, eCharacterClass.Eldritch, eCharacterClass.Enchanter, eCharacterClass.Mentalist, eCharacterClass.Animist, eCharacterClass.Valewalker, eCharacterClass.Vampiir, eCharacterClass.Bainshee, eCharacterClass.MaulerHib
+                };
+                eCharacterClass randomClass = validClasses[Util.Random(validClasses.Length - 1)];
+                ItemModelManager.EquipClassWeapons(npc, template, randomClass, "classic", color);
             }
             else
             {
-                // Epic
-                Clear(npc);
-                template = new GameNpcInventoryTemplate();
-
-                ItemTemplate tgeneric0 = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>(ClasseEpic + "EpicHelm");
-                ItemTemplate tgeneric1 = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>(ClasseEpic + "EpicGloves");
-                ItemTemplate tgeneric2 = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>(ClasseEpic + "EpicArms");
-                ItemTemplate tgeneric3 = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>(ClasseEpic + "EpicVest");
-                ItemTemplate tgeneric4 = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>(ClasseEpic + "EpicLegs");
-                ItemTemplate tgeneric5 = (ItemTemplate)GameServer.Database.FindObjectByKey<ItemTemplate>(ClasseEpic + "EpicBoots");
-
-                if (args.Length > 3)
-                {
-                    if (args.Length == 4)
-                    {
-                        template.AddNPCEquipment((eInventorySlot)slots[0], Convert.ToUInt16(tgeneric0.Model), color, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[1], Convert.ToUInt16(tgeneric1.Model), color, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[2], Convert.ToUInt16(tgeneric2.Model), color, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[3], Convert.ToUInt16(tgeneric3.Model), color, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[4], Convert.ToUInt16(tgeneric4.Model), color, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[5], Convert.ToUInt16(tgeneric5.Model), color, 0);
-                    }
-                    else
-                    {
-                        template.AddNPCEquipment((eInventorySlot)slots[0], Convert.ToUInt16(tgeneric0.Model), color1, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[1], Convert.ToUInt16(tgeneric1.Model), color2, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[2], Convert.ToUInt16(tgeneric2.Model), color3, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[3], Convert.ToUInt16(tgeneric3.Model), color4, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[4], Convert.ToUInt16(tgeneric4.Model), color5, 0);
-                        template.AddNPCEquipment((eInventorySlot)slots[5], Convert.ToUInt16(tgeneric5.Model), color6, 0);
-                    }
-                }
-                else
-                {
-                    template.AddNPCEquipment((eInventorySlot)slots[0], Convert.ToUInt16(tgeneric0.Model), Util.Random(86), 0);
-                    template.AddNPCEquipment((eInventorySlot)slots[1], Convert.ToUInt16(tgeneric1.Model), Util.Random(86), 0);
-                    template.AddNPCEquipment((eInventorySlot)slots[2], Convert.ToUInt16(tgeneric2.Model), Util.Random(86), 0);
-                    template.AddNPCEquipment((eInventorySlot)slots[3], Convert.ToUInt16(tgeneric3.Model), Util.Random(86), 0);
-                    template.AddNPCEquipment((eInventorySlot)slots[4], Convert.ToUInt16(tgeneric4.Model), Util.Random(86), 0);
-                    template.AddNPCEquipment((eInventorySlot)slots[5], Convert.ToUInt16(tgeneric5.Model), Util.Random(86), 0);
-                }
-                if (args.Length > 3)
-                {
-                    template.RemoveNPCEquipment((eInventorySlot)slots[6]);
-                    template.AddNPCEquipment((eInventorySlot)slots[6], cloak[Util.Random(cloak.Length - 1)], color, 0);
-                }
-                else
-                {
-                    template.RemoveNPCEquipment((eInventorySlot)slots[6]);
-                    template.AddNPCEquipment((eInventorySlot)slots[6], cloak[Util.Random(cloak.Length - 1)], Util.Random(86), 0);
-                }
+                npc.Inventory = template;
             }
-            npc.Inventory = template;
+
             npc.BroadcastLivingEquipmentUpdate();
-            return;
         }
 
         private void Clear(GameNPC target)
         {
-            target.Inventory = null;
-            target.EquipmentTemplateID = null;
-        }
-
-        private void Save(GameNPC target)
-        {
-            String tn;
-            do
-            {
-                tn = Guid.NewGuid().ToString();
-            } while (!target.Inventory.SaveIntoDatabase(tn));
-            target.EquipmentTemplateID = tn;
-            target.SaveIntoDatabase();
-        }
-
-        private void Save(GameClient client, GameNPC target, string saveName)
-        {
-            String tn;
-            do
-            {
-                tn = saveName;
-            } while (!target.Inventory.SaveIntoDatabase(tn));
-            target.EquipmentTemplateID = tn;
-            target.SaveIntoDatabase();
-            client.Player.Out.SendMessage("Equipment template saved as: " + saveName, DOL.GS.PacketHandler.eChatType.CT_System, DOL.GS.PacketHandler.eChatLoc.CL_SystemWindow);
+            if (target != null) { target.Inventory = null; target.EquipmentTemplateID = null; }
         }
     }
 }

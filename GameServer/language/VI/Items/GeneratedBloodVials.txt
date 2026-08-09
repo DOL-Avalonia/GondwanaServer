@@ -1,0 +1,43 @@
+
+ROG.BloodVial.Format: Lọ {2} {1}của {0}
+ROG.BloodVial.Format.Sap: Lọ {2} của {0}
+
+ROG.BloodVial.Prefix.Minor: Nhỏ
+ROG.BloodVial.Prefix.Lesser: Kém
+ROG.BloodVial.Prefix.Flimsy: Lỏng
+ROG.BloodVial.Prefix.Average: Thường
+ROG.BloodVial.Prefix.Greater: Lớn
+ROG.BloodVial.Prefix.Major: Cao Cấp
+ROG.BloodVial.Prefix.Superior: Thượng Hạng
+ROG.BloodVial.Prefix.Exceptional: Xuất Sắc
+ROG.BloodVial.Prefix.Legendary: Huyền Thoại
+
+ROG.BloodVial.Type.Blood: Máu
+ROG.BloodVial.Type.ColdBlood: Máu Lạnh
+ROG.BloodVial.Type.RabidBlood: Máu Dại
+ROG.BloodVial.Type.DemonicIchor: Huyết Dịch Ác Quỷ
+ROG.BloodVial.Type.LiquidHellfire: Lửa Địa Ngục Lỏng
+ROG.BloodVial.Type.BoilingDragonblood: Máu Rồng Sôi
+ROG.BloodVial.Type.MineralSlurry: Bùn Khoáng
+ROG.BloodVial.Type.LiquidMagma: Dung Nham Lỏng
+ROG.BloodVial.Type.LiquidFrost: Băng Lỏng
+ROG.BloodVial.Type.PureElementalWater: Nước Nguyên Tố Tinh Khiết
+ROG.BloodVial.Type.CorrosiveAcid: Axit Ăn Mòn
+ROG.BloodVial.Type.Venom: Nọc Độc
+ROG.BloodVial.Type.InsectoidIchor: Huyết Dịch Côn Trùng
+ROG.BloodVial.Type.AcidicSlime: Nhầy Axit
+ROG.BloodVial.Type.FaerieDew: Sương Tiên
+ROG.BloodVial.Type.MachineOil: Dầu Máy
+ROG.BloodVial.Type.MagicalBlood: Máu Ma Thuật
+ROG.BloodVial.Type.StickySap: Nhựa Dính
+ROG.BloodVial.Type.PlantNectar: Mật Hoa
+ROG.BloodVial.Type.SporeExtract: Chiết Xuất Bào Tử
+ROG.BloodVial.Type.DeadlyVenom: Nọc Độc Chết Người
+ROG.BloodVial.Type.PutrefiedBlood: Máu Thối Rữa
+ROG.BloodVial.Type.Ectoplasm: Ngoại Chất
+
+ROG.BloodVial.Type.PaleSap: Nhựa Nhạt
+ROG.BloodVial.Type.AmberResin: Nhựa Hổ Phách
+ROG.BloodVial.Type.GlowingSap: Nhựa Phát Sáng
+ROG.BloodVial.Type.PetrifiedResin: Nhựa Hóa Thạch
+ROG.BloodVial.Type.VoidSap: Nhựa Hư Không

@@ -66,7 +66,7 @@ namespace DOL.GS
     /// </summary>
     public partial class GameNPC : GameLiving, ITranslatableObject
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constant for determining if already at a point
@@ -4285,6 +4285,12 @@ namespace DOL.GS
             if (target == null)
                 return;
 
+            GamePlayer pTarget = target as GamePlayer ?? (target as GameLiving)?.GetPlayerOwner();
+            if (pTarget != null && pTarget.TempProperties.getProperty<bool>("ArenaParticipant", false))
+            {
+                return;
+            }
+
             if (IsReturningHome)
             {
                 IsReturningHome = false;
@@ -4668,6 +4674,13 @@ namespace DOL.GS
 
         public override void TakeDamage(AttackData ad)
         {
+            GamePlayer pAttacker = ad.Attacker as GamePlayer ?? (ad.Attacker as GameLiving)?.GetPlayerOwner();
+            if (pAttacker != null && pAttacker.TempProperties.getProperty<bool>("ArenaParticipant", false))
+            {
+                pAttacker.Out.SendMessage("You cannot attack monsters while in an Arena match.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             // Ablative Shield Interception
             if (IsBoss && BossAblativeShieldMult > 0 && ad.Damage > 0)
             {
@@ -4932,6 +4945,12 @@ namespace DOL.GS
 
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
+            GamePlayer pSource = source as GamePlayer ?? (source as GameLiving)?.GetPlayerOwner();
+            if (pSource != null && pSource.TempProperties.getProperty<bool>("ArenaParticipant", false))
+            {
+                return;
+            }
+
             if (source is GameLiving livingSource)
             {
                 WarnTerritory(livingSource);
@@ -5263,6 +5282,7 @@ namespace DOL.GS
             if (IsObjectGreyCon(killerPlayer, this))
                 return;
 
+            bool canAwardStandard = GamePlayer.TaskSafeguardCheck(killerPlayer, this, "Standard");
             var currentTerritory = TerritoryManager.GetCurrentTerritory(this);
             var rvrTerritory = RvrManager.Instance.GetRvRTerritory(this.CurrentRegionID);
 
@@ -5272,8 +5292,7 @@ namespace DOL.GS
                 {
                     case "DOL.GS.Scripts.MageMob":
                     case "DOL.GS.Scripts.TerritoryGuard":
-                    case "DOL.GS.Scripts.GuardNPC":
-                        if (GvGManager.IsOpen)
+                        if (GvGManager.IsOpen && canAwardStandard)
                         {
                             TaskManager.UpdateTaskProgress(killerPlayer, "KillTerritoryGuards", 1);
                         }
@@ -5281,7 +5300,7 @@ namespace DOL.GS
                     case "DOL.GS.Scripts.TerritoryBoss":
                         if (killerPlayer.Guild != null && killerPlayer.Guild.GuildType == Guild.eGuildType.PlayerGuild)
                         {
-                            if (GvGManager.IsOpen)
+                            if (GvGManager.IsOpen && canAwardStandard)
                             {
                                 TaskManager.UpdateTaskProgress(killerPlayer, "KillTerritoryBoss", 1);
                             }
@@ -5300,31 +5319,34 @@ namespace DOL.GS
                     case "DOL.GS.Scripts.GuardNPC":
                     case "GuardArcher":
                     case "GuardFighter":
-                        TaskManager.UpdateTaskProgress(killerPlayer, "KillKeepGuards", 1);
+                        if (canAwardStandard)
+                            TaskManager.UpdateTaskProgress(killerPlayer, "KillKeepGuards", 1);
                         return;
                 }
             }
             else
             {
-                if (IsDungeonCreature())
+                if (IsDungeonCreature() && canAwardStandard)
                 {
                     TaskManager.UpdateTaskProgress(killerPlayer, "KillCreaturesInDungeons", 1);
                 }
-                else if (IsOutdoorCreature())
+                else if (IsOutdoorCreature() && canAwardStandard)
                 {
                     TaskManager.UpdateTaskProgress(killerPlayer, "KillOutdoorsCreatures", 1);
                 }
             }
-            IncrementBodyTypeTaskPoints(killerPlayer);
 
-            if (IsBoss && !BossTasksIgnored)
+            if (canAwardStandard)
+                IncrementBodyTypeTaskPoints(killerPlayer);
+
+            if (IsBoss && !BossTasksIgnored && GamePlayer.TaskSafeguardCheck(killerPlayer, this, "EpicBossesSlaughtered"))
             {
                 TaskManager.UpdateTaskProgress(killerPlayer, "EpicBossesSlaughtered", 1);
                 killerPlayer.KillsEpicBoss++;
                 GameEventMgr.Notify(GamePlayerEvent.KillsEpicBossChanged, killerPlayer);
             }
 
-            if (killerPlayer.HasAdrenalineBuff())
+            if (killerPlayer.HasAdrenalineBuff() && GamePlayer.TaskSafeguardCheck(killerPlayer, this, "EnemiesKilledInAdrenalineMode"))
             {
                 TaskManager.UpdateTaskProgress(killerPlayer, "EnemiesKilledInAdrenalineMode", 1);
             }
@@ -5333,51 +5355,52 @@ namespace DOL.GS
         private void IncrementBodyTypeTaskPoints(GamePlayer killerPlayer)
         {
             var activeCreatureTypes = TaskCommandHandler.GetActiveCreatureTypes();
+            bool canAwardStandard = GamePlayer.TaskSafeguardCheck(killerPlayer, this, "Standard");
 
             switch ((NpcTemplateMgr.eBodyType)BodyType)
             {
                 case NpcTemplateMgr.eBodyType.Animal:
-                    if (activeCreatureTypes.Contains("KillAnimalCreatures"))
+                    if (activeCreatureTypes.Contains("KillAnimalCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillAnimalCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Demon:
-                    if (activeCreatureTypes.Contains("KillDemonCreatures"))
+                    if (activeCreatureTypes.Contains("KillDemonCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillDemonCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Dragon:
-                    if (activeCreatureTypes.Contains("KillDragonCreatures"))
+                    if (activeCreatureTypes.Contains("KillDragonCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillDragonCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Elemental:
-                    if (activeCreatureTypes.Contains("KillElementalCreatures"))
+                    if (activeCreatureTypes.Contains("KillElementalCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillElementalCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Giant:
-                    if (activeCreatureTypes.Contains("KillGiantCreatures"))
+                    if (activeCreatureTypes.Contains("KillGiantCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillGiantCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Humanoid:
-                    if (activeCreatureTypes.Contains("KillHumanoidCreatures"))
+                    if (activeCreatureTypes.Contains("KillHumanoidCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillHumanoidCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Insect:
-                    if (activeCreatureTypes.Contains("KillInsectCreatures"))
+                    if (activeCreatureTypes.Contains("KillInsectCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillInsectCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Magical:
-                    if (activeCreatureTypes.Contains("KillMagicalCreatures"))
+                    if (activeCreatureTypes.Contains("KillMagicalCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillMagicalCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Reptile:
-                    if (activeCreatureTypes.Contains("KillReptileCreatures"))
+                    if (activeCreatureTypes.Contains("KillReptileCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillReptileCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Plant:
-                    if (activeCreatureTypes.Contains("KillPlantCreatures"))
+                    if (activeCreatureTypes.Contains("KillPlantCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillPlantCreatures", 1);
                     break;
                 case NpcTemplateMgr.eBodyType.Undead:
-                    if (activeCreatureTypes.Contains("KillUndeadCreatures"))
+                    if (activeCreatureTypes.Contains("KillUndeadCreatures") && canAwardStandard)
                         TaskManager.UpdateTaskProgress(killerPlayer, "KillUndeadCreatures", 1);
                     break;
                 default:
@@ -5940,7 +5963,8 @@ namespace DOL.GS
 
                     if (lootTemplate is ItemUnique)
                     {
-                        GameServer.Database.AddObject(lootTemplate);
+                        if (!lootTemplate.IsPersisted)
+                            GameServer.Database.AddObject(lootTemplate);
                         invitem = GameInventoryItem.Create(lootTemplate as ItemUnique);
                     }
                     else

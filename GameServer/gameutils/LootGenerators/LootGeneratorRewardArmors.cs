@@ -55,13 +55,13 @@ namespace DOL.GS.Scripts
                                 Realm = generatedItem.Realm
                             };
 
-                            List<ArmorPatternMgr.PatternType> validPatterns = new List<ArmorPatternMgr.PatternType>();
+                            List<PatternType> validPatterns = new List<PatternType>();
 
-                            foreach (ArmorPatternMgr.PatternType pt in Enum.GetValues(typeof(ArmorPatternMgr.PatternType)))
+                            foreach (PatternType pt in Enum.GetValues(typeof(PatternType)))
                             {
-                                if (pt == ArmorPatternMgr.PatternType.None) continue;
+                                if (pt == PatternType.None) continue;
 
-                                if (ArmorPatternMgr.GetModel(pt, dummyItem) != -1)
+                                if (ItemModelManager.GetPatternModelForTargetItem(pt.ToString(), dummyItem) != -1)
                                 {
                                     validPatterns.Add(pt);
                                 }
@@ -69,8 +69,8 @@ namespace DOL.GS.Scripts
 
                             if (validPatterns.Count > 0)
                             {
-                                ArmorPatternMgr.PatternType chosenPattern = validPatterns[Util.Random(0, validPatterns.Count - 1)];
-                                generatedItem.Model = ArmorPatternMgr.GetModel(chosenPattern, dummyItem);
+                                PatternType chosenPattern = validPatterns[Util.Random(0, validPatterns.Count - 1)];
+                                generatedItem.Model = ItemModelManager.GetPatternModelForTargetItem(chosenPattern.ToString(), dummyItem);
                             }
                         }
 

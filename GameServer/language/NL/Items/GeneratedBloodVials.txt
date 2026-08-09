@@ -1,0 +1,43 @@
+
+ROG.BloodVial.Format: Flesje met {1}{2} van {0}
+ROG.BloodVial.Format.Sap: Flesje met {2} van {0}
+
+ROG.BloodVial.Prefix.Minor: Gering
+ROG.BloodVial.Prefix.Lesser: Minderwaardig
+ROG.BloodVial.Prefix.Flimsy: Dun
+ROG.BloodVial.Prefix.Average: Gemiddeld
+ROG.BloodVial.Prefix.Greater: Groter
+ROG.BloodVial.Prefix.Major: Zwaar
+ROG.BloodVial.Prefix.Superior: Superieur
+ROG.BloodVial.Prefix.Exceptional: Uitzonderlijk
+ROG.BloodVial.Prefix.Legendary: Legendarisch
+
+ROG.BloodVial.Type.Blood: Bloed
+ROG.BloodVial.Type.ColdBlood: Koud Bloed
+ROG.BloodVial.Type.RabidBlood: Hondsdol Bloed
+ROG.BloodVial.Type.DemonicIchor: Demonisch Ichor
+ROG.BloodVial.Type.LiquidHellfire: Vloeibaar Hellevuur
+ROG.BloodVial.Type.BoilingDragonblood: Kokend Drakenbloed
+ROG.BloodVial.Type.MineralSlurry: Minerale Modder
+ROG.BloodVial.Type.LiquidMagma: Vloeibaar Magma
+ROG.BloodVial.Type.LiquidFrost: Vloeibare Vorst
+ROG.BloodVial.Type.PureElementalWater: Puur Elementair Water
+ROG.BloodVial.Type.CorrosiveAcid: Corrosief Zuur
+ROG.BloodVial.Type.Venom: Venijn
+ROG.BloodVial.Type.InsectoidIchor: Insectoïde Ichor
+ROG.BloodVial.Type.AcidicSlime: Zuur Slijm
+ROG.BloodVial.Type.FaerieDew: Feeëndauw
+ROG.BloodVial.Type.MachineOil: Machineolie
+ROG.BloodVial.Type.MagicalBlood: Magisch Bloed
+ROG.BloodVial.Type.StickySap: Kleverig Sap
+ROG.BloodVial.Type.PlantNectar: Plantennectar
+ROG.BloodVial.Type.SporeExtract: Sporenextract
+ROG.BloodVial.Type.DeadlyVenom: Dodelijk Venijn
+ROG.BloodVial.Type.PutrefiedBlood: Verrot Bloed
+ROG.BloodVial.Type.Ectoplasm: Ectoplasma
+
+ROG.BloodVial.Type.PaleSap: Bleek Sap
+ROG.BloodVial.Type.AmberResin: Barnsteenhars
+ROG.BloodVial.Type.GlowingSap: Gloeiend Sap
+ROG.BloodVial.Type.PetrifiedResin: Versteend Hars
+ROG.BloodVial.Type.VoidSap: Leegtesap

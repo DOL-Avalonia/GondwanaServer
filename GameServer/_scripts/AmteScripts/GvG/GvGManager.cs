@@ -10,6 +10,7 @@ namespace DOL.GS.Scripts
     public static class GvGManager
     {
         public static bool ForceOpen = false;
+        public static bool DebugMode = false;
         public static event Action OnGvGStatusChanged;
 
         private static bool _isOpen;
@@ -26,17 +27,38 @@ namespace DOL.GS.Scripts
             }
         }
 
-        // Timer to check the schedule every 60 seconds
+        // Timer to check the schedule
         private static System.Timers.Timer _gvgTimer;
+
+        // Debug mode internal trackers
+        private static DateTime _debugPhaseStartTime;
+        private static bool _debugNextPhaseOpen = false;
 
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
             DateTime parisTime = GetParisTime();
             _isOpen = (parisTime.Hour >= 10);
-            _gvgTimer = new System.Timers.Timer(60000);
+            _gvgTimer = new System.Timers.Timer(20000);
             _gvgTimer.Elapsed += (s, ev) => EvaluateSchedule();
             _gvgTimer.Start();
+        }
+
+        public static void ToggleDebugMode()
+        {
+            DebugMode = !DebugMode;
+            if (DebugMode)
+            {
+                _debugNextPhaseOpen = true;
+                _debugPhaseStartTime = DateTime.UtcNow;
+                _isOpen = false;
+                EvaluateSchedule();
+            }
+            else
+            {
+                ForceOpen = false;
+                EvaluateSchedule();
+            }
         }
 
         public static DateTime GetParisTime()
@@ -56,6 +78,32 @@ namespace DOL.GS.Scripts
 
         public static void EvaluateSchedule()
         {
+            if (DebugMode)
+            {
+                DateTime now = DateTime.UtcNow;
+                if (_isOpen)
+                {
+                    if ((now - _debugPhaseStartTime).TotalMinutes >= 5)
+                    {
+                        _isOpen = false;
+                        _debugPhaseStartTime = now;
+                        OnGvGStatusChanged?.Invoke();
+                    }
+                }
+                else
+                {
+                    if (_debugNextPhaseOpen || (now - _debugPhaseStartTime).TotalMinutes >= 2)
+                    {
+                        _isOpen = true;
+                        _debugNextPhaseOpen = false;
+                        _debugPhaseStartTime = now;
+                        OnGvGStatusChanged?.Invoke();
+                        AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();
+                    }
+                }
+                return;
+            }
+
             if (ForceOpen)
             {
                 if (!_isOpen)
@@ -89,7 +137,7 @@ namespace DOL.GS.Scripts
             if (territory.Type == Territory.eType.Subterritory)
                 return true;
 
-            if (ForceOpen)
+            if (ForceOpen || DebugMode)
                 return true;
 
             if (!IsOpen)

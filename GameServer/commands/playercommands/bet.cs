@@ -15,7 +15,7 @@ namespace DOL.GS.Commands
         ePrivLevel.Player,
         "Place a bet on an active Arena match during the betting phase.",
         "/bet list - List active teams and the pool",
-        "/bet <1 or 2> <gold amount> (Example: /bet 1 500 to bet 500 gold on Team 1)")]
+        "/bet <Team1 or Team2> <gold amount> (Example: /bet 1 500 to bet 500 gold on Team 1)")]
     public class BetCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)

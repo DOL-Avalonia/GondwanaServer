@@ -475,7 +475,7 @@ namespace DOL.GS.ServerRules
                 {
                     if (attInArena != defInArena)
                     {
-                        if (!quiet) MessageToLiving(attacker, "You cannot interfere with Arena participants.");
+                        if (!quiet && attacker is GamePlayer) MessageToLiving(attacker, "You cannot interfere with Arena participants.");
                         return false;
                     }
 

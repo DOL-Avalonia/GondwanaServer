@@ -2114,15 +2114,28 @@ namespace DOL.GS
                         {
                             if (ad.Attacker is GamePlayer)
                             {
-                                string hitWeapon = "weapon";
-                                if (weapon != null)
-                                    hitWeapon = GlobalConstants.NameToShortName(weapon.Name);
                                 if (broadcast)
+                                {
                                     foreach (GamePlayer player in ad.Attacker.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                                     {
+                                        string hitWeapon = "weapon";
+                                        if (weapon != null)
+                                        {
+                                            if (weapon.Name.StartsWith("[ROG]"))
+                                            {
+                                                string lang = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+                                                hitWeapon = LanguageMgr.GetItemNameMessage(lang, weapon.Name);
+                                            }
+                                            else
+                                            {
+                                                hitWeapon = GlobalConstants.NameToShortName(weapon.Name);
+                                            }
+                                        }
+
                                         message = string.Format("{0} attacks {1} with {2} {3}!", player.GetPersonalizedName(ad.Attacker), player.GetPersonalizedName(ad.Target), ad.Attacker.GetPronoun(1, false), hitWeapon);
                                         player.MessageFromArea(ad.Attacker, message, eChatType.CT_OthersCombat, eChatLoc.CL_SystemWindow);
                                     }
+                                }
                             }
                             else
                             {
@@ -2391,7 +2404,7 @@ namespace DOL.GS
         /// </summary>
         public virtual int SpellInterruptDuration
         {
-            get { return ServerProperties.Properties.SPELL_INTERRUPT_DURATION; }
+            get { return Properties.SPELL_INTERRUPT_DURATION; }
         }
 
         /// <summary>
@@ -2399,7 +2412,7 @@ namespace DOL.GS
         /// </summary>
         public virtual int SpellInterruptRecastTime
         {
-            get { return ServerProperties.Properties.SPELL_INTERRUPT_RECAST; }
+            get { return Properties.SPELL_INTERRUPT_RECAST; }
         }
 
         /// <summary>
@@ -2407,7 +2420,7 @@ namespace DOL.GS
         /// </summary>
         public virtual int SpellInterruptRecastAgain
         {
-            get { return ServerProperties.Properties.SPELL_INTERRUPT_AGAIN; }
+            get { return Properties.SPELL_INTERRUPT_AGAIN; }
         }
 
         /// <summary>
@@ -7535,6 +7548,97 @@ namespace DOL.GS
             get { return m_groupIndex; }
             set { m_groupIndex = value; }
         }
+        #endregion
+
+        #region Task Safeguards
+
+        /// <summary>
+        /// Helper to evaluate task point attribution safeguards based on group sizes and con levels
+        /// </summary>
+        public static bool TaskSafeguardCheck(GamePlayer player, GameLiving enemy, string taskName, bool isArena = false)
+        {
+            if (player == null || enemy == null) return false;
+
+            if (taskName != "EnemyKilledInDuel")
+            {
+                if (!player.IsWithinRadius(enemy, 3800))
+                    return false;
+            }
+
+            int groupSize = 1;
+            GamePlayer highestLevelPlayer = player;
+
+            if (player.Group != null)
+            {
+                groupSize = player.Group.MemberCount;
+                foreach (GamePlayer member in player.Group.GetPlayersInTheGroup())
+                {
+                    if (member.Level > highestLevelPlayer.Level)
+                        highestLevelPlayer = member;
+                }
+            }
+
+            // Tiers: 0 = Grey/Green, 1 = Blue, 2 = Yellow, 3 = Orange/Red/Purple
+            int groupConTier = 0;
+            int soloConTier = 0;
+
+            if (enemy is GamePlayer)
+            {
+                // PvP: Use Level Difference, exactly like the Adrenaline/Tension system.
+                int groupDiff = enemy.EffectiveLevel - highestLevelPlayer.EffectiveLevel;
+                int soloDiff = enemy.EffectiveLevel - player.EffectiveLevel;
+
+                groupConTier = groupDiff <= -5 ? 0 : (groupDiff <= -2 ? 1 : (groupDiff <= 2 ? 2 : 3));
+                soloConTier = soloDiff <= -5 ? 0 : (soloDiff <= -2 ? 1 : (soloDiff <= 2 ? 2 : 3));
+            }
+            else
+            {
+                // PvE: player.GetConLevel(enemy) returns a double.
+                // Decimals like -1.5 (Blue) are cleanly caught by evaluating the exact threshold.
+                double groupCon = highestLevelPlayer.GetConLevel(enemy);
+                groupConTier = groupCon >= 0.01 ? 3 : (groupCon >= -0.99 ? 2 : (groupCon >= -1.99 ? 1 : 0));
+
+                double soloCon = player.GetConLevel(enemy);
+                soloConTier = soloCon >= 0.01 ? 3 : (soloCon >= -0.99 ? 2 : (soloCon >= -1.99 ? 1 : 0));
+            }
+
+            bool isBattlegroup = player.BattleGroup != null;
+
+            if (taskName == "EnemyKilledInDuel")
+            {
+                if (isArena) return true;
+                return soloConTier >= 1; // Blue+
+            }
+
+            if (taskName == "EnemiesKilledInAdrenalineMode")
+            {
+                if (isBattlegroup)
+                {
+                    if (player.Group != null && groupSize >= 4) return groupConTier >= 3; // Orange+
+                    return groupConTier >= 2; // Yellow+
+                }
+                else
+                {
+                    if (groupSize >= 2 && groupSize <= 8) return groupConTier >= 2; // Yellow+
+                    return soloConTier >= 1; // Blue+
+                }
+            }
+
+            if (taskName == "EpicBossesSlaughtered")
+            {
+                if (groupSize >= 5 && groupSize <= 8) return groupConTier >= 3; // Orange+
+                if (groupSize >= 2 && groupSize <= 4) return groupConTier >= 2; // Yellow+
+                return soloConTier >= 1; // Blue+
+            }
+
+            if (isBattlegroup) return false;
+            if (isArena) return true;
+
+            if (groupSize >= 5 && groupSize <= 8) return groupConTier >= 3; // Orange+
+            if (groupSize >= 2 && groupSize <= 4) return groupConTier >= 2; // Yellow+
+            return soloConTier >= 1; // Blue+
+        }
+
         #endregion
 
         public bool IsDamned

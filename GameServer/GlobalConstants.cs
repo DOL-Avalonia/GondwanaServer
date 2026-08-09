@@ -1457,6 +1457,18 @@ namespace DOL.GS
 
         public static string NameToShortName(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return name;
+
+            if (name.StartsWith("[ROG]"))
+            {
+                string[] parts = name.Split('|');
+                if (parts.Length > 0)
+                {
+                    name = parts[parts.Length - 1];
+                }
+            }
+
             string[] values = name.Trim().ToLower().Split(' ');
             for (int i = 0; i < values.Length; i++)
             {

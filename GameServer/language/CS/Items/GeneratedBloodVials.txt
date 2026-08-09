@@ -1,0 +1,43 @@
+
+ROG.BloodVial.Format: Lahvička: {1}{2} z {0}
+ROG.BloodVial.Format.Sap: Lahvička: {2} z {0}
+
+ROG.BloodVial.Prefix.Minor: Menší
+ROG.BloodVial.Prefix.Lesser: Slabší
+ROG.BloodVial.Prefix.Flimsy: Řídký
+ROG.BloodVial.Prefix.Average: Běžný
+ROG.BloodVial.Prefix.Greater: Větší
+ROG.BloodVial.Prefix.Major: Velký
+ROG.BloodVial.Prefix.Superior: Prvotřídní
+ROG.BloodVial.Prefix.Exceptional: Výjimečný
+ROG.BloodVial.Prefix.Legendary: Legendární
+
+ROG.BloodVial.Type.Blood: Krev
+ROG.BloodVial.Type.ColdBlood: Chladná krev
+ROG.BloodVial.Type.RabidBlood: Vzteklá krev
+ROG.BloodVial.Type.DemonicIchor: Démonický ichor
+ROG.BloodVial.Type.LiquidHellfire: Tekutý pekelný oheň
+ROG.BloodVial.Type.BoilingDragonblood: Vroucí dračí krev
+ROG.BloodVial.Type.MineralSlurry: Minerální kal
+ROG.BloodVial.Type.LiquidMagma: Tekuté magma
+ROG.BloodVial.Type.LiquidFrost: Tekutý mráz
+ROG.BloodVial.Type.PureElementalWater: Čistá elementární voda
+ROG.BloodVial.Type.CorrosiveAcid: Žíravá kyselina
+ROG.BloodVial.Type.Venom: Jed
+ROG.BloodVial.Type.InsectoidIchor: Hmyzí ichor
+ROG.BloodVial.Type.AcidicSlime: Kyselý sliz
+ROG.BloodVial.Type.FaerieDew: Vílí rosa
+ROG.BloodVial.Type.MachineOil: Strojní olej
+ROG.BloodVial.Type.MagicalBlood: Magická krev
+ROG.BloodVial.Type.StickySap: Lepivá míza
+ROG.BloodVial.Type.PlantNectar: Rostlinný nektar
+ROG.BloodVial.Type.SporeExtract: Výtažek ze spor
+ROG.BloodVial.Type.DeadlyVenom: Smrtící jed
+ROG.BloodVial.Type.PutrefiedBlood: Hnijící krev
+ROG.BloodVial.Type.Ectoplasm: Ektoplazma
+
+ROG.BloodVial.Type.PaleSap: Světlá míza
+ROG.BloodVial.Type.AmberResin: Jantarová pryskyřice
+ROG.BloodVial.Type.GlowingSap: Zářící míza
+ROG.BloodVial.Type.PetrifiedResin: Zkamenělá pryskyřice
+ROG.BloodVial.Type.VoidSap: Míza prázdnoty

@@ -98,6 +98,7 @@ namespace AmteScripts.Managers
             GameEventMgr.AddHandler(GamePlayerEvent.Linkdeath, OnPlayerQuitOrRegionChange);
             GameEventMgr.AddHandler(GamePlayerEvent.RegionChanged, OnPlayerQuitOrRegionChange);
             GameEventMgr.AddHandler(GameLivingEvent.Dying, OnPlayerDying);
+            GameEventMgr.AddHandler(GamePlayerEvent.Revive, OnPlayerRevive);
         }
 
         public void Start()
@@ -482,11 +483,18 @@ namespace AmteScripts.Managers
                         dbPlayer.GuildID = p.GuildID ?? "";
                         dbPlayer.GuildRank = p.GuildRank != null ? p.GuildRank.RankLevel : 9;
 
-                        dbPlayer.OldX = p.Coordinate.X;
-                        dbPlayer.OldY = p.Coordinate.Y;
-                        dbPlayer.OldZ = p.Coordinate.Z;
-                        dbPlayer.OldHeading = p.Heading;
-                        dbPlayer.OldRegion = p.CurrentRegionID;
+                        // Generate a random distance (50 to 300 units) and a random heading and calculate the offset Vector and apply it to the ArenaMaster's coordinates
+                        int randDist = Util.Random(50, 200);
+                        int randHeading = Util.Random(0, 4095);
+                        Vector offset = Vector.Create(Angle.Heading(randHeading), randDist, 0);
+                        Coordinate returnCoord = session.ArenaMaster.Coordinate + offset;
+
+                        // Save the new calculated coordinates so the player returns near the ArenaMaster
+                        dbPlayer.OldX = returnCoord.X;
+                        dbPlayer.OldY = returnCoord.Y;
+                        dbPlayer.OldZ = session.ArenaMaster.Coordinate.Z;
+                        dbPlayer.OldHeading = randHeading;
+                        dbPlayer.OldRegion = session.ArenaMaster.CurrentRegionID;
 
                         dbPlayer.OldBindX = p.BindPosition.Coordinate.X;
                         dbPlayer.OldBindY = p.BindPosition.Coordinate.Y;
@@ -562,7 +570,7 @@ namespace AmteScripts.Managers
             BroadcastToParticipants(session, $"{roundMsg} : {session.CurrentTeamA.TeamName} vs {session.CurrentTeamB.TeamName}", true);
             
             BroadcastRegion(session.RegionID, $"=== ARENA MATCH: [1] {session.CurrentTeamA.TeamName} vs [2] {session.CurrentTeamB.TeamName} ===", eChatType.CT_Important);
-            BroadcastRegion(session.RegionID, $"Betting is open for 45 seconds! Use /bet <1 or 2> <gold>!", eChatType.CT_System);
+            BroadcastRegion(session.RegionID, $"Betting is open for 45 seconds! Use /bet <Team1 or Team2> <gold>!", eChatType.CT_System);
             BroadcastSoundToParticipants(session, 9205);
 
             // Teleport and root (visible)
@@ -586,13 +594,24 @@ namespace AmteScripts.Managers
                 BroadcastRegionLog(session.RegionID, $"{roundName} Winner : {winner.TeamName}");
                 ResolveBets(session, winner);
 
-                foreach (var p in loser.Members) ClearParticipant(p, loser);
+                foreach (var p in loser.Members)
+                {
+                    if (p != null)
+                    {
+                        p.TempProperties.removeProperty("ArenaMatchDead");
+                        if (!p.IsAlive) p.Release(GamePlayer.eReleaseType.Arena, true);
+                        p.Health = p.MaxHealth; p.Mana = p.MaxMana; p.Endurance = p.MaxEndurance;
+                        p.MoveTo(session.ArenaMaster.Position);
+                        ClearParticipant(p, loser);
+                    }
+                }
+
                 foreach (var p in winner.Members)
                 {
                     if (p != null)
                     {
                         p.TempProperties.removeProperty("ArenaMatchDead");
-                        if (!p.IsAlive) { p.Health = p.MaxHealth; p.Out.SendPlayerRevive(p); p.Out.SendUpdatePoints(); }
+                        if (!p.IsAlive) p.Release(GamePlayer.eReleaseType.Arena, true);
                         p.Health = p.MaxHealth; p.Mana = p.MaxMana; p.Endurance = p.MaxEndurance;
                         p.MoveTo(session.ArenaMaster.Position);
                         SetWaitState(p, true, false);
@@ -614,8 +633,18 @@ namespace AmteScripts.Managers
 
             GiveRewards(session, winner);
 
-            foreach (var p in winner.Members) ClearParticipant(p, winner);
-            
+            foreach (var p in winner.Members)
+            {
+                if (p != null)
+                {
+                    p.TempProperties.removeProperty("ArenaMatchDead");
+                    if (!p.IsAlive) p.Release(GamePlayer.eReleaseType.Arena, true);
+                    p.Health = p.MaxHealth; p.Mana = p.MaxMana; p.Endurance = p.MaxEndurance;
+                    p.MoveTo(session.ArenaMaster.Position);
+                    ClearParticipant(p, winner);
+                }
+            }
+
             session.State = eArenaState.Cooldown;
             int cdMins = Properties.ARENA_COOLDOWN_MINUTES > 0 ? Properties.ARENA_COOLDOWN_MINUTES : 60;
             session.NextStateTime = WorldMgr.GetRegion(session.RegionID).Time + (cdMins * 60 * 1000);
@@ -641,6 +670,14 @@ namespace AmteScripts.Managers
                         p.Out.SendSoundEffect(soundId, p.Position, 0);
                     }
                 }
+            }
+        }
+
+        private static void OnPlayerRevive(DOLEvent e, object sender, EventArgs args)
+        {
+            if (sender is GamePlayer p && p.TempProperties.getProperty<bool>(ARENA_PARTICIPANT_PROP, false))
+            {
+                p.TempProperties.removeProperty("ArenaMatchDead");
             }
         }
 
@@ -806,9 +843,14 @@ namespace AmteScripts.Managers
                 {
                     if (p.Client != null && p.Client.IsPlaying && p.CurrentRegionID == session.RegionID)
                         p.Out.SendMessage($"Your team has been disqualified: {reason}", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                    p.TempProperties.removeProperty("ArenaMatchDead");
+                    if (!p.IsAlive) p.Release(GamePlayer.eReleaseType.Arena, true);
+                    p.Health = p.MaxHealth; p.Mana = p.MaxMana; p.Endurance = p.MaxEndurance;
+                    p.MoveTo(session.ArenaMaster.Position);
+
                     ClearParticipant(p, team);
                     p.TempProperties.setProperty("ArenaMatchDead", true);
-                    p.MoveTo(session.ArenaMaster.Position);
                 }
             }
 
@@ -834,12 +876,51 @@ namespace AmteScripts.Managers
                 RefundBets(session);
             }
 
-            foreach (var p in session.SoloQueue) ClearParticipant(p, null);
-            foreach (var g in session.GroupQueue) foreach (var p in g.GetPlayersInTheGroup()) ClearParticipant(p, null);
-            foreach (var t in session.ActiveTeams) foreach (var p in t.Members) ClearParticipant(p, t);
-            foreach (var t in session.NextRoundTeams) foreach (var p in t.Members) ClearParticipant(p, t);
-            if (session.CurrentTeamA != null) foreach (var p in session.CurrentTeamA.Members) ClearParticipant(p, session.CurrentTeamA);
-            if (session.CurrentTeamB != null) foreach (var p in session.CurrentTeamB.Members) ClearParticipant(p, session.CurrentTeamB);
+            HashSet<GamePlayer> processed = new HashSet<GamePlayer>();
+
+            foreach (var p in session.SoloQueue)
+            {
+                if (p != null && processed.Add(p))
+                    ClearParticipant(p, null);
+            }
+            foreach (var g in session.GroupQueue)
+            {
+                foreach (var p in g.GetPlayersInTheGroup())
+                {
+                    if (p != null && processed.Add(p))
+                        ClearParticipant(p, null);
+                }
+            }
+
+            var allTeams = new List<ArenaTeam>(session.ActiveTeams);
+            allTeams.AddRange(session.NextRoundTeams);
+            if (session.CurrentTeamA != null) allTeams.Add(session.CurrentTeamA);
+            if (session.CurrentTeamB != null) allTeams.Add(session.CurrentTeamB);
+
+            foreach (var t in allTeams)
+            {
+                foreach (var p in t.Members)
+                {
+                    if (p != null && processed.Add(p))
+                    {
+                        if (p.TempProperties.getProperty<bool>(ARENA_PARTICIPANT_PROP, false))
+                        {
+                            p.TempProperties.removeProperty("ArenaMatchDead");
+                            if (!p.IsAlive)
+                                p.Release(GamePlayer.eReleaseType.Arena, true);
+
+                            p.Health = p.MaxHealth;
+                            p.Mana = p.MaxMana;
+                            p.Endurance = p.MaxEndurance;
+
+                            if (session.ArenaMaster != null && p.CurrentRegionID == session.RegionID)
+                                p.MoveTo(session.ArenaMaster.Position);
+                        }
+
+                        ClearParticipant(p, t);
+                    }
+                }
+            }
 
             session.SoloQueue.Clear(); session.GroupQueue.Clear(); session.ActiveTeams.Clear();
             session.NextRoundTeams.Clear(); session.Bracket.Clear(); session.CurrentTeamA = null; session.CurrentTeamB = null;
@@ -881,7 +962,14 @@ namespace AmteScripts.Managers
                 p.TempProperties.setProperty(ARENA_WAITING_PROP, true);
                 p.StopCurrentSpellcast();
                 p.StopAttack();
-                if (!visible) p.Stealth(true);
+                if (!visible)
+                {
+                    p.Stealth(true);
+                }
+                else
+                {
+                    p.Stealth(false);
+                }
             }
             else
             {
@@ -1162,14 +1250,16 @@ namespace AmteScripts.Managers
                 isNew = true;
             }
 
-            dbPlayer.GuildID = p.GuildID ?? "";
-            dbPlayer.GuildRank = p.GuildRank != null ? p.GuildRank.RankLevel : 9;
+            int randDist = Util.Random(50, 200);
+            int randHeading = Util.Random(0, 4095);
+            Vector offset = Vector.Create(Angle.Heading(randHeading), randDist, 0);
+            Coordinate returnCoord = session.ArenaMaster.Coordinate + offset;
 
-            dbPlayer.OldX = p.Coordinate.X;
-            dbPlayer.OldY = p.Coordinate.Y;
-            dbPlayer.OldZ = p.Coordinate.Z;
-            dbPlayer.OldHeading = p.Heading;
-            dbPlayer.OldRegion = p.CurrentRegionID;
+            dbPlayer.OldX = returnCoord.X;
+            dbPlayer.OldY = returnCoord.Y;
+            dbPlayer.OldZ = session.ArenaMaster.Coordinate.Z;
+            dbPlayer.OldHeading = randHeading;
+            dbPlayer.OldRegion = session.ArenaMaster.CurrentRegionID;
 
             dbPlayer.OldBindX = p.BindPosition.Coordinate.X;
             dbPlayer.OldBindY = p.BindPosition.Coordinate.Y;

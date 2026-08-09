@@ -1,0 +1,43 @@
+
+ROG.BloodVial.Format: Phiole mit {1}{2} von {0}
+ROG.BloodVial.Format.Sap: Phiole mit {2} von {0}
+
+ROG.BloodVial.Prefix.Minor: Schwachem
+ROG.BloodVial.Prefix.Lesser: Geringem
+ROG.BloodVial.Prefix.Flimsy: Dünnem
+ROG.BloodVial.Prefix.Average: Normalem
+ROG.BloodVial.Prefix.Greater: Großem
+ROG.BloodVial.Prefix.Major: Mächtigem
+ROG.BloodVial.Prefix.Superior: Überlegenem
+ROG.BloodVial.Prefix.Exceptional: Außergewöhnlichem
+ROG.BloodVial.Prefix.Legendary: Legendärem
+
+ROG.BloodVial.Type.Blood: Blut
+ROG.BloodVial.Type.ColdBlood: Kaltem Blut
+ROG.BloodVial.Type.RabidBlood: Tollwütigem Blut
+ROG.BloodVial.Type.DemonicIchor: Dämonenblut
+ROG.BloodVial.Type.LiquidHellfire: Flüssigem Höllenfeuer
+ROG.BloodVial.Type.BoilingDragonblood: Kochendem Drachenblut
+ROG.BloodVial.Type.MineralSlurry: Mineralschlamm
+ROG.BloodVial.Type.LiquidMagma: Flüssigem Magma
+ROG.BloodVial.Type.LiquidFrost: Flüssigem Frost
+ROG.BloodVial.Type.PureElementalWater: Reinem Elementarwasser
+ROG.BloodVial.Type.CorrosiveAcid: Ätzender Säure
+ROG.BloodVial.Type.Venom: Gift
+ROG.BloodVial.Type.InsectoidIchor: Insektensekret
+ROG.BloodVial.Type.AcidicSlime: Saurem Schleim
+ROG.BloodVial.Type.FaerieDew: Feentau
+ROG.BloodVial.Type.MachineOil: Maschinenöl
+ROG.BloodVial.Type.MagicalBlood: Magischem Blut
+ROG.BloodVial.Type.StickySap: Klebrigem Saft
+ROG.BloodVial.Type.PlantNectar: Pflanzennektar
+ROG.BloodVial.Type.SporeExtract: Sporenextrakt
+ROG.BloodVial.Type.DeadlyVenom: Tödlichem Gift
+ROG.BloodVial.Type.PutrefiedBlood: Verfaultem Blut
+ROG.BloodVial.Type.Ectoplasm: Ektoplasma
+
+ROG.BloodVial.Type.PaleSap: Blassem Saft
+ROG.BloodVial.Type.AmberResin: Bernsteinharz
+ROG.BloodVial.Type.GlowingSap: Leuchtendem Saft
+ROG.BloodVial.Type.PetrifiedResin: Versteinertem Harz
+ROG.BloodVial.Type.VoidSap: Leeren-Saft

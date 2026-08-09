@@ -1,0 +1,43 @@
+
+ROG.BloodVial.Format: Fiala di {2} {1}di {0}
+ROG.BloodVial.Format.Sap: Fiala di {2} di {0}
+
+ROG.BloodVial.Prefix.Minor: Minore
+ROG.BloodVial.Prefix.Lesser: Inferiore
+ROG.BloodVial.Prefix.Flimsy: Fragile
+ROG.BloodVial.Prefix.Average: Medio
+ROG.BloodVial.Prefix.Greater: Maggiore
+ROG.BloodVial.Prefix.Major: Grande
+ROG.BloodVial.Prefix.Superior: Superiore
+ROG.BloodVial.Prefix.Exceptional: Eccezionale
+ROG.BloodVial.Prefix.Legendary: Leggendario
+
+ROG.BloodVial.Type.Blood: Sangue
+ROG.BloodVial.Type.ColdBlood: Sangue Freddo
+ROG.BloodVial.Type.RabidBlood: Sangue Infetto
+ROG.BloodVial.Type.DemonicIchor: Icore Demoniaco
+ROG.BloodVial.Type.LiquidHellfire: Fuoco Infernale Liquido
+ROG.BloodVial.Type.BoilingDragonblood: Sangue di Drago Bollente
+ROG.BloodVial.Type.MineralSlurry: Fango Minerale
+ROG.BloodVial.Type.LiquidMagma: Magma Liquido
+ROG.BloodVial.Type.LiquidFrost: Gelo Liquido
+ROG.BloodVial.Type.PureElementalWater: Acqua Elementale Pura
+ROG.BloodVial.Type.CorrosiveAcid: Acido Corrosivo
+ROG.BloodVial.Type.Venom: Veleno
+ROG.BloodVial.Type.InsectoidIchor: Icore Insettoide
+ROG.BloodVial.Type.AcidicSlime: Bava Acida
+ROG.BloodVial.Type.FaerieDew: Rugiada Fatata
+ROG.BloodVial.Type.MachineOil: Olio per Macchine
+ROG.BloodVial.Type.MagicalBlood: Sangue Magico
+ROG.BloodVial.Type.StickySap: Linfa Appiccicosa
+ROG.BloodVial.Type.PlantNectar: Nettare di Pianta
+ROG.BloodVial.Type.SporeExtract: Estratto di Spora
+ROG.BloodVial.Type.DeadlyVenom: Veleno Mortale
+ROG.BloodVial.Type.PutrefiedBlood: Sangue Putrefatto
+ROG.BloodVial.Type.Ectoplasm: Ectoplasma
+
+ROG.BloodVial.Type.PaleSap: Linfa Pallida
+ROG.BloodVial.Type.AmberResin: Resina d'Ambra
+ROG.BloodVial.Type.GlowingSap: Linfa Luminescente
+ROG.BloodVial.Type.PetrifiedResin: Resina Pietrificata
+ROG.BloodVial.Type.VoidSap: Linfa del Vuoto

@@ -1580,34 +1580,14 @@ namespace DOL.GS
         /// </summary>
         public enum eReleaseType
         {
-            /// <summary>
-            /// Normal release to the bind point using /release command and 10sec delay after death
-            /// </summary>
             Normal,
-            /// <summary>
-            /// Release to the players home city
-            /// </summary>
             City,
-            /// <summary>
-            /// Release to the current location
-            /// </summary>
             Duel,
-            /// <summary>
-            /// Release to your bind point
-            /// </summary>
             Bind,
-            /// <summary>
-            /// Release in a battleground or the frontiers
-            /// </summary>
             RvR,
-            /// <summary>
-            /// Release to players house
-            /// </summary>
             House,
-            /// <summary>
-            /// Release To Jail
-            /// </summary>
-            Jail
+            Jail,
+            Arena
         }
 
         /// <summary>
@@ -1661,6 +1641,13 @@ namespace DOL.GS
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Release.CantReleaseDuel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
+
+                if (m_releaseType == eReleaseType.Arena)
+                {
+                    Out.SendMessage("You cannot release during an Arena Contest. You will be automatically resurrected at the end of the round.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+
                 m_releaseType = releaseCommand;
                 // we use realtime, because timer window is realtime
                 var diff = m_deathTick - GameTimer.GetTickCount() + RELEASE_MINIMUM_WAIT * 1000;
@@ -1709,6 +1696,7 @@ namespace DOL.GS
             switch (m_releaseType)
             {
                 case eReleaseType.Duel:
+                case eReleaseType.Arena:
                     {
                         releasePosition = character.GetPosition().With(Angle.Degrees(180));
                         break;
@@ -7477,6 +7465,7 @@ namespace DOL.GS
             base.SendAttackingCombatMessages(ad);
             GameObject target = ad.Target;
             InventoryItem weapon = ad.Weapon;
+
             if (ad.Target is GameNPC)
             {
                 switch (ad.AttackResult)
@@ -7511,22 +7500,31 @@ namespace DOL.GS
 
                         string hitWeapon = "";
 
-                        switch (Client.Account.Language)
+                        if (weapon != null)
                         {
-                            case "DE":
-                                if (weapon != null)
-                                    hitWeapon = weapon.Name;
-                                break;
-                            default:
-                                if (weapon != null)
-                                    hitWeapon = GlobalConstants.NameToShortName(weapon.Name);
-                                break;
+                            if (weapon.Name.StartsWith("[ROG]"))
+                            {
+                                string lang = Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+                                hitWeapon = LanguageMgr.GetItemNameMessage(lang, weapon.Name);
+                            }
+                            else
+                            {
+                                switch (Client?.Account?.Language)
+                                {
+                                    case "DE":
+                                        hitWeapon = weapon.Name;
+                                        break;
+                                    default:
+                                        hitWeapon = GlobalConstants.NameToShortName(weapon.Name);
+                                        break;
+                                }
+                            }
                         }
 
                         if (hitWeapon.Length > 0)
-                            hitWeapon = " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.WithYour") + " " + hitWeapon;
+                            hitWeapon = " " + LanguageMgr.GetTranslation(Client!.Account.Language, "GameObjects.GamePlayer.Attack.WithYour") + " " + hitWeapon;
 
-                        string attackTypeMsg = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.YouAttack");
+                        string attackTypeMsg = LanguageMgr.GetTranslation(Client!.Account.Language, "GameObjects.GamePlayer.Attack.YouAttack");
                         if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
                             attackTypeMsg = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.YouShot");
 
@@ -7583,22 +7581,31 @@ namespace DOL.GS
 
                         string hitWeapon = "";
 
-                        switch (Client.Account.Language)
+                        if (weapon != null)
                         {
-                            case "DE":
-                                if (weapon != null)
-                                    hitWeapon = weapon.Name;
-                                break;
-                            default:
-                                if (weapon != null)
-                                    hitWeapon = GlobalConstants.NameToShortName(weapon.Name);
-                                break;
+                            if (weapon.Name.StartsWith("[ROG]"))
+                            {
+                                string lang = Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+                                hitWeapon = LanguageMgr.GetItemNameMessage(lang, weapon.Name);
+                            }
+                            else
+                            {
+                                switch (Client?.Account?.Language)
+                                {
+                                    case "DE":
+                                        hitWeapon = weapon.Name;
+                                        break;
+                                    default:
+                                        hitWeapon = GlobalConstants.NameToShortName(weapon.Name);
+                                        break;
+                                }
+                            }
                         }
 
                         if (hitWeapon.Length > 0)
-                            hitWeapon = " " + LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.WithYour") + " " + hitWeapon;
+                            hitWeapon = " " + LanguageMgr.GetTranslation(Client!.Account.Language, "GameObjects.GamePlayer.Attack.WithYour") + " " + hitWeapon;
 
-                        string attackTypeMsg = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.YouAttack");
+                        string attackTypeMsg = LanguageMgr.GetTranslation(Client!.Account.Language, "GameObjects.GamePlayer.Attack.YouAttack");
                         if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
                             attackTypeMsg = LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Attack.YouShot");
 
@@ -9239,6 +9246,9 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual bool CheckIfLostConstitution(GameObject killer)
         {
+            if (TempProperties.getProperty<bool>("ArenaParticipant", false))
+                return false;
+
             GameNPC mob = killer as GameNPC;
             if (mob == null)
                 return !IsInPvP && !IsInRvR;
@@ -9707,10 +9717,16 @@ namespace DOL.GS
             else
                 location = CurrentZone?.Description;
 
+            bool isArena = TempProperties.getProperty<bool>("ArenaParticipant", false);
             if (killer == null)
             {
                 LastKiller = null;
-                if (realmDeath)
+                if (isArena)
+                {
+                    m_releaseType = eReleaseType.Arena;
+                    publicMessage = "GameObjects.GamePlayer.Die.KilledBy";
+                }
+                else if (realmDeath)
                 {
                     publicMessage = "GameObjects.GamePlayer.Die.KilledLocation";
                 }
@@ -9728,6 +9744,12 @@ namespace DOL.GS
                     deathWasDuel = true;
                     messageDistance = WorldMgr.YELL_DISTANCE;
                     publicMessage = "GameObjects.GamePlayer.Die.DuelDefeated";
+                }
+                else if (isArena)
+                {
+                    m_releaseType = eReleaseType.Arena;
+                    messageDistance = WorldMgr.YELL_DISTANCE;
+                    publicMessage = "GameObjects.GamePlayer.Die.KilledBy";
                 }
                 else
                 {
@@ -10118,12 +10140,19 @@ namespace DOL.GS
                 m_releasePhase = 0;
                 m_deathTick = GameTimer.GetTickCount(); // we use realtime, because timer window is realtime
 
-                Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "System.ReleaseTimer"), (m_automaticRelease ? RELEASE_MINIMUM_WAIT : RELEASE_TIME));
-                m_releaseTimer = new RegionTimer(this);
-                m_releaseTimer.Callback = new RegionTimerCallback(ReleaseTimerCallback);
-                m_releaseTimer.Start(1000);
+                if (m_releaseType == eReleaseType.Arena)
+                {
+                    Out.SendMessage("You have been defeated! You will be automatically resurrected when the match progresses.", eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
+                }
+                else
+                {
+                    Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "System.ReleaseTimer"), (m_automaticRelease ? RELEASE_MINIMUM_WAIT : RELEASE_TIME));
+                    m_releaseTimer = new RegionTimer(this);
+                    m_releaseTimer.Callback = new RegionTimerCallback(ReleaseTimerCallback);
+                    m_releaseTimer.Start(1000);
 
-                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.ReleaseToReturn"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.ReleaseToReturn"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
+                }
 
                 // clear target object so no more actions can used on this target, spells, styles, attacks...
                 TargetObject = null;
@@ -10160,7 +10189,7 @@ namespace DOL.GS
                             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.DeadRVR"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
                             xpLossPercent = 0;
                             m_deathtype = eDeathType.PvP;
-                            if (Properties.PVP_DEATH_CON_LOSS && CheckIfLostConstitution(killer))
+                            if (Properties.PVP_DEATH_CON_LOSS && CheckIfLostConstitution(killer) && m_releaseType != eReleaseType.Arena)
                             {
                                 conpenalty = 3;
                                 TempProperties.setProperty(DEATH_CONSTITUTION_LOSS_PROPERTY, conpenalty);
@@ -10171,7 +10200,7 @@ namespace DOL.GS
                 }
                 else
                 {
-                    if (Level >= Properties.PVE_EXP_LOSS_LEVEL)
+                    if (Level >= Properties.PVE_EXP_LOSS_LEVEL && m_releaseType != eReleaseType.Arena)
                     {
                         Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.LoseExperience"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
                         // if this is the first death in level, you lose only half the penalty
@@ -10191,7 +10220,7 @@ namespace DOL.GS
                         m_deathtype = eDeathType.PvE;
                     }
 
-                    if (Level >= Properties.PVE_CON_LOSS_LEVEL && CheckIfLostConstitution(killer))
+                    if (Level >= Properties.PVE_CON_LOSS_LEVEL && CheckIfLostConstitution(killer) && m_releaseType != eReleaseType.Arena)
                     {
                         int conLoss = DeathCount;
                         if (conLoss > 3)
@@ -10201,7 +10230,7 @@ namespace DOL.GS
                         TempProperties.setProperty(DEATH_CONSTITUTION_LOSS_PROPERTY, conLoss);
                     }
                 }
-                if (xpLossPercent > 0)
+                if (xpLossPercent > 0 && m_releaseType != eReleaseType.Arena)
                 {
                     int modifier = GetModified(eProperty.DeathExpLoss);
                     xpLossPercent = (int)Math.Round(xpLossPercent * modifier / 100.0);
@@ -10239,7 +10268,7 @@ namespace DOL.GS
             // deal out exp and realm points based on server rules
             // no other way to keep correct message order...
             GameServer.ServerRules.OnPlayerKilled(this, killer);
-            if (m_releaseType != eReleaseType.Duel)
+            if (m_releaseType != eReleaseType.Duel || m_releaseType != eReleaseType.Arena)
                 DeathTime = PlayedTime;
 
             IsSwimming = false;
@@ -10448,6 +10477,8 @@ namespace DOL.GS
             {
                 return;
             }
+
+            LootGeneratorBloodVials.HandlePlayerVialLoot(killer, this);
 
             long now = DateTimeOffset.Now.ToUnixTimeSeconds();
             if (Reputation < 0 && now - m_lastHeadDropTime >= Properties.PLAYER_HEAD_DROP_COOLDOWN_SECONDS)
@@ -12427,7 +12458,10 @@ namespace DOL.GS
                                 newDbItem.SlotPosition = startSlot + i;
                                 newDbItem.OwnerID = vault.GetOwner(this);
 
-                                GameServer.Database.AddObject(newDbItem);
+                                if (!newDbItem.IsPersisted)
+                                    GameServer.Database.AddObject(newDbItem);
+                                else
+                                    GameServer.Database.SaveObject(newDbItem);
 
                                 updatedItems[newDbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = newDbItem;
                                 usedSlots[i] = true;
@@ -12552,7 +12586,7 @@ namespace DOL.GS
                                 newDbItem.SlotPosition = startSlot + i;
                                 newDbItem.OwnerID = vault.GetOwner(this);
 
-                                if (string.IsNullOrEmpty(newDbItem.ObjectId))
+                                if (!newDbItem.IsPersisted)
                                     GameServer.Database.AddObject(newDbItem);
                                 else
                                     GameServer.Database.SaveObject(newDbItem);
