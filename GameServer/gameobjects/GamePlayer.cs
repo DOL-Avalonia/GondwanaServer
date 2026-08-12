@@ -4963,24 +4963,8 @@ namespace DOL.GS
                 // RVR POPULATION BONUSES
                 if (this.IsInRvR)
                 {
-                    int rvrPop = 0;
-                    int albPop = 0;
-                    int midPop = 0;
-                    int hibPop = 0;
+                    WorldMgr.GetRvRPopulation(out int rvrPop, out int albPop, out int midPop, out int hibPop);
 
-                    foreach (GameClient client in WorldMgr.GetAllPlayingClients())
-                    {
-                        if (client.Player != null && client.Player.IsInRvR)
-                        {
-                            rvrPop++;
-                            switch (client.Player.Realm)
-                            {
-                                case eRealm.Albion: albPop++; break;
-                                case eRealm.Midgard: midPop++; break;
-                                case eRealm.Hibernia: hibPop++; break;
-                            }
-                        }
-                    }
                     if (rvrPop >= 0 && rvrPop < 21)
                     {
                         if (rvrPop <= 5) lowPopBonusPercent = 15;
@@ -5132,24 +5116,7 @@ namespace DOL.GS
 
             if (this.IsInRvR)
             {
-                int rvrPop = 0;
-                int albPop = 0;
-                int midPop = 0;
-                int hibPop = 0;
-
-                foreach (GameClient client in WorldMgr.GetAllPlayingClients())
-                {
-                    if (client.Player != null && client.Player.IsInRvR)
-                    {
-                        rvrPop++;
-                        switch (client.Player.Realm)
-                        {
-                            case eRealm.Albion: albPop++; break;
-                            case eRealm.Midgard: midPop++; break;
-                            case eRealm.Hibernia: hibPop++; break;
-                        }
-                    }
-                }
+                WorldMgr.GetRvRPopulation(out int rvrPop, out int albPop, out int midPop, out int hibPop);
 
                 if (rvrPop >= 0 && rvrPop < 21)
                 {
@@ -5986,7 +5953,7 @@ namespace DOL.GS
 
             if (xpSource == eXPSource.NPC || xpSource == eXPSource.EventNPC)
             {
-                int playerCount = WorldMgr.GetAllClients().Count;
+                int playerCount = WorldMgr.GetAllPlayingClientsCount();
 
                 if (playerCount <= 5)
                 {
@@ -6401,12 +6368,12 @@ namespace DOL.GS
             this.RefreshQuestNPCs();
             
             // Level up pets and subpets
-            if (DOL.GS.ServerProperties.Properties.PET_LEVELS_WITH_OWNER &&
+            if (Properties.PET_LEVELS_WITH_OWNER &&
                 ControlledBrain is ControlledNpcBrain brain && brain.Body is GamePet pet)
             {
                 if (pet.SetPetLevel())
                 {
-                    if (DOL.GS.ServerProperties.Properties.PET_SCALE_SPELL_MAX_LEVEL > 0 && pet.Spells.Count > 0)
+                    if (Properties.PET_SCALE_SPELL_MAX_LEVEL > 0 && pet.Spells.Count > 0)
                         pet.SortSpells();
 
                     brain.UpdatePetWindow();
@@ -6417,7 +6384,7 @@ namespace DOL.GS
                     foreach (ABrain subBrain in pet.ControlledNpcList)
                         if (subBrain != null && subBrain.Body is GamePet subPet)
                             if (subPet.SetPetLevel()) // Levels up subpet
-                                if (DOL.GS.ServerProperties.Properties.PET_SCALE_SPELL_MAX_LEVEL > 0)
+                                if (Properties.PET_SCALE_SPELL_MAX_LEVEL > 0)
                                     subPet.SortSpells();
             }
 
@@ -9793,13 +9760,19 @@ namespace DOL.GS
 
                 void UpdateKillTaskProgress()
                 {
-                    string task = killerPlayer.Group != null ? "KillEnemyPlayersGroup" : "KillEnemyPlayersAlone";
-                    TaskManager.UpdateTaskProgress(killerPlayer, task, 1);
+                    if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "Standard"))
+                    {
+                        string task = killerPlayer.Group != null ? "KillEnemyPlayersGroup" : "KillEnemyPlayersAlone";
+                        TaskManager.UpdateTaskProgress(killerPlayer, task, 1);
+                    }
                 }
 
                 if (!IsInRvR && !IsInPvP && !IsInPvPArea() && Reputation < 0 && canAwardTaskPoints)
                 {
-                    TaskManager.UpdateTaskProgress(killerPlayer, "OutlawPlayersSentToJail", 1);
+                    if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "Standard"))
+                    {
+                        TaskManager.UpdateTaskProgress(killerPlayer, "OutlawPlayersSentToJail", 1);
+                    }
                 }
 
                 // Check if the dying player is near a territory relic
@@ -9819,11 +9792,14 @@ namespace DOL.GS
 
                 if (isAssassination && canAwardTaskPoints && Reputation >= 0)
                 {
-                    var taskData = killerPlayer.TaskXPlayer ?? TaskManager.EnsureTaskData(killerPlayer);
-                    if (taskData != null)
+                    if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "Standard"))
                     {
-                        taskData.AssassinationKillsStats++;
-                        GameServer.Database.SaveObject(taskData);
+                        var taskData = killerPlayer.TaskXPlayer ?? TaskManager.EnsureTaskData(killerPlayer);
+                        if (taskData != null)
+                        {
+                            taskData.AssassinationKillsStats++;
+                            GameServer.Database.SaveObject(taskData);
+                        }
                     }
                 }
 
@@ -9847,7 +9823,10 @@ namespace DOL.GS
 
                 if (killerPlayer.HasAdrenalineBuff() && canAwardTaskPoints)
                 {
-                    TaskManager.UpdateTaskProgress(killerPlayer, "EnemiesKilledInAdrenalineMode", 1);
+                    if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "EnemiesKilledInAdrenalineMode"))
+                    {
+                        TaskManager.UpdateTaskProgress(killerPlayer, "EnemiesKilledInAdrenalineMode", 1);
+                    }
                 }
 
                 if (canAwardTaskPoints)
@@ -9855,10 +9834,13 @@ namespace DOL.GS
                     // 1. Standard /duel command logic
                     if (deathWasDuel)
                     {
-                        TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
+                        if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "EnemyKilledInDuel"))
+                            TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
+                            
                         if (!IsInRvR && !IsInPvP && !IsInPvPArea())
                         {
-                            TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
+                            if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "Standard"))
+                                TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
                         }
                     }
                     // 2. Arena Contest Logic
@@ -9869,11 +9851,13 @@ namespace DOL.GS
                         {
                             if (session.Mode == ArenaManager.eArenaMode.Solo)
                             {
-                                TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
+                                if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "EnemyKilledInDuel", true))
+                                    TaskManager.UpdateTaskProgress(killerPlayer, "EnemyKilledInDuel", 1);
 
                                 if (!IsInRvR && !IsInPvP && !IsInPvPArea())
                                 {
-                                    TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
+                                    if (GameLiving.TaskSafeguardCheck(killerPlayer, this, "Standard", true))
+                                        TaskManager.UpdateTaskProgress(killerPlayer, "KillEnemyPlayersAlone", 1);
                                 }
                             }
                             else if (session.CurrentTeamA != null && session.CurrentTeamB != null)
@@ -9890,11 +9874,13 @@ namespace DOL.GS
                                         {
                                             if (winningMember != null)
                                             {
-                                                TaskManager.UpdateTaskProgress(winningMember, "EnemyKilledInDuel", 1);
+                                                if (GameLiving.TaskSafeguardCheck(winningMember, this, "EnemyKilledInDuel", true))
+                                                    TaskManager.UpdateTaskProgress(winningMember, "EnemyKilledInDuel", 1);
 
                                                 if (!IsInRvR && !IsInPvP && !IsInPvPArea())
                                                 {
-                                                    TaskManager.UpdateTaskProgress(winningMember, "KillEnemyPlayersGroup", 1);
+                                                    if (GameLiving.TaskSafeguardCheck(winningMember, this, "Standard", true))
+                                                        TaskManager.UpdateTaskProgress(winningMember, "KillEnemyPlayersGroup", 1);
                                                 }
                                             }
                                         }
@@ -10499,7 +10485,6 @@ namespace DOL.GS
             }
         }
 
-
         public override void EnemyKilled(GameLiving enemy)
         {
             if (Group != null)
@@ -10526,7 +10511,6 @@ namespace DOL.GS
 
             base.EnemyKilled(enemy);
         }
-
 
         /// <summary>
         /// Check this flag to see wether this living is involved in combat

@@ -18,7 +18,7 @@ namespace DOL.GS.Commands
        "'/ngg cloak [color] [category]' Add a cloak (Categories: ToA, Class, Regular, Guard, Realm, Otherworldly, Special)",
        "'/ngg mask [maskType] [color]' Apply a specific mask to the head slot",
        "'/ngg epic [class] [color] [DF]' create the class epic set (armor+wep+cloak) to the NPC",
-       "'/ngg weapon [class] [template] [color]' create a class weapon set to the NPC (templates: epic, epicdf, classic)",
+       "'/ngg weapon [class] [template] [color]' create a class weapon set to the NPC (templates: epic, epicdf, classic, toa, pict, lab, scorchedlab, dragonsworn, dragonslayer)",
        "'/ngg equip [slotNumber] [color]' Add a random equipement to the NPC slot",
        "'/ngg colors' Display all available armor colors and IDs",
        "'/ngg save' Save the template and NPC to database",
@@ -185,8 +185,16 @@ namespace DOL.GS.Commands
                 }
 
                 string wTemplate = "epic"; // default
-                if (args.Any(a => a.Equals("epicdf", StringComparison.OrdinalIgnoreCase))) wTemplate = "epicdf";
-                else if (args.Any(a => a.Equals("classic", StringComparison.OrdinalIgnoreCase))) wTemplate = "classic";
+                string[] validTemplates = { "epic", "epicdf", "classic", "toa", "pict", "lab", "scorchedlab", "scortchedlab", "dragonsworn", "dragonslayer" };
+                foreach (string arg in args)
+                {
+                    if (validTemplates.Contains(arg.ToLower()))
+                    {
+                        wTemplate = arg.ToLower();
+                        if (wTemplate == "scortchedlab") wTemplate = "scorchedlab";
+                        break;
+                    }
+                }
 
                 // Clean the weapon slots first to avoid overlap issues
                 template.RemoveNPCEquipment(eInventorySlot.RightHandWeapon);

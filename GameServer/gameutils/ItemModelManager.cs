@@ -8,7 +8,7 @@ namespace DOL.GS
     // Added all class patterns to the enum
     public enum PatternType
     {
-        None, Possessed, Good, Corrupt, Minotaur, Oceanus, Stygia, Volcanus, Aerus,
+        None, Possessed, Good, Corrupt, Minotaur, Oceanus, Stygia, Volcanus, Aerus, Symbol, Labyrinth, ScorchedLab,
         ClassAnimist, ClassArmsman, ClassBainshee, ClassBard, ClassBerserker, ClassBlademaster,
         ClassBonedancer, ClassCabalist, ClassChampion, ClassCleric, ClassDruid, ClassEldritch,
         ClassEnchanter, ClassFriar, ClassHealer, ClassHeretic, ClassHero, ClassHunter,
@@ -132,7 +132,12 @@ namespace DOL.GS
             { "Oceanus_Armor_pattern", PatternType.Oceanus },
             { "Stygia_Armor_pattern", PatternType.Stygia },
             { "Volcanus_Armor_pattern", PatternType.Volcanus },
-            { "Aerus_Armor_pattern", PatternType.Aerus }
+            { "Aerus_Armor_pattern", PatternType.Aerus },
+            { "Volcanus_Weapon_pattern", PatternType.Volcanus },
+            { "Aerus_Weapon_pattern", PatternType.Aerus },
+            { "Symbol_Weapon_pattern", PatternType.Symbol },
+            { "Labyrinth_Weapon_pattern", PatternType.Labyrinth },
+            { "ScorchedLab_Weapon_pattern", PatternType.ScorchedLab }
         };
 
         private static readonly Dictionary<eCharacterClass, int[]> Epic1H = new Dictionary<eCharacterClass, int[]>();
@@ -288,9 +293,257 @@ namespace DOL.GS
             }
         }
 
+        public static bool IsMageClass(eCharacterClass cClass)
+        {
+            switch (cClass)
+            {
+                case eCharacterClass.Cabalist: case eCharacterClass.Necromancer: case eCharacterClass.Occultist:
+                case eCharacterClass.Sorcerer: case eCharacterClass.Theurgist: case eCharacterClass.Wizard:
+                case eCharacterClass.Bonedancer: case eCharacterClass.Runemaster: case eCharacterClass.Spiritmaster:
+                case eCharacterClass.Warlock: case eCharacterClass.Eldritch: case eCharacterClass.Enchanter:
+                case eCharacterClass.Mentalist: case eCharacterClass.Animist: case eCharacterClass.Bainshee:
+                case eCharacterClass.Acolyte: case eCharacterClass.Disciple: case eCharacterClass.Elementalist:
+                case eCharacterClass.Mage: case eCharacterClass.Mystic: case eCharacterClass.Seer:
+                case eCharacterClass.Magician: case eCharacterClass.Forester:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static int GetWeaponTemplateModel(string template, eObjectType type, int hand, eDamageType dmg, eRealm realm, eCharacterClass cClass)
+        {
+            template = template.ToLower();
+            bool isOffhand = (hand == 2);
+            bool is2H = (hand == 1) && (type == eObjectType.TwoHandedWeapon || type == eObjectType.PolearmWeapon || type == eObjectType.Spear || type == eObjectType.CelticSpear || type == eObjectType.Scythe || type == eObjectType.LargeWeapons || type == eObjectType.Staff || type == eObjectType.MaulerStaff);
+
+            if (template == "toa")
+            {
+                if (type == eObjectType.Shield)
+                {
+                    int sz = GetMaxShieldSizeFromClass(cClass);
+                    if (sz == 1) return new[] { 2200, 2210, 2218, 1663 }[Util.Random(3)];
+                    if (sz == 2) return new[] { 2201, 2211, 2219, 1664 }[Util.Random(3)];
+                    return new[] { 2202, 2212, 2220, 1665 }[Util.Random(3)];
+                }
+
+                switch (type)
+                {
+                    case eObjectType.CrushingWeapon:
+                    case eObjectType.Hammer:
+                    case eObjectType.Blunt:
+                        if (is2H) return new[] { 2113, 2206, 2567, 2215, 3449, 3448 }[Util.Random(6)];
+                        return new[] { 1671, 1672, 2205, 2214, 2198, 3447, 3453 }[Util.Random(7)];
+                    case eObjectType.SlashingWeapon:
+                    case eObjectType.Sword:
+                    case eObjectType.Blades:
+                        if (is2H) return new[] { 2204, 2208, 2196 }[Util.Random(3)];
+                        return new[] { 2112, 2195, 2203, 2209 }[Util.Random(4)];
+                    case eObjectType.Axe:
+                    case eObjectType.LeftAxe:
+                        if (is2H) return new[] { 2217, 2110, 3452 }[Util.Random(3)];
+                        return new[] { 2109, 2216, 3451 }[Util.Random(3)];
+                    case eObjectType.ThrustWeapon:
+                    case eObjectType.Piercing:
+                        if (is2H) return new[] { 1660, 1661, 1662, 2191 }[Util.Random(4)];
+                        return new[] { 1668, 1669, 2190, 2467, 2468, 1807 }[Util.Random(6)];
+                    case eObjectType.HandToHand:
+                        return Util.Chance(50) ? 2190 : 2197;
+                    case eObjectType.Flexible:
+                        return Util.Chance(50) ? 2119 : 2132;
+                    case eObjectType.MaulerStaff:
+                        return 1659;
+                    case eObjectType.Staff:
+                        return new[] { 1658, 2199, 1659 }[Util.Random(3)];
+                    case eObjectType.PolearmWeapon:
+                    case eObjectType.Spear:
+                    case eObjectType.CelticSpear:
+                        return new[] { 1660, 1661, 1662, 2191 }[Util.Random(4)];
+                    case eObjectType.TwoHandedWeapon:
+                    case eObjectType.LargeWeapons:
+                        if (dmg == eDamageType.Slash) return new[] { 2204, 2208, 2196 }[Util.Random(3)];
+                        if (dmg == eDamageType.Crush) return new[] { 2113, 2206, 2567, 2215, 3449, 3448 }[Util.Random(6)];
+                        return new[] { 1660, 1661, 1662, 2191 }[Util.Random(4)];
+                    case eObjectType.Scythe:
+                        return new[] { 2213, 2111, 3450 }[Util.Random(3)];
+                    case eObjectType.Longbow:
+                    case eObjectType.RecurvedBow:
+                    case eObjectType.CompositeBow:
+                    case eObjectType.Fired:
+                        return new[] { 2207, 3243, 3365 }[Util.Random(3)];
+                    case eObjectType.FistWraps:
+                        return 3575;
+                    case eObjectType.Crossbow:
+                        return 1964;
+                    case eObjectType.Instrument:
+                        return new[] { 2114, 2115, 2116, 2117 }[Util.Random(4)];
+                }
+            }
+            else if (template == "aerus" || template == "volcanus" || template == "symbol" || template == "aerusweapons" || template == "volcanusweapons" || template == "symbolweapons")
+            {
+                bool isAerus = template.Contains("aerus");
+                bool isVolc = template.Contains("volcanus");
+                bool isSym = template.Contains("symbol");
+
+                if (type == eObjectType.Shield)
+                {
+                    int sz = GetMaxShieldSizeFromClass(cClass);
+                    if (isAerus) return sz == 1 ? 2210 : sz == 2 ? 2211 : 2212;
+                    if (isVolc) return sz == 1 ? 2218 : sz == 2 ? 2219 : 2220;
+                    if (isSym) return sz == 1 ? 2200 : sz == 2 ? 2201 : 2202;
+                }
+
+                switch (type)
+                {
+                    case eObjectType.CrushingWeapon:
+                    case eObjectType.Hammer:
+                    case eObjectType.Blunt:
+                        if (is2H) return isAerus ? (realm == eRealm.Midgard ? 2567 : 2206) : (isVolc ? 2215 : 3448);
+                        return isAerus ? 2205 : (isVolc ? 2214 : 2198);
+                    case eObjectType.SlashingWeapon:
+                    case eObjectType.Sword:
+                    case eObjectType.Blades:
+                        if (is2H) return isAerus ? 2204 : (isVolc ? 2208 : 2196);
+                        return isAerus ? (Util.Chance(50) ? 2203 : 2209) : (isVolc ? 2112 : 2195);
+                    case eObjectType.Axe:
+                    case eObjectType.LeftAxe:
+                        if (is2H) return isAerus ? 2110 : (isVolc ? 2217 : 3452);
+                        return isAerus ? 2109 : (isVolc ? 2216 : 2109);
+                    case eObjectType.ThrustWeapon:
+                    case eObjectType.Piercing:
+                        if (is2H) return isAerus ? 1662 : (isVolc ? 1661 : 1660);
+                        return isAerus ? 2190 : (isVolc ? 1668 : 2468);
+                    case eObjectType.HandToHand:
+                        return isSym ? 2197 : 2190;
+                    case eObjectType.Flexible:
+                        return isVolc ? 2132 : 2119;
+                    case eObjectType.MaulerStaff:
+                        return 1659;
+                    case eObjectType.Staff:
+                        return isAerus ? 1658 : (isVolc ? 1659 : 2199);
+                    case eObjectType.PolearmWeapon:
+                    case eObjectType.Spear:
+                    case eObjectType.CelticSpear:
+                        return isAerus ? 1662 : (isVolc ? 1661 : 1660);
+                    case eObjectType.TwoHandedWeapon:
+                    case eObjectType.LargeWeapons:
+                        if (dmg == eDamageType.Slash) return isAerus ? 2204 : (isVolc ? 2208 : 2196);
+                        if (dmg == eDamageType.Crush) return isAerus ? (realm == eRealm.Midgard ? 2567 : 2206) : (isVolc ? 2215 : 3448);
+                        return isAerus ? 1662 : (isVolc ? 1661 : 1660);
+                    case eObjectType.Scythe:
+                        return isAerus ? 2111 : (isVolc ? 2213 : 3450);
+                    case eObjectType.Longbow:
+                    case eObjectType.RecurvedBow:
+                    case eObjectType.CompositeBow:
+                    case eObjectType.Fired:
+                        return isAerus ? 2207 : (isVolc ? 3365 : 3243);
+                    case eObjectType.FistWraps:
+                        return 3575;
+                    case eObjectType.Crossbow:
+                        return 1964;
+                    case eObjectType.Instrument:
+                        return new[] { 2114, 2115, 2116, 2117 }[Util.Random(4)];
+                }
+            }
+
+            int b = 0;
+            bool isGroupA = false;
+            if (template.Contains("lab") && !template.Contains("scorched") && !template.Contains("scortched")) { b = 3653; isGroupA = true; }
+            else if (template.Contains("scorched") || template.Contains("scortched")) { b = 3696; isGroupA = true; }
+            else if (template.Contains("pict")) { b = 4278; }
+            else if (template.Contains("dragonsworn")) { b = 3813; }
+            else if (template.Contains("dragonslayer")) {
+                if (realm == eRealm.Hibernia) b = 3873;
+                else if (realm == eRealm.Midgard) b = 3914;
+                else b = 3950;
+            }
+
+            if (b > 0)
+            {
+                int offset = -1;
+                switch (type)
+                {
+                    case eObjectType.Flexible:
+                        if (isGroupA) {
+                            if (dmg == eDamageType.Slash) offset = 1;
+                            else if (dmg == eDamageType.Thrust) offset = 2;
+                            else offset = 0; // Blunt
+                        } else {
+                            if (dmg == eDamageType.Slash) offset = 1;
+                            else if (dmg == eDamageType.Crush) offset = 2;
+                            else offset = 0; // Thrust
+                        }
+                        break;
+                    case eObjectType.Crossbow: offset = 3; break;
+                    case eObjectType.TwoHandedWeapon:
+                    case eObjectType.LargeWeapons:
+                        if (dmg == eDamageType.Thrust) offset = 4;
+                        else if (dmg == eDamageType.Slash) offset = 5;
+                        else offset = 8;
+                        break;
+                    case eObjectType.Spear:
+                    case eObjectType.CelticSpear:
+                        offset = (dmg == eDamageType.Thrust) ? 6 : 7;
+                        break;
+                    case eObjectType.Hammer:
+                    case eObjectType.CrushingWeapon:
+                    case eObjectType.Blunt:
+                        if (is2H) offset = 8;
+                        else offset = isOffhand ? 23 : 24;
+                        break;
+                    case eObjectType.Axe:
+                    case eObjectType.LeftAxe:
+                        if (is2H) offset = 9;
+                        else offset = isOffhand ? 27 : 28;
+                        break;
+                    case eObjectType.Longbow:
+                    case eObjectType.CompositeBow:
+                    case eObjectType.RecurvedBow: offset = 10; break;
+                    case eObjectType.Fired: offset = 11; break; // Short bow
+                    case eObjectType.Scythe: offset = 12; break;
+                    case eObjectType.Staff:
+                    case eObjectType.MaulerStaff:
+                        offset = IsMageClass(cClass) ? 14 : 13;
+                        break;
+                    case eObjectType.PolearmWeapon:
+                        if (dmg == eDamageType.Thrust) offset = 18;
+                        else if (dmg == eDamageType.Slash) offset = 19;
+                        else offset = 20; 
+                        break;
+                    case eObjectType.SlashingWeapon:
+                    case eObjectType.Sword:
+                    case eObjectType.Blades:
+                        if (is2H) offset = 5;
+                        else offset = isOffhand ? 21 : 22;
+                        break;
+                    case eObjectType.ThrustWeapon:
+                    case eObjectType.Piercing:
+                        if (is2H) offset = 6;
+                        else offset = isOffhand ? 25 : 26;
+                        break;
+                    case eObjectType.HandToHand:
+                    case eObjectType.FistWraps:
+                        if (dmg == eDamageType.Slash) offset = isOffhand ? 29 : 30;
+                        else if (dmg == eDamageType.Thrust) offset = isOffhand ? 33 : 34;
+                        else offset = isOffhand ? 31 : 32;
+                        break;
+                    case eObjectType.Instrument: offset = 35; break;
+                    case eObjectType.Shield:
+                        if (isGroupA || template.Contains("dragonslayer")) {
+                            int sz = GetMaxShieldSizeFromClass(cClass);
+                            offset = 35 + sz;
+                        }
+                        break;
+                }
+                if (offset != -1) return b + offset;
+            }
+            return 0;
+        }
+
         public static void EquipClassWeapons(GameNPC npc, GameNpcInventoryTemplate template, eCharacterClass cClass, string wTemplate, ushort color)
         {
             bool isDF = wTemplate.Equals("epicdf", StringComparison.OrdinalIgnoreCase);
+            bool isEpic = wTemplate.Equals("epic", StringComparison.OrdinalIgnoreCase);
             bool isClassic = wTemplate.Equals("classic", StringComparison.OrdinalIgnoreCase);
 
             int w1H_model = 0, w2H_model = 0, wDist_model = 0, wLeft_model = 0;
@@ -305,7 +558,7 @@ namespace DOL.GS
                                     cClass == eCharacterClass.MaulerHib || cClass == eCharacterClass.Savage ||
                                     cClass == eCharacterClass.Shadowblade;
 
-            if (isClassic)
+            if (!isEpic && !isDF)
             {
                 List<eObjectType> classTypes = GetClassWeaponTypes(cClass);
 
@@ -321,31 +574,41 @@ namespace DOL.GS
                 {
                     eObjectType selectedType = oneHandTypes[Util.Random(0, oneHandTypes.Count - 1)];
                     eDamageType dmg = GenerateDamageType(selectedType, cClass);
-                    GetWeaponData(selectedType, realm, level, 1, dmg, 35, cClass, out w1H_model, out _, out _, out _, out _);
+                    if (!isClassic) w1H_model = GetWeaponTemplateModel(wTemplate, selectedType, 1, dmg, realm, cClass);
+                    
+                    if (w1H_model <= 0) GetWeaponData(selectedType, realm, level, 1, dmg, 35, cClass, out w1H_model, out _, out _, out _, out _);
                 }
                 if (twoHandTypes.Count > 0)
                 {
                     eObjectType selectedType = twoHandTypes[Util.Random(0, twoHandTypes.Count - 1)];
                     eDamageType dmg = GenerateDamageType(selectedType, cClass);
-                    GetWeaponData(selectedType, realm, level, 1, dmg, 35, cClass, out w2H_model, out _, out _, out _, out _);
+                    if (!isClassic) w2H_model = GetWeaponTemplateModel(wTemplate, selectedType, 1, dmg, realm, cClass);
+                    
+                    if (w2H_model <= 0) GetWeaponData(selectedType, realm, level, 1, dmg, 35, cClass, out w2H_model, out _, out _, out _, out _);
                 }
                 if (distTypes.Count > 0)
                 {
                     eObjectType selectedType = distTypes[Util.Random(0, distTypes.Count - 1)];
                     eDamageType dmg = GenerateDamageType(selectedType, cClass);
-                    GetWeaponData(selectedType, realm, level, 1, dmg, 35, cClass, out wDist_model, out _, out _, out _, out _);
+                    if (!isClassic) wDist_model = GetWeaponTemplateModel(wTemplate, selectedType, 1, dmg, realm, cClass);
+                    
+                    if (wDist_model <= 0) GetWeaponData(selectedType, realm, level, 1, dmg, 35, cClass, out wDist_model, out _, out _, out _, out _);
                 }
                 if (leftTypes.Count > 0)
                 {
                     eObjectType selectedType = leftTypes[Util.Random(0, leftTypes.Count - 1)];
                     eDamageType dmg = GenerateDamageType(selectedType, cClass);
-                    GetWeaponData(selectedType, realm, level, 2, dmg, 35, cClass, out wLeft_model, out _, out _, out _, out _);
+                    if (!isClassic) wLeft_model = GetWeaponTemplateModel(wTemplate, selectedType, 2, dmg, realm, cClass);
+                    
+                    if (wLeft_model <= 0) GetWeaponData(selectedType, realm, level, 2, dmg, 35, cClass, out wLeft_model, out _, out _, out _, out _);
                 }
                 else if (isDualWieldClass && oneHandTypes.Count > 0) // give dual wielding capability
                 {
                     eObjectType selectedType = oneHandTypes[Util.Random(0, oneHandTypes.Count - 1)];
                     eDamageType dmg = GenerateDamageType(selectedType, cClass);
-                    GetWeaponData(selectedType, realm, level, 2, dmg, 35, cClass, out wLeft_model, out _, out _, out _, out _);
+                    if (!isClassic) wLeft_model = GetWeaponTemplateModel(wTemplate, selectedType, 2, dmg, realm, cClass);
+                    
+                    if (wLeft_model <= 0) GetWeaponData(selectedType, realm, level, 2, dmg, 35, cClass, out wLeft_model, out _, out _, out _, out _);
                 }
             }
             else // Epic or EpicDF templates
@@ -512,9 +775,42 @@ namespace DOL.GS
             }
         }
 
+        public static int GetPatternModelForTargetItem(GamePlayer player, string patternString, InventoryItem item)
+        {
+            if (GlobalConstants.IsArmor(item.Object_Type) || item.Object_Type == (int)eObjectType.Shield) {
+                int model = GetPatternModel(patternString, item.Object_Type, item.Item_Type, item.Realm);
+                if (model > 0) return model; // Let it fallback to weapon logic for smart pattern shields
+            }
+            
+            if (GlobalConstants.IsWeapon(item.Object_Type) || item.Object_Type == (int)eObjectType.Shield || item.Object_Type == (int)eObjectType.Instrument) {
+                string tpl = "";
+                PatternType pt = GetPatternType(patternString);
+                switch (pt) {
+                    case PatternType.Aerus: tpl = "aerus"; break;
+                    case PatternType.Volcanus: tpl = "volcanus"; break;
+                    case PatternType.Symbol: tpl = "symbol"; break;
+                    case PatternType.Labyrinth: tpl = "lab"; break;
+                    case PatternType.ScorchedLab: tpl = "scorchedlab"; break;
+                }
+                
+                if (tpl != "")
+                {
+                    int hand = item.Hand;
+                    if (item.Item_Type == 11) hand = 2; // Left hand
+                    
+                    eCharacterClass cClass = player != null && player.CharacterClass != null ? (eCharacterClass)player.CharacterClass.ID : eCharacterClass.Unknown;
+                    
+                    int model = GetWeaponTemplateModel(tpl, (eObjectType)item.Object_Type, hand, (eDamageType)item.Type_Damage, (eRealm)item.Realm, cClass);
+                    if (model > 0) return model;
+                }
+            }
+            
+            return -1;
+        }
+
         public static int GetPatternModelForTargetItem(string patternString, InventoryItem item)
         {
-            return GetPatternModel(patternString, item.Object_Type, item.Item_Type, item.Realm);
+            return GetPatternModelForTargetItem(null, patternString, item);
         }
 
         public static PatternType GetPatternType(string templateId)
@@ -532,7 +828,12 @@ namespace DOL.GS
 
         public static int GetPatternModelForTargetItem(PatternType patternType, InventoryItem item)
         {
-            return GetPatternModelForTargetItem(patternType.ToString(), item);
+            return GetPatternModelForTargetItem(null, patternType.ToString(), item);
+        }
+
+        public static int GetPatternModelForTargetItem(GamePlayer player, PatternType patternType, InventoryItem item)
+        {
+            return GetPatternModelForTargetItem(player, patternType.ToString(), item);
         }
 
         public static int GetRandomWeaponModelForNgg(int slotIndex, eRealm realm)
@@ -612,14 +913,13 @@ namespace DOL.GS
                 }
             }
 
+            int overrideModel = 0;
             if (!pattern.Equals("None", StringComparison.OrdinalIgnoreCase) && !pattern.StartsWith("Class", StringComparison.OrdinalIgnoreCase))
             {
                 int pModel = GetPatternModel(pattern, (int)material, (int)slot, (int)realm);
                 if (pModel > 0)
                 {
-                    model = pModel;
-                    name = pattern.ToString() + " Armor";
-                    return;
+                    overrideModel = pModel;
                 }
             }
 
@@ -704,6 +1004,8 @@ namespace DOL.GS
                 else if (realm == eRealm.Hibernia) model = Util.Chance(33) ? 1282 : (Util.Chance(50) ? 1285 : 1288); //2% chance of robin hood hat, leaf hat, stag helm
                 else model = Util.Chance(33) ? 1289 : (Util.Chance(50) ? 1283 : 1286); //2% chance of wolf hat, fur cap, wing hat
             }
+
+            if (overrideModel > 0) model = overrideModel;
         }
 
         public static void GetWeaponData(eObjectType type, eRealm realm, int level, int hand, eDamageType dmg, int spdAbs, eCharacterClass charClass, out int model, out string name, out int newHand, out eInventorySlot slot, out int effect)
@@ -713,6 +1015,10 @@ namespace DOL.GS
 
             switch (type)
             {
+                case eObjectType.Sword:
+                    if (hand == 1) { model = Get2HSwordForLevel(level, realm); name = GeneratedUniqueItem.GetNameFromId(model); newHand = 1; slot = eInventorySlot.TwoHandWeapon; }
+                    else { model = GetBladeModelForLevel(level, realm); name = GeneratedUniqueItem.GetNameFromId(model); if (spdAbs < 32) { newHand = 2; slot = eInventorySlot.LeftHandWeapon; } }
+                    break;
                 case eObjectType.Axe:
                     if (hand == 1) { model = Get2HAxeModelForLevel(level, realm); name = GeneratedUniqueItem.GetNameFromId(model); }
                     else { model = GetAxeModelForLevel(level, realm); name = GeneratedUniqueItem.GetNameFromId(model); }

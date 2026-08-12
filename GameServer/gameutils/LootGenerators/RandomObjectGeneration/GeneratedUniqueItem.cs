@@ -1274,6 +1274,30 @@ namespace DOL.GS
                 return eProperty.MaxHealth;
 
             int rand = Util.Random(100);
+
+            if (ItemModelManager.IsMageClass(charClass))
+            {
+                if (Util.Chance(20))
+                    return eProperty.MaxMana;
+
+                if (rand <= 30) return eProperty.Dexterity;
+                else if (rand <= 40) return eProperty.Strength;
+                else if (rand <= 70) 
+                {
+                    CharacterClass cClass = CharacterClass.GetClass((int)charClass);
+                    if (cClass != null)
+                    {
+                        if (cClass.ManaStat == eStat.PIE) return eProperty.Piety;
+                        if (cClass.ManaStat == eStat.EMP) return eProperty.Empathy;
+                        if (cClass.ManaStat == eStat.INT) return eProperty.Intelligence;
+                        if (cClass.ManaStat == eStat.CHR) return eProperty.Charisma;
+                    }
+                    if ((eRealm)Realm == eRealm.Midgard) return eProperty.Piety;
+                    return eProperty.Intelligence;
+                }
+                else if (rand <= 80) return eProperty.Quickness;
+                else return eProperty.Constitution;
+            }
             switch (charClass)
             {
                 case eCharacterClass.Armsman:
@@ -1304,48 +1328,6 @@ namespace DOL.GS
                     else if (rand <= 75)
                         return eProperty.Constitution;
                     else return eProperty.Quickness;
-
-                case eCharacterClass.Cabalist:
-                case eCharacterClass.Sorcerer:
-                case eCharacterClass.Theurgist:
-                case eCharacterClass.Wizard:
-                case eCharacterClass.Necromancer:
-                case eCharacterClass.Occultist:
-                case eCharacterClass.Eldritch:
-                case eCharacterClass.Enchanter:
-                case eCharacterClass.Mentalist:
-                case eCharacterClass.Animist:
-                    if (Util.Chance(20))
-                        return eProperty.MaxMana;
-
-                    //weight stats for casters towards dex, acu, con
-                    //keep some 10% chance of str or quick since useful for carrying/occasional melee
-                    if (rand <= 30)
-                        return eProperty.Dexterity;
-                    else if (rand <= 40)
-                        return eProperty.Strength;
-                    else if (rand <= 70)
-                        return eProperty.Intelligence;
-                    else if (rand <= 80)
-                        return eProperty.Quickness;
-                    else return eProperty.Constitution;
-
-                case eCharacterClass.Runemaster:
-                case eCharacterClass.Spiritmaster:
-                case eCharacterClass.Bonedancer:
-                    if (Util.Chance(20))
-                        return eProperty.MaxMana;
-                    //weight stats for casters towards dex, acu, con
-                    //keep some 10% chance of str or quick since useful for carrying/occasional melee
-                    if (rand <= 30)
-                        return eProperty.Dexterity;
-                    else if (rand <= 40)
-                        return eProperty.Strength;
-                    else if (rand <= 70)
-                        return eProperty.Piety;
-                    else if (rand <= 80)
-                        return eProperty.Quickness;
-                    else return eProperty.Constitution;
 
                 case eCharacterClass.Paladin:
                     if (rand <= 25)
@@ -1465,29 +1447,6 @@ namespace DOL.GS
                     else if (rand <= 80)
                         return eProperty.Constitution;
                     else return eProperty.Strength;
-
-                case eCharacterClass.Bainshee:
-                case eCharacterClass.Acolyte:
-                case eCharacterClass.Disciple:
-                case eCharacterClass.Elementalist:
-                case eCharacterClass.Forester:
-                case eCharacterClass.Magician:
-                case eCharacterClass.Mage:
-                case eCharacterClass.Mystic:
-                    if (Util.Chance(20)) return eProperty.MaxMana;
-                    if (rand <= 30) return eProperty.Dexterity;
-                    else if (rand <= 40) return eProperty.Strength;
-                    else if (rand <= 70) return eProperty.Intelligence;
-                    else if (rand <= 80) return eProperty.Quickness;
-                    else return eProperty.Constitution;
-
-                case eCharacterClass.Warlock:
-                    if (Util.Chance(20)) return eProperty.MaxMana;
-                    if (rand <= 30) return eProperty.Dexterity;
-                    else if (rand <= 40) return eProperty.Strength;
-                    else if (rand <= 70) return eProperty.Piety;
-                    else if (rand <= 80) return eProperty.Quickness;
-                    else return eProperty.Constitution;
 
                 case eCharacterClass.Valkyrie:
                     if (Util.Chance(10)) return eProperty.MaxMana;
@@ -2405,25 +2364,11 @@ namespace DOL.GS
                     }
                 case eProperty.AllMagicSkills:
                     {
-                        if (charClass != eCharacterClass.Cabalist && //albion
+                        if (!ItemModelManager.IsMageClass(charClass) && 
                             charClass != eCharacterClass.Cleric &&
-                            charClass != eCharacterClass.Necromancer &&
-                            charClass != eCharacterClass.Occultist &&
-                            charClass != eCharacterClass.Sorcerer &&
-                            charClass != eCharacterClass.Theurgist &&
-                            charClass != eCharacterClass.Wizard &&
                             charClass != eCharacterClass.Heretic &&
-                            charClass != eCharacterClass.Animist && //hibernia
-                            charClass != eCharacterClass.Eldritch &&
-                            charClass != eCharacterClass.Enchanter &&
-                            charClass != eCharacterClass.Mentalist &&
                             charClass != eCharacterClass.Valewalker &&
-                            charClass != eCharacterClass.Bainshee &&
                             charClass != eCharacterClass.Vampiir &&
-                            charClass != eCharacterClass.Bonedancer && //midgard
-                            charClass != eCharacterClass.Runemaster &&
-                            charClass != eCharacterClass.Spiritmaster &&
-                            charClass != eCharacterClass.Warlock &&
                             charClass != eCharacterClass.Valkyrie &&
                             charClass != eCharacterClass.MaulerAlb &&
                             charClass != eCharacterClass.MaulerMid &&
@@ -3536,28 +3481,14 @@ namespace DOL.GS
                     }
                 case eProperty.AllMagicSkills:
                     {
-                        if (charClass != eCharacterClass.Cabalist && //albion
+                        if (!ItemModelManager.IsMageClass(charClass) && 
                             charClass != eCharacterClass.Cleric &&
-                            charClass != eCharacterClass.Necromancer &&
-                            charClass != eCharacterClass.Occultist &&
-                            charClass != eCharacterClass.Sorcerer &&
-                            charClass != eCharacterClass.Theurgist &&
-                            charClass != eCharacterClass.Wizard &&
                             charClass != eCharacterClass.Heretic &&
-                            charClass != eCharacterClass.Animist && //hibernia
-                            charClass != eCharacterClass.Eldritch &&
-                            charClass != eCharacterClass.Enchanter &&
-                            charClass != eCharacterClass.Mentalist &&
                             charClass != eCharacterClass.Valewalker &&
-                            charClass != eCharacterClass.Bainshee &&
                             charClass != eCharacterClass.Vampiir &&
-                            charClass != eCharacterClass.Bonedancer &&
-                            charClass != eCharacterClass.Runemaster &&
-                            charClass != eCharacterClass.Spiritmaster &&
-                            charClass != eCharacterClass.Warlock &&
                             charClass != eCharacterClass.Valkyrie &&
                             charClass != eCharacterClass.MaulerAlb &&
-                            charClass != eCharacterClass.MaulerMid && 
+                            charClass != eCharacterClass.MaulerMid &&
                             charClass != eCharacterClass.MaulerHib)
                         {
                             return false;
@@ -5445,20 +5376,13 @@ namespace DOL.GS
 			eObjectType.Instrument,//
 			eObjectType.Crossbow,
 			*/
-            switch (charClass)
+            if (ItemModelManager.IsMageClass(charClass))
             {
                 //staff classes
-                case eCharacterClass.Cabalist:
-                case eCharacterClass.Necromancer:
-                case eCharacterClass.Occultist:
-                case eCharacterClass.Sorcerer:
-                case eCharacterClass.Theurgist:
-                case eCharacterClass.Wizard:
-                case eCharacterClass.Acolyte:
-                case eCharacterClass.Disciple:
-                case eCharacterClass.Elementalist:
-                    weaponTypes.Add(eObjectType.Staff);
-                    break;
+                weaponTypes.Add(eObjectType.Staff);
+            }
+            else switch (charClass)
+            {
                 case eCharacterClass.Friar:
                     weaponTypes.Add(eObjectType.Staff);
                     weaponTypes.Add(eObjectType.Staff);
@@ -5587,22 +5511,13 @@ namespace DOL.GS
 
         public static eObjectType GetAlbionArmorType(eCharacterClass charClass, byte level)
         {
+            if (ItemModelManager.IsMageClass(charClass) || charClass == eCharacterClass.Heretic)
+            {
+                return eObjectType.Cloth;
+            }
 
             switch (charClass)
             {
-                //staff classes
-                case eCharacterClass.Cabalist:
-                case eCharacterClass.Necromancer:
-                case eCharacterClass.Occultist:
-                case eCharacterClass.Sorcerer:
-                case eCharacterClass.Theurgist:
-                case eCharacterClass.Wizard:
-                case eCharacterClass.Heretic:
-                case eCharacterClass.Acolyte:
-                case eCharacterClass.Disciple:
-                case eCharacterClass.Elementalist:
-                    return eObjectType.Cloth;
-
                 case eCharacterClass.Friar:
                 case eCharacterClass.Infiltrator:
                 case eCharacterClass.MaulerAlb:
@@ -5709,17 +5624,13 @@ namespace DOL.GS
 			eObjectType.FistWraps,//Maulers
 			eObjectType.MaulerStaff,//Maulers
 			*/
-            switch (charClass)
+            if (ItemModelManager.IsMageClass(charClass) && charClass != eCharacterClass.Seer)
             {
                 //staff classes
-                case eCharacterClass.Bonedancer:
-                case eCharacterClass.Runemaster:
-                case eCharacterClass.Spiritmaster:
-                case eCharacterClass.Warlock:
-                case eCharacterClass.Mage:
-                case eCharacterClass.Mystic:
-                    weaponTypes.Add(eObjectType.Staff);
-                    break;
+                weaponTypes.Add(eObjectType.Staff);
+            }
+            else switch (charClass)
+            {
                 case eCharacterClass.Healer:
                 case eCharacterClass.Shaman:
                     weaponTypes.Add(eObjectType.Staff);
@@ -5842,19 +5753,13 @@ namespace DOL.GS
 
         public static eObjectType GetMidgardArmorType(eCharacterClass charClass, byte level)
         {
+            if (ItemModelManager.IsMageClass(charClass))
+            {
+                return eObjectType.Cloth;
+            }
 
             switch (charClass)
             {
-                //staff classes
-                case eCharacterClass.Bonedancer:
-                case eCharacterClass.Runemaster:
-                case eCharacterClass.Spiritmaster:
-                case eCharacterClass.Warlock:
-                case eCharacterClass.Mage:
-                case eCharacterClass.Mystic:
-                case eCharacterClass.Seer:
-                    return eObjectType.Cloth;
-
                 case eCharacterClass.Shadowblade:
                 case eCharacterClass.MaulerMid:
                 case eCharacterClass.MidgardRogue:
@@ -5941,18 +5846,13 @@ namespace DOL.GS
 			eObjectType.FistWraps,//Maulers
 			eObjectType.MaulerStaff,//Maulers
 			*/
-            switch (charClass)
+            if (ItemModelManager.IsMageClass(charClass) && charClass != eCharacterClass.Valewalker)
             {
                 //staff classes
-                case eCharacterClass.Eldritch:
-                case eCharacterClass.Enchanter:
-                case eCharacterClass.Mentalist:
-                case eCharacterClass.Animist:
-                case eCharacterClass.Bainshee:
-                case eCharacterClass.Forester:
-                case eCharacterClass.Magician:
-                    weaponTypes.Add(eObjectType.Staff);
-                    break;
+                weaponTypes.Add(eObjectType.Staff);
+            }
+            else switch (charClass)
+            {
                 case eCharacterClass.Valewalker:
                     weaponTypes.Add(eObjectType.Scythe);
                     break;
@@ -6081,26 +5981,19 @@ namespace DOL.GS
 
         public static eObjectType GetHiberniaArmorType(eCharacterClass charClass, byte level)
         {
-
             /* Hib Armor
 			eObjectType.Cloth,
 			eObjectType.Leather,
 			eObjectType.Reinforced,
 			eObjectType.Scale,
 			 */
+            if (ItemModelManager.IsMageClass(charClass) || charClass == eCharacterClass.Valewalker)
+            {
+                return eObjectType.Cloth;
+            }
+
             switch (charClass)
             {
-                //staff classes
-                case eCharacterClass.Valewalker:
-                case eCharacterClass.Animist:
-                case eCharacterClass.Mentalist:
-                case eCharacterClass.Enchanter:
-                case eCharacterClass.Eldritch:
-                case eCharacterClass.Bainshee:
-                case eCharacterClass.Forester:
-                case eCharacterClass.Magician:
-                    return eObjectType.Cloth;
-
                 case eCharacterClass.Nightshade:
                 case eCharacterClass.MaulerHib:
                 case eCharacterClass.Vampiir:
@@ -6636,7 +6529,7 @@ namespace DOL.GS
             {
                 if (Util.Chance(50))
                 {
-                    string[] pool = { "Oceanus", "Stygia", "Aerus" };
+                    string[] pool = { "Oceanus", "Stygia", "Aerus", "Volcanus", "Labyrinth", "ScorchedLab" };
                     return pool[Util.Random(0, pool.Length - 1)];
                 }
                 return "None";
@@ -6667,7 +6560,7 @@ namespace DOL.GS
                     }
                     else if (env == eRegionEnvironment.VolcanicAndEarth) 
                     {
-                        string[] deepCataVolcanic = { "Volcanus", "Corrupt", "Minotaur" };
+                        string[] deepCataVolcanic = { "Volcanus", "Corrupt", "Minotaur", "Labyrinth", "ScorchedLab" };
                         return deepCataVolcanic[Util.Random(0, deepCataVolcanic.Length - 1)];
                     }
                 }
@@ -6703,21 +6596,36 @@ namespace DOL.GS
             {
                 ItemModelManager.GetArmorData(type, slot, this.Level, realm, patternToApply, npcModelId, out model, out name, out canAddExtension, out headeffect);
 
-                if (!patternToApply.Equals("None", StringComparison.OrdinalIgnoreCase) && model > 0 && !patternToApply.StartsWith("Class", StringComparison.OrdinalIgnoreCase))
+                if (!patternToApply.StartsWith("Class", StringComparison.OrdinalIgnoreCase))
                 {
-                    name = patternToApply + " " + ArmorSlotToName(slot, type);
-                }
-                else if (!patternToApply.StartsWith("Class", StringComparison.OrdinalIgnoreCase))
-                {
-                    name = name + " " + ArmorSlotToName(slot, type);
+                    name = name + " " + ArmorSlotToName(slot, type); // Keep it clean (e.g. "Leather Jerkin")
                 }
             }
-            else if ((int)type >= (int)eObjectType._FirstWeapon && (int)type <= (int)eObjectType._LastWeapon || type == eObjectType.Shield)
+            else if ((int)type >= (int)eObjectType._FirstWeapon && (int)type <= (int)eObjectType._LastWeapon || type == eObjectType.Shield || type == eObjectType.Instrument)
             {
                 ItemModelManager.GetWeaponData(type, realm, this.Level, this.Hand, damage, this.SPD_ABS, this.charClass, out model, out name, out int hand, out eInventorySlot newSlot, out int effect);
                 this.Hand = hand;
                 this.Item_Type = (int)newSlot;
                 this.Effect = effect;
+
+                if (!patternToApply.Equals("None", StringComparison.OrdinalIgnoreCase))
+                {
+                    string weaponPattern = "";
+                    if (patternToApply.Equals("Stygia", StringComparison.OrdinalIgnoreCase)) weaponPattern = "symbol"; 
+                    else if (patternToApply.Equals("Oceanus", StringComparison.OrdinalIgnoreCase)) weaponPattern = "toa";
+                    else if (patternToApply.Equals("Minotaur", StringComparison.OrdinalIgnoreCase)) weaponPattern = "lab";
+                    else if (patternToApply.Equals("Corrupt", StringComparison.OrdinalIgnoreCase)) weaponPattern = "scorchedlab";
+                    else weaponPattern = patternToApply.ToLower();
+                    
+                    if (weaponPattern != "")
+                    {
+                        int pModel = ItemModelManager.GetWeaponTemplateModel(weaponPattern, type, this.Hand, damage, realm, this.charClass);
+                        if (pModel > 0)
+                        {
+                            model = pModel;
+                        }
+                    }
+                }
             }
             else if (type == eObjectType.Magical)
             {
@@ -6730,8 +6638,6 @@ namespace DOL.GS
             }
 
             this.Model = model <= 0 ? 488 : model;
-
-            if (!patternToApply.Equals("None", StringComparison.OrdinalIgnoreCase)) this.Flags = 5;
 
             // Create a safe key without spaces or apostrophes
             string baseNameKey = name.Replace(" ", "").Replace("-", "").Replace("'", "");

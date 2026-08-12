@@ -45,32 +45,62 @@ namespace DOL.GS.Scripts
                             }
                         }
 
-                        // Apply only to armor types (Cloth=32, Leather=33, Studded=34, Chain=35, Plate=36, Reinforced=37, Scale=38)
-                        if (applyPattern && generatedItem.Object_Type >= 32 && generatedItem.Object_Type <= 38)
+                        if (applyPattern)
                         {
                             InventoryItem dummyItem = new InventoryItem
                             {
                                 Item_Type = generatedItem.Item_Type,
                                 Object_Type = generatedItem.Object_Type,
-                                Realm = generatedItem.Realm
+                                Realm = generatedItem.Realm,
+                                Hand = generatedItem.Hand,
+                                Type_Damage = generatedItem.Type_Damage
                             };
 
-                            List<PatternType> validPatterns = new List<PatternType>();
-
-                            foreach (PatternType pt in Enum.GetValues(typeof(PatternType)))
+                            // ARMORS (types Cloth=32, Leather=33, Studded=34, Chain=35, Plate=36, Reinforced=37, Scale=38)
+                            if (applyPattern && generatedItem.Object_Type >= 32 && generatedItem.Object_Type <= 38)
                             {
-                                if (pt == PatternType.None) continue;
+                                List<PatternType> validPatterns = new List<PatternType>();
 
-                                if (ItemModelManager.GetPatternModelForTargetItem(pt.ToString(), dummyItem) != -1)
+                                foreach (PatternType pt in Enum.GetValues(typeof(PatternType)))
                                 {
-                                    validPatterns.Add(pt);
+                                    if (pt == PatternType.None) continue;
+
+                                    if (ItemModelManager.GetPatternModelForTargetItem(pt.ToString(), dummyItem) != -1)
+                                    {
+                                        validPatterns.Add(pt);
+                                    }
+                                }
+
+                                if (validPatterns.Count > 0)
+                                {
+                                    PatternType chosenPattern = validPatterns[Util.Random(0, validPatterns.Count - 1)];
+                                    generatedItem.Model = ItemModelManager.GetPatternModelForTargetItem(chosenPattern.ToString(), dummyItem);
                                 }
                             }
-
-                            if (validPatterns.Count > 0)
+                            // WEAPON / SHIELD / INSTRUMENT
+                            else if (GlobalConstants.IsWeapon(generatedItem.Object_Type) || generatedItem.Object_Type == (int)eObjectType.Shield || generatedItem.Object_Type == (int)eObjectType.Instrument)
                             {
-                                PatternType chosenPattern = validPatterns[Util.Random(0, validPatterns.Count - 1)];
-                                generatedItem.Model = ItemModelManager.GetPatternModelForTargetItem(chosenPattern.ToString(), dummyItem);
+                                List<PatternType> validPatterns = new List<PatternType>();
+                                PatternType[] weaponPatterns = { PatternType.Aerus, PatternType.Volcanus, PatternType.Symbol };
+                                
+                                foreach (PatternType pt in weaponPatterns)
+                                {
+                                    if (ItemModelManager.GetPatternModelForTargetItem(player, pt.ToString(), dummyItem) != -1)
+                                    {
+                                        validPatterns.Add(pt);
+                                    }
+                                }
+
+                                if (validPatterns.Count > 0)
+                                {
+                                    PatternType chosenPattern = validPatterns[Util.Random(0, validPatterns.Count - 1)];
+                                    int newModel = ItemModelManager.GetPatternModelForTargetItem(player, chosenPattern.ToString(), dummyItem);
+
+                                    if (newModel > 0)
+                                    {
+                                        generatedItem.Model = newModel;
+                                    }
+                                }
                             }
                         }
 

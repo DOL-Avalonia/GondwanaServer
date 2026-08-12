@@ -23,6 +23,11 @@ namespace DOL.GS.Scripts
         "Commands.GM.EchangeurNPC.Usage.Priceressource2",
         "Commands.GM.EchangeurNPC.Usage.Priceressource3",
         "Commands.GM.EchangeurNPC.Usage.Priceressource",
+        "/echangeurnpc unique stonemaker - Converts NPC into a Stone Maker",
+        "/echangeurnpc unique vial player",
+        "/echangeurnpc unique vial npc all",
+        "/echangeurnpc unique vial npc name <Name> - (e.g. Agisfield)",
+        "/echangeurnpc unique vial npc blood <Type> - (e.g. MachineOil)",
         "Commands.GM.EchangeurNPC.Usage.AdditionalDescription")]
     public class EchangeurNPCCommandHandler : AbstractCommandHandler, ICommandHandler
     {
@@ -162,6 +167,85 @@ namespace DOL.GS.Scripts
                         npc.GetTextNPCPolicy(player).EchangeurDB[item].ItemGiveID = item2;
                         npc.GetTextNPCPolicy(player).SaveIntoDatabase();
                         player.Out.SendMessage(item + " donne " + count + " " + item2 + " maintenant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    break;
+
+                case "unique":
+                    if (npc == null || args.Length < 3)
+                    {
+                        player.Out.SendMessage("Syntax: /echangeurnpc unique vial <player | npc> <all | name <name> | blood <blood> | stonemaker>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                    
+                    string category = args[2].ToLower();
+                    string dbKey = "";
+
+                    if (category == "stonemaker")
+                    {
+                        dbKey = "STONEMAKER:ALL";
+                    }
+                    else if (category == "vial")
+                    {
+                        if (args.Length < 4) return;
+                        string vialType = args[3].ToLower();
+                        if (vialType == "player") 
+                        {
+                            dbKey = "PLAYERVIAL:ALL";
+                        }
+                        else if (vialType == "npc")
+                        {
+                            if (args.Length < 5)
+                            {
+                                player.Out.SendMessage("Syntax: /echangeurnpc unique vial npc <all | name <name> | blood <blood>>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+                            
+                            string subType = args[4].ToLower();
+                            if (subType == "all") 
+                                dbKey = "NPCVIAL:ALL";
+                            else if (subType == "name" && args.Length >= 6) 
+                                dbKey = "NPCVIAL:NAME:" + string.Join("", args, 5, args.Length - 5).Replace(" ", "");
+                            else if (subType == "blood" && args.Length >= 6) 
+                                dbKey = "NPCVIAL:BLOOD:" + string.Join("", args, 5, args.Length - 5).Replace(" ", ""); 
+                            else 
+                            {
+                                player.Out.SendMessage("Provide mob name or blood type. Example: /echangeurnpc unique vial npc blood MachineOil", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+                        }
+                        else 
+                        {
+                            player.Out.SendMessage("Syntax: /echangeurnpc unique vial <player | npc> <all | name <name> | blood <blood>>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+
+                    }
+                    else
+                    {
+                        player.Out.SendMessage("Unknown unique category. Use 'stonemaker' or 'vial'.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    if (!string.IsNullOrEmpty(dbKey))
+                    {
+                        if (!npc.GetTextNPCPolicy(player).EchangeurDB.ContainsKey(dbKey))
+                        {
+                            npc.GetTextNPCPolicy(player).EchangeurDB[dbKey] = new DBEchangeur
+                            {
+                                ItemRecvCount = 1,
+                                ItemRecvID = dbKey,
+                                ItemGiveCount = 0,
+                                ItemGiveID = "",
+                                GainMoney = 0,
+                                GainXP = 0
+                            };
+                            npc.GetTextNPCPolicy(player).SaveIntoDatabase();
+                            player.Out.SendMessage($"Unique Item Configuration '{dbKey}' has been added to {((GameNPC)npc).Name}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        else
+                        {
+                            player.Out.SendMessage($"Unique Item Configuration '{dbKey}' already exists on this NPC.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
                     }
                     break;
 

@@ -408,10 +408,7 @@ namespace AmteScripts.Managers
             else
             {
                 // Count the number of player in RvR
-                int countPlayer = 0;
-                int albPop = 0;
-                int midPop = 0;
-                int hibPop = 0;
+                WorldMgr.GetRvRPopulation(out int countPlayer, out int albPop, out int midPop, out int hibPop);
 
                 foreach (var id in _regions)
                 {
@@ -1090,27 +1087,11 @@ namespace AmteScripts.Managers
             }
 
             // RVR Bonuses: RP/Tick, Population bonuses && Yearly events RvR RP Bonus
-            int rvrPop = 0;
-            int albPop = 0;
-            int midPop = 0;
-            int hibPop = 0;
             var yearlyEvent = DOL.GameEvents.GameEventManager.Instance.GetActiveYearlyEvent();
             int yearlyEventBonusPercent = Properties.YEARLY_EVENT_RP_BONUS_PERCENT;
             bool hasyearlyEvent = yearlyEvent != null && yearlyEventBonusPercent > 0;
 
-            foreach (GameClient client in WorldMgr.GetAllPlayingClients())
-            {
-                if (client.Player != null && client.Player.IsInRvR)
-                {
-                    rvrPop++;
-                    switch (client.Player.Realm)
-                    {
-                        case eRealm.Albion: albPop++; break;
-                        case eRealm.Midgard: midPop++; break;
-                        case eRealm.Hibernia: hibPop++; break;
-                    }
-                }
-            }
+            WorldMgr.GetRvRPopulation(out int rvrPop, out int albPop, out int midPop, out int hibPop);
 
             double mapFactor = player.Level switch
             {

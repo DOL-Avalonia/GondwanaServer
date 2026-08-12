@@ -2115,7 +2115,7 @@ namespace DOL.GS
             }
 
             // 32-38 = Armor, 42=Shield. Weapons=1-26,45.
-            if (!GlobalConstants.IsArmor(targetItem.Object_Type) && !GlobalConstants.IsWeapon(targetItem.Object_Type))
+            if (!GlobalConstants.IsArmor(targetItem.Object_Type) && !GlobalConstants.IsWeapon(targetItem.Object_Type) && targetItem.Object_Type != (int)eObjectType.Instrument)
             {
                 m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternArmorWeaponOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
@@ -2134,7 +2134,7 @@ namespace DOL.GS
                 return false;
             }
 
-            int newModel = ItemModelManager.GetPatternModelForTargetItem(patternType, targetItem);
+            int newModel = ItemModelManager.GetPatternModelForTargetItem(m_player, patternType.ToString(), targetItem);
 
             if (newModel <= 0)
             {

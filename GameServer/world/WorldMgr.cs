@@ -1404,18 +1404,43 @@ namespace DOL.GS
         /// Find a GameClient by the Player's ID
         /// Case-insensitive, make sure you use returned Player.Name instead of what player typed.
         /// </summary>
-        /// <param name="playerID">ID to search</param>
-        /// <param name="exactMatch">true if AccountName match exactly</param>
-        /// <param name="activeRequired"></param>
-        /// <returns>The found GameClient or null</returns>
         public static GameClient GetClientByPlayerID(string playerID, bool exactMatch, bool activeRequired)
         {
-            foreach (GameClient client in WorldMgr.GetAllPlayingClients())
+            lock (m_clients.SyncRoot)
             {
-                if (client.Player.InternalID == playerID)
-                    return client;
+                for (int i = 0; i < m_clients.Length; i++)
+                {
+                    GameClient client = m_clients[i];
+                    if (client != null && client.IsPlaying && client.Player != null && client.Player.ObjectState == GameObject.eObjectState.Active)
+                    {
+                        if (client.Player.InternalID == playerID)
+                            return client;
+                    }
+                }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Safely fetches only the players currently in PvP without allocating the full server client list.
+        /// </summary>
+        public static List<GamePlayer> GetAllPlayersInPvP()
+        {
+            var pvpPlayers = new List<GamePlayer>();
+            lock (m_clients.SyncRoot)
+            {
+                for (int i = 0; i < m_clients.Length; i++)
+                {
+                    GameClient client = m_clients[i];
+                    if (client != null && client.IsPlaying && client.Player != null &&
+                        client.Player.ObjectState == GameObject.eObjectState.Active &&
+                        client.Player.IsInPvP)
+                    {
+                        pvpPlayers.Add(client.Player);
+                    }
+                }
+            }
+            return pvpPlayers;
         }
 
         /// <summary>
@@ -1603,6 +1628,58 @@ namespace DOL.GS
                 }
             }
             return count;
+        }
+
+        /// <summary>
+        /// Fast counting of RvR population by realm without memory allocation.
+        /// </summary>
+        public static void GetRvRPopulation(out int rvrPop, out int albPop, out int midPop, out int hibPop)
+        {
+            int r = 0, a = 0, m = 0, h = 0;
+            lock (m_clients.SyncRoot)
+            {
+                for (int i = 0; i < m_clients.Length; i++)
+                {
+                    GameClient client = m_clients[i];
+                    if (client != null && client.IsPlaying && client.Player != null && client.Player.ObjectState == GameObject.eObjectState.Active && client.Player.IsInRvR)
+                    {
+                        r++;
+                        switch (client.Player.Realm)
+                        {
+                            case eRealm.Albion: a++; break;
+                            case eRealm.Midgard: m++; break;
+                            case eRealm.Hibernia: h++; break;
+                        }
+                    }
+                }
+            }
+            rvrPop = r; albPop = a; midPop = m; hibPop = h;
+        }
+
+        /// <summary>
+        /// Fast counting of PvP population by realm without memory allocation.
+        /// </summary>
+        public static void GetPvPPopulation(out int pvpPop, out int albPop, out int midPop, out int hibPop)
+        {
+            int p = 0, a = 0, m = 0, h = 0;
+            lock (m_clients.SyncRoot)
+            {
+                for (int i = 0; i < m_clients.Length; i++)
+                {
+                    GameClient client = m_clients[i];
+                    if (client != null && client.IsPlaying && client.Player != null && client.Player.ObjectState == GameObject.eObjectState.Active && client.Player.IsInPvP)
+                    {
+                        p++;
+                        switch (client.Player.Realm)
+                        {
+                            case eRealm.Albion: a++; break;
+                            case eRealm.Midgard: m++; break;
+                            case eRealm.Hibernia: h++; break;
+                        }
+                    }
+                }
+            }
+            pvpPop = p; albPop = a; midPop = m; hibPop = h;
         }
 
         /// <summary>

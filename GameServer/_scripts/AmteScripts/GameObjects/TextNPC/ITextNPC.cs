@@ -461,6 +461,11 @@ namespace DOL.GS.Scripts
             
             _body.Notify(GameObjectEvent.ReceiveItem, _body, new ReceiveItemEventArgs(source, _body, item));
 
+            if (UniqueItemExchangerEngine.TryProcessUniqueItemTrade(this, player, (GameNPC)_body, item))
+            {
+                return true;
+            }
+
             if (!EchangeurDB.TryGetValue(item.Id_nb, out var EchItem))
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameLiving.ReceiveItem", _body.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -493,7 +498,7 @@ namespace DOL.GS.Scripts
 
             if (requireditems.Any())
             {
-                var playerItems = this.GetPlayerRequiredItems(player, requireditems, item.Id_nb);
+                var playerItems = this.GetPlayerRequiredItems(player, requireditems, item.Id_nb, EchItem.ItemRecvCount);
                 if (playerItems.HasAllRequiredItems)
                 {
                     player.Client.Out.SendCustomDialog(string.Format("Afin de procéder à l'échange, il va falloir payer {0} et me donner en plus {1}",
@@ -621,96 +626,43 @@ namespace DOL.GS.Scripts
         }
 
 
-        private void RemoveItemsFromPlayer(GamePlayer player, IEnumerable<RequireItemInfo> requireItems, InventoryItem gaveItem)
+        private void RemoveItemsFromPlayer(GamePlayer player, IEnumerable<RequireItemInfo> requireItems)
         {
-            List<GameInventoryItem> items = new();
-            var playerItems = new Dictionary<string, int>();
-
-            foreach (var val in requireItems)
+            foreach (var reqItem in requireItems)
             {
-                if (!playerItems.ContainsKey(val.ItemId))
-                    playerItems.Add(val.ItemId, 0);
-            }
-
-            foreach (GameInventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
-            {
-                var requireItem = requireItems.FirstOrDefault(i => i.ItemId.Equals(item.Id_nb));
-
-                if (requireItem != null)
-                {
-                    if (item.Id_nb.Equals(gaveItem))
-                    {
-                        continue;
-                    }
-
-                    if (item.Count >= requireItem.Count)
-                    {
-                        player.Inventory.RemoveCountFromStack(item, requireItem.Count);
-                    }
-                    else
-                    {
-                        items.Add(item);
-                    }
-                    requireItem.Name = item.Name;
-                }
-            }
-
-            foreach (var item in items)
-            {
-                if (item.OwnerID == null)
-                    item.OwnerID = player.InternalID;
-
-                player.Inventory.RemoveItem(item);
+                UniqueItemExchangerEngine.RemoveItems(player, reqItem.ItemId, reqItem.Count);
             }
         }
 
-        private EchangeurPlayerItemsCount GetPlayerRequiredItems(GamePlayer player, IEnumerable<RequireItemInfo> requireItems, string gaveItem)
+        private EchangeurPlayerItemsCount GetPlayerRequiredItems(GamePlayer player, IEnumerable<RequireItemInfo> requireItems, string gaveItemId_nb, int baseConsumedCount)
         {
-            var playerItems = new Dictionary<string, int>();
             var playerItemsCount = new Dictionary<string, int>();
             bool hasAllRequiredItems = true;
 
-            foreach (var val in requireItems)
+            var aggregatedCounts = new Dictionary<string, int>();
+
+            foreach (var item in UniqueItemExchangerEngine.GetAllAccessibleItems(player))
             {
-                if (!playerItems.ContainsKey(val.ItemId))
-                    playerItems.Add(val.ItemId, 0);
+                if (item == null) continue;
+                if (!aggregatedCounts.ContainsKey(item.Id_nb))
+                    aggregatedCounts[item.Id_nb] = 0;
+
+                aggregatedCounts[item.Id_nb] += item.Count;
             }
 
-            bool hasRemovedgaveItem = false;
-
-            foreach (var item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            if (!string.IsNullOrEmpty(gaveItemId_nb) && aggregatedCounts.ContainsKey(gaveItemId_nb))
             {
-                var requireItem = requireItems.FirstOrDefault(i => i.ItemId.Equals(item.Id_nb));
-
-                if (requireItem != null)
-                {
-                    if (item.Id_nb.Equals(gaveItem) && !hasRemovedgaveItem)
-                    {
-                        hasRemovedgaveItem = true;
-                        continue;
-                    }
-
-                    if (item.Count >= requireItem.Count)
-                    {
-                        playerItems[item.Id_nb] = item.Count;
-                    }
-                    else
-                    {
-                        playerItems[item.Id_nb] += item.Count;
-                    }
-
-                    requireItem.Name = item.Name;
-                }
+                aggregatedCounts[gaveItemId_nb] -= baseConsumedCount;
             }
-
 
             foreach (var reqItem in requireItems)
             {
-                int missingCount = reqItem.Count - playerItems[reqItem.ItemId];
+                int currentCount = aggregatedCounts.ContainsKey(reqItem.ItemId) ? aggregatedCounts[reqItem.ItemId] : 0;
+                int missingCount = reqItem.Count - currentCount;
                 if (missingCount > 0)
                 {
                     hasAllRequiredItems = false;
-                    playerItemsCount.Add(reqItem.Name, missingCount);
+                    playerItemsCount.Add(reqItem.Name ?? reqItem.ItemId, missingCount);
                 }
             }
 
@@ -750,11 +702,13 @@ namespace DOL.GS.Scripts
             }
 
             if (echItem.MoneyPrice > 0)
+            {
                 player.RemoveMoney(Currency.Copper.Mint(echItem.MoneyPrice));
-            player.SendSystemMessage(string.Format("Vous avez payé {0}.", Money.GetString(echItem.MoneyPrice)));
+                player.SendSystemMessage(string.Format("Vous avez payé {0}.", Money.GetString(echItem.MoneyPrice)));
+            }
 
             if (requireItems.Any())
-                this.RemoveItemsFromPlayer(player, requireItems, item);
+                this.RemoveItemsFromPlayer(player, requireItems);
 
 
             echItem.ChangedItemCount++;

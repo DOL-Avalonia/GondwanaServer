@@ -1,24 +1,8 @@
-﻿/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
+﻿
 using System;
 using System.Reflection;
 using DOL.GS;
+using DOL.GS.Scripts;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Keeps;
@@ -32,7 +16,7 @@ namespace DOL.GS
     /// </summary>
     public class LootGeneratorDreadedSeals : LootGeneratorBase
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static readonly ItemTemplate m_GlowingDreadedSeal = GameServer.Database.FindObjectByKey<ItemTemplate>("glowing_dreaded_seal");
         private static readonly ItemTemplate m_SanguineDreadedSeal = GameServer.Database.FindObjectByKey<ItemTemplate>("sanguine_dreaded_seal");
@@ -52,6 +36,8 @@ namespace DOL.GS
                 if ((killer as GameLiving)?.GetController() is not GamePlayer player)
                     return loot;
 
+                int playerCount = WorldMgr.GetAllPlayingClientsCount();
+
                 switch (mob)
                 {
                     // Certain mobs have a 100% drop chance of multiple seals at once
@@ -61,6 +47,40 @@ namespace DOL.GS
                         else
                             loot.AddFixed(m_SanguineDreadedSeal, 5 * lord.Component.Keep.Level);
                         break;
+
+
+                    case TerritoryBoss tBoss:
+                    {
+                        int bossSealCount = 3; // default amount for > 50 players population
+                        
+                        if (playerCount < 20)
+                            bossSealCount = 10;
+                        else if (playerCount <= 50)
+                            bossSealCount = 5;
+
+                        loot.AddFixed(m_SanguineDreadedSeal, bossSealCount);
+                        break;
+                    }
+
+                    case TerritoryGuard tGuard:
+                    {
+                        int baseChance = 2000; 
+                        
+                        if (playerCount < 20)
+                            baseChance = 5000;
+                        else if (playerCount <= 50)
+                            baseChance = 3000;
+
+                        int finalChance = Math.Min(10000, baseChance + (player.LootChance * 100));
+
+                        if (Util.Random(9999) < finalChance)
+                        {
+                            loot.AddFixed(m_SanguineDreadedSeal, 1);
+                        }
+                        
+                        break;
+                    }
+
                     default:
                         if (mob.Name.ToUpper() == "LORD AGRAMON")
                             loot.AddFixed(m_SanguineDreadedSeal, 10);

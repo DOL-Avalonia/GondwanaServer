@@ -19,7 +19,6 @@ using DOL.Language;
 using DOL.Territories;
 using Google.Protobuf.WellKnownTypes;
 using log4net;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -32,16 +31,8 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using System.Reflection.Metadata;
-using System.Reflection.PortableExecutable;
-using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
-using static AmteScripts.Managers.PvpManager;
-using static DOL.GameEvents.GameEvent;
-using static DOL.GS.Area;
-using static System.Formats.Asn1.AsnWriter;
-using static System.Threading.Lock;
 using Region = DOL.GS.Region;
 using Zone = DOL.GS.Zone;
 
@@ -1140,7 +1131,7 @@ namespace AmteScripts.Managers
             }
             else
             {
-                int currentPvPCount = WorldMgr.GetAllPlayingClients().Count(c => c?.Player != null && c.Player.IsInPvP);
+                WorldMgr.GetPvPPopulation(out int currentPvPCount, out _, out _, out _);
                 if (currentPvPCount > PeakPlayerCount)
                     PeakPlayerCount = currentPvPCount;
 
@@ -1521,7 +1512,7 @@ namespace AmteScripts.Managers
 
         private IEnumerable<GamePlayer> GetPlayersInPvP()
         {
-            return WorldMgr.GetAllPlayingClients().Select(c => c.Player).Where(p => p is { IsInPvP: true });
+            return WorldMgr.GetAllPlayersInPvP();
         }
 
         private async Task DoAnnouncements(IList<IGrouping<int, HighScore>> scores, List<GamePlayer> pvpPlayers, eSessionTypes sessionType)
@@ -2208,7 +2199,12 @@ namespace AmteScripts.Managers
             if (!_isOpen || _activeSession == null) return;
 
             if (!killer.IsInPvP || !victim.IsInPvP) return;
-            
+
+            if (!GameLiving.TaskSafeguardCheck(killer, victim, "Standard", false))
+            {
+                return;
+            }
+
             // check if victim is RR5 or more
             bool rr5bonus = (victim.RealmLevel >= 40);
             bool isSolo = killer.Group is not { MemberCount: > 1 };
@@ -3642,12 +3638,10 @@ namespace AmteScripts.Managers
                 .Where(t => t.Type == Territory.eType.Subterritory && t.Zone != null && zoneIDs.Contains(t.Zone.ID))
                 .ToList();
 
-            var clients = specificPlayer != null ? new[] { specificPlayer.Client } : WorldMgr.GetAllPlayingClients();
-
-            foreach (var client in clients)
+            IEnumerable<GamePlayer> players = specificPlayer != null ? new[] { specificPlayer } : GetPlayersInPvP();
+            foreach (var p in players)
             {
-                var p = client?.Player;
-                if (p == null || !p.IsInPvP) continue;
+                if (!p.IsAlive) continue;
 
                 byte markerId = 1;
 
@@ -3746,14 +3740,11 @@ namespace AmteScripts.Managers
 
             int finalPoints = (int)Math.Round(points);
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                if (client.Player != null && client.Player.IsInPvP)
-                {
-                    string modeStr = isSolo ? LanguageMgr.GetTranslation(client.Account.Language, "PvPManager.Solo") : LanguageMgr.GetTranslation(client.Account.Language, "PvPManager.Group");
-                    string msg = LanguageMgr.GetTranslation(client.Account.Language, "PvPManager.BossHunt.SlewBoss", killer.Name, modeStr, boss.Name, finalPoints);
-                    client.Player.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                }
+                string modeStr = isSolo ? LanguageMgr.GetTranslation(p.Language, "PvPManager.Solo") : LanguageMgr.GetTranslation(p.Language, "PvPManager.Group");
+                string msg = LanguageMgr.GetTranslation(p.Language, "PvPManager.BossHunt.SlewBoss", killer.Name, modeStr, boss.Name, finalPoints);
+                p.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
 
             AwardScore(killer, (score) =>
@@ -3772,7 +3763,7 @@ namespace AmteScripts.Managers
 
             _activeBosses.RemoveAll(b => b == null || !b.IsAlive || b.ObjectState != GameObject.eObjectState.Active);
 
-            var playingClients = WorldMgr.GetAllPlayingClients().Where(c => c.Player != null && c.Player.IsInPvP).ToList();
+            var playingPlayers = GetPlayersInPvP().ToList();
 
             for (int i = 0; i < _activeBosses.Count; i++)
             {
@@ -3789,16 +3780,16 @@ namespace AmteScripts.Managers
 
                 bool showMarker = isUnderAttack || hasPlayersNearby;
 
-                foreach (var client in playingClients)
+                foreach (var p in playingPlayers)
                 {
                     if (showMarker)
                     {
-                        client.Player.Out.SendMinotaurRelicMapUpdate(markerId, boss.Position);
-                        client.Player.Out.SendMinotaurRelicRealm(markerId, 1);
+                        p.Out.SendMinotaurRelicMapUpdate(markerId, boss.Position);
+                        p.Out.SendMinotaurRelicRealm(markerId, 1);
                     }
                     else
                     {
-                        client.Player.Out.SendMinotaurRelicMapRemove(markerId);
+                        p.Out.SendMinotaurRelicMapRemove(markerId);
                     }
                 }
             }
@@ -3848,10 +3839,9 @@ namespace AmteScripts.Managers
             _kothOwnershipStartTick = 0;
 
             string msg = $"[KotH] The Hill has moved to a new location!";
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach(var p in GetPlayersInPvP())
             {
-                if (client.Player != null && client.Player.IsInPvP)
-                    client.Player.Out.SendMessage(msg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                p.Out.SendMessage(msg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
             }
             
             _kothGameLoop?.Stop();
@@ -4184,19 +4174,12 @@ namespace AmteScripts.Managers
 
             bool isClaimed = _activeHill.OwningGuild != null || _activeHill.OwningSolo != null;
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                if (client.Player != null && client.Player.IsInPvP)
-                {
-                    if (isClaimed)
-                    {
-                        client.Player.Out.SendMapObjective(KOTH_MARKER_ID, _activeHill.Position);
-                    }
-                    else
-                    {
-                        client.Player.Out.ClearMapObjective(KOTH_MARKER_ID);
-                    }
-                }
+                if (isClaimed)
+                    p.Out.SendMapObjective(KOTH_MARKER_ID, _activeHill.Position);
+                else
+                    p.Out.ClearMapObjective(KOTH_MARKER_ID);
             }
         }
 
@@ -4408,10 +4391,9 @@ namespace AmteScripts.Managers
             _coreRunPlayerSnapshots.Clear();
             if (_coreRunToreArea == null) return;
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                GamePlayer p = client.Player;
-                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+                if (!p.IsAlive) continue;
 
                 if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate)) continue;
 
@@ -4483,13 +4465,10 @@ namespace AmteScripts.Managers
 
         private void BroadcastCoreRunMessage(string langKey, eChatType type)
         {
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                if (client.Player != null && client.Player.IsInPvP)
-                {
-                    string localizedMsg = LanguageMgr.GetTranslation(client.Account.Language, langKey);
-                    client.Player.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
-                }
+                string localizedMsg = LanguageMgr.GetTranslation(p.Language, langKey);
+                p.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -4497,17 +4476,16 @@ namespace AmteScripts.Managers
         {
             if (_coreRunToreArea == null) return;
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                GamePlayer p = client?.Player;
-                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+                if (!p.IsAlive) continue;
 
                 if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate))
                     continue;
 
                 if (_coreRunToreArea.IsContaining(p.Coordinate))
                 {
-                    string localizedMsg = LanguageMgr.GetTranslation(client!.Account.Language, langKey);
+                    string localizedMsg = LanguageMgr.GetTranslation(p.Language, langKey);
                     p.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
                 }
             }
@@ -4593,10 +4571,9 @@ namespace AmteScripts.Managers
             if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun || _coreRunToreArea == null)
                 return 0;
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                GamePlayer p = client?.Player;
-                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+                if (!p.IsAlive) continue;
 
                 if (_coreRunCenterSafeZone != null && _coreRunCenterSafeZone.IsContaining(p.Coordinate))
                     continue;
@@ -4807,13 +4784,10 @@ namespace AmteScripts.Managers
 
         private void BroadcastBiohazardMessage(string langKey, eChatType type)
         {
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in GetPlayersInPvP())
             {
-                if (client.Player != null && client.Player.IsInPvP)
-                {
-                    string localizedMsg = LanguageMgr.GetTranslation(client.Account.Language, langKey);
-                    client.Player.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
-                }
+                string localizedMsg = LanguageMgr.GetTranslation(p.Language, langKey);
+                p.Out.SendMessage(localizedMsg, type, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -4833,10 +4807,9 @@ namespace AmteScripts.Managers
                     RotateBiohazardChests();
                 }
 
-                foreach (var client in WorldMgr.GetAllPlayingClients())
+                foreach (var p in GetPlayersInPvP())
                 {
-                    GamePlayer p = client?.Player;
-                    if (p == null || !p.IsInPvP || !p.IsAlive || p.CurrentRegion == null) continue;
+                    if (!p.IsAlive || p.CurrentRegion == null) continue;
 
                     // Zombie outside Radioactive Zone logic (Damage decay)
                     if (p.IsDamned && !p.IsRadioactiveAreaActive)
@@ -4912,10 +4885,10 @@ namespace AmteScripts.Managers
             Position? flagPos = null;
             GamePlayer flagCarrier = null;
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            var pvpPlayers = GetPlayersInPvP().ToList();
+            foreach (var p in pvpPlayers)
             {
-                var p = client.Player;
-                if (p == null || !p.IsInPvP || !p.IsAlive) continue;
+                if (!p.IsAlive) continue;
 
                 bool isCarryingFlag = false;
                 for (eInventorySlot slot = eInventorySlot.FirstBackpack; slot <= eInventorySlot.LastBackpack; slot++)
@@ -4936,10 +4909,9 @@ namespace AmteScripts.Managers
                 }
             }
 
-            foreach (var client in WorldMgr.GetAllPlayingClients())
+            foreach (var p in pvpPlayers)
             {
-                var p = client.Player;
-                if (p == null || !p.IsInPvP) continue;
+                if (!p.IsAlive) continue;
 
                 if (flagPos.HasValue && p != flagCarrier)
                 {
@@ -5512,12 +5484,7 @@ namespace AmteScripts.Managers
                 lines.Add($"Session Max Group size: {CurrentSession?.GroupMaxSize} players");
                 lines.Add("");
 
-                int inPvP = 0;
-                foreach (var c in WorldMgr.GetAllPlayingClients())
-                {
-                    if (c?.Player != null && c.Player.IsInPvP)
-                        inPvP++;
-                }
+                WorldMgr.GetPvPPopulation(out int inPvP, out _, out _, out _);
                 lines.Add($"Players currently in PvP: {inPvP}");
             }
 

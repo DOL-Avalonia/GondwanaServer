@@ -5,6 +5,8 @@ using DOL.GS.Commands;
 using AmteScripts.Managers;
 using DOL.GS;
 using DOL.GS.PacketHandler;
+using AmteScripts.PvP.Rewards;
+using DOL.GS.Scripts;
 
 namespace DOL.GS.Commands
 {
@@ -26,7 +28,8 @@ namespace DOL.GS.Commands
         "Commands.GM.PvP.Usage.Unforce",
         "Commands.GM.PvP.Usage.Status",
         "Commands.GM.PvP.Usage.Refresh",
-        "Commands.GM.PvP.Usage.Reset")]
+        "Commands.GM.PvP.Usage.Reset",
+        "Commands.GM.PvP.Usage.SpawnDebugChests")]
     public class PvpCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         public void OnCommand(GameClient client, string[] args)
@@ -175,6 +178,53 @@ namespace DOL.GS.Commands
                 default:
                     DisplaySyntax(client);
                     break;
+
+                case "spawndebugchests" when client.Account.PrivLevel >= 2:
+                    {
+                        var targetNPC = client.Player.TargetObject as GameNPC;
+                        
+                        eRewardTier selectedTier;
+                        string expectedPrefix;
+
+                        if (targetNPC is TeleporterPvP)
+                        {
+                            selectedTier = eRewardTier.PvPTier1; // Yields 'Legendary' with high scores
+                            expectedPrefix = "Legendary";
+                        }
+                        else if (targetNPC is TeleporterRvR)
+                        {
+                            selectedTier = eRewardTier.RvRFinest; // Yields 'Mythical' with high scores
+                            expectedPrefix = "Mythical";
+                        }
+                        else
+                        {
+                            DisplayMessage(client, "You must select a PvP Teleporter or an RvR Teleporter as your target first to spawn the chests around it.");
+                            return;
+                        }
+
+                        int fakePeakPlayers = 100;
+                        int fakeScore = 100;
+                        int fakeNeededPlayers = 10;
+
+                        bool spawned = RewardChestSpawner.SpawnChestsForPlayer(
+                            client.Player,
+                            selectedTier, 
+                            targetNPC,
+                            fakePeakPlayers,
+                            fakeScore,
+                            fakeNeededPlayers
+                        );
+
+                        if (spawned)
+                        {
+                            DisplayMessage(client, $"Debug '{expectedPrefix}' reward chests have been successfully spawned around the teleporter.");
+                        }
+                        else
+                        {
+                            DisplayMessage(client, "Failed to spawn debug reward chests. Check the console logs for errors.");
+                        }
+                        break;
+                    }
 
                 case "info":
                     {
