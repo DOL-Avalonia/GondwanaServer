@@ -47,6 +47,8 @@ ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (ou /at) : Activez l
 ServerRPGMessage.CmdMarket:				/market <open|close|name> : Déployez, renommez ou fermez votre marché personnel.
 ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto> : Automatisez votre file d'attente d'artisanat et achetez facilement les ingrédients manquants directement aux marchands.
 ServerRPGMessage.CmdCombineList:		/combine list : Affiche vos combinaisons d'objets d'artisanat alternatif découvertes avec succès.
+ServerRPGMessage.CmdEvent:				/event : Affiche des informations concernant les événements mondiaux en cours.
+ServerRPGMessage.CmdEpicMount:			/epicmount : Contrôles de la monture volante épique - Utilisation : /epicmount [voler | aller | cible | gauche | droite | arret | monter | descendre | atterrir].
 ServerRPGMessage.CmdVol:				/vol ou /steal <joueur> : Pour voler de l'argent ou de précieuses Reliques de Territoire aux joueurs rivaux ! Permet aussi de dérober les trésors récupérés dans les coffres d'un clan adverse en PvP.
 ServerRPGMessage.CmdFaceMob:			/facemob <nom_du_monstre> : Tournez-vous vers la direction où se trouve le monstre spécifié dans votre région. Très utile pour les quêtes !
 ServerRPGMessage.CmdAskName:			/askname : Demandez son nom à votre cible afin de l'afficher. Vous devez le faire avant de pouvoir l'ajouter comme ami(e).

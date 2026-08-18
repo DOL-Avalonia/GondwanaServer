@@ -1,13 +1,14 @@
-using System;
-using System.Linq;
 using DOL.Database;
-using DOL.GS;
-using DOL.GS.Housing;
-using DOL.Language;
-using DOL.GS.ServerProperties;
-using DOL.GS.PacketHandler;
-using DOL.GS.Finance;
 using DOL.Events;
+using DOL.GS;
+using DOL.GS.Finance;
+using DOL.GS.Housing;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
+using DOL.Language;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DOL.GS.Scripts
 {
@@ -15,6 +16,7 @@ namespace DOL.GS.Scripts
     {
         private static System.Threading.Timer m_loanTimer;
         private static int m_currentInterval = 60000; // Track interval state
+        private static int m_isCheckingLoans = 0;
 
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
@@ -61,9 +63,11 @@ namespace DOL.GS.Scripts
 
         public static void IssueCoupon(GamePlayer player, DBBanque bank, int type, long amount)
         {
-            if (bank.LoanAmount > 0) { player.Out.SendMessage("You already have an active loan.", eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
-            if (bank.IsDebtor) { player.Out.SendMessage("You cannot get a loan while you are marked as a debtor.", eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
-            if (DateTime.Now < bank.LoanRestrictionUntil) { player.Out.SendMessage("You are restricted from making loans due to previous debts.", eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
+            string lang = player.Client.Account.Language;
+
+            if (bank.LoanAmount > 0) { player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.HasLoan"), eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
+            if (bank.IsDebtor) { player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.IsDebtor"), eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
+            if (DateTime.Now < bank.LoanRestrictionUntil) { player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.Restricted"), eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
 
             long minRequiredFunds = 0;
             if (type == 1)
@@ -80,12 +84,12 @@ namespace DOL.GS.Scripts
 
             if (bank.Money < minRequiredFunds)
             {
-                player.Out.SendMessage($"You do not have the minimum required funds in your bank ({Money.GetString(minRequiredFunds)}).", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.MinFunds", Money.GetString(minRequiredFunds, lang)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
-            if (HasCoupon(player)) { player.Out.SendMessage("You already have a loan coupon in your inventory or vault.", eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
-            
+            if (HasCoupon(player)) { player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.HasCoupon"), eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
+
             ItemUnique item = new ItemUnique
             {
                 Model = 499,
@@ -109,11 +113,11 @@ namespace DOL.GS.Scripts
             if (!player.Inventory.AddTemplate(invItem, 1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
             {
                 GameServer.Database.DeleteObject(item);
-                player.Out.SendMessage("Your backpack is full. Please clear some space.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.InventoryFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
-            
-            player.Out.SendMessage($"You received a {item.Name}. The loan countdown triggers when used at a merchant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.ReceivedCoupon", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
         public static bool TryUseCoupon(GamePlayer player, long costInCopper, bool isLotMarker)
@@ -121,7 +125,7 @@ namespace DOL.GS.Scripts
             InventoryItem coupon = FindCoupon(player, costInCopper, isLotMarker);
             if (coupon == null) 
             {
-                if (HasCoupon(player)) player.Out.SendMessage("I noted you have a loan, but it isn't necessary or valid to use it for an item like this.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                if (HasCoupon(player)) player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "BankLoanMgr.NotValidUse"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
@@ -163,14 +167,16 @@ namespace DOL.GS.Scripts
             bank.LastLoanPayment = DateTime.Now;
 
             GameServer.Database.SaveObject(bank);
-            player.Out.SendMessage($"I've cashed your loan coupon of {goldAmount}g. The bank will withdraw daily payments.", eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "BankLoanMgr.Cashed", goldAmount), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
         }
 
         public static void RepayLoanEarly(GamePlayer player, DBBanque bank)
         {
+            string lang = player.Client.Account.Language;
+
             if (bank.LoanAmount <= 0 || bank.LoanType == 0)
             {
-                player.Out.SendMessage("You don't have an active loan.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.NoActiveLoan"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -217,178 +223,191 @@ namespace DOL.GS.Scripts
                 bank.LoanOriginalAmount = 0;
                 GameServer.Database.SaveObject(bank);
 
-                player.Out.SendMessage($"You have successfully repaid your loan early for {Money.GetString(earlyRepaymentAmount)} with a reduced interest rate.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.RepaidEarly", Money.GetString(earlyRepaymentAmount, lang)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
             else
             {
-                player.Out.SendMessage($"You need {Money.GetString(earlyRepaymentAmount)} in total to be able to repay your loan early.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.NeedFundsEarly", Money.GetString(earlyRepaymentAmount, lang)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
 
         public static void CheckPeriodicLoans(object state)
         {
-            bool debug = Properties.BANK_LOAN_DEBUG;
+            if (System.Threading.Interlocked.CompareExchange(ref m_isCheckingLoans, 1, 0) == 1)
+                return;
 
-            int targetInterval = debug ? 15000 : 60000;
-            if (m_currentInterval != targetInterval)
+            try
             {
-                m_currentInterval = targetInterval;
-                m_loanTimer.Change(m_currentInterval, m_currentInterval);
-            }
+                bool debug = Properties.BANK_LOAN_DEBUG;
 
-            var banks = GameServer.Database.SelectAllObjects<DBBanque>();
-            foreach (var bank in banks)
-            {
-                bool saved = false;
-
-                if (bank.LoanType > 0 && bank.LoanDaysRemaining > 0 && bank.LastLoanPayment != DateTime.MinValue)
+                int targetInterval = debug ? 15000 : 60000;
+                if (m_currentInterval != targetInterval)
                 {
-                    TimeSpan passed = DateTime.Now - bank.LastLoanPayment;
+                    m_currentInterval = targetInterval;
+                    m_loanTimer.Change(m_currentInterval, m_currentInterval);
+                }
 
-                    double requiredIntervalInDays = 1.0;
-                    if (debug)
+                var banks = GameServer.Database.SelectAllObjects<DBBanque>();
+                foreach (var bank in banks)
+                {
+                    bool saved = false;
+
+                    if (bank.LoanType > 0 && bank.LoanDaysRemaining > 0 && bank.LastLoanPayment != DateTime.MinValue)
                     {
-                        // 30 seconds for personal (Type 1), 15 seconds for house (Type 2)
-                        requiredIntervalInDays = bank.LoanType == 1 ? TimeSpan.FromSeconds(30).TotalDays : TimeSpan.FromSeconds(15).TotalDays;
-                    }
+                        TimeSpan passed = DateTime.Now - bank.LastLoanPayment;
 
-                    if (passed.TotalDays >= requiredIntervalInDays)
-                    {
-                        int intervalsToProcess = (int)(passed.TotalDays / requiredIntervalInDays);
-                        long totalOwed = bank.LoanType == 1 ? (long)(bank.LoanOriginalAmount * 1.15) : (long)(bank.LoanOriginalAmount * 1.10);
-                        int totalDays = bank.LoanType == 1 ? 7 : 30;
-                        long dailyPayment = totalOwed / totalDays;
-                        long amountToPay = 0;
-
-                        for (int i = 0; i < intervalsToProcess; i++)
+                        double requiredIntervalInDays = 1.0;
+                        if (debug)
                         {
-                            if (bank.LoanDaysRemaining > 0)
-                            {
-                                amountToPay += dailyPayment;
-                                bank.LoanAmount -= dailyPayment;
-                                bank.LoanDaysRemaining--;
-                            }
+                            // 30 seconds for personal (Type 1), 15 seconds for house (Type 2)
+                            requiredIntervalInDays = bank.LoanType == 1 ? TimeSpan.FromSeconds(30).TotalDays : TimeSpan.FromSeconds(15).TotalDays;
                         }
 
-                        if (amountToPay > 0)
+                        if (passed.TotalDays >= requiredIntervalInDays)
                         {
-                            // 1. Try to take from bank
-                            if (bank.Money >= amountToPay)
-                            {
-                                bank.Money -= amountToPay;
-                                amountToPay = 0;
-                            }
-                            else
-                            {
-                                if (bank.Money > 0)
-                                {
-                                    amountToPay -= bank.Money;
-                                    bank.Money = 0;
-                                }
+                            int intervalsToProcess = (int)(passed.TotalDays / requiredIntervalInDays);
+                            long totalOwed = bank.LoanType == 1 ? (long)(bank.LoanOriginalAmount * 1.15) : (long)(bank.LoanOriginalAmount * 1.10);
+                            int totalDays = bank.LoanType == 1 ? 7 : 30;
+                            long dailyPayment = totalOwed / totalDays;
+                            long amountToPay = 0;
 
-                                // 2. Try to take from Player's Pocket (Online or Offline)
-                                GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
-                                if (p != null)
+                            for (int i = 0; i < intervalsToProcess; i++)
+                            {
+                                if (bank.LoanDaysRemaining > 0)
                                 {
-                                    long pocketMoney = p.CopperBalance;
-                                    if (pocketMoney >= amountToPay)
-                                    {
-                                        p.RemoveMoney(Currency.Copper.Mint(amountToPay));
-                                        p.Out.SendMessage($"The bank withdrew {Currency.Copper.Mint(amountToPay).ToText()} from your pocket for your loan.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                                        amountToPay = 0;
-                                    }
-                                    else if (pocketMoney > 0)
-                                    {
-                                        p.RemoveMoney(Currency.Copper.Mint(pocketMoney));
-                                        p.Out.SendMessage($"The bank withdrew {Currency.Copper.Mint(pocketMoney).ToText()} from your pocket to partially cover your loan.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                                        amountToPay -= pocketMoney;
-                                    }
+                                    amountToPay += dailyPayment;
+                                    bank.LoanAmount -= dailyPayment;
+                                    bank.LoanDaysRemaining--;
+                                }
+                            }
+
+                            if (amountToPay > 0)
+                            {
+                                // 1. Try to take from bank
+                                if (bank.Money >= amountToPay)
+                                {
+                                    bank.Money -= amountToPay;
+                                    amountToPay = 0;
                                 }
                                 else
                                 {
-                                    // Player is offline: pull from DBCharacter directly
-                                    DOLCharacters character = GameServer.Database.FindObjectByKey<DOLCharacters>(bank.PlayerID);
-                                    if (character != null)
+                                    if (bank.Money > 0)
                                     {
-                                        long offlineMoney = Money.GetMoney(character.Mithril, character.Platinum, character.Gold, character.Silver, character.Copper);
-                                        if (offlineMoney >= amountToPay)
+                                        amountToPay -= bank.Money;
+                                        bank.Money = 0;
+                                    }
+
+                                    // 2. Try to take from Player's Pocket (Online or Offline)
+                                    GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
+                                    if (p != null)
+                                    {
+                                        long pocketMoney = p.CopperBalance;
+                                        if (pocketMoney >= amountToPay)
                                         {
-                                            offlineMoney -= amountToPay;
+                                            p.RemoveMoney(Currency.Copper.Mint(amountToPay));
+                                            p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "BankLoanMgr.WithdrewPocket", Currency.Copper.Mint(amountToPay).ToText(p.Client.Account.Language)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                                             amountToPay = 0;
                                         }
-                                        else if (offlineMoney > 0)
+                                        else if (pocketMoney > 0)
                                         {
-                                            amountToPay -= offlineMoney;
-                                            offlineMoney = 0;
+                                            p.RemoveMoney(Currency.Copper.Mint(pocketMoney));
+                                            p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "BankLoanMgr.WithdrewPartially", Currency.Copper.Mint(pocketMoney).ToText(p.Client.Account.Language)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                            amountToPay -= pocketMoney;
                                         }
+                                    }
+                                    else
+                                    {
+                                        // Player is offline: pull from DBCharacter directly
+                                        DOLCharacters character = GameServer.Database.FindObjectByKey<DOLCharacters>(bank.PlayerID);
+                                        if (character != null)
+                                        {
+                                            long offlineMoney = Money.GetMoney(character.Mithril, character.Platinum, character.Gold, character.Silver, character.Copper);
+                                            if (offlineMoney >= amountToPay)
+                                            {
+                                                offlineMoney -= amountToPay;
+                                                amountToPay = 0;
+                                            }
+                                            else if (offlineMoney > 0)
+                                            {
+                                                amountToPay -= offlineMoney;
+                                                offlineMoney = 0;
+                                            }
 
-                                        character.Copper = Money.GetCopper(offlineMoney);
-                                        character.Silver = Money.GetSilver(offlineMoney);
-                                        character.Gold = Money.GetGold(offlineMoney);
-                                        character.Platinum = Money.GetPlatinum(offlineMoney);
-                                        character.Mithril = Money.GetMithril(offlineMoney);
-                                        GameServer.Database.SaveObject(character);
+                                            character.Copper = Money.GetCopper(offlineMoney);
+                                            character.Silver = Money.GetSilver(offlineMoney);
+                                            character.Gold = Money.GetGold(offlineMoney);
+                                            character.Platinum = Money.GetPlatinum(offlineMoney);
+                                            character.Mithril = Money.GetMithril(offlineMoney);
+                                            GameServer.Database.SaveObject(character);
+                                        }
+                                    }
+
+                                    // 3. Push any remaining missed payment to Debt
+                                    if (amountToPay > 0)
+                                    {
+                                        bank.Debt += amountToPay;
                                     }
                                 }
+                            }
 
-                                // 3. Push any remaining missed payment to Debt
-                                if (amountToPay > 0)
-                                {
-                                    bank.Debt += amountToPay;
-                                }
+                            if (bank.LoanDaysRemaining <= 0)
+                            {
+                                bank.LoanType = 0;
+                                bank.LoanAmount = 0;
+                                bank.LoanOriginalAmount = 0;
+                            }
+
+                            // Progress the timer correctly by the evaluated fractions of a day
+                            bank.LastLoanPayment = bank.LastLoanPayment.AddDays(intervalsToProcess * requiredIntervalInDays);
+                            saved = true;
+                        }
+                    }
+
+                    // Debtor Grace period check
+                    double debtorGraceDays = debug
+                        ? TimeSpan.FromSeconds(90).TotalDays
+                        : TimeSpan.FromHours(Properties.DEBTOR_GRACE_PERIOD_HOURS).TotalDays;
+
+                    if (bank.Money < 0 || bank.Debt > 0)
+                    {
+                        if (bank.NegativeMoneySince == DateTime.MinValue)
+                        {
+                            bank.NegativeMoneySince = DateTime.Now;
+                            bank.IsDebtor = true;
+                            saved = true;
+
+                            GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
+                            if (p != null)
+                            {
+                                string timeUnit = debug ? LanguageMgr.GetTranslation(p.Client.Account.Language, "BankLoanMgr.TimeUnit.Seconds") : (Properties.DEBTOR_GRACE_PERIOD_HOURS == 1 ? LanguageMgr.GetTranslation(p.Client.Account.Language, "BankLoanMgr.TimeUnit.Hour") : LanguageMgr.GetTranslation(p.Client.Account.Language, "BankLoanMgr.TimeUnit.Hours"));
+                                int timeVal = debug ? 90 : Properties.DEBTOR_GRACE_PERIOD_HOURS;
+                                string timeWarning = $"{timeVal} {timeUnit}";
+
+                                p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "BankLoanMgr.WarningDebt", timeWarning), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             }
                         }
-
-                        if (bank.LoanDaysRemaining <= 0)
+                        else if ((DateTime.Now - bank.NegativeMoneySince).TotalDays >= debtorGraceDays)
                         {
-                            bank.LoanType = 0;
-                            bank.LoanAmount = 0;
-                            bank.LoanOriginalAmount = 0;
-                        }
-
-                        // Progress the timer correctly by the evaluated fractions of a day
-                        bank.LastLoanPayment = bank.LastLoanPayment.AddDays(intervalsToProcess * requiredIntervalInDays);
-                        saved = true;
-                    }
-                }
-
-                // Debtor Grace period check
-                double debtorGraceDays = debug
-                    ? TimeSpan.FromSeconds(90).TotalDays
-                    : TimeSpan.FromHours(Properties.DEBTOR_GRACE_PERIOD_HOURS).TotalDays;
-
-                if (bank.Money < 0 || bank.Debt > 0)
-                {
-                    if (bank.NegativeMoneySince == DateTime.MinValue)
-                    {
-                        bank.NegativeMoneySince = DateTime.Now;
-                        bank.IsDebtor = true;
-                        saved = true;
-                        
-                        GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
-                        if (p != null)
-                        {
-                            string timeWarning = debug ? "90 seconds" : $"{ServerProperties.Properties.DEBTOR_GRACE_PERIOD_HOURS} hours";
-                            p.Out.SendMessage($"WARNING: Your bank account is in debt. You have {timeWarning} to reimburse your debt or your assets will be seized!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            SeizeAssets(bank);
+                            saved = true;
                         }
                     }
-                    else if ((DateTime.Now - bank.NegativeMoneySince).TotalDays >= debtorGraceDays)
+                    else
                     {
-                        SeizeAssets(bank);
-                        saved = true;
+                        if (bank.NegativeMoneySince != DateTime.MinValue || bank.IsDebtor)
+                        {
+                            bank.NegativeMoneySince = DateTime.MinValue;
+                            bank.IsDebtor = false;
+                            saved = true;
+                        }
                     }
-                }
-                else
-                {
-                    if (bank.NegativeMoneySince != DateTime.MinValue || bank.IsDebtor)
-                    {
-                        bank.NegativeMoneySince = DateTime.MinValue;
-                        bank.IsDebtor = false;
-                        saved = true;
-                    }
-                }
 
-                if (saved) GameServer.Database.SaveObject(bank);
+                    if (saved) GameServer.Database.SaveObject(bank);
+                }
+            }
+            finally
+            {
+                System.Threading.Interlocked.Exchange(ref m_isCheckingLoans, 0);
             }
         }
 
@@ -410,35 +429,73 @@ namespace DOL.GS.Scripts
             }
 
             long moneyRecovered = 0;
-            
-            var houses = GameServer.Database.SelectObjects<DBHouse>(DB.Column("OwnerID").IsEqualTo(bank.PlayerID));
-            foreach (var house in houses)
-            {
-                long price = 0;
-                switch (house.Model % 4)
-                {
-                    case 1: price = 500 * 10000L; break;   // Cottage
-                    case 2: price = 2500 * 10000L; break;  // House
-                    case 3: price = 5000 * 10000L; break;  // Villa
-                    case 0: price = 12500 * 10000L; break; // Mansion
-                }
+            long originalDebt = bank.Debt;
+            bool houseSeized = false;
+            bool horseSeized = false;
 
-                moneyRecovered += price;
-                House h = HouseMgr.GetHouse(house.RegionID, house.HouseNumber);
-                if (h != null) HouseMgr.RemoveHouse(h);
-                else GameServer.Database.DeleteObject(house);
-            }
-            
-            var invItems = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("OwnerID").IsEqualTo(bank.PlayerID));
-            foreach (var item in invItems)
+            GamePlayer pOnline = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
+
+            // 1. Try to sell Horses First to cover debt before houses
+            if (pOnline != null)
             {
-                ItemTemplate tpl = GameServer.Database.FindObjectByKey<ItemTemplate>(item.Id_nb) ?? GameServer.Database.FindObjectByKey<ItemUnique>(item.Id_nb) as ItemTemplate;
-                if (item.Item_Type == (int)eInventorySlot.Horse || (tpl != null && tpl.Item_Type == (int)eInventorySlot.Horse)) 
+                var itemsToRemove = new List<InventoryItem>();
+                lock (pOnline.Inventory)
                 {
-                    moneyRecovered += item.Price / 2;
-                    GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
-                    if (p != null) p.Inventory.RemoveItem(item);
-                    else GameServer.Database.DeleteObject(item);
+                    var allItems = pOnline.Inventory.AllItems.ToList();
+                    foreach (var item in allItems)
+                    {
+                        if (moneyRecovered >= bank.Debt) break;
+                        ItemTemplate tpl = item.Template;
+                        if (item.Item_Type == (int)eInventorySlot.Horse || (tpl != null && tpl.Item_Type == (int)eInventorySlot.Horse))
+                        {
+                            long horsePrice = (item.Price > 0) ? item.Price : (tpl != null ? tpl.Price : 4000000);
+                            moneyRecovered += horsePrice / 2;
+                            itemsToRemove.Add(item);
+                            horseSeized = true;
+                        }
+                    }
+                    foreach (var item in itemsToRemove) pOnline.Inventory.RemoveItem(item);
+                }
+            }
+            else
+            {
+                var invItems = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("OwnerID").IsEqualTo(bank.PlayerID));
+                foreach (var item in invItems)
+                {
+                    if (moneyRecovered >= bank.Debt) break;
+
+                    ItemTemplate tpl = GameServer.Database.FindObjectByKey<ItemTemplate>(item.Id_nb) ?? GameServer.Database.FindObjectByKey<ItemUnique>(item.Id_nb) as ItemTemplate;
+                    if (item.Item_Type == (int)eInventorySlot.Horse || (tpl != null && tpl.Item_Type == (int)eInventorySlot.Horse))
+                    {
+                        long horsePrice = (item.Price > 0) ? item.Price : (tpl != null ? tpl.Price : 4000000);
+                        moneyRecovered += horsePrice / 2;
+                        horseSeized = true;
+                        GameServer.Database.DeleteObject(item);
+                    }
+                }
+            }
+
+            // 2. Sell Houses only if the debt is still not covered!
+            if (moneyRecovered < bank.Debt)
+            {
+                var houses = GameServer.Database.SelectObjects<DBHouse>(DB.Column("OwnerID").IsEqualTo(bank.PlayerID));
+                foreach (var house in houses)
+                {
+                    if (moneyRecovered >= bank.Debt) break;
+                    houseSeized = true;
+                    long price = 0;
+                    switch (house.Model % 4)
+                    {
+                        case 1: price = 500 * 10000L; break;   // Cottage
+                        case 2: price = 2500 * 10000L; break;  // House
+                        case 3: price = 5000 * 10000L; break;  // Villa
+                        case 0: price = 12500 * 10000L; break; // Mansion
+                    }
+
+                    moneyRecovered += price;
+                    House h = HouseMgr.GetHouse(house.RegionID, house.HouseNumber);
+                    if (h != null) HouseMgr.RemoveHouse(h);
+                    else GameServer.Database.DeleteObject(house);
                 }
             }
 
@@ -455,37 +512,67 @@ namespace DOL.GS.Scripts
             DOLCharacters character = GameServer.Database.FindObjectByKey<DOLCharacters>(bank.PlayerID);
             string charName = character != null ? character.Name : "Unknown";
 
-            if (bank.Debt > 0)
+            string lang = null;
+            if (pOnline != null && pOnline.Client?.Account != null)
             {
-                long debtCopper = bank.Debt;
+                lang = pOnline.Client.Account.Language;
+            }
+            else if (character != null && !string.IsNullOrEmpty(character.AccountName))
+            {
+                Account acc = GameServer.Database.FindObjectByKey<Account>(character.AccountName);
+                if (acc != null && !string.IsNullOrEmpty(acc.Language))
+                {
+                    lang = acc.Language;
+                }
+            }
+
+            if (string.IsNullOrEmpty(lang))
+                lang = LanguageMgr.DefaultLanguage;
+
+            if (!LanguageMgr.TryGetTranslation(out string bankerName, lang, "BankLoanMgr.BankerName"))
+                bankerName = "Banker";
+
+            if (bank.Debt > 0 || houseSeized)
+            {
+                // Strict Penalty (Houses seized or debt still partially unpaid)
+                long debtCopper = bank.Debt > 0 ? bank.Debt : originalDebt;
+                if (debtCopper == 0) debtCopper = 10000;
                 long debtGold = debtCopper / 10000;
                 int penaltyCost = (int)(debtGold * 1.30); // 30% added
+                if (penaltyCost <= 0) penaltyCost = 150;
                 int jailDays = 7 + (int)(debtGold / 50);
 
-                bank.Debt = 0; // Wipe from bank (shifts over to jail release cost)
+                bank.Debt = 0;
                 bank.NegativeMoneySince = DateTime.MinValue;
                 bank.LoanRestrictionUntil = DateTime.Now.AddDays(jailDays).AddMonths(3);
 
+                string reasonKey = houseSeized ? "BankLoanMgr.JailReason.HouseSeized" : "BankLoanMgr.JailReason.UnpaidDebt";
+                if (!LanguageMgr.TryGetTranslation(out string reason, lang, reasonKey))
+                    reason = houseSeized ? "Unpaid Debt - Properties Seized." : "Unpaid Debt.";
+
                 if (character != null)
                 {
-                    GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
-                    if (p != null) JailMgr.EmprisonnerRP(p, penaltyCost, DateTime.Now.AddDays(jailDays), "Banker", "Unpaid Debt", false);
-                    else JailMgr.EmprisonnerRP(charName, penaltyCost, DateTime.Now.AddDays(jailDays), "Banker", "Unpaid Debt");
+                    if (pOnline != null) JailMgr.EmprisonnerRP(pOnline, penaltyCost, DateTime.Now.AddDays(jailDays), bankerName, reason, false);
+                    else JailMgr.EmprisonnerRP(charName, penaltyCost, DateTime.Now.AddDays(jailDays), bankerName, reason);
                 }
             }
             else
             {
+                // Debt is fully covered by horses without touching houses! (Light penalty)
                 bank.NegativeMoneySince = DateTime.MinValue;
-                bank.LoanRestrictionUntil = DateTime.Now.AddDays(7);
+                bank.LoanRestrictionUntil = DateTime.Now.AddDays(10);
+
+                string reasonKey = horseSeized ? "BankLoanMgr.JailReason.HorseSeized" : "BankLoanMgr.JailReason.UnpaidDebt";
+                if (!LanguageMgr.TryGetTranslation(out string reason, lang, reasonKey))
+                    reason = horseSeized ? "Unpaid Debt - Mount Seized." : "Unpaid Debt.";
 
                 if (character != null)
                 {
-                    GamePlayer p = WorldMgr.GetClientByPlayerID(bank.PlayerID, false, false)?.Player;
-                    if (p != null) JailMgr.EmprisonnerRP(p, 150, DateTime.Now.AddDays(1), "Banker", "Asset Seizure for Debt", false);
-                    else JailMgr.EmprisonnerRP(charName, 150, DateTime.Now.AddDays(1), "Banker", "Asset Seizure for Debt");
+                    if (pOnline != null) JailMgr.EmprisonnerRP(pOnline, 150, DateTime.Now.AddDays(1), bankerName, reason, false);
+                    else JailMgr.EmprisonnerRP(charName, 150, DateTime.Now.AddDays(1), bankerName, reason);
                 }
             }
-            bank.IsDebtor = false; 
+            bank.IsDebtor = false;
         }
     }
 }

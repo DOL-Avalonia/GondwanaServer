@@ -6,10 +6,15 @@ Commands.GM.PvP.Usage.Close:		/pvp close : Force la fermeture du pvp
 Commands.GM.PvP.Usage.Unforce:		/pvp unforce : Permet après un '/pvp open' de fermer le pvp s'il n'est pas dans les bonnes horaires
 Commands.GM.PvP.Usage.Status:		/pvp status : Affiche le statut de la session PvP
 Commands.GM.PvP.Usage.Refresh:		/pvp refresh : Permet de rafraîchir les maps disponibles en PvP
-Commands.GM.PvP.Usage.Reset:		/pvp reset : Réinitialise la session PvP.
-Commands.GM.PvP.ZoneNotFound:		La zone {0} n'a pas été trouvée.
-Commands.GM.PvP.AlreadyOpen:		Une session de PvP est déjà en cours ({0})!
-Commands.GM.PvP.PvPOpened:			La session PvP "{0}" a été ouverte sur {1} (Région {2}).
-Commands.GM.PvP.PvPNotFound:        La session PvP "{0}" n'a pas pu être ouverte.
-Commands.GM.PvP.PvPNotOpened:       Aucune session PvP n'a pu être ouverte.
-Commands.GM.PvP.PvPCannotReset:     La session PvP actuelle ne peut pas être réitialisée, veuillez la terminer d'abord.
+Commands.GM.PvP.Usage.Reset:		/pvp reset : Réinitialise la session PvP
+Commands.GM.PvP.Usage.SpawnDebugChests:		/pvp spawndebugchests : Faire apparaître des coffres près du téléporteur ciblé
+Commands.GM.PvP.ZoneNotFound:				La zone {0} n'a pas été trouvée.
+Commands.GM.PvP.AlreadyOpen:				Une session de PvP est déjà en cours ({0})!
+Commands.GM.PvP.PvPOpened:					La session PvP "{0}" a été ouverte sur {1} (Région {2}).
+Commands.GM.PvP.PvPNotFound:				La session PvP "{0}" n'a pas pu être ouverte.
+Commands.GM.PvP.PvPNotOpened:				Aucune session PvP n'a pu être ouverte.
+Commands.GM.PvP.PvPCannotReset:				La session PvP actuelle ne peut pas être réitialisée, veuillez la terminer d'abord.
+Commands.GM.PvP.Spawns.SelectTeleporter:	Vous devez d'abord cibler un Téléporteur PvP ou RvR pour faire apparaître les coffres.
+Commands.GM.PvP.Spawns.Success:				Les coffres de récompense Debug '{0}' sont apparus avec succès autour du téléporteur.
+Commands.GM.PvP.Spawns.Failed:				Échec de l'apparition des coffres. Vérifiez les erreurs dans la console.
+Commands.PvP.Info.Title:					Informations PvP

@@ -4,6 +4,7 @@ GameUtils.Group.LivingJoined:			{0} a rejoint le groupe.
 GameUtils.Group.YouLeft:			Vous avez quitté votre groupe.
 GameUtils.Group.PlayerLeft:			{0} a quitté le groupe.
 GameUtils.Group.LivingLeft:			{0} a quitté le groupe.
+GameUtils.Group.CannotLeaveInArena:			Vous ne pouvez pas quitter votre groupe en étant inscrit ou que vous participez à un tournoi d'arène.
 GameUtils.Group.DisbandedLastMember:		Votre groupe a été automatiquement dissous car vous êtes le seul membre restant.
 GameUtils.Group.NewLeader:			{0} est désormais le chef du groupe.
 GameUtils.Group.NoGroupCreationInSession:	Créer ou rejoindre des groupes n'est pas autorisé dans cette session PvP.

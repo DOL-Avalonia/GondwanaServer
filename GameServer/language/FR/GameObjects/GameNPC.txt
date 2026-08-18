@@ -19,7 +19,8 @@ GameNPC.Interact.IsFull:						Ce {0} est plein.
 GameNPC.SayTo.Says:								{0} dit, "{1}"
 GameNPC.SayTo.SpeaksTo:							{0} parle avec {1}
 
-GameNPC.Interact.NotRenaissance:				Désolé, je ne parle qu'avec ceux qui ont accompli leur renaissance.
+GameNPC.Interact.NotRenaissance:			Désolé, je ne parle qu'avec ceux qui ont accompli leur renaissance.
+GameNPC.Combat.CantBeAttackedFromArena:		Vous ne pouvez pas combattre de monstres pendant que vous participez à un tournois d'Arène !
 
 GameNPC.BossAblative.ErodibleAbsorb:		Le bouclier ablatif de votre cible absorbe {0} dégâts ! ({1}% restants)
 GameNPC.BossAblative.ErodibleShatter:		Vous avez détruit le bouclier ablatif de votre cible !

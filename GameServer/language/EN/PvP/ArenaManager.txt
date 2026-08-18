@@ -1,0 +1,47 @@
+
+ArenaManager.Betting.NoWinnerBet:				No one bet on the winning team! The house claims the {0} pool!
+ArenaManager.Betting.Win:						You WON your bet! Payout: {0}
+ArenaManager.Betting.Lost:						You LOST your bet of {0}.
+ArenaManager.Betting.Distributed:				The betting pool of {0} has been distributed to the winners!
+ArenaManager.Betting.DebtCleared:				Your winnings have automatically cleared your bank debt!
+ArenaManager.Betting.Refunded:					The tournament was cancelled. Your bet of {0} has been refunded.
+ArenaManager.Queue.Opened:						A new [{0}] Arena contest is open for subscription! Talk to {1} to join. Queue closes in {2} minutes.
+ArenaManager.Queue.Joined:						You joined the Arena {0}v{1} queue.
+ArenaManager.Queue.GroupJoined:					Your group has joined the Arena queue.
+ArenaManager.Queue.ReasonLeft:					Your group was removed from the Arena queue because a member left the game.
+ArenaManager.Queue.ReasonDC:					Your group was removed from the Arena queue because a member disconnected or changed regions.
+ArenaManager.Match.Cleaned:						The Arena has been cleaned and is now open for new challenges!
+ArenaManager.Match.BetsClosed:					Bets are CLOSED! Let the battle begin!
+ArenaManager.Queue.RemovedNotEnough:			You were removed from the Arena queue because there were not enough players to form a full team. Better luck next time!
+ArenaManager.Match.NotEnoughStart:				Not enough participants to start the Arena Tournament. You must re-subscribe.
+ArenaManager.Match.EndedNoTeams:				The tournament ended prematurely (No Teams Left).
+ArenaManager.Match.Bye:							{0} gets a bye this round and advances!
+ArenaManager.Match.RoundStart:					{0} : {1} vs {2}
+ArenaManager.Match.FinalRound:					FINAL ROUND
+ArenaManager.Match.RoundNum:					ROUND {0}
+ArenaManager.Match.ArenaMatchLog:				=== ARENA MATCH: [1] {0} vs [2] {1} ===
+ArenaManager.Match.BettingOpen:					Betting is open for 45 seconds! Use /bet <Team1 or Team2> <gold>!
+ArenaManager.Match.Winner:						{0} Winner : {1}
+ArenaManager.Match.FinalWinner:					FINAL ROUND Winner : {0}!
+ArenaManager.Match.Survived:					Congratulations! You survived {0} rounds and won the Arena Tournament! You received {1} RP, {2} BP, and {3}!
+ArenaManager.Match.ChestsSpawned:				Your {0} reward chests have spawned nearby!
+ArenaManager.Match.OOBWarning:					You left the Arena bounds! Return within 15 seconds or be disqualified!
+ArenaManager.Match.OOBDisqualified:				{0} left the arena bounds.
+ArenaManager.Match.OOB5Sec:						Return to the arena! 5 seconds left!
+ArenaManager.Match.OOB10Sec:					Return to the arena! 10 seconds left!
+ArenaManager.Match.OOBReturned:					You returned within the arena boundaries.
+ArenaManager.Match.TeamDisqualified:			Your team has been disqualified: {0}
+ArenaManager.Match.TooManyLeft:					Too many participants left the arena tournament. There's not enough participants!
+ArenaManager.Match.Cancelled:					Arena Contest Cancelled: {0}
+ArenaManager.Match.MemberLeftRegion:			{0} left the region or disconnected.
+ArenaManager.Match.RoundStart.Normal:			ROUND {0} : {1} vs {2}
+ArenaManager.Match.RoundStart.Final:			FINAL ROUND : {0} vs {1}
+ArenaManager.Match.Winner.Normal:				ROUND {0} Winner : {1}
+ArenaManager.Match.Winner.Final:				FINAL ROUND Winner : {0}!
+ArenaManager.Debug.ForceShutdown:				Forced shutdown by GM.
+ArenaManager.Debug.ShutdownMsg:					Arena session force shut down.
+ArenaManager.Debug.Override:					Debug override.
+ArenaManager.Debug.ForcedSolo:					You forced a solo debug match. You are currently the active fighter.
+ArenaManager.Debug.ForcedSpectator:				You forced a debug match and joined as a spectator.
+ArenaManager.Debug.SwitchedSpectator:			You joined/switched to spectator mode.
+ArenaManager.Debug.SwitchedFighter:				You joined/switched to fighter mode.

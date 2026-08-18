@@ -30,6 +30,7 @@ Items.Specialitems.GuarkRingUsageStealing:			Nu poți folosi magia celestă în 
 Items.Specialitems.GuarkRingUsageAFK:				Nu poți folosi magia celestă în timp ce ești AFK!
 Items.Specialitems.GuarkRingUsageClimbing:			Nu poți folosi magia celestă în timp ce te cațeri!
 Items.Specialitems.GuarkRingUsageRelic:				Nu poți folosi magia celestă în timp ce porți o relicvă a teritoriului.
+Items.Specialitems.GuarkRingUsageArena:				Nu poți folosi magia celestă în timp ce participi la un turneu în Arenă.
 Items.Specialitems.GuarkRingCannotUseHere:			Nu poți folosi acest obiect aici.
 Items.Specialitems.GuarkRingDoNotMove:				Trebuie să rămâi în același loc pentru a folosi acest obiect.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Ai fost în luptă recent, așa că trebuie să aștepți pentru a putea folosi acest obiect din nou.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		Nu s-a putut distruge obiectul 
 Items.Specialitems.DieTriggerSpell.FailRez:			Blestemul care îți afectează cadavrul este prea puternic aici, vraja de înviere a eșuat!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Obiectul tău {0} este epuizat și a fost eliminat din inventar.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	Nu poți folosi acest obiect în luptă!
+Items.Specialitems.PasswordCurseItemUsageJailed:	Nu poți folosi acest obiect în timp ce ești întemnițat!
+Items.Specialitems.PasswordCurseItemUsageMounted:	Nu poți folosi acest obiect în timp ce ești pe montura ta!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	Nu poți folosi acest obiect în timp ce ești ascuns.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	Nu poți folosi acest obiect în timp ce ești pietrificat!
+Items.Specialitems.PasswordCurseItemUsageDamned:	Nu poți folosi acest obiect în timp ce ești blestemat!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	Nu poți folosi acest obiect în timp ce ești sub un descântec "{0}"!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	Nu poți folosi acest obiect în timp ce meșteșugești!
+Items.Specialitems.PasswordCurseItemUsageDuel:		Nu poți folosi acest obiect în timp ce ești într-un duel!
+Items.Specialitems.PasswordCurseItemUsageStealing:	Nu poți folosi acest obiect în timp ce furi de la alt jucător!
+Items.Specialitems.PasswordCurseItemUsageAFK:		Nu poți folosi acest obiect în timp ce ești AFK!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	Nu poți folosi acest obiect în timp ce te cațeri!
+Items.Specialitems.PasswordCurseItemUsageRelic:		Nu poți folosi acest obiect în timp ce transporți o relicvă de teritoriu.
+Items.Specialitems.PasswordCurseItemUsageArena:		Nu poți folosi acest obiect în timp ce participi la un Turneu de Arenă.

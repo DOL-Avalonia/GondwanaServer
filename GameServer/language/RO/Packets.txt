@@ -161,6 +161,16 @@ DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Consumă {0}% Mana pe ti
 DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Consumă {0}% din Condiție pe tick{1}.
 DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Pierde {0}% din Condiție la moarte{1}.
 DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Nu poate fi dezechipat.
+DetailDisplayHandler.UndeequippableItem.RequiresPassword:		- Necesită o formulă rostită pentru a activa blestemul și efectele.
+DetailDisplayHandler.UndeequippableItem.HaltsHealRegen:			- Oprește orice regenerare a sănătății în timp ce este echipat.
+DetailDisplayHandler.UndeequippableItem.PeriodicSpell:			- Aruncă periodic o vrajă specifică.
+DetailDisplayHandler.UndeequippableItem.PeriodicAura:			- Aplică periodic o aură vizuală.
+DetailDisplayHandler.LoanCoupon.PersonalTitle:					Cupon de împrumut personal
+DetailDisplayHandler.LoanCoupon.PersonalDesc:					Înmânează acest lucru oricărui negustor standard atunci când nu ai fonduri pentru a-l încasa.
+DetailDisplayHandler.LoanCoupon.PersonalMinPrice:				Nu poate fi folosit pentru obiecte sub {0} aur.
+DetailDisplayHandler.LoanCoupon.HouseTitle:						Cupon de împrumut pentru casă
+DetailDisplayHandler.LoanCoupon.HouseDesc:						Înmânează acest lucru unui negustor de locuințe sau unui marcator de lot atunci când nu ai fonduri pentru a-l încasa.
+DetailDisplayHandler.LoanCoupon.HouseMinPrice:					Utilizabil doar pentru achiziții de locuințe de {0} aur sau mai mult.
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:				{0} este prea departe!

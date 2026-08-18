@@ -139,7 +139,7 @@ namespace DOL.GS.Scripts
             {
                 if (!silent)
                 {
-                    player.Out.SendMessage("You cannot teleport while registered for an Arena Contest.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NoEnterInArena"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 }
                 return false;
             }

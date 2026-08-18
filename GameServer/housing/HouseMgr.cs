@@ -895,11 +895,11 @@ namespace DOL.GS.Housing
                                             paidFromBank = true;
                                             log.Debug($"[Housing] Rent of {rent} for guild house #{house.HouseNumber} automatically paid from Guild Bank.");
 
-                                            string rentFormatted = Finance.Currency.Copper.Mint(rent).ToText();
                                             foreach (GamePlayer guildPlayer in guild.GetListOfOnlineMembers())
                                             {
                                                 if (guildPlayer.GuildRank != null && guildPlayer.GuildRank.RankLevel <= 3)
                                                 {
+                                                    string rentFormatted = Finance.Currency.Copper.Mint(rent).ToText(guildPlayer.Client.Account.Language);
                                                     string rentMessage = LanguageMgr.GetTranslation(guildPlayer.Client.Account.Language, "Scripts.Player.Housing.GuildRentPaidFromBank", rentFormatted);
                                                     guildPlayer.Out.SendMessage(rentMessage, eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                                 }
@@ -927,7 +927,7 @@ namespace DOL.GS.Housing
                                         GameClient ownerClient = WorldMgr.GetClientByPlayerID(house.OwnerID, true, false);
                                         if (ownerClient != null && ownerClient.Player != null)
                                         {
-                                            string rentFormatted = Finance.Currency.Copper.Mint(rent).ToText();
+                                            string rentFormatted = Finance.Currency.Copper.Mint(rent).ToText(ownerClient.Account.Language);
                                             string rentMessage = LanguageMgr.GetTranslation(ownerClient.Account.Language, "Scripts.Player.Housing.RentPaidFromBank", rentFormatted);
                                             ownerClient.Player.Out.SendMessage(rentMessage, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                                         }

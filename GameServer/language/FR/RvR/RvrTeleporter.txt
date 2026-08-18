@@ -5,6 +5,7 @@ TeleporterRvR.CannotHelpPart2:			Revenez plus tard !
 TeleporterRvR.ChickenOutPart1:			Pff, tu es trop une poule mouillée pour rester ?!
 TeleporterRvR.ChickenOutPart2:			[Partir]
 TeleporterRvR.SendToCombat:				Bonjour {0}, je peux vous envoyer au combat ! [Prêt] ?!
+TeleporterRvR.NoEnterInArena:			Vous ne pouvez pas entrer en RvR en étant inscrit ou en participant à un Tournoi d'Arène.
 TeleporterRvR.InCombat:					Vous ne pouvez pas être téléporté en étant en combat !
 TeleporterRvR.Leave:					Partir
 TeleporterRvR.Ready:					Prêt

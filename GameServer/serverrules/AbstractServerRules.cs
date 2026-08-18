@@ -390,6 +390,18 @@ namespace DOL.GS.ServerRules
             GamePlayer pSource = source as GamePlayer ?? source.GetPlayerOwner();
             GamePlayer pTarget = target as GamePlayer ?? target.GetPlayerOwner();
 
+            if (pTarget != null && pTarget.IsAfkActive() && pSource != pTarget)
+            {
+                if (!quiet && source is GamePlayer p) MessageToLiving(source, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.CannotInteractPlayerAFK"));
+                return false;
+            }
+
+            if (pSource != null && pSource.IsAfkActive() && pSource != pTarget)
+            {
+                if (!quiet && source is GamePlayer p) MessageToLiving(source, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.CannotInteractWithOtherAFK"));
+                return false;
+            }
+
             if (pSource != null && pTarget != null)
             {
                 bool sourceInArena = pSource.TempProperties.getProperty<bool>("ArenaParticipant", false);
@@ -399,7 +411,7 @@ namespace DOL.GS.ServerRules
                 {
                     if (sourceInArena != targetInArena)
                     {
-                        if (!quiet && source is GamePlayer p) p.Out.SendMessage("You cannot interfere with Arena participants.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        if (!quiet && source is GamePlayer p) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.CannotInterfere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                     }
 
@@ -415,7 +427,7 @@ namespace DOL.GS.ServerRules
 
                             if ((sourceInA && targetInB) || (sourceInB && targetInA))
                             {
-                                if (!quiet && source is GamePlayer p) p.Out.SendMessage("You cannot assist the enemy team.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                if (!quiet && source is GamePlayer p) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.CannotAssistEnemy"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return false;
                             }
 
@@ -466,6 +478,12 @@ namespace DOL.GS.ServerRules
             GamePlayer playerAttacker = attacker as GamePlayer ?? attacker.GetPlayerOwner();
             GamePlayer playerDefender = defender as GamePlayer ?? defender.GetPlayerOwner();
 
+            if (playerDefender != null && playerDefender.IsAfkActive())
+            {
+                if (!quiet) MessageToLiving(attacker, LanguageMgr.GetTranslation((attacker as GamePlayer)?.Client, "ServerRules.AbstractServerRules.CannotAttackPlayerAFK"));
+                return false;
+            }
+
             if (attacker != null && defender != null)
             {
                 bool attInArena = playerAttacker != null && playerAttacker.TempProperties.getProperty<bool>("ArenaParticipant", false);
@@ -475,7 +493,7 @@ namespace DOL.GS.ServerRules
                 {
                     if (attInArena != defInArena)
                     {
-                        if (!quiet && attacker is GamePlayer) MessageToLiving(attacker, "You cannot interfere with Arena participants.");
+                        if (!quiet && attacker is GamePlayer p) MessageToLiving(attacker, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.CannotInterfere"));
                         return false;
                     }
 
@@ -810,7 +828,7 @@ namespace DOL.GS.ServerRules
             if (player?.Client.Account.PrivLevel > (uint)ePrivLevel.Player) return string.Empty;
 
             // player restrictions
-            if (player != null && (player.TempProperties.getProperty<bool>("ArenaParticipant", false))) return "You cannot mount while participating in an Arena Contest.";
+            if (player != null && (player.TempProperties.getProperty<bool>("ArenaParticipant", false))) return "GameObjects.GamePlayer.UseSlot.CantMountArena";
             if (SpellHandler.FindEffectOnTarget(living, "Petrify") != null) return "GameObjects.GamePlayer.UseSlot.CantMountPetrified";
             if (living.IsMoving) return "GameObjects.GamePlayer.UseSlot.CantMountMoving";
             if (living.IsMezzed) return "GameObjects.GamePlayer.UseSlot.CantMountMezzed";
@@ -1930,14 +1948,14 @@ namespace DOL.GS.ServerRules
 
                     if (isArenaMatch)
                     {
-                        var session = AmteScripts.Managers.ArenaManager.Instance.GetSession(killerPlayer.CurrentRegionID);
-                        if (session != null && session.State == AmteScripts.Managers.ArenaManager.eArenaState.Running)
+                        var session = ArenaManager.Instance.GetSession(killerPlayer.CurrentRegionID);
+                        if (session != null && session.State == ArenaManager.eArenaState.Running)
                         {
                             if (session.RoundNumber >= 2)
                             {
                                 int arenaBonusPct = (session.RoundNumber - 1) * 5 + 5; // Round 2 = 10%, 3 = 15%, etc.
                                 realmPoints += (realmPoints * arenaBonusPct) / 100;
-                                killerPlayer.Out.SendMessage($"Arena Round {session.RoundNumber} Bonus: +{arenaBonusPct}% RP!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                killerPlayer.Out.SendMessage(LanguageMgr.GetTranslation(killerPlayer.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.RoundBonus", session.RoundNumber, arenaBonusPct), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
                     }
@@ -1967,9 +1985,9 @@ namespace DOL.GS.ServerRules
                 //apply the keep bonus for bounty points
                 if (killer != null)
                 {
-                    if (Keeps.KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_5, (eRealm)killer.Realm))
+                    if (KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_5, (eRealm)killer.Realm))
                         bountyPoints += (bountyPoints / 100) * 5;
-                    else if (Keeps.KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_3, (eRealm)killer.Realm))
+                    else if (KeepBonusMgr.RealmHasBonus(eKeepBonusType.Bounty_Points_3, (eRealm)killer.Realm))
                         bountyPoints += (bountyPoints / 100) * 3;
                 }
 

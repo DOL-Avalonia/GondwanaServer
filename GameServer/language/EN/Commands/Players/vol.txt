@@ -11,6 +11,7 @@ Commands.Players.Vol.Hypnotized: 			You cannot steal while being mesmerized!
 Commands.Players.Vol.Stunned:				You cannot steal while being stunned!
 Commands.Players.Vol.Damned:				You cannot steal while being damned!
 Commands.Players.Vol.AFK:					You cannot steal while being afk ! Type /afk to disable it.
+Commands.Players.Vol.CannotArena:			You cannot steal while participating in an Arena Tournament.
 Commands.Players.Vol.Dead:					You cannot steal once dead!
 Commands.Players.Vol.AlreadyStealing:		You are already stealing someone!
 Commands.Players.Vol.TargetAFK: 			You cannot steal a player who is afk!
@@ -30,6 +31,7 @@ Commands.Players.Vol.NothingToSteal: 		There is nothing to steal on this player!
 Commands.Players.Vol.FullBag: 				Your bags are full, you can't steal anything!
 Commands.Players.Vol.StealItem: 			You just stole {0} to {1}!
 Commands.Players.Vol.BeStealedItem: 		{0} stole you {1}!
+Commands.Players.Vol.CannotFromArenaPlayer:	You cannot steal from an Arena participant.
 Commands.Players.Vol.OwnChest: 			You cannot steal from your own locked chest!
 Commands.Players.Vol.GroupChest: 		You cannot steal from your group's locked chest!
 Commands.Players.Vol.NeedCrochets: 		You need a Crochets to be able to steal this chest.

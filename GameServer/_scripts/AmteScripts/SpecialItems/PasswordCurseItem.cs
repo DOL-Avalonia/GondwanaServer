@@ -57,9 +57,14 @@ namespace DOL.GS.Scripts
         /// </summary>
         public void ProcessPasswordAction(GamePlayer player, string spokenText)
         {
-            if (player.CurrentRegionID == ServerRules.AmtenaelRules.HousingRegionID)
+            if (player.InCombat)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemCannotUseHere"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.PasswordCurseItemgUsageCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+            if (RvrManager.Instance.IsInRvr(player) || player.IsInPvP || player.CurrentRegionID == ServerRules.AmtenaelRules.HousingRegionID)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingCannotUseHere"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (JailMgr.IsPrisoner(player))
@@ -69,37 +74,42 @@ namespace DOL.GS.Scripts
             }
             if (player.IsRiding || player.IsOnHorse)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemMounted"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageMounted"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (SpellHandler.FindEffectOnTarget(player, "Petrify") != null)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemPetrified"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsagePetrified"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (player.IsDamned)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemDamned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageDamned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (player.IsCrafting)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemCrafting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageCrafting"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (player.IsClimbing)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemClimbing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageClimbing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
+            }
+            if (player.DuelTarget != null)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageDuel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
             }
             if (player.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {
-                player.Out.SendMessage("You cannot use this item while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageArena"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (player.TempProperties.getProperty<object>(StealCommandHandlerBase.PLAYER_VOL_TIMER, null) != null)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemStealing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageStealing"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (player.PlayerAfkMessage != null)

@@ -1,16 +1,18 @@
 ﻿using DOL.Database;
 using DOL.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using DOL.GS.Behaviour;
 using DOL.GameEvents;
-using System.Threading.Tasks;
+using DOL.GS.Behaviour;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using DOL.MobGroups;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
 {
@@ -244,7 +246,7 @@ namespace DOL.GS.Quests
                 {
                     var player = questData.Owner;
                     var translate = TranslateGoalText(player, Description);
-                    questData.Owner.Out.SendQuestUpdate(questData);
+                    await player.Out.SendQuestUpdate(questData);
 
                     string desc = await translate;
 
@@ -447,7 +449,10 @@ namespace DOL.GS.Quests
             if (!player.ReceiveItem(null, item))
             {
                 player.CreateItemOnTheGround(item);
-                ChatUtil.SendImportant(player, $"Your backpack is full, {itemTemplate.Name} is dropped on the ground.");
+
+                string lang = player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage;
+                LanguageMgr.TryGetTranslation(out string message, lang, "TextNPC.InventoryFullItemGround", itemTemplate.Name);
+                ChatUtil.SendImportant(player, message);
             }
         }
 

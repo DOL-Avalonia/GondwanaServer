@@ -4,6 +4,7 @@ GameUtils.Group.LivingJoined:			{0} has joined the group.
 GameUtils.Group.YouLeft:			You leave your group.
 GameUtils.Group.PlayerLeft:			{0} has left the group.
 GameUtils.Group.LivingLeft:			{0} has left the group.
+GameUtils.Group.CannotLeaveInArena:			You cannot leave your group while queued for or participating in an Arena Tournament.
 GameUtils.Group.DisbandedLastMember:		Your group has been automatically disbanded because you are the only member remaining.
 GameUtils.Group.NewLeader:			{0} is now the group leader.
 GameUtils.Group.NoGroupCreationInSession:	Creating or joining groups is not allowed in this PvP session.

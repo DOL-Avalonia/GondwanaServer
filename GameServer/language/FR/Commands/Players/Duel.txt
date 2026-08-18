@@ -6,8 +6,10 @@ Commands.Players.Duel.EnemyRealm:				Vous ne pouvez pas défier un membre d'un r
 Commands.Players.Duel.NeedTarget:				Vous devez cibler quelqu'un pour le défier !
 Commands.Players.Duel.NotInDuel:				Vous n'êtes pas en duel !
 Commands.Players.Duel.PlayerVsPlayer:			{0} se rend à {1} !
+Commands.Players.Duel.BusyInArena:				{0} est occupé et participe actuellement à un Tournoi d'Arène !
 Commands.Players.Duel.SafeZone:					Vous êtes dans une zone sécurisée et ne pouvez vous battre en duel ici !
 Commands.Players.Duel.TargetSafeZone:			{0} est dans une zone sécurisée et ne peut pas se battre en duel ici !
+Commands.Players.Duel.InArena:					Impossible de faire un duel alors que vous participez déjà à un Tournoi d'Arène !
 Commands.Players.Duel.InHousing:				Les duels ne sont pas autorisés dans les zones résidentielles !
 Commands.Players.Duel.InPvP&RvR:				Les duels ne sont pas autorisés dans les zones RvR/PvP !
 Commands.Players.Duel.InDungeon:				Les duels ne sont pas autorisés dans les donjons !

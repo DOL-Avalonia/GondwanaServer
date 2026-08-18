@@ -123,6 +123,8 @@ GameObjects.GamePlayer.Die.KilledLocation:	    {0} vient de se faire tuer à {1}
 GameObjects.GamePlayer.Die.LoseExperience:	    Vous perdez de l'experience.
 GameObjects.GamePlayer.Die.ReleaseToReturn:	    Vous êtes mort·e.  Tapez '/release' pour retourner à votre pierre d'âmes.
 GameObjects.GamePlayer.Die.YouKilled:		    Vous venez de tuer {0}.
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Votre {0} s'est dégradé lors de votre mort.
+GameObjects.GamePlayer.Die.ArenaDefeated:		Vous avez été vaincu ! Vous serez automatiquement ressuscité·e lorsque le match se poursuivra.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Vous ne pouvez pas respirer sous l'eau et buvez la tasse !
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Vous perdez 5% de votre total de points de vie.
@@ -492,6 +494,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:			Vous ne pouvez pas monter à che
 GameObjects.GamePlayer.UseSlot.CantMountStealing:		Vous ne pouvez pas monter à cheval tout en volant un joueur !
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:		Vous ne pouvez pas monter sur votre cheval, vous êtes mort·e.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:	Vous ne pouvez pas utiliser cette monture en portant une Relique !
+GameObjects.GamePlayer.UseSlot.CantMountArena:			Vous ne pouvez pas monter à cheval pendant que vous participez à un tournois d'Arène.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	L'espace aérien est restreint ici. Vous ne pouvez pas appeler votre monture volante.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:		Vous ne pouvez pas invoquer votre monture volante en nageant ou sous l'eau.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:		Vous renvoyez votre monture volante épique.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:			Vous ne pouvez pas invoquer de monture volante dans cette zone.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:	Votre {0} répond à votre appel ! Tapez '/epicmount cruise' pour avancer, '/epicmount rise' pour monter.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:			Vous ne voyez pas votre cible.
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:			Vous ne pouvez pas invoquer de monture dans une zone RvR.
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:	    Vous ne pouvez pas utiliser cet objet directement dans votre sac à dos. Equipez-le avant.
@@ -531,6 +539,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Votre {0} s'est brisé s
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Votre {0} a été déséquipé en raison d'une énergie insuffisante.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Votre {0} s'est brisé et est tombé par terre !
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Votre inventaire est plein ! Votre {0} est tombé par terre.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:			Vous ne pouvez pas jeter {0} tant qu'il est équipé.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:				Vous ne pouvez pas utiliser de potions durant un tournoi d'arène.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:				Vous ne pouvez pas utiliser de parchemins durant un tournoi d'arène.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			Cet espace réservé Génistar ne peut être placé que dans le jardin.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Votre œuf de Genistar a été placé dans votre jardin. Prenez-en soin et modelez-le selon vos désirs !
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Vous devez relâcher votre Genistar invoqué avant de le replacer dans le jardin.

@@ -1,10 +1,11 @@
 ﻿using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
-using DOL.GS.ServerProperties;
+using System.Linq;
 
 namespace DOL.GS.Scripts
 {
@@ -15,25 +16,39 @@ namespace DOL.GS.Scripts
     /// </summary>
     public class StorageBagItem : GameInventoryItem
     {
-        private int _cachedFilledSlots = -1;
-        public StorageBagItem()
-            : base()
-        {
-        }
-
-        public StorageBagItem(ItemTemplate template)
-            : base(template)
-        {
-        }
-
-        public StorageBagItem(InventoryItem item)
-            : base(item)
+        public Dictionary<int, InventoryItem> CachedItems { get; } = new Dictionary<int, InventoryItem>();
+        public bool IsLoaded { get; private set; } = false;
+        public StorageBagItem() : base() { }
+        public StorageBagItem(ItemTemplate template) : base(template) { }
+        public StorageBagVault BagVault { get; protected set; }
+        public StorageBagItem(InventoryItem item) : base(item)
         {
             OwnerID = item.OwnerID;
             ObjectId = item.ObjectId;
         }
 
-        public StorageBagVault BagVault { get; protected set; }
+        /// <summary>
+        /// Loads the items from the database. Called only once during player login.
+        /// </summary>
+        public void LoadItemsFromDb()
+        {
+            if (IsLoaded || string.IsNullOrEmpty(ObjectId)) return;
+
+            var dbItems = GameServer.Database.SelectObjects<InventoryItem>(
+                DB.Column("OwnerID").IsEqualTo(ObjectId)
+                .And(DB.Column("SlotPosition").IsGreaterOrEqualTo((int)eInventorySlot.HouseVault_First))
+                .And(DB.Column("SlotPosition").IsLessOrEqualTo((int)eInventorySlot.HouseVault_Last)));
+
+            lock (CachedItems)
+            {
+                CachedItems.Clear();
+                foreach (var item in dbItems)
+                {
+                    CachedItems[item.SlotPosition] = GameInventoryItem.Create(item) ?? item;
+                }
+            }
+            IsLoaded = true;
+        }
 
         /// <summary>
         /// Whether a bag has the ability to hold the item at any point (not counting e.g. current bag space)
@@ -60,28 +75,25 @@ namespace DOL.GS.Scripts
             return true;
         }
 
-        /// <inheritdoc />
         public override bool Use(GamePlayer player)
         {
+            LoadItemsFromDb();
             StorageBagVault vault = new StorageBagVault(player, this);
             player.ActiveInventoryObject = vault;
             player.Out.SendInventoryItemsUpdate(vault.GetClientInventory(player), eInventoryWindowType.PlayerVault);
-            return (true);
+            return true;
         }
 
-        /// <inheritdoc />
         public override void OnReceive(GamePlayer player)
         {
             BagVault = new StorageBagVault(player, this);
-
+            LoadItemsFromDb();
             base.OnReceive(player);
         }
 
-        /// <inheritdoc />
         public override void OnLose(GamePlayer player)
         {
             BagVault = null;
-
             base.OnLose(player);
         }
 
@@ -90,17 +102,7 @@ namespace DOL.GS.Scripts
         /// </summary>
         public int GetFilledSlotsCount()
         {
-            if (_cachedFilledSlots == -1)
-            {
-                if (string.IsNullOrEmpty(ObjectId))
-                    return 0;
-
-                _cachedFilledSlots = GameServer.Database.SelectObjects<InventoryItem>(DB.Column("OwnerID").IsEqualTo(ObjectId)
-                    .And(DB.Column("SlotPosition").IsGreaterOrEqualTo((int)eInventorySlot.HouseVault_First))
-                    .And(DB.Column("SlotPosition").IsLessOrEqualTo((int)eInventorySlot.HouseVault_Last))).Count;
-            }
-
-            return _cachedFilledSlots;
+            lock (CachedItems) return CachedItems.Count;
         }
 
         /// <summary>
@@ -116,28 +118,14 @@ namespace DOL.GS.Scripts
         /// </summary>
         public void InvalidateWeightCache()
         {
-            _cachedFilledSlots = -1;
         }
     }
 
     public class IngredientsBag : StorageBagItem
     {
-        public IngredientsBag()
-            : base()
-        {
-        }
-
-        public IngredientsBag(ItemTemplate template)
-            : base(template)
-        {
-        }
-
-        public IngredientsBag(InventoryItem item)
-            : base(item)
-        {
-            OwnerID = item.OwnerID;
-            ObjectId = item.ObjectId;
-        }
+        public IngredientsBag() : base() { }
+        public IngredientsBag(ItemTemplate template) : base(template) { }
+        public IngredientsBag(InventoryItem item) : base(item) { }
 
         /// <inheritdoc />
         /*public override void OnReceive(GamePlayer player)
@@ -193,12 +181,13 @@ namespace DOL.GS.Scripts
 
     public class StorageBagVault : GameVault
     {
-        private StorageBagItem BagItem { get; init; }
+        public StorageBagItem BagItem { get; init; }
 
         public StorageBagVault(GamePlayer player, StorageBagItem item)
         {
             Name = item.Name;
             BagItem = item;
+            BagItem.LoadItemsFromDb();
         }
 
         public override bool Interact(GamePlayer player)
@@ -215,7 +204,6 @@ namespace DOL.GS.Scripts
             return true;
         }
 
-        /// <inheritdoc />
         public override bool CanAddItem(GamePlayer player, InventoryItem item)
         {
             return BagItem.CanHoldItem(item);
@@ -245,7 +233,7 @@ namespace DOL.GS.Scripts
             bool fromVault = IsVaultInventorySlot(fromSlot);
             bool toVault = IsVaultInventorySlot(toSlot);
 
-            if (fromVault == false && toVault == false)
+            if (!fromVault && !toVault)
             {
                 return false;
             }
@@ -260,41 +248,85 @@ namespace DOL.GS.Scripts
 
             if (toVault)
             {
-                if (!gameVault.CanAddItem(player, player.Inventory.GetItem((eInventorySlot)fromSlot)))
+                InventoryItem itemToMove = null;
+                if (fromVault)
+                {
+                    int dbSlot = fromSlot - FirstClientSlot + FirstDBSlot;
+                    lock (BagItem.CachedItems)
+                    {
+                        BagItem.CachedItems.TryGetValue(dbSlot, out itemToMove);
+                    }
+                }
+                else
+                {
+                    itemToMove = player.Inventory.GetItem((eInventorySlot)fromSlot);
+                }
+
+                if (itemToMove != null && !gameVault.CanAddItem(player, itemToMove))
                 {
                     player.SendTranslatedMessage("Items.Specialitems.StorageBag.BadItem", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
             }
 
-            DoMoveItem(player, fromSlot, toSlot, count);
-
-            return true;
+            return DoMoveItem(player, fromSlot, toSlot, count);
         }
 
         public override bool OnAddItem(GamePlayer player, InventoryItem item)
         {
-            BagItem.InvalidateWeightCache();
+            lock (BagItem.CachedItems)
+            {
+                BagItem.CachedItems[item.SlotPosition] = item;
+            }
+
             player.UpdateEncumberance();
             return base.OnAddItem(player, item);
         }
 
         public override bool OnRemoveItem(GamePlayer player, InventoryItem item)
         {
-            BagItem.InvalidateWeightCache();
+            lock (BagItem.CachedItems)
+            {
+                BagItem.CachedItems.Remove(item.SlotPosition);
+            }
+
             player.UpdateEncumberance();
             return base.OnRemoveItem(player, item);
         }
 
-        public void DoMoveItem(GamePlayer player, ushort fromSlot, ushort toSlot, ushort count)
+        public bool DoMoveItem(GamePlayer player, ushort fromSlot, ushort toSlot, ushort count)
         {
+            bool success = false;
             lock (m_vaultSync)
             {
-                this.NotifyPlayers(this, player, _observers, this.MoveItem(player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot, count));
+                var updatedItems = GameInventoryObjectExtensions.MoveItem(this, player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot, count);
+
+                if (updatedItems != null)
+                {
+                    success = true;
+                    lock (BagItem.CachedItems)
+                    {
+                        foreach (var kvp in updatedItems)
+                        {
+                            int clientSlot = kvp.Key;
+                            InventoryItem item = kvp.Value;
+
+                            if (IsVaultInventorySlot((ushort)clientSlot))
+                            {
+                                int dbSlot = clientSlot - FirstClientSlot + FirstDBSlot;
+                                if (item == null || item.Count == 0)
+                                    BagItem.CachedItems.Remove(dbSlot);
+                                else
+                                    BagItem.CachedItems[dbSlot] = item;
+                            }
+                        }
+                    }
+                    this.NotifyPlayers(this, player, _observers, updatedItems);
+                }
             }
 
-            BagItem.InvalidateWeightCache();
             player.UpdateEncumberance();
+            return success;
         }
 
         /// <inheritdoc />
@@ -308,7 +340,11 @@ namespace DOL.GS.Scripts
         /// </summary>
         public override IList<InventoryItem> DBItems(GamePlayer player = null)
         {
-            return GameServer.Database.SelectObjects<InventoryItem>(DB.Column("OwnerID").IsEqualTo(BagItem.ObjectId).And(DB.Column("SlotPosition").IsGreaterOrEqualTo(FirstDBSlot).And(DB.Column("SlotPosition").IsLessOrEqualTo(LastDBSlot))));
+            if (!BagItem.IsLoaded) BagItem.LoadItemsFromDb();
+            lock (BagItem.CachedItems)
+            {
+                return BagItem.CachedItems.Values.ToList();
+            }
         }
     }
 }

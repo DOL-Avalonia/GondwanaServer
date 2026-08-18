@@ -1,0 +1,21 @@
+
+UniqueItemExchangerEngine.StoneMaker.Offer1:				Ah, un(e) {0}...
+UniqueItemExchangerEngine.StoneMaker.Offer2:				Je peux certainement travailler avec cela pour façonner un joyau d'une qualité exceptionnelle !
+UniqueItemExchangerEngine.StoneMaker.Offer3:				Cependant, mon art requiert exactement {0} exemplaires{1}, ainsi que des frais de joaillerie de {2} pour mon temps et mon expertise.
+UniqueItemExchangerEngine.StoneMaker.BinderAddon:			, plus {0}x '{1}' pour traiter et stabiliser correctement la pierre
+UniqueItemExchangerEngine.StoneMaker.Success1:				Excellent...
+UniqueItemExchangerEngine.StoneMaker.Success2:				{0} prend les matériaux et travaille avec une précision immense.
+UniqueItemExchangerEngine.StoneMaker.Success3:				Voici votre {0}. Un véritable chef-d'œuvre, n'êtes-vous pas d'accord ?
+UniqueItemExchangerEngine.BloodVial.NeedFullVial:			Je n'ai que faire de récipients à moitié pleins. Ne revenez me voir que lorsque vous aurez extrait une fiole de sang pur et pleine à 100 %.
+UniqueItemExchangerEngine.Reward.Coins:						Le marchand hoche la tête avec approbation et vous remet {0} pour vos efforts.
+UniqueItemExchangerEngine.Reward.Seals:						Vous recevez {0}x {1} en gage de l'échange.
+UniqueItemExchangerEngine.Reward.ExtraCoins:				Vous découvrez une bourse supplémentaire contenant {0}.
+UniqueItemExchangerEngine.Reward.Experience:				L'essence brute contenue dans le sang vous traverse, vous conférant {0} points d'expérience !
+UniqueItemExchangerEngine.Reward.ItemGive:					Le marchand vous remet soigneusement {0}x {1}.
+UniqueItemExchangerEngine.Reward.StowsVial:					{0} hoche silencieusement la tête en signe d'appréciation et range précieusement la fiole en lieu sûr.
+
+UniqueItemExchangerEngine.Reward.ThanksForVial1:			Je me dois de vous exprimer ma plus profonde gratitude, voyageur. L'essence que vous avez capturée dans ce récipient est d'une pureté extraordinaire et s'avérera inestimable pour mes recherches arcaniques en cours. Si vos voyages vous amènent à croiser d'autres créatures aux lignées si rares et puissantes, je vous implore d'extraire leur force vitale et de revenir me voir. Je vous assure que ma bourse est lourde et que je récompenserai toujours grassement votre diligence.
+UniqueItemExchangerEngine.Reward.ThanksForVial2:			Un spécimen remarquable ! Vous possédez un véritable œil de chasseur pour avoir obtenu une fiole d'une qualité aussi immaculée sans en altérer les humeurs. Mes transmutations alchimiques nécessitent de vastes quantités de ce sang de premier choix. Je vous en prie, ne laissez pas votre extracteur prendre la poussière. Traquez d'autres bêtes puissantes, puisez leur essence et apportez-moi les fioles pleines. Vous trouverez ma compensation plus que généreuse.
+UniqueItemExchangerEngine.Reward.ThanksForVial3:			Fascinant... on peut presque sentir le pouls de la créature résonner encore à travers le verre. Vous avez rendu un grand service à notre cercle aujourd'hui, champion. Les rituels que nous préparons exigent des réactifs de la plus haute puissance. Recherchez les monstres les plus redoutables qui errent sur ces terres, drainez leur vitalité et présentez-moi les récipients pleins. Je vous promets que vos efforts seront couronnés d'une immense richesse.
+UniqueItemExchangerEngine.Reward.ThanksForVial4:			Splendide ! J'ai traité avec de nombreux mercenaires qui m'apportaient de la bouillie gâtée ou coagulée, mais ceci... c'est la perfection. Vous comprenez manifestement l'art délicat de l'extraction vitale. Ma collection est vaste, mais elle a constamment soif de nouvelles acquisitions de ce calibre. Gardez votre extracteur à portée de main lors de vos voyages. Chaque fois que vous remplirez une fiole d'un tel ictère, apportez-la ici. Nous nous enrichirons tous deux de vos chasses.
+UniqueItemExchangerEngine.Reward.ThanksForVial5:			Enfin ! Je commençais à craindre de ne jamais trouver un récolteur capable pour mes expériences. La viscosité, la couleur... c'est absolument parfait. Écoutez-moi bien, guerrier : quoi que vous fassiez, continuez ainsi. Les royaumes regorgent de bêtes abritant cette précieuse essence dans leurs veines. Récoltez-la entièrement, remplissez les fioles à ras bord et revenez me voir. Je céderai volontiers une fortune en échange de votre approvisionnement continu.

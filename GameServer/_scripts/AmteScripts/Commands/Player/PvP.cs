@@ -198,7 +198,7 @@ namespace DOL.GS.Commands
                         }
                         else
                         {
-                            DisplayMessage(client, "You must select a PvP Teleporter or an RvR Teleporter as your target first to spawn the chests around it.");
+                            DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.PvP.Spawns.SelectTeleporter"));
                             return;
                         }
 
@@ -217,11 +217,11 @@ namespace DOL.GS.Commands
 
                         if (spawned)
                         {
-                            DisplayMessage(client, $"Debug '{expectedPrefix}' reward chests have been successfully spawned around the teleporter.");
+                            DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.PvP.Spawns.Success", expectedPrefix));
                         }
                         else
                         {
-                            DisplayMessage(client, "Failed to spawn debug reward chests. Check the console logs for errors.");
+                            DisplayMessage(client, LanguageMgr.GetTranslation(client.Account.Language, "Commands.GM.PvP.Spawns.Failed"));
                         }
                         break;
                     }
@@ -230,7 +230,7 @@ namespace DOL.GS.Commands
                     {
                         // Show PvP scoreboard or session infos
                         var stats = PvpManager.Instance.GetStatistics(client.Player);
-                        client.Out.SendCustomTextWindow("PvP Info", stats);
+                        client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "Commands.PvP.Info.Title"), stats);
                         break;
                     }
 
@@ -238,7 +238,7 @@ namespace DOL.GS.Commands
                     {
                         // Show PvP scoreboard or session infos
                         var stats = PvpManager.Instance.GetStatistics(client.Player, true);
-                        client.Out.SendCustomTextWindow("PvP Info", stats);
+                        client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(client.Account.Language, "Commands.PvP.Info.Title"), stats);
                         break;
                     }
             }

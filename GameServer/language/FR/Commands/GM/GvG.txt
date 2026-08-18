@@ -1,4 +1,5 @@
-GvG.Manager.CaptureRestricted:	Les territoires ne peuvent être capturés qu'entre 10h00 et 00h00.
+
+GvG.Manager.CaptureRestricted:		Les territoires ne peuvent être capturés qu'entre 10h00 et 00h00.
 
 GvG.Command.Status:					Statut d'ouverture forcée GvG actuel : {0}
 GvG.Command.ForcedOpen:				Le GvG est maintenant en OUVERTURE FORCÉE (restrictions horaires ignorées).
@@ -8,3 +9,6 @@ GvG.Command.ResetAllTerrSuccess:	{count} territoires ont été réinitialisés �
 GvG.Command.ResetOneTerrSuccess:	Le territoire '{t.Name}' ({t.ID}) a été réinitialisé à l'état neutre.
 GvG.Command.ResetTerrNeutral:		Le territoire '{t.Name}' ({t.ID}) est déjà neutre.
 GvG.Command.ResetTerrNotFound:		Le territoire avec l'ID '{args[2]}' est introuvable.
+GvG.Command.DebugModeOn:			Le mode débogage GvG est maintenant ACTIVÉ (cycle rapide).
+GvG.Command.DebugModeOff:			Le mode débogage GvG est maintenant DÉSACTIVÉ (retour au cycle normal).
+GvG.Command.TerritoryResetSyntax:	Syntaxe : /gvg territoryreset <TerritoryID|all>

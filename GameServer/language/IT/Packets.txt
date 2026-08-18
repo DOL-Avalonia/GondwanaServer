@@ -161,6 +161,16 @@ DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Consuma il {0}% di Mana 
 DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Consuma il {0}% di Condizione per tick{1}.
 DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Perde il {0}% di Condizione alla morte{1}.
 DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Non può essere rimosso.
+DetailDisplayHandler.UndeequippableItem.RequiresPassword:		- Richiede una formula parlata per attivare la maledizione e gli effetti.
+DetailDisplayHandler.UndeequippableItem.HaltsHealRegen:			- Interrompe tutta la rigenerazione della salute mentre equipaggiato.
+DetailDisplayHandler.UndeequippableItem.PeriodicSpell:			- Lancia periodicamente un incantesimo specifico.
+DetailDisplayHandler.UndeequippableItem.PeriodicAura:			- Applica periodicamente un'aura visiva.
+DetailDisplayHandler.LoanCoupon.PersonalTitle:					Coupon di prestito personale
+DetailDisplayHandler.LoanCoupon.PersonalDesc:					Consegnalo a qualsiasi mercante standard quando sei a corto di fondi per incassarlo.
+DetailDisplayHandler.LoanCoupon.PersonalMinPrice:				Non può essere usato per oggetti al di sotto di {0} oro.
+DetailDisplayHandler.LoanCoupon.HouseTitle:						Coupon di prestito per la casa
+DetailDisplayHandler.LoanCoupon.HouseDesc:					Consegnalo a un mercante di alloggi o a un marcatore di lotto quando sei a corto di fondi per incassarlo.
+DetailDisplayHandler.LoanCoupon.HouseMinPrice:					Utilizzabile solo per acquisti di alloggi di {0} oro o più.
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:				{0} è troppo distante!

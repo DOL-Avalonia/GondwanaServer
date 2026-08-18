@@ -1,0 +1,15 @@
+
+EpicMount.Cmd.Description:					Control your epic flying mount
+EpicMount.Cmd.Usage.Cruise:					/epicmount cruise - Auto-fly forward (steer with ground targets (F5))
+EpicMount.Cmd.Usage.Move:					/epicmount move - Fly to ground target
+EpicMount.Cmd.Usage.Target:					/epicmount target - Fly to selected target
+EpicMount.Cmd.Usage.Left:					/epicmount left - Rotate left
+EpicMount.Cmd.Usage.Right:					/epicmount right - Rotate right
+EpicMount.Cmd.Usage.Stop:					/epicmount stop - Stop moving
+EpicMount.Cmd.Usage.Rise:					/epicmount rise - Move up 100 units
+EpicMount.Cmd.Usage.Down:					/epicmount down - Move down 100 units
+EpicMount.Cmd.Usage.Land:					/epicmount land - Drop down towards land
+EpicMount.Cmd.Usage.Full:					Usage: /epicmount [cruise | move | target | left | right | stop | rise | down | land]
+EpicMount.Cmd.Wait:							You must wait before using this command again.
+EpicMount.Cmd.NotRiding:					You must be actively riding an epic flying mount to use this command.
+EpicMount.Cmd.Stopped:						Mount stopped.

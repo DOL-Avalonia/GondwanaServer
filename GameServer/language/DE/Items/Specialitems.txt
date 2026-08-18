@@ -30,6 +30,7 @@ Items.Specialitems.GuarkRingUsageStealing:			Du kannst keine himmlische Magie an
 Items.Specialitems.GuarkRingUsageAFK:				Du kannst keine himmlische Magie anwenden, während du AFK bist!
 Items.Specialitems.GuarkRingUsageClimbing:			Du kannst keine himmlische Magie beim Klettern anwenden!
 Items.Specialitems.GuarkRingUsageRelic:				Du kannst keine himmlische Magie anwenden, während du ein Gebietsrelikt trägst.
+Items.Specialitems.GuarkRingUsageArena:				Du kannst keine himmlische Magie anwenden, während du an einem Arena-Turnier teilnimmst.
 Items.Specialitems.GuarkRingCannotUseHere:			Du kannst diesen Gegenstand hier nicht benutzen.
 Items.Specialitems.GuarkRingDoNotMove:				Du darfst dich nicht bewegen, um diesen Gegenstand zu benutzen.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Du warst vor Kurzem in einen Kampf verwickelt, daher musst du warten, bevor du diesen Gegenstand wieder benutzen kannst.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		Gegenstand konnte aus irgendein
 Items.Specialitems.DieTriggerSpell.FailRez:			Der Fluch, der auf deiner Leiche liegt, ist hier zu stark, der Wiederbelebungszauber verpufft!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Dein {0} ist aufgebraucht und wurde aus deinem Inventar entfernt.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	Ihr könnt diesen Gegenstand nicht benutzen, während Ihr im Kampf seid!
+Items.Specialitems.PasswordCurseItemUsageJailed:	Ihr könnt diesen Gegenstand nicht benutzen, während Ihr eingesperrt seid!
+Items.Specialitems.PasswordCurseItemUsageMounted:	Ihr könnt diesen Gegenstand nicht auf einem Reittier benutzen!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	Ihr könnt diesen Gegenstand nicht in Verstohlenheit benutzen.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	Ihr könnt diesen Gegenstand nicht benutzen, während Ihr versteinert seid!
+Items.Specialitems.PasswordCurseItemUsageDamned:	Ihr könnt diesen Gegenstand nicht benutzen, während Ihr verdammt seid!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	Ihr könnt diesen Gegenstand nicht benutzen, während Ihr unter der Verzauberung "{0}" steht!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	Ihr könnt diesen Gegenstand nicht beim Handwerken benutzen!
+Items.Specialitems.PasswordCurseItemUsageDuel:		Ihr könnt diesen Gegenstand nicht in einem Duell benutzen!
+Items.Specialitems.PasswordCurseItemUsageStealing:	Ihr könnt diesen Gegenstand nicht benutzen, während Ihr einen anderen Spieler bestehlt!
+Items.Specialitems.PasswordCurseItemUsageAFK:		Ihr könnt diesen Gegenstand nicht benutzen, während Ihr AFK seid!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	Ihr könnt diesen Gegenstand nicht beim Klettern benutzen!
+Items.Specialitems.PasswordCurseItemUsageRelic:		Ihr könnt diesen Gegenstand nicht benutzen, während Ihr ein Gebietsrelikt tragt.
+Items.Specialitems.PasswordCurseItemUsageArena:		Ihr könnt diesen Gegenstand nicht benutzen, während Ihr an einem Arena-Turnier teilnehmt.

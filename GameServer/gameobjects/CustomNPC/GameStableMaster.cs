@@ -140,7 +140,7 @@ namespace DOL.GS
 
             if (player.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {
-                player.Out.SendMessage("You cannot ride a horse while participating in an Arena Contest!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerInteract.NoRideInArena"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 

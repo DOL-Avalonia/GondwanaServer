@@ -1,4 +1,5 @@
-GvG.Manager.CaptureRestricted:	Territories can only be captured between 10:00 and 00:00.
+
+GvG.Manager.CaptureRestricted:		Territories can only be captured between 10:00 and 00:00.
 
 GvG.Command.Status:					Current GvG Force Open Status: {0}
 GvG.Command.ForcedOpen:				GvG is now FORCED OPEN (ignoring time restrictions).
@@ -8,3 +9,6 @@ GvG.Command.ResetAllTerrSuccess:	Successfully reset {count} territories to neutr
 GvG.Command.ResetOneTerrSuccess:	Territory '{t.Name}' ({t.ID}) has been reset to neutral.
 GvG.Command.ResetTerrNeutral:		Territory '{t.Name}' ({t.ID}) is already neutral.
 GvG.Command.ResetTerrNotFound:		Territory with ID '{args[2]}' not found.
+GvG.Command.DebugModeOn:			GvG Debug Mode is now ON (fast cycle).
+GvG.Command.DebugModeOff:			GvG Debug Mode is now OFF (Reverted to schedule).
+GvG.Command.TerritoryResetSyntax:	Syntax: /gvg territoryreset <TerritoryID|all>

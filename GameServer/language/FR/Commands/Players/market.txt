@@ -21,4 +21,5 @@ Commands.Players.Market.Cant.DeployCrafting:	Vous ne pouvez pas déployer votre 
 Commands.Players.Market.Cant.DeployAFK:			Vous ne pouvez pas déployer votre marché en étant AFK !
 Commands.Players.Market.Cant.DeployClimbing:	Vous ne pouvez pas déployer votre marché alors que vous grimpez !
 Commands.Players.Market.Cant.DeployTerRelic:	Vous ne pouvez pas déployer votre marché tout en portant une relique de territoire.
+Commands.Players.Market.Cant.DeployArena:		Vous ne pouvez pas déployer votre marché tout en participant à un tournoi d'arène.
 Commands.Players.Market.InvalidName:			Le nom de marché choisi est invalide ou contient des termes restreints.

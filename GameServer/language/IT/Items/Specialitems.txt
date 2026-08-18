@@ -13,23 +13,24 @@ Items.Specialitems.GuarkAmuletNoPower:				Non hai abbastanza energia vitale nell
 Items.Specialitems.GuarkRingTPCancelMoved:			Ti sei mosso, la richiesta magica è fallita e non puoi essere teletrasportato.
 Items.Specialitems.GuarkRingTPCancelRemoved:		Hai rimosso l'anello dal dito, la richiesta magica è fallita e non puoi essere teletrasportato.
 Items.Specialitems.GuarkAmuletTPCancelRemoved:		Hai rimosso l'amuleto dal collo, la richiesta magica è fallita e non puoi essere teletrasportato.
-Items.Specialitems.GuarkRingTPFailed:				La magia celeste è fallita, destinazione sconosciuta.
+Items.Specialitems.GuarkRingTPFailed:				La magia celestiale è fallita, destinazione sconosciuta.
 Items.Specialitems.GuarkRingTPNone:					Non è stata fatta alcuna richiesta, la tua destinazione è sconosciuta.
-Items.Specialitems.GuarkRingUsageCombat:			Non puoi usare la magia celeste mentre sei in combattimento!
-Items.Specialitems.GuarkRingUsageHere:				La magia celeste non esiste in questo luogo.
-Items.Specialitems.GuarkRingUsageJailed:			Non puoi usare la magia celeste mentre sei imprigionato!
-Items.Specialitems.GuarkRingUsageMounted:			Non puoi usare la magia celeste da una cavalcatura!
-Items.Specialitems.GuarkRingUsageStealthed:			Non puoi usare la magia celeste mentre sei in modalità furtiva.
-Items.Specialitems.GuarkRingUsagePetrified:			Non puoi usare la magia celeste mentre sei pietrificato!
-Items.Specialitems.GuarkRingUsageDamned:			Non puoi usare la magia celeste mentre sei dannato!
-Items.Specialitems.GuarkRingUsageCantThisForm:		Non puoi usare la magia celeste mentre sei in questa forma!
-Items.Specialitems.GuarkRingUsageMorphed:			Non puoi usare la magia celeste mentre sei sotto un incantesimo di "{0}"!
-Items.Specialitems.GuarkRingUsageCrafting:			Non puoi usare la magia celeste mentre crei oggetti!
-Items.Specialitems.GuarkRingUsageDuel:				Non puoi usare la magia celeste mentre sei in un duello!
-Items.Specialitems.GuarkRingUsageStealing:			Non puoi usare la magia celeste mentre derubi un altro giocatore!
-Items.Specialitems.GuarkRingUsageAFK:				Non puoi usare la magia celeste mentre sei AFK!
-Items.Specialitems.GuarkRingUsageClimbing:			Non puoi usare la magia celeste mentre ti arrampichi!
-Items.Specialitems.GuarkRingUsageRelic:				Non puoi usare la magia celeste mentre trasporti una reliquia del territorio.
+Items.Specialitems.GuarkRingUsageCombat:			Non puoi usare la magia celestiale mentre sei in combattimento!
+Items.Specialitems.GuarkRingUsageHere:				La magia celestiale non esiste in questo luogo.
+Items.Specialitems.GuarkRingUsageJailed:			Non puoi usare la magia celestiale mentre sei imprigionato!
+Items.Specialitems.GuarkRingUsageMounted:			Non puoi usare la magia celestiale da una cavalcatura!
+Items.Specialitems.GuarkRingUsageStealthed:			Non puoi usare la magia celestiale mentre sei in modalità furtiva.
+Items.Specialitems.GuarkRingUsagePetrified:			Non puoi usare la magia celestiale mentre sei pietrificato!
+Items.Specialitems.GuarkRingUsageDamned:			Non puoi usare la magia celestiale mentre sei dannato!
+Items.Specialitems.GuarkRingUsageCantThisForm:		Non puoi usare la magia celestiale mentre sei in questa forma!
+Items.Specialitems.GuarkRingUsageMorphed:			Non puoi usare la magia celestiale mentre sei sotto un incantesimo di "{0}"!
+Items.Specialitems.GuarkRingUsageCrafting:			Non puoi usare la magia celestiale mentre crei oggetti!
+Items.Specialitems.GuarkRingUsageDuel:				Non puoi usare la magia celestiale mentre sei in un duello!
+Items.Specialitems.GuarkRingUsageStealing:			Non puoi usare la magia celestiale mentre derubi un altro giocatore!
+Items.Specialitems.GuarkRingUsageAFK:				Non puoi usare la magia celestiale mentre sei AFK!
+Items.Specialitems.GuarkRingUsageClimbing:			Non puoi usare la magia celestiale mentre ti arrampichi!
+Items.Specialitems.GuarkRingUsageRelic:				Non puoi usare la magia celestiale mentre trasporti una reliquia del territorio.
+Items.Specialitems.GuarkRingUsageArena:				Non puoi usare la magia celestiale mentre partecipi a un torneo dell'Arena.
 Items.Specialitems.GuarkRingCannotUseHere:			Non puoi usare questo oggetto qui.
 Items.Specialitems.GuarkRingDoNotMove:				Devi rimanere nello stesso posto per usare questo oggetto.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Sei stato in combattimento di recente, quindi devi aspettare per poter usare di nuovo questo oggetto.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		Impossibile distruggere l'ogget
 Items.Specialitems.DieTriggerSpell.FailRez:			La maledizione che affligge il tuo cadavere è troppo forte qui, l'incantesimo di resurrezione fallisce!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Il tuo {0} è esaurito ed è stato rimosso dall'inventario.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	Non puoi usare questo oggetto in combattimento!
+Items.Specialitems.PasswordCurseItemUsageJailed:	Non puoi usare questo oggetto mentre sei imprigionato!
+Items.Specialitems.PasswordCurseItemUsageMounted:	Non puoi usare questo oggetto mentre sei sulla tua cavalcatura!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	Non puoi usare questo oggetto mentre sei in furtività.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	Non puoi usare questo oggetto mentre sei pietrificato!
+Items.Specialitems.PasswordCurseItemUsageDamned:	Non puoi usare questo oggetto mentre sei dannato!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	Non puoi usare questo oggetto mentre sei sotto l'effetto dell'incantesimo "{0}"!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	Non puoi usare questo oggetto mentre stai creando un oggetto!
+Items.Specialitems.PasswordCurseItemUsageDuel:		Non puoi usare questo oggetto mentre sei in un duello!
+Items.Specialitems.PasswordCurseItemUsageStealing:	Non puoi usare questo oggetto mentre stai derubando un altro giocatore!
+Items.Specialitems.PasswordCurseItemUsageAFK:		Non puoi usare questo oggetto mentre sei AFK!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	Non puoi usare questo oggetto mentre ti arrampichi!
+Items.Specialitems.PasswordCurseItemUsageRelic:		Non puoi usare questo oggetto mentre trasporti una reliquia del territorio.
+Items.Specialitems.PasswordCurseItemUsageArena:		Non puoi usare questo oggetto mentre partecipi a un Torneo dell'Arena.

@@ -12,3 +12,4 @@ Commands.Players.Invite.StillGrouped:	The player is already in a group.
 Commands.Players.Invite.Usage:			Usage : '/invite <playerName>'
 Commands.Players.Invite.YouInvite:		You have invited {0} to join your group.
 Commands.Players.Invite.NotAllowed:		Creating or joining groups is not allowed in this PvP session.
+Commands.Players.Invite.CannotArena:	You cannot create groups or invite players in your group while queued for or participating in an Arena Tournament.

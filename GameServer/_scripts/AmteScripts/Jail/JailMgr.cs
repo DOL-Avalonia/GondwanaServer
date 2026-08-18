@@ -1,14 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using DOL.Database;
 using DOL.events.gameobjects;
 using DOL.Events;
+using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.Language;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace DOL.GS.Scripts
 {
@@ -17,7 +18,7 @@ namespace DOL.GS.Scripts
     /// </summary>
     public static class JailMgr
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         public const ushort Radius = 300; //Taille de la prison
 
         // Réglages prison
@@ -146,8 +147,8 @@ namespace DOL.GS.Scripts
             player.Reputation = 0;
             player.Wanted = false;
 
-            if (prison.RP) player.MoveTo(Prison_RegionID, Prison_X, Prison_Y, Prison_Z, Prison_Heading);
-            else player.MoveTo(PrisonHRP_RegionID, PrisonHRP_X, PrisonHRP_Y, PrisonHRP_Z, PrisonHRP_Heading);
+            if (prison.RP) player.MoveTo(Position.Create((ushort)Prison_RegionID, Prison_X, Prison_Y, Prison_Z, (ushort)Prison_Heading));
+            else player.MoveTo(Position.Create((ushort)PrisonHRP_RegionID, PrisonHRP_X, PrisonHRP_Y, PrisonHRP_Z, (ushort)PrisonHRP_Heading));
 
             player.MaxSpeedBase = 50;
             player.Out.SendUpdateMaxSpeed();
@@ -175,8 +176,8 @@ namespace DOL.GS.Scripts
             Prisoner prison = player.TempProperties.getProperty<Prisoner>("JailMgr", null);
             if (prison == null) return;
 
-            if (prison.RP) player.MoveTo(Prison_RegionID, Prison_X, Prison_Y, Prison_Z, Prison_Heading);
-            else player.MoveTo(PrisonHRP_RegionID, PrisonHRP_X, PrisonHRP_Y, PrisonHRP_Z, PrisonHRP_Heading);
+            if (prison.RP) player.MoveTo(Position.Create((ushort)Prison_RegionID, Prison_X, Prison_Y, Prison_Z, (ushort)Prison_Heading));
+            else player.MoveTo(Position.Create((ushort)PrisonHRP_RegionID, PrisonHRP_X, PrisonHRP_Y, PrisonHRP_Z, (ushort)PrisonHRP_Heading));
             player.Bind(true);
 
             if (player.MaxSpeed == 50) return;
@@ -236,24 +237,44 @@ namespace DOL.GS.Scripts
         /// <param name="raison"></param>
         private static void Emprisonner(GamePlayer player, int cost, DateTime sortie, string jailer, bool JailRP, string raison, bool isOutLaw)
         {
-            //On vérifie le tps
             long time = (sortie.Ticks - DateTime.Now.Ticks) / 10000;
             if (sortie != DateTime.MinValue && time <= 0)
                 return;
 
-            //La DB
-            Prisoner prisoner = new Prisoner(player)
+            bool isNew = false;
+            Prisoner prisoner = GetPrisoner(player);
+
+            if (prisoner == null)
+                prisoner = GameServer.Database.FindObjectByKey<Prisoner>(player.InternalID);
+
+            if (prisoner != null)
             {
-                Cost = cost,
-                Sortie = sortie,
-                RP = JailRP,
-                Raison = raison,
-                IsOutLaw = isOutLaw
-            };
-            GameServer.Database.AddObject(prisoner);
+                // Player is already in jail, update existing sentence
+                prisoner.Cost += cost;
+                if (sortie > prisoner.Sortie) prisoner.Sortie = sortie;
+                prisoner.Raison = string.IsNullOrEmpty(prisoner.Raison) ? raison : prisoner.Raison + " - " + raison;
+                prisoner.IsOutLaw = isOutLaw;
+                prisoner.RP = JailRP;
+                GameServer.Database.SaveObject(prisoner);
+            }
+            else
+            {
+                // Create new sentence
+                isNew = true;
+                prisoner = new Prisoner(player)
+                {
+                    Cost = cost,
+                    Sortie = sortie,
+                    RP = JailRP,
+                    Raison = raison,
+                    IsOutLaw = isOutLaw
+                };
+                GameServer.Database.AddObject(prisoner);
+            }
+
             if (JailRP)
-                player.MoveTo(Prison_RegionID, Prison_X, Prison_Y, Prison_Z, Prison_Heading);
-            else player.MoveTo(PrisonHRP_RegionID, PrisonHRP_X, PrisonHRP_Y, PrisonHRP_Z, PrisonHRP_Heading);
+                player.MoveTo(Position.Create((ushort)Prison_RegionID, Prison_X, Prison_Y, Prison_Z, (ushort)Prison_Heading));
+            else player.MoveTo(Position.Create((ushort)PrisonHRP_RegionID, PrisonHRP_X, PrisonHRP_Y, PrisonHRP_Z, (ushort)PrisonHRP_Heading));
 
             player.Bind(true);
             player.MaxSpeedBase = 50;
@@ -261,21 +282,32 @@ namespace DOL.GS.Scripts
             player.Reputation = 0;
             player.Wanted = false;
             player.SaveIntoDatabase();
-            Prisonniers.Add(player);
-            PlayerXPrisoner.Add(player, prisoner);
 
-            //Les Events
-            player.TempProperties.setProperty("JailMgr", prisoner);
-            GameEventMgr.AddHandler(player, GamePlayerEvent.Quit, PlayerExit);
-            GameEventMgr.AddHandler(player, GamePlayerEvent.Revive, PlayerRevive);
-            GameEventMgr.AddHandler(player, GamePlayerEvent.RegionChanged, PlayerRevive);
+            if (isNew)
+            {
+                Prisonniers.Add(player);
+                PlayerXPrisoner.Add(player, prisoner);
+
+                player.TempProperties.setProperty("JailMgr", prisoner);
+                GameEventMgr.AddHandler(player, GamePlayerEvent.Quit, PlayerExit);
+                GameEventMgr.AddHandler(player, GamePlayerEvent.Revive, PlayerRevive);
+                GameEventMgr.AddHandler(player, GamePlayerEvent.RegionChanged, PlayerRevive);
+            }
+            else
+            {
+                if (!Prisonniers.Contains(player)) Prisonniers.Add(player);
+                if (!PlayerXPrisoner.ContainsKey(player)) PlayerXPrisoner.Add(player, prisoner);
+                else PlayerXPrisoner[player] = prisoner;
+
+                player.TempProperties.setProperty("JailMgr", prisoner);
+            }
+
             Animation(player);
 
             if (JailRP)
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.JailedRP", jailer, cost), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             else
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.JailedHRP", jailer), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-
 
             string message = "";
             if (!string.IsNullOrEmpty(jailer))
@@ -289,19 +321,30 @@ namespace DOL.GS.Scripts
                 NewsMgr.CreateNews("GameObjects.GamePlayer.Jailed.Unknown", player.Realm, eNewsType.RvRGlobal, false, true, player.Name);
             }
 
-            if (DOL.GS.ServerProperties.Properties.DISCORD_ACTIVE)
+            if (Properties.DISCORD_ACTIVE)
             {
-                DolWebHook hook = new DolWebHook(DOL.GS.ServerProperties.Properties.DISCORD_WEBHOOK_ID);
+                DolWebHook hook = new DolWebHook(Properties.DISCORD_WEBHOOK_ID);
                 hook.SendMessage(message);
             }
 
             if (sortie == DateTime.MinValue) return;
 
-            //Timer pour sortir
-            if (sortie == DateTime.MinValue || time <= 0 || time >= 864000000) return;
+            // Stop existing timer if there is one
+            RegionTimer oldTimer = player.TempProperties.getProperty<RegionTimer>("JailTimer", null);
+            if (oldTimer != null)
+            {
+                oldTimer.Stop();
+                player.TempProperties.removeProperty("JailTimer");
+            }
+
+            // Start a new timer for the updated total duration
+            time = (prisoner.Sortie.Ticks - DateTime.Now.Ticks) / 10000;
+            if (time <= 0 || time >= 864000000) return;
+
             RegionTimer SortieTimer = new RegionTimer(player, SortiePrison, 1);
             SortieTimer.Properties.setProperty("player", player);
             SortieTimer.Start((int)time);
+            player.TempProperties.setProperty("JailTimer", SortieTimer);
         }
 
         /// <summary>
@@ -314,26 +357,39 @@ namespace DOL.GS.Scripts
         /// <param name="raison"></param>
         private static bool Emprisonner(string playerName, int cost, DateTime sortie, bool JailRP, string raison)
         {
-            //On vérifie le tps
             long time = (sortie.Ticks - DateTime.Now.Ticks) / 10000;
             if (sortie != DateTime.MinValue && time <= 0)
                 return false;
 
-            //On vérifie si le joueur existe
             var perso = GameServer.Database.SelectObject<DOLCharacters>(c => c.Name == playerName);
             if (perso == null || perso.Name.ToLower() != playerName.ToLower())
                 return false;
 
 
-            //La DB
-            Prisoner Prisonnier = new Prisoner(perso)
+            bool isNew = false;
+            Prisoner Prisonnier = GameServer.Database.FindObjectByKey<Prisoner>(perso.ObjectId);
+
+            if (Prisonnier != null)
             {
-                Cost = cost,
-                Sortie = sortie,
-                RP = JailRP,
-                Raison = raison
-            };
-            GameServer.Database.AddObject(Prisonnier);
+                Prisonnier.Cost += cost;
+                if (sortie > Prisonnier.Sortie) Prisonnier.Sortie = sortie;
+                Prisonnier.Raison = string.IsNullOrEmpty(Prisonnier.Raison) ? raison : Prisonnier.Raison + " - " + raison;
+                Prisonnier.RP = JailRP;
+
+                GameServer.Database.SaveObject(Prisonnier);
+            }
+            else
+            {
+                isNew = true;
+                Prisonnier = new Prisoner(perso)
+                {
+                    Cost = cost,
+                    Sortie = sortie,
+                    RP = JailRP,
+                    Raison = raison
+                };
+                GameServer.Database.AddObject(Prisonnier);
+            }
 
             if (JailRP)
             {
@@ -417,14 +473,22 @@ namespace DOL.GS.Scripts
             player.Reputation = 0;
             player.Wanted = false;
 
-            if (Prisonnier.RP) player.MoveTo(Sortie_RegionID, Sortie_X, Sortie_Y, Sortie_Z, Sortie_Heading);
-            else player.MoveTo(SortieHRP_RegionID, SortieHRP_X, SortieHRP_Y, SortieHRP_Z, SortieHRP_Heading);
+            if (Prisonnier.RP) player.MoveTo(Position.Create((ushort)Sortie_RegionID, Sortie_X, Sortie_Y, Sortie_Z, (ushort)Sortie_Heading));
+            else player.MoveTo(Position.Create((ushort)SortieHRP_RegionID, SortieHRP_X, SortieHRP_Y, SortieHRP_Z, (ushort)SortieHRP_Heading));
             player.Bind(true);
             player.SaveIntoDatabase();
 
             Prisonniers.Remove(player);
             PlayerXPrisoner.Remove(player);
             player.TempProperties.removeProperty("JailMgr");
+
+            RegionTimer oldTimer = player.TempProperties.getProperty<RegionTimer>("JailTimer", null);
+            if (oldTimer != null)
+            {
+                oldTimer.Stop();
+                player.TempProperties.removeProperty("JailTimer");
+            }
+
             GameEventMgr.RemoveHandler(player, GamePlayerEvent.Revive, PlayerRevive);
             GameEventMgr.RemoveHandler(player, GamePlayerEvent.Quit, PlayerExit);
             GameEventMgr.RemoveHandler(player, GamePlayerEvent.RegionChanged, PlayerRevive);

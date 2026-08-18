@@ -194,6 +194,12 @@ namespace DOL.GS
         private bool m_isDivingEnabled;
 
         /// <summary>
+        /// Max flight altitude for using Epic mounts
+        /// </summary>
+        private int m_maxFlyAltitude = 10000;
+        public int MaxFlyAltitude { get { return m_maxFlyAltitude; } set { m_maxFlyAltitude = value; } }
+
+        /// <summary>
         /// Does this zone contain Lava
         /// </summary>
         private bool m_isLava;
@@ -227,7 +233,7 @@ namespace DOL.GS
         /// <param name="width">the Width of this zone</param>
         /// <param name="height">the Height of this zone</param>
         /// <param name="zoneskinID">For clientside positioning in instances: The 'fake' zoneid we send to clients.</param>
-        public Zone(Region region, ushort id, string desc, int xoff, int yoff, int width, int height, ushort zoneskinID, bool isDivingEnabled, int waterlevel, bool islava, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm, bool allowMagicalItem, bool allowReputation, float tensionRate, bool isDungeon)
+        public Zone(Region region, ushort id, string desc, int xoff, int yoff, int width, int height, ushort zoneskinID, bool isDivingEnabled, int waterlevel, bool islava, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm, bool allowMagicalItem, bool allowReputation, float tensionRate, bool isDungeon, int maxFlyAltitude = 10000)
         {
             m_Region = region;
             m_ID = id;
@@ -238,6 +244,7 @@ namespace DOL.GS
             m_zoneSkinID = zoneskinID;
             m_waterlevel = waterlevel;
             m_isDivingEnabled = isDivingEnabled;
+            m_maxFlyAltitude = maxFlyAltitude;
             m_isLava = islava;
 
             m_bonusXP = xpBonus;

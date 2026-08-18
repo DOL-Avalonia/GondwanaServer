@@ -1227,45 +1227,45 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                 if (hasPassword)
                 {
-                    objectInfo.Add("- Requires a spoken formula to activate the curse and effects.");
+                    objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.RequiresPassword"));
                 }
 
                 if (stopHealRegen)
                 {
-                    objectInfo.Add("- Halts all health regeneration while equipped.");
+                    objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.HaltsHealRegen"));
                 }
 
                 if (spellId > 0 && !hasPassword)
                 {
-                    objectInfo.Add($"- Periodically casts a specific Spell.");
+                    objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.UndeequippableItem.PeriodicSpell"));
                 }
             }
 
             if (flags == 46)
             {
                 objectInfo.Add(" ");
-                objectInfo.Add("Personal Loan Coupon.");
-                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", item.MaxCondition) + " Gold.");
-                objectInfo.Add("Hand this to any standard merchant when you are short on funds to cash it.");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.LoanCoupon.PersonalTitle"));
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", item.MaxCondition) + " " + "Money.GetString.Text4");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.LoanCoupon.PersonalDesc"));
 
                 long minPrice = 80;
                 if (item.MaxCondition == 600 || item.MaxCondition == 800) minPrice = 120;
 
-                objectInfo.Add($"Cannot be used for items under {minPrice}g.");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.LoanCoupon.PersonalMinPrice", minPrice));
                 objectInfo.Add(" ");
             }
             else if (flags == 47)
             {
                 objectInfo.Add(" ");
-                objectInfo.Add("House Loan Coupon.");
-                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", item.MaxCondition) + " Gold.");
-                objectInfo.Add("Hand this to a housing merchant or lot marker when short on funds to cash it.");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.LoanCoupon.HouseTitle"));
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DelveInfo.Value", item.MaxCondition) + " " + "Money.GetString.Text4");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.LoanCoupon.HouseDesc"));
 
                 long minPrice = 900;
                 if (item.MaxCondition == 3000 || item.MaxCondition == 6000) minPrice = 1000;
                 else if (item.MaxCondition == 10000 || item.MaxCondition == 25000) minPrice = 4000;
 
-                objectInfo.Add($"Only usable for housing purchases of {minPrice}g or more.");
+                objectInfo.Add(LanguageMgr.GetTranslation(client.Account.Language, "DetailDisplayHandler.LoanCoupon.HouseMinPrice", minPrice));
                 objectInfo.Add(" ");
             }
 

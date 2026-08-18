@@ -28,6 +28,8 @@ GameMerchant.OnPlayerInteract.EmbarkNotAllowed:	I can't let you embark for now!
 GameMerchant.OnPlayerInteract.EmbarkMorphed:	Oh, as a {0}, you can't quite hop onto a boat just yet!
 GameMerchant.OnPlayerInteract.EmbarkDamned:		You can't embark while damned!
 GameMerchant.OnPlayerInteract.EmbarkThisForm:	You can't embark under this form!
+GameMerchant.OnPlayerInteract.NoRideInArena:	You cannot ride a horse while participating in an Arena Tournament!
+GameMerchant.OnPlayerInteract.NoBoatInArena:	You cannot embark while participating in an Arena Tournament.
 
 # GameTerritoryMerchant
 GameMerchant.Interact.Territory.NotSameGuild:		I have nothing to sell you !

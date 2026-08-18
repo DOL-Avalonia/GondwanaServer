@@ -47,6 +47,8 @@ ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (sau /at): Activeaz�
 ServerRPGMessage.CmdMarket:				/market <open|close|name>: Deschide, redenumește sau închide piața ta personală.
 ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatizează lista de meșteșugit și cumpără cu ușurință ingredientele lipsă pentru rețete direct de la negustori.
 ServerRPGMessage.CmdCombineList:		/combine list: Afișează combinațiile tale de obiecte pentru meșteșugul alternativ descoperite cu succes.
+ServerRPGMessage.CmdEvent:				/event: Afișează informații cu privire la evenimentele mondiale curente.
+ServerRPGMessage.CmdEpicMount:			/epicmount: Comenzi pentru montura zburătoare epică - Utilizare: /epicmount [cruise | move | target | left | right | stop | rise | down | land].
 ServerRPGMessage.CmdVol:				/vol sau /steal <player>: Fură bani sau Relicve de Teritoriu prețioase de la jucătorii rivali! De asemenea, îți permite să furi comorile jefuite din cuferele unui clan advers în PvP.
 ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Te întoarce în direcția în care se află monstrul (mob) specificat în regiunea ta. Foarte util pentru misiuni!
 ServerRPGMessage.CmdAskName:			/askname: Cere numele țintei tale pentru a-l afișa. Trebuie să faci acest lucru înainte de a-i putea adăuga ca prieten.

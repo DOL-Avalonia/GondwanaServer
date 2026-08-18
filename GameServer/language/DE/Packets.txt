@@ -166,6 +166,16 @@ DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Verbraucht {0}% Mana pro
 DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Verbraucht {0}% Zustand pro Tick{1}.
 DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Verliert {0}% Zustand bei Tod{1}.
 DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Kann nicht abgelegt werden.
+DetailDisplayHandler.UndeequippableItem.RequiresPassword:		- Erfordert eine gesprochene Formel, um den Fluch und die Effekte zu aktivieren.
+DetailDisplayHandler.UndeequippableItem.HaltsHealRegen:			- Stoppt jegliche Gesundheitsregeneration, solange ausgerüstet.
+DetailDisplayHandler.UndeequippableItem.PeriodicSpell:			- Wirkt regelmäßig einen bestimmten Zauber.
+DetailDisplayHandler.UndeequippableItem.PeriodicAura:			- Wendet regelmäßig eine visuelle Aura an.
+DetailDisplayHandler.LoanCoupon.PersonalTitle:					Persönlicher Kreditcoupon
+DetailDisplayHandler.LoanCoupon.PersonalDesc:					Übergebt dies einem beliebigen Standardhändler, wenn Ihr knapp bei Kasse seid, um ihn einzulösen.
+DetailDisplayHandler.LoanCoupon.PersonalMinPrice:				Kann nicht für Gegenstände unter {0} Gold verwendet werden.
+DetailDisplayHandler.LoanCoupon.HouseTitle:						Hauskreditcoupon
+DetailDisplayHandler.LoanCoupon.HouseDesc:						Übergebt dies einem Häuserhändler oder einer Grundstücksmarkierung, wenn Ihr knapp bei Kasse seid, um es einzulösen.
+DetailDisplayHandler.LoanCoupon.HouseMinPrice:					Nur verwendbar für Häuserkäufe von {0} Gold oder mehr.
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:				{0} ist zu weit entfernt!

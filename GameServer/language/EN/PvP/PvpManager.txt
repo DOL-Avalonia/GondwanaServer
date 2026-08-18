@@ -35,6 +35,7 @@ PvPManager.KingHill.CapturedBy:				The Hill has been captured by {0}!
 PvPManager.KingHill.Pressuring:				Pressuring the Hill... (+{0} pressure)
 PvPManager.KingHill.YouCapture:				You captured the Hill!
 PvPManager.KingHill.Holding:				Holding Hill... (+{0})
+PvPManager.KingHill.HillMoved:				[KotH] The Hill has moved to a new location!
 
 PvPManager.CoreRun.Begins:					The Core Run begins! GREEN LIGHT - GO!
 PvPManager.CoreRun.CastMovement:			Casting non-instant spells implies movement!

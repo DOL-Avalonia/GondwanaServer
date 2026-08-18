@@ -35,6 +35,7 @@ PvPManager.KingHill.CapturedBy:				{0} a pris le contrôle de la colline !
 PvPManager.KingHill.Pressuring:				Mise sous pression de la colline... (+{0} pression)
 PvPManager.KingHill.YouCapture:				Vous avez capturé la colline !
 PvPManager.KingHill.Holding:				Contrôle de la colline... (+{0})
+PvPManager.KingHill.HillMoved:				[KotH] La Colline s'est déplacée vers un nouvel emplacement !
 
 PvPManager.CoreRun.Begins:					La Course au Coeur commence ! FEU VERT - PARTEZ !
 PvPManager.CoreRun.CastMovement:			Lancer des sorts non-instantanés implique du mouvement !

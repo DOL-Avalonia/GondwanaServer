@@ -1,0 +1,24 @@
+
+BankLoanMgr.HasLoan:							Vous avez déjà un prêt actif.
+BankLoanMgr.IsDebtor:							Vous ne pouvez pas obtenir de prêt tant que vous êtes débiteur.
+BankLoanMgr.Restricted:							Vos possibilités d'emprunt sont restreintes en raison de dettes antérieures.
+BankLoanMgr.MinFunds:							Vous n'avez pas les fonds minimum requis dans votre banque ({0}).
+BankLoanMgr.HasCoupon:							Vous avez déjà un coupon de prêt dans votre inventaire ou votre coffre.
+BankLoanMgr.InventoryFull:						Votre inventaire est plein. Veuillez faire de la place.
+BankLoanMgr.ReceivedCoupon:						Vous avez reçu un {0}. Le compte à rebours s'activera lors de l'utilisation.
+BankLoanMgr.NotValidUse:						J'ai noté que vous avez un prêt, mais il n'est pas nécessaire de l'utiliser pour un tel achat.
+BankLoanMgr.Cashed:								J'ai encaissé votre coupon de prêt de {0}o. La banque prélèvera des paiements quotidiens.
+BankLoanMgr.NoActiveLoan:						Vous n'avez pas de prêt actif.
+BankLoanMgr.RepaidEarly:						Vous avez remboursé votre prêt par anticipation pour {0} avec un taux réduit.
+BankLoanMgr.NeedFundsEarly:						Il vous faut {0} au total pour rembourser votre prêt par anticipation.
+BankLoanMgr.WithdrewPocket:						La banque a prélevé {0} de votre inventaire pour rembourser votre prêt.
+BankLoanMgr.WithdrewPartially:					La banque a prélevé {0} de votre inventaire pour couvrir partiellement votre prêt.
+BankLoanMgr.WarningDebt:						ATTENTION : Votre compte bancaire est à découvert. Vous avez {0} pour rembourser votre dette, sinon vos biens seront saisis !
+BankLoanMgr.AutoActivateOnly:					Ce coupon de prêt ne peut être activé automatiquement que lors d'un achat coûteux chez un marchand.
+BankLoanMgr.TimeUnit.Seconds:					secondes
+BankLoanMgr.TimeUnit.Hour:						heure
+BankLoanMgr.TimeUnit.Hours:						heures
+BankLoanMgr.BankerName:							Banquier
+BankLoanMgr.JailReason.HouseSeized:				Dette impayée - Propriétés saisies.
+BankLoanMgr.JailReason.HorseSeized:				Dette impayée - Monture saisie.
+BankLoanMgr.JailReason.UnpaidDebt:				Dette impayée.

@@ -5,6 +5,7 @@ TeleportNPC.YouAreNotOutlaw:            Circulez, vous n'avez n'a rien à voir i
 TeleportNPC.NoPassword:                 Bien le bonjour, messire. Comment puis-je vous aider ?
 TeleportNPC.UnknownDestination:         Je ne connais pas cette destination.
 TeleportNPC.NoTPCombat:                 Vous ne pouvez pas être téléporté en étant en combat !
+TeleportNPC.NoEnterInArena:				Je ne peux pas vous téléporter alors que vous êtes inscrit ou participaez à un Tournoi d'Arène.
 TeleportNPC.NotInOwnedTerritory:        Bien le bonjour, messire. Je suis navré de devoir vous refuser mes services, car notre territoire n'est point vassal de votre guilde !
 TeleportNPC.EventNotOccurred:			L'événement "{0}" n'a pas encore eu lieu.
 TeleportNPC.TooLittleExperience:		Vous avez trop peu d'expérience pour que je vous transporte à cet endroit, revenez plus tard !

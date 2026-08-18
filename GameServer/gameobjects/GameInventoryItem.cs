@@ -470,7 +470,7 @@ namespace DOL.GS
 
             if (Template != null && (Template.Flags == 46 || Template.Flags == 47))
             {
-                player.Out.SendMessage("This loan coupon can only be activated automatically when making an expensive purchase at a merchant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "BankLoanMgr.AutoActivateOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
             return false;
@@ -618,28 +618,28 @@ namespace DOL.GS
             if (Flags == 46)
             {
                 delve.Add(" ");
-                delve.Add("Personal Loan Coupon");
-                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", MaxCondition) + " Gold");
-                delve.Add("Hand this to any standard merchant when you are short on funds to cash it.");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.LoanCoupon.PersonalTitle"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", MaxCondition) + " " + "Money.GetString.Text4");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.LoanCoupon.PersonalDesc"));
 
                 long minPrice = 80;
                 if (MaxCondition == 600 || MaxCondition == 800) minPrice = 120;
 
-                delve.Add($"Cannot be used for items under {minPrice}g.");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.LoanCoupon.PersonalMinPrice", minPrice));
                 delve.Add(" ");
             }
             else if (Flags == 47)
             {
                 delve.Add(" ");
-                delve.Add("House Loan Coupon");
-                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", MaxCondition) + " Gold");
-                delve.Add("Hand this to a housing merchant or lot marker when short on funds to cash it.");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.LoanCoupon.HouseTitle"));
+                delve.Add(LanguageMgr.GetTranslation(lang, "DelveInfo.Value", MaxCondition) + " " + "Money.GetString.Text4");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.LoanCoupon.HouseDesc"));
 
                 long minPrice = 900;
                 if (MaxCondition == 3000 || MaxCondition == 6000) minPrice = 1000;
                 else if (MaxCondition == 10000 || MaxCondition == 25000) minPrice = 4000;
 
-                delve.Add($"Only usable for housing purchases of {minPrice}g or more.");
+                delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.LoanCoupon.HouseMinPrice", minPrice));
                 delve.Add(" ");
             }
 
@@ -741,22 +741,22 @@ namespace DOL.GS
 
                 if (hasPassword)
                 {
-                    delve.Add("- Requires a spoken formula to activate the curse and effects.");
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.RequiresPassword"));
                 }
 
                 if (stopHealRegen)
                 {
-                    delve.Add("- Halts all health regeneration while equipped.");
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.HaltsHealRegen"));
                 }
 
                 if (spellId > 0 && !hasPassword)
                 {
-                    delve.Add($"- Periodically casts a specific Spell.");
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.PeriodicSpell"));
                 }
 
                 if (effectId > 0 && !hasPassword)
                 {
-                    delve.Add($"- Periodically applies a visual aura.");
+                    delve.Add(LanguageMgr.GetTranslation(lang, "DetailDisplayHandler.UndeequippableItem.PeriodicAura"));
                 }
 
                 if (manaPct > 0 || condLoss > 0 || deathCondLoss > 0 || hasPassword || stopHealRegen || spellId > 0 || effectId > 0) delve.Add(" ");

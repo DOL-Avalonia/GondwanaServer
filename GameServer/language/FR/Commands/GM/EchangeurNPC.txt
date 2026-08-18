@@ -1,14 +1,19 @@
-Commands.GM.EchangeurNPC.Description:	Gestions des échangeurs (TextNPC)
-Commands.GM.EchangeurNPC.Usage.Add:		add <nombre d'item> <ID de l'item à donner>' Ajoute un item que le pnj accepte
-Commands.GM.EchangeurNPC.Usage.Remove:	remove <ID de l'item à donner>' Retire un item
-Commands.GM.EchangeurNPC.Usage.Money:		money <ID de l'item à donner> <quantité>' Echange de l'argent
-Commands.GM.EchangeurNPC.Usage.XP:	xp <ID de l'item à donner> <quantité>' Mettre une quantité négative pour un pourmille (xp/1000) suivant le niveau du joueur
-Commands.GM.EchangeurNPC.Usage.Item:		item <ID de l'item à donner> <nombre d'item final> <ID de l'item final>' Echange des objets
-Commands.GM.EchangeurNPC.Usage.Quest:	quest <ID de l'item à donner> <questID> <step>' Échanger un objet lors d'une quête et d'une étape spécifique
-Commands.GM.EchangeurNPC.Usage.Info:	info' affiche les infos de l'échangeur
-Commands.GM.EchangeurNPC.Usage.Pricemoney:		pricemoney <ID de l'item à donner> <gold>' Définit la valeur en <gold> pour valider l'échange
-Commands.GM.EchangeurNPC.Usage.Priceressource1:	priceressource1 <ID de l'item à donner> <item_id> <nombre>' Définit l'objet requis par son <item_id> et le <nombre> requis pour la ressource 1
-Commands.GM.EchangeurNPC.Usage.Priceressource2:		priceressource2 <ID de l'item à donner> <item_id> <nombre>' Définit l'objet requis par son <item_id> et le <nombre> requis pour la ressource 2
-Commands.GM.EchangeurNPC.Usage.Priceressource3:	priceressource3 <ID de l'item à donner> <item_id> <nombre>' Définit l'objet requis par son <item_id> et le <nombre> requis pour la ressource 3
-Commands.GM.EchangeurNPC.Usage.Priceressource:		priceressource remove <1|2|3> <ID de l'item à donner>' Supprime la condition de Price Ressource numéro <1|2|3> pour l'item à donner.
+Commands.GM.EchangeurNPC.Description:					Gestions des échangeurs (TextNPC)
+Commands.GM.EchangeurNPC.Usage.Add:						'/echangeurnpc add <nombre d'item> <ID de l'item à donner>' Ajoute un item que le pnj accepte
+Commands.GM.EchangeurNPC.Usage.Remove:					'/echangeurnpc remove <ID de l'item à donner>' Retire un item
+Commands.GM.EchangeurNPC.Usage.Money:					'/echangeurnpc money <ID de l'item à donner> <quantité>' Echange de l'argent
+Commands.GM.EchangeurNPC.Usage.XP:						'/echangeurnpc xp <ID de l'item à donner> <quantité>' Mettre une quantité négative pour un pourmille (xp/1000) suivant le niveau du joueur
+Commands.GM.EchangeurNPC.Usage.Item:					'/echangeurnpc item <ID de l'item à donner> <nombre d'item final> <ID de l'item final>' Echange des objets
+Commands.GM.EchangeurNPC.Usage.Quest:					'/echangeurnpc quest <ID de l'item à donner> <questID> <step>' Échanger un objet lors d'une quête et d'une étape spécifique
+Commands.GM.EchangeurNPC.Usage.Info:					'/echangeurnpc info' affiche les infos de l'échangeur
+Commands.GM.EchangeurNPC.Usage.Pricemoney:				'/echangeurnpc pricemoney <ID de l'item à donner> <gold>' Définit la valeur en <gold> pour valider l'échange
+Commands.GM.EchangeurNPC.Usage.Priceressource1:			'/echangeurnpc priceressource1 <ID de l'item à donner> <item_id> <nombre>' Définit l'objet requis par son <item_id> et le <nombre> requis pour la ressource 1
+Commands.GM.EchangeurNPC.Usage.Priceressource2:			'/echangeurnpc priceressource2 <ID de l'item à donner> <item_id> <nombre>' Définit l'objet requis par son <item_id> et le <nombre> requis pour la ressource 2
+Commands.GM.EchangeurNPC.Usage.Priceressource3:			'/echangeurnpc priceressource3 <ID de l'item à donner> <item_id> <nombre>' Définit l'objet requis par son <item_id> et le <nombre> requis pour la ressource 3
+Commands.GM.EchangeurNPC.Usage.Priceressource:			'/echangeurnpc priceressource remove <1|2|3> <ID de l'item à donner>' Supprime la condition de Price Ressource numéro <1|2|3> pour l'item à donner.
+Commands.GM.EchangeurNPC.Usage.UniqueStonemaker:		'/echangeurnpc unique stonemaker - Convertit le PNJ en Tailleur de pierre
+Commands.GM.EchangeurNPC.Usage.UniqueVialPlayer:		'/echangeurnpc unique vial player' - Ne recoit que des fioles de sang de joueur.
+Commands.GM.EchangeurNPC.Usage.UniqueVialNpcAll:		'/echangeurnpc unique vial npc all' - Recoit tout type de fiole de samg de Mob
+Commands.GM.EchangeurNPC.Usage.UniqueVialNpcName:		'/echangeurnpc unique vial npc name <Nom>' - Ne recoit qu'un seul type de fiole de sang selon le nom du mob - (ex: Agisfield)
+Commands.GM.EchangeurNPC.Usage.UniqueVialNpcBlood:		'/echangeurnpc unique vial npc blood <Type>' - Ne recoit qu'un seul type de sang - (ex: MachineOil)
 Commands.GM.EchangeurNPC.Usage.AdditionalDescription:	Pour la réponse, ajoutez une réponse avec l'ID de l'item à donner grâce aux commandes des textnpc

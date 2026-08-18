@@ -122,6 +122,8 @@ GameObjects.GamePlayer.Die.KilledLocation:         {0} è stato appena ucciso pr
 GameObjects.GamePlayer.Die.LoseExperience:         Perdi esperienza.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Sei morto. Digita “/release” per tornare alla tua pietra d'anima.
 GameObjects.GamePlayer.Die.YouKilled:              Hai ucciso {0}.
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Il tuo {0} ha perso condizione in seguito alla tua morte.
+GameObjects.GamePlayer.Die.ArenaDefeated:			Sei stato sconfitto! Verrai resuscitato automaticamente col proseguire della partita.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Non puoi respirare sott'acqua e ingoi acqua!
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Perdi il 5% dei tuoi punti vita massimi.
@@ -491,6 +493,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:				Non puoi montare durante un due
 GameObjects.GamePlayer.UseSlot.CantMountStealing:			Non puoi montare mentre stai derubando un altro giocatore!
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:     Non puoi montare; sei morto.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:  Non puoi usare questa cavalcatura mentre porti una reliquia!
+GameObjects.GamePlayer.UseSlot.CantMountArena:			Non puoi evocare una cavalcatura mentre partecipi a un Torneo dell'Arena.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	Lo spazio aereo qui è limitato. Non puoi richiamare la tua cavalcatura volante epica.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:		Non puoi evocare la tua cavalcatura volante epica mentre nuoti o sei sott'acqua.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:		Congedi la tua cavalcatura volante epica.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:			Non puoi evocare una cavalcatura volante in questa zona.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:	Il tuo {0} risponde alla tua chiamata! Digita '/epicmount cruise' per avanzare, '/epicmount rise' per salire.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:          Non puoi vedere il tuo bersaglio.
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:          Non puoi evocare una cavalcatura in un'area RvR.
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:    Non puoi usare questo oggetto direttamente dallo zaino. Equipaggialo prima.
@@ -530,6 +538,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Il tuo {0} si è rotto a
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Il tuo {0} è stato rimosso a causa di energia insufficiente.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Il tuo {0} si è rotto ed è caduto a terra!
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Il tuo zaino è pieno! Il tuo {0} è caduto a terra.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:			Non puoi usare pozioni durante un Torneo dell'Arena.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:			Non puoi usare pergamene durante un Torneo dell'Arena.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:		Non puoi scartare {0} mentre è equipaggiato.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Questo segnaposto Genistar deve essere posizionato in uno slot del giardino.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Il tuo uovo di Genistar è stato posizionato nel tuo giardino. Ora spetta a te nutrirlo e modellarlo secondo i tuoi desideri!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Devi liberare il tuo Genistar evocato prima di poterlo rimettere nel giardino.

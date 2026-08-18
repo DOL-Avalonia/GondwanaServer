@@ -11,6 +11,7 @@ Commands.Players.Vol.Hypnotized: 			Vous ne pouvez voler étant hypnotisé !
 Commands.Players.Vol.Stunned:				Vous ne pouvez voler étant assomé !
 Commands.Players.Vol.Damned:				Vous ne pouvez voler étant damné !
 Commands.Players.Vol.AFK:					Vous ne pouvez voler lorsque vous êtes afk ! Tapez /afk pour le désactiver.
+Commands.Players.Vol.CannotArena:			Vous ne pouvez voler tout en participant à un tournoi d'arène.
 Commands.Players.Vol.Dead:					Vous ne pouvez voler étant mort !
 Commands.Players.Vol.AlreadyStealing:		Vous êtes déjà en train de voler quelqu'un !
 Commands.Players.Vol.TargetAFK: 			Vous ne pouvez pas voler un joueur afk !
@@ -30,6 +31,7 @@ Commands.Players.Vol.NothingToSteal: 		Il n'y avait rien à voler !
 Commands.Players.Vol.FullBag: 				Vous avez vos sacs pleins, impossible de voler quoi que ce soit !
 Commands.Players.Vol.StealItem: 			Vous avez volé {0} à {1} !
 Commands.Players.Vol.BeStealedItem: 		{0} vous a volé {1} !
+Commands.Players.Vol.CannotFromArenaPlayer:	Vous ne pouvez pas voler un combattant de tournoi d'arène !
 Commands.Players.Vol.OwnChest: 			Vous ne pouvez pas voler votre propre coffre verrouillé !
 Commands.Players.Vol.GroupChest: 		Vous ne pouvez pas voler le coffre verrouillé de votre groupe !
 Commands.Players.Vol.NeedCrochets: 		Vous avez besoin de Crochets pour voler ce coffre.

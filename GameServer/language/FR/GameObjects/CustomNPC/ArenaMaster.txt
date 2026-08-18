@@ -1,0 +1,37 @@
+
+ArenaManager.2v2:								2 contre 2
+ArenaManager.3v3:								3 contre 3
+ArenaManager.4v4:								4 contre 4
+ArenaManager.SoloVsSolo:						Solo vs Solo
+ArenaMaster.Interact.CurrentMatch:				Tournoi en cours
+ArenaMaster.Interact.CurrentMatch1:				[1] {0}
+ArenaMaster.Interact.CurrentMatch2:				[2] {0}
+ArenaMaster.Interact.InProgress:				Un tournoi d'Arène est en cours.
+ArenaMaster.Interact.BettingOpen:				Les paris sont OUVERTS! Utilisez la commande:
+ArenaMaster.Interact.BettingCmd:				/bet <1 ou 2> <or>
+ArenaMaster.Interact.BettingWarning:			Attention: Vous pouvez parier plus que vous ne possédez ! Cela tirera un crédit à la banque. Risque de saisie de biens et prison !
+ArenaMaster.Interact.MatchUnderway:				Un tournoi est en cours ! Attendez la prochaine manche pour parier. Utilisez /bet list pour voir la cagnotte.
+ArenaMaster.Interact.GMMenuTitle:				Menu GM
+ArenaMaster.Interact.GMMenuShutdown:			[Force Shutdown]
+ArenaMaster.Interact.GMSwitchSpec:				[Debug: Switch as Spectator]
+ArenaMaster.Interact.GMSwitchFight:				[Debug: Switch as Fighter]
+ArenaMaster.Interact.GMJoinSpec:				[Debug: Join as a Spectator]
+ArenaMaster.Interact.GMJoinFight:				[Debug: Join as a Fighter]
+ArenaMaster.Interact.IdleGreetings:				Salutations! L'arène est prête à acceuillir ses nouveaux combattants ! Quel type de tournoi souhaitez-vous engager?
+ArenaMaster.Interact.OptSolo:					[Solo vs Solo]
+ArenaMaster.Interact.Opt2v2:					[2 contre 2]
+ArenaMaster.Interact.Opt3v3:					[3 contre 3]
+ArenaMaster.Interact.Opt4v4:					[4 contre 4]
+ArenaMaster.Interact.GMStartSolo:				[Debug: Start Solo Match]
+ArenaMaster.Interact.GMStartSpec:				[Debug: Start as Spectator]
+ArenaMaster.Interact.InQueue:					Vous êtes actuellement dans la file d'attente.
+ArenaMaster.Interact.LeaveQueueCmd:				quitter la file
+ArenaMaster.Interact.LeaveQueue:				[quitter la file d'attente]
+ArenaMaster.Interact.Forming:					Une session d'Arène ({0}) est en cours de formation !
+ArenaMaster.Interact.JoinQueueCmd:				rejoindre la file
+ArenaMaster.Interact.JoinQueue:					[rejoindre la file d'attente]
+ArenaMaster.Whisper.GroupSolo:					C'est une arène solo. Veuillez dissoudre votre groupe.
+ArenaMaster.Whisper.NotLeader:					Seul le chef peut inscrire le groupe.
+ArenaMaster.Whisper.GroupSize:					Cette arène requiert exactement {0} membres dans le groupe.
+ArenaMaster.Whisper.AutoBalance:				Vous avez rejoint l'Arène individuellement et serez assigné à une équipe plus tard.
+

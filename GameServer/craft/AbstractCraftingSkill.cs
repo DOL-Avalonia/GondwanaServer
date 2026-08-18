@@ -548,7 +548,11 @@ namespace DOL.GS
                                         if (!slotKvp.Value.HasValue)
                                         {
                                             GameServer.Database.DeleteObject(dbItem);
-                                            updatedItems[dbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = null;
+                                            vault.OnRemoveItem(player, dbItem);
+                                            InventoryItem emptyItem = new InventoryItem();
+                                            emptyItem.SlotPosition = dbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot;
+                                            emptyItem.Count = 0;
+                                            updatedItems[emptyItem.SlotPosition] = emptyItem;
                                         }
                                         else
                                         {

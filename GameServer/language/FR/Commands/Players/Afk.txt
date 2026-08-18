@@ -16,7 +16,8 @@ Commands.Players.Afk.CannotWhileStunned:	Vous ne pouvez pas utiliser le mode AFK
 Commands.Players.Afk.CannotWhileMezzed:		Vous ne pouvez pas utiliser le mode AFK en étant hypnotisé.
 Commands.Players.Afk.CannotWhileDamned:		Vous ne pouvez pas utiliser le mode AFK en étant damné.
 Commands.Players.Afk.CannotWhileCrafting:	Vous ne pouvez pas utiliser le mode AFK alors que fabriquez un objet !
-Commands.Players.Afk.CannotWhilekMorphed:	Vous ne pouvez pas utiliser le mode AFK en étant sous l'effet d'un enchantement "{0}"!
+Commands.Players.Afk.CannotWhileMorphed:	Vous ne pouvez pas utiliser le mode AFK en étant sous l'effet d'un enchantement "{0}"!
+Commands.Players.Afk.CannotWhileArena:		Vous ne pouvez pas utiliser le mode AFK en étant inscrit ou en participant à un Tournoi d'Arène.
 Commands.Players.AfkAttack.On:				Vous démarrez votre entraînement (AFK) !
 Commands.Players.AfkAttack.Off:				Vous cessez de vous entraîner.
 Commands.Players.AfkAttack.NeedDummyTarget:	Vous devez sélectionner un pantin d'entraînement !

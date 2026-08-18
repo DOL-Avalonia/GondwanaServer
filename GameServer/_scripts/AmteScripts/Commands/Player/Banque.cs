@@ -88,7 +88,7 @@ namespace DOL.GS.Commands
                         GameServer.Database.SaveObject(bank);
                         GameServer.Database.SaveObject(targetBank);
 
-                        string formattedTransferAmount = Currency.Copper.Mint(transferAmount).ToText();
+                        string formattedTransferAmount = Currency.Copper.Mint(transferAmount).ToText(client.Account.Language);
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.Transfer.Success", formattedTransferAmount, targetPlayerName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
                         // Notify target if online
@@ -150,7 +150,7 @@ namespace DOL.GS.Commands
                         };
                         GameServer.Database.AddObject(term);
 
-                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.Success", Currency.Copper.Mint(depositAmount).ToText(), days, interestRate), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Banque.TermDeposit.Success", Currency.Copper.Mint(depositAmount).ToText(client.Account.Language), days, interestRate), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
 
@@ -176,7 +176,7 @@ namespace DOL.GS.Commands
                             Price = newMoney,
                             Weight = 2,
                             Name = LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.Name", client.Player.Name),
-                            Description = LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.Description1", Money.GetString(newMoney)) + "\n\n" + LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.Description2")
+                            Description = LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.Description1", Money.GetString(newMoney, client.Account.Language)) + "\n\n" + LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.Description2")
                         };
                         GameServer.Database.AddObject(item);
 
@@ -200,7 +200,7 @@ namespace DOL.GS.Commands
                             }
                             message += LanguageMgr.GetTranslation(client.Account.Language, "Banque.Cheque.MovedToVault") + "\n";
                         }
-                        message += LanguageMgr.GetTranslation(client.Account.Language, "Banque.AccountOverview", Money.GetString(bank.Money));
+                        message += LanguageMgr.GetTranslation(client.Account.Language, "Banque.AccountOverview", Money.GetString(bank.Money, client.Account.Language));
                         client.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         InventoryLogging.LogInventoryAction(client.Player, target, eInventoryActionType.Other, newMoney);
                         InventoryLogging.LogInventoryAction(target, client.Player, eInventoryActionType.Other, item);
@@ -220,7 +220,7 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-                        string message = LanguageMgr.GetTranslation(client.Account.Language, "Banque.AccountOverview", Money.GetString(bank.Money));
+                        string message = LanguageMgr.GetTranslation(client.Account.Language, "Banque.AccountOverview", Money.GetString(bank.Money, client.Account.Language));
                         client.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         InventoryLogging.LogInventoryAction(target, client.Player, eInventoryActionType.Other, newMoney);
                     }

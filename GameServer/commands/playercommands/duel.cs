@@ -33,9 +33,9 @@ namespace DOL.GS.Commands
             if (IsSpammingCommand(player, "duel"))
                 return;
 
-            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
+            if (player.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {
-                player.Out.SendMessage("You cannot duel while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                DisplayMessage(client, LanguageMgr.GetTranslation(client!.Account.Language, "Commands.Players.Duel.InArena"));
                 return;
             }
 
@@ -324,7 +324,7 @@ namespace DOL.GS.Commands
             // Is Arena Participant
             if (actionTarget.TempProperties.getProperty<bool>("ArenaParticipant", false) || actionTarget.TempProperties.getProperty<bool>("ArenaQueued", false))
             {
-                actionSource.Out.SendMessage($"{actionTarget.Name} is busy participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                actionSource.Out.SendMessage(LanguageMgr.GetTranslation(actionSource.Client, "Commands.Players.Duel.BusyInArena", actionSource.GetPersonalizedName(actionTarget)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 

@@ -41,7 +41,7 @@ namespace DOL.GS.Commands
 
             if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false) || client.Player.IsInPvP)
             {
-                client.Player.Out.SendMessage("You cannot use battlegroup commands while in an Arena or PvP.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlegroup.CannotInPvPArena"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -104,7 +104,7 @@ namespace DOL.GS.Commands
 
             if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false) || client.Player.IsInPvP)
             {
-                client.Player.Out.SendMessage("You cannot use battlegroup commands while in an Arena or PvP.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Battlegroup.CannotInPvPArena"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
             }
 

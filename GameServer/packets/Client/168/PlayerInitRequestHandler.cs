@@ -218,19 +218,21 @@ namespace DOL.GS.PacketHandler.Client.v168
                     TimeSpan elapsed = DateTime.Now - bank.NegativeMoneySince;
                     int timeRemaining;
                     string timeUnit;
+                    string lang = player.Client.Account.Language;
 
                     if (debug)
                     {
                         timeRemaining = Math.Max(0, 90 - (int)elapsed.TotalSeconds);
-                        timeUnit = "seconds";
+                        timeUnit = LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Seconds");
                     }
                     else
                     {
                         timeRemaining = Math.Max(0, Properties.DEBTOR_GRACE_PERIOD_HOURS - (int)elapsed.TotalHours);
-                        timeUnit = timeRemaining == 1 ? "hour" : "hours";
+                        timeUnit = timeRemaining == 1 ? LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Hour") : LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Hours");
                     }
 
-                    player.Out.SendMessage($"WARNING: Your bank account is in debt. You have {timeRemaining} {timeUnit} to reimburse your debt or your assets will be seized!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    string timeWarning = $"{timeRemaining} {timeUnit}";
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.WarningDebt", timeWarning), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
 
@@ -295,6 +297,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdMarket") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCraft") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCombineList") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEvent") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEpicMount") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdVol") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdFaceMob") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAskName") + "\n\n" +

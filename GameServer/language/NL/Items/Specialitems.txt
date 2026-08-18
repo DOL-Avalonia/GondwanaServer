@@ -30,6 +30,7 @@ Items.Specialitems.GuarkRingUsageStealing:			Je kunt geen hemelse magie gebruike
 Items.Specialitems.GuarkRingUsageAFK:				Je kunt geen hemelse magie gebruiken terwijl je AFK bent!
 Items.Specialitems.GuarkRingUsageClimbing:			Je kunt geen hemelse magie gebruiken tijdens het klimmen!
 Items.Specialitems.GuarkRingUsageRelic:				Je kunt geen hemelse magie gebruiken terwijl je een territorium-relikwie draagt.
+Items.Specialitems.GuarkRingUsageArena:				Je kunt geen hemelse magie gebruiken terwijl je deelneemt aan een arenatoernooi.
 Items.Specialitems.GuarkRingCannotUseHere:			Je kunt dit voorwerp hier niet gebruiken.
 Items.Specialitems.GuarkRingDoNotMove:				Je moet op dezelfde plek blijven om dit voorwerp te gebruiken.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Je bent onlangs in gevecht geweest, je moet wachten voordat je dit voorwerp weer kunt gebruiken.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		Het voorwerp kon om de een of a
 Items.Specialitems.DieTriggerSpell.FailRez:			De vloek die op je lijk rust is hier te sterk, de opwekkingsspreuk mislukt!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Je {0} is uitgeput en is uit je inventaris verwijderd.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	Je kunt dit voorwerp niet gebruiken tijdens gevechten!
+Items.Specialitems.PasswordCurseItemUsageJailed:	Je kunt dit voorwerp niet gebruiken terwijl je gevangen zit!
+Items.Specialitems.PasswordCurseItemUsageMounted:	Je kunt dit voorwerp niet gebruiken terwijl je op je rijdier zit!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	Je kunt dit voorwerp niet gebruiken terwijl je in stealth bent.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	Je kunt dit voorwerp niet gebruiken terwijl je versteend bent!
+Items.Specialitems.PasswordCurseItemUsageDamned:	Je kunt dit voorwerp niet gebruiken terwijl je verdoemd bent!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	Je kunt dit voorwerp niet gebruiken terwijl je onder een "{0}" betovering bent!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	Je kunt dit voorwerp niet gebruiken terwijl je aan het craften bent!
+Items.Specialitems.PasswordCurseItemUsageDuel:		Je kunt dit voorwerp niet gebruiken terwijl je in een duel zit!
+Items.Specialitems.PasswordCurseItemUsageStealing:	Je kunt dit voorwerp niet gebruiken terwijl je een andere speler besteelt!
+Items.Specialitems.PasswordCurseItemUsageAFK:		Je kunt dit voorwerp niet gebruiken terwijl je AFK bent!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	Je kunt dit voorwerp niet gebruiken tijdens het klimmen!
+Items.Specialitems.PasswordCurseItemUsageRelic:		Je kunt dit voorwerp niet gebruiken terwijl je een territoriumrelikwie draagt.
+Items.Specialitems.PasswordCurseItemUsageArena:		Je kunt dit voorwerp niet gebruiken terwijl je deelneemt aan een Arena Toernooi.

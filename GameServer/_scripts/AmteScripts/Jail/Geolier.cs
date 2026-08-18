@@ -36,15 +36,15 @@ namespace DOL.GS.Scripts
                     if (prison == null) return Interact(player);
 
                     string reason = string.Empty;
-                    if (prison.IsOutLaw)
+                    if (!string.IsNullOrEmpty(prison.Raison))
                     {
-                        reason = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.Reason", prison.Raison);
+                        reason = LanguageMgr.GetTranslation(player!.Client.Account.Language, "GameJail.Reason", prison.Raison);
                     }
 
                     if (prison.RP)
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.RPWait", prison.Sortie.ToShortDateString(), prison.Sortie.Hour) + "\n\n" + LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.RPReason", reason), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                        player!.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.RPWait", prison.Sortie.ToShortDateString(), prison.Sortie.Hour) + "\n\n" + LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.RPReason", reason), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     else
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.NonRPWait", prison.Sortie.ToShortDateString(), prison.Sortie.Hour), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                        player!.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameJail.NonRPWait", prison.Sortie.ToShortDateString(), prison.Sortie.Hour), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     break;
 
                 default: return Interact(player);

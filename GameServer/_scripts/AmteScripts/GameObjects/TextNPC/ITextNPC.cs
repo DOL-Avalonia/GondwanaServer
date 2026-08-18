@@ -677,16 +677,28 @@ namespace DOL.GS.Scripts
             InventoryLogging.LogInventoryAction(player, _body, eInventoryActionType.Quest, item, echItem.ItemRecvCount);
 
             if (echItem.GiveTemplate != null)
-                if (!player.Inventory.AddTemplate(GameInventoryItem.Create(echItem.GiveTemplate), echItem.ItemGiveCount, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            {
+                var templateItem = GameInventoryItem.Create(echItem.GiveTemplate);
+                if (!player.Inventory.AddTemplate(templateItem, echItem.ItemGiveCount, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    var invItem = GameInventoryItem.Create(echItem.GiveTemplate);
-                    invItem.Count = echItem.ItemGiveCount;
-                    player.CreateItemOnTheGround(invItem);
-                    InventoryLogging.LogInventoryAction(_body, "", $"(ground;{player.InternalID})", eInventoryActionType.Quest, invItem, echItem.ItemGiveCount);
+                    if (!player.TryAddToStorageBagTemplate(templateItem, echItem.ItemGiveCount))
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        templateItem.Count = echItem.ItemGiveCount;
+                        player.CreateItemOnTheGround(templateItem);
+                        InventoryLogging.LogInventoryAction(_body, "", $"(ground;{player.InternalID})", eInventoryActionType.Quest, templateItem, echItem.ItemGiveCount);
+                    }
+                    else
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", templateItem.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        InventoryLogging.LogInventoryAction(_body, player, eInventoryActionType.Quest, echItem.GiveTemplate, echItem.ItemGiveCount);
+                    }
                 }
                 else
+                {
                     InventoryLogging.LogInventoryAction(_body, player, eInventoryActionType.Quest, echItem.GiveTemplate, echItem.ItemGiveCount);
+                }
+            }
 
             if (echItem.GainMoney > 0)
             {

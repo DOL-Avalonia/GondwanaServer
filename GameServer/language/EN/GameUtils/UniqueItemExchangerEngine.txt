@@ -1,0 +1,21 @@
+
+UniqueItemExchangerEngine.StoneMaker.Offer1:				Ah, a {0}...
+UniqueItemExchangerEngine.StoneMaker.Offer2:				I can certainly work with that to fashion a jewel of exceptional quality.
+UniqueItemExchangerEngine.StoneMaker.Offer3:				However, my craft requires exactly {0} of them{1}, along with a modest jeweler's fee of {2} for my time and expertise.
+UniqueItemExchangerEngine.StoneMaker.BinderAddon:			, plus {0}x '{1}' to properly treat and stabilize the stone
+UniqueItemExchangerEngine.StoneMaker.Success1:				Excellent...
+UniqueItemExchangerEngine.StoneMaker.Success2:				{0} takes the materials and works with immense precision.
+UniqueItemExchangerEngine.StoneMaker.Success3:				Here is your {0}. A true masterpiece, wouldn't you agree?
+UniqueItemExchangerEngine.BloodVial.NeedFullVial:			I have no use for partially filled containers. Return to me only when you have extracted a full, 100% pure vial of blood.
+UniqueItemExchangerEngine.Reward.Coins:						The merchant nods in approval and hands you {0} for your efforts.
+UniqueItemExchangerEngine.Reward.Seals:						You receive {0}x {1} as a token of the exchange.
+UniqueItemExchangerEngine.Reward.ExtraCoins:				You discover an additional pouch containing {0}.
+UniqueItemExchangerEngine.Reward.Experience:				The raw essence contained within the blood surges through you, imparting {0} experience!
+UniqueItemExchangerEngine.Reward.ItemGive:					The merchant carefully hands over {0}x {1} to you.
+UniqueItemExchangerEngine.Reward.StowsVial:					{0} gives a silent nod of appreciation and securely stows the precious vial away.
+
+UniqueItemExchangerEngine.Reward.ThanksForVial1:			I must express my deepest gratitude to you, traveler. The essence you have captured within this vessel is of extraordinary purity and will prove invaluable to my ongoing arcane research. Should your journeys lead you across more creatures of such rare and potent bloodlines, I implore you to extract their life force and return to me. I assure you, my coin purse is heavy, and I shall always reward your diligence handsomely.
+UniqueItemExchangerEngine.Reward.ThanksForVial2:			A remarkable specimen! You possess a true hunter's eye to have secured a vial of such pristine quality without tainting the humors. My alchemical transmutations require vast quantities of exactly this caliber of lifeblood. I beg of you, do not let your extractor gather dust. Hunt down more beasts of power, draw their essence, and bring the full vials straight to my counter. You will find my compensation more than generous.
+UniqueItemExchangerEngine.Reward.ThanksForVial3:			Fascinating... you can almost feel the pulse of the creature still echoing within the glass. You have done a great service to our circle today, champion. The rituals we prepare demand reagents of the highest potency, and this fills our needs perfectly. Seek out the strongest monsters that roam these lands, drain their vitality, and present the full vessels to me. I promise that your efforts will be met with untold riches.
+UniqueItemExchangerEngine.Reward.ThanksForVial4:			Splendid work! I have dealt with many mercenaries who bring me spoiled or coagulated mess, but this... this is perfection. You clearly understand the delicate art of vital extraction. My collection is vast, yet it constantly hungers for new additions of this caliber. Keep your extractor at the ready as you travel. Whenever you fill a vial with such exquisite ichor, bring it here. We will both grow exceedingly wealthy from your hunts.
+UniqueItemExchangerEngine.Reward.ThanksForVial5:			At last! I was beginning to fear I would never find a capable gatherer for my experiments. The viscosity, the color... it is absolutely flawless. Listen to me closely, warrior: whatever you are doing, keep doing it. The realms are teeming with beasts hoarding this precious essence in their veins. Harvest it completely, fill the vials to the brim, and return to me. I will gladly trade a fortune for your continued supply.

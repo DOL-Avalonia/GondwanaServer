@@ -1,0 +1,23 @@
+
+BetCommand.Description:						Place a bet on an active Arena match during the betting phase.
+BetCommand.Usage.List:						/bet list - List active teams and the pool
+BetCommand.Usage.Bet:						/bet <1 or 2> <gold amount> (Example: /bet 1 500 to bet 500 gold on Team 1)
+BetCommand.NoActiveMatch:					There is no active Arena match in this region.
+BetCommand.List.Header:						--- Arena Contest Teams ---
+BetCommand.List.Team1:						[1] {0}
+BetCommand.List.Team2:						[2] {0}
+BetCommand.List.TotalPool:					Total Betting Pool: {0}
+BetCommand.List.Preparing:					Teams are currently preparing...
+BetCommand.List.Footer:						---------------------------
+BetCommand.BettingClosed:					Betting is currently closed. You can only place bets during the 30-second countdown before a match starts.
+BetCommand.CannotBetOwnMatch:				You cannot place bets on a match you are participating in!
+BetCommand.AlreadyBet:						You have already placed a bet for this match.
+BetCommand.InvalidTeam:						Invalid team choice. Use 1 for Team 1 or 2 for Team 2.
+BetCommand.InvalidAmount:					Invalid amount. Please specify a positive number of gold.
+BetCommand.MaxBet:							The maximum allowed bet is {0} gold.
+BetCommand.Debtor:							You are currently marked as a Debtor! The bookie refuses your bets until you pay off your bank loans.
+BetCommand.NotEnoughMoney:					You can only bet up to {0} (including a {1} credit line).
+BetCommand.TooLate:							You were too late! Betting has just closed.
+BetCommand.BankEmptyDebt:					WARNING: Your bank account is now empty and you are in debt ({0}) due to betting on credit! You are now a debtor and have 3 days to reimburse the bank or your assets will be seized and you will be sent to jail!
+BetCommand.Success:							You successfully placed a bet of {0} gold on {1}!
+BetCommand.Usage:							Usage: /bet list OR /bet <1 or 2> <gold amount>

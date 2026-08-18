@@ -122,6 +122,8 @@ GameObjects.GamePlayer.Die.KilledLocation:         {0} is zojuist gedood bij {1}
 GameObjects.GamePlayer.Die.LoseExperience:         Je verliest ervaring.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Je bent dood. Typ “/release” om terug te keren naar je zielensteen.
 GameObjects.GamePlayer.Die.YouKilled:              Je hebt {0} gedood.
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Je {0} heeft conditie verloren na je dood.
+GameObjects.GamePlayer.Die.ArenaDefeated:			Je bent verslagen! Je wordt automatisch tot leven gewekt als de wedstrijd vordert.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Je kunt onder water niet ademen en slikt water!
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Je verliest 5% van je maximale gezondheidspunten.
@@ -491,6 +493,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:				Je kunt niet opstijgen tijdens 
 GameObjects.GamePlayer.UseSlot.CantMountStealing:			Je kunt niet opstijgen terwijl je een andere speler bestelt!
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:     Je kunt niet op je paard stappen; je bent dood.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:  Je kunt dit rijdier niet gebruiken terwijl je een relikwie draagt!
+GameObjects.GamePlayer.UseSlot.CantMountArena:			Je kunt niet op een rijdier stijgen tijdens een Arena Toernooi.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	Het luchtruim is hier beperkt. Je kunt je epische vliegende rijdier niet roepen.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:		Je kunt je epische vliegende rijdier niet oproepen terwijl je zwemt of onder water bent.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:		Je stuurt je epische vliegende rijdier weg.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:			Je kunt in deze zone geen vliegend rijdier oproepen.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:	Je {0} beantwoordt je roep! Typ '/epicmount cruise' om vooruit te gaan, '/epicmount rise' om te stijgen.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:          Je kunt je doel niet zien.
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:          Je kunt geen rijdier oproepen in een RvR-gebied.
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:    Je kunt dit voorwerp niet rechtstreeks in de rugzak gebruiken. Rust het eerst uit.
@@ -530,6 +538,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Je {0} is gebroken door 
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Je {0} is afgedaan vanwege onvoldoende energie.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Je {0} is gebroken en op de grond gevallen!
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Je rugzak zit vol! Je {0} is op de grond gevallen.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:			Je kunt geen drankjes gebruiken tijdens een Arena Toernooi.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:			Je kunt geen rollen gebruiken tijdens een Arena Toernooi.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:		Je kunt {0} niet laten vallen terwijl het is uitgerust.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Deze Genistar-placeholder moet in een tuinslot worden geplaatst.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Je Genistar-ei is in je tuin geplaatst. Het is nu aan jou om het te verzorgen en te vormen naar jouw wensen!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Je moet je opgeroepen Genistar vrijlaten voordat je hem terug in de tuin kunt plaatsen.

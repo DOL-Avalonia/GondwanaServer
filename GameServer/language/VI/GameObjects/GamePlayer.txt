@@ -122,6 +122,8 @@ GameObjects.GamePlayer.Die.KilledLocation:         {0} vừa bị giết tại {
 GameObjects.GamePlayer.Die.LoseExperience:         Bạn mất kinh nghiệm.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Bạn đã chết. Gõ “/release” để trở về đá linh hồn.
 GameObjects.GamePlayer.Die.YouKilled:              Bạn đã giết {0}.
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:	{0} của bạn đã bị giảm độ bền sau khi bạn chết.
+GameObjects.GamePlayer.Die.ArenaDefeated:			Bạn đã bị đánh bại! Bạn sẽ tự động được hồi sinh khi trận đấu tiếp diễn.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Bạn không thể thở dưới nước và đang nuốt nước!
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Bạn mất 5% lượng HP tối đa.
@@ -491,6 +493,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:				Bạn không thể cưỡi tron
 GameObjects.GamePlayer.UseSlot.CantMountStealing:			Bạn không thể cưỡi khi đang trộm từ người chơi khác!
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:     Bạn không thể lên ngựa; bạn đã chết.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:  Bạn không thể dùng thú cưỡi khi đang mang báu vật!
+GameObjects.GamePlayer.UseSlot.CantMountArena:			Bạn không thể gọi thú cưỡi khi đang tham gia Giải đấu Arena.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	Không phận ở đây bị hạn chế. Bạn không thể gọi thú cưỡi bay sử thi của mình.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:		Bạn không thể triệu hồi thú cưỡi bay sử thi của mình khi đang bơi hoặc ở dưới nước.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:		Bạn thu hồi thú cưỡi bay sử thi của mình.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:			Bạn không thể triệu hồi thú cưỡi bay trong khu vực này.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:	{0} của bạn đáp lại lời gọi! Nhập '/epicmount cruise' để tiến về phía trước, '/epicmount rise' để bay lên.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:          Bạn không nhìn thấy mục tiêu.
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:          Không thể gọi thú cưỡi trong khu vực RvR.
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:    Không thể dùng vật phẩm trực tiếp trong ba lô. Hãy trang bị trước.
@@ -530,6 +538,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		{0} của bạn đã b�
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	{0} của bạn đã bị gỡ ra do không đủ năng lượng.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	{0} của bạn đã bị hỏng và rơi xuống đất!
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Túi đồ của bạn đã đầy! {0} của bạn đã rơi xuống đất.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:			Bạn không thể sử dụng bình thuốc trong Giải đấu Arena.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:			Bạn không thể sử dụng cuộn giấy trong Giải đấu Arena.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:		Bạn không thể vứt bỏ {0} trong khi đang trang bị nó.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Vật giữ chỗ Genistar này phải được đặt vào một ô trong sân vườn.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Trứng Genistar của bạn đã được đặt trong vườn. Giờ đây, bạn có quyền chăm sóc và nuôi dưỡng nó theo mong muốn của mình!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Bạn phải thả Genistar đã triệu hồi của mình trước khi đặt nó trở lại khu vườn.

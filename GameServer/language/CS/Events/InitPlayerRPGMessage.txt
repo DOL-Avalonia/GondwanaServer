@@ -47,6 +47,8 @@ ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (nebo /at): Zapne au
 ServerRPGMessage.CmdMarket:				/market <open|close|name>: Rozvine, přejmenuje nebo zavře váš osobní trh.
 ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatizuje frontu výroby a snadno nakoupí chybějící ingredience do receptů přímo od obchodníků.
 ServerRPGMessage.CmdCombineList:		/combine list: Zobrazí vámi úspěšně objevené kombinace předmětů pro alternativní výrobu.
+ServerRPGMessage.CmdEvent:				/event: Zobrazí informace o aktuálních událostech ve světě.
+ServerRPGMessage.CmdEpicMount:			/epicmount: Ovládání epického létajícího zvířete - Použití: /epicmount [cruise | move | target | left | right | stop | rise | down | land].
 ServerRPGMessage.CmdVol:				/vol nebo /steal <player>: Ukradněte peníze nebo vzácné relikvie území od nepřátelských hráčů! Umožňuje také ukrást poklady vyrabované z truhel nepřátelského klanu v PvP.
 ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Otočí vás do směru, kde se ve vašem regionu nachází určený mob. Velmi užitečné pro úkoly!
 ServerRPGMessage.CmdAskName:			/askname: Zeptá se na jméno vašeho cíle za účelem jeho zobrazení. Toto musíte udělat, než si jej budete moci přidat do přátel.

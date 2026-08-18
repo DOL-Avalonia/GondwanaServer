@@ -63,14 +63,14 @@ namespace DOL.GS
         /// </summary>
         /// <param name="money"></param>
         /// <returns></returns>
-        public static string GetString(long money)
+        public static string GetString(long money, string language = null)
         {
-            return Currency.Copper.Mint(money).ToText();
+            return Currency.Copper.Mint(money).ToText(language);
         }
 
-        public static string GetShortString(long money)
+        public static string GetShortString(long money, string language = null)
         {
-            return Currency.Copper.Mint(money).ToAbbreviatedText();
+            return Currency.Copper.Mint(money).ToAbbreviatedText(language);
         }
 
         [Obsolete("This is going to be removed without replacement.")]

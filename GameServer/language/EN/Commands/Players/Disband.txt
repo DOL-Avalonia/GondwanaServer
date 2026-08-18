@@ -7,3 +7,4 @@ Commands.Players.Disband.NoYourself:	You cannot disband yourself this way this w
 Commands.Players.Disband.Usage:			'/disband' # Disband yourself from the group.
 Commands.Players.Disband.Usage.Name:	'/disband <name> # Disband a specified player from the group.
 Commands.Players.Disband.NotAllowed:	You cannot disband a group in this PvP session.
+Commands.Players.Disband.CannotArena:	You cannot disband your group while queued for or participating in an Arena Tournament.

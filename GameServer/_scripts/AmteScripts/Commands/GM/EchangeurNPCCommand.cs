@@ -23,11 +23,11 @@ namespace DOL.GS.Scripts
         "Commands.GM.EchangeurNPC.Usage.Priceressource2",
         "Commands.GM.EchangeurNPC.Usage.Priceressource3",
         "Commands.GM.EchangeurNPC.Usage.Priceressource",
-        "/echangeurnpc unique stonemaker - Converts NPC into a Stone Maker",
-        "/echangeurnpc unique vial player",
-        "/echangeurnpc unique vial npc all",
-        "/echangeurnpc unique vial npc name <Name> - (e.g. Agisfield)",
-        "/echangeurnpc unique vial npc blood <Type> - (e.g. MachineOil)",
+        "Commands.GM.EchangeurNPC.Usage.UniqueStonemaker",
+        "Commands.GM.EchangeurNPC.Usage.UniqueVialPlayer",
+        "Commands.GM.EchangeurNPC.Usage.UniqueVialNpcAll",
+        "Commands.GM.EchangeurNPC.Usage.UniqueVialNpcName",
+        "Commands.GM.EchangeurNPC.Usage.UniqueVialNpcBlood",
         "Commands.GM.EchangeurNPC.Usage.AdditionalDescription")]
     public class EchangeurNPCCommandHandler : AbstractCommandHandler, ICommandHandler
     {

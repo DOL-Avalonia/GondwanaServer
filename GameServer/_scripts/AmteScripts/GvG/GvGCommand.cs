@@ -39,7 +39,10 @@ namespace DOL.GS.Commands
                     break;
                 case "debug":
                     GvGManager.ToggleDebugMode();
-                    client.Out.SendMessage($"GvG Debug Mode is now {(GvGManager.DebugMode ? "ON (fast cycle)" : "OFF (Reverted to schedule)")}.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    if (GvGManager.DebugMode)
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.DebugModeOn"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    else
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.DebugModeOff"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     break;
                 case "resetrelics":
                     AmteScripts.Managers.TerritoryRelicManager.OnGvGOpened();
@@ -48,7 +51,7 @@ namespace DOL.GS.Commands
                 case "territoryreset":
                     if (args.Length < 3)
                     {
-                        client.Out.SendMessage("Syntax: /gvg territoryreset <TerritoryID|all>", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GvG.Command.TerritoryResetSyntax"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return;
                     }
 

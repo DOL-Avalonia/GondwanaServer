@@ -57,6 +57,10 @@ namespace DOL.GS
         public int WaterLevel
         { get { return m_waterLevel; } set { m_waterLevel = value; } }
 
+        private int m_maxFlyAltitude = 10000;
+        public int MaxFlyAltitude 
+        { get { return m_maxFlyAltitude; } set { m_maxFlyAltitude = value; } }
+
         public bool IsLava
         { get { return m_IsLava; } set { m_IsLava = value; } }
 
@@ -93,6 +97,7 @@ namespace DOL.GS
             Description = z.Name;
             WaterLevel = z.WaterLevel;
             DivingFlag = z.DivingFlag;
+            MaxFlyAltitude = z.MaxFlyAltitude;
             IsLava = z.IsLava;
             AllowMagicalItem = z.AllowMagicalItem;
             AllowReputation = z.AllowReputation;

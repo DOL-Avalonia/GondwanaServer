@@ -23,6 +23,7 @@ Commands.Players.Battlegroup.Help.Treasurer:         /bg treasurer <player name>
 Commands.Players.Battlegroup.Help.Status:	        /bg status - Shows the number of members of your battlegroup.
 Commands.Players.Battlegroup.Help.Credit:            /bg credit - Lists MasterLevel encounters type your battlegroup has met during the last 10 minutes.
 Commands.Players.Battlegroup.Help.GrantCredit:       /bg grantcredit <masterlevel> <player name> - Allows the battle group leader to grant credits to players for completed MasterLevels.
+Commands.Players.Battlegroup.CannotInPvPArena:		You cannot use battlegroup commands while in an Arena or PvP.
 Commands.Players.Battlegroup.InBattleGroup:			You must be in a battlegroup to use this command.
 Commands.Players.Battlegroup.InviteYourself:		    You cannot invite yourself to a battlegroup.
 Commands.Players.Battlegroup.JoinBattleGroup:		Do you want to join {0}'s battlegroup?

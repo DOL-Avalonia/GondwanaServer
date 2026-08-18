@@ -10,3 +10,11 @@ Lootgenerator.RewardChests.YouGetScroll:	You unsealed the Magic Scrolls chest! Y
 Lootgenerator.RewardChests.ChestEmpty:		This chest is mysteriously empty...
 Lootgenerator.RewardChests.YouGetJewel:		You unsealed the Magical Jewellery chest! You received a unique {0} tailored to your class!
 Lootgenerator.RewardChests.YouGetArmament:	You unsealed the Armaments chest! You received a unique {0} tailored to your class!
+
+Lootgenerator.LootGeneratorBloodVials.Filled:				You filled your {0}.
+Lootgenerator.LootGeneratorBloodVials.Extracted:			You extracted a full {0}.
+Lootgenerator.LootGeneratorBloodVials.Collected:			You collected a full {0}.
+Lootgenerator.LootGeneratorBloodVials.StartedCollecting:	You started collecting a {0}.
+Lootgenerator.LootGeneratorBloodVials.CombinedPartial:		You combined the vials to {0}%.
+Lootgenerator.LootGeneratorBloodVials.CombinedRemainder:	You combined the vials into a full one and have a {0} left.
+Lootgenerator.LootGeneratorBloodVials.CombinedFull:			You combined the vials into a full one.

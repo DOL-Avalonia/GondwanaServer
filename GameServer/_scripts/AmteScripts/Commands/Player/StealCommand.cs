@@ -247,7 +247,8 @@ namespace DOL.GS.Commands
 
             if (Player.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {
-                Player.Out.SendMessage("You cannot steal while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Player.Out.SendMessage(LanguageMgr.GetTranslation(Player.Client.Account.Language, "Commands.Players.Vol.CannotArena"),
+                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -324,7 +325,7 @@ namespace DOL.GS.Commands
             var targetPlayer = Player.TargetObject as GamePlayer;
             if (targetPlayer!.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {
-                Player.Out.SendMessage("You cannot steal from an Arena participant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Player.Out.SendMessage(LanguageMgr.GetTranslation(Player.Client.Account.Language, "Commands.Players.Vol.CannotFromArenaPlayer"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 

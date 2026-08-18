@@ -6,6 +6,7 @@ TeleporterPvP.ChickenOutPart1:			Pff, are you too much of a wimp to hold your gr
 TeleporterPvP.ChickenOutPart2:			[Leave]
 TeleporterPvP.SendToCombat:				Hello {0}, I can send you to the fight! Ready?!
 TeleporterPvP.InCombat:					You cannot be teleported while in combat!
+TeleporterPvP.NoEnterInArena:			You cannot enter PvP while queued for or participating in an Arena Tournament.
 TeleporterPvP.Leave:					Leave
 TeleporterPvP.Ready:					Ready
 TeleporterPvP.NoSessionActive:			PvP is not currently open; no session is active.

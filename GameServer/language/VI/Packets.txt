@@ -161,6 +161,16 @@ DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Tiêu hao {0}% Năng lư
 DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Tiêu hao {0}% Độ bền mỗi tick{1}.
 DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Mất {0}% Độ bền khi chết{1}.
 DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Không thể gỡ trang bị.
+DetailDisplayHandler.UndeequippableItem.RequiresPassword:		- Yêu cầu đọc một câu thần chú để kích hoạt lời nguyền và hiệu ứng.
+DetailDisplayHandler.UndeequippableItem.HaltsHealRegen:			- Ngừng mọi quá trình hồi máu khi trang bị.
+DetailDisplayHandler.UndeequippableItem.PeriodicSpell:			- Thi triển một Phép thuật cụ thể theo chu kỳ.
+DetailDisplayHandler.UndeequippableItem.PeriodicAura:			- Áp dụng một vầng hào quang hình ảnh theo chu kỳ.
+DetailDisplayHandler.LoanCoupon.PersonalTitle:					Phiếu Vay Tiền Cá Nhân
+DetailDisplayHandler.LoanCoupon.PersonalDesc:					Đưa vật này cho bất kỳ thương gia tiêu chuẩn nào khi bạn thiếu tiền để quy đổi nó.
+DetailDisplayHandler.LoanCoupon.PersonalMinPrice:				Không thể sử dụng cho các vật phẩm dưới {0} vàng.
+DetailDisplayHandler.LoanCoupon.HouseTitle:						Phiếu Vay Mua Nhà
+DetailDisplayHandler.LoanCoupon.HouseDesc:						Đưa vật này cho thương gia bán nhà hoặc điểm đánh dấu lô đất khi bạn thiếu tiền để quy đổi nó.
+DetailDisplayHandler.LoanCoupon.HouseMinPrice:					Chỉ có thể sử dụng để mua nhà từ {0} vàng trở lên.
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:				{0} ở quá xa!

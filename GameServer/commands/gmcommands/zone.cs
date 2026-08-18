@@ -35,6 +35,7 @@ namespace DOL.GS.Commands
         "/zone info",
         "/zone divingflag <0 = use region, 1 = on, 2 = off>",
         "/zone waterlevel <#>",
+        "/zone maxflyaltitude <#> - Set max fly altitude for epic mounts in this zone",
         "/zone bonus <zoneID|current> <xpBonus> <rpBonus> <bpBonus> <coinBonus> <Save? (true/false)>",
         "/zone allowMagicalItem <true|false> Should Players use Magical items in this zone",
         "/zone allowReputation <true|false> - Allow or disallow the reputation system in this zone",
@@ -71,7 +72,7 @@ namespace DOL.GS.Commands
                     info.Add(" Zone Height: " + client.Player.CurrentZone.Height);
                     info.Add(" Zone DivingEnabled: " + client.Player.CurrentZone.IsDivingEnabled);
                     info.Add(" Zone Waterlevel: " + client.Player.CurrentZone.Waterlevel);
-                    info.Add(" Zone AllowMagical Items: " + client.Player.CurrentZone.AllowMagicalItem);
+                    info.Add(" Zone MaxFlyAltitude: " + client.Player.CurrentZone.MaxFlyAltitude);
                     info.Add(" Zone AllowMagical Items: " + client.Player.CurrentZone.AllowMagicalItem);
 
                     bool internalFlag = client.Player.CurrentZone.AllowReputation;
@@ -128,6 +129,22 @@ namespace DOL.GS.Commands
                         dflag = "Always No";
 
                     DisplayMessage(client, string.Format("Diving Flag for {0}:{1} changed to {2} ({3}).", zone.ID, zone.Description, divingFlag, dflag));
+                    return;
+                }
+
+                if (args[1].ToLower() == "maxflyaltitude" && args.Length == 3)
+                {
+                    zone = WorldMgr.GetZone(client.Player.CurrentZone.ID);
+                    if (!int.TryParse(args[2], out int maxFlyAlt)) return;
+                    zone.MaxFlyAltitude = maxFlyAlt;
+
+                    var dbZone = DOLDB<Zones>.SelectObject(DB.Column(nameof(Zones.ZoneID)).IsEqualTo(zone.ID).And(DB.Column(nameof(Zones.RegionID)).IsEqualTo(zone.ZoneRegion.ID)));
+                    if (dbZone != null)
+                    {
+                        dbZone.MaxFlyAltitude = maxFlyAlt;
+                        GameServer.Database.SaveObject(dbZone);
+                    }
+                    DisplayMessage(client, string.Format("MaxFlyAltitude for {0}:{1} changed to {2}.", zone.ID, zone.Description, maxFlyAlt));
                     return;
                 }
 
@@ -297,7 +314,7 @@ namespace DOL.GS.Commands
                 if (args[6].ToLower().StartsWith("t"))
                 {
                     client.Player.TempProperties.setProperty("ZONE_BONUS_SAVE", zone);
-                    client.Player.Out.SendCustomDialog(string.Format("Are you sure you wan't to over write {0} in the database?", zone.Description), new CustomDialogResponse(AreYouSure));
+                    client.Player.Out.SendCustomDialog(string.Format("Are you sure you want to overwrite {0} in the database?", zone.Description), new CustomDialogResponse(AreYouSure));
                 }
                 else
                 {

@@ -6,6 +6,7 @@ TeleporterRvR.ChickenOutPart1:			Pff, are you too much of a wimp to hold your gr
 TeleporterRvR.ChickenOutPart2:			[Leave]
 TeleporterRvR.SendToCombat:				Hello {0}, I can send you to the fight! [Ready]?!
 TeleporterRvR.InCombat:					You cannot be teleported while in combat!
+TeleporterRvR.NoEnterInArena:			You cannot enter RvR while queued for or participating in an Arena Tournament.
 TeleporterRvR.Leave:					Leave
 TeleporterRvR.Ready:					Ready
 TeleporterRvR.DamnationRefusal1:		Stay back, {0}!

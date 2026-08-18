@@ -6598,7 +6598,21 @@ namespace DOL.GS
 
                 if (!patternToApply.StartsWith("Class", StringComparison.OrdinalIgnoreCase))
                 {
-                    name = name + " " + ArmorSlotToName(slot, type); // Keep it clean (e.g. "Leather Jerkin")
+                    if (type == eObjectType.Plate && slot == eInventorySlot.HeadArmor)
+                    {
+                        if (name != null && name.IndexOf("Full", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            name = "Plate Full Helm";
+                        }
+                        else
+                        {
+                            name = "Plate Helm";
+                        }
+                    }
+                    else
+                    {
+                        name = name + " " + ArmorSlotToName(slot, type); // Keep it clean (e.g. "Leather Jerkin")
+                    }
                 }
             }
             else if ((int)type >= (int)eObjectType._FirstWeapon && (int)type <= (int)eObjectType._LastWeapon || type == eObjectType.Shield || type == eObjectType.Instrument)

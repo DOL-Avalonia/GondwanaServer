@@ -161,6 +161,16 @@ DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Spotřebuje {0}% Many za
 DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Spotřebuje {0}% stavu za tik{1}.
 DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Při smrti ztratí {0}% stavu{1}.
 DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Nelze sundat.
+DetailDisplayHandler.UndeequippableItem.RequiresPassword:		- K aktivaci kletby a efektů je nutné vyřknout formuli.
+DetailDisplayHandler.UndeequippableItem.HaltsHealRegen:			- Během vybavení zastavuje veškerou regeneraci zdraví.
+DetailDisplayHandler.UndeequippableItem.PeriodicSpell:			- Pravidelně sesílá specifické kouzlo.
+DetailDisplayHandler.UndeequippableItem.PeriodicAura:			- Pravidelně aplikuje vizuální auru.
+DetailDisplayHandler.LoanCoupon.PersonalTitle:					Osobní úvěrový kupón
+DetailDisplayHandler.LoanCoupon.PersonalDesc:					Předejte toto jakémukoli standardnímu obchodníkovi, pokud nemáte dostatek prostředků, abyste to proplatili.
+DetailDisplayHandler.LoanCoupon.PersonalMinPrice:				Nelze použít pro předměty pod {0} zlaťáků.
+DetailDisplayHandler.LoanCoupon.HouseTitle:						Kupón na půjčku na dům
+DetailDisplayHandler.LoanCoupon.HouseDesc:						Předejte toto obchodníkovi s bydlením nebo na značku parcely, když nemáte dostatek peněz k proplacení.
+DetailDisplayHandler.LoanCoupon.HouseMinPrice:					Použitelné pouze pro nákupy bydlení v hodnotě {0} zlaťáků a více.
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:				{0} je příliš daleko!

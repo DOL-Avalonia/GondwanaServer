@@ -30,6 +30,7 @@ Items.Specialitems.GuarkRingUsageStealing:			Nebeskou magii nemůžeš používa
 Items.Specialitems.GuarkRingUsageAFK:				Nebeskou magii nemůžeš používat, když jsi AFK!
 Items.Specialitems.GuarkRingUsageClimbing:			Nebeskou magii nemůžeš používat při šplhání!
 Items.Specialitems.GuarkRingUsageRelic:				Nebeskou magii nemůžeš používat, když neseš relikvii území.
+Items.Specialitems.GuarkRingUsageArena:				Nebeskou magii nemůžeš používat, když se účastníš arénového turnaje.
 Items.Specialitems.GuarkRingCannotUseHere:			Tento předmět zde nemůžeš použít.
 Items.Specialitems.GuarkRingDoNotMove:				Pro použití tohoto předmětu musíš zůstat na stejném místě.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Nedávno jsi byl v boji, takže musíš počkat, než budeš moci tento předmět znovu použít.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		Z nějakého důvodu se předm�
 Items.Specialitems.DieTriggerSpell.FailRez:			Kletba sužující tvou mrtvolu je zde příliš silná, kouzlo oživení selhalo!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Tvůj {0} je vyčerpán a byl odstraněn z tvého inventáře.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	Nemůžeš použít tento předmět během boje!
+Items.Specialitems.PasswordCurseItemUsageJailed:	Nemůžeš použít tento předmět, když jsi uvězněn!
+Items.Specialitems.PasswordCurseItemUsageMounted:	Nemůžeš použít tento předmět, když jsi na svém zvířeti!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	Nemůžeš použít tento předmět, když jsi v neviditelnosti.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	Nemůžeš použít tento předmět, když jsi zkamenělý!
+Items.Specialitems.PasswordCurseItemUsageDamned:	Nemůžeš použít tento předmět, když jsi zatracený!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	Nemůžeš použít tento předmět, když jsi pod vlivem očarování "{0}"!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	Nemůžeš použít tento předmět během výroby!
+Items.Specialitems.PasswordCurseItemUsageDuel:		Nemůžeš použít tento předmět, když jsi v duelu!
+Items.Specialitems.PasswordCurseItemUsageStealing:	Nemůžeš použít tento předmět, když okrádáš jiného hráče!
+Items.Specialitems.PasswordCurseItemUsageAFK:		Nemůžeš použít tento předmět, když jsi AFK!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	Nemůžeš použít tento předmět během šplhání!
+Items.Specialitems.PasswordCurseItemUsageRelic:		Nemůžeš použít tento předmět, když neseš teritoriální relikvii.
+Items.Specialitems.PasswordCurseItemUsageArena:		Nemůžeš použít tento předmět během účasti v arénovém turnaji.

@@ -42,3 +42,17 @@ Banker.Term.Matured:			A Term Deposit has matured! {0} (Principal + {1}% interes
 Banker.Term.Biweekly:			biweekly
 Banker.Term.Monthly:			monthly
 Banker.Term.Quarterly:			quarterly
+Banker.Greetings.Debt:			Greetings {0}! You currently have no money and an unpaid debt of {1}.
+Banker.Greetings.DebtWarning:	[Warning] You have {0} {1} left to pay it off before your assets are seized!
+Banker.Loan.Available:			Available Loans:
+Banker.Loan.Personal:			Personal Loans (15% interest, 1 week):
+Banker.Loan.House:				House Loans (10% interest, 1 month):
+Banker.Loan.Personal400:		[personal loan 400g] - Requires 50g balance
+Banker.Loan.Personal600:		[personal loan 600g] - Requires 80g balance
+Banker.Loan.Personal800:		[personal loan 800g] - Requires 80g balance
+Banker.Loan.House1500:			[house loan 1500g] - Requires 250g balance
+Banker.Loan.House3000:			[house loan 3000g] - Requires 500g balance
+Banker.Loan.House6000:			[house loan 6000g] - Requires 500g balance
+Banker.Loan.House10000:			[house loan 10000g] - Requires 2000g balance
+Banker.Loan.House25000:			[house loan 25000g] - Requires 2000g balance
+Banker.Loan.Active:				You have an active loan. You can [repay loan] early to save on interest rates.

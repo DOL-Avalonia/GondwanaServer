@@ -210,6 +210,18 @@ namespace DOL.GS.ServerRules
             var sourceOwner = source as GamePlayer ?? source.GetPlayerOwner();
             var targetOwner = target as GamePlayer ?? target.GetPlayerOwner();
 
+            if (targetOwner != null && targetOwner.IsAfkActive() && sourceOwner != targetOwner)
+            {
+                if (!quiet && source is GamePlayer p) MessageToLiving(source, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.CannotInteractPlayerAFK"));
+                return false;
+            }
+
+            if (sourceOwner != null && sourceOwner.IsAfkActive() && sourceOwner != targetOwner)
+            {
+                if (!quiet && source is GamePlayer p) MessageToLiving(source, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.CannotInteractWithOtherAFK"));
+                return false;
+            }
+
             bool sourceInArena = sourceOwner != null && sourceOwner.TempProperties.getProperty<bool>("ArenaParticipant", false);
             bool targetInArena = targetOwner != null && targetOwner.TempProperties.getProperty<bool>("ArenaParticipant", false);
 
@@ -217,7 +229,7 @@ namespace DOL.GS.ServerRules
             {
                 if (sourceInArena != targetInArena)
                 {
-                    if (!quiet && source is GamePlayer p) MessageToLiving(source, Lang(source, "You cannot interfere with Arena participants."));
+                    if (!quiet && source is GamePlayer p) MessageToLiving(source, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.CannotInterfere"));
                     return false;
                 }
 
@@ -348,6 +360,13 @@ namespace DOL.GS.ServerRules
 
             var attackerControllerPlayer = attackerController as GamePlayer;
             var defenderControllerPlayer = defenderController as GamePlayer;
+
+            if (defenderControllerPlayer != null && defenderControllerPlayer.IsAfkActive())
+            {
+                if (!quiet) MessageToLiving(attacker, LanguageMgr.GetTranslation((attacker as GamePlayer)?.Client, "ServerRules.AbstractServerRules.CannotAttackPlayerAFK"));
+                return false;
+            }
+
             var attackerPriv = attackerControllerPlayer?.Client.Account.PrivLevel;
             var defenderPriv = defenderControllerPlayer?.Client.Account.PrivLevel;
 
@@ -494,7 +513,7 @@ namespace DOL.GS.ServerRules
                 {
                     if (attackerInArena != defenderInArena)
                     {
-                        if (!quiet && attacker is GamePlayer) MessageToLiving(attacker, Lang(attacker, "You cannot interfere with Arena participants."));
+                        if (!quiet && attacker is GamePlayer p) MessageToLiving(attacker, LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.CannotInterfere"));
                         return false;
                     }
 
@@ -831,6 +850,12 @@ namespace DOL.GS.ServerRules
             GamePlayer pCaster = caster as GamePlayer ?? caster?.GetPlayerOwner();
             GamePlayer pTarget = target as GamePlayer ?? target?.GetPlayerOwner();
 
+            if (pTarget != null && pTarget.IsAfkActive() && pCaster != pTarget)
+            {
+                if (caster is GamePlayer p) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.CannotCastPlayerAFK"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
             bool casterInArena = pCaster != null && pCaster.TempProperties.getProperty<bool>("ArenaParticipant", false);
             bool targetInArena = pTarget != null && pTarget.TempProperties.getProperty<bool>("ArenaParticipant", false);
 
@@ -838,7 +863,7 @@ namespace DOL.GS.ServerRules
             {
                 if (casterInArena != targetInArena)
                 {
-                    if (caster is GamePlayer p) p.Out.SendMessage("You cannot interfere with Arena participants.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    if (caster is GamePlayer p) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.CannotInterfere"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
 
@@ -1157,7 +1182,7 @@ namespace DOL.GS.ServerRules
                             {
                                 int arenaBonusPct = (session.RoundNumber - 1) * 5 + 5; // Round 2 = 10%, 3 = 15%, etc.
                                 realmPoints += (realmPoints * arenaBonusPct) / 100;
-                                killerPlayer.Out.SendMessage($"Arena Round {session.RoundNumber} Bonus: +{arenaBonusPct}% RP!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                killerPlayer.Out.SendMessage(LanguageMgr.GetTranslation(killerPlayer.Client.Account.Language, "ServerRules.AbstractServerRules.Arena.RoundBonus", session.RoundNumber, arenaBonusPct), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
                     }
@@ -1202,7 +1227,7 @@ namespace DOL.GS.ServerRules
                 // TODO: pets take 25% and owner gets 75%
                 long xpReward = (long)(playerExpValue * damagePercent); // exp for damage percent
 
-                long expCap = (long)(living.ExperienceValue * ServerProperties.Properties.XP_PVP_CAP_PERCENT / 100);
+                long expCap = (long)(living.ExperienceValue * Properties.XP_PVP_CAP_PERCENT / 100);
                 if (xpReward > expCap)
                     xpReward = expCap;
 

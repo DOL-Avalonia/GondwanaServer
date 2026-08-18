@@ -1,0 +1,17 @@
+
+EpicMount.Msg.OutOfBounds:					You have flown out of bounds and your mount drops you!
+EpicMount.Msg.NoWater:						Your mount refuses to fly underwater and bucks you off!
+EpicMount.Msg.Arrived:						Destination reached.
+EpicMount.Msg.CruiseOff:					Cruise control deactivated. The mount hovers in place.
+EpicMount.Msg.CruiseOn:						Cruise control activated! Steer by setting up Ground Targets (F5).
+EpicMount.Msg.SetGroundTarget:				You must set a Ground Target (F5) first!
+EpicMount.Msg.FlyToTarget:					Your mount flies autonomously towards the target location.
+EpicMount.Msg.SelectTarget:					You must select a target first!
+EpicMount.Msg.FlyToPlayer:					Your mount flies autonomously towards your target.
+EpicMount.Msg.Vanishes:						Your epic flying mount vanishes into the distance.
+EpicMount.Msg.MaxAltitude:					You have reached the maximum flight altitude!
+EpicMount.Msg.CantWater:					Your mount can't fly into the water!
+EpicMount.Msg.CantWaterDrop:				Your mount can't fly into the water!
+EpicMount.Interact.NotOwner:				This steed answers only to its master.
+EpicMount.Interact.TooFar:					You are too far away to mount this.
+EpicMount.Interact.Help:					To fly: /epicmount cruise, /epicmount move, /epicmount rise, /epicmount down, /epicmount left, /epicmount right

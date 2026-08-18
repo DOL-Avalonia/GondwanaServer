@@ -1,0 +1,40 @@
+
+ArenaManager.2v2:								2 vs 2
+ArenaManager.3v3:								3 vs 3
+ArenaManager.4v4:								4 vs 4
+ArenaManager.SoloVsSolo:						Solo vs Solo
+ArenaMaster.Interact.CurrentMatch:				Current Tournament
+ArenaMaster.Interact.CurrentMatch1:				[1] {0}
+ArenaMaster.Interact.CurrentMatch2:				[2] {0}
+ArenaMaster.Interact.InProgress:				An Arena Contest is currently in progress.
+ArenaMaster.Interact.BettingOpen:				Betting is OPEN! Use the command:
+ArenaMaster.Interact.BettingCmd:				/bet <1 or 2> <gold>
+ArenaMaster.Interact.BettingWarning:			Warning: You can bet more gold than you have! Doing so draws from the Bank on credit. If you lose, your bank goes negative, risking asset seizure and jail!
+ArenaMaster.Interact.MatchUnderway:				A tournament is underway! Wait for the next round to place your bets. Use /bet list to see the current pool.
+ArenaMaster.Interact.GMMenuTitle:				GM Debug Menu
+ArenaMaster.Interact.GMMenuShutdown:			[Force Shutdown]
+ArenaMaster.Interact.GMSwitchSpec:				[Debug: Switch as Spectator]
+ArenaMaster.Interact.GMSwitchFight:				[Debug: Switch as Fighter]
+ArenaMaster.Interact.GMJoinSpec:				[Debug: Join as a Spectator]
+ArenaMaster.Interact.GMJoinFight:				[Debug: Join as a Fighter]
+ArenaMaster.Interact.IdleGreetings:				Hail warrior! The arena stands ready to welcome its newest challengers! What type of tournament do you wish to engage in?
+ArenaMaster.Interact.OptSolo:					[Solo vs Solo]
+ArenaMaster.Interact.Opt2v2:					[2 vs 2]
+ArenaMaster.Interact.Opt3v3:					[3 vs 3]
+ArenaMaster.Interact.Opt4v4:					[4 vs 4]
+ArenaMaster.Interact.GMStartSolo:				[Debug: Start Solo Match]
+ArenaMaster.Interact.GMStartSpec:				[Debug: Start as Spectator]
+ArenaMaster.Interact.InQueue:					You are currently in the queue.
+ArenaMaster.Interact.LeaveQueueCmd:				leave queue
+ArenaMaster.Interact.LeaveQueue:				[Leave Queue]
+ArenaMaster.Interact.Forming:					An Arena session ({0}) is currently forming!
+ArenaMaster.Interact.JoinQueueCmd:				join queue
+ArenaMaster.Interact.JoinQueue:					[Join Queue]
+ArenaMaster.Whisper.GroupSolo:					This is a solo arena. Disband your group first.
+ArenaMaster.Whisper.NotLeader:					Only the group leader can subscribe the group.
+ArenaMaster.Whisper.GroupSize:					This arena requires exactly {0} members in your group.
+ArenaMaster.Whisper.AutoBalance:				You joined the Arena Queue individually and will be auto-balanced into a team later.
+ArenaManager.SoloVsSolo:						Solo vs Solo
+ArenaManager.Chest.Scrolls:						Chest of Magic Scrolls
+ArenaManager.Chest.Armaments:					Chest of Armaments
+ArenaManager.Chest.Jewellery:					Chest of Magical Jewellery

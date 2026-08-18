@@ -132,6 +132,7 @@ namespace DOL.GS.Scripts
 
             string formattedMoney = Currency.Copper.Mint(bank.Money).ToText(player.Client.Account.Language);
             string message = "";
+            string lang = player.Client.Account.Language;
 
             if (bank.Debt > 0 || bank.Money < 0)
             {
@@ -142,33 +143,35 @@ namespace DOL.GS.Scripts
                 if (Properties.BANK_LOAN_DEBUG)
                 {
                     timeRemaining = Math.Max(0, 90 - (int)elapsed.TotalSeconds);
-                    timeUnit = "seconds";
+                    timeUnit = LanguageMgr.GetTranslation(lang, "Banker.TimeUnit.Seconds");
                 }
                 else
                 {
                     timeRemaining = Math.Max(0, Properties.DEBTOR_GRACE_PERIOD_HOURS - (int)elapsed.TotalHours);
-                    timeUnit = timeRemaining == 1 ? "hour" : "hours";
+                    timeUnit = timeRemaining <= 1 ? LanguageMgr.GetTranslation(lang, "Banker.TimeUnit.Hour") : LanguageMgr.GetTranslation(lang, "Banker.TimeUnit.Hours");
                 }
 
                 long displayDebt = bank.Debt + (bank.Money < 0 ? Math.Abs(bank.Money) : 0);
-                string formattedDebt = Currency.Copper.Mint(displayDebt).ToText(player.Client.Account.Language);
+                string formattedDebt = Currency.Copper.Mint(displayDebt).ToText(lang);
 
-                message += $"Greetings {player.Name}! You currently have no money and an unpaid debt of {formattedDebt}.\n";
-                message += $"[Warning] You have {timeRemaining} {timeUnit} left to pay it off before your assets are seized!\n\n";
+                message += LanguageMgr.GetTranslation(lang, "Banker.Greetings.Debt", player.Name, formattedDebt) + "\n";
+                message += LanguageMgr.GetTranslation(lang, "Banker.Greetings.DebtWarning", timeRemaining, timeUnit) + "\n\n";
             }
             else
             {
-                message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings1", player.Name, formattedMoney) + " \r\n";
+                message += LanguageMgr.GetTranslation(lang, "Banker.Greetings1", player.Name, formattedMoney) + " \r\n";
             }
 
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings2") + "\n\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings3") + "\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings4") + "\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings5") + "\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings6") + "\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings7") + "\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings8") + "\n\n";
-            message += LanguageMgr.GetTranslation(player.Client.Account.Language, "Banker.Greetings9", autoRentToggle) + "\n\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings2") + "\n\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings3") + "\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings4") + "\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings5") + "\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings6") + "\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings7") + "\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings8") + "\n\n";
+            message += LanguageMgr.GetTranslation(lang, "Banker.Greetings9", autoRentToggle) + "\n";
+
+            player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             player.Out.SendMessage(message, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             return true;
         }
@@ -273,31 +276,34 @@ namespace DOL.GS.Scripts
                     break;
                 case "bank loan":
                 case "prêt bancaire":
-                    string msg = "Available Loans:\n\n";
-                    msg += "Personal Loans (15% interest, 1 week):\n";
-                    msg += "[personal loan 400g] - Requires 50g balance\n";
-                    msg += "[personal loan 600g] - Requires 80g balance\n";
-                    msg += "[personal loan 800g] - Requires 80g balance\n\n";
-                    msg += "House Loans (10% interest, 1 month):\n";
-                    msg += "[house loan 1500g] - Requires 250g balance\n";
-                    msg += "[house loan 3000g] - Requires 500g balance\n";
-                    msg += "[house loan 6000g] - Requires 500g balance\n";
+                    string lang = player.Client.Account.Language;
+                    string msg = LanguageMgr.GetTranslation(lang, "Banker.Loan.Available") + "\n\n";
+
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.Personal") + "\n";
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.Personal400") + "\n";
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.Personal600") + "\n";
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.Personal800") + "\n\n";
+
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.House") + "\n";
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.House1500") + "\n";
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.House3000") + "\n";
+                    msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.House6000") + "\n";
 
                     // Display higher tier house loans only if the player has >= 2000 gold (2 platinum)
                     if (bank.Money >= 20000000)
                     {
-                        msg += "[house loan 10000g] - Requires 2000g balance\n";
-                        msg += "[house loan 25000g] - Requires 2000g balance\n";
+                        msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.House10000") + "\n";
+                        msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.House25000") + "\n";
                     }
                     msg += "\n";
 
                     if (bank.LoanType > 0)
-                        msg += "You have an active loan. You can [repay loan] early to save on interest rates.\n";
+                        msg += LanguageMgr.GetTranslation(lang, "Banker.Loan.Active") + "\n";
 
                     player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     break;
                 case "repay loan":
-                case "rembourser prêt":
+                case "rembourser le prêt":
                     BankLoanMgr.RepayLoanEarly(player, bank);
                     break;
                 case "personal loan 400g":

@@ -119,7 +119,7 @@ namespace DOL.GS.Commands
                         }
                         if (client.Player.TempProperties.getProperty<bool>("ArenaParticipant", false))
                         {
-                            client.Player.Out.SendMessage("You cannot deploy a market while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Market.Cant.DeployArena"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return;
                         }
                         if (client.Player.HasTerritoryRelic())

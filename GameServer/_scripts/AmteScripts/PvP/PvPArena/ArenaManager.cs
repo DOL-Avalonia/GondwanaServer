@@ -150,7 +150,7 @@ namespace AmteScripts.Managers
             if (winningPool == 0)
             {
                 if (losingPool > 0)
-                    BroadcastRegion(session.RegionID, $"No one bet on the winning team! The house claims the {DOL.GS.Finance.Money.Mint(losingPool, Currency.Copper).ToText()} pool!", eChatType.CT_Important);
+                    BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Betting.NoWinnerBet", c => new object[] { Currency.Copper.Mint(losingPool).ToText(c.Account.Language) });
             }
             else
             {
@@ -164,22 +164,26 @@ namespace AmteScripts.Managers
                         double share = (double)bet.AmountInCopper / winningPool;
                         long payout = (long)(distributablePool * share);
 
-                        GiveMoney(bet.PlayerID, payout, $"You WON your bet! Payout: {DOL.GS.Finance.Money.Mint(payout, Currency.Copper).ToText()}");
+                        GiveMoney(bet.PlayerID, payout, "ArenaManager.Betting.Win");
                     }
                     else
                     {
                         GamePlayer bettor = WorldMgr.GetClientByPlayerID(bet.PlayerID, false, false)?.Player;
                         if (bettor != null)
-                            bettor.Out.SendMessage($"You LOST your bet of {DOL.GS.Finance.Money.Mint(bet.AmountInCopper, Currency.Copper).ToText()}.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        {
+                            string lang = bettor.Client.Account.Language;
+                            string moneyStr = Currency.Copper.Mint(bet.AmountInCopper).ToText(lang);
+                            bettor.Out.SendMessage(LanguageMgr.GetTranslation(lang, "ArenaManager.Betting.Lost", moneyStr), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
                     }
                 }
-                BroadcastRegion(session.RegionID, $"The betting pool of {DOL.GS.Finance.Money.Mint(distributablePool, Currency.Copper).ToText()} has been distributed to the winners!", eChatType.CT_System);
+                BroadcastRegion(session.RegionID, eChatType.CT_System, "ArenaManager.Betting.Distributed", c => new object[] { Currency.Copper.Mint(distributablePool).ToText(c.Account.Language) });
             }
 
             session.ActiveBets.Clear();
         }
 
-        private void GiveMoney(string playerId, long amount, string message)
+        private void GiveMoney(string playerId, long amount, string messageKey)
         {
             DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(playerId) ?? new DBBanque(playerId);
             if (bank.PlayerID == null) GameServer.Database.AddObject(bank);
@@ -194,7 +198,6 @@ namespace AmteScripts.Managers
                 {
                     bank.Debt = 0;
                     remainingToGive -= debt;
-
                     bank.IsDebtor = false;
                     bank.NegativeMoneySince = DateTime.MinValue;
                 }
@@ -211,10 +214,12 @@ namespace AmteScripts.Managers
             {
                 if (remainingToGive > 0)
                     p.AddMoney(Currency.Copper.Mint(remainingToGive));
-                
-                p.Out.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                string moneyText = Currency.Copper.Mint(amount).ToText(p.Client.Account.Language);
+                p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, messageKey, moneyText), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
                 if (bank.Money >= 0 && amount > remainingToGive)
-                    p.Out.SendMessage("Your winnings have automatically cleared your bank debt!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Betting.DebtCleared"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             } 
             else 
             {
@@ -230,7 +235,7 @@ namespace AmteScripts.Managers
         {
             foreach (var bet in session.ActiveBets.Values)
             {
-                GiveMoney(bet.PlayerID, bet.AmountInCopper, $"The match was cancelled. Your bet of {DOL.GS.Finance.Money.Mint(bet.AmountInCopper, Currency.Copper).ToText()} has been refunded.");
+                GiveMoney(bet.PlayerID, bet.AmountInCopper, "ArenaManager.Betting.Refunded");
             }
             session.ActiveBets.Clear();
         }
@@ -244,9 +249,8 @@ namespace AmteScripts.Managers
             session.State = eArenaState.Queuing;
             int mins = Properties.ARENA_QUEUE_MINUTES > 0 ? Properties.ARENA_QUEUE_MINUTES : 45;
             session.NextStateTime = WorldMgr.GetRegion(session.RegionID).Time + (mins * 60 * 1000);
-            
-            string modeStr = mode == eArenaMode.Solo ? "Solo vs Solo" : $"{session.TeamSize} vs {session.TeamSize}";
-            BroadcastRegion(session.RegionID, $"A new [{modeStr}] Arena contest is open for subscription! Talk to {session.ArenaMaster.Name} to join. Queue closes in {mins} minutes.", eChatType.CT_Important);
+
+            BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Queue.Opened", c => new object[] {mode == eArenaMode.Solo ? LanguageMgr.GetTranslation(c.Account.Language, "ArenaManager.SoloVsSolo") : $"{session.TeamSize} vs {session.TeamSize}", session.ArenaMaster.Name, mins});
         }
 
         public void EnqueueSolo(ArenaSession session, GamePlayer player)
@@ -259,7 +263,7 @@ namespace AmteScripts.Managers
                     player.TempProperties.setProperty("ArenaQueued", true);
                     player.TempProperties.setProperty("ArenaRegion", session.RegionID);
                     player.TempProperties.setProperty("ArenaQueueTime", DateTime.Now.Ticks);
-                    player.Out.SendMessage($"You joined the Arena {session.TeamSize}v{session.TeamSize} queue.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Queue.Joined", session.TeamSize, session.TeamSize), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -276,7 +280,7 @@ namespace AmteScripts.Managers
                         member.TempProperties.setProperty("ArenaQueued", true);
                         member.TempProperties.setProperty("ArenaRegion", session.RegionID);
                     }
-                    group.SendPlayerActionTranslationToGroupMembers(group.Leader, "Your group has joined the Arena queue.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    group.SendPlayerActionTranslationToGroupMembers(group.Leader, "ArenaManager.Queue.GroupJoined", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -295,7 +299,12 @@ namespace AmteScripts.Managers
                     foreach (var m in g.GetPlayersInTheGroup())
                     {
                         m.TempProperties.removeProperty("ArenaQueued");
-                        if (m != player) m.Out.SendMessage($"Your group was removed from the Arena queue because {(intentional ? "a member left" : "a member disconnected or changed regions")}.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        if (m != player)
+                        {
+                            string translationKey = intentional ? "ArenaManager.Queue.ReasonLeft" : "ArenaManager.Queue.ReasonDC";
+                            string translatedReason = LanguageMgr.GetTranslation(m.Client.Account.Language, translationKey);
+                            m.Out.SendMessage(LanguageMgr.GetTranslation(m.Client.Account.Language, "ArenaManager.Queue.GroupRemoved", translatedReason), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
                     }
                 }
             }
@@ -332,7 +341,7 @@ namespace AmteScripts.Managers
                         chest.Delete();
                     }
                     session.SpawnedChests.Clear();
-                    BroadcastRegion(session.RegionID, "The Arena has been cleaned and is now open for new challenges!", eChatType.CT_System);
+                    BroadcastRegion(session.RegionID, eChatType.CT_System, "ArenaManager.Match.Cleaned");
                 }
                 else if (session.State == eArenaState.Queuing && now >= session.NextStateTime)
                 {
@@ -347,7 +356,7 @@ namespace AmteScripts.Managers
                         if (session.IsBettingOpen && now >= session.BettingEndTime)
                         {
                             session.IsBettingOpen = false;
-                            BroadcastRegion(session.RegionID, "Bets are CLOSED! Let the battle begin!", eChatType.CT_Important);
+                            BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Match.BetsClosed");
                             UnlockTeam(session.CurrentTeamA);
                             UnlockTeam(session.CurrentTeamB);
                         }
@@ -381,7 +390,7 @@ namespace AmteScripts.Managers
                         foreach (var drop in droppedPlayers)
                         {
                             session.SoloQueue.Remove(drop);
-                            drop.Out.SendMessage("You were removed from the Arena queue because there were not enough players to form a full team. Better luck next time!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            drop.Out.SendMessage(LanguageMgr.GetTranslation(drop.Client.Account.Language, "ArenaManager.Queue.RemovedNotEnough"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             ClearParticipant(drop, null);
                         }
                     }
@@ -398,7 +407,7 @@ namespace AmteScripts.Managers
 
                 if (!canStart)
                 {
-                    CancelSession(session, "Not enough participants to start the Arena. You must re-subscribe.");
+                    CancelSession(session, "ArenaManager.Match.NotEnoughStart");
                     return;
                 }
 
@@ -544,7 +553,7 @@ namespace AmteScripts.Managers
                 }
                 else
                 {
-                    CancelSession(session, "The tournament ended prematurely (No Teams Left).");
+                    CancelSession(session, "ArenaManager.Match.EndedNoTeams");
                     return;
                 }
             }
@@ -553,7 +562,7 @@ namespace AmteScripts.Managers
             {
                 var byeTeam = session.Bracket.Dequeue();
                 session.NextRoundTeams.Add(byeTeam);
-                BroadcastToParticipants(session, $"{byeTeam.TeamName} gets a bye this round and advances!", false);
+                BroadcastToParticipants(session, false, "ArenaManager.Match.Bye", p => new object[] { byeTeam.TeamName });
                 session.NextStateTime = now + 1000;
                 return;
             }
@@ -565,12 +574,17 @@ namespace AmteScripts.Managers
             session.IsBettingOpen = true;
             session.BettingEndTime = now + 45000; // 45 seconds for bets
             session.NextStateTime = session.BettingEndTime; // Pause loop
-            
-            string roundMsg = (session.Bracket.Count == 0 && session.NextRoundTeams.Count == 0) ? "FINAL ROUND" : $"ROUND {session.RoundNumber:D2}";
-            BroadcastToParticipants(session, $"{roundMsg} : {session.CurrentTeamA.TeamName} vs {session.CurrentTeamB.TeamName}", true);
-            
-            BroadcastRegion(session.RegionID, $"=== ARENA MATCH: [1] {session.CurrentTeamA.TeamName} vs [2] {session.CurrentTeamB.TeamName} ===", eChatType.CT_Important);
-            BroadcastRegion(session.RegionID, $"Betting is open for 45 seconds! Use /bet <Team1 or Team2> <gold>!", eChatType.CT_System);
+
+            bool isFinal = (session.Bracket.Count == 0 && session.NextRoundTeams.Count == 0);
+            string transKey = isFinal ? "ArenaManager.Match.RoundStart.Final" : "ArenaManager.Match.RoundStart.Normal";
+
+            if (isFinal)
+                BroadcastToParticipants(session, true, transKey, p => new object[] { session.CurrentTeamA.TeamName, session.CurrentTeamB.TeamName });
+            else
+                BroadcastToParticipants(session, true, transKey, p => new object[] { session.RoundNumber, session.CurrentTeamA.TeamName, session.CurrentTeamB.TeamName });
+
+            BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Match.ArenaMatchLog", c => new object[] { session.CurrentTeamA.TeamName, session.CurrentTeamB.TeamName });
+            BroadcastRegion(session.RegionID, eChatType.CT_System, "ArenaManager.Match.BettingOpen");
             BroadcastSoundToParticipants(session, 9205);
 
             // Teleport and root (visible)
@@ -588,10 +602,19 @@ namespace AmteScripts.Managers
                 ArenaTeam winner = (aElim && bElim) ? (Util.Chance(50) ? session.CurrentTeamA : session.CurrentTeamB) : (bElim ? session.CurrentTeamA : session.CurrentTeamB);
                 ArenaTeam loser = winner == session.CurrentTeamA ? session.CurrentTeamB : session.CurrentTeamA;
 
-                string roundName = (session.Bracket.Count == 0 && session.NextRoundTeams.Count == 0) ? "FINAL ROUND" : $"ROUND {session.RoundNumber:D2}";
-                
-                BroadcastToParticipants(session, $"{roundName} Winner : {winner.TeamName}", true);
-                BroadcastRegionLog(session.RegionID, $"{roundName} Winner : {winner.TeamName}");
+                bool isFinal = (session.Bracket.Count == 0 && session.NextRoundTeams.Count == 0);
+                string winnerKey = isFinal ? "ArenaManager.Match.Winner.Final" : "ArenaManager.Match.Winner.Normal";
+
+                if (isFinal)
+                {
+                    BroadcastToParticipants(session, true, winnerKey, p => new object[] { winner.TeamName });
+                    BroadcastRegionLog(session.RegionID, winnerKey, c => new object[] { winner.TeamName });
+                }
+                else
+                {
+                    BroadcastToParticipants(session, true, winnerKey, p => new object[] { session.RoundNumber, winner.TeamName });
+                    BroadcastRegionLog(session.RegionID, winnerKey, c => new object[] { session.RoundNumber, winner.TeamName });
+                }
                 ResolveBets(session, winner);
 
                 foreach (var p in loser.Members)
@@ -627,8 +650,8 @@ namespace AmteScripts.Managers
 
         private void DeclareFinalWinner(ArenaSession session, ArenaTeam winner)
         {
-            BroadcastToParticipants(session, $"FINAL ROUND Winner : {winner.TeamName}!", true);
-            BroadcastRegion(session.RegionID, $"FINAL ROUND Winner : {winner.TeamName}!", eChatType.CT_Important);
+            BroadcastToParticipants(session, true, "ArenaManager.Match.FinalWinner", p => new object[] { winner.TeamName });
+            BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Match.FinalWinner", c => new object[] { winner.TeamName });
             BroadcastSoundToParticipants(session, 9213);
 
             GiveRewards(session, winner);
@@ -728,21 +751,24 @@ namespace AmteScripts.Managers
                     
                     if (rpReward > 0) p.GainRealmPoints(rpReward);
                     if (finalBpReward > 0) p.GainBountyPoints(finalBpReward);
-                    if (finalGoldReward > 0) p.AddMoney(DOL.GS.Finance.Currency.Copper.Mint(finalGoldReward));
-                    
-                    p.Out.SendMessage($"Congratulations! You survived {roundsFought} rounds and won the Arena! You received {rpReward} RP, {finalBpReward} BP, and {DOL.GS.Finance.Money.Mint(finalGoldReward, Currency.Copper).ToText()}!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    if (finalGoldReward > 0) p.AddMoney(Currency.Copper.Mint(finalGoldReward));
 
-                    // Spawn the Physical Chests
-                    var c1 = CreateChest(p, session.ArenaMaster, tier, eRewardChestType.ScrollsAndBuffs, new LootGeneratorRewardScrolls(), "Chest of Magic Scrolls", targetSlots, targetMaxUti, regionID, rarityPrefix, color);
-                    var c2 = CreateChest(p, session.ArenaMaster, tier, eRewardChestType.ArmorsAndWeapons, new LootGeneratorRewardArmors(), "Chest of Armaments", targetSlots, targetMaxUti, regionID, rarityPrefix, color);
-                    var c3 = CreateChest(p, session.ArenaMaster, tier, eRewardChestType.Jewellery, new LootGeneratorRewardJewels(), "Chest of Magical Jewellery", targetSlots, targetMaxUti, regionID, rarityPrefix, color);
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.Survived", roundsFought, rpReward, finalBpReward, Currency.Copper.Mint(finalGoldReward).ToText(p.Client.Account.Language)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                    string scrollTitle = LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Chest.Scrolls");
+                    string armTitle = LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Chest.Armaments");
+                    string jewelTitle = LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Chest.Jewellery");
+
+                    var c1 = CreateChest(p, session.ArenaMaster, tier, eRewardChestType.ScrollsAndBuffs, new LootGeneratorRewardScrolls(), scrollTitle, targetSlots, targetMaxUti, regionID, rarityPrefix, color);
+                    var c2 = CreateChest(p, session.ArenaMaster, tier, eRewardChestType.ArmorsAndWeapons, new LootGeneratorRewardArmors(), armTitle, targetSlots, targetMaxUti, regionID, rarityPrefix, color);
+                    var c3 = CreateChest(p, session.ArenaMaster, tier, eRewardChestType.Jewellery, new LootGeneratorRewardJewels(), jewelTitle, targetSlots, targetMaxUti, regionID, rarityPrefix, color);
 
                     c1.Siblings.Add(c2); c1.Siblings.Add(c3);
                     c2.Siblings.Add(c1); c2.Siblings.Add(c3);
                     c3.Siblings.Add(c1); c3.Siblings.Add(c2);
 
                     c1.AddToWorld(); c2.AddToWorld(); c3.AddToWorld();
-                    p.Out.SendMessage($"Your {rarityPrefix} reward chests have spawned nearby!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.ChestsSpawned", rarityPrefix), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
                     lock (_lock)
                     {
@@ -813,20 +839,20 @@ namespace AmteScripts.Managers
                         if (!session.OobWarnings.ContainsKey(p.InternalID))
                         {
                             session.OobWarnings[p.InternalID] = now + 15000;
-                            p.Out.SendMessage("You left the Arena bounds! Return within 15 seconds or be disqualified!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOBWarning"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         }
                         else
                         {
                             long timeLeft = session.OobWarnings[p.InternalID] - now;
-                            if (timeLeft <= 0) DisqualifyTeam(session, team, $"{p.Name} left the arena bounds.");
-                            else if (timeLeft <= 5000 && timeLeft > 3000) p.Out.SendMessage("Return to the arena! 5 seconds left!", eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
-                            else if (timeLeft <= 10000 && timeLeft > 8000) p.Out.SendMessage("Return to the arena! 10 seconds left!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                            if (timeLeft <= 0) DisqualifyTeam(session, team, LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOBDisqualified", p.Name));
+                            else if (timeLeft <= 5000 && timeLeft > 3000) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOB5Sec", "5"), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+                            else if (timeLeft <= 10000 && timeLeft > 8000) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOB10Sec", "10"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         }
                     }
                     else if (session.OobWarnings.ContainsKey(p.InternalID))
                     {
                         session.OobWarnings.Remove(p.InternalID);
-                        p.Out.SendMessage("You returned to the arena boundaries.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOBReturned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
             }
@@ -842,7 +868,7 @@ namespace AmteScripts.Managers
                 if (p != null)
                 {
                     if (p.Client != null && p.Client.IsPlaying && p.CurrentRegionID == session.RegionID)
-                        p.Out.SendMessage($"Your team has been disqualified: {reason}", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.TeamDisqualified", reason), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
                     p.TempProperties.removeProperty("ArenaMatchDead");
                     if (!p.IsAlive) p.Release(GamePlayer.eReleaseType.Arena, true);
@@ -858,14 +884,14 @@ namespace AmteScripts.Managers
             int minThreshold = session.Mode == eArenaMode.Solo ? Properties.ARENA_MIN_SOLO : Properties.ARENA_MIN_TEAMS;
 
             if (validTeams < minThreshold)
-                CancelSession(session, "Too many participants left the arena. Minimum threshold breached.");
+                CancelSession(session, "ArenaManager.Match.TooManyLeft");
         }
 
-        public void CancelSession(ArenaSession session, string reason)
+        public void CancelSession(ArenaSession session, string reasonKey)
         {
             if (session.State != eArenaState.Idle)
             {
-                BroadcastToParticipants(session, $"Arena Contest Cancelled: {reason}");
+                BroadcastToParticipants(session, false, "ArenaManager.Match.Cancelled", p => new object[] { LanguageMgr.GetTranslation(p.Client.Account.Language, reasonKey) });
 
                 foreach (var chest in session.SpawnedChests)
                 {
@@ -1017,33 +1043,55 @@ namespace AmteScripts.Managers
             }
         }
 
-        private void BroadcastToParticipants(ArenaSession session, string message, bool centerScreen = false)
+        private void BroadcastToParticipants(ArenaSession session, bool centerScreen, string translationKey, Func<GamePlayer, object[]> argsProvider = null)
         {
-            foreach (var p in session.SoloQueue) p.Out.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-            foreach (var g in session.GroupQueue) foreach (var p in g.GetPlayersInTheGroup()) p.Out.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-            
             var allTeams = new List<ArenaTeam>(session.Bracket);
             allTeams.AddRange(session.NextRoundTeams);
             if (session.CurrentTeamA != null) allTeams.Add(session.CurrentTeamA);
             if (session.CurrentTeamB != null) allTeams.Add(session.CurrentTeamB);
 
-            foreach (var t in allTeams) foreach (var p in t.Members) if (p != null) { p.Out.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow); if (centerScreen) p.Out.SendMessage(message, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow); }
+            var players = new HashSet<GamePlayer>();
+            foreach (var p in session.SoloQueue) if (p != null) players.Add(p);
+            foreach (var g in session.GroupQueue) foreach (var p in g.GetPlayersInTheGroup()) if (p != null) players.Add(p);
+            foreach (var t in allTeams) foreach (var p in t.Members) if (p != null) players.Add(p);
+
+            foreach (var p in players)
+            {
+                object[] args = argsProvider != null ? argsProvider(p) : Array.Empty<object>();
+                string message = LanguageMgr.GetTranslation(p.Client.Account.Language, translationKey, args);
+                p.Out.SendMessage(message, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                if (centerScreen) p.Out.SendMessage(message, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
+            }
         }
 
-        private void BroadcastRegion(ushort regionId, string message, eChatType type = eChatType.CT_System)
-        {
-            foreach (var c in WorldMgr.GetClientsOfRegion(regionId)) c.Player?.Out.SendMessage(message, type, eChatLoc.CL_SystemWindow);
-        }
-
-        private void BroadcastRegionLog(ushort regionId, string message)
+        private void BroadcastRegion(ushort regionId, eChatType type, string translationKey, Func<GameClient, object[]> argsProvider = null)
         {
             foreach (var c in WorldMgr.GetClientsOfRegion(regionId))
-                if (c.Player != null && !c.Player.TempProperties.getProperty(ARENA_PARTICIPANT_PROP, false)) c.Player.Out.SendMessage(message, eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+            {
+                if (c.Player != null)
+                {
+                    object[] args = argsProvider != null ? argsProvider(c) : Array.Empty<object>();
+                    string message = LanguageMgr.GetTranslation(c.Account.Language, translationKey, args);
+                    c.Player.Out.SendMessage(message, type, eChatLoc.CL_SystemWindow);
+                }
+            }
+        }
+
+        private void BroadcastRegionLog(ushort regionId, string translationKey, Func<GameClient, object[]> argsProvider = null)
+        {
+            foreach (var c in WorldMgr.GetClientsOfRegion(regionId))
+            {
+                if (c.Player != null && !c.Player.TempProperties.getProperty(ARENA_PARTICIPANT_PROP, false))
+                {
+                    object[] args = argsProvider != null ? argsProvider(c) : Array.Empty<object>();
+                    string message = LanguageMgr.GetTranslation(c.Account.Language, translationKey, args);
+                    c.Player.Out.SendMessage(message, eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+                }
+            }
         }
 
         private static void OnPlayerLogin(DOLEvent e, object sender, EventArgs args)
         {
-            // If the server crashed while players were in the arena, restore them so they aren't orphaned
             if (sender is GamePlayer p)
             {
                 RvrPlayer dbPlayer = GameServer.Database.SelectObject<RvrPlayer>(DB.Column("PlayerID").IsEqualTo(p.InternalID));
@@ -1099,7 +1147,7 @@ namespace AmteScripts.Managers
                         var team = allTeams.FirstOrDefault(t => t.Members.Contains(p));
                         if (team != null && !team.IsDisqualified)
                         {
-                            Instance.DisqualifyTeam(session, team, $"{p.Name} left the region or disconnected.");
+                            Instance.DisqualifyTeam(session, team, LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.MemberLeftRegion", p.Name));
                         }
                     }
                     Instance.ClearParticipant(p, null);
@@ -1121,14 +1169,14 @@ namespace AmteScripts.Managers
             {
                 if (command == "force shutdown")
                 {
-                    CancelSession(session, "Forced shutdown by GM.");
-                    player.Out.SendMessage("Arena session force shut down.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    CancelSession(session, "ArenaManager.Debug.ForceShutdown");
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Debug.ShutdownMsg"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     return;
                 }
 
                 if (command == "debug: start solo match" || command == "debug: start as spectator")
                 {
-                    CancelSession(session, "Debug override.");
+                    CancelSession(session, "ArenaManager.Debug.Override");
                     session.IsDebugMode = true;
                     session.State = eArenaState.Running;
                     session.Mode = eArenaMode.Solo;
@@ -1150,7 +1198,7 @@ namespace AmteScripts.Managers
                         teamA.Members.Add(player);
                         SetupDebugParticipant(player, session);
                         TeleportTeamToSpawns(teamA, session.LeftSpawns, false, true);
-                        player.Out.SendMessage("You forced a solo debug match. You are currently the active fighter.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Debug.ForcedSolo"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     else if (command == "debug: start as spectator")
                     {
@@ -1161,7 +1209,7 @@ namespace AmteScripts.Managers
                         SetupDebugParticipant(player, session);
                         player.MoveTo(session.ArenaMaster.Position);
                         SetWaitState(player, true, false);
-                        player.Out.SendMessage("You forced a debug match and joined as a spectator.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Debug.ForcedSpectator"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                 }
 
@@ -1186,7 +1234,7 @@ namespace AmteScripts.Managers
                     SetupDebugParticipant(player, session);
                     player.MoveTo(session.ArenaMaster.Position);
                     SetWaitState(player, true, false);
-                    player.Out.SendMessage("You joined/switched to spectator mode.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Debug.SwitchedSpectator"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 else if (command == "debug: switch as fighter" || command == "debug: join as a fighter")
                 {
@@ -1230,7 +1278,7 @@ namespace AmteScripts.Managers
                     player.Mana = player.MaxMana;
                     player.Endurance = player.MaxEndurance;
 
-                    player.Out.SendMessage("You joined/switched to fighter mode.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Debug.SwitchedFighter"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
         }

@@ -6,8 +6,10 @@ Commands.Players.Duel.EnemyRealm:				You cannot challenge a member of an enemy r
 Commands.Players.Duel.NeedTarget:				You have to target someone want to defy!
 Commands.Players.Duel.NotInDuel:				You are currently not in a duel!
 Commands.Players.Duel.PlayerVsPlayer:			{0} surrenders to {1}!
+Commands.Players.Duel.BusyInArena:				{0} is busy participating in an Arena Tournament!
 Commands.Players.Duel.SafeZone:					You are in a secure area and you cannot fight here!
 Commands.Players.Duel.TargetSafeZone:			{0} is in a secure area and you cannot fight there!
+Commands.Players.Duel.InArena:					Dueling is not allowed while you're already participating in an Arena Tournament!
 Commands.Players.Duel.InHousing:				Dueling is not allowed in housing zones!
 Commands.Players.Duel.InPvP&RvR:				Dueling is not allowed in PvP or RvR zones!
 Commands.Players.Duel.InDungeon:				Dueling is not allowed inside a dungeon!

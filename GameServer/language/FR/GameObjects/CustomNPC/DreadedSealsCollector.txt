@@ -1,0 +1,9 @@
+
+DreadedSealCollector.NoLevelMultipliers:	Désolé, aucun multiplicateur de niveau n'est défini, je ne peux donc pas accepter de sceaux pour le moment.
+DreadedSealCollector.GiveBPRP:				Donnez-moi des Sceaux Redoutés et je vous donnerai des points de prime et de royaume !
+DreadedSealCollector.GiveBP:				Donnez-moi des Sceaux Redoutés et je vous donnerai des points de prime !
+DreadedSealCollector.GiveRP:				Donnez-moi des Sceaux Redoutés et je vous donnerai des points de royaume !
+DreadedSealCollector.NoSealTypes:			Désolé, aucun type de sceau redouté n'est défini, je ne peux donc pas accepter de sceaux pour le moment.
+DreadedSealCollector.TooFar:				Vous êtes trop loin pour me donner quoi que ce soit {0}. Approchez-vous un peu.
+DreadedSealCollector.CannotAcceptType:		Désolé, je ne peux pas accepter d'objets de ce type.
+DreadedSealCollector.TooYoung:				Vous êtes encore trop jeune pour utiliser ces objets {0}. Revenez dans {1} niveaux.'est fait ! Maintenant, vous devez quitter ce monde pour un court instant afin que la magie opère. (Vous devez vous déconnecter pour changer votre apparence.)

@@ -41,7 +41,7 @@ namespace DOL.GS.Scripts
         {
             if (player.TempProperties.getProperty<bool>("ArenaParticipant", false) || player.TempProperties.getProperty<bool>("ArenaQueued", false))
             {
-                player.Out.SendMessage("You cannot enter RvR while registered for an Arena Contest.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.NoEnterInArena"), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return true;
             }
 

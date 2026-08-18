@@ -30,6 +30,7 @@ Items.Specialitems.GuarkRingUsageStealing:			Bạn không thể sử dụng phé
 Items.Specialitems.GuarkRingUsageAFK:				Bạn không thể sử dụng phép thuật thiên thể khi đang AFK!
 Items.Specialitems.GuarkRingUsageClimbing:			Bạn không thể sử dụng phép thuật thiên thể khi đang leo trèo!
 Items.Specialitems.GuarkRingUsageRelic:				Bạn không thể sử dụng phép thuật thiên thể khi đang mang thánh tích lãnh thổ.
+Items.Specialitems.GuarkRingUsageArena:				Bạn không thể sử dụng phép thuật thiên thể trong khi tham gia giải đấu Đấu trường.
 Items.Specialitems.GuarkRingCannotUseHere:			Bạn không thể sử dụng vật phẩm này ở đây.
 Items.Specialitems.GuarkRingDoNotMove:				Bạn phải đứng yên một chỗ để sử dụng vật phẩm này.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Bạn vừa mới chiến đấu gần đây, vì vậy bạn phải đợi một lúc để có thể sử dụng lại vật phẩm này.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		Không thể phá hủy vật p
 Items.Specialitems.DieTriggerSpell.FailRez:			Lời nguyền ảnh hưởng đến xác chết của bạn quá mạnh ở đây, phép thuật hồi sinh thất bại!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		{0} của bạn đã cạn kiệt và bị xóa khỏi túi đồ.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	Bạn không thể sử dụng vật phẩm này khi đang chiến đấu!
+Items.Specialitems.PasswordCurseItemUsageJailed:	Bạn không thể sử dụng vật phẩm này khi đang bị giam cầm!
+Items.Specialitems.PasswordCurseItemUsageMounted:	Bạn không thể sử dụng vật phẩm này khi đang cưỡi thú!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	Bạn không thể sử dụng vật phẩm này khi đang tàng hình.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	Bạn không thể sử dụng vật phẩm này khi đang bị hóa đá!
+Items.Specialitems.PasswordCurseItemUsageDamned:	Bạn không thể sử dụng vật phẩm này khi đang bị nguyền rủa!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	Bạn không thể sử dụng vật phẩm này khi đang chịu phép thuật "{0}"!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	Bạn không thể sử dụng vật phẩm này khi đang chế tạo!
+Items.Specialitems.PasswordCurseItemUsageDuel:		Bạn không thể sử dụng vật phẩm này khi đang quyết đấu!
+Items.Specialitems.PasswordCurseItemUsageStealing:	Bạn không thể sử dụng vật phẩm này khi đang trộm đồ của người chơi khác!
+Items.Specialitems.PasswordCurseItemUsageAFK:		Bạn không thể sử dụng vật phẩm này khi đang AFK (Treo máy)!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	Bạn không thể sử dụng vật phẩm này khi đang leo trèo!
+Items.Specialitems.PasswordCurseItemUsageRelic:		Bạn không thể sử dụng vật phẩm này khi đang mang thánh tích lãnh thổ.
+Items.Specialitems.PasswordCurseItemUsageArena:		Bạn không thể sử dụng vật phẩm này khi đang tham gia Giải đấu Arena.

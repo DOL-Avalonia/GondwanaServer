@@ -1,0 +1,17 @@
+
+EpicMount.Msg.OutOfBounds:					Vous avez volé hors des limites et votre monture vous lâche !
+EpicMount.Msg.NoWater:						Votre monture refuse d'aller sous l'eau et vous désarçonne !
+EpicMount.Msg.Arrived:						Destination atteinte.
+EpicMount.Msg.CruiseOff:					Vol stationnaire activé. La monture fait du surplace.
+EpicMount.Msg.CruiseOn:						Vol continu activé ! Dirigez-vous en positionnant des cibles au sol (F5).
+EpicMount.Msg.SetGroundTarget:				Vous devez d'abord définir une Cible au sol (F5) !
+EpicMount.Msg.FlyToTarget:					Votre monture vole de façon autonome vers la zone ciblée.
+EpicMount.Msg.SelectTarget:					Vous devez d'abord sélectionner une cible !
+EpicMount.Msg.FlyToPlayer:					Votre monture vole de façon autonome vers votre cible.
+EpicMount.Msg.Vanishes:						Votre monture épique volante disparait au loin.
+EpicMount.Msg.MaxAltitude:					Vous avez atteint l'altitude de vol maximale !
+EpicMount.Msg.CantWater:					Votre monture ne peut pas voler sous l'eau !
+EpicMount.Msg.CantWaterDrop:				Votre monture refuse d'aller dans l'eau !
+EpicMount.Interact.NotOwner:				Ce destrier ne répond qu'à son maître.
+EpicMount.Interact.TooFar:					Vous êtes trop loin pour monter ceci.
+EpicMount.Interact.Help:					Pour voler : /epicmount voler, /epicmount aller, /epicmount monter, /epicmount descendre, /epicmount gauche, /epicmount droite

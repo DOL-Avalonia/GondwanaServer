@@ -7,3 +7,4 @@ Commands.Players.Disband.NoYourself:	Vous ne pouvez pas vous dégrouper de cette
 Commands.Players.Disband.Usage:			'/disband' # Vous vous séparez du groupe.
 Commands.Players.Disband.Usage.Name:	'/disband <name> # Dégrouper le joueur spécifié.
 Commands.Players.Disband.NotAllowed:	Vous ne pouvez pas dégrouper dans cette session PvP.
+Commands.Players.Disband.CannotArena:	Vous ne pouvez pas dissoudre votre groupe en étant inscrit ou en participant à un Tournoi d'Arène.

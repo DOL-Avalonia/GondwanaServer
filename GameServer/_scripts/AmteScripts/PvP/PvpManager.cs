@@ -3838,9 +3838,9 @@ namespace AmteScripts.Managers
             _kothNextMoveTick = _activeHill.CurrentRegion.Time + duration;
             _kothOwnershipStartTick = 0;
 
-            string msg = $"[KotH] The Hill has moved to a new location!";
-            foreach(var p in GetPlayersInPvP())
+            foreach (var p in GetPlayersInPvP())
             {
+                string msg = LanguageMgr.GetTranslation(p.Client.Account.Language, "PvPManager.KingHill.HillMoved");
                 p.Out.SendMessage(msg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
             }
             

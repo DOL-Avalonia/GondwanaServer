@@ -4515,12 +4515,9 @@ namespace DOL.GS
                         break;
                 }
                 
-            if ((ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL == 0 || Level > ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL) &&
-                ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL > 0 &&
-                damage > 0 &&
-                Brain is not IControlledBrain || GetPlayerOwner() == null)
+            if ((Properties.MOB_DAMAGE_INCREASE_STARTLEVEL == 0 || Level > Properties.MOB_DAMAGE_INCREASE_STARTLEVEL) && Properties.MOB_DAMAGE_INCREASE_PERLEVEL > 0 && damage > 0 && Brain is not IControlledBrain || GetPlayerOwner() == null)
             {
-                double modifiedDamage = ServerProperties.Properties.MOB_DAMAGE_INCREASE_PERLEVEL * (Level - ServerProperties.Properties.MOB_DAMAGE_INCREASE_STARTLEVEL);
+                double modifiedDamage = Properties.MOB_DAMAGE_INCREASE_PERLEVEL * (Level - Properties.MOB_DAMAGE_INCREASE_STARTLEVEL);
                 damage += modifiedDamage;
             }
 
@@ -4677,7 +4674,7 @@ namespace DOL.GS
             GamePlayer pAttacker = ad.Attacker as GamePlayer ?? (ad.Attacker as GameLiving)?.GetPlayerOwner();
             if (pAttacker != null && pAttacker.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {
-                pAttacker.Out.SendMessage("You cannot attack monsters while in an Arena match.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                pAttacker.Out.SendMessage(LanguageMgr.GetTranslation(pAttacker.Client.Account.Language, "GameNPC.Combat.CantBeAttackedFromArena"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 

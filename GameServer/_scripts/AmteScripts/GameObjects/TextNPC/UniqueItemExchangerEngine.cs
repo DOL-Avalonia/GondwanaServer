@@ -196,6 +196,7 @@ namespace DOL.GS.Scripts
                                 if (vItem.Count <= 0)
                                 {
                                     GameServer.Database.DeleteObject(vItem);
+                                    vault.OnRemoveItem(player, vItem);
                                     InventoryItem emptyItem = new InventoryItem();
                                     emptyItem.SlotPosition = clientSlot;
                                     emptyItem.Count = 0;
@@ -370,19 +371,20 @@ namespace DOL.GS.Scripts
 
                 if (currentRawCount < recipe.RawCountNeeded || currentBinderCount < recipe.BinderCountNeeded || player.CopperBalance < Currency.Copper.Mint(recipe.CoinFee).Amount)
                 {
-                    string msg = $"Ah, {item.Name}. I can work with that to make a fine jewel. ";
-                    msg += $"However, I will need {recipe.RawCountNeeded}x of them";
-                    
+                    string binderAddon = "";
                     if (recipe.BinderCountNeeded > 0)
                     {
                         ItemTemplate binderTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(recipe.BinderId);
                         string binderName = binderTemplate != null ? binderTemplate.Name : System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(recipe.BinderId.Replace("_", " "));
-                        msg += $", plus {recipe.BinderCountNeeded}x '{binderName}' to treat the stone";
+                        binderAddon = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.BinderAddon", recipe.BinderCountNeeded, binderName);
                     }
 
-                    msg += $", and my jeweler's fee is {Currency.Copper.Mint(recipe.CoinFee).ToText(player.Client?.Account?.Language)}.";
-                    
-                    player.Out.SendMessage(msg, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    string msg1 = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.Offer1", item.Name);
+                    string msg2 = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.Offer2");
+                    string msg3 = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.Offer3", recipe.RawCountNeeded, binderAddon, Currency.Copper.Mint(recipe.CoinFee).ToText(player.Client?.Account?.Language));
+                    string msgfinal = msg1 + "\n" + msg2 + "\n\n" + msg3;
+
+                    player.Out.SendMessage(msgfinal, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                     return true;
                 }
 
@@ -410,12 +412,22 @@ namespace DOL.GS.Scripts
                 {
                     carvedResult.Count = 1;
                     player.CreateItemOnTheGround(carvedResult);
-                    player.Out.SendMessage($"Your backpack is full! The {carvedTemplate.Name} falls to the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround", carvedTemplate.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
                 else
                 {
-                    player.Out.SendMessage($"\"Excellent...\" {npc.Name} works quickly and with immense precision. \"Here is your {carvedTemplate.Name}. A true beauty, isn't it?\"", eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    player.Out.SendPlaySound(eSoundType.Craft, 0x04); 
+                    string msg1 = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.Success1");
+                    string msg2 = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.Success2", npc.Name);
+                    string msg3 = LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.StoneMaker.Success3", carvedTemplate.Name);
+                    string msgfinal = msg1 + "\n" + msg2 + "\n\n" + msg3;
+
+                    player.Out.SendMessage(msgfinal, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendPlaySound(eSoundType.Craft, 0x04);
+
+                    foreach (GamePlayer plr in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                    {
+                        plr.Out.SendEmoteAnimation(npc, eEmote.Raise);
+                    }
                 }
                 
                 InventoryLogging.LogInventoryAction(player, npc, eInventoryActionType.Craft, carvedResult, 1);
@@ -541,7 +553,7 @@ namespace DOL.GS.Scripts
                 // Reject temporary partial (< 100%) vials.
                 if (item.Id_nb != null && item.Id_nb.StartsWith("vt_"))
                 {
-                    player.Out.SendMessage("I only accept full, 100% blood vials. Extract completely before returning.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.BloodVial.NeedFullVial"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return true;
                 }
 
@@ -609,7 +621,7 @@ namespace DOL.GS.Scripts
                 if (finalCopperReward > 0)
                 {
                     player.AddMoney(Currency.Copper.Mint(finalCopperReward));
-                    player.Out.SendMessage($"The exchanger rewards you with {Currency.Copper.Mint(finalCopperReward).ToText(player.Client?.Account?.Language)}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.Reward.Coins", Currency.Copper.Mint(finalCopperReward).ToText(player.Client?.Account?.Language)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
 
                 // Items ("sanguine_dreaded_seal")
@@ -625,11 +637,11 @@ namespace DOL.GS.Scripts
                             {
                                 rewardItem.Count = sealCount;
                                 player.CreateItemOnTheGround(rewardItem);
-                                player.Out.SendMessage("Your backpack is full! The seals fall to the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client?.Account?.Language, "TextNPC.InventoryFullItemGround", sealTemplate.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             }
                             else
                             {
-                                player.Out.SendMessage($"You receive {sealCount}x {sealTemplate.Name}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "UniqueItemExchangerEngine.Reward.Seals", sealCount, sealTemplate.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
                     }
@@ -639,7 +651,7 @@ namespace DOL.GS.Scripts
                 {
                     long finalGainMoney = rule.GainMoney + ((rule.GainMoney * coinBonusPercent) / 100);
                     player.AddMoney(Currency.Copper.Mint(finalGainMoney));
-                    player.Out.SendMessage($"You receive an extra {Currency.Copper.Mint(finalGainMoney).ToText(player.Client?.Account?.Language)}.", eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "UniqueItemExchangerEngine.Reward.ExtraCoins", Currency.Copper.Mint(finalGainMoney).ToText(player.Client?.Account?.Language)), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
                 }
 
                 if (rule.GainXP > 0)
@@ -683,7 +695,7 @@ namespace DOL.GS.Scripts
                 if (finalXpReward > 0)
                 {
                     player.GainExperience(GameLiving.eXPSource.Quest, finalXpReward, 0, 0, 0, false, false, 1);
-                    player.Out.SendMessage($"The blood essence imparts {finalXpReward} experience to you.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.Reward.Experience", finalXpReward), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
 
                 if (!string.IsNullOrEmpty(rule.ItemGiveID) && rule.ItemGiveCount > 0)
@@ -698,11 +710,11 @@ namespace DOL.GS.Scripts
                             {
                                 rewardItem.Count = rule.ItemGiveCount;
                                 player.CreateItemOnTheGround(rewardItem);
-                                player.Out.SendMessage($"Your backpack is full! The {giveTemplate.Name} falls to the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround", giveTemplate.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             }
                             else
                             {
-                                player.Out.SendMessage($"You receive {rule.ItemGiveCount}x {giveTemplate.Name}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.Reward.ItemGive", rule.ItemGiveCount, giveTemplate.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
                     }
@@ -714,7 +726,7 @@ namespace DOL.GS.Scripts
                     long finalGainMoney = rule.GainMoney + ((rule.GainMoney * coinBonusPercent) / 100);
 
                     player.AddMoney(Currency.Copper.Mint(finalGainMoney));
-                    player.Out.SendMessage($"You receive an extra {Currency.Copper.Mint(finalGainMoney).ToText(player.Client?.Account?.Language)}.", eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.Reward.ExtraCoins", Currency.Copper.Mint(finalGainMoney).ToText(player.Client?.Account?.Language)), eChatType.CT_Skill, eChatLoc.CL_SystemWindow);
                 }
 
                 if (rule.GainXP > 0)
@@ -739,7 +751,16 @@ namespace DOL.GS.Scripts
                 }
                 else
                 {
-                    player.Out.SendMessage($"{npc.Name} nods and securely stows the vial away.", eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "UniqueItemExchangerEngine.Reward.StowsVial", npc.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                    int randomResponseId = Util.Random(1, 5);
+                    string translationKey = "UniqueItemExchangerEngine.Reward.ThanksForVial" + randomResponseId;
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, translationKey), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                }
+
+                foreach (GamePlayer plr in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                {
+                    plr.Out.SendEmoteAnimation(npc, eEmote.Yes);
                 }
             }
         }

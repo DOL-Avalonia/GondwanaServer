@@ -10,3 +10,11 @@ Lootgenerator.RewardChests.YouGetScroll:	Vous avez descellé le coffre de Parche
 Lootgenerator.RewardChests.ChestEmpty:		Ce coffre est mystérieusement vide...
 Lootgenerator.RewardChests.YouGetJewel:		Vous avez descellé le coffre de Bijoux Magiques ! Vous avez reçu un(e) {0} unique adapté(e) à votre classe !
 Lootgenerator.RewardChests.YouGetArmament:	Vous avez descellé le coffre d'Armements ! Vous avez reçu un(e) {0} unique adapté(e) à votre classe !
+
+Lootgenerator.LootGeneratorBloodVials.Filled:             Vous avez rempli votre {0}.
+Lootgenerator.LootGeneratorBloodVials.Extracted:          Vous avez extrait une {0} pleine.
+Lootgenerator.LootGeneratorBloodVials.Collected:          Vous avez collecté une {0} pleine.
+Lootgenerator.LootGeneratorBloodVials.StartedCollecting:  Vous commencez à collecter une {0}.
+Lootgenerator.LootGeneratorBloodVials.CombinedPartial:    Vous avez combiné les fioles à {0}%.
+Lootgenerator.LootGeneratorBloodVials.CombinedRemainder:  Vous avez combiné les fioles pour en faire une pleine et il vous reste une {0}.
+Lootgenerator.LootGeneratorBloodVials.CombinedFull:       Vous avez combiné les fioles pour en faire une pleine.

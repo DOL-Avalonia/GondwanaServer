@@ -1,0 +1,23 @@
+
+BetCommand.Description:						Placer un pari sur un match d'Arène actif durant la phase de pari.
+BetCommand.Usage.List:						/bet list - Liste les équipes actives et la cagnotte
+BetCommand.Usage.Bet:						/bet <1 ou 2> <montant en or> (Exemple : /bet 1 500 pour parier 500 or sur l'Équipe 1)
+BetCommand.NoActiveMatch:					Il n'y a aucun match d'arène en cours dans cette région.
+BetCommand.List.Header:						--- Équipes du Tournoi d'Arène ---
+BetCommand.List.Team1:						[1] {0}
+BetCommand.List.Team2:						[2] {0}
+BetCommand.List.TotalPool:					Cagnotte Totale : {0}
+BetCommand.List.Preparing:					Les équipes se préparent actuellement...
+BetCommand.List.Footer:						---------------------------
+BetCommand.BettingClosed:					Les paris sont fermés. Vous ne pouvez parier que pendant le compte à rebours avant le combat.
+BetCommand.CannotBetOwnMatch:				Vous ne pouvez pas parier sur un match auquel vous participez !
+BetCommand.AlreadyBet:						Vous avez déjà placé un pari pour ce match.
+BetCommand.InvalidTeam:						Choix d'équipe invalide. Utilisez 1 pour l'équipe 1 ou 2 pour l'équipe 2.
+BetCommand.InvalidAmount:					Montant invalide. Veuillez spécifier un nombre positif d'or.
+BetCommand.MaxBet:							La mise maximale autorisée est de {0} or.
+BetCommand.Debtor:							Vous êtes débiteur ! Le bookmaker refuse vos paris jusqu'au remboursement de vos prêts.
+BetCommand.NotEnoughMoney:					Vous ne pouvez parier que jusqu'à {0} (incluant une ligne de crédit de {1}).
+BetCommand.TooLate:							Trop tard ! Les paris viennent de fermer.
+BetCommand.BankEmptyDebt:					ATTENTION : Votre compte est vide et vous avez une dette de {0} suite à ce pari à crédit ! Vous avez 3 jours pour rembourser sous peine de saisie et d'emprisonnement !
+BetCommand.Success:							Vous avez parié {0} pièces d'or sur {1} avec succès !
+BetCommand.Usage:							Syntaxe : /bet list OU /bet <1 ou 2> <montant en or>

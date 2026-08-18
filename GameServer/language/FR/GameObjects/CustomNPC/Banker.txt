@@ -42,3 +42,17 @@ Banker.Term.Matured:			Un dépôt à terme est arrivé à échéance ! {0} (Capi
 Banker.Term.Biweekly:			bimensuel
 Banker.Term.Monthly:			mensuel
 Banker.Term.Quarterly:			trimestriel
+Banker.Greetings.Debt:			Salutations {0} ! Vous n'avez actuellement plus d'argent et une dette impayée de {1}.
+Banker.Greetings.DebtWarning:	[Attention] Il vous reste {0} {1} pour payer avant que vos biens ne soient saisis !
+Banker.Loan.Available:			Prêts disponibles :
+Banker.Loan.Personal:			Prêts personnels (15% d'intérêts, 1 semaine) :
+Banker.Loan.House:				Prêts immobiliers (10% d'intérêts, 1 mois) :
+Banker.Loan.Personal400:		[prêt personnel 400g] - Nécessite 50g en banque
+Banker.Loan.Personal600:		[prêt personnel 600g] - Nécessite 80g en banque
+Banker.Loan.Personal800:		[prêt personnel 800g] - Nécessite 80g en banque
+Banker.Loan.House1500:			[prêt immobilier 1500g] - Nécessite 250g en banque
+Banker.Loan.House3000:			[prêt immobilier 3000g] - Nécessite 500g en banque
+Banker.Loan.House6000:			[prêt immobilier 6000g] - Nécessite 500g en banque
+Banker.Loan.House10000:			[prêt immobilier 10000g] - Nécessite 2000g en banque
+Banker.Loan.House25000:			[prêt immobilier 25000g] - Nécessite 2000g en banque
+Banker.Loan.Active:				Vous avez un prêt actif. Vous pouvez [rembourser le prêt] par anticipation.

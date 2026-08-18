@@ -133,7 +133,13 @@ namespace DOL.Database
 
         public override bool Dirty
         {
-            get { return true; }
+            get
+            {
+                if (m_id_nb != null && (m_id_nb.StartsWith("vf_") || m_id_nb.StartsWith("vt_")))
+                    return base.Dirty;
+
+                return true;
+            }
             set { base.Dirty = true; }
         }
     }

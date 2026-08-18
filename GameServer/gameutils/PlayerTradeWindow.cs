@@ -575,137 +575,142 @@ namespace DOL.GS
                     ArrayList ownerTradeItems = (ArrayList)TradeItems.Clone();
                     ArrayList partnerTradeItems = (ArrayList)m_partnerWindow.TradeItems.Clone();
 
-                    // remove all items first to make sure there is enough space
-                    // if inventory is full but removed items count >= received count
-                    foreach (InventoryItem item in ownerTradeItems)
+                    try
                     {
-                        lock (m_owner.Inventory)
+                        // remove all items first to make sure there is enough space
+                        // if inventory is full but removed items count >= received count
+                        foreach (InventoryItem item in ownerTradeItems)
                         {
-                            if (!m_owner.Inventory.RemoveTradeItem(item))
+                            lock (m_owner.Inventory)
                             {
+                                if (!m_owner.Inventory.RemoveTradeItem(item))
+                                {
+                                    if (logTrade)
+                                        GameServer.Instance.LogGMAction("   NOTItem: " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") -> " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
+
+                                    //BOT.Ban(m_owner, "Trade Hack");
+                                    //BOT.Ban(partner, "Trade Hack");
+
+                                    return false;
+                                }
+                            }
+                        }
+                        foreach (InventoryItem item in partnerTradeItems)
+                        {
+                            lock (partner.Inventory)
+                            {
+                                if (!partner.Inventory.RemoveTradeItem(item))
+                                {
+                                    if (logTrade)
+                                        GameServer.Instance.LogGMAction("   NOTItem: " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") -> " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
+
+                                    //BOT.Ban(m_owner, "Trade Hack");
+                                    //BOT.Ban(partner, "Trade Hack");
+
+                                    return false;
+                                }
+                            }
+                        }
+
+                        foreach (InventoryItem item in ownerTradeItems)
+                        {
+                            if (m_owner.Guild != partner.Guild)
+                            {
+                                item.Emblem = 0;
+                            }
+
+                            bool tradeSuccess = false;
+
+                            InventoryItem itemtoadd = item;
+
+                            // If PLayer is not Infiltrator (9), Shadowblade (23), Nightshade (49), remove Envenom bonus before add the item in the inventory
+                            if (item.PoisonSpellID > 0 && !(partner.CharacterClass.ID == 9 || partner.CharacterClass.ID == 23 || partner.CharacterClass.ID == 49))
+                            {
+                                itemtoadd = GameInventoryItem.Create(itemtoadd);
+                                itemtoadd.PoisonCharges = 0;
+                                itemtoadd.PoisonMaxCharges = 0;
+                                itemtoadd.PoisonSpellID = 0;
+                            }
+
+                            if (item.IsDeleted)
+                            {
+                                tradeSuccess = partner.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
+                            }
+                            else
+                            {
+                                tradeSuccess = partner.Inventory.AddTradeItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
+                            }
+
+                            if (!tradeSuccess)
+                            {
+                                log.Error("Trade item was not added to Partner first free slot.  Owner = " + partner.GetPersonalizedName(m_owner) + ", Partner = " + m_owner.GetPersonalizedName(partner) + "; Item = " + item.Id_nb);
+                            }
+                            else
+                            {
+                                InventoryLogging.LogInventoryAction(m_owner, partner, eInventoryActionType.Trade, item, item.Count);
                                 if (logTrade)
-                                    GameServer.Instance.LogGMAction("   NOTItem: " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") -> " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
-
-                                //BOT.Ban(m_owner, "Trade Hack");
-                                //BOT.Ban(partner, "Trade Hack");
-
-                                return false;
+                                {
+                                    GameServer.Instance.LogGMAction("   Item: " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") -> " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
+                                }
                             }
                         }
-                    }
-                    foreach (InventoryItem item in partnerTradeItems)
-                    {
-                        lock (partner.Inventory)
+
+                        foreach (InventoryItem item in partnerTradeItems)
                         {
-                            if (!partner.Inventory.RemoveTradeItem(item))
+                            if (m_owner.Guild != partner.Guild)
                             {
+                                item.Emblem = 0;
+                            }
+
+                            bool tradeSuccess = false;
+
+                            InventoryItem itemtoadd = item;
+
+                            // If PLayer is not Infiltrator (9), Shadowblade (23), Nightshade (49), remove Envenom bonus before add the item in the inventory
+                            if (item.PoisonSpellID > 0 && !(m_owner.CharacterClass.ID == 9 || m_owner.CharacterClass.ID == 23 || m_owner.CharacterClass.ID == 49))
+                            {
+                                itemtoadd = GameInventoryItem.Create(itemtoadd);
+                                itemtoadd.PoisonCharges = 0;
+                                itemtoadd.PoisonMaxCharges = 0;
+                                itemtoadd.PoisonSpellID = 0;
+                            }
+
+                            if (item.IsDeleted)
+                            {
+                                tradeSuccess = m_owner.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
+                            }
+                            else
+                            {
+                                tradeSuccess = m_owner.Inventory.AddTradeItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
+                            }
+
+                            if (!tradeSuccess)
+                            {
+                                log.Error("Trade item was not added to Owner first free slot.  Owner = " + partner.GetPersonalizedName(m_owner) + ", Partner = " + m_owner.GetPersonalizedName(partner) + "; Item = " + item.Id_nb);
+                            }
+                            else
+                            {
+                                InventoryLogging.LogInventoryAction(partner, m_owner, eInventoryActionType.Trade, item, item.Count);
                                 if (logTrade)
-                                    GameServer.Instance.LogGMAction("   NOTItem: " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") -> " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
-
-                                //BOT.Ban(m_owner, "Trade Hack");
-                                //BOT.Ban(partner, "Trade Hack");
-
-                                return false;
+                                {
+                                    GameServer.Instance.LogGMAction("   Item: " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") -> " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
+                                }
                             }
                         }
-                    }
 
-                    foreach (InventoryItem item in ownerTradeItems)
+                        m_owner.Out.SendMessage(LanguageMgr.GetTranslation(m_owner.Client, "GameUtils.PlayerTradeWindow.TradeCompleted", partnerTradeItemsCount, myTradeItemsCount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        partner.Out.SendMessage(LanguageMgr.GetTranslation(partner.Client, "GameUtils.PlayerTradeWindow.TradeCompleted", myTradeItemsCount, partnerTradeItemsCount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                        m_owner.Inventory.SaveIntoDatabase(m_owner.InternalID);
+                        partner.Inventory.SaveIntoDatabase(partner.InternalID);
+                    }
+                    finally
                     {
-                        if (m_owner.Guild != partner.Guild)
-                        {
-                            item.Emblem = 0;
-                        }
-
-                        bool tradeSuccess = false;
-
-                        InventoryItem itemtoadd = item;
-
-                        // If PLayer is not Infiltrator (9), Shadowblade (23), Nightshade (49), remove Envenom bonus before add the item in the inventory
-                        if (item.PoisonSpellID > 0 && !(partner.CharacterClass.ID == 9 || partner.CharacterClass.ID == 23 || partner.CharacterClass.ID == 49))
-                        {
-                            itemtoadd = GameInventoryItem.Create(itemtoadd);
-                            itemtoadd.PoisonCharges = 0;
-                            itemtoadd.PoisonMaxCharges = 0;
-                            itemtoadd.PoisonSpellID = 0;
-                        }
-
-                        if (item.IsDeleted)
-                        {
-                            tradeSuccess = partner.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
-                        }
-                        else
-                        {
-                            tradeSuccess = partner.Inventory.AddTradeItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
-                        }
-
-                        if (!tradeSuccess)
-                        {
-                            log.Error("Trade item was not added to Partner first free slot.  Owner = " + partner.GetPersonalizedName(m_owner) + ", Partner = " + m_owner.GetPersonalizedName(partner) + "; Item = " + item.Id_nb);
-                        }
-                        else
-                        {
-                            InventoryLogging.LogInventoryAction(m_owner, partner, eInventoryActionType.Trade, item, item.Count);
-                            if (logTrade)
-                            {
-                                GameServer.Instance.LogGMAction("   Item: " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") -> " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
-                            }
-                        }
+                        m_owner.Inventory.CommitChanges();
+                        partner.Inventory.CommitChanges();
+                        m_changesCount--;
+                        m_partnerWindow.m_changesCount--;
                     }
-
-                    foreach (InventoryItem item in partnerTradeItems)
-                    {
-                        if (m_owner.Guild != partner.Guild)
-                        {
-                            item.Emblem = 0;
-                        }
-
-                        bool tradeSuccess = false;
-
-                        InventoryItem itemtoadd = item;
-
-                        // If PLayer is not Infiltrator (9), Shadowblade (23), Nightshade (49), remove Envenom bonus before add the item in the inventory
-                        if (item.PoisonSpellID > 0 && !(m_owner.CharacterClass.ID == 9 || m_owner.CharacterClass.ID == 23 || m_owner.CharacterClass.ID == 49))
-                        {
-                            itemtoadd = GameInventoryItem.Create(itemtoadd);
-                            itemtoadd.PoisonCharges = 0;
-                            itemtoadd.PoisonMaxCharges = 0;
-                            itemtoadd.PoisonSpellID = 0;
-                        }
-
-                        if (item.IsDeleted)
-                        {
-                            tradeSuccess = m_owner.Inventory.AddItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
-                        }
-                        else
-                        {
-                            tradeSuccess = m_owner.Inventory.AddTradeItem(eInventorySlot.FirstEmptyBackpack, itemtoadd);
-                        }
-
-                        if (!tradeSuccess)
-                        {
-                            log.Error("Trade item was not added to Owner first free slot.  Owner = " + partner.GetPersonalizedName(m_owner) + ", Partner = " + m_owner.GetPersonalizedName(partner) + "; Item = " + item.Id_nb);
-                        }
-                        else
-                        {
-                            InventoryLogging.LogInventoryAction(partner, m_owner, eInventoryActionType.Trade, item, item.Count);
-                            if (logTrade)
-                            {
-                                GameServer.Instance.LogGMAction("   Item: " + m_owner.GetPersonalizedName(partner) + "(" + partner.Client.Account.Name + ") -> " + partner.GetPersonalizedName(m_owner) + "(" + m_owner.Client.Account.Name + ") : " + item.Name + "(" + item.Id_nb + ")");
-                            }
-                        }
-                    }
-
-                    m_owner.Inventory.CommitChanges();
-                    partner.Inventory.CommitChanges();
-                    m_changesCount--;
-                    m_partnerWindow.m_changesCount--;
-
-                    m_owner.Out.SendMessage(LanguageMgr.GetTranslation(m_owner.Client, "GameUtils.PlayerTradeWindow.TradeCompleted", partnerTradeItemsCount, myTradeItemsCount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    partner.Out.SendMessage(LanguageMgr.GetTranslation(partner.Client, "GameUtils.PlayerTradeWindow.TradeCompleted", myTradeItemsCount, partnerTradeItemsCount), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
-                    m_owner.Inventory.SaveIntoDatabase(m_owner.InternalID);
-                    partner.Inventory.SaveIntoDatabase(partner.InternalID);
                 }
 
                 if (logTrade)

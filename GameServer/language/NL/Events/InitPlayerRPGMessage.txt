@@ -47,6 +47,8 @@ ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (of /at): Schakel de
 ServerRPGMessage.CmdMarket:				/market <open|close|name>: Zet je persoonlijke markt op, hernoem of sluit deze.
 ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatiseer je crafting-wachtrij en koop eenvoudig ontbrekende receptingrediënten rechtstreeks bij handelaren.
 ServerRPGMessage.CmdCombineList:		/combine list: Toon je succesvol ontdekte combinaties van alternatieve ambachtsvoorwerpen.
+ServerRPGMessage.CmdEvent:				/event: Toont informatie over actuele wereldgebeurtenissen.
+ServerRPGMessage.CmdEpicMount:			/epicmount: Besturing epische vliegende rijdieren - Gebruik: /epicmount [cruise | move | target | left | right | stop | rise | down | land].
 ServerRPGMessage.CmdVol:				/vol of /steal <player>: Steel geld of kostbare Gebiedsrelikwieën van rivaliserende spelers! Het stelt je ook in staat om schatten te stelen die geplunderd zijn uit kisten van een vijandige clan in PvP.
 ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Draai in de richting waar de gespecificeerde mob zich in jouw regio bevindt. Erg handig voor missies!
 ServerRPGMessage.CmdAskName:			/askname: Vraag om de naam van je doelwit om deze weer te geven. Je moet dit doen voordat je ze als vriend kunt toevoegen.

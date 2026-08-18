@@ -47,6 +47,8 @@ ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (o /at): Enciende el
 ServerRPGMessage.CmdMarket:				/market <open|close|name>: Despliega, renombra o cierra tu mercado personal.
 ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Automatiza tu cola de elaboración y compra fácilmente los ingredientes de recetas que te falten directamente de los comerciantes.
 ServerRPGMessage.CmdCombineList:		/combine list: Muestra las combinaciones de objetos de elaboración alternativa que has descubierto con éxito.
+ServerRPGMessage.CmdEvent:				/event: Muestra información sobre los eventos mundiales actuales.
+ServerRPGMessage.CmdEpicMount:			/epicmount: Controles de la montura voladora épica - Uso: /epicmount [cruise | move | target | left | right | stop | rise | down | land].
 ServerRPGMessage.CmdVol:				/vol o /steal <player>: ¡Roba dinero o preciosas Reliquias de Territorio a jugadores rivales! También te permite saquear los tesoros robados de los cofres de un clan rival en JcJ.
 ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Gira hacia la dirección donde se encuentra el monstruo (mob) especificado en tu región. ¡Muy útil para las misiones!
 ServerRPGMessage.CmdAskName:			/askname: Pregunta por el nombre de tu objetivo para mostrarlo. Debes hacer esto antes de poder agregarlo como amigo.

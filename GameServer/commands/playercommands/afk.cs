@@ -162,7 +162,7 @@ namespace DOL.GS.Commands
 
             if (p.TempProperties.getProperty<bool>("ArenaParticipant", false) || p.TempProperties.getProperty<bool>("ArenaQueued", false))
             {
-                p.Out.SendMessage("You cannot be AFK while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client, "Commands.Players.Afk.CannotWhileArena"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
             
@@ -172,7 +172,7 @@ namespace DOL.GS.Commands
                 int rm = wsdSrc.Spell?.ResurrectMana ?? 0;
                 string appearance = LanguageMgr.GetWarlockMorphAppearance(p.Client.Account.Language, rm);
                 p.Out.SendMessage(
-                    LanguageMgr.GetTranslation(p.Client, "Commands.Players.Afk.CannotWhilekMorphed", appearance),
+                    LanguageMgr.GetTranslation(p.Client, "Commands.Players.Afk.CannotWhileMorphed", appearance),
                     eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }

@@ -1,0 +1,51 @@
+
+ArenaManager.Betting.NoWinnerBet:				Personne n'a parié sur l'équipe gagnante ! La banque remporte la mise de {0} !
+ArenaManager.Betting.Win:						Vous avez GAGNÉ votre pari ! Gains : {0}
+ArenaManager.Betting.Lost:						Vous avez PERDU votre pari de {0}.
+ArenaManager.Betting.Distributed:				La cagnotte de {0} a été distribuée aux gagnants !
+ArenaManager.Betting.DebtCleared:				Vos gains ont automatiquement effacé votre dette bancaire !
+ArenaManager.Betting.Refunded:					Le tournoi a été annulé. Votre pari de {0} a été remboursé.
+ArenaManager.Queue.Opened:						Un nouveau tournoi [{0}] est ouvert ! Parlez à {1} pour rejoindre. Fermeture dans {2} minutes.
+ArenaManager.Queue.Joined:						Vous avez rejoint la file d'attente de l'arène {0}v{1}.
+ArenaManager.Queue.GroupJoined:					Votre groupe a rejoint la file de l'arène.
+ArenaManager.Queue.ReasonLeft:					Votre groupe a été retiré de l'arène car un membre a quitté le jeu.
+ArenaManager.Queue.ReasonDC:					Votre groupe a été retiré de l'arène car un membre s'est déconnecté.
+ArenaManager.Match.Cleaned:						L'Arène a été nettoyée et est prête pour de nouveaux défis !
+ArenaManager.Match.BetsClosed:					Les paris sont FERMÉS ! Que le combat commence !
+ArenaManager.Queue.RemovedNotEnough:			Vous avez été retiré de la file d'attente de l'arène car il manquait des joueurs pour former l'équipe.
+ArenaManager.Match.NotEnoughStart:				Pas assez de participants pour lancer le Tournoi d'Arène. Vous devez vous réinscrire.
+ArenaManager.Match.EndedNoTeams:				Le tournoi s'est terminé prématurément (Aucune équipe restante).
+ArenaManager.Match.Bye:							{0} passe automatiquement au tour suivant !
+ArenaManager.Match.RoundStart:					{0} : {1} vs {2}
+ArenaManager.Match.FinalRound:					MANCHE FINALE
+ArenaManager.Match.RoundNum:					MANCHE {0}
+ArenaManager.Match.ArenaMatchLog:				=== MATCH EN ARÈNE : [1] {0} vs [2] {1} ===
+ArenaManager.Match.BettingOpen:					Les paris sont ouverts (45s) ! Tapez /bet <1 ou 2> <or> !
+ArenaManager.Match.Winner:						Gagnant du {0} : {1}
+ArenaManager.Match.FinalWinner:					Gagnant de la FINALE : {0} !
+ArenaManager.Match.Survived:					Félicitations ! Vous avez survécu {0} manches et remporté le Tournoi d'Arène ! Vous recevez {1} PR, {2} PB, et {3} !
+ArenaManager.Match.ChestsSpawned:				Vos {0} coffres de récompense sont apparus près de vous !
+ArenaManager.Match.OOBWarning:					Vous avez quitté la zone ! Revenez dans les 15 secondes ou vous serez disqualifié !
+ArenaManager.Match.OOBDisqualified:				{0} a quitté l'arène.
+ArenaManager.Match.OOB5Sec:						Revenez dans l'arène ! Il reste 5 secondes !
+ArenaManager.Match.OOB10Sec:					Revenez dans l'arène ! Il reste 10 secondes !
+ArenaManager.Match.OOBReturned:					Vous êtes de retour dans la zone de l'arène.
+ArenaManager.Match.TeamDisqualified:			Votre équipe a été disqualifiée : {0}
+ArenaManager.Match.TooManyLeft:					Trop de participants ont quitté le tournoi. Il n'y a plus assez de participants !
+ArenaManager.Match.Cancelled:					Tournoi d'Arène annulé : {0}
+ArenaManager.Match.MemberLeftRegion:			{0} a quitté la zone ou s'est déconnecté.
+ArenaManager.Match.RoundStart.Normal:			MANCHE {0} : {1} vs {2}
+ArenaManager.Match.RoundStart.Final:			MANCHE FINALE : {0} vs {1}
+ArenaManager.Match.Winner.Normal:				Gagnant manche {0} : {1}
+ArenaManager.Match.Winner.Final:				Gagnant de la FINALE : {0} !
+ArenaManager.Debug.ForceShutdown:				Fermeture forcée par un GM.
+ArenaManager.Debug.ShutdownMsg:					Fermeture forcée de la session d'Arène.
+ArenaManager.Debug.Override:					Contrôle Debug.
+ArenaManager.Debug.ForcedSolo:					Vous avez forcé un match solo. Vous êtes un combattant actif.
+ArenaManager.Debug.ForcedSpectator:				Vous avez forcé un match et rejoint en spectateur.
+ArenaManager.Debug.SwitchedSpectator:			Vous êtes passé en mode spectateur.
+ArenaManager.Debug.SwitchedFighter:				Vous êtes passé en mode combattant.
+ArenaManager.SoloVsSolo:						Solo vs Solo
+ArenaManager.Chest.Scrolls:						Coffre de parchemins magiques
+ArenaManager.Chest.Armaments:					Coffre d'armures et d'armes
+ArenaManager.Chest.Jewellery:					Coffre de bijoux magiques

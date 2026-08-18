@@ -56,6 +56,13 @@ ServerRules.AbstractServerRules.ReceiveMoney:						Vous recevez {0}
 ServerRules.AbstractServerRules.CantSpeakWhileDead:					Hmmm… vous ne pouvez pas {0} en étant mort·e !
 ServerRules.AbstractServerRules.Housing.UnknownMerchantType:		Type de marchand inconnu !
 ServerRules.AbstractServerRules.Housing.ConsignmentMerchantName:	Commissaire-priseur
+ServerRules.AbstractServerRules.Arena.CannotInterfere:				Vous ne pouvez pas interférer avec les participants de l'Arène.
+ServerRules.AbstractServerRules.Arena.CannotAssistEnemy:			Vous ne pouvez pas assister l'équipe ennemie.
+ServerRules.AbstractServerRules.Arena.RoundBonus:					Bonus de la Manche {0} de l'Arène : +{1}% PR !
+ServerRules.AbstractServerRules.CannotAttackPlayerAFK:				Vous ne pouvez pas attaquer un joueur AFK.
+ServerRules.AbstractServerRules.CannotInteractPlayerAFK:			Vous ne pouvez pas interagir avec un joueur AFK.
+ServerRules.AbstractServerRules.CannotInteractWithOtherAFK:			Vous ne pouvez pas interagir avec les autres en étant AFK.
+ServerRules.AbstractServerRules.CannotCastPlayerAFK:				Vous ne pouvez lancer aucun sort sur un joueur AFK.
 
 # /DemonsBreachJumpPoint
 DemonsBreachJumpPoint.Requirements:									Vous ne remplissez pas les conditions pour entrer dans cette région !

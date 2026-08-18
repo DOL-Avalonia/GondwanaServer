@@ -47,6 +47,8 @@ ServerRPGMessage.CmdAutotranslate:		/autotranslate <on|off> (hoặc /at): Bật 
 ServerRPGMessage.CmdMarket:				/market <open|close|name>: Triển khai, đổi tên hoặc đóng khu chợ cá nhân của bạn.
 ServerRPGMessage.CmdCraft:				/craftmacro <set|clear|show|buy|buyto>: Tự động hóa hàng đợi chế tạo của bạn và dễ dàng mua các nguyên liệu công thức còn thiếu trực tiếp từ các thương gia.
 ServerRPGMessage.CmdCombineList:		/combine list: Hiển thị các sự kết hợp vật phẩm chế tạo thay thế mà bạn đã khám phá thành công.
+ServerRPGMessage.CmdEvent:				/event: Hiển thị thông tin liên quan đến các sự kiện thế giới hiện tại.
+ServerRPGMessage.CmdEpicMount:			/epicmount: Điều khiển thú cưỡi bay sử thi - Cách sử dụng: /epicmount [cruise | move | target | left | right | stop | rise | down | land].
 ServerRPGMessage.CmdVol:				/vol hoặc /steal <player>: Đánh cắp tiền hoặc các Thánh tích Lãnh thổ quý giá từ người chơi đối thủ! Nó cũng cho phép bạn chôm chỉa những kho báu bị cướp từ rương của một bang hội đối lập trong PvP.
 ServerRPGMessage.CmdFaceMob:			/facemob <mobname>: Quay người về hướng có chứa quái vật (mob) được chỉ định trong khu vực của bạn. Rất hữu ích cho các nhiệm vụ!
 ServerRPGMessage.CmdAskName:			/askname: Hỏi tên mục tiêu của bạn để hiển thị nó. Bạn phải thực hiện việc này trước khi có thể kết bạn với họ.

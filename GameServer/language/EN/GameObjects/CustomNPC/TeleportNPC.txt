@@ -5,6 +5,7 @@ TeleportNPC.YouAreNotOutlaw:            Move along, there is nothing to see here
 TeleportNPC.NoPassword:                 Good day, my lord. How can I help you?
 TeleportNPC.UnknownDestination:         I do not know this destination.
 TeleportNPC.NoTPCombat:                 You can't be teleported while in combat!
+TeleportNPC.NoEnterInArena:				I can't teleport you while you're queued for or participating in an Arena Tournament.
 TeleportNPC.NotInOwnedTerritory:        Good day, my lord. I regret to inform you that I must refuse you my services, as our territory is not a vassal of your guild!
 TeleportNPC.EventNotOccurred:			The event "{0}" has not yet occurred.
 TeleportNPC.TooLittleExperience:		You have too little experience to go there, come back later!

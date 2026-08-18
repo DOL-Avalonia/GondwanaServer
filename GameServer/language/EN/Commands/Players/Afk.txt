@@ -16,7 +16,8 @@ Commands.Players.Afk.CannotWhileStunned:	You can't be AFK while while you're stu
 Commands.Players.Afk.CannotWhileMezzed:		You can't be AFK while while you're mezzed.
 Commands.Players.Afk.CannotWhileDamned:		You can't be AFK while while you're damned.
 Commands.Players.Afk.CannotWhileCrafting:	You can't be AFK while while you're crafting!
-Commands.Players.Afk.CannotWhilekMorphed:	You can't be AFK while you're under a "{0}" enchantment!
+Commands.Players.Afk.CannotWhileMorphed:	You can't be AFK while you're under a "{0}" enchantment!
+Commands.Players.Afk.CannotWhileArena:		You can't be AFK while queued for or participating in an Arena Tournament.
 Commands.Players.AfkAttack.On:				You are now AFK training.
 Commands.Players.AfkAttack.Off:				You interrupt your AFK training.
 Commands.Players.AfkAttack.NeedDummyTarget:	You have to select a training dummy!

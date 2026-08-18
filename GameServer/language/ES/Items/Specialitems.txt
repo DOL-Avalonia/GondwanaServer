@@ -19,7 +19,7 @@ Items.Specialitems.GuarkRingUsageCombat:			¡No puedes usar magia celestial mien
 Items.Specialitems.GuarkRingUsageHere:				La magia celestial no existe en este lugar.
 Items.Specialitems.GuarkRingUsageJailed:			¡No puedes usar magia celestial mientras estás encarcelado!
 Items.Specialitems.GuarkRingUsageMounted:			¡No puedes usar magia celestial desde una montura!
-Items.Specialitems.GuarkRingUsageStealthed:			No puedes usar magia celestial mientras estás en sigilo.
+Items.Specialitems.GuarkRingUsageStealthed:			¡No puedes usar magia celestial mientras estás en sigilo.
 Items.Specialitems.GuarkRingUsagePetrified:			¡No puedes usar magia celestial mientras estás petrificado!
 Items.Specialitems.GuarkRingUsageDamned:			¡No puedes usar magia celestial mientras estás maldito!
 Items.Specialitems.GuarkRingUsageCantThisForm:		¡No puedes usar magia celestial mientras estás en esta forma!
@@ -30,6 +30,7 @@ Items.Specialitems.GuarkRingUsageStealing:			¡No puedes usar magia celestial mi
 Items.Specialitems.GuarkRingUsageAFK:				¡No puedes usar magia celestial mientras estás AFK!
 Items.Specialitems.GuarkRingUsageClimbing:			¡No puedes usar magia celestial mientras escalas!
 Items.Specialitems.GuarkRingUsageRelic:				No puedes usar magia celestial mientras llevas una reliquia de territorio.
+Items.Specialitems.GuarkRingUsageArena:				No puedes usar magia celestial mientras participas en un torneo de arena.
 Items.Specialitems.GuarkRingCannotUseHere:			No puedes usar este objeto aquí.
 Items.Specialitems.GuarkRingDoNotMove:				Debes permanecer en el mismo lugar para usar este objeto.
 Items.Specialitems.GuarkRingWaitBeforeUse:			Has estado en combate recientemente, por lo que debes esperar para poder usar este objeto de nuevo.
@@ -47,3 +48,18 @@ Items.Specialitems.DieTriggerSpell.FailDestroy:		¡Fallo al destruir el objeto p
 Items.Specialitems.DieTriggerSpell.FailRez:			La maldición que afecta a tu cadáver es demasiado fuerte aquí, ¡el hechizo de resurrección fracasa!
 
 Items.Specialitems.AfkXpToken.DepletedRemoved:		Tu {0} se ha agotado y ha sido eliminado de tu inventario.
+
+Items.Specialitems.PasswordCurseItemUsageCombat:	¡No puedes usar este objeto mientras estás en combate!
+Items.Specialitems.PasswordCurseItemUsageJailed:	¡No puedes usar este objeto mientras estás encarcelado!
+Items.Specialitems.PasswordCurseItemUsageMounted:	¡No puedes usar este objeto mientras estás en tu montura!
+Items.Specialitems.PasswordCurseItemUsageStealthed:	No puedes usar este objeto mientras estás en sigilo.
+Items.Specialitems.PasswordCurseItemUsagePetrified:	¡No puedes usar este objeto mientras estás petrificado!
+Items.Specialitems.PasswordCurseItemUsageDamned:	¡No puedes usar este objeto mientras estás condenado!
+Items.Specialitems.PasswordCurseItemUsageMorphed:	¡No puedes usar este objeto mientras estás bajo el encantamiento de "{0}"!
+Items.Specialitems.PasswordCurseItemUsageCrafting:	¡No puedes usar este objeto mientras estás fabricando!
+Items.Specialitems.PasswordCurseItemUsageDuel:		¡No puedes usar este objeto mientras estás en un duelo!
+Items.Specialitems.PasswordCurseItemUsageStealing:	¡No puedes usar este objeto mientras le robas a otro jugador!
+Items.Specialitems.PasswordCurseItemUsageAFK:		¡No puedes usar este objeto mientras estás AFK!
+Items.Specialitems.PasswordCurseItemUsageClimbing:	¡No puedes usar este objeto mientras escalas!
+Items.Specialitems.PasswordCurseItemUsageRelic:		No puedes usar este objeto mientras llevas una reliquia de territorio.
+Items.Specialitems.PasswordCurseItemUsageArena:		No puedes usar este objeto mientras participas en un Torneo de Arena.

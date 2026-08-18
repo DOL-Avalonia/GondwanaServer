@@ -56,6 +56,13 @@ ServerRules.AbstractServerRules.ReceiveMoney:						You receive {0}
 ServerRules.AbstractServerRules.CantSpeakWhileDead:					Hmmmm… you can't {0} while dead!
 ServerRules.AbstractServerRules.Housing.UnknownMerchantType:		Unknown merchant type!
 ServerRules.AbstractServerRules.Housing.ConsignmentMerchantName:	Consignment Merchant
+ServerRules.AbstractServerRules.Arena.CannotInterfere:				You cannot interfere with Arena participants.
+ServerRules.AbstractServerRules.Arena.CannotAssistEnemy:			You cannot assist the enemy team.
+ServerRules.AbstractServerRules.Arena.RoundBonus:					Arena Round {0} Bonus: +{1}% RP!
+ServerRules.AbstractServerRules.CannotAttackPlayerAFK:				You cannot attack an AFK player.
+ServerRules.AbstractServerRules.CannotInteractPlayerAFK:			You cannot interact with an AFK player.
+ServerRules.AbstractServerRules.CannotInteractWithOtherAFK:			You cannot interact with others while AFK.
+ServerRules.AbstractServerRules.CannotCastPlayerAFK:				You cannot cast spells on an AFK player.
 
 # /DemonsBreachJumpPoint
 DemonsBreachJumpPoint.Requirements:									You do not meet the requirements to enter this region!

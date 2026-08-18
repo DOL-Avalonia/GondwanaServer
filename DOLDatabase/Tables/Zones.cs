@@ -48,6 +48,7 @@ namespace DOL
             private bool m_allowReputation;
             private float m_tensionRate = 1.0f;
             private bool m_isDungeon;
+            private int m_maxFlyAltitude = 10000;
 
             public Zones()
             {
@@ -325,6 +326,21 @@ namespace DOL
                 set
                 {
                     m_isDungeon = value;
+                    Dirty = true;
+                }
+            }
+
+            [DataElement(AllowDbNull = false)]
+            public int MaxFlyAltitude
+            {
+                get
+                {
+                    return m_maxFlyAltitude;
+                }
+
+                set
+                {
+                    m_maxFlyAltitude = value;
                     Dirty = true;
                 }
             }

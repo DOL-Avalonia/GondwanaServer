@@ -1,0 +1,24 @@
+
+BankLoanMgr.HasLoan:							You already have an active loan.
+BankLoanMgr.IsDebtor:							You cannot get a loan while you are marked as a debtor.
+BankLoanMgr.Restricted:							You are restricted from making loans due to previous debts.
+BankLoanMgr.MinFunds:							You do not have the minimum required funds in your bank ({0}).
+BankLoanMgr.HasCoupon:							You already have a loan coupon in your inventory or vault.
+BankLoanMgr.InventoryFull:						Your inventory is full. Please clear some space.
+BankLoanMgr.ReceivedCoupon:						You received a {0}. The loan countdown triggers when used at a merchant.
+BankLoanMgr.NotValidUse:						I noted you have a loan, but it isn't necessary or valid to use it for an item like this.
+BankLoanMgr.Cashed:								I've cashed your loan coupon of {0}g. The bank will withdraw daily payments.
+BankLoanMgr.NoActiveLoan:						You don't have an active loan.
+BankLoanMgr.RepaidEarly:						You have successfully repaid your loan early for {0} with a reduced interest rate.
+BankLoanMgr.NeedFundsEarly:						You need {0} in total to be able to repay your loan early.
+BankLoanMgr.WithdrewPocket:						The bank withdrew {0} from your pocket for your loan.
+BankLoanMgr.WithdrewPartially:					The bank withdrew {0} from your pocket to partially cover your loan.
+BankLoanMgr.WarningDebt:						WARNING: Your bank account is in debt. You have {0} to reimburse your debt or your assets will be seized!
+BankLoanMgr.AutoActivateOnly:					This loan coupon can only be activated automatically when making an expensive purchase at a merchant.
+BankLoanMgr.TimeUnit.Seconds:					seconds
+BankLoanMgr.TimeUnit.Hour:						hour
+BankLoanMgr.TimeUnit.Hours:						hours
+BankLoanMgr.BankerName:							Banker
+BankLoanMgr.JailReason.HouseSeized:				Unpaid Debt - Properties Seized.
+BankLoanMgr.JailReason.HorseSeized:				Unpaid Debt - Mount Seized.
+BankLoanMgr.JailReason.UnpaidDebt:				Unpaid Debt.

@@ -7788,7 +7788,7 @@ namespace DOL.GS
                                     {
                                         if (obj != ad.Target)
                                         {
-                                            this.MakeAttack(obj, attackWeapon, null, 1, ServerProperties.Properties.SPELL_INTERRUPT_DURATION, false, false);
+                                            this.MakeAttack(obj, attackWeapon, null, 1, Properties.SPELL_INTERRUPT_DURATION, false, false);
                                         }
                                     }
                                 }
@@ -10093,7 +10093,7 @@ namespace DOL.GS
                             }
                             else
                             {
-                                Out.SendMessage($"Your {item.Name} lost condition upon your death.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.ConditionLostOnDeath", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
                     }
@@ -10128,7 +10128,7 @@ namespace DOL.GS
 
                 if (m_releaseType == eReleaseType.Arena)
                 {
-                    Out.SendMessage("You have been defeated! You will be automatically resurrected when the match progresses.", eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.ArenaDefeated"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
                 }
                 else
                 {
@@ -11547,12 +11547,12 @@ namespace DOL.GS
 
                     if (isPotion && !Properties.ARENA_ALLOW_POTIONS)
                     {
-                        Out.SendMessage("You cannot use potions during an Arena Contest.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.ArenaNoPotions"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         return;
                     }
                     if (isScroll)
                     {
-                        Out.SendMessage("You cannot use scrolls during an Arena Contest.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.ArenaNoScrolls"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         return;
                     }
                 }
@@ -11573,6 +11573,36 @@ namespace DOL.GS
                     case Slot.HORSE:
                         if (type == 0)
                         {
+                            InventoryItem horseItem = Inventory.GetItem(eInventorySlot.Horse);
+                            ushort epicModelId;
+                            string epicMountName;
+                            bool isEpicFlyingMount = IsEpicFlyingMount(horseItem, out epicModelId, out epicMountName);
+
+                            if (isEpicFlyingMount)
+                            {
+                                int maxAlt = CurrentZone != null ? CurrentZone.MaxFlyAltitude : 10000;
+                                int waterLvl = CurrentZone != null ? CurrentZone.Waterlevel : 0;
+
+                                if (maxAlt <= 0 || (waterLvl != 0 && maxAlt <= waterLvl))
+                                {
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+                                if (this.IsSwimming || this.IsDiving || this.IsUnderwater || (waterLvl != 0 && this.Position.Z <= waterLvl))
+                                {
+                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    return;
+                                }
+                            }
+
+                            if (isEpicFlyingMount && IsRiding && Steed is GameEpicFlyingMount fm)
+                            {
+                                DismountSteed(true);
+                                fm.Delete();
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.EpicMountDismiss"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
                             if (IsOnHorse)
                                 IsOnHorse = false;
                             else
@@ -11584,16 +11614,16 @@ namespace DOL.GS
                                 }
 
                                 string reason = GameServer.ServerRules.ReasonForDisallowMounting(this);
-                                bool isEpicMount = useItem != null && useItem.Model == 2912 && useItem.SPD_ABS >= 49 && useItem.SPD_ABS <= 63;
+                                bool isEpicMountLegacy = useItem != null && useItem.Model == 2912 && useItem.SPD_ABS >= 49 && useItem.SPD_ABS <= 61;
 
-                                if (m_radioactiveAreaCount > 0 && !isEpicMount)
+                                if (m_radioactiveAreaCount > 0 && !(isEpicMountLegacy || isEpicFlyingMount))
                                 {
                                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.RadiationMountFail"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     StopWhistleTimers();
                                     return;
                                 }
 
-                                if (IsDamned && !isEpicMount)
+                                if (IsDamned && !(isEpicMountLegacy || isEpicFlyingMount))
                                 {
                                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.CantMountDamned"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     StopWhistleTimers();
@@ -11641,9 +11671,19 @@ namespace DOL.GS
                                     effects.Cancel(false);
                                 if (effect != null)
                                     effect.Cancel(false);
+
                                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.WhistleMount"), eChatType.CT_Emote, eChatLoc.CL_SystemWindow);
                                 m_whistleMountTimer = new RegionTimer(this);
-                                m_whistleMountTimer.Callback = new RegionTimerCallback(WhistleMountTimerCallback);
+
+                                if (isEpicFlyingMount)
+                                {
+                                    TempProperties.setProperty("epicModelId", epicModelId);
+                                    TempProperties.setProperty("epicMountName", epicMountName);
+                                    m_whistleMountTimer.Callback = new RegionTimerCallback(WhistleEpicFlyingMountTimerCallback);
+                                }
+                                else
+                                    m_whistleMountTimer.Callback = new RegionTimerCallback(WhistleMountTimerCallback);
+
                                 m_whistleMountTimer.Start(5000);
                             }
                         }
@@ -11828,6 +11868,33 @@ namespace DOL.GS
                 }
                 // notify event handlers about used slot
                 Notify(GamePlayerEvent.UseSlot, this, new UseSlotEventArgs(slot, type, useItem));
+            }
+        }
+
+        /// <summary>
+        /// Checks if an item is a valid Epic Flying Mount and translates the Model ID
+        /// </summary>
+        public static bool IsEpicFlyingMount(InventoryItem item, out ushort modelId, out string mountName)
+        {
+            modelId = 0;
+            mountName = "";
+            if (item == null) return false;
+
+            switch (item.SPD_ABS)
+            {
+                case 62: modelId = 765; mountName = "Wyvern"; return true;
+                case 63: modelId = 696; mountName = "Winged Gryphon"; return true;
+                case 64: modelId = 824; mountName = "Cicada"; return true;
+                case 65: modelId = 843; mountName = "Rencan"; return true;
+                case 66: modelId = 990; mountName = "Harpy"; return true;
+                case 67: modelId = 1206; mountName = "Winged Scarab"; return true;
+                case 68: modelId = 1207; mountName = "DragonFly Mount"; return true;
+                case 69: modelId = 2237; mountName = "Winged DemonWolf"; return true;
+                case 70: modelId = 2276; mountName = "Dracolich"; return true;
+                case 71: modelId = 2303; mountName = "Stone Dragon"; return true;
+                case 72: modelId = 2307; mountName = "Glimmer Dragon"; return true;
+                case 73: modelId = 2309; mountName = "Wolf Dragon"; return true;
+                default: return false;
             }
         }
 
@@ -12424,7 +12491,7 @@ namespace DOL.GS
                                 int toAdd = Math.Min(remaining, template.MaxCount > 0 ? template.MaxCount : 1);
                                 InventoryItem newDbItem;
 
-                                if (template.Template is ItemUnique unique)
+                                if (template.Template is ItemUnique unique && !template.IsStackable)
                                 {
                                     ItemUnique newUnique = new ItemUnique(unique);
                                     GameServer.Database.AddObject(newUnique);
@@ -12447,6 +12514,7 @@ namespace DOL.GS
                                 else
                                     GameServer.Database.SaveObject(newDbItem);
 
+                                vault.OnAddItem(this, newDbItem);
                                 updatedItems[newDbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = newDbItem;
                                 usedSlots[i] = true;
                                 remaining -= toAdd;
@@ -12544,7 +12612,7 @@ namespace DOL.GS
                                 {
                                     newDbItem = item;
                                 }
-                                else if (item.Template is ItemUnique unique)
+                                else if (item.Template is ItemUnique unique && !item.IsStackable)
                                 {
                                     ItemUnique newUnique = new ItemUnique(unique);
                                     GameServer.Database.AddObject(newUnique);
@@ -12575,6 +12643,7 @@ namespace DOL.GS
                                 else
                                     GameServer.Database.SaveObject(newDbItem);
 
+                                vault.OnAddItem(this, newDbItem);
                                 updatedItems[newDbItem.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = newDbItem;
                                 usedSlots[i] = true;
                                 remaining -= toAdd;
@@ -13000,7 +13069,7 @@ namespace DOL.GS
         {
             if (this.TempProperties.getProperty<bool>("ArenaParticipant", false) || this.TempProperties.getProperty<bool>("ArenaQueued", false))
             {
-                this.Out.SendMessage("You cannot mount while participating in an Arena Contest.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                this.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.CantMountArena"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
@@ -15406,7 +15475,7 @@ namespace DOL.GS
                     {
                         if (item.Template != null && (item.Template.Flags == 44 || item.Template.Flags == 45))
                         {
-                            Out.SendMessage($"You cannot drop {item.Name} while it is equipped.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.CannotDropEquipped", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             return false;
                         }
                     }
@@ -18962,7 +19031,9 @@ namespace DOL.GS
                 return 0;
             });
             _isAfkDelayElapsed = false;
-            _afkDelayTimer.Start(30_000);
+
+            int delay = (IsInPvP || IsInRvR) ? 60_000 : 30_000;
+            _afkDelayTimer.Start(delay);
 
             // 2) kickout
             int kickoutMs = Properties.AFK_TIMEOUT * 60 * 1000;
@@ -18979,6 +19050,11 @@ namespace DOL.GS
 
         private void StartAfkCooldown(int ms = 30_000)
         {
+            if (IsInPvP || IsInRvR)
+            {
+                ms *= 2;
+            }
+
             _afkDelayTimer?.Stop();
             _afkDelayTimer = new RegionTimer(this, _ =>
             {
@@ -20105,6 +20181,61 @@ namespace DOL.GS
             IsOnHorse = true;
             if (IsSitting)
                 IsSitting = false;
+            return 0;
+        }
+
+        protected int WhistleEpicFlyingMountTimerCallback(RegionTimer callingTimer)
+        {
+            StopWhistleTimers();
+
+            InventoryItem horseItem = Inventory.GetItem(eInventorySlot.Horse);
+            ushort modelId = TempProperties.getProperty<ushort>("epicModelId", (ushort)696);
+            string mountName = TempProperties.getProperty<string>("epicMountName", "Epic Mount");
+
+            TempProperties.removeProperty("epicModelId");
+            TempProperties.removeProperty("epicMountName");
+
+            if (!IsEpicFlyingMount(horseItem, out _, out _))
+                return 0;
+
+            int maxAlt = CurrentZone != null ? CurrentZone.MaxFlyAltitude : 10000;
+            int waterLevel = CurrentZone != null ? CurrentZone.Waterlevel : 0;
+
+            if (maxAlt <= 0 || (waterLevel != 0 && maxAlt <= waterLevel))
+            {
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.EpicMountNoZone"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return 0;
+            }
+
+            if (IsSwimming || IsDiving || IsUnderwater || (waterLevel != 0 && this.Position.Z <= waterLevel))
+            {
+                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return 0;
+            }
+
+            if (IsSitting)
+                Sit(false);
+
+            foreach (GameNPC npc in CurrentRegion.GetNPCsInRadius(Coordinate, 2000, false, false).OfType<GameNPC>())
+            {
+                if (npc is GameEpicFlyingMount fm && fm.Owner == this)
+                {
+                    fm.Delete();
+                }
+            }
+
+            GameEpicFlyingMount steed = new GameEpicFlyingMount();
+            steed.Owner = this;
+            steed.Model = modelId;
+            steed.Name = this.Name + "'s " + mountName;
+            steed.Realm = this.Realm;
+            steed.CurrentRegionID = this.CurrentRegionID;
+            steed.Position = this.Position;
+            steed.AddToWorld();
+
+            this.MountSteed(steed, true);
+
+            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall", mountName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return 0;
         }
 

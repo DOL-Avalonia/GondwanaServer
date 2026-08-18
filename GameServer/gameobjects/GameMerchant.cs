@@ -682,7 +682,17 @@ namespace DOL.GS
                     newItem.Count = toCurrencyItemCount;
 
                     if (!player.Inventory.AddTemplate(newItem, newItem.Count, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
-                        player.CreateItemOnTheGround(newItem);
+                    {
+                        if (player.TryAddToStorageBagTemplate(newItem, newItem.Count))
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", newItem.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        else
+                        {
+                            player.CreateItemOnTheGround(newItem);
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround", newItem.Name), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+                    }
 
                     var playerItem = player.Inventory.GetItem((eInventorySlot)item.SlotPosition);
                     playerItem.Count -= toCurrencyItemCount * toCurrencyRate / fromCurrencyRate;

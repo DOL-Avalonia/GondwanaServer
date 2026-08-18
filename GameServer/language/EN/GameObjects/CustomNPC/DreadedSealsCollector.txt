@@ -1,0 +1,9 @@
+
+DreadedSealCollector.NoLevelMultipliers:	Sorry, no level multipliers are defined so I cannot accept seals at this time.
+DreadedSealCollector.GiveBPRP:				Hand me Dreaded Seals and I'll give you Bounty and Realm points!
+DreadedSealCollector.GiveBP:				Hand me Dreaded Seals and I'll give you Bounty points!
+DreadedSealCollector.GiveRP:				Hand me Dreaded Seals and I'll give you Realm points!
+DreadedSealCollector.NoSealTypes:			Sorry, no dreaded seal types are defined so I cannot accept seals at this time.
+DreadedSealCollector.TooFar:				You are too far away to give anything to me {0}. Come a little closer.
+DreadedSealCollector.CannotAcceptType:		Sorry, I cannot accept items of that type.
+DreadedSealCollector.TooYoung:				You are too young yet to make use of these items {0}. Come back in {1} levels.

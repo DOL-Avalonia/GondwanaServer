@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DOL.Database;
 using DOL.AI.Brain;
+using log4net;
 using DOL.GS.PacketHandler;
 using DOL.Language;
 using DOL.GS.Scripts;
@@ -11,7 +12,7 @@ namespace DOL.GS
 {
     public class LootGeneratorBloodVials : LootGeneratorBase
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         // O(1) hashset for extremely fast model lookups
         private static readonly HashSet<ushort> SpecialSapModels = new HashSet<ushort>
@@ -53,7 +54,6 @@ namespace DOL.GS
 
         public static void HandlePlayerVialLoot(GamePlayer killer, GamePlayer victim, LootList loot = null)
         {
-            // Safeguards
             if (killer.Reputation >= 0) return;
             if (killer.IsInPvP || killer.IsInRvR || killer.CurrentRegion.IsRvR) return;
             if (killer.DuelTarget == victim) return;
@@ -192,6 +192,7 @@ namespace DOL.GS
                         uT.MaxCondition = mob.Level;
                         uT.Price = price;
                         uT.Model = GetVialModel(bloodType, mob.BodyType);
+                        uT.Dirty = true;
                         GameServer.Database.SaveObject(uT);
                     }
 
@@ -199,7 +200,7 @@ namespace DOL.GS
                     UpdateVialUI(player, tempVial);
 
                     string translatedName = LanguageMgr.GetItemNameMessage(player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage, newVialName);
-                    player.Out.SendMessage($"You filled your {translatedName}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "Lootgenerator.LootGeneratorBloodVials.Filled", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
             else
@@ -298,19 +299,23 @@ namespace DOL.GS
 
         private static bool RemoveEmptyVial(GamePlayer player, InventoryItem emptyVial)
         {
+            var bag = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack).OfType<StorageBagItem>().FirstOrDefault(b => b.ObjectId == emptyVial.OwnerID);
+            StorageBagVault vault = bag != null ? new StorageBagVault(player, bag) : null;
+
             if (emptyVial.SlotPosition >= (int)eInventorySlot.HouseVault_First)
             {
                 if (emptyVial.Count > 1)
                 {
                     emptyVial.Count--;
                     GameServer.Database.SaveObject(emptyVial);
+                    if (vault != null) vault.OnAddItem(player, emptyVial);
                 }
                 else
                 {
                     GameServer.Database.DeleteObject(emptyVial);
+                    if (vault != null) vault.OnRemoveItem(player, emptyVial);
                 }
 
-                var bag = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack).OfType<StorageBagItem>().FirstOrDefault(b => b.ObjectId == emptyVial.OwnerID);
                 if (bag != null) bag.InvalidateWeightCache();
                 return true;
             }
@@ -335,7 +340,7 @@ namespace DOL.GS
                 }
 
                 GameServer.Database.DeleteObject(item);
-                if (item.Template is ItemUnique u) { try { if (u.IsPersisted) GameServer.Database.DeleteObject(u); } catch { } }
+                if (item.Template is ItemUnique u && u.Id_nb != null && u.Id_nb.StartsWith("vt_")) { try { if (u.IsPersisted) GameServer.Database.DeleteObject(u); } catch { } }
 
                 if (activeVault != null && player.ActiveInventoryObject is StorageBagVault currentActive && currentActive.GetOwner(player) == item.OwnerID)
                 {
@@ -348,7 +353,7 @@ namespace DOL.GS
             {
                 if (player.Inventory.RemoveItem(item))
                 {
-                    if (item.Template is ItemUnique u) { try { if (u.IsPersisted) GameServer.Database.DeleteObject(u); } catch { } }
+                    if (item.Template is ItemUnique u && u.Id_nb != null && u.Id_nb.StartsWith("vt_")) { try { if (u.IsPersisted) GameServer.Database.DeleteObject(u); } catch { } }
                 }
             }
         }
@@ -406,6 +411,7 @@ namespace DOL.GS
             {
                 uF.Price = price;
                 uF.Model = model;
+                uF.Dirty = true;
                 GameServer.Database.SaveObject(uF);
             }
 
@@ -419,21 +425,38 @@ namespace DOL.GS
 
             if (originVial != null && originVial.SlotPosition >= (int)eInventorySlot.HouseVault_First)
             {
-                fullInvItem.SlotPosition = originVial.SlotPosition;
-                fullInvItem.OwnerID = originVial.OwnerID;
-
                 var bag = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack).OfType<StorageBagItem>().FirstOrDefault(b => b.ObjectId == originVial.OwnerID);
                 if (bag != null)
                 {
                     var vault = new StorageBagVault(player, bag);
-                    vault.OnAddItem(player, fullInvItem);
-                    bag.InvalidateWeightCache();
+
+                    bool slotIsEmpty = true;
+                    lock (bag.CachedItems)
+                    {
+                        if (bag.CachedItems.ContainsKey(originVial.SlotPosition))
+                            slotIsEmpty = false;
+                    }
+
+                    if (slotIsEmpty)
+                    {
+                        fullInvItem.SlotPosition = originVial.SlotPosition;
+                        fullInvItem.OwnerID = originVial.OwnerID;
+
+                        GameServer.Database.AddObject(fullInvItem);
+                        vault.OnAddItem(player, fullInvItem);
+                        bag.InvalidateWeightCache();
+                        added = true;
+                        UpdateVialUI(player, fullInvItem);
+                    }
+                    else
+                    {
+                        if (vault.AddItem(player, fullInvItem))
+                        {
+                            added = true;
+                            bag.InvalidateWeightCache();
+                        }
+                    }
                 }
-
-                GameServer.Database.AddObject(fullInvItem);
-                added = true;
-
-                UpdateVialUI(player, fullInvItem);
             }
             else
             {
@@ -449,7 +472,7 @@ namespace DOL.GS
             if (added)
             {
                 InventoryLogging.LogInventoryAction(player, "", "Player Vial Extraction", eInventoryActionType.Loot, fullInvItem, 1);
-                player.Out.SendMessage($"You extracted a full {translatedName}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "Lootgenerator.LootGeneratorBloodVials.Extracted", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
             else
             {
@@ -463,7 +486,7 @@ namespace DOL.GS
                     drop.Position = player.Position;
                     drop.AddToWorld();
                 }
-                player.Out.SendMessage($"Your backpack is full! The {translatedName} falls to the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "TextNPC.InventoryFullItemGround", translatedName), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -508,6 +531,7 @@ namespace DOL.GS
                 uF.MaxCondition = mobLevel;
                 uF.Price = price;
                 uF.Model = GetVialModel(bloodType, bodyType);
+                uF.Dirty = true;
                 GameServer.Database.SaveObject(uF);
             }
 
@@ -521,21 +545,38 @@ namespace DOL.GS
 
             if (originVial != null && originVial.SlotPosition >= (int)eInventorySlot.HouseVault_First)
             {
-                fullInvItem.SlotPosition = originVial.SlotPosition;
-                fullInvItem.OwnerID = originVial.OwnerID;
-
                 var bag = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack).OfType<StorageBagItem>().FirstOrDefault(b => b.ObjectId == originVial.OwnerID);
                 if (bag != null)
                 {
                     var vault = new StorageBagVault(player, bag);
-                    vault.OnAddItem(player, fullInvItem);
-                    bag.InvalidateWeightCache();
+
+                    bool slotIsEmpty = true;
+                    lock (bag.CachedItems)
+                    {
+                        if (bag.CachedItems.ContainsKey(originVial.SlotPosition))
+                            slotIsEmpty = false;
+                    }
+
+                    if (slotIsEmpty)
+                    {
+                        fullInvItem.SlotPosition = originVial.SlotPosition;
+                        fullInvItem.OwnerID = originVial.OwnerID;
+
+                        GameServer.Database.AddObject(fullInvItem);
+                        vault.OnAddItem(player, fullInvItem);
+                        bag.InvalidateWeightCache();
+                        added = true;
+                        UpdateVialUI(player, fullInvItem);
+                    }
+                    else
+                    {
+                        if (vault.AddItem(player, fullInvItem))
+                        {
+                            added = true;
+                            bag.InvalidateWeightCache();
+                        }
+                    }
                 }
-
-                GameServer.Database.AddObject(fullInvItem);
-                added = true;
-
-                UpdateVialUI(player, fullInvItem);
             }
             else
             {
@@ -555,7 +596,7 @@ namespace DOL.GS
                 else
                     InventoryLogging.LogInventoryAction(player, "", "Combine Vials", eInventoryActionType.Other, fullInvItem, 1);
 
-                player.Out.SendMessage($"You collected a full {translatedName}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "Lootgenerator.LootGeneratorBloodVials.Collected", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
             else
             {
@@ -569,7 +610,7 @@ namespace DOL.GS
                     drop.Position = player.Position;
                     drop.AddToWorld();
                 }
-                player.Out.SendMessage($"Your backpack is full! The {translatedName} falls to the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "TextNPC.InventoryFullItemGround", translatedName), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -609,21 +650,51 @@ namespace DOL.GS
 
             if (originVial != null && originVial.SlotPosition >= (int)eInventorySlot.HouseVault_First)
             {
-                tempInvItem.SlotPosition = originVial.SlotPosition;
-                tempInvItem.OwnerID = originVial.OwnerID;
-                GameServer.Database.AddObject(tempInvItem);
-
                 var bag = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack).OfType<StorageBagItem>().FirstOrDefault(b => b.ObjectId == originVial.OwnerID);
-                if (bag != null) bag.InvalidateWeightCache();
+                if (bag != null)
+                {
+                    var vault = new StorageBagVault(player, bag);
 
-                UpdateVialUI(player, tempInvItem);
+                    bool slotIsEmpty = true;
+                    lock (bag.CachedItems)
+                    {
+                        if (bag.CachedItems.ContainsKey(originVial.SlotPosition))
+                            slotIsEmpty = false;
+                    }
 
-                if (sourceObj != null)
-                    InventoryLogging.LogInventoryAction(player, sourceObj, eInventoryActionType.Loot, tempInvItem, 1);
-                else
-                    InventoryLogging.LogInventoryAction(player, "", "Combine Vials", eInventoryActionType.Other, tempInvItem, 1);
+                    if (slotIsEmpty)
+                    {
+                        tempInvItem.SlotPosition = originVial.SlotPosition;
+                        tempInvItem.OwnerID = originVial.OwnerID;
+                        GameServer.Database.AddObject(tempInvItem);
 
-                player.Out.SendMessage($"You started collecting a {translatedName}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        vault.OnAddItem(player, tempInvItem);
+                        bag.InvalidateWeightCache();
+                        UpdateVialUI(player, tempInvItem);
+
+                        if (sourceObj != null) InventoryLogging.LogInventoryAction(player, sourceObj, eInventoryActionType.Loot, tempInvItem, 1);
+                        else InventoryLogging.LogInventoryAction(player, "", "Combine Vials", eInventoryActionType.Other, tempInvItem, 1);
+
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "Lootgenerator.LootGeneratorBloodVials.StartedCollecting", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                    else
+                    {
+                        if (vault.AddItem(player, tempInvItem))
+                        {
+                            bag.InvalidateWeightCache();
+
+                            if (sourceObj != null) InventoryLogging.LogInventoryAction(player, sourceObj, eInventoryActionType.Loot, tempInvItem, 1);
+                            else InventoryLogging.LogInventoryAction(player, "", "Combine Vials", eInventoryActionType.Other, tempInvItem, 1);
+
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "Lootgenerator.LootGeneratorBloodVials.StartedCollecting", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        }
+                        else
+                        {
+                            if (loot != null) loot.AddFixed(newTempTemplate, 1);
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "TextNPC.InventoryFullItemGround", translatedName), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        }
+                    }
+                }
             }
             else
             {
@@ -635,7 +706,7 @@ namespace DOL.GS
                     else
                         InventoryLogging.LogInventoryAction(player, "", "Combine Vials", eInventoryActionType.Other, tempInvItem, 1);
 
-                    player.Out.SendMessage($"You started collecting a {translatedName}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Lootgenerator.LootGeneratorBloodVials.StartedCollecting", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 else
                 {
@@ -643,7 +714,7 @@ namespace DOL.GS
                     {
                         loot.AddFixed(newTempTemplate, 1);
                     }
-                    player.Out.SendMessage($"Your backpack is full! The {translatedName} falls to the ground.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround", translatedName), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -688,14 +759,21 @@ namespace DOL.GS
                 {
                     uTo.Name = newName;
                     uTo.Price = newPrice;
+                    uTo.Dirty = true;
                     GameServer.Database.SaveObject(uTo);
                 }
                 GameServer.Database.SaveObject(toItem);
 
                 RemoveVialItem(player, fromItem);
 
+                if (toItem.SlotPosition >= (int)eInventorySlot.HouseVault_First)
+                {
+                    var bag = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack).OfType<StorageBagItem>().FirstOrDefault(b => b.ObjectId == toItem.OwnerID);
+                    if (bag != null) new StorageBagVault(player, bag).OnAddItem(player, toItem);
+                }
+
                 UpdateVialUI(player, toItem);
-                player.Out.SendMessage($"You combined the vials to {totalPct}%.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Lootgenerator.LootGeneratorBloodVials.CombinedPartial", totalPct), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return true;
             }
             else
@@ -729,6 +807,7 @@ namespace DOL.GS
                     {
                         uFrom.Name = newName;
                         uFrom.Price = newPrice;
+                        uFrom.Dirty = true;
                         GameServer.Database.SaveObject(uFrom);
                     }
                     GameServer.Database.SaveObject(fromItem);
@@ -736,12 +815,12 @@ namespace DOL.GS
                     UpdateVialUI(player, fromItem);
 
                     string translatedRemainder = LanguageMgr.GetItemNameMessage(player.Client?.Account?.Language ?? LanguageMgr.DefaultLanguage, newName);
-                    player.Out.SendMessage($"You combined the vials into a full one and have a {translatedRemainder} left.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client!.Account.Language, "Lootgenerator.LootGeneratorBloodVials.CombinedRemainder", translatedRemainder), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
                 else
                 {
                     RemoveVialItem(player, fromItem);
-                    player.Out.SendMessage($"You combined the vials into a full one.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Lootgenerator.LootGeneratorBloodVials.CombinedFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
 
                 return true;

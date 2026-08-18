@@ -161,6 +161,16 @@ DetailDisplayHandler.UndeequippableItem.ConsumesMana:			Verbruikt {0}% Mana per 
 DetailDisplayHandler.UndeequippableItem.ConsumesCondition:		Verbruikt {0}% Conditie per tik{1}.
 DetailDisplayHandler.UndeequippableItem.LosesConditionDeath:	Verliest {0}% Conditie bij overlijden{1}.
 DetailDisplayHandler.UndeequippableItem.CannotUnequip:			Kan niet worden afgedaan.
+DetailDisplayHandler.UndeequippableItem.RequiresPassword:		- Vereist een uitgesproken formule om de vloek en effecten te activeren.
+DetailDisplayHandler.UndeequippableItem.HaltsHealRegen:			- Stopt alle gezondheidsregeneratie terwijl uitgerust.
+DetailDisplayHandler.UndeequippableItem.PeriodicSpell:			- Werpt periodiek een specifieke spreuk.
+DetailDisplayHandler.UndeequippableItem.PeriodicAura:			- Past periodiek een visuele aura toe.
+DetailDisplayHandler.LoanCoupon.PersonalTitle:					Persoonlijke Lening Coupon
+DetailDisplayHandler.LoanCoupon.PersonalDesc:					Overhandig dit aan een standaardkoopman als je geld tekortkomt om het te verzilveren.
+DetailDisplayHandler.LoanCoupon.PersonalMinPrice:				Kan niet worden gebruikt voor voorwerpen onder {0} goud.
+DetailDisplayHandler.LoanCoupon.HouseTitle:						Huis Lening Coupon
+DetailDisplayHandler.LoanCoupon.HouseDesc:						Overhandig dit aan een huizenkoopman of kavelmarkering als je geld tekortkomt om het te verzilveren.
+DetailDisplayHandler.LoanCoupon.HouseMinPrice:					Alleen bruikbaar voor huizenaankopen van {0} goud of meer.
 
 # /DoorRequestHandler.cs
 DoorRequestHandler.OnTick.TooFarAway:				De {0} is te ver weg!

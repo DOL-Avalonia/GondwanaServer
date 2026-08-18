@@ -1814,7 +1814,7 @@ namespace DOL.GameEvents
             }
 
             return enumerable
-                .Where(p => eventZones.Contains(p.CurrentZone.ID.ToString()));
+                .Where(p => p != null && p.CurrentZone != null && eventZones.Contains(p.CurrentZone.ID.ToString()));
         }
 
         private void RemainingTimeTimer_Elapsed(object sender, ElapsedEventArgs e)

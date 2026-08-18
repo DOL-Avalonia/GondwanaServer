@@ -1,0 +1,15 @@
+
+EpicMount.Cmd.Description:					Contrôle votre monture volante épique
+EpicMount.Cmd.Usage.Cruise:					/epicmount voler - Vol continu automatique (dirigez avec la cible au sol (F5))
+EpicMount.Cmd.Usage.Move:					/epicmount aller - Voler vers la cible au sol
+EpicMount.Cmd.Usage.Target:					/epicmount cible - Voler vers la cible sélectionnée
+EpicMount.Cmd.Usage.Left:					/epicmount gauche - Tourner à gauche
+EpicMount.Cmd.Usage.Right:					/epicmount droite - Tourner à droite
+EpicMount.Cmd.Usage.Stop:					/epicmount arret - Arrêter d'avancer
+EpicMount.Cmd.Usage.Rise:					/epicmount monter - Monter de 100 unités
+EpicMount.Cmd.Usage.Down:					/epicmount descendre - Descendre de 100 unités
+EpicMount.Cmd.Usage.Land:					/epicmount atterrir - Se poser vers le sol
+EpicMount.Cmd.Usage.Full:					Syntaxe : /epicmount [voler | aller | cible | gauche | droite | arret | monter | descendre | atterrir]
+EpicMount.Cmd.Wait:							Vous devez patienter avant de réutiliser cette commande.
+EpicMount.Cmd.NotRiding:					Vous devez monter une monture épique volante pour utiliser cette commande.
+EpicMount.Cmd.Stopped:						Monture arrêtée.

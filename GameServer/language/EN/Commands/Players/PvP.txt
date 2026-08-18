@@ -6,10 +6,15 @@ Commands.GM.PvP.Usage.Close:		/pvp close : Force-close the PvP session
 Commands.GM.PvP.Usage.Unforce:		/pvp unforce : Re-adjust PvP session hours after '/pvp open' in order to fix eventual PvP hours misadjustments
 Commands.GM.PvP.Usage.Status:		/pvp status : Display PvP session status
 Commands.GM.PvP.Usage.Refresh:		/pvp refresh : To refresh maps available for PvP sessions
-Commands.GM.PvP.Usage.Reset:		/pvp reset : Resets the current PvP session.
-Commands.GM.PvP.ZoneNotFound:		Zone {0} was not found.
-Commands.GM.PvP.AlreadyOpen:		A PvP session is already open ({0})!
-Commands.GM.PvP.PvPOpened:			The PvP session "{0}" was opened in {1} (Region {2}).
-Commands.GM.PvP.PvPNotFound:        The PvP session "{0}" could not be opened.
-Commands.GM.PvP.PvPNotOpened:       Failed to open a PvP session.
-Commands.GM.PvP.PvPCannotReset:     The current PvP session cannot be reset, please stop the session first.
+Commands.GM.PvP.Usage.Reset:		/pvp reset : Resets the current PvP session
+Commands.GM.PvP.Usage.SpawnDebugChests:		/pvp spawndebugchests : Spawn reward chests at the selected teleporter target
+Commands.GM.PvP.ZoneNotFound:				Zone {0} was not found.
+Commands.GM.PvP.AlreadyOpen:				A PvP session is already open ({0})!
+Commands.GM.PvP.PvPOpened:					The PvP session "{0}" was opened in {1} (Region {2}).
+Commands.GM.PvP.PvPNotFound:				The PvP session "{0}" could not be opened.
+Commands.GM.PvP.PvPNotOpened:				Failed to open a PvP session.
+Commands.GM.PvP.PvPCannotReset:				The current PvP session cannot be reset, please stop the session first.
+Commands.GM.PvP.Spawns.SelectTeleporter:	You must select a PvP Teleporter or an RvR Teleporter as your target first to spawn the chests around it.
+Commands.GM.PvP.Spawns.Success:				Debug '{0}' reward chests have been successfully spawned around the teleporter.
+Commands.GM.PvP.Spawns.Failed:				Failed to spawn debug reward chests. Check the console logs for errors.
+Commands.PvP.Info.Title:					PvP Info

@@ -122,6 +122,8 @@ GameObjects.GamePlayer.Die.KilledLocation:         {0} tocmai a fost ucis(ă) la
 GameObjects.GamePlayer.Die.LoseExperience:         Pierzi experiență.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Ai murit. Tastează „/release” pentru a te întoarce la piatra sufletelor.
 GameObjects.GamePlayer.Die.YouKilled:              L-ai/ai ucis-o pe {0}.
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:	{0} al tău a pierdut condiție la moartea ta.
+GameObjects.GamePlayer.Die.ArenaDefeated:			Ai fost învins! Vei fi înviat automat pe măsură ce meciul progresează.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Nu poți respira sub apă și înghiți apă!
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Pierzi 5% din punctele tale de viață maxime.
@@ -491,6 +493,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:				Nu poți încăleca în timpul 
 GameObjects.GamePlayer.UseSlot.CantMountStealing:			Nu poți încăleca în timp ce jefuiești un alt jucător!
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:     Nu poți încăleca; ești mort.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:  Nu poți folosi această montură cât timp porți o relicvă!
+GameObjects.GamePlayer.UseSlot.CantMountArena:			Nu poți folosi o montură în timp ce participi la un Turneu de Arenă.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	Spațiul aerian de aici este restricționat. Nu îți poți chema montura zburătoare epică.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:		Nu îți poți invoca montura zburătoare epică în timp ce înoți sau ești sub apă.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:		Îți alungi montura zburătoare epică.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:			Nu poți invoca o montură zburătoare în această zonă.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:	{0} al tău răspunde la chemare! Tastează '/epicmount cruise' pentru a merge înainte, '/epicmount rise' pentru a urca.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:          Nu îți poți vedea ținta.
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:          Nu poți invoca o montură într-o zonă RvR.
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:    Nu poți folosi acest obiect direct din rucsac. Echipază-l mai întâi.
@@ -530,6 +538,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		{0} al tău s-a spart di
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	{0} al tău a fost dezechipat din cauza energiei insuficiente.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	{0} al tău s-a spart și a căzut pe jos!
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Rucsacul tău este plin! {0} al tău a căzut pe jos.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:			Nu poți folosi poțiuni în timpul unui Turneu de Arenă.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:			Nu poți folosi pergamente în timpul unui Turneu de Arenă.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:		Nu poți arunca {0} cât timp este echipat.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Acest substituent Genistar trebuie plasat într-un slot de grădină.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Oul tău Genistar a fost plasat în grădina ta. Acum este al tău pentru a-l hrăni și a-l modela conform dorințelor tale!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Trebuie să eliberezi Genistar-ul tău invocat înainte de a-l plasa înapoi în grădină.

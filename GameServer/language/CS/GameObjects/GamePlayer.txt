@@ -122,6 +122,8 @@ GameObjects.GamePlayer.Die.KilledLocation:         {0} byl/a právě zabit/a u {
 GameObjects.GamePlayer.Die.LoseExperience:         Přicházíš o zkušenosti.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Jsi mrtvý/mrtvá. Napiš „/release“ pro návrat ke svému kameni duší.
 GameObjects.GamePlayer.Die.YouKilled:              Zabil/a jsi {0}.
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Tvému předmětu {0} se po tvé smrti snížila kondice.
+GameObjects.GamePlayer.Die.ArenaDefeated:			Byl jsi poražen! Budeš automaticky oživen, jakmile zápas pokročí.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Pod vodou nemůžeš dýchat a polykáš vodu!
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:  Ztrácíš 5 % svých maximálních životů.
@@ -491,6 +493,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:				Nemůžeš nasednout během sou
 GameObjects.GamePlayer.UseSlot.CantMountStealing:			Nemůžeš nasednout, když okrádáš jiného hráče!
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:     Nemůžeš nasednout; jsi mrtvý/mrtvá.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:  Toto jízdní zvíře nemůžeš použít, když neseš relikvii!
+GameObjects.GamePlayer.UseSlot.CantMountArena:			Nemůžeš nasednout na zvíře během účasti v arénovém turnaji.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	Vzdušný prostor je zde omezen. Nemůžeš přivolat své epické létající zvíře.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:		Nemůžeš vyvolat své epické létající zvíře, když plaveš nebo jsi pod vodou.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:		Odvolal jsi své epické létající zvíře.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:			V této zóně nemůžeš vyvolat létající zvíře.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:	Tvé {0} odpovídá na tvé volání! Napiš '/epicmount cruise' pro pohyb vpřed a '/epicmount rise' pro stoupání.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:          Nevidíš svůj cíl.
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:          V oblasti RvR nelze přivolat jízdní zvíře.
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:    Tento předmět nelze použít přímo v batohu. Nejprve si jej nasaď.
@@ -530,6 +538,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Tvůj {0} se rozbil kvů
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Tvůj {0} byl sundán kvůli nedostatku energie.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Tvůj {0} se rozbil a spadl na zem!
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Tvůj batoh je plný! Tvůj {0} spadl na zem.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:			Nemůžeš používat lektvary během arénového turnaje.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:			Nemůžeš používat svitky během arénového turnaje.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:		Nemůžeš zahodit {0}, když ho máš vybavené.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:		Tento zástupce Genistaru musí být umístěn do zahradního slotu.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:		Vaše vejce Genistaru bylo umístěno na vaší zahradě. Nyní je jen na vás, abyste ho vychovali a formovali podle svých představ!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			Předtím, než svůj vyvolaný Genistar umístíš zpět do zahrady, ho musíš propustit.

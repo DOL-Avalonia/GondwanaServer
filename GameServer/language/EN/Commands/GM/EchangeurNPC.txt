@@ -1,14 +1,19 @@
-Commands.GM.EchangeurNPC.Description:	Item changer NPC management: (Based on TextNPC)
-Commands.GM.EchangeurNPC.Usage.Add:		add <quantity of item to change> <ID_nb of the item to give>' Add an item to the NPC's list that will be accepted for an exchange
-Commands.GM.EchangeurNPC.Usage.Remove:	remove <ID_nb of the item to give>' Removes an item from the NPC's list
-Commands.GM.EchangeurNPC.Usage.Money:		money <ID_nb of the item to give> <quantity>' Gives money in exchange for an item
-Commands.GM.EchangeurNPC.Usage.XP:	xp <ID_nb of the item to give> <quantity>' Gives experience in exchange for an item. Put a negative quantity that will be one per thousand (xp/1000) of the experience return to match player's level
-Commands.GM.EchangeurNPC.Usage.Item:		item <ID_nb of the item to give> <quantity of final item to get> <ID_nb of the final item to get>' To exchange items
-Commands.GM.EchangeurNPC.Usage.Quest:	quest <ID_nb of the item to give> <questID> <step>' Exchange an item during a quest and a specific step
-Commands.GM.EchangeurNPC.Usage.Info:	info' Shows item changer NPC's informations
-Commands.GM.EchangeurNPC.Usage.Pricemoney:		pricemoney <ID de l'item a donner> <gold>' Defines a cost <gold> to validate a trade
-Commands.GM.EchangeurNPC.Usage.Priceressource1:	priceressource1 <ID_nb of the item to give> <ID_nb of a required ressource1> <quantity of the required ressource1>' Defines a required ressource1 by its <ID_nb> and its quantity in order to validate an exchange for an item (can add up to the cost of trading in gold)
-Commands.GM.EchangeurNPC.Usage.Priceressource2:		priceressource2 <ID_nb of the item to give> <ID_nb of a required ressource2> <quantity of the required ressource2>' Defines a required ressource2 by its <ID_nb> and its quantity in order to validate an exchange for an item (can add up to the cost of trading in gold)
-Commands.GM.EchangeurNPC.Usage.Priceressource3:	priceressource3 <ID_nb of the item to give> <ID_nb of a required ressource3> <quantity of the required ressource3>' Defines a required ressource3 by its <ID_nb> and its quantity in order to validate an exchange for an item (can add up to the cost of trading in gold)
-Commands.GM.EchangeurNPC.Usage.Priceressource:		priceressource remove <1|2|3> <ID_nb of the item to give>' Removes price ressource condition number <1|2|3> for the item to give.
+Commands.GM.EchangeurNPC.Description:					Item changer NPC management: (Based on TextNPC)
+Commands.GM.EchangeurNPC.Usage.Add:						'/echangeurnpc add <quantity of item to change> <ID_nb of the item to give>' Add an item to the NPC's list that will be accepted for an exchange
+Commands.GM.EchangeurNPC.Usage.Remove:					'/echangeurnpc remove <ID_nb of the item to give>' Removes an item from the NPC's list
+Commands.GM.EchangeurNPC.Usage.Money:					'/echangeurnpc money <ID_nb of the item to give> <quantity>' Gives money in exchange for an item
+Commands.GM.EchangeurNPC.Usage.XP:						'/echangeurnpc xp <ID_nb of the item to give> <quantity>' Gives experience in exchange for an item. Put a negative quantity that will be one per thousand (xp/1000) of the experience return to match player's level
+Commands.GM.EchangeurNPC.Usage.Item:					'/echangeurnpc item <ID_nb of the item to give> <quantity of final item to get> <ID_nb of the final item to get>' To exchange items
+Commands.GM.EchangeurNPC.Usage.Quest:					'/echangeurnpc quest <ID_nb of the item to give> <questID> <step>' Exchange an item during a quest and a specific step
+Commands.GM.EchangeurNPC.Usage.Info:					'/echangeurnpc info' Shows item changer NPC's informations
+Commands.GM.EchangeurNPC.Usage.Pricemoney:				'/echangeurnpc pricemoney <ID de l'item a donner> <gold>' Defines a cost <gold> to validate a trade
+Commands.GM.EchangeurNPC.Usage.Priceressource1:			'/echangeurnpc priceressource1 <ID_nb of the item to give> <ID_nb of a required ressource1> <quantity of the required ressource1>' Defines a required ressource1 by its <ID_nb> and its quantity in order to validate an exchange for an item (can add up to the cost of trading in gold)
+Commands.GM.EchangeurNPC.Usage.Priceressource2:			'/echangeurnpc priceressource2 <ID_nb of the item to give> <ID_nb of a required ressource2> <quantity of the required ressource2>' Defines a required ressource2 by its <ID_nb> and its quantity in order to validate an exchange for an item (can add up to the cost of trading in gold)
+Commands.GM.EchangeurNPC.Usage.Priceressource3:			'/echangeurnpc priceressource3 <ID_nb of the item to give> <ID_nb of a required ressource3> <quantity of the required ressource3>' Defines a required ressource3 by its <ID_nb> and its quantity in order to validate an exchange for an item (can add up to the cost of trading in gold)
+Commands.GM.EchangeurNPC.Usage.Priceressource:			'/echangeurnpc priceressource remove <1|2|3> <ID_nb of the item to give>' Removes price ressource condition number <1|2|3> for the item to give.
+Commands.GM.EchangeurNPC.Usage.UniqueStonemaker:		'/echangeurnpc unique stonemaker' - Converts NPC into a Stone Maker
+Commands.GM.EchangeurNPC.Usage.UniqueVialPlayer:		'/echangeurnpc unique vial player' - Only receives player blood vials.
+Commands.GM.EchangeurNPC.Usage.UniqueVialNpcAll:		'/echangeurnpc unique vial npc all' - Receives all types of mob blood vials.
+Commands.GM.EchangeurNPC.Usage.UniqueVialNpcName:		'/echangeurnpc unique vial npc name <Name>' - Only receives a specific type of blood vial based on the mob's name - (e.g. Agisfield)
+Commands.GM.EchangeurNPC.Usage.UniqueVialNpcBlood:		'/echangeurnpc unique vial npc blood <Type>' - Only receives a specific type of blood - (e.g. MachineOil)
 Commands.GM.EchangeurNPC.Usage.AdditionalDescription:	In order to get a response from the NPC while trading an item, use the ID_nb of the related item with the TextNPC response command then add a response in text format.

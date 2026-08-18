@@ -122,7 +122,9 @@ GameObjects.GamePlayer.Die.KilledByLocation:				{0} was just killed by {1} in {2
 GameObjects.GamePlayer.Die.KilledLocation:					{0} was just killed in {1}!	
 GameObjects.GamePlayer.Die.LoseExperience:					You lose some experience!	
 GameObjects.GamePlayer.Die.ReleaseToReturn:					You have died.  Type /release to return to your last bindpoint.	
-GameObjects.GamePlayer.Die.YouKilled:						You just killed {0}!	
+GameObjects.GamePlayer.Die.YouKilled:						You just killed {0}!
+GameObjects.GamePlayer.Die.ConditionLostOnDeath:			Your {0} lost condition upon your death.
+GameObjects.GamePlayer.Die.ArenaDefeated:					You have been defeated! You will be automatically resurrected when the match progresses.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:	You cannot breathe underwater and take damage!
 GameObjects.GamePlayer.DrowningTimerCallback.Take5%Damage:	You take 5% of your max hits in damage.
@@ -493,6 +495,12 @@ GameObjects.GamePlayer.UseSlot.CantMountDuel:				You can't mount while you're in
 GameObjects.GamePlayer.UseSlot.CantMountStealing:			You can't mount while you're stealing another player!
 GameObjects.GamePlayer.UseSlot.CantMountWhileDead:			You can't mount while you're dead.
 GameObjects.GamePlayer.UseSlot.CantMountRelicCarrier:		You can't mount while carrying a Relic!
+GameObjects.GamePlayer.UseSlot.CantMountArena:				You can't mount while participating in an Arena Tournament.
+GameObjects.GamePlayer.UseSlot.EpicMountAirspaceRestricted:	The airspace here is restricted. You cannot call your epic flying mount.
+GameObjects.GamePlayer.UseSlot.EpicMountNoSwimming:			You cannot summon your epic flying mount while swimming or underwater.
+GameObjects.GamePlayer.UseSlot.EpicMountDismiss:			You dismiss your epic flying mount.
+GameObjects.GamePlayer.UseSlot.EpicMountNoZone:				You cannot summon a flying mount in this zone.
+GameObjects.GamePlayer.UseSlot.EpicMountAnswersCall:		Your {0} answers your call! Type '/epicmount cruise' to move forward, /epicmount rise to ascend.
 GameObjects.GamePlayer.UseSlot.CantSeeTarget:				You can't see your target!
 GameObjects.GamePlayer.UseSlot.CantSummonRvR:				You cannot summon your mount in RvR zones.		
 GameObjects.GamePlayer.UseSlot.CantUseFromBackpack:	    	You can't use this item from your backpack. Equip it before!			
@@ -532,6 +540,9 @@ GameObjects.GamePlayer.UseSlot.UndeequipableItemBroke:		Your {0} has broken due 
 GameObjects.GamePlayer.UseSlot.UndeequipableItemUnequip:	Your {0} has been unequipped due to insufficient energy.
 GameObjects.GamePlayer.UseSlot.UndeequipableItemBrokeDrop:	Your {0} broke and dropped to the ground!
 GameObjects.GamePlayer.UseSlot.UndeequipableInvFull:		Your backpack is full! Your {0} has been dropped to the ground.
+GameObjects.GamePlayer.UseSlot.ArenaNoPotions:				You cannot use potions during an Arena Tournament.
+GameObjects.GamePlayer.UseSlot.ArenaNoScrolls:				You cannot use scrolls during an Arena Tournament.
+GameObjects.GamePlayer.UseSlot.CannotDropEquipped:			You cannot drop {0} while it is equipped.
 GameObjects.GamePlayer.UseSlot.GenistarHouseGarden:			This Genistar placeholder must be placed in a garden slot.
 GameObjects.GamePlayer.UseSlot.GenistarEggPlaced:			Your Genistar egg has been placed in your garden. It is now yours to nurture and mold it according to your desires!
 GameObjects.GamePlayer.UseSlot.MustReleaseGenistar:			You must release your summoned Genistar before placing it back in the garden.

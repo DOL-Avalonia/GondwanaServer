@@ -449,6 +449,7 @@ namespace DOL.GS
                 zoneData.ZoneID = (ushort)dbZone.ZoneID;
                 zoneData.WaterLevel = dbZone.WaterLevel;
                 zoneData.DivingFlag = dbZone.DivingFlag;
+                zoneData.MaxFlyAltitude = dbZone.MaxFlyAltitude;
                 zoneData.IsLava = dbZone.IsLava;
                 zoneData.AllowMagicalItem = dbZone.AllowMagicalItem;
                 zoneData.AllowReputation = dbZone.AllowReputation;
@@ -456,7 +457,7 @@ namespace DOL.GS
                 zoneData.IsDungeon = dbZone.IsDungeon;
 
                 RegisterZone(zoneData, zoneData.ZoneID, zoneData.RegionID, zoneData.Description,
-                             dbZone.Experience, dbZone.Realmpoints, dbZone.Bountypoints, dbZone.Coin, dbZone.Realm, dbZone.AllowMagicalItem, dbZone.AllowReputation, dbZone.TensionRate, dbZone.IsDungeon);
+                             dbZone.Experience, dbZone.Realmpoints, dbZone.Bountypoints, dbZone.Coin, dbZone.Realm, dbZone.AllowMagicalItem, dbZone.AllowReputation, dbZone.TensionRate, dbZone.IsDungeon, dbZone.MaxFlyAltitude);
 
                 //Save the zonedata.
                 if (!m_zonesData.ContainsKey(zoneData.RegionID))
@@ -911,7 +912,7 @@ namespace DOL.GS
         /// <summary>
         /// Registers a Zone into a Region
         /// </summary>
-        public static void RegisterZone(ZoneData zoneData, ushort zoneID, ushort regionID, string zoneName, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm, bool allowMagicalItem, bool allowReputation, float tensionRate, bool IsDungeon)
+        public static void RegisterZone(ZoneData zoneData, ushort zoneID, ushort regionID, string zoneName, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm, bool allowMagicalItem, bool allowReputation, float tensionRate, bool IsDungeon, int maxFlyAltitude = 10000)
         {
             Region region = GetRegion(regionID);
             if (region == null)
@@ -956,7 +957,8 @@ namespace DOL.GS
                 allowMagicalItem,
                 allowReputation,
                 tensionRate,
-                zoneData.IsDungeon);
+                zoneData.IsDungeon,
+                maxFlyAltitude);
 
             //Dinberg:Instances
             //ZoneID will always be constant as last parameter, because ZoneSkinID will effectively be a bluff, to remember
@@ -1024,6 +1026,8 @@ namespace DOL.GS
         /// <returns>the zone object or null</returns>
         public static Zone GetZone(ushort zoneID)
         {
+            if (zoneID == 65535) return null;
+
             Zone z;
             if (m_zones.TryGetValue(zoneID, out z))
                 return z;
@@ -1996,7 +2000,7 @@ namespace DOL.GS
                                                   return true;
                                               }))
                 {
-                    RegisterZone(dat, (ushort)zoneID, ID, $"{dat.Description} (Instance)", 0, 0, 0, 0, 0, dat.AllowMagicalItem, dat.AllowReputation, dat.TensionRate, dat.IsDungeon);
+                    RegisterZone(dat, (ushort)zoneID, ID, $"{dat.Description} (Instance)", 0, 0, 0, 0, 0, dat.AllowMagicalItem, dat.AllowReputation, dat.TensionRate, dat.IsDungeon, 10000);
                 }
             }
 
