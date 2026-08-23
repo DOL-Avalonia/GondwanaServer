@@ -320,9 +320,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 player.SaveIntoDatabase();
 
                                 // notify the player of what we took and how long they are prepaid for
-                                string depositMoneyMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.DepositInLockbox", Money.GetString(moneyToAdd));
+                                string depositMoneyMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.DepositInLockbox", Money.GetString(moneyToAdd, player.Client.Account.Language));
                                 player.Out.SendMessage(depositMoneyMsg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                string lockboxMoneyMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.LockboxHasMoneyWeeklyPayment", Money.GetString(house.KeptMoney), Money.GetString(HouseMgr.GetRentByModel(house.Model)));
+                                string lockboxMoneyMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.LockboxHasMoneyWeeklyPayment", Money.GetString(house.KeptMoney, player.Client.Account.Language), Money.GetString(HouseMgr.GetRentByModel(house.Model)));
                                 player.Out.SendMessage(lockboxMoneyMsg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 string housePrepaidMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.HousePrepaidForPayments", (house.KeptMoney / HouseMgr.GetRentByModel(house.Model)));
                                 player.Out.SendMessage(housePrepaidMsg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -346,9 +346,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 player.SaveIntoDatabase();
 
                                 // notify the player of what we took and how long they are prepaid for
-                                string depositBPsMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.DepositInLockbox", Money.GetString(bpsToMoney));
+                                string depositBPsMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.DepositInLockbox", Money.GetString(bpsToMoney, player.Client.Account.Language));
                                 player.Out.SendMessage(depositBPsMsg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                string lockboxBPsMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.LockboxHasMoneyWeeklyPayment", Money.GetString(house.KeptMoney), Money.GetString(HouseMgr.GetRentByModel(house.Model)));
+                                string lockboxBPsMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.LockboxHasMoneyWeeklyPayment", Money.GetString(house.KeptMoney, player.Client.Account.Language), Money.GetString(HouseMgr.GetRentByModel(house.Model)));
                                 player.Out.SendMessage(lockboxBPsMsg, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 string housePrepaidBPsMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.HousePrepaidForPayments", (house.KeptMoney / HouseMgr.GetRentByModel(house.Model)));
                                 player.Out.SendMessage(housePrepaidBPsMsg, eChatType.CT_System, eChatLoc.CL_SystemWindow);

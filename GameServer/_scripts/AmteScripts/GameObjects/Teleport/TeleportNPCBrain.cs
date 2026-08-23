@@ -31,10 +31,10 @@ namespace DOL.AI.Brain
             {
                 foreach (var player in Body.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE, true).Cast<GamePlayer>())
                 {
-                    Body.RefreshEffects(player);
+                    QuestIndicatorManager.RefreshIndicator(teleportNPC, player);
                 }
             }
-            
+
             m_previousTick = currentTick;
         }
 

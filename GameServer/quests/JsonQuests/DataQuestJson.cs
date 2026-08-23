@@ -1,6 +1,12 @@
 ﻿using DOL.Database;
 using DOL.Events;
+using DOL.GS.Behaviour;
+using DOL.GS.Finance;
 using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
+using DOL.Language;
+using DOL.MobGroups;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,11 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DOL.Language;
-using DOL.GS.Finance;
-using DOL.GS.ServerProperties;
-using DOL.MobGroups;
-using DOL.GS.Behaviour;
 using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
@@ -277,7 +278,16 @@ namespace DOL.GS.Quests
         {
             foreach (var mob in player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().Where(npc => npc.IsRelatedToQuest(this)))
             {
-                player.Out.SendNPCsQuestEffect(mob, mob.GetQuestIndicator(player));
+                QuestIndicatorManager.RefreshIndicator(mob, player);
+            }
+
+            var questData = player.QuestList.FirstOrDefault(q => q.QuestId == this.Id) as PlayerQuest;
+            if (questData != null)
+            {
+                foreach (var goal in this.Goals.Values)
+                {
+                    goal.RefreshCustomIndicators(questData);
+                }
             }
         }
 

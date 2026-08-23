@@ -262,6 +262,8 @@ namespace DOL.GS.PacketHandler
 
                 eQuestIndicator questIndicator = npc.GetQuestIndicator(m_gameClient.Player);
 
+                if ((byte)questIndicator >= 0x20)
+                    questIndicator = eQuestIndicator.None;
                 if (questIndicator == eQuestIndicator.Available)
                     flags2 |= 0x08;//hex 8 - quest available
                 if (questIndicator == eQuestIndicator.Finish)

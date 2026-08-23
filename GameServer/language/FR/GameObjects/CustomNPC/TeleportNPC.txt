@@ -15,6 +15,12 @@ TeleportNPC.WrongTime:					Vous avez choisi le mauvais moment pour venir ici, ce
 TeleportNPC.QuestNotCompleted:			Vous devez avoir terminé la quête "{0}" afin de prouver que vous êtes digne d'aller à cet endroit !
 TeleportNPC.QuestStepNotCompleted:		Vous devez actuellement faire la quête "{0}" (étape {1}) pour que je vous téléporte à cet endroit !
 TeleportNPC.ConditionsNotMet:			Je ne peux pas encore vous transporter à cet endroit !
-TeleportNPC.ItemConsumed:			La magie épuise votre {0} ; il tombe en poussière !
-TeleportNPC.ItemDegrading:			Le voyage abîme votre {0} ({1}% de condition restante).
-TeleportNPC.RelicBlocked:			Je ne parviens pas à canaliser le flux... l'ancienne magie de la relique rejette cette destination !
+TeleportNPC.ItemConsumed:				La magie épuise votre {0} ; il tombe en poussière !
+TeleportNPC.ItemDegrading:				Le voyage abîme votre {0} ({1}% de condition restante).
+TeleportNPC.RelicBlocked:				Je ne parviens pas à canaliser le flux... l'ancienne magie de la relique rejette cette destination !
+TeleportNPC.TpInstanceMustGroup:		Vous devez être dans un groupe pour entrer dans cette instance.
+TeleportNPC.TpInstanceGroupLeader:		Seul le chef de groupe peut lancer la téléportation vers l'instance.
+TeleportNPC.TpInstanceMustGuild:		Vous devez être dans une guilde pour entrer dans cette instance.
+TeleportNPC.TpInstanceMustBG:			Vous devez être dans un groupe de combat pour entrer dans cette instance.
+TeleportNPC.TpInstanceBGLeader:			Seul le chef du groupe de combat peut lancer la téléportation vers l'instance.
+TeleportNPC.NoInstanceNoRegion:			Impossible de créer l'instance : aucun ID de région disponible.

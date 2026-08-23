@@ -2,9 +2,10 @@
 using DOL.GS.Behaviour;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
@@ -14,6 +15,7 @@ namespace DOL.GS.Quests
         private readonly Area.Circle m_area;
         private readonly string m_text;
         private readonly ushort m_areaRegion;
+        private QuestIndicatorNPC m_areaIndicator;
 
         public override eQuestGoalType Type => eQuestGoalType.Unknown;
         public override int ProgressTotal => 1;
@@ -29,6 +31,20 @@ namespace DOL.GS.Quests
             var reg = WorldMgr.GetRegion(m_areaRegion);
             reg.AddArea(m_area);
             PointA = new QuestZonePoint(reg.GetZone(m_area.Coordinate), m_area.Coordinate);
+
+            if (db.AreaRadius != null && db.AreaRadius != "" && db.AreaRegion != null && db.AreaRegion != "" && db.AreaCenter != null)
+            {
+                m_areaIndicator = new QuestIndicatorNPC(null);
+                m_areaIndicator.StaticIndicator = eQuestIndicator.RedTarget;
+                m_areaIndicator.IsVisibleCondition = (player) =>
+                {
+                    var pq = player.QuestList.OfType<PlayerQuest>().FirstOrDefault(q => q.QuestId == QuestId);
+                    return pq != null && IsActive(pq) && !IsDone(pq);
+                };
+                m_areaIndicator.CurrentRegionID = m_areaRegion;
+                m_areaIndicator.Position = Position.Create(m_areaRegion, m_area.Coordinate.X, m_area.Coordinate.Y, m_area.Coordinate.Z, 0) + Vector.Create(z: 1);
+                m_areaIndicator.AddToWorld();
+            }
         }
 
         public override Dictionary<string, object> GetDatabaseJsonObject()
@@ -41,9 +57,18 @@ namespace DOL.GS.Quests
             return dict;
         }
 
+        public override void RefreshCustomIndicators(PlayerQuest questData)
+        {
+            if (m_areaIndicator != null && questData != null)
+            {
+                questData.Owner.Out.SendModelChange(m_areaIndicator, m_areaIndicator.GetModelForPlayer(questData.Owner));
+            }
+        }
+
         private void OnPlayerEnterArea(PlayerQuest quest, PlayerGoalState goal)
         {
             AdvanceGoal(quest, goal);
+            RefreshCustomIndicators(quest);
         }
         
         private void OnPlayerLeaveArea(PlayerQuest quest, PlayerGoalState goal)
@@ -52,6 +77,7 @@ namespace DOL.GS.Quests
             goal.State = eQuestGoalStatus.Active;
             quest.SaveIntoDatabase();
             quest.Owner.Out.SendQuestUpdate(quest);
+            RefreshCustomIndicators(quest);
         }
 
         protected override void NotifyActive(PlayerQuest quest, PlayerGoalState goal, DOLEvent e, object sender, EventArgs args)
@@ -74,6 +100,8 @@ namespace DOL.GS.Quests
         public override void Unload()
         {
             WorldMgr.GetRegion(m_areaRegion)?.RemoveArea(m_area);
+            if (m_areaIndicator != null)
+                m_areaIndicator.RemoveFromWorld();
             base.Unload();
         }
     }

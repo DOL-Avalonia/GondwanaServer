@@ -180,7 +180,7 @@ namespace DOL.GS
             lock (player.Inventory)
             {
                 var price = currency.Mint(cost);
-                var costToText = price.ToText();
+                var costToText = price.ToText(player.Client.Account.Language);
                 var playerHasNotEnoughBalance = player.GetBalance(price.Currency).Amount < price.Amount;
 
                 if (playerHasNotEnoughBalance && price.Currency.Equals(Currency.Copper))
@@ -260,7 +260,7 @@ namespace DOL.GS
 
                 if (playerHasNotEnoughBalance)
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.YouNeed", totalCost.ToText()), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.YouNeed", totalCost.ToText(player.Client.Account.Language)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
                 
@@ -282,9 +282,9 @@ namespace DOL.GS
                 string message;
                 if (amountToBuy > 1)
 
-                    message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.BoughtPieces", amountToBuy, template.GetName(1, false), totalCost.ToText());
+                    message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.BoughtPieces", amountToBuy, template.GetName(1, false), totalCost.ToText(player.Client.Account.Language));
                 else
-                    message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.Bought", template.GetName(1, false), totalCost.ToText());
+                    message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerBuy.Bought", template.GetName(1, false), totalCost.ToText(player.Client.Account.Language));
 
                 // Check if player has enough money and subtract the money
                 if (!player.RemoveMoney(totalCost))
@@ -321,7 +321,7 @@ namespace DOL.GS
                 return;
             }
 
-            if (!this.IsWithinRadius(player, GS.ServerProperties.Properties.WORLD_PICKUP_DISTANCE)) // tested
+            if (!this.IsWithinRadius(player, ServerProperties.Properties.WORLD_PICKUP_DISTANCE)) // tested
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerSell.TooFarAway", GetName(0, true)), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
                 return;
@@ -337,7 +337,7 @@ namespace DOL.GS
 
             if (player.Inventory.RemoveItem(item))
             {
-                string message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerSell.GivesYou", GetName(0, true), Money.GetString(itemValue), item.GetName(0, false));
+                string message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerSell.GivesYou", GetName(0, true), Money.GetString(itemValue, player.Client.Account.Language), item.GetName(0, false));
                 player.AddMoney(Currency.Copper.Mint(itemValue));
                 player.SendMessage(message, eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
                 InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, item, item.Count);
@@ -388,7 +388,7 @@ namespace DOL.GS
                 }
                 else
                 {
-                    message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerAppraise.Offers", GetName(0, true), Money.GetString(val), item.GetName(0, false));
+                    message = LanguageMgr.GetTranslation(player.Client.Account.Language, "GameMerchant.OnPlayerAppraise.Offers", GetName(0, true), Money.GetString(val, player.Client.Account.Language), item.GetName(0, false));
                 }
                 player.Out.SendMessage(message, eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
             }

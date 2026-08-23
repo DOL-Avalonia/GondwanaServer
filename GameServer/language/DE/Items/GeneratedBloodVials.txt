@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: {0}{1}-Phiole
+ROG.PlayerVial.Format.Sap: {0}{1}-Saftphiole
+ROG.PlayerVial.Prefix.Vigorous: Mächtige
+ROG.PlayerVial.Prefix.Illustrous: Illustre
+ROG.PlayerVial.Prefix.Exalted: Erhabene
+
 ROG.BloodVial.Format: Phiole mit {1}{2} von {0}
 ROG.BloodVial.Format.Sap: Phiole mit {2} von {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Magischem Blut
 ROG.BloodVial.Type.StickySap: Klebrigem Saft
 ROG.BloodVial.Type.PlantNectar: Pflanzennektar
 ROG.BloodVial.Type.SporeExtract: Sporenextrakt
+ROG.BloodVial.Type.AbyssalIchor: Abgrund-Ichor
 ROG.BloodVial.Type.DeadlyVenom: Tödlichem Gift
 ROG.BloodVial.Type.PutrefiedBlood: Verfaultem Blut
 ROG.BloodVial.Type.Ectoplasm: Ektoplasma

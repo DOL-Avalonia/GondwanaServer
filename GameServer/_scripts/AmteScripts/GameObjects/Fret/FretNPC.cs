@@ -138,7 +138,7 @@ namespace DOL.GS.Scripts
                 if (TempItems.ContainsKey(player!.InternalID))
                 {
                     InteractPlayer IP = TempItems[player.InternalID];
-                    player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendConfirm") + " " + Money.GetString(IP.Price) + " ?",
+                    player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendConfirm") + " " + Money.GetString(IP.Price, player.Client.Account.Language) + " ?",
                                                 SendColisResponse);
                 }
                 else
@@ -215,7 +215,7 @@ namespace DOL.GS.Scripts
             string msg = LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription01") + "\n";
             msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription02") + " " + (IP.ToPlayerID == "" ? LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription03") : IP.ToPlayerName) + "\n";
             msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription04") + " " + (IP.Weight / 10) + "," + (IP.Weight % 10) + " " + LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription05") + "\n";
-            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription06") + " " + Money.GetString(IP.Price) + "\n";
+            msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription06") + " " + Money.GetString(IP.Price, player.Client.Account.Language) + "\n";
             msg += LanguageMgr.GetTranslation(player.Client.Account.Language,"Fret.PackageSendDescription07") + " " + IP.Items.Count + "/" + MaxItem + "\n";
             int id = 1;
             foreach (InventoryItem item in IP.Items)

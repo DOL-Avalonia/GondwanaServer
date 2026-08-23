@@ -943,7 +943,7 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoBP", client.Player.Guild.BountyPoints), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoMP", client.Player.Guild.MeritPoints), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuildLevel", client.Player.Guild.GuildLevel), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
-                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuildBank", Money.GetString(long.Parse(client.Player.Guild.GetGuildBank().ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuildBank", Money.GetString(long.Parse(client.Player.Guild.GetGuildBank().ToString()), client.Account.Language)), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.InfoGuildDues", client.Player.Guild.GetGuildDuesPercent().ToString() + "%"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
 
                                 double bonusPercentage = GetBuffBonusPercentage(client.Player.Guild);
@@ -3815,7 +3815,7 @@ namespace DOL.GS.Commands
                             else
                             {
                                 client.Player.Guild!.SetGuildBank(client.Player, amount);
-                                client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.DepositAmount", Money.GetString(long.Parse(amount.ToString()))), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                                client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.Guild.DepositAmount", Money.GetString(long.Parse(amount.ToString()), client.Account.Language)), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                             }
                             client.Player.Guild!.UpdateGuildWindow();
                         }
@@ -3843,7 +3843,7 @@ namespace DOL.GS.Commands
                             {
                                 if (client.Player.Guild.WithdrawGuildBank(client.Player, amount))
                                 {
-                                    client.Player.SendTranslatedMessage("Commands.Players.Guild.Withdrawamount", eChatType.CT_Guild, eChatLoc.CL_SystemWindow, Money.GetString(long.Parse(amount.ToString())));
+                                    client.Player.SendTranslatedMessage("Commands.Players.Guild.Withdrawamount", eChatType.CT_Guild, eChatLoc.CL_SystemWindow, Money.GetString(long.Parse(amount.ToString()), client.Account.Language));
                                     client.Player.Guild?.UpdateGuildWindow();
                                     return;
                                 }

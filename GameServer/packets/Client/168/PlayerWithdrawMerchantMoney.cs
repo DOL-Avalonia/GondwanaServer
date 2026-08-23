@@ -32,7 +32,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -53,7 +53,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             // make sure player has permissions to withdraw from the consignment merchant
             if ((!conMerchant.houseRequired && conMerchant.OwnerID != client.Player.ObjectId) || (house != null && !house.CanUseConsignmentMerchant(client.Player, ConsignmentPermissions.Withdraw)))
             {
-                client.Player.Out.SendMessage("You don't have permission to withdraw money from this merchant!", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
+                client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GameMerchant.OnPlayerWithdrawNotAllowed"), eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                 return;
             }
 
@@ -65,12 +65,12 @@ namespace DOL.GS.PacketHandler.Client.v168
                 {
                     if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                     {
-                        client.Player.Out.SendMessage("You withdraw " + totalConMoney.ToString() + " BountyPoints from your Merchant.", eChatType.CT_Important, eChatLoc.CL_ChatWindow);
+                        client.Player.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "GameMerchant.OnPlayerWithdrawBP", totalConMoney.ToString()), eChatType.CT_Important, eChatLoc.CL_ChatWindow);
                         client.Player.AddMoney(Currency.BountyPoints.Mint(totalConMoney));
                     }
                     else
                     {
-                        ChatUtil.SendMerchantMessage(client, "GameMerchant.OnPlayerWithdraw", Money.GetString(totalConMoney));
+                        ChatUtil.SendMerchantMessage(client, "GameMerchant.OnPlayerWithdraw", Money.GetString(totalConMoney, client.Account.Language));
                         client.Player.AddMoney(Currency.Copper.Mint(totalConMoney));
                         InventoryLogging.LogInventoryAction(conMerchant, client.Player, eInventoryActionType.Merchant, totalConMoney);
                     }

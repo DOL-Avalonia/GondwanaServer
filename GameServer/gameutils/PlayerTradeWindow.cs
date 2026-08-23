@@ -725,9 +725,9 @@ namespace DOL.GS
                 {
                     //Now add the money
                     m_owner.AddMoney(PartnerCopperOffer);
-                    m_owner.SendSystemMessage(LanguageMgr.GetTranslation(m_owner.Client, "GameUtils.PlayerTradeWindow.MoneyReceived", PartnerCopperOffer.ToText()));
+                    m_owner.SendSystemMessage(LanguageMgr.GetTranslation(m_owner.Client, "GameUtils.PlayerTradeWindow.MoneyReceived", PartnerCopperOffer.ToText(m_owner.Client.Account.Language)));
                     partner.AddMoney(MyCopperOffer);
-                    partner.SendSystemMessage(LanguageMgr.GetTranslation(partner.Client, "GameUtils.PlayerTradeWindow.MoneyReceived", MyCopperOffer.ToText()));
+                    partner.SendSystemMessage(LanguageMgr.GetTranslation(partner.Client, "GameUtils.PlayerTradeWindow.MoneyReceived", MyCopperOffer.ToText(partner.Client.Account.Language)));
                     InventoryLogging.LogInventoryAction(m_owner, partner, eInventoryActionType.Trade, TradeMoney);
                     InventoryLogging.LogInventoryAction(partner, m_owner, eInventoryActionType.Trade, m_partnerWindow.TradeMoney);
                     m_owner.SaveIntoDatabase();

@@ -1893,7 +1893,8 @@ namespace DOL.GS
 
             //Later, we will share the resources over the different threads.
 
-            GameTimer.TimeManager time = m_regionTimeManagers[0];
+            int index = skinID % m_regionTimeManagers.Length;
+            GameTimer.TimeManager time = m_regionTimeManagers[index];
 
             if (time == null)
             {

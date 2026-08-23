@@ -89,7 +89,7 @@ namespace DOL.GS.Scripts
             if (npc == null) return;
             foreach (GamePlayer player in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendNPCsQuestEffect(npc, npc.GetQuestIndicator(player));
+                QuestIndicatorManager.RefreshIndicator(npc, player);
             }
         }
 
@@ -675,7 +675,7 @@ namespace DOL.GS.Scripts
                     else
                     {
                         eQuestIndicator indicator;
-                        if (args.Length < 3 || !Enum.TryParse(args[2], out indicator))
+                        if (args.Length < 3 || !Enum.TryParse(args[2], true, out indicator))
                         {
                             DisplaySyntax(client);
                             return;

@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: Vial de {1} {0}
+ROG.PlayerVial.Format.Sap: Vial de Savia de {1} {0}
+ROG.PlayerVial.Prefix.Vigorous: Vigoroso
+ROG.PlayerVial.Prefix.Illustrous: Ilustre
+ROG.PlayerVial.Prefix.Exalted: Exaltado
+
 ROG.BloodVial.Format: Vial de {2} {1}de {0}
 ROG.BloodVial.Format.Sap: Vial de {2} de {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Sangre Mágica
 ROG.BloodVial.Type.StickySap: Savia Pegajosa
 ROG.BloodVial.Type.PlantNectar: Néctar de Planta
 ROG.BloodVial.Type.SporeExtract: Extracto de Espora
+ROG.BloodVial.Type.AbyssalIchor: Icor Abisal
 ROG.BloodVial.Type.DeadlyVenom: Veneno Mortal
 ROG.BloodVial.Type.PutrefiedBlood: Sangre Putrefacta
 ROG.BloodVial.Type.Ectoplasm: Ectoplasma

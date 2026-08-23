@@ -60,9 +60,9 @@ namespace DOL.GS.Scripts
             if (player.InCombat)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.PasswordCurseItemgUsageCombat"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return false;
+                return;
             }
-            if (RvrManager.Instance.IsInRvr(player) || player.IsInPvP || player.CurrentRegionID == ServerRules.AmtenaelRules.HousingRegionID)
+            if (player.IsInRvR || player.IsInPvP || player.CurrentRegionID == ServerRules.AmtenaelRules.HousingRegionID)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingCannotUseHere"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
@@ -100,7 +100,7 @@ namespace DOL.GS.Scripts
             if (player.DuelTarget != null)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.PasswordCurseItemUsageDuel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return false;
+                return ;
             }
             if (player.TempProperties.getProperty<bool>("ArenaParticipant", false))
             {

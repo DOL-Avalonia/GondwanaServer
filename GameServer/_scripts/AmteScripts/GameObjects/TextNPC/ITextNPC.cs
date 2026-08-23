@@ -1,6 +1,3 @@
-/**
- * Created by Virant "Dre" Jérémy for Amtenael
- */
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -480,7 +477,7 @@ namespace DOL.GS.Scripts
 
             if (EchItem.MoneyPrice > 0 && player.CopperBalance < EchItem.MoneyPrice)
             {
-                player.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.YouNeedToExchange", Money.GetString(EchItem.MoneyPrice))), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(string.Format(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.YouNeedToExchange", Money.GetString(EchItem.MoneyPrice, player.Client.Account.Language))), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return false;
             }
 
@@ -502,7 +499,7 @@ namespace DOL.GS.Scripts
                 if (playerItems.HasAllRequiredItems)
                 {
                     player.Client.Out.SendCustomDialog(string.Format("Afin de procéder à l'échange, il va falloir payer {0} et me donner en plus {1}",
-                       Money.GetString(EchItem.MoneyPrice),
+                       Money.GetString(EchItem.MoneyPrice, player.Client.Account.Language),
                        string.Join(", ", requireditems.Select(r => string.Format("{0} {1}", r.Count, r.Name)))
                         ), this.HandleClientResponse);
                 }
@@ -537,7 +534,7 @@ namespace DOL.GS.Scripts
                         this.PlayerReferences.Add(player.InternalID, new EchangeurInfo() { requireInfos = requireditems, GiveItem = item as GameInventoryItem });
                     }
 
-                    player.Client.Out.SendCustomDialog(string.Format("J'aurais besoin de {0} pour échanger ça. Valider l'échange ?", Money.GetString(EchItem.MoneyPrice)), this.HandleClientResponse);
+                    player.Client.Out.SendCustomDialog(string.Format("J'aurais besoin de {0} pour échanger ça. Valider l'échange ?", Money.GetString(EchItem.MoneyPrice, player.Client.Account.Language)), this.HandleClientResponse);
                     return false;
                 }
                 else
@@ -716,7 +713,7 @@ namespace DOL.GS.Scripts
             if (echItem.MoneyPrice > 0)
             {
                 player.RemoveMoney(Currency.Copper.Mint(echItem.MoneyPrice));
-                player.SendSystemMessage(string.Format("Vous avez payé {0}.", Money.GetString(echItem.MoneyPrice)));
+                player.SendSystemMessage(string.Format("Vous avez payé {0}.", Money.GetString(echItem.MoneyPrice, player.Client.Account.Language)));
             }
 
             if (requireItems.Any())

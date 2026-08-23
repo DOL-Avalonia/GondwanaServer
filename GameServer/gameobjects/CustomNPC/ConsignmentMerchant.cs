@@ -547,7 +547,7 @@ namespace DOL.GS
             }
             
             float tax = 1 + (float)ServerProperties.Properties.TRADING_TAX / 100;
-            string buyText = LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.BuyConfirm", ServerProperties.Properties.TRADING_TAX, Money.GetString((long)(fromItem.SellPrice * tax)));
+            string buyText = LanguageMgr.GetTranslation(player.Client.Account.Language, "ConsignmentMerchant.BuyConfirm", ServerProperties.Properties.TRADING_TAX, Money.GetString((long)(fromItem.SellPrice * tax), player.Client.Account.Language));
 
             // If the player has a marketExplorer activated they will be charged a commission
             if (player.TargetObject is MarketExplorer)
@@ -665,7 +665,7 @@ namespace DOL.GS
                     {
                         if (player.CopperBalance < purchasePrice)
                         {
-                            ChatUtil.SendSystemMessage(player, "GameMerchant.OnPlayerBuy.YouNeed", Money.GetString(purchasePrice));
+                            ChatUtil.SendSystemMessage(player, "GameMerchant.OnPlayerBuy.YouNeed", Money.GetString(purchasePrice, player.Client.Account.Language));
                             return;
                         }
                     }
@@ -688,7 +688,7 @@ namespace DOL.GS
                         if (player.RemoveMoney(Currency.Copper.Mint(purchasePrice)))
                         {
                             InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, purchasePrice);
-                            ChatUtil.SendMerchantMessage(player, "GameMerchant.OnPlayerBuy.Bought", item.GetName(1, false), Money.GetString(purchasePrice));
+                            ChatUtil.SendMerchantMessage(player, "GameMerchant.OnPlayerBuy.Bought", item.GetName(1, false), Money.GetString(purchasePrice, player.Client.Account.Language));
                         }
                         else
                         {

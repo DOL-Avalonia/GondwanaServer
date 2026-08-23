@@ -791,7 +791,16 @@ namespace DOL.GS.PacketHandler.Client.v168
             client.Player.IsJumping = ((playerAction & 0x40) != 0);
             client.Player.IsStrafing = ((playerState & 0xe000) != 0);
 
-            Zone newZone = WorldMgr.GetZone(currentZoneID);
+            var newPosition = Position.Create(
+                regionID: client.Player.Position.RegionID,
+                x: (int)newPlayerX,
+                y: (int)newPlayerY,
+                z: (int)newPlayerZ,
+                heading: (ushort)(newHeading & 0xFFF)
+            );
+
+            Zone parsedZone = WorldMgr.GetZone(currentZoneID);
+            Zone newZone = client.Player.CurrentRegion.GetZone(newPosition.Coordinate) ?? parsedZone;
             if (newZone == null)
             {
                 if (!client.Player.TempProperties.getProperty("isbeingbanned", false))
@@ -841,20 +850,18 @@ namespace DOL.GS.PacketHandler.Client.v168
                         screenDescription = translation.ScreenDescription;
                 }
 
+                if (client.Player.CurrentRegion.IsInstance)
+                {
+                    if (!description.EndsWith("(Instance)", StringComparison.OrdinalIgnoreCase)) description += " (Instance)";
+                    if (!screenDescription.EndsWith("(Instance)", StringComparison.OrdinalIgnoreCase)) screenDescription += " (Instance)";
+                }
+
                 client.Out.SendMessage(LanguageMgr.GetTranslation(client.Account.Language, "PlayerPositionUpdateHandler.Entered", description),
                                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 client.Out.SendMessage(screenDescription, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
 
                 client.Player.LastPositionUpdateZone = newZone;
             }
-
-            var newPosition = Position.Create(
-                regionID: newZone.ZoneRegion.ID,
-                x: (int)newPlayerX,
-                y: (int)newPlayerY,
-                z: (int)newPlayerZ,
-                heading: (ushort)(newHeading & 0xFFF)
-            );
 
             int coordsPerSec = 0;
             int jumpDetect = 0;

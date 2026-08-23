@@ -155,7 +155,7 @@ namespace DOL.GS
         private static void UpdatePlayerOtherPlayers(GamePlayer player, uint nowTicks)
         {
             // Get All Player in Range
-            var players = player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GamePlayer>().ToArray();
+            var players = new HashSet<GamePlayer>(player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GamePlayer>());
 
             try
             {

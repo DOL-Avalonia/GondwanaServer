@@ -262,6 +262,8 @@ namespace DOL.GS.PacketHandler
 
                 eQuestIndicator questIndicator = npc.GetQuestIndicator(m_gameClient.Player);
 
+                if ((byte)questIndicator >= 0x20)
+                    questIndicator = eQuestIndicator.None;
                 //When Renaissance is available, it triggers this (0x08)
                 if (questIndicator == eQuestIndicator.Available)
                     flags2 |= 0x08;//hex 8 - quest available
@@ -1169,7 +1171,7 @@ namespace DOL.GS.PacketHandler
                 if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                     name += "[" + item.SellPrice.ToString() + " BP]";
                 else
-                    name += "[" + Money.GetString(item.SellPrice) + "]";
+                    name += "[" + Money.GetString(item.SellPrice, m_gameClient.Account.Language) + "]";
             }
             if (name == null) name = "";
             if (name.Length > 55)

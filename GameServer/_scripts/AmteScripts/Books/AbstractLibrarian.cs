@@ -289,7 +289,7 @@ namespace DOL.GS.Scripts
             cache.CurrentListPage = page;
             foreach (var b in books)
             {
-                string price = Money.GetString(b.Price);
+                string price = Money.GetString(b.Price, player.Client.Account.Language);
                 string title = await cache.TranslateBookTitle(b);
 
                 sb.Append("\n[")

@@ -598,11 +598,11 @@ namespace DOL.GS.Commands
                 target.RemoveMoney(Currency.Copper.Mint(vol.Money));
 
                 target.Out.SendMessage(
-                    LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealed", Money.GetString(vol.Money)),
+                    LanguageMgr.GetTranslation(target.Client.Account.Language, "Commands.Players.Vol.BeStealed", Money.GetString(vol.Money, target.Client.Account.Language)),
                     eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
                 stealer.Out.SendMessage(
-                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealGain", Money.GetString(vol.Money)),
+                    LanguageMgr.GetTranslation(stealer.Client.Account.Language, "Commands.Players.Vol.StealGain", Money.GetString(vol.Money, stealer.Client.Account.Language)),
                     eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
                 TaskManager.UpdateTaskProgress(stealer, "SuccessfulPvPThefts", 1);

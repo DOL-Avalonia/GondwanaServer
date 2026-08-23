@@ -1368,7 +1368,32 @@ namespace DOL.AI.Brain
                             continue;
                         }
 
-                        if (LivingHasEffect(Body.TargetObject as GameLiving, spell) && spell.SpellType is not ("DirectDamage" or "DirectDamageWithDebuff"))
+                        if (spell.SpellType.Equals("OffProcShear", StringComparison.OrdinalIgnoreCase))
+                        {
+                            GameLiving targetLiving = Body.TargetObject as GameLiving;
+                            if (targetLiving == null) continue;
+
+                            bool targetHasOffProc = false;
+                            foreach (GameSpellEffect eff in targetLiving.EffectList.GetAllOfType<GameSpellEffect>())
+                            {
+                                if (eff?.Spell == null) continue;
+
+                                if (eff.SpellHandler is OffensiveProcSpellHandler ||
+                                    eff.SpellHandler is OffensiveProcPvESpellHandler ||
+                                    string.Equals(eff.Spell.SpellType, "OffensiveProc", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    targetHasOffProc = true;
+                                    break;
+                                }
+                            }
+
+                            if (!targetHasOffProc)
+                            {
+                                continue;
+                            }
+                        }
+
+                        if (LivingHasEffect(Body.TargetObject as GameLiving, spell) && spell.SpellType is not ("DirectDamage" or "DirectDamageWithDebuff" or "OffProcShear"))
                         {
                             continue;
                         }
@@ -1743,7 +1768,8 @@ namespace DOL.AI.Brain
                 case "SUMMONUNDERHILL":
                 case "SUMMONSIMULACRUM":
                 case "SUMMONSPIRITFIGHTER":
-                    //case "SummonTheurgistPet":
+                case "SummonTheurgistPet":
+                case "SummonMultiTemplatePets":
                     if (Body.ControlledBrain != null)
                         break;
                     Body.TargetObject = Body;
@@ -1786,7 +1812,7 @@ namespace DOL.AI.Brain
 
             bool casted = false;
 
-            if (Body.TargetObject is GameLiving living && GameServer.ServerRules.IsAllowedToAttack(Body, living, true) && (spell.Duration == 0 || !living.HasEffect(spell) || spell.SpellType.ToUpper() == "DIRECTDAMAGEWITHDEBUFF"))
+            if (Body.TargetObject is GameLiving living && GameServer.ServerRules.IsAllowedToAttack(Body, living, true) && (spell.Duration == 0 || !living.HasEffect(spell) || spell.SpellType.ToUpper() == "DIRECTDAMAGEWITHDEBUFF" || spell.SpellType.ToUpper() == "OFFPROCSHEAR"))
             {
                 if (spell.SpellType.Equals("ZombieHeal", StringComparison.OrdinalIgnoreCase) && IsValidZombieHealRecipient(living))
                 {
@@ -1860,6 +1886,7 @@ namespace DOL.AI.Brain
                 case "CallAreaEffect":
                 case "BumpSpell":
                 case "OmniHarm":
+                case "OffProcShear":
                     if (!LivingHasEffect(lastTarget as GameLiving, spell))
                     {
                         Body.TargetObject = lastTarget;

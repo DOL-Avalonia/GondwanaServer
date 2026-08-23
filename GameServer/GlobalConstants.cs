@@ -1096,7 +1096,14 @@ namespace DOL.GS
         Lesson = 0x04,
         Lore = 0x08,
         Pending = 0x10, // patch 0031
-        New = 0x11
+        New = 0x11,
+
+        // Custom 3D Fake-Mob Indicators
+        Tasks = 0x20,       // Model 1761 (Gold)
+        RedTarget = 0x21,   // Model 1762 (Red)
+        BlueTarget = 0x22,  // Model 1763 (Blue)
+        GreenTarget = 0x23, // Model 1764 (Green)
+        Teleport = 0x24     // Model 1923 (Teleporter)
     }
 
     /// <summary>

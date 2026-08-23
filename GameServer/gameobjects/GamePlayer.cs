@@ -1142,7 +1142,7 @@ namespace DOL.GS
             }
             #region TempPropertiesManager LookUp
 
-            if (ServerProperties.Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP)
+            if (Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP)
             {
                 try
                 {
@@ -1156,7 +1156,7 @@ namespace DOL.GS
 
                         //List<string> registered_temprop = new List<string>;
 
-                        registered_temprop = Util.SplitCSV(ServerProperties.Properties.TEMPPROPERTIES_TO_REGISTER).ToList();
+                        registered_temprop = Util.SplitCSV(Properties.TEMPPROPERTIES_TO_REGISTER).ToList();
 
                         occurences = (from j in registered_temprop
                                       where p.Contains(j)
@@ -1172,7 +1172,7 @@ namespace DOL.GS
                         long longresult = 0;
                         if (long.TryParse(v.ToString(), out longresult))
                         {
-                            if (ServerProperties.Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP_DEBUG)
+                            if (Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP_DEBUG)
                                 log.Debug("On Disconnection found and was saved: " + p + " with value: " + v.ToString() + " for player: " + Name);
 
                             TempPropertiesManager.TempPropContainerList.Add(new TempPropertiesManager.TempPropContainer(DBCharacter.ObjectId, p, v.ToString()));
@@ -1180,7 +1180,7 @@ namespace DOL.GS
                         }
                         else
                         {
-                            if (ServerProperties.Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP_DEBUG)
+                            if (Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP_DEBUG)
                                 log.Debug("On Disconnection found but was not saved (not a long value): " + p + " with value: " + v.ToString() + " for player: " + Name);
                         }
                     }
@@ -2053,7 +2053,7 @@ namespace DOL.GS
             if (player.IsUnderwater && player.CanBreathUnderWater == false)
                 player.Diving(waterBreath.Holding);
             //We need two different sickness spells because RvR sickness is not curable by Healer NPC -Unty
-            if (player.Level >= ServerProperties.Properties.RESS_SICKNESS_LEVEL)
+            if (player.Level >= Properties.RESS_SICKNESS_LEVEL)
                 switch (DeathType)
                 {
                     case eDeathType.RvR:
@@ -8322,7 +8322,7 @@ namespace DOL.GS
                 StopCrafting();
             }
 
-            if (Client.Account.PrivLevel > 1 && ServerProperties.Properties.ENABLE_DEBUG)
+            if (Client.Account.PrivLevel > 1 && Properties.ENABLE_DEBUG)
             {
                 SendAttackDetails(ad);
             }
@@ -11397,12 +11397,12 @@ namespace DOL.GS
 
         private Wallet Wallet { get; }
 
-        public DOL.GS.Finance.Money GetBalance(Currency currency) => Wallet.GetBalance(currency);
+        public Finance.Money GetBalance(Currency currency) => Wallet.GetBalance(currency);
         public long CopperBalance => GetBalance(Currency.Copper).Amount;
         public long BountyPointBalance => GetBalance(Currency.BountyPoints).Amount;
 
-        public void AddMoney(DOL.GS.Finance.Money money) => Wallet.AddMoney(money);
-        public bool RemoveMoney(DOL.GS.Finance.Money money) => Wallet.RemoveMoney(money);
+        public void AddMoney(Finance.Money money) => Wallet.AddMoney(money);
+        public bool RemoveMoney(Finance.Money money) => Wallet.RemoveMoney(money);
 
         [Obsolete("Use CopperBalance instead.")]
         public virtual long GetCurrentMoney() => CopperBalance;
@@ -11418,14 +11418,14 @@ namespace DOL.GS
         public virtual void AddMoney(long copperAmount, string message)
         {
             AddMoney(copperAmount);
-            if (message != null) SendSystemMessage(string.Format(message, Money.GetString(copperAmount)));
+            if (message != null) SendSystemMessage(string.Format(message, Money.GetString(copperAmount, Language)));
         }
 
         [Obsolete("Use AddMoney(Money) and SendMessage(string,eChatType,eChatLoc) instead.")]
         public virtual void AddMoney(long copperAmount, string messageFormat, eChatType ct, eChatLoc cl)
         {
             AddMoney(copperAmount);
-            if (messageFormat != null) SendMessage(string.Format(messageFormat, Money.GetString(copperAmount)), ct, cl);
+            if (messageFormat != null) SendMessage(string.Format(messageFormat, Money.GetString(copperAmount, Language)), ct, cl);
         }
 
         [Obsolete("Use RemoveMoney(Money) and SendSystemMessage(string) instead.")]
@@ -15780,7 +15780,7 @@ namespace DOL.GS
                                 if (eligibleMember.Guild.GetGuildDuesPercent() != 100)
                                 {
                                     eligibleMember.AddMoney(Currency.Copper.Mint(moneyToPlayer));
-                                    eligibleMember.SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YourLootShare", Money.GetString(moneyToPlayer)));
+                                    eligibleMember.SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YourLootShare", Money.GetString(moneyToPlayer, eligibleMember.Client.Account.Language)));
                                 }
                                 else
                                     eligibleMember.AddMoney(Currency.Copper.Mint(moneyToPlayer));
@@ -15792,7 +15792,7 @@ namespace DOL.GS
                             {
 
                                 eligibleMember.AddMoney(Currency.Copper.Mint(moneyToPlayer));
-                                eligibleMember.SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YourLootShare", Money.GetString(moneyToPlayer)));
+                                eligibleMember.SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YourLootShare", Money.GetString(moneyToPlayer, eligibleMember.Client.Account.Language)));
                                 InventoryLogging.LogInventoryAction("", "(ground)", eligibleMember, eInventoryActionType.Loot, moneyToPlayer);
                             }
                         }
@@ -15806,7 +15806,7 @@ namespace DOL.GS
                             if (Guild.GetGuildDuesPercent() != 100)
                             {
                                 AddMoney(Currency.Copper.Mint(moneyObject.TotalCopper));
-                                SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouPickUp", Money.GetString(moneyObject.TotalCopper)));
+                                SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouPickUp", Money.GetString(moneyObject.TotalCopper, Client.Account.Language)));
                             }
                             else
                             {
@@ -15814,12 +15814,12 @@ namespace DOL.GS
                             }
                             InventoryLogging.LogInventoryAction("", "(ground)", this, eInventoryActionType.Loot, moneyObject.TotalCopper);
                             Guild.SetGuildBank(this, moneyToGuild);
-                            Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.PickupObject.GuildDueTax", Money.GetString(moneyToGuild)), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
+                            Out.SendMessage(LanguageMgr.GetTranslation(Client, "GameObjects.GamePlayer.PickupObject.GuildDueTax", Money.GetString(moneyToGuild, Client.Account.Language)), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
                         }
                         else
                         {
                             AddMoney(Currency.Copper.Mint(moneyObject.TotalCopper));
-                            SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouPickUp", Money.GetString(moneyObject.TotalCopper)));
+                            SendSystemMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouPickUp", Money.GetString(moneyObject.TotalCopper, Client.Account.Language)));
                             InventoryLogging.LogInventoryAction("", "(ground)", this, eInventoryActionType.Loot, moneyObject.TotalCopper);
                         }
                     }

@@ -343,20 +343,20 @@ namespace DOL.GS
             {
                 "KillEnemyPlayersGroup" => level switch
                 {
-                    0 => 25,
-                    1 => 40,
-                    2 => 80,
-                    3 => 150,
-                    4 => 300,
+                    0 => 30,
+                    1 => 60,
+                    2 => 100,
+                    3 => 200,
+                    4 => 400,
                     _ => int.MaxValue
                 },
                 "KillEnemyPlayersAlone" => level switch
                 {
-                    0 => 15,
-                    1 => 30,
-                    2 => 50,
-                    3 => 80,
-                    4 => 150,
+                    0 => 20,
+                    1 => 40,
+                    2 => 80,
+                    3 => 150,
+                    4 => 300,
                     _ => int.MaxValue
                 },
                 "KillKeepGuards" => level switch

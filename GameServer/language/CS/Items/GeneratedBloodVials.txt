@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: Lahvička: {0}{1}
+ROG.PlayerVial.Format.Sap: Lahvička s mízou: {0}{1}
+ROG.PlayerVial.Prefix.Vigorous: Rázný
+ROG.PlayerVial.Prefix.Illustrous: Slavný
+ROG.PlayerVial.Prefix.Exalted: Vznešený
+
 ROG.BloodVial.Format: Lahvička: {1}{2} z {0}
 ROG.BloodVial.Format.Sap: Lahvička: {2} z {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Magická krev
 ROG.BloodVial.Type.StickySap: Lepivá míza
 ROG.BloodVial.Type.PlantNectar: Rostlinný nektar
 ROG.BloodVial.Type.SporeExtract: Výtažek ze spor
+ROG.BloodVial.Type.AbyssalIchor: Hlubinný ichor
 ROG.BloodVial.Type.DeadlyVenom: Smrtící jed
 ROG.BloodVial.Type.PutrefiedBlood: Hnijící krev
 ROG.BloodVial.Type.Ectoplasm: Ektoplazma

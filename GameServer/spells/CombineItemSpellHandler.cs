@@ -5,15 +5,13 @@ using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
-using DOL.GS.Trainer;
+using DOL.GS.Scripts;
 using DOL.Language;
 using DOLDatabase.Tables;
 using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DOL.spells
@@ -21,7 +19,7 @@ namespace DOL.spells
     [SpellHandler("CombineItem")]
     public class CombineItemSpellHandler : SpellHandler
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static readonly int[] modelForge = { 478, 1495 };
         private static readonly int[] modelTannery = { 479 };
@@ -56,13 +54,34 @@ namespace DOL.spells
                 return null;
             }
 
-            var backpack = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
+            var availableItems = new List<InventoryItem>();
+            var bags = new List<StorageBagItem>();
+
+            // Aggregate items from both Backpack and StorageBags
+            lock (player.Inventory)
+            {
+                foreach (InventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+                {
+                    if (item != null)
+                    {
+                        availableItems.Add(item);
+                        if (item is StorageBagItem sbi) bags.Add(sbi);
+                    }
+                }
+            }
+
+            foreach (var bag in bags)
+            {
+                StorageBagVault bagVault = new StorageBagVault(player, bag);
+                availableItems.AddRange(bagVault.DBItems(player));
+            }
+
             foreach (var combinable in possibleItems)
             {
-                var matchedItems = TryMatch(combinable, backpack, usedItem);
+                var matchedItems = TryMatch(combinable, availableItems, usedItem);
                 if (matchedItems != null)
                 {
-                    return new(combinable, matchedItems.Values.SelectMany(l => l).ToList());
+                    return new Combine(combinable, matchedItems.Values.SelectMany(l => l).ToList());
                 }
             }
             return null;
@@ -968,49 +987,81 @@ namespace DOL.spells
         private bool RemoveItems(GamePlayer player)
         {
             IEnumerable<ItemMatch> matches = currentCombine.Matches;
-            bool CheckAllItemsPresent()
-            {
-                foreach (var (item, count) in matches)
-                {
-                    if (item == null || item.OwnerID != player.InternalID || item.Count < count)
-                        return false;
-                }
-                return true;
-            }
-            
-            var backpack = player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
-            if (!CheckAllItemsPresent())
-            {
-                // Inventory layout changed, re-calculate
-                var usedItem = useItem.OwnerID == player.ObjectId ? useItem : null; // Re-check the item we were using is still there too
-                matches = TryMatch(match, backpack, usedItem)?.Values.SelectMany(i => i);
-                if (matches == null)
-                {
-                    log.Debug($"Could not find items for combine {match.DbId} for player {player.Name}");
-                    return false;
-                }
-            }
-            foreach (var (item, count) in matches)
-            {
-                int toRemove = count;
 
-                if (item == useItem)
+            var bags = new List<StorageBagItem>();
+            lock (player.Inventory)
+            {
+                foreach (InventoryItem item in player.Inventory.GetItemRange(eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
                 {
-                    toRemove -= 1;
+                    if (item is StorageBagItem sbi) bags.Add(sbi);
                 }
+            }
+
+            var bagUpdatedItems = new Dictionary<string, Dictionary<int, InventoryItem>>();
+            player.Inventory.BeginChanges();
+
+            foreach (var match in matches)
+            {
+                var item = match.item;
+                int toRemove = match.Count;
+
+                if (item == useItem) toRemove -= 1;
 
                 if (toRemove > 0)
                 {
-                    if (item.Count == toRemove)
+                    bool inBag = item.SlotPosition >= 1000 && item.SlotPosition <= 1399;
+
+                    if (inBag)
                     {
-                        player.Inventory.RemoveItem(item);
+                        StorageBagItem bagItem = bags.FirstOrDefault(b => b.ObjectId == item.OwnerID);
+
+                        if (bagItem != null)
+                        {
+                            StorageBagVault vault = new StorageBagVault(player, bagItem);
+                            if (!bagUpdatedItems.ContainsKey(bagItem.ObjectId)) bagUpdatedItems[bagItem.ObjectId] = new Dictionary<int, InventoryItem>();
+
+                            lock (vault.LockObject())
+                            {
+                                if (item.Count <= toRemove)
+                                {
+                                    if (item.IsPersisted)
+                                        GameServer.Database.DeleteObject(item);
+
+                                    vault.OnRemoveItem(player, item);
+
+                                    InventoryItem emptyItem = new InventoryItem();
+                                    emptyItem.SlotPosition = item.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot;
+                                    emptyItem.Count = 0;
+                                    bagUpdatedItems[bagItem.ObjectId][emptyItem.SlotPosition] = emptyItem;
+                                }
+                                else
+                                {
+                                    item.Count -= toRemove;
+                                    GameServer.Database.SaveObject(item);
+                                    bagUpdatedItems[bagItem.ObjectId][item.SlotPosition - vault.FirstDBSlot + vault.FirstClientSlot] = item;
+                                }
+                            }
+                            bagItem.InvalidateWeightCache();
+                        }
                     }
                     else
                     {
-                        player.Inventory.RemoveCountFromStack(item, toRemove);
+                        if (item.Count <= toRemove) player.Inventory.RemoveItem(item);
+                        else player.Inventory.RemoveCountFromStack(item, toRemove);
                     }
                 }
             }
+            player.Inventory.CommitChanges();
+
+            foreach (var bagUpdateKvp in bagUpdatedItems)
+            {
+                if (player.ActiveInventoryObject is StorageBagVault activeVault && activeVault.BagItem.ObjectId == bagUpdateKvp.Key)
+                {
+                    player.Out.SendInventoryItemsUpdate(bagUpdateKvp.Value, eInventoryWindowType.Update);
+                }
+            }
+
+            player.UpdateEncumberance();
             return true;
         }
 

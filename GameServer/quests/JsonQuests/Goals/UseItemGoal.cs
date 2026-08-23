@@ -3,6 +3,7 @@ using DOL.Events;
 using DOL.GS.Behaviour;
 using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace DOL.GS.Quests
         private readonly ushort m_areaRegion;
         private readonly bool hasArea = false;
         private readonly bool destroyItem = false;
+        private QuestIndicatorNPC m_areaIndicator;
         public override QuestZonePoint PointA { get; }
 
         public UseItemGoal(DataQuestJson quest, int goalId, dynamic db) : base(quest, goalId, (object)db)
@@ -40,6 +42,17 @@ namespace DOL.GS.Quests
                 var reg = WorldMgr.GetRegion(m_areaRegion);
                 reg.AddArea(m_area);
                 PointA = new QuestZonePoint(reg.GetZone(m_area.Coordinate), m_area.Coordinate);
+
+                m_areaIndicator = new QuestIndicatorNPC(null);
+                m_areaIndicator.StaticIndicator = eQuestIndicator.RedTarget;
+                m_areaIndicator.IsVisibleCondition = (player) =>
+                {
+                    var pq = player.QuestList.OfType<PlayerQuest>().FirstOrDefault(q => q.QuestId == QuestId);
+                    return pq != null && IsActive(pq) && !IsDone(pq);
+                };
+                m_areaIndicator.CurrentRegionID = m_areaRegion;
+                m_areaIndicator.Position = Position.Create(m_areaRegion, m_area.Coordinate.X, m_area.Coordinate.Y, m_area.Coordinate.Z, 0) + DOL.GS.Geometry.Vector.Create(z: 1);
+                m_areaIndicator.AddToWorld();
             }
             if (db.TargetName != null && db.TargetName != "" && db.TargetRegion != null && db.TargetRegion != "")
             {
@@ -57,14 +70,25 @@ namespace DOL.GS.Quests
         {
             var dict = base.GetDatabaseJsonObject();
             dict.Add("Item", m_item.Id_nb);
-            dict.Add("TargetName", Target.Name);
+            dict.Add("TargetName", Target?.Name ?? "");
             dict.Add("DestroyItem", destroyItem);
-            dict.Add("TargetRegion", Target.CurrentRegionID);
-            dict.Add("AreaCenter", m_area.Coordinate);
-            dict.Add("AreaRadius", m_area.Radius);
-            dict.Add("AreaRegion", m_areaRegion);
+            dict.Add("TargetRegion", Target?.CurrentRegionID ?? 0);
+            if (hasArea)
+            {
+                dict.Add("AreaCenter", m_area.Coordinate);
+                dict.Add("AreaRadius", m_area.Radius);
+                dict.Add("AreaRegion", m_areaRegion);
+            }
             dict.Add("Text", m_text);
             return dict;
+        }
+
+        public override void RefreshCustomIndicators(PlayerQuest questData)
+        {
+            if (m_areaIndicator != null && questData != null)
+            {
+                questData.Owner.Out.SendModelChange(m_areaIndicator, m_areaIndicator.GetModelForPlayer(questData.Owner));
+            }
         }
 
         protected override void NotifyActive(PlayerQuest quest, PlayerGoalState goal, DOLEvent e, object sender, EventArgs args)
@@ -73,10 +97,12 @@ namespace DOL.GS.Quests
             if ((!hasArea || (hasArea && m_area.IsContaining(player.Coordinate, false))) && e == GamePlayerEvent.UseSlot && args is UseSlotEventArgs useSlot)
             {
                 var usedItem = player.Inventory.GetItem((eInventorySlot)useSlot.Slot);
-                if (usedItem.Id_nb == QuestItem.Id_nb && (Target == null || player.TargetObject == Target))
+                if (usedItem != null && usedItem.Id_nb == QuestItem.Id_nb && (Target == null || player.TargetObject == Target))
                 {
                     if (AdvanceGoal(quest, goal))
                     {
+                        RefreshCustomIndicators(quest);
+
                         if (destroyItem)
                         {
                             player.Inventory.RemoveCountFromStack(usedItem, 1);
@@ -87,13 +113,26 @@ namespace DOL.GS.Quests
                             player.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
                         });
                     }
-                    
+                }
+            }
+
+            if (hasArea && (sender as AbstractArea)?.ID == m_area.ID && args is AreaEventArgs arguments && arguments.GameObject == quest.Owner)
+            {
+                if (e == AreaEvent.PlayerEnter || e == AreaEvent.PlayerLeave)
+                {
+                    RefreshCustomIndicators(quest);
                 }
             }
         }
+
         public override void Unload()
         {
-            WorldMgr.GetRegion(m_areaRegion)?.RemoveArea(m_area);
+            if (hasArea)
+                WorldMgr.GetRegion(m_areaRegion)?.RemoveArea(m_area);
+
+            if (m_areaIndicator != null)
+                m_areaIndicator.RemoveFromWorld();
+
             base.Unload();
         }
     }

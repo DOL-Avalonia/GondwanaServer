@@ -117,7 +117,7 @@ namespace DOL.GS.Scripts
                     {
                         npc.GetTextNPCPolicy(player).EchangeurDB[item].GainMoney = money;
                         npc.GetTextNPCPolicy(player).SaveIntoDatabase();
-                        player.Out.SendMessage(item + " donne " + Money.GetString(money) + " maintenant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(item + " donne " + Money.GetString(money, player.Client.Account.Language) + " maintenant.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }
                     break;
 
@@ -289,7 +289,7 @@ namespace DOL.GS.Scripts
                         if (pair.Value.ItemGiveCount > 0)
                             text.Add("     " + pair.Value.ItemGiveCount + " " + pair.Value.ItemGiveID);
                         if (pair.Value.GainMoney > 0)
-                            text.Add("     " + Money.GetString(pair.Value.GainMoney));
+                            text.Add("     " + Money.GetString(pair.Value.GainMoney, player.Client.Account.Language));
                         if (pair.Value.GainXP > 0)
                             text.Add("     " + pair.Value.GainXP + "xp");
                         if (pair.Value.GainXP < 0)

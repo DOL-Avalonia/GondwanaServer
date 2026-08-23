@@ -15,6 +15,12 @@ TeleportNPC.WrongTime:					You have chosen the wrong time to come here, this des
 TeleportNPC.QuestNotCompleted:			You must have completed the quest "{0}" to show you're worthy enough to go to this place!
 TeleportNPC.QuestStepNotCompleted:		You must currently be doing the quest "{0}" (step {1}) to let me teleport you to this place!
 TeleportNPC.ConditionsNotMet:			I can't let you go to this location yet!
-TeleportNPC.ItemConsumed:			The magic depletes your {0}, consuming it entirely!
-TeleportNPC.ItemDegrading:			The strain of travel cracks your {0} ({1}% condition remaining).
-TeleportNPC.RelicBlocked:			I cannot channel the weave... the relic's ancient magic rejects this destination!
+TeleportNPC.ItemConsumed:				The magic depletes your {0}, consuming it entirely!
+TeleportNPC.ItemDegrading:				The strain of travel cracks your {0} ({1}% condition remaining).
+TeleportNPC.RelicBlocked:				I cannot channel the weave... the relic's ancient magic rejects this destination!
+TeleportNPC.TpInstanceMustGroup:		You must be in a group to enter this instance.
+TeleportNPC.TpInstanceGroupLeader:		Only the group leader can initiate the instance teleport.
+TeleportNPC.TpInstanceMustGuild:		You must be in a guild to enter this instance.
+TeleportNPC.TpInstanceMustBG:			You must be in a battlegroup to enter this instance.
+TeleportNPC.TpInstanceBGLeader:			Only the battlegroup leader can initiate the instance teleport.
+TeleportNPC.NoInstanceNoRegion:			Cannot create instance: no region IDs available.

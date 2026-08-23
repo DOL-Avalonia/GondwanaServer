@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: Fiolă cu {1} {0}
+ROG.PlayerVial.Format.Sap: Fiolă cu Sevă de {1} {0}
+ROG.PlayerVial.Prefix.Vigorous: Viguros
+ROG.PlayerVial.Prefix.Illustrous: Ilustru
+ROG.PlayerVial.Prefix.Exalted: Exaltat
+
 ROG.BloodVial.Format: Fiolă cu {2} {1}de la {0}
 ROG.BloodVial.Format.Sap: Fiolă cu {2} de la {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Sânge Magic
 ROG.BloodVial.Type.StickySap: Sevă Lipicioasă
 ROG.BloodVial.Type.PlantNectar: Nectar de Plante
 ROG.BloodVial.Type.SporeExtract: Extract de Spori
+ROG.BloodVial.Type.AbyssalIchor: Icor Abisal
 ROG.BloodVial.Type.DeadlyVenom: Venin Mortal
 ROG.BloodVial.Type.PutrefiedBlood: Sânge Putrefiat
 ROG.BloodVial.Type.Ectoplasm: Ectoplasmă

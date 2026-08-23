@@ -28,12 +28,17 @@ namespace DOL.GS.Scripts
          "Commands.GM.TeleportNPC.Usage.Conditions.Condition",
          "Commands.GM.TeleportNPC.Usage.Conditions.Niveaux",
          "Commands.GM.TeleportNPC.Usage.Conditions.Bind",
-         "Commands.GM.TeleportNPC.Usage.AdditionalDescription",
          "Commands.GM.TeleportNPC.Usage.Conditions.Hours",
          "Commands.GM.TeleportNPC.Usage.Conditions.Event",
          "Commands.GM.TeleportNPC.Usage.Conditions.CompletedQuest",
          "Commands.GM.TeleportNPC.Usage.Conditions.QuestStep",
          "Commands.GM.TeleportNPC.Usage.Conditions.BlockRelic",
+         "Commands.GM.TeleportNPC.Usage.Conditions.InstanceRule",
+         "Commands.GM.TeleportNPC.Usage.Conditions.ScaleMobs",
+         "Commands.GM.TeleportNPC.Usage.Conditions.BossScaling",
+         "Commands.GM.TeleportNPC.Usage.Conditions.InstanceSkin",
+         "Commands.GM.TeleportNPC.Usage.Conditions.ClonePlayer",
+         "Commands.GM.TeleportNPC.Usage.Conditions.Remove",
          "Commands.GM.TeleportNPC.Usage.TerritoryLinked",
          "Commands.GM.TeleportNPC.Usage.ShowTeleporterIndicator",
          "Commands.GM.TeleportNPC.Usage.ShowBoundary",
@@ -43,9 +48,19 @@ namespace DOL.GS.Scripts
          "Commands.GM.TeleportNPC.Usage.AreaPulse.CastTicks",
          "Commands.GM.TeleportNPC.Usage.AreaPulse.ClientEffect",
          "Commands.GM.TeleportNPC.Usage.AreaPulse.CastEffect",
-         "Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect")]
+         "Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect",
+         "Commands.GM.TeleportNPC.Usage.AdditionalDescription")]
     public class TeleportNPCCommandHandler : AbstractCommandHandler, ICommandHandler
     {
+        private void RefreshIndicators(GameNPC npc)
+        {
+            if (npc == null) return;
+            foreach (GamePlayer player in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+            {
+                QuestIndicatorManager.RefreshIndicator(npc, player);
+            }
+        }
+
         public void OnCommand(GameClient client, string[] args)
         {
             if (client.Player == null) return;
@@ -305,9 +320,10 @@ namespace DOL.GS.Scripts
                         DisplaySyntax(client);
                         return;
                     }
-                    if (args[2].Equals("on", StringComparison.CurrentCultureIgnoreCase))
+                    string indToggle = args[2].Replace("\"", "").ToLower();
+                    if (indToggle == "on")
                         npc.ShowTPIndicator = true;
-                    else if (args[2].Equals("off", StringComparison.CurrentCultureIgnoreCase))
+                    else if (indToggle == "off")
                         npc.ShowTPIndicator = false;
                     else
                     {
@@ -323,8 +339,9 @@ namespace DOL.GS.Scripts
                 #region Show Boundary
                 case "showboundary":
                     if (npc == null || args.Length < 3) { DisplaySyntax(client); return; }
-                    if (args[2].Equals("on", StringComparison.CurrentCultureIgnoreCase)) npc.ShowBoundary = true;
-                    else if (args[2].Equals("off", StringComparison.CurrentCultureIgnoreCase)) npc.ShowBoundary = false;
+                    string boundToggle = args[2].Replace("\"", "").ToLower();
+                    if (boundToggle == "on") npc.ShowBoundary = true;
+                    else if (boundToggle == "off") npc.ShowBoundary = false;
                     else { DisplaySyntax(client); return; }
                     npc.SaveIntoDatabase();
                     player.Out.SendMessage("Show boundary set to " + npc.ShowBoundary + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -451,6 +468,7 @@ namespace DOL.GS.Scripts
                     targetMob.LoadFromDatabase(GameServer.Database.FindObjectByKey<Mob>(targetMob.InternalID));
                     targetMob.AddToWorld();
                     client.Player.Out.SendMessage(targetMob.Name + " reloaded!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    RefreshIndicators(targetMob);
                 }
                 else
                 {
@@ -524,6 +542,7 @@ namespace DOL.GS.Scripts
 
                 #region niveaux
                 case "level":
+                case "levels":
                 case "niveau":
                 case "niveaux":
                     if (int.TryParse(args[4], out min))
@@ -678,13 +697,170 @@ namespace DOL.GS.Scripts
                     break;
                 #endregion
 
+                #region instances
+                case "instancerule":
+                    if (args.Length < 5) { DisplaySyntax(client); return; }
+                    if (Enum.TryParse(args[4], true, out eInstanceRule rule))
+                    {
+                        jump.Conditions.InstanceRule = rule;
+                        DisplayMessage(client, "Instance rule set to: " + rule);
+                    }
+                    else { DisplaySyntax(client); return; }
+                    break;
+
+                case "scalemobs":
+                    if (args.Length < 5) { DisplaySyntax(client); return; }
+
+                    if (args[4].Equals("smart", StringComparison.OrdinalIgnoreCase))
+                    {
+                        jump.Conditions.ScaleMobs = true;
+                        jump.Conditions.SmartScale = true;
+                        jump.Conditions.ScaleOffset = 0;
+                        DisplayMessage(client, "Mob scaling set to: Smart (Class-based for Solo)");
+                    }
+                    else if (bool.TryParse(args[4], out bool scale))
+                    {
+                        jump.Conditions.ScaleMobs = scale;
+                        jump.Conditions.SmartScale = false;
+                        jump.Conditions.ScaleOffset = 0;
+                        DisplayMessage(client, "Mob scaling set to: " + scale);
+                    }
+                    else if (int.TryParse(args[4], out int offset))
+                    {
+                        jump.Conditions.ScaleMobs = true;
+                        jump.Conditions.SmartScale = false;
+                        jump.Conditions.ScaleOffset = offset;
+                        DisplayMessage(client, "Mob scaling enabled with offset: " + offset);
+                    }
+                    else { DisplaySyntax(client); return; }
+                    break;
+
+                case "bossscaling":
+                    if (args.Length < 5) { DisplaySyntax(client); return; }
+                    string bossStr = string.Join(" ", args.Skip(4));
+                    if (bossStr.ToLower() == "none") bossStr = "";
+                    jump.Conditions.BossScaling = bossStr;
+                    DisplayMessage(client, "Boss scaling set to: " + (bossStr == "" ? "None" : bossStr));
+                    break;
+
+                case "instanceskin":
+                    if (args.Length < 5) { DisplaySyntax(client); return; }
+                    if (ushort.TryParse(args[4], out ushort skinId))
+                    {
+                        jump.Conditions.InstanceSkin = skinId;
+                        DisplayMessage(client, "Instance skin set to: " + skinId);
+                    }
+                    else { DisplaySyntax(client); return; }
+                    break;
+
+                case "cloneplayerclasses":
+                    if (args.Length < 5) { DisplaySyntax(client); return; }
+                    if (bool.TryParse(args[4], out bool cloneClasses))
+                    {
+                        jump.Conditions.ClonePlayerClasses = cloneClasses;
+                        if (args.Length >= 6 && ushort.TryParse(args[5], out ushort col))
+                            jump.Conditions.CloneClassesColor = col;
+                        else
+                            jump.Conditions.CloneClassesColor = 0; // Default 0
+
+                        DisplayMessage(client, "Clone player classes set to: " + cloneClasses + (cloneClasses ? $" (Color: {jump.Conditions.CloneClassesColor})" : ""));
+                    }
+                    else { DisplaySyntax(client); return; }
+                    break;
+                #endregion
+
+                #region remove
+                case "remove":
+                    if (args.Length < 5)
+                    {
+                        DisplaySyntax(client);
+                        return;
+                    }
+
+                    string propToRemove = args[4].ToLower();
+
+                    if (propToRemove == "all")
+                    {
+                        if (!string.IsNullOrEmpty(jump.Conditions.ActiveEventId))
+                        {
+                            var ev = GameEventManager.Instance.GetEventByID(jump.Conditions.ActiveEventId);
+                            if (ev != null)
+                            {
+                                lock (ev.RelatedNPCs) { ev.RelatedNPCs.Remove(npc); }
+                            }
+                        }
+
+                        jump.Conditions = new TeleportNPC.TeleportCondition("");
+                        DisplayMessage(client, "Toutes les conditions pour le jump \"" + jump.Name + "\" ont été supprimées.");
+                    }
+                    else
+                    {
+                        switch (propToRemove)
+                        {
+                            case "visible": jump.Conditions.Visible = true; break;
+                            case "item":
+                            case "objet": jump.Conditions.Item = ""; break;
+                            case "slot": jump.Conditions.RequiredSlot = 0; break;
+                            case "condition": jump.Conditions.ConditionAmount = 0; break;
+                            case "level":
+                            case "niveau":
+                            case "niveaux":
+                                jump.Conditions.LevelMin = 0;
+                                jump.Conditions.LevelMax = 50;
+                                break;
+                            case "bind": jump.Conditions.Bind = false; break;
+                            case "hour":
+                            case "hours":
+                            case "heure":
+                            case "heures":
+                                jump.Conditions.HourMin = 0;
+                                jump.Conditions.HourMax = 24;
+                                break;
+                            case "completedquest":
+                            case "quest": jump.Conditions.RequiredCompletedQuestID = 0; break;
+                            case "queststep":
+                            case "step": jump.Conditions.RequiredQuestStepID = 0; break;
+                            case "blockrelic":
+                            case "relic": jump.Conditions.BlockRelic = false; break;
+                            case "event":
+                                if (!string.IsNullOrEmpty(jump.Conditions.ActiveEventId))
+                                {
+                                    var ev = GameEventManager.Instance.GetEventByID(jump.Conditions.ActiveEventId);
+                                    if (ev != null)
+                                    {
+                                        lock (ev.RelatedNPCs) { ev.RelatedNPCs.Remove(npc); }
+                                    }
+                                }
+                                jump.Conditions.ActiveEventId = string.Empty;
+                                break;
+                            case "instancerule": jump.Conditions.InstanceRule = eInstanceRule.None; break;
+                            case "scalemobs":
+                                jump.Conditions.ScaleMobs = false;
+                                jump.Conditions.SmartScale = false;
+                                jump.Conditions.ScaleOffset = 0;
+                                break;
+                            case "bossscaling": jump.Conditions.BossScaling = string.Empty; break;
+                            case "instanceskin": jump.Conditions.InstanceSkin = 0; break;
+                            case "cloneplayerclasses":
+                                jump.Conditions.ClonePlayerClasses = false;
+                                jump.Conditions.CloneClassesColor = 0;
+                                break;
+                            default:
+                                DisplayMessage(client, "La condition \"" + args[4] + "\" n'est pas reconnue.");
+                                return;
+                        }
+                        DisplayMessage(client, "La condition \"" + args[4] + "\" a été supprimée pour le jump \"" + jump.Name + "\".");
+                    }
+                    break;
+                #endregion
+
                 default:
                     DisplaySyntax(client);
                     return;
             }
+
             npc.SaveIntoDatabase();
-            npc.RemoveFromWorld();
-            npc.AddToWorld();
+            RefreshIndicators(npc);
         }
     }
 }

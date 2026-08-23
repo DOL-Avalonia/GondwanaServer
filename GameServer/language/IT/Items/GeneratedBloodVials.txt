@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: Fiala di {1} {0}
+ROG.PlayerVial.Format.Sap: Fiala di Linfa di {1} {0}
+ROG.PlayerVial.Prefix.Vigorous: Vigoroso
+ROG.PlayerVial.Prefix.Illustrous: Illustre
+ROG.PlayerVial.Prefix.Exalted: Esaltato
+
 ROG.BloodVial.Format: Fiala di {2} {1}di {0}
 ROG.BloodVial.Format.Sap: Fiala di {2} di {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Sangue Magico
 ROG.BloodVial.Type.StickySap: Linfa Appiccicosa
 ROG.BloodVial.Type.PlantNectar: Nettare di Pianta
 ROG.BloodVial.Type.SporeExtract: Estratto di Spora
+ROG.BloodVial.Type.AbyssalIchor: Icore Abissale
 ROG.BloodVial.Type.DeadlyVenom: Veleno Mortale
 ROG.BloodVial.Type.PutrefiedBlood: Sangue Putrefatto
 ROG.BloodVial.Type.Ectoplasm: Ectoplasma

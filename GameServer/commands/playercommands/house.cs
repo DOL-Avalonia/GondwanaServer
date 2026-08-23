@@ -25,6 +25,7 @@ using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Reflection;
 
 namespace DOL.GS.Commands
@@ -120,8 +121,8 @@ namespace DOL.GS.Commands
                         textList.Add($"\u2022 " + LanguageMgr.GetTranslation(client.Account.Language, "Commands.Players.House.ListHouse", count.ToString("D2")));
                         textList.Add($"  - " + LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.Owner", h.Name));
                         textList.Add($"  - " + LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.Lotnum", h.HouseNumber));
-                        textList.Add($"  - " + LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.Lockbox", Money.GetString(h.KeptMoney)));
-                        textList.Add($"  - " + LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.RentalPrice", Money.GetString(HouseMgr.GetRentByModel(h.Model))));
+                        textList.Add($"  - " + LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.Lockbox", Money.GetString(h.KeptMoney, client.Account.Language)));
+                        textList.Add($"  - " + LanguageMgr.GetTranslation(client.Account.Language, "House.SendHouseInfo.RentalPrice", Money.GetString(HouseMgr.GetRentByModel(h.Model), client.Account.Language)));
 
                         // Calculate rent due time
                         TimeSpan due;

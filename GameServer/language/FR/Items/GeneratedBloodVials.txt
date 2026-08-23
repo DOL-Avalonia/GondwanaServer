@@ -38,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Sang Magique
 ROG.BloodVial.Type.StickySap: Sève Collante
 ROG.BloodVial.Type.PlantNectar: Nectar de Plante
 ROG.BloodVial.Type.SporeExtract: Extrait de Spore
+ROG.BloodVial.Type.AbyssalIchor: Ichor des Profondeurs
 ROG.BloodVial.Type.DeadlyVenom: Venin Mortel
 ROG.BloodVial.Type.PutrefiedBlood: Sang Putréfié
 ROG.BloodVial.Type.Ectoplasm: Ectoplasme

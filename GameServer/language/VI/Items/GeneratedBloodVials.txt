@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: Lọ {1} {0}
+ROG.PlayerVial.Format.Sap: Lọ Nhựa {1} {0}
+ROG.PlayerVial.Prefix.Vigorous: Mạnh Mẽ
+ROG.PlayerVial.Prefix.Illustrous: Lừng Lẫy
+ROG.PlayerVial.Prefix.Exalted: Tối Cao
+
 ROG.BloodVial.Format: Lọ {2} {1}của {0}
 ROG.BloodVial.Format.Sap: Lọ {2} của {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Máu Ma Thuật
 ROG.BloodVial.Type.StickySap: Nhựa Dính
 ROG.BloodVial.Type.PlantNectar: Mật Hoa
 ROG.BloodVial.Type.SporeExtract: Chiết Xuất Bào Tử
+ROG.BloodVial.Type.AbyssalIchor: Huyết Dịch Vực Thẳm
 ROG.BloodVial.Type.DeadlyVenom: Nọc Độc Chết Người
 ROG.BloodVial.Type.PutrefiedBlood: Máu Thối Rữa
 ROG.BloodVial.Type.Ectoplasm: Ngoại Chất

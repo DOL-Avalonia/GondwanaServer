@@ -182,8 +182,10 @@ namespace DOL.GS
                 count++;
                 level += player.Level;
             }
-            level = Math.Max(1, (level / count)); //double needed needed for lower levels...
 
+            if (count == 0) return 1;
+
+            level = Math.Max(1, (level / count)); //double needed needed for lower levels...
             level *= ((100 + 7 * count) / 100);
             return (int)level;
         }

@@ -1,11 +1,8 @@
 ﻿using DOL;
-using DOL.GS;
-using System;
 using DOL.Database;
-using System.Timers;
-using System.Collections;
-using DOL.GS.PacketHandler;
+using DOL.GS;
 using DOL.GS.Finance;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS
 {
@@ -68,7 +65,7 @@ namespace DOL.GS
                     }
 
                     player.RemoveMoney(Currency.Copper.Mint(Price));
-                    player.Out.SendMessage("Vous donnez " + Money.GetString(Price) + " au douanier.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage("Vous donnez " + Money.GetString(Price, player.Client.Account.Language) + " au douanier.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     Say("Bien, tu peux passer toi !");
 
                     //TeleportClass tc = new TeleportClass(this, player, 393786,616663,9025,3501, 163);		

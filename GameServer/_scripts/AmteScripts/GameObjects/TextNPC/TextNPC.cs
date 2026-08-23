@@ -1,7 +1,3 @@
-/**
- * Created by Virant "Dre" Jérémy for Amtenael
- */
-
 using System.Linq;
 using System.Numerics;
 using DOL.AI.Brain;
@@ -128,9 +124,15 @@ namespace DOL.GS.Scripts
         {
             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
-                player.Out.SendNPCsQuestEffect(this, this.GetQuestIndicator(player));
+                RefreshEffects(player);
             }
             return 15000;
+        }
+
+        public override void RefreshEffects(GamePlayer player)
+        {
+            base.RefreshEffects(player);
+            QuestIndicatorManager.RefreshIndicator(this, player);
         }
 
         public override eQuestIndicator GetQuestIndicator(GamePlayer player)
@@ -143,12 +145,11 @@ namespace DOL.GS.Scripts
             {
                 return eQuestIndicator.None;
             }
-            
-            var result = base.GetQuestIndicator(player);
-            if (result != eQuestIndicator.None)
-                return result;
 
-            return policy.Condition.CanGiveQuest;
+            if (policy.Condition.CanGiveQuest != eQuestIndicator.None)
+                return policy.Condition.CanGiveQuest;
+
+            return base.GetQuestIndicator(player);
         }
 
         #endregion

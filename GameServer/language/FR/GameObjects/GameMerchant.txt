@@ -18,6 +18,8 @@ GameMerchant.OnPlayerSell.CantBeSold:			Votre objet ne peut être vendu.
 GameMerchant.OnPlayerSell.GivesYou:				{0} vous donne {1} pour {2}.
 GameMerchant.OnPlayerSell.IsntInterested:		{0} n'est pas interessé·e par {1}.
 GameMerchant.OnPlayerSell.TooFarAway:			{0} est trop loin !
+GameMerchant.OnPlayerWithdrawNotAllowed:		Vous n'êtes pas autorisé à retirer de l'argent chez ce marchand !
+GameMerchant.OnPlayerWithdrawBP:				Vous retirez {0} Points de Prime chez votre marchand.
 GameMerchant.OnPlayerWithdraw:		           	Vous retirez {0} de votre marchand.
 GameMerchant.OnPlayerInteract.Outlaw:			Je n'attends rien de valable d'un gredin tel que toi !
 GameMerchant.OnPlayerInteract.Morphed:			En tant que {0}, grimper sur un cheval risque d'être assez délicat !

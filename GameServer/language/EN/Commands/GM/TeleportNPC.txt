@@ -2,27 +2,31 @@ Commands.GM.TeleportNPC.Description:			TeleportNPC management:
 Commands.GM.TeleportNPC.Usage.Create:			'/teleportnpc create [isRenaissance]' Create a new TeleportNPC [isRenaissance] Check if the player is Reborn in order to allow the TeleportNPC to interact
 Commands.GM.TeleportNPC.Usage.Create.Douanier:			'/teleportnpc create douanier <gold> [isRenaissance]' Create a Border Officer where <gold> is the cost of the jump, [isRenaissance] Check if the player is Reborn in order to allow the TeleportNPC to interact
 Commands.GM.TeleportNPC.Usage.Text:			'/teleportnpc text <texte>' Text shown when the player can be teleported, the text has to contain {5}
-Commands.GM.TeleportNPC.Usage.Refuse:			'/teleportnpc refuse <texte>' Text shown when the player cannot be teleported (NPC rejecting player's request)
-Commands.GM.TeleportNPC.Usage.Radius:			'/teleportnpc radius <0 - 500>' Radius in which players can be telepoted (works only if radius > 0, no dialog showing anymore while beeing teleported)
+Commands.GM.TeleportNPC.Usage.Refuse:			'/teleportnpc refuse <texte>' Text shown when the player cannot be teleported (NPC rejecting player's request).
+Commands.GM.TeleportNPC.Usage.Radius:			'/teleportnpc radius <0 - 500>' Radius in which players can be telepoted (works only if radius > 0, no dialog showing anymore while beeing teleported).
 Commands.GM.TeleportNPC.Usage.Level:			'/teleportnpc level <min level>' Sets the minimum level required for a player to be teleported.
-Commands.GM.TeleportNPC.Usage.AddJump:			'/teleportnpc addjump <X> <Y> <Z> <Heading> <RegionID> <Name>' Add a jump (WARNING Gloc, use \"Area\" as jump name to make an automatic teleporter)
-Commands.GM.TeleportNPC.Usage.Jump:			'/teleportnpc jump' Listed jumps with their conditions
-Commands.GM.TeleportNPC.Usage.RemoveJump:			'/teleportnpc removejump <Name>' Removes a jump from the teleport list
+Commands.GM.TeleportNPC.Usage.AddJump:			'/teleportnpc addjump <X> <Y> <Z> <Heading> <RegionID> <Name>' Add a jump (WARNING Gloc, use \"Area\" as jump name to make an automatic teleporter).
+Commands.GM.TeleportNPC.Usage.Jump:				'/teleportnpc jump' Listed jumps with their conditions.
+Commands.GM.TeleportNPC.Usage.RemoveJump:			'/teleportnpc removejump <Name>' Removes a jump from the teleport list.
 Commands.GM.TeleportNPC.Usage.Password:				'/teleportnpc password <sentence>' Sets a required password sentence to enable access to the NPC.
-Commands.GM.TeleportNPC.Usage.Conditions.Visible:		'/teleportnpc conditions <name of the jump> visible <on/off>' Shows if a jump can appear on the list while the player interacts with the NPC
-Commands.GM.TeleportNPC.Usage.Conditions.Item:				'/teleportnpc conditions <name of the jump> item <ItemTemplate>' Required item in player's inventory to be teleported
-Commands.GM.TeleportNPC.Usage.Conditions.Slot:				'/teleportnpc conditions <jump> slot <id>' Requires item to be equipped in specific slot (0 = backpack).
-Commands.GM.TeleportNPC.Usage.Conditions.Condition:			'/teleportnpc conditions <jump> condition <amount>' Amount of item durability/condition to consume (0 = none).
-Commands.GM.TeleportNPC.Usage.Conditions.Niveaux:			'/teleportnpc conditions <name of the jump> levels <min> <max>' Minimum and maximum player levels allowed for the jump
-Commands.GM.TeleportNPC.Usage.Conditions.Bind:				'/teleportnpc conditions <name of the jump> bind <on/off>' Binds the player after beeing teleported
-Commands.GM.TeleportNPC.Usage.AdditionalDescription:		For every NPC dialog: {0} = Name of the player, {1} = Family name, {2} = Guild name, {3} = Class, {4} = Race, {5} jump list (except refusal)
+Commands.GM.TeleportNPC.Usage.Conditions.Visible:           '/teleportnpc conditions <JumpName> visible <on/off>' Shows if a jump can appear on the list while the player interacts with the NPC.
+Commands.GM.TeleportNPC.Usage.Conditions.Item:				'/teleportnpc conditions <JumpName> item <ItemTemplate>' Required item in player's inventory to be teleported.
+Commands.GM.TeleportNPC.Usage.Conditions.Slot:				'/teleportnpc conditions <JumpName> slot <id>' Requires item to be equipped in specific slot (0 = backpack).
+Commands.GM.TeleportNPC.Usage.Conditions.Condition:			'/teleportnpc conditions <JumpName> condition <amount>' Amount of item durability/condition to consume (0 = none).
+Commands.GM.TeleportNPC.Usage.Conditions.Niveaux:			'/teleportnpc conditions <JumpName> levels <min> <max>' Minimum and maximum player levels allowed for the jump.
+Commands.GM.TeleportNPC.Usage.Conditions.Bind:				'/teleportnpc conditions <JumpName> bind <on/off>' Binds the player after beeing teleported.
+Commands.GM.TeleportNPC.Usage.Conditions.Hours:				'/teleportnpc conditions <JumpName> hours <hourmin> <hourmax>' Defines hours allowing players to be teleported.
+Commands.GM.TeleportNPC.Usage.Conditions.CompletedQuest:	'/teleportnpc conditions <JumpName> completedquest <questID>' Sets the required completed quest ID.
+Commands.GM.TeleportNPC.Usage.Conditions.QuestStep:			'/teleportnpc conditions <JumpName> queststep <questID> <stepID>' Sets the required quest step ID for teleportation.
+Commands.GM.TeleportNPC.Usage.Conditions.Event:				'/teleportnpc conditions <JumpName> event <eventID>' Sets an event required to be active for teleportation.
+Commands.GM.TeleportNPC.Usage.Conditions.InstanceRule:		'/teleportnpc conditions <JumpName> instancerule <Value>', Sets instance system for the jump and apply ruls 'Solo", 'Group', 'Guild', 'BG'.
+Commands.GM.TeleportNPC.Usage.Conditions.ScaleMobs:			'/teleportnpc conditions <JumpName> scalemobs <Value> (smart)', Scale mob level in relation with player's levels plus or minus an offset (can be '-4' '0' '4') or in a smart way depending on player's class using 'smart' prefix instead of offset.
+Commands.GM.TeleportNPC.Usage.Conditions.BossScaling:		'/teleportnpc conditions <JumpName> bossscaling <Value>', Scale Boss levels related to player's levels (e.g /teleportnpc condition Avaloncity bossscaling The Arbitre|+5).
+Commands.GM.TeleportNPC.Usage.Conditions.InstanceSkin:		'/teleportnpc conditions <JumpName> instanceskin <Value>', Apply another region's skin onto an instance.
+Commands.GM.TeleportNPC.Usage.Conditions.ClonePlayer:		'/teleportnpc conditions <JumpName> cloneplayerclasses <true/false> [ColorID]', Apply player's classes, skills and equipment to all mobs in the instance.
+Commands.GM.TeleportNPC.Usage.Conditions.Remove:			'/teleportnpc conditions <JumpName> remove <all/condition_name>', To remove a specific Jump condition.
 Commands.GM.TeleportNPC.Usage.TerritoryLinked:				'/teleportnpc territorylinked <on/off>' Toggles whether the teleporter is linked to territory ownership.
 Commands.GM.TeleportNPC.Usage.ShowTeleporterIndicator:		'/teleportnpc showindicator <on/off>' Toggles the visibility of the teleporter indicator.
-Commands.GM.TeleportNPC.Usage.Conditions.HourMin:			'/teleportnpc hourmin <hour>' Sets the minimum hour for teleportation.
-Commands.GM.TeleportNPC.Usage.Conditions.Hours:				'/teleportnpc conditions <name of the jump> hours <hourmin> <hourmax> Defines hours allowing players to be teleported.
-Commands.GM.TeleportNPC.Usage.Conditions.CompletedQuest:	'/teleportnpc conditions <name of the jump> completedquest <questID>' Sets the required completed quest ID.
-Commands.GM.TeleportNPC.Usage.Conditions.QuestStep:			'/teleportnpc conditions <name of the jump> queststep <questID> <stepID>' Sets the required quest step ID for teleportation.
-Commands.GM.TeleportNPC.Usage.Conditions.Event:				'/teleportnpc conditions <name of the jump> event <eventID>' Sets an event required to be active for teleportation.
 Commands.GM.TeleportNPC.Usage.ShowBoundary:					'/teleportnpc showboundary <on/off>' Toggles the visual ring showing teleport range.
 Commands.GM.TeleportNPC.Usage.BoundaryModel:				'/teleportnpc boundarymodel <modelID>' Sets the model ID used for the boundary ring.
 Commands.GM.TeleportNPC.Usage.AreaPulse.Use:				'/teleportnpc useareapulse <on/off>' Toggles the area pulse visual effect.
@@ -32,3 +36,4 @@ Commands.GM.TeleportNPC.Usage.AreaPulse.ClientEffect:		'/teleportnpc areapulsecl
 Commands.GM.TeleportNPC.Usage.AreaPulse.CastEffect:			'/teleportnpc areapulsecasteffect <id>' Sets the spell casting animation ID.
 Commands.GM.TeleportNPC.Usage.AreaPulse.PlayerEffect:		'/teleportnpc areapulseplayereffect <id>' Sets the effect played on players within range.
 Commands.GM.TeleportNPC.Usage.Conditions.BlockRelic:		'/teleportnpc blockrelic' - Forbids the player to jump to a specific destination if he carries a relic.
+Commands.GM.TeleportNPC.Usage.AdditionalDescription:		For every NPC dialog: {0} = Name of the player, {1} = Family name, {2} = Guild name, {3} = Class, {4} = Race, {5} jump list (except refusal)

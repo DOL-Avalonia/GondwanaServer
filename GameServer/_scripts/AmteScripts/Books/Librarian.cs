@@ -268,7 +268,7 @@ namespace DOL.GS.Scripts
         {
             var player = cache.Player;
             bool isAuthor = (book.PlayerID == player.InternalID);
-            string price = Money.GetString(book.CurrentPriceCopper);
+            string price = Money.GetString(book.CurrentPriceCopper, player.Client.Account.Language);
             string language = string.IsNullOrEmpty(book.Language) ? Properties.SERV_LANGUAGE : book.Language;
             cache.CurrentBook = book;
 
@@ -530,7 +530,7 @@ namespace DOL.GS.Scripts
 
             if (buyer.CopperBalance < priceCopper)
             {
-                buyer.Out.SendMessage(LanguageMgr.Translate(buyer, "Librarian.Buy.NotEnoughMoney", Money.GetString(priceCopper)),
+                buyer.Out.SendMessage(LanguageMgr.Translate(buyer, "Librarian.Buy.NotEnoughMoney", Money.GetString(priceCopper, buyer.Client.Account.Language)),
                     eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return;
             }
@@ -573,7 +573,7 @@ namespace DOL.GS.Scripts
                 var taskUpvote = cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_UP);
                 var taskDownvote = cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_DOWN);
                 var title = await cache.TranslateBookTitle(book);
-                var success = string.Format(await taskSuccess, title, Money.GetString(priceCopper));
+                var success = string.Format(await taskSuccess, title, Money.GetString(priceCopper, buyer.Client.Account.Language));
 
                 buyer.Out.SendMessage(success,
                                       eChatType.CT_Merchant, eChatLoc.CL_PopupWindow);
@@ -673,7 +673,7 @@ namespace DOL.GS.Scripts
             }
 
             author.AddMoney(Currency.Copper.Mint(total));
-            author.Out.SendMessage(LanguageMgr.Translate(author, "Librarian.Royalties.Collected", Money.GetString(total)),
+            author.Out.SendMessage(LanguageMgr.Translate(author, "Librarian.Royalties.Collected", Money.GetString(total, author.Client.Account.Language)),
                 eChatType.CT_System, eChatLoc.CL_PopupWindow);
         }
     }

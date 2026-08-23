@@ -1270,7 +1270,7 @@ namespace DOL.GS.ServerRules
                     }
                     //long money = (long)(Money.GetMoney(0, 0, 17, 85, 0) * damagePercent * killedPlayer.Level / 50);
                     player.AddMoney(Currency.Copper.Mint(money));
-                    player.SendSystemMessage(string.Format(Lang(player, "ServerRules.AbstractServerRules.ReceiveMoney"), Money.GetString(money)));
+                    player.SendSystemMessage(string.Format(Lang(player, "ServerRules.AbstractServerRules.ReceiveMoney"), Money.GetString(money, player.Client.Account.Language)));
                     InventoryLogging.LogInventoryAction(killer, player, eInventoryActionType.Other, money);
                 }
 

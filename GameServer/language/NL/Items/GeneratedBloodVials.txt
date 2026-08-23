@@ -1,4 +1,10 @@
 
+ROG.PlayerVial.Format: Flesje van {0}{1}
+ROG.PlayerVial.Format.Sap: Flesje met Sap van {0}{1}
+ROG.PlayerVial.Prefix.Vigorous: Krachtige
+ROG.PlayerVial.Prefix.Illustrous: Doorluchtige
+ROG.PlayerVial.Prefix.Exalted: Verheven
+
 ROG.BloodVial.Format: Flesje met {1}{2} van {0}
 ROG.BloodVial.Format.Sap: Flesje met {2} van {0}
 
@@ -32,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Magisch Bloed
 ROG.BloodVial.Type.StickySap: Kleverig Sap
 ROG.BloodVial.Type.PlantNectar: Plantennectar
 ROG.BloodVial.Type.SporeExtract: Sporenextract
+ROG.BloodVial.Type.AbyssalIchor: Abyssaal Ichor
 ROG.BloodVial.Type.DeadlyVenom: Dodelijk Venijn
 ROG.BloodVial.Type.PutrefiedBlood: Verrot Bloed
 ROG.BloodVial.Type.Ectoplasm: Ectoplasma

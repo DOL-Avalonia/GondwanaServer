@@ -1,6 +1,3 @@
-/**
- * Created by Virant "Dre" Jérémy for Amtenael
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,7 +31,7 @@ namespace DOL.GS.Scripts
         private string m_Text_Refuse = String.Empty;
         protected DBTeleportNPC db;
         protected bool m_busy;
-        
+
         public bool HasHourConditions { get; private set; }
         public bool IsTerritoryLinked { get; set; }
         public ushort RequiredModel { get; set; }
@@ -48,7 +45,7 @@ namespace DOL.GS.Scripts
 
         public bool ShowTPIndicator { get; set; }
         public string WhisperPassword { get; set; } = String.Empty;
-        
+
         private static HashSet<GamePlayer> AuthorizedPlayers = new();
         public bool ShowBoundary { get; set; }
         public int BoundaryModel { get; set; } = 2069;
@@ -79,7 +76,7 @@ namespace DOL.GS.Scripts
 
             if (!WillTalkTo(player))
                 return false;
-            
+
             if (!string.IsNullOrEmpty(WhisperPassword))
             {
                 lock (AuthorizedPlayers)
@@ -95,20 +92,19 @@ namespace DOL.GS.Scripts
             return true;
         }
 
-        public void SendModelUpdate(GamePlayer player)
+        public override eQuestIndicator GetQuestIndicator(GamePlayer player)
         {
-            if (m_teleporterIndicator == null)
+            if (ShowTPIndicator)
             {
-                return;
+                return ShouldShowInvisibleModel(player) ? eQuestIndicator.Teleport : eQuestIndicator.None;
             }
-            
-            player.Out.SendModelChange(m_teleporterIndicator, m_teleporterIndicator.GetModelForPlayer(player));
+            return base.GetQuestIndicator(player);
         }
 
         public override void RefreshEffects(GamePlayer player)
         {
             base.RefreshEffects(player);
-            SendModelUpdate(player);
+            QuestIndicatorManager.RefreshIndicator(this, player);
         }
 
         private void SendList(GamePlayer player)
@@ -427,7 +423,7 @@ namespace DOL.GS.Scripts
             GamePlayer player = timer.Properties.getProperty<GamePlayer>("player", null);
             if (pos == null || player == null) return 0;
             if (player.InCombat)
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"TeleportNPC.NoTPCombat"), eChatType.CT_Important,
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NoTPCombat"), eChatType.CT_Important,
                                        eChatLoc.CL_SystemWindow);
             else
                 pos.Jump(this, player);
@@ -946,16 +942,16 @@ namespace DOL.GS.Scripts
         public override bool AddToWorld()
         {
             if (!base.AddToWorld()) return false;
-            
+
             if (JumpPositions == null)
                 JumpPositions = new Dictionary<string, JumpPos>();
-            
+
             else if (JumpPositions.Values.Any(j => j.Conditions.HourMin >= 0 || j.Conditions.HourMax <= 24))
                 HasHourConditions = true;
 
             if (Brain is not TeleportNPCBrain)
                 SetOwnBrain(new TeleportNPCBrain());
-            
+
             foreach (var jump in JumpPositions.Values.Where(j => !string.IsNullOrEmpty(j.Conditions.ActiveEventId)))
             {
                 var e = GameEventManager.Instance.GetEventByID(jump.Conditions.ActiveEventId);
@@ -980,32 +976,13 @@ namespace DOL.GS.Scripts
                 _nextPulseMs = nowMs + (long)AreaPulseSeconds * 1000L;
             }
 
-            if (ShowTPIndicator)
-            {
-                if (m_teleporterIndicator == null)
-                {
-                    m_teleporterIndicator = new TeleportIndicator(this);
-                    m_teleporterIndicator.Name = "";
-                    m_teleporterIndicator.Model = 1923;
-                    m_teleporterIndicator.Flags ^= eFlags.PEACE;
-                    m_teleporterIndicator.Flags ^= eFlags.CANTTARGET;
-                    m_teleporterIndicator.Flags ^= eFlags.DONTSHOWNAME;
-                    m_teleporterIndicator.Flags ^= eFlags.FLYING;
-                    m_teleporterIndicator.Position = Position + Vector.Create(z: 1);
-                    m_teleporterIndicator.AddToWorld();
-                }
-            }
-
             return true;
         }
 
         public override bool MoveTo(Position position)
         {
-            if (!base.MoveTo(position))
-            {
-                return false;
-            }
-            m_teleporterIndicator?.MoveTo(position + Vector.Create(z: 1));
+            if (!base.MoveTo(position)) return false;
+
             SpawnBoundary();
             return true;
         }
@@ -1013,12 +990,6 @@ namespace DOL.GS.Scripts
         public override bool RemoveFromWorld()
         {
             ClearBoundary();
-
-            if (m_teleporterIndicator != null)
-            {
-                m_teleporterIndicator.RemoveFromWorld();
-                m_teleporterIndicator = null;
-            }
             return base.RemoveFromWorld();
         }
 
@@ -1064,9 +1035,7 @@ namespace DOL.GS.Scripts
             public JumpPos(string name, int x, int y, int z, ushort heading, ushort regionID)
             {
                 Name = name;
-                Position = Position.Create(
-                    regionID, x, y, z, heading
-                );
+                Position = Position.Create(regionID, x, y, z, heading);
                 Conditions = new TeleportCondition("");
             }
 
@@ -1095,7 +1064,7 @@ namespace DOL.GS.Scripts
                 {
                     var e = GameEventManager.Instance.GetEventByID(Conditions.ActiveEventId);
                     var now = DateTimeOffset.UtcNow;
-                    if (e.StartedTime == null || e.StartedTime > now || (e.EndTime != null && e.EndTime < now))
+                    if (e == null || e.StartedTime == null || e.StartedTime > now || (e.EndTime != null && e.EndTime < now))
                     {
                         return false;
                     }
@@ -1115,10 +1084,201 @@ namespace DOL.GS.Scripts
                 var quest = player.IsDoingQuest(DataQuestJsonMgr.GetQuest((ushort)questID));
                 if (quest != null)
                 {
-                    // Ensure the quest has started and check if any of its goals match the given stepID and are active
+ 
                     return quest.GoalStates.Any(g => g.GoalId == stepID && g.IsActive);
                 }
                 return false;
+            }
+
+            private void HandleInstancedJump(TeleportNPC source, GamePlayer player)
+            {
+                string ownerId = "";
+                List<GamePlayer> playersToMove = new List<GamePlayer>();
+
+                switch (Conditions.InstanceRule)
+                {
+                    case eInstanceRule.Solo:
+                        ownerId = "Solo:" + player.InternalID;
+                        playersToMove.Add(player);
+                        break;
+                    case eInstanceRule.Group:
+                        if (player.Group == null)
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.TpInstanceMustGroup"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                        if (player.Group.Leader != player)
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.TpInstanceGroupLeader"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                        ownerId = "Group:" + player.Group.Leader.InternalID;
+                        playersToMove.AddRange(player.Group.GetPlayersInTheGroup());
+                        break;
+                    case eInstanceRule.Guild:
+                        if (player.Guild == null || player.Guild.IsSystemGuild)
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.TpInstanceMustGuild"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                        ownerId = "Guild:" + player.Guild.GuildID;
+                        playersToMove.AddRange(player.Guild.GetListOfOnlineMembers().Where(m => m.CurrentRegionID == player.CurrentRegionID));
+                        break;
+                    case eInstanceRule.Battlegroup:
+                        if (player.BattleGroup == null)
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.TpInstanceMustBG"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                        if (player.BattleGroup.Leader != player)
+                        {
+                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.TpInstanceBGLeader"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                        ownerId = "BG:" + player.BattleGroup.Leader.InternalID;
+                        playersToMove.AddRange(player.BattleGroup.Members.Values.OfType<GamePlayer>());
+                        break;
+                }
+
+                // Filter out offline players or players who are too far away
+                var finalPlayers = new List<GamePlayer>();
+                foreach (var p in playersToMove)
+                {
+                    if (p.IsWithinRadius(source, 2000) && CanJump(p))
+                        finalPlayers.Add(p);
+                }
+
+                if (finalPlayers.Count == 0) return;
+
+                // Grab Median level for scaling
+                int medianLevel = player.Level;
+                var levels = finalPlayers.Select(p => (int)p.Level).OrderBy(l => l).ToList();
+                if (levels.Count > 0)
+                    medianLevel = levels[levels.Count / 2];
+
+                ushort baseRegionID = Position.RegionID;
+                ushort skinID = baseRegionID;
+
+                // Custom instance skin if configured in the Teleporter Conditions
+                if (Conditions.InstanceSkin > 0)
+                {
+                    skinID = Conditions.InstanceSkin;
+                }
+
+                CustomEventInstance instance = WorldMgr.Regions.Values.OfType<CustomEventInstance>()
+                    .FirstOrDefault(i => i.InstanceOwnerID == ownerId && i.RegionData.Id == baseRegionID);
+
+                if (instance == null)
+                {
+                    ushort requestedID = WorldMgr.DEFAULT_VALUE_FOR_INSTANCE_ID_SEARCH_START;
+                    while (requestedID < ushort.MaxValue && WorldMgr.Regions.ContainsKey(requestedID))
+                        requestedID++;
+
+                    if (requestedID == ushort.MaxValue)
+                    {
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleportNPC.NoInstanceNoRegion"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    instance = WorldMgr.CreateInstance(requestedID, skinID, typeof(CustomEventInstance)) as CustomEventInstance;
+                    if (instance != null)
+                    {
+                        instance.InstanceOwnerID = ownerId;
+                        instance.InstanceType = Conditions.InstanceRule;
+                        if (Conditions.InstanceRule == eInstanceRule.Solo) instance.Player = player;
+                        if (Conditions.InstanceRule == eInstanceRule.Group) { instance.Group = player.Group; instance.Player = player.Group.Leader; }
+                        if (Conditions.InstanceRule == eInstanceRule.Guild) { instance.Guild = player.Guild; instance.Player = player; }
+                        if (Conditions.InstanceRule == eInstanceRule.Battlegroup) { instance.BattleGroup = player.BattleGroup; instance.Player = player.BattleGroup.Leader; }
+
+                        long m = 0, me = 0, i = 0, b = 0;
+                        instance.LoadFromDatabase(WorldMgr.RegionData[baseRegionID].Mobs, ref m, ref me, ref i, ref b);
+                    }
+                }
+
+                if (instance != null)
+                {
+                    if (Conditions.ScaleMobs || Conditions.SmartScale)
+                    {
+                        int targetLvl = medianLevel;
+
+                        if (Conditions.SmartScale && Conditions.InstanceRule == eInstanceRule.Solo)
+                        {
+                            targetLvl = GetSmartScaleLevel(player);
+                        }
+                        else
+                        {
+                            targetLvl = medianLevel + Conditions.ScaleOffset;
+                        }
+
+                        instance.ScaleMobs(targetLvl, Conditions.BossScaling);
+                    }
+
+                    if (Conditions.ClonePlayerClasses)
+                    {
+                        instance.ApplyPlayerClassesToMobs(finalPlayers, Conditions.CloneClassesColor);
+                    }
+
+                    foreach (var p in finalPlayers)
+                    {
+                        p.MoveTo(Position.Create(instance.ID, Position.X, Position.Y, Position.Z, Position.Orientation.InHeading));
+                        if (Conditions.Bind) p.Bind(true);
+                    }
+                }
+            }
+
+            private int GetSmartScaleLevel(GamePlayer player)
+            {
+                int pLvl = player.Level;
+                eClassType cType = player.CharacterClass.ClassType;
+
+                if (cType == eClassType.ListCaster)
+                {
+                    return GetBlueConLevel(pLvl);
+                }
+                else if (cType == eClassType.Hybrid)
+                {
+                    if (pLvl >= 42) return Math.Max(1, pLvl - 4);
+                    if (pLvl >= 35) return Math.Max(1, pLvl - 3);
+                    if (pLvl >= 22) return Math.Max(1, pLvl - 2);
+                    if (pLvl >= 12) return Math.Max(1, pLvl - 1);
+                    return pLvl;
+                }
+                else if (cType == eClassType.PureTank)
+                {
+                    if (pLvl > 22) return GetOrangeConLevel(pLvl);
+                    if (pLvl >= 12) return pLvl + 1;
+                    return pLvl;
+                }
+                return pLvl;
+            }
+
+            /// <summary>
+            /// Gets the exact level for a Blue Con mob relative to the player's level bracket.
+            /// </summary>
+            private int GetBlueConLevel(int pLvl)
+            {
+                int offset = 1;
+                if (pLvl >= 40) offset = 5;
+                else if (pLvl >= 30) offset = 4;
+                else if (pLvl >= 20) offset = 3;
+                else if (pLvl >= 10) offset = 2;
+                else offset = 1;
+
+                return Math.Max(1, pLvl - offset);
+            }
+
+            /// <summary>
+            /// Gets the exact level for an Orange Con mob relative to the player's level bracket.
+            /// </summary>
+            private int GetOrangeConLevel(int pLvl)
+            {
+                int offset = 2;
+                if (pLvl >= 40) offset = 3;
+                else if (pLvl >= 30) offset = 2;
+                else if (pLvl >= 20) offset = 2;
+                else offset = 1;
+
+                return Math.Min(255, pLvl + offset);
             }
 
             public void Jump(GameLiving source, GamePlayer player)
@@ -1160,9 +1320,16 @@ namespace DOL.GS.Scripts
                         InventoryLogging.LogInventoryAction(player, source, eInventoryActionType.Other, Conditions.ItemTemplate, 1);
                     }
                 }
-                player.MoveTo(Position);
-                if (Conditions.Bind)
-                    player.Bind(true);
+
+                if (Conditions.InstanceRule != eInstanceRule.None)
+                {
+                    HandleInstancedJump((TeleportNPC)source, player);
+                }
+                else
+                {
+                    player.MoveTo(Position);
+                    if (Conditions.Bind) player.Bind(true);
+                }
             }
         }
 
@@ -1173,6 +1340,14 @@ namespace DOL.GS.Scripts
             public bool Bind;
             public bool Visible = true;
             public bool BlockRelic;
+            public eInstanceRule InstanceRule = eInstanceRule.None;
+            public bool ScaleMobs = false;
+            public bool SmartScale = false;
+            public int ScaleOffset = 0;
+            public string BossScaling = string.Empty;
+            public ushort InstanceSkin = 0;
+            public bool ClonePlayerClasses = false;
+            public ushort CloneClassesColor = 0;
 
             public string Item
             {
@@ -1215,7 +1390,7 @@ namespace DOL.GS.Scripts
                 {
                     return true;
                 }
-            
+
                 uint minTick = ((uint)HourMin) * 60 * 60 * 1000;
                 uint maxTick = ((uint)HourMax) * 60 * 60 * 1000;
 
@@ -1241,44 +1416,44 @@ namespace DOL.GS.Scripts
                             string[] arg = s.Split('=');
                             switch (arg[0])
                             {
-                                case "BlockRelic":
-                                    BlockRelic = bool.Parse(arg[1]);
+                                case "BlockRelic": BlockRelic = bool.Parse(arg[1]); break;
+                                case "Bind": Bind = bool.Parse(arg[1]); break;
+                                case "Visible": Visible = bool.Parse(arg[1]); break;
+                                case "Item": Item = arg[1]; break;
+                                case "LevelMin": LevelMin = int.Parse(arg[1]); break;
+                                case "LevelMax": LevelMax = int.Parse(arg[1]); break;
+                                case "HourMin": HourMin = int.Parse(arg[1]); break;
+                                case "HourMax": HourMax = int.Parse(arg[1]); break;
+                                case "RequiredCompletedQuestID": RequiredCompletedQuestID = int.Parse(arg[1]); break;
+                                case "RequiredQuestStepID": RequiredQuestStepID = int.Parse(arg[1]); break;
+                                case "EventID": ActiveEventId = arg[1]; break;
+                                case "Slot": RequiredSlot = int.Parse(arg[1]); break;
+                                case "Condition": ConditionAmount = int.Parse(arg[1]); break;
+
+                                // Instance variables
+                                case "InstanceRule":
+                                    if (Enum.TryParse(arg[1], true, out eInstanceRule rule)) InstanceRule = rule;
                                     break;
-                                case "Bind":
-                                    Bind = bool.Parse(arg[1]);
+                                case "ScaleMobs":
+                                    if (arg[1].Equals("Smart", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        ScaleMobs = true; SmartScale = true; ScaleOffset = 0;
+                                    }
+                                    else if (bool.TryParse(arg[1], out bool bScale))
+                                    {
+                                        ScaleMobs = bScale; SmartScale = false; ScaleOffset = 0;
+                                    }
+                                    else if (int.TryParse(arg[1], out int iScale))
+                                    {
+                                        ScaleMobs = true; SmartScale = false; ScaleOffset = iScale;
+                                    }
                                     break;
-                                case "Visible":
-                                    Visible = bool.Parse(arg[1]);
-                                    break;
-                                case "Item":
-                                    Item = arg[1];
-                                    break;
-                                case "LevelMin":
-                                    LevelMin = int.Parse(arg[1]);
-                                    break;
-                                case "LevelMax":
-                                    LevelMax = int.Parse(arg[1]);
-                                    break;
-                                case "HourMin":
-                                    HourMin = int.Parse(arg[1]);
-                                    break;
-                                case "HourMax":
-                                    HourMax = int.Parse(arg[1]);
-                                    break;
-                                case "RequiredCompletedQuestID":
-                                    RequiredCompletedQuestID = int.Parse(arg[1]);
-                                    break;
-                                case "RequiredQuestStepID":
-                                    RequiredQuestStepID = int.Parse(arg[1]);
-                                    break;
-                                case "EventID":
-                                    ActiveEventId = arg[1];
-                                    break;
-                                case "Slot":
-                                    RequiredSlot = int.Parse(arg[1]);
-                                    break;
-                                case "Condition":
-                                    ConditionAmount = int.Parse(arg[1]);
+                                case "BossScaling": BossScaling = arg[1]; break;
+                                case "InstanceSkin": ushort.TryParse(arg[1], out InstanceSkin); break;
+                                case "ClonePlayerClasses":
+                                    string[] cpcArgs = arg[1].Split(',');
+                                    if (cpcArgs.Length > 0) bool.TryParse(cpcArgs[0], out ClonePlayerClasses);
+                                    if (cpcArgs.Length > 1) ushort.TryParse(cpcArgs[1], out CloneClassesColor);
                                     break;
                             }
                         }
@@ -1371,6 +1546,18 @@ namespace DOL.GS.Scripts
                     sb.Append("EventID=");
                     sb.Append(ActiveEventId);
                 }
+
+                if (InstanceRule != eInstanceRule.None) { if (sb.Length > 0) sb.Append("/"); sb.Append("InstanceRule=").Append(InstanceRule); }
+                if (ScaleMobs || SmartScale)
+                {
+                    if (sb.Length > 0) sb.Append("/");
+                    sb.Append("ScaleMobs=");
+                    if (SmartScale) sb.Append("Smart");
+                    else sb.Append(ScaleOffset != 0 ? ScaleOffset.ToString() : "True");
+                }
+                if (!string.IsNullOrEmpty(BossScaling)) { if (sb.Length > 0) sb.Append("/"); sb.Append("BossScaling=").Append(BossScaling); }
+                if (InstanceSkin > 0) { if (sb.Length > 0) sb.Append("/"); sb.Append("InstanceSkin=").Append(InstanceSkin); }
+                if (ClonePlayerClasses) { if (sb.Length > 0) sb.Append("/"); sb.Append("ClonePlayerClasses=").Append(ClonePlayerClasses).Append(",").Append(CloneClassesColor); }
                 return sb.ToString();
             }
 
@@ -1381,6 +1568,14 @@ namespace DOL.GS.Scripts
                 sb.Append(Bind ? "oui" : "non");
                 sb.Append("\nVisible dans la liste: ");
                 sb.Append(Visible ? "oui" : "non");
+
+                if (InstanceRule != eInstanceRule.None) sb.Append($"\nInstance: {InstanceRule}");
+                if (SmartScale) sb.Append($"\nMob Scaling Enabled: Smart (Class-Based)");
+                else if (ScaleMobs) sb.Append($"\nMob Scaling Enabled: oui (Offset: {ScaleOffset})");
+                if (!string.IsNullOrEmpty(BossScaling)) sb.Append($"\nBoss Modifiers: {BossScaling}");
+                if (InstanceSkin > 0) sb.Append($"\nInstance Skin: {InstanceSkin}");
+                if (ClonePlayerClasses) sb.Append($"\nClone Player Classes: {ClonePlayerClasses} (Color: {CloneClassesColor})");
+
                 if (BlockRelic)
                 {
                     if (sb.Length > 0) sb.Append("\n");

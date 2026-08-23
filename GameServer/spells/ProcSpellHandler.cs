@@ -290,6 +290,9 @@ namespace DOL.GS.Spells
 
             AttackData ad = args.AttackData;
 
+            if (ad.Attacker == null || ad.Target == null)
+                return;
+
             int baseChance = Spell.Frequency / 100;
 
             if (ad.AttackType == AttackData.eAttackType.MeleeDualWield)
@@ -298,26 +301,37 @@ namespace DOL.GS.Spells
             if (baseChance < 1)
                 baseChance = 1;
 
-            if (ad.Attacker == ad.Attacker as GameNPC)
+            if (ad.Attacker is GameNPC pet)
             {
                 Spell baseSpell = null;
-
-                GameNPC pet = ad.Attacker as GameNPC;
                 var procSpells = new List<Spell>();
-                foreach (Spell spell in pet!.Spells)
+
+                if (pet.Spells != null)
                 {
-                    if (pet.GetSkillDisabledDuration(spell) == 0)
+                    foreach (Spell spell in pet.Spells)
                     {
-                        if (spell.SpellType.ToLower() == "offensiveproc")
-                            procSpells.Add(spell);
+                        if (spell != null && pet.GetSkillDisabledDuration(spell) == 0)
+                        {
+                            if (spell.SpellType.Equals("offensiveproc", StringComparison.OrdinalIgnoreCase))
+                                procSpells.Add(spell);
+                        }
                     }
                 }
+
                 if (procSpells.Count > 0)
                 {
                     baseSpell = procSpells[Util.Random((procSpells.Count - 1))];
+                    m_procSpell = SkillBase.GetSpellByID((int)baseSpell.Value);
                 }
-                m_procSpell = SkillBase.GetSpellByID((int)baseSpell!.Value);
+                else
+                {
+                    return;
+                }
             }
+
+            if (m_procSpell == null)
+                return;
+
             if (Util.Chance(baseChance))
             {
                 ISpellHandler handler = ScriptMgr.CreateSpellHandler((GameLiving)sender, m_procSpell, m_procSpellLine);
@@ -338,7 +352,6 @@ namespace DOL.GS.Spells
 
         public OffensiveProcSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
-        /// <inheritdoc />
         public override string GetDelveDescription(GameClient delveClient)
         {
             ISpellHandler subSpell = ScriptMgr.CreateSpellHandler(m_caster, m_procSpell, m_procSpellLine);
@@ -363,6 +376,9 @@ namespace DOL.GS.Spells
                 return;
 
             AttackData ad = args.AttackData;
+
+            if (ad.Attacker == null || ad.Target == null || m_procSpell == null)
+                return;
 
             int baseChance = Spell.Frequency / 100;
 
@@ -391,7 +407,7 @@ namespace DOL.GS.Spells
         }
 
         public DefensiveProcSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-        /// <inheritdoc />
+
         public override string GetDelveDescription(GameClient delveClient)
         {
             ISpellHandler subSpell = ScriptMgr.CreateSpellHandler(m_caster, m_procSpell, m_procSpellLine);

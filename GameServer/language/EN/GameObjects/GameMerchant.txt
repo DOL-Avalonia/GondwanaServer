@@ -18,6 +18,8 @@ GameMerchant.OnPlayerSell.CantBeSold:			This item can't be sold.
 GameMerchant.OnPlayerSell.GivesYou:			    {0} gives you {1} for {2}.
 GameMerchant.OnPlayerSell.IsntInterested:		{0} isn't interested in {1}.
 GameMerchant.OnPlayerSell.TooFarAway:			{0} is too far away!
+GameMerchant.OnPlayerWithdrawNotAllowed:		You don't have permission to withdraw money from this merchant!
+GameMerchant.OnPlayerWithdrawBP:				You withdraw {0} BountyPoints from your Merchant.
 GameMerchant.OnPlayerWithdraw:		            You withdraw {0} from your merchant.
 GameMerchant.OnPlayerInteract.Outlaw:			I expect nothing worthwhile from a scoundrel like you!
 GameMerchant.OnPlayerInteract.Morphed:			Oh, as a {0}, you can't quite hop onto a horse just yet!

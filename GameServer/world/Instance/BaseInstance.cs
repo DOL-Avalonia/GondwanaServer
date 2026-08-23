@@ -68,7 +68,7 @@ namespace DOL.GS
 
             foreach (Zone z in m_zones)
             {
-                m_zoneSkinMap.Add(z.ZoneSkinID, z);
+                m_zoneSkinMap[z.ZoneSkinID] = z;
             }
         }
 
@@ -523,17 +523,19 @@ namespace DOL.GS
         /// <returns>List of Mobs</returns>
         public IEnumerable<GameNPC> GetMobsInsideInstance(bool alive)
         {
+            var mobs = new List<GameNPC>();
             lock (ObjectsSyncLock)
             {
-                if (alive)
+                foreach (var obj in this.Objects)
                 {
-                    return new List<GameNPC>(from regionObjects in this.Objects where (regionObjects is GameNPC) && (!((GameNPC)regionObjects).IsPeaceful) && ((GameNPC)regionObjects).IsAlive select (GameNPC)regionObjects);
-                }
-                else
-                {
-                    return new List<GameNPC>(from regionObjects in this.Objects where (regionObjects is GameNPC) && (!((GameNPC)regionObjects).IsPeaceful) select (GameNPC)regionObjects);
+                    if (obj is GameNPC npc && !npc.IsPeaceful)
+                    {
+                        if (!alive || npc.IsAlive)
+                            mobs.Add(npc);
+                    }
                 }
             }
+            return mobs;
         }
 
         #endregion

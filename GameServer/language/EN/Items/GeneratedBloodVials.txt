@@ -38,6 +38,7 @@ ROG.BloodVial.Type.MagicalBlood: Magical Blood
 ROG.BloodVial.Type.StickySap: Sticky Sap
 ROG.BloodVial.Type.PlantNectar: Plant Nectar
 ROG.BloodVial.Type.SporeExtract: Spore Extract
+ROG.BloodVial.Type.AbyssalIchor: Abyssal Ichor
 ROG.BloodVial.Type.DeadlyVenom: Deadly Venom
 ROG.BloodVial.Type.PutrefiedBlood: Putrefied Blood
 ROG.BloodVial.Type.Ectoplasm: Ectoplasm

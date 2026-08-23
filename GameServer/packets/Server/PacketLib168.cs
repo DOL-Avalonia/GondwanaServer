@@ -4354,7 +4354,7 @@ namespace DOL.GS.PacketHandler
                             if (Properties.CONSIGNMENT_USE_BP)
                                 name += "[" + item.SellPrice + " BP]";
                             else
-                                name += "[" + Money.GetString(item.SellPrice) + "]";
+                                name += "[" + Money.GetString(item.SellPrice, m_gameClient.Account.Language) + "]";
                         }
                         pak.WritePascalString(name);
                     }

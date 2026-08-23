@@ -69,6 +69,22 @@ namespace DOL.GS
             set { password = value; }
         }
 
+        public GamePlayer Leader
+        {
+            get
+            {
+                lock (m_battlegroupMembers)
+                {
+                    foreach (DictionaryEntry entry in m_battlegroupMembers)
+                    {
+                        if (entry.Value is bool isLeader && isLeader)
+                            return (GamePlayer)entry.Key;
+                    }
+                }
+                return null;
+            }
+        }
+
         /// <summary>
         /// Adds a player to the chatgroup
         /// </summary>

@@ -49,6 +49,7 @@ namespace DOL.GS.Quests
         public bool StartEvent { get; set; } = false;
         public bool ResetEvent { get; set; } = false;
         public string EventId { get; set; } = "";
+        public virtual void RefreshCustomIndicators(PlayerQuest questData) { }
 
         public record GoalConditions(bool? IsDamned = null, ushort ModelId = 0)
         {
@@ -177,6 +178,7 @@ namespace DOL.GS.Quests
             if (StartItemTemplate != null)
                 GiveItem(player, StartItemTemplate);
 
+            RefreshCustomIndicators(questData);
             Task task = Task.CompletedTask;
             if (Visible)
             {
@@ -274,6 +276,7 @@ namespace DOL.GS.Quests
             else if (!goalState.IsFinished)
                 goalState.State = eQuestGoalStatus.Aborted;
 
+            RefreshCustomIndicators(questData);
             var player = questData.Owner;
             if (goalState.State == eQuestGoalStatus.Aborted && !string.IsNullOrWhiteSpace(MessageAborted))
             {
@@ -364,6 +367,8 @@ namespace DOL.GS.Quests
             if (GiveItemTemplate != null)
                 GiveItem(player, GiveItemTemplate);
             goalData.State = eQuestGoalStatus.Completed;
+            RefreshCustomIndicators(questData);
+
             if (!string.IsNullOrWhiteSpace(MessageCompleted))
             {
                 Task.Run(async () =>

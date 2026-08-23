@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Threading;
 
 using DOL.GS;
+using log4net;
 using DOL.Database;
 
 using log4net;
@@ -39,7 +40,7 @@ namespace DOL.GS
         /// <summary>
         /// Console Logger
         /// </summary>
-        private static readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// List Containing players in instance
@@ -51,8 +52,10 @@ namespace DOL.GS
         /// </summary>
         protected List<GamePlayer> PlayersInside
         {
-            get { return m_players_in; }
+            get { lock (m_playerLock) { return new List<GamePlayer>(m_players_in); } }
         }
+
+        private readonly object m_playerLock = new object();
 
         /// <summary>
         /// On Player Enter override to add him to container
@@ -61,7 +64,7 @@ namespace DOL.GS
         public override void OnPlayerEnterInstance(GamePlayer player)
         {
             //Add Player
-            this.m_players_in.Add(player);
+            lock (m_playerLock) { this.m_players_in.Add(player); }
             //Stop the timer to prevent the region's removal.
             base.OnPlayerEnterInstance(player);
         }
@@ -74,7 +77,7 @@ namespace DOL.GS
         {
             //Decrease the amount of players
             base.OnPlayerLeaveInstance(player);
-            this.m_players_in.Remove(player);
+            lock (m_playerLock) { this.m_players_in.Remove(player); }
         }
 
         /// <summary>
