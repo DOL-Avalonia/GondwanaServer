@@ -301,6 +301,9 @@ SpellDescription.StormEffect.SubDescription2:				Storms will dynamically spawn a
 SpellDescription.StormEffect.SubDescription3:				A maximum of {0} targets can be affected collectively by this storm cascade.
 SpellDescription.StormEffect.PulseDescription:				The storm generation will pulse every {0} seconds.
 SpellDescription.StormEffect.SubSpellTitle:					Storm Effect: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Increases target's effectiveness by {1}% as well as allies within a {0} radius from the target.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Increases target's effectiveness by {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		This spell can only be used in PvE.
 
 
 # ML Spells ShortDescriptions

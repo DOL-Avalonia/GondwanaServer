@@ -101,12 +101,6 @@ namespace DOL.GS.Scripts
             return base.GetQuestIndicator(player);
         }
 
-        public override void RefreshEffects(GamePlayer player)
-        {
-            base.RefreshEffects(player);
-            QuestIndicatorManager.RefreshIndicator(this, player);
-        }
-
         private void SendList(GamePlayer player)
         {
             if (!string.IsNullOrEmpty(m_Text))
@@ -1084,7 +1078,6 @@ namespace DOL.GS.Scripts
                 var quest = player.IsDoingQuest(DataQuestJsonMgr.GetQuest((ushort)questID));
                 if (quest != null)
                 {
- 
                     return quest.GoalStates.Any(g => g.GoalId == stepID && g.IsActive);
                 }
                 return false;

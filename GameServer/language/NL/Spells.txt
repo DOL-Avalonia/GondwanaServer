@@ -300,6 +300,9 @@ SpellDescription.StormEffect.SubDescription2:				Stormen spawnen dynamisch langs
 SpellDescription.StormEffect.SubDescription3:				Maximaal {0} doelen kunnen collectief worden geraakt door deze stormcascade.
 SpellDescription.StormEffect.PulseDescription:				Het genereren van stormen zal elke {0} seconden pulseren.
 SpellDescription.StormEffect.SubSpellTitle:					Stormeffect: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Verhoogt de effectiviteit van het doelwit met {1}% evenals die van bondgenoten binnen een straal van {0} rond het doelwit.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Verhoogt de effectiviteit van het doelwit met {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Deze spreuk kan alleen in PvE worden gebruikt.
 
 
 # ML Spells ShortDescriptions
@@ -372,7 +375,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Verhoogt de crit‑kans v
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Verlaagt effectiviteit van DoT's op bondgenoten binnen {0} met {1}%. Als de schade nul wordt, eindigt het effect.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Verlaagt effectiviteit van DoT's op het doel met {0}%. Eindigt bij nul schade.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Verhoogt effectiviteit van bondgenoten binnen {0} met {1}% (spreuken en melee).
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Verhoogt effectiviteit van het doel met {1}% (spreuken en melee).
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Verhoogt effectiviteit van het doel met {0}% (spreuken en melee).
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Verhoogt pantserabsorptie van bondgenoten binnen {0} met {1}%.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Verhoogt pantserabsorptie van het doel met {1}%.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Vernietigt de doelrune en nabije runen binnen {0}.

@@ -301,6 +301,9 @@ SpellDescription.StormEffect.SubDescription2:				Les tempêtes apparaîtront dyn
 SpellDescription.StormEffect.SubDescription3:				Un maximum de {0} cibles peut être affecté collectivement par cette cascade de tempêtes.
 SpellDescription.StormEffect.PulseDescription:				La génération de tempêtes s'activera toutes les {0} secondes.
 SpellDescription.StormEffect.SubSpellTitle:					Effet de tempête : {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Augmente l'efficacité de la cible de {1}% ainsi que celle des alliés dans un rayon de {0} autour de la cible.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Augmente l'efficacité de la cible de {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Ce sort ne peut être utilisé qu'en PvE.
 
 
 # ML Spells ShortDescriptions
@@ -373,7 +376,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Augmente la chance de cou
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Réduit de {1}% l'efficacité des DoTs sur les alliés dans un rayon de {0}. Si les dégâts tombent à zéro, l'effet est supprimé.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Réduit de {0}% l'efficacité des DoTs sur la cible. Si les dégâts tombent à zéro, l'effet est supprimé.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Augmente de {1}% l'efficacité des alliés à portée de {0} pour les dégâts des sorts et attaques de mêlée.
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Augmente de {1}% l'efficacité de la cible pour les dégâts des sorts et attaques de mêlée.
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Augmente de {0}% l'efficacité de la cible pour les dégâts des sorts et attaques de mêlée.
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Augmente de {1}% l'absorption d'armure des alliés dans un rayon de {0}.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Augmente de {1}% l'absorption d'armure de la cible.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Détruit la rune ciblée et celles aux alentours dans un rayon de {0}.

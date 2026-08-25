@@ -32,6 +32,7 @@ namespace DOL.AI.Brain
             {
                 foreach (var player in Body.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE, true).Cast<GamePlayer>())
                 {
+                    player.TempProperties.removeProperty("QuestIndState_" + Body.ObjectID);
                     Body.RefreshEffects(player);
                 }
             }

@@ -511,10 +511,13 @@ namespace DOL.GS.Spells
             base.FinishSpellCast(target, force);
         }
 
+        public override bool HasPositiveEffect => false;
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
             effect.Owner.DebuffCategory[eProperty.LivingEffectiveness] += (int)Spell.Value;
+
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -524,14 +527,15 @@ namespace DOL.GS.Spells
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            base.OnEffectExpires(effect, noMessages);
+            int immunity = base.OnEffectExpires(effect, noMessages);
             effect.Owner.DebuffCategory[eProperty.LivingEffectiveness] -= (int)Spell.Value;
+
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }
-            return 0;
+            return immunity;
         }
 
         public EffectivenessDeBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

@@ -300,6 +300,9 @@ SpellDescription.StormEffect.SubDescription2:				Las tormentas aparecerán diná
 SpellDescription.StormEffect.SubDescription3:				Un máximo de {0} objetivos pueden ser afectados colectivamente por esta cascada de tormentas.
 SpellDescription.StormEffect.PulseDescription:				La generación de tormentas pulsará cada {0} segundos.
 SpellDescription.StormEffect.SubSpellTitle:					Efecto de Tormenta: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Aumenta la efectividad del objetivo en un {1}%, así como la de los aliados en un radio de {0} alrededor del objetivo.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Aumenta la efectividad del objetivo en un {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Este hechizo solo se puede usar en PvE.
 
 
 # ML Spells ShortDescriptions
@@ -372,7 +375,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Aumenta en {0}% la probab
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Reduce la eficacia de DoTs en aliados en {0} de radio un {1}%. Si el daño llega a cero, el efecto termina.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Reduce la eficacia de DoTs en el objetivo un {0}%. Si el daño llega a cero, termina.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Aumenta la efectividad de aliados en {0} de alcance un {1}% (hechizos y cuerpo a cuerpo).
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Aumenta la efectividad del objetivo un {1}% (hechizos y cuerpo a cuerpo).
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Aumenta la efectividad del objetivo un {0}% (hechizos y cuerpo a cuerpo).
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Aumenta la absorción de armadura de aliados en {0} de radio un {1}%.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Aumenta la absorción de armadura del objetivo un {1}%.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Destruye la runa objetivo y las cercanas en un radio de {0}.

@@ -300,6 +300,9 @@ SpellDescription.StormEffect.SubDescription2:				Bão sẽ xuất hiện động
 SpellDescription.StormEffect.SubDescription3:				Tối đa {0} mục tiêu có thể bị ảnh hưởng tập thể bởi chuỗi bão này.
 SpellDescription.StormEffect.PulseDescription:				Việc tạo bão sẽ dao động mỗi {0} giây.
 SpellDescription.StormEffect.SubSpellTitle:					Hiệu Ứng Bão: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Tăng {1}% hiệu quả của mục tiêu cũng như của các đồng minh trong bán kính {0} xung quanh mục tiêu.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Tăng {0}% hiệu quả của mục tiêu.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Phép thuật này chỉ có thể được sử dụng trong PvE.
 
 
 # ML Spells ShortDescriptions
@@ -372,7 +375,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Tăng cơ hội chí mạ
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Giảm hiệu quả DoT trên đồng minh trong {0} {1}%. Khi sát thương về 0, hiệu ứng kết thúc.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Giảm hiệu quả DoT trên mục tiêu {0}%. Kết thúc khi sát thương về 0.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Tăng hiệu quả của đồng minh trong {0} {1}% (phép và cận).
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Tăng hiệu quả của mục tiêu {1}% (phép và cận).
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Tăng hiệu quả của mục tiêu {0}% (phép và cận).
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Tăng hấp thụ giáp của đồng minh trong {0} {1}%.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Tăng hấp thụ giáp của mục tiêu {1}%.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Phá hủy phù văn mục tiêu và phù văn gần trong {0}.

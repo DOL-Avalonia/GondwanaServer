@@ -156,7 +156,7 @@ namespace DOL.GS
         {
             get
             {
-                return (GetLivingOwner()?.Effectiveness ?? 1.0) * base.Effectiveness;
+                return base.Effectiveness;
             }
         }
         #endregion

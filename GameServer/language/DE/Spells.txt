@@ -300,6 +300,9 @@ SpellDescription.StormEffect.SubDescription2:				Stürme entstehen dynamisch ent
 SpellDescription.StormEffect.SubDescription3:				Maximal {0} Ziele können kollektiv von dieser Sturmkaskade getroffen werden.
 SpellDescription.StormEffect.PulseDescription:				Die Sturmerzeugung pulsiert alle {0} Sekunden.
 SpellDescription.StormEffect.SubSpellTitle:					Sturmeffekt: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Erhöht die Effektivität des Ziels um {1}% sowie die von Verbündeten innerhalb eines Radius von {0} um das Ziel.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Erhöht die Effektivität des Ziels um {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Dieser Zauber kann nur im PvE verwendet werden.
 
 
 # ML Spells ShortDescriptions
@@ -372,7 +375,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Erhöht die Kritchance de
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Verringert die Wirksamkeit von DoTs auf Verbündete in einem Radius von {0} um {1}%. Fällt der Schaden auf null, wird der Effekt aufgehoben.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Verringert die Wirksamkeit von DoTs auf dem Ziel um {0}%. Fällt der Schaden auf null, wird der Effekt aufgehoben.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Erhöht die Effektivität von Verbündeten in {0} Reichweite um {1}% für Zauberschaden und Nahkampfangriffe.
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Erhöht die Effektivität des Ziels um {1}% für Zauberschaden und Nahkampfangriffe.
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Erhöht die Effektivität des Ziels um {0}% für Zauberschaden und Nahkampfangriffe.
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Erhöht die Rüstungsabsorption von Verbündeten in einem Radius von {0} um {1}%.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Erhöht die Rüstungsabsorption des Ziels um {1}%.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Zerstört die anvisierte Rune und benachbarte Runen im Radius von {0}.

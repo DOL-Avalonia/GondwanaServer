@@ -300,6 +300,9 @@ SpellDescription.StormEffect.SubDescription2:				Bouře se budou dynamicky tvoř
 SpellDescription.StormEffect.SubDescription3:				Tato kaskáda bouří může hromadně zasáhnout maximálně {0} cílů.
 SpellDescription.StormEffect.PulseDescription:				Generování bouří bude pulzovat každých {0} sekund.
 SpellDescription.StormEffect.SubSpellTitle:					Efekt bouře: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Zvyšuje efektivitu cíle o {1} % a také spojenců v okruhu {0} od cíle.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Zvyšuje efektivitu cíle o {0} %.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Toto kouzlo lze použít pouze v PvE.
 
 
 # ML Spells ShortDescriptions

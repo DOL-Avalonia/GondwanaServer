@@ -31,7 +31,8 @@ namespace DOL.AI.Brain
             {
                 foreach (var player in Body.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE, true).Cast<GamePlayer>())
                 {
-                    QuestIndicatorManager.RefreshIndicator(teleportNPC, player);
+                    player.TempProperties.removeProperty("QuestIndState_" + teleportNPC.ObjectID);
+                    Body.RefreshEffects(player);
                 }
             }
 

@@ -283,19 +283,15 @@ namespace DOL.GS.Spells
             base.FinishSpellCast(target, force);
         }
 
-        public override bool HasPositiveEffect
-        {
-            get { return true; }
-        }
+        public override bool HasPositiveEffect => true;
 
         /// <summary>
         /// When an applied effect starts
         /// duration spells only
         /// </summary>
-        /// <param name="effect"></param>
         public override void OnEffectStart(GameSpellEffect effect)
         {
-            effect.Owner.BaseBuffBonusCategory[eProperty.LivingEffectiveness] -= (int)Spell.Value;
+            effect.Owner.BaseBuffBonusCategory[eProperty.LivingEffectiveness] += (int)Spell.Value;
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendUpdateWeaponAndArmorStats();
@@ -307,18 +303,17 @@ namespace DOL.GS.Spells
         /// When an applied effect expires.
         /// Duration spells only.
         /// </summary>
-        /// <param name="effect">The expired effect</param>
-        /// <param name="noMessages">true, when no messages should be sent to player and surrounding</param>
-        /// <returns>immunity duration in milliseconds</returns>
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
-            effect.Owner.DebuffCategory[eProperty.LivingEffectiveness] += (int)Spell.Value;
+            int immunity = base.OnEffectExpires(effect, noMessages);
+            effect.Owner.BaseBuffBonusCategory[eProperty.LivingEffectiveness] -= (int)Spell.Value;
+
             if (effect.Owner is GamePlayer player)
             {
                 player.Out.SendUpdateWeaponAndArmorStats();
                 player.Out.SendStatusUpdate();
             }
-            return 0;
+            return immunity;
         }
 
         public EffectivenessBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }

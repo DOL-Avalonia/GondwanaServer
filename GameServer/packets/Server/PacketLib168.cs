@@ -17,32 +17,31 @@
  *
  */
 
+using DOL.AI.Brain;
+using DOL.Database;
+using DOL.GS.Effects;
+using DOL.GS.Finance;
+using DOL.GS.Geometry;
+using DOL.GS.Housing;
+using DOL.GS.Keeps;
+using DOL.GS.PlayerTitles;
+using DOL.GS.Profession;
+using DOL.GS.Quests;
+using DOL.GS.RealmAbilities;
+using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
+using DOL.GS.Spells;
+using DOL.GS.Styles;
+using DOL.Language;
+using DOL.MobGroups;
+using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
-
-using DOL.Database;
-using DOL.Language;
-using DOL.AI.Brain;
-using DOL.GS.Effects;
-using DOL.GS.Housing;
-using DOL.GS.Keeps;
-using DOL.GS.PlayerTitles;
-using DOL.GS.Quests;
-using DOL.GS.RealmAbilities;
-using DOL.GS.Spells;
-using DOL.GS.Styles;
-using DOL.GS.Finance;
-using DOL.GS.Geometry;
-using DOL.GS.Profession;
-
-using log4net;
-using DOL.GS.ServerProperties;
 using System.Numerics;
-using DOL.MobGroups;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DOL.GS.PacketHandler
@@ -1188,8 +1187,20 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(npc.CurrentRegionID, (ushort)npc.ObjectID)] = 0;
+            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(npc.CurrentRegionID, (ushort)npc.ObjectID)] = GameTimer.GetTickCount();
 
+            try
+            {
+                if ((npc.QuestIdListToGive != null && npc.QuestIdListToGive.Count > 0) || npc is ITextNPC || npc is TeleportNPC)
+                {
+                    m_gameClient.Player.TempProperties.removeProperty("QuestIndState_" + npc.InternalID);
+                    npc.RefreshEffects(m_gameClient.Player);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error refreshing NPC effects on creation", ex);
+            }
         }
 
         public virtual void SendLivingEquipmentUpdate(GameLiving living)

@@ -299,6 +299,9 @@ SpellDescription.StormEffect.SubDescription2:				Furtunile vor apărea dinamic d
 SpellDescription.StormEffect.SubDescription3:				Un maxim de {0} ținte pot fi afectate în mod colectiv de această cascadă de furtuni.
 SpellDescription.StormEffect.PulseDescription:				Generarea furtunilor va pulsa la fiecare {0} secunde.
 SpellDescription.StormEffect.SubSpellTitle:					Efect de Furtună: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Crește eficacitatea țintei cu {1}%, precum și pe cea a aliaților aflați pe o rază de {0} față de țintă.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Crește eficacitatea țintei cu {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Această vrajă poate fi folosită doar în PvE.
 
 
 # ML Spells ShortDescriptions
@@ -371,7 +374,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Creste șansa de critic a
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Reduce eficiența DoT-urilor pe aliații din {0} cu {1}%. Când daunele ajung la zero, efectul se încheie.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Reduce eficiența DoT-urilor pe țintă cu {0}%. Se încheie la zero daune.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Creste eficiența aliaților din {0} cu {1}% (vrăji și melee).
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Creste eficiența țintei cu {1}% (vrăji și melee).
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Creste eficiența țintei cu {0}% (vrăji și melee).
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Creste absorbția armurii aliaților din {0} cu {1}%.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Creste absorbția armurii țintei cu {1}%.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Distruge runa țintă și runele apropiate în {0}.

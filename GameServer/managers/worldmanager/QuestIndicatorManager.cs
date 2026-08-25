@@ -76,44 +76,37 @@ namespace DOL.GS.Scripts
             GameEventMgr.AddHandler(GamePlayerEvent.LevelUp, OnPlayerStateChanged);
             GameEventMgr.AddHandler(GamePlayerEvent.GameEntered, OnPlayerStateChanged);
             GameEventMgr.AddHandler(RegionEvent.PlayerEnter, OnPlayerStateChanged);
+
+            foreach (var region in WorldMgr.GetAllRegions())
+            {
+                foreach (var npc in region.Objects.OfType<GameNPC>())
+                {
+                    if (npc is ITextNPC || npc is TeleportNPC || (npc.QuestIdListToGive != null && npc.QuestIdListToGive.Count > 0))
+                    {
+                        GetOrSpawnIndicator(npc);
+                    }
+                }
+            }
         }
 
         private static void OnPlayerStateChanged(DOLEvent e, object sender, EventArgs args)
         {
-            GamePlayer player = sender as GamePlayer;
-            if (player == null && args is RegionPlayerEventArgs rpArgs)
-                player = rpArgs.Player;
+            GamePlayer player = sender as GamePlayer ?? (args as RegionPlayerEventArgs)?.Player;
 
-            if (player != null)
+            if (player != null && player.ObjectState == GameObject.eObjectState.Active)
             {
-
-                var existingTimer = player.TempProperties.getProperty<RegionTimer>("QuestIndicatorTimer");
-                if (existingTimer != null)
+                foreach (var npc in player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>())
                 {
-                    existingTimer.Stop();
+                    if (npc is ITextNPC || npc is TeleportNPC || (npc.QuestIdListToGive != null && npc.QuestIdListToGive.Count > 0))
+                    {
+                        player.TempProperties.removeProperty("QuestIndState_" + npc.InternalID);
+                        npc.RefreshEffects(player);
+                    }
                 }
 
-                var newTimer = new RegionTimer(player, new RegionTimerCallback(state =>
-                {
-                    if (player.ObjectState != GameObject.eObjectState.Active) return 0;
-
-                    foreach (var npc in player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>())
-                    {
-                        if (npc is ITextNPC || npc is TeleportNPC || (npc.QuestIdListToGive != null && npc.QuestIdListToGive.Count > 0))
-                        {
-                            RefreshIndicator(npc, player);
-                        }
-                    }
-
-                    foreach (var pq in player.QuestList.OfType<PlayerQuest>())
-                        foreach (var goal in pq.Quest.Goals.Values)
-                            goal.RefreshCustomIndicators(pq);
-
-                    return 5000;
-                }));
-
-                player.TempProperties.setProperty("QuestIndicatorTimer", newTimer);
-                newTimer.Start(1500);
+                foreach (var pq in player.QuestList.OfType<PlayerQuest>())
+                    foreach (var goal in pq.Quest.Goals.Values)
+                        goal.RefreshCustomIndicators(pq);
             }
         }
 
@@ -123,7 +116,13 @@ namespace DOL.GS.Scripts
             {
                 bool needsIndicator = false;
 
-                if (npc is ITextNPC || npc is TeleportNPC)
+                if (npc is ITextNPC textNpc)
+                {
+                    var policy = textNpc.GetTextNPCPolicy();
+                    if (policy != null && (byte)policy.Condition.CanGiveQuest >= 0x20)
+                        needsIndicator = true;
+                }
+                else if (npc is TeleportNPC tpNpc && tpNpc.ShowTPIndicator)
                     needsIndicator = true;
                 else if (npc.QuestIdListToGive != null && npc.QuestIdListToGive.Count > 0)
                     needsIndicator = true;
@@ -196,8 +195,7 @@ namespace DOL.GS.Scripts
                 var fakeMob = GetOrSpawnIndicator(npc);
                 if (fakeMob != null)
                 {
-                    player.Out.SendObjectRemove(fakeMob);
-                    player.Out.SendNPCCreate(fakeMob);
+                    player.Out.SendModelChange(fakeMob, fakeMob.GetModelForPlayer(player));
                 }
             }
             else
@@ -205,8 +203,7 @@ namespace DOL.GS.Scripts
                 var fakeMob = npc.TempProperties.getProperty<QuestIndicatorNPC>("QuestIndicatorMob", null);
                 if (fakeMob != null)
                 {
-                    player.Out.SendObjectRemove(fakeMob);
-                    player.Out.SendNPCCreate(fakeMob);
+                    player.Out.SendModelChange(fakeMob, 667);
                 }
             }
         }

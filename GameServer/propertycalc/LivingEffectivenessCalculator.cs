@@ -23,7 +23,7 @@ using DOL.AI.Brain;
 namespace DOL.GS.PropertyCalc
 {
     /// <summary>
-    /// Calculator for Robbery Resist
+    /// Calculator for Living Effectiveness
     /// </summary>
     [PropertyCalculator(eProperty.LivingEffectiveness)]
     public class LivingEffectivenessCalculator : PropertyCalculator
@@ -31,17 +31,46 @@ namespace DOL.GS.PropertyCalc
         public override int CalcValue(GameLiving living, eProperty property)
         {
             double value = living.BaseEffectiveness;
-            int bonus = 100;
-            
-            bonus += Math.Min(10, living.ItemBonus[eProperty.LivingEffectiveness]);
-            bonus += Math.Min(30, living.BaseBuffBonusCategory[eProperty.LivingEffectiveness]);
-            bonus += Math.Min(50, living.SpecBuffBonusCategory[eProperty.LivingEffectiveness]);
-            bonus += Math.Min(50, living.AbilityBonus[eProperty.LivingEffectiveness]);
-            bonus += Math.Min(30, living.OtherBuffBonus[eProperty.LivingEffectiveness]);
-            bonus -= Math.Max(0, living.DebuffCategory[eProperty.LivingEffectiveness]);
-            bonus -= Math.Max(0, living.SpecDebuffCategory[eProperty.LivingEffectiveness]);
-            value *= Math.Round(value * bonus / 100);
-            value *= living.BuffBonusMultCategory1.Get((int)eProperty.LivingEffectiveness);
+            int itemBonus = Math.Min(10, living.ItemBonus[eProperty.LivingEffectiveness]);
+
+            int buffBonus = Math.Min(30, living.BaseBuffBonusCategory[eProperty.LivingEffectiveness])
+                          + Math.Min(50, living.SpecBuffBonusCategory[eProperty.LivingEffectiveness])
+                          + Math.Min(50, living.AbilityBonus[eProperty.LivingEffectiveness])
+                          + Math.Min(30, living.OtherBuffBonus[eProperty.LivingEffectiveness]);
+
+            int debuff = Math.Max(0, living.DebuffCategory[eProperty.LivingEffectiveness])
+                       + Math.Max(0, living.SpecDebuffCategory[eProperty.LivingEffectiveness]);
+
+            double mult = living.BuffBonusMultCategory1.Get((int)eProperty.LivingEffectiveness);
+
+            if (living is GamePet pet)
+            {
+                GameLiving owner = pet.GetLivingOwner();
+                if (owner != null && owner != living)
+                {
+                    itemBonus += Math.Min(10, owner.ItemBonus[eProperty.LivingEffectiveness]);
+
+                    int ownerBuffBonus = Math.Min(30, owner.BaseBuffBonusCategory[eProperty.LivingEffectiveness])
+                                       + Math.Min(50, owner.SpecBuffBonusCategory[eProperty.LivingEffectiveness])
+                                       + Math.Min(50, owner.AbilityBonus[eProperty.LivingEffectiveness])
+                                       + Math.Min(30, owner.OtherBuffBonus[eProperty.LivingEffectiveness]);
+
+                    buffBonus += ownerBuffBonus;
+
+                    debuff += Math.Max(0, owner.DebuffCategory[eProperty.LivingEffectiveness])
+                            + Math.Max(0, owner.SpecDebuffCategory[eProperty.LivingEffectiveness]);
+
+                    mult *= owner.BuffBonusMultCategory1.Get((int)eProperty.LivingEffectiveness);
+                    value *= owner.BaseEffectiveness;
+                }
+
+                buffBonus = Math.Min(25, buffBonus);
+            }
+
+            int bonus = 100 + itemBonus + buffBonus - debuff;
+            value *= (bonus / 100.0);
+            value *= mult;
+
             return (int)Math.Max(0, Math.Round(value * 100));
         }
 
@@ -49,11 +78,22 @@ namespace DOL.GS.PropertyCalc
         public override int CalcValueBase(GameLiving living, eProperty property)
         {
             double value = living.BaseEffectiveness;
-            int bonus = 100;
-            
-            bonus += Math.Min(10, living.ItemBonus[eProperty.LivingEffectiveness]);
-            value *= Math.Round(value * bonus / 100);
-            return (int)Math.Max(0, value * 100);
+            int itemBonus = Math.Min(10, living.ItemBonus[eProperty.LivingEffectiveness]);
+
+            if (living is GamePet pet)
+            {
+                GameLiving owner = pet.GetLivingOwner();
+                if (owner != null && owner != living)
+                {
+                    itemBonus += Math.Min(10, owner.ItemBonus[eProperty.LivingEffectiveness]);
+                    value *= owner.BaseEffectiveness;
+                }
+            }
+
+            int bonus = 100 + itemBonus;
+            value *= (bonus / 100.0);
+
+            return (int)Math.Max(0, Math.Round(value * 100));
         }
     }
 }

@@ -300,6 +300,9 @@ SpellDescription.StormEffect.SubDescription2:				Le tempeste si genereranno dina
 SpellDescription.StormEffect.SubDescription3:				Un massimo di {0} bersagli può essere influenzato collettivamente da questa cascata di tempeste.
 SpellDescription.StormEffect.PulseDescription:				La generazione della tempesta pulserà ogni {0} secondi.
 SpellDescription.StormEffect.SubSpellTitle:					Effetto Tempesta: {0}
+SpellDescription.EffectivenessBuffPvE.MainDescription1:		Aumenta l'efficacia del bersaglio del {1}%, così come quella degli alleati entro un raggio di {0} dal bersaglio.
+SpellDescription.EffectivenessBuffPvE.MainDescription2:		Aumenta l'efficacia del bersaglio del {0}%.
+SpellDescription.EffectivenessBuffPvE.MainDescription3:		Questo incantesimo può essere usato solo in PvE.
 
 
 # ML Spells ShortDescriptions
@@ -372,7 +375,7 @@ SpellDescription.Warlord.Critical.MainDescription2:				Aumenta del {0}% la proba
 SpellDescription.Warlord.CleansingAura.MainDescription1:		Riduce l'efficacia dei DoT sugli alleati entro {0} del {1}%. Se il danno scende a zero, l'effetto termina.
 SpellDescription.Warlord.CleansingAura.MainDescription2:		Riduce l'efficacia dei DoT sul bersaglio del {0}%. Se il danno scende a zero, termina.
 SpellDescription.Warlord.EffectivenessBuff.MainDescription1:	Aumenta l'efficacia degli alleati entro {0} del {1}% (magie e mischia).
-SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Aumenta l'efficacia del bersaglio del {1}% (magie e mischia).
+SpellDescription.Warlord.EffectivenessBuff.MainDescription2:	Aumenta l'efficacia del bersaglio del {0}% (magie e mischia).
 SpellDescription.Warlord.MLABSBuff.MainDescription1:			Aumenta l'assorbimento armatura degli alleati entro {0} del {1}%.
 SpellDescription.Warlord.MLABSBuff.MainDescription2:			Aumenta l'assorbimento armatura del bersaglio del {1}%.
 SpellDescription.Sojourner.UnmakeCrystalseed.MainDescription:	Distrugge la runa bersaglio e quelle vicine entro {0}.

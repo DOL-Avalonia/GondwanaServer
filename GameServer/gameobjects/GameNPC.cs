@@ -2246,9 +2246,16 @@ namespace DOL.GS
 
         public virtual void RefreshEffects(GamePlayer player)
         {
-            if (QuestIdListToGive.Any() || player.QuestList.Any(q => IsRelatedToQuest(q.Quest)))
+            bool hasQuests = QuestIdListToGive.Count > 0 || player.QuestList.Any(q => IsRelatedToQuest(q.Quest));
+
+            if (hasQuests)
             {
                 player.Out.SendNPCsQuestEffect(this, this.GetQuestIndicator(player));
+            }
+
+            if (hasQuests || this is ITextNPC || this is TeleportNPC)
+            {
+                QuestIndicatorManager.RefreshIndicator(this, player);
             }
         }
 
