@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Mágico
+ROG.ItemFormat.Focus: {1} {2} {0}
+ROG.ItemFormat.Tiered.Focus: {2} {3} {1} {0}
+ROG.ItemFormat.CustomTiered.Focus: {2} {3} {0} {1}
+
 ROG.ItemFormat: {1} {0}
 ROG.ItemFormat.Tiered: {2} {1} {0}
 ROG.MobDropFormat: {1} de {0}
 ROG.ItemFormat.CustomTiered: {2} {0} {1}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: de Lana
+ROG.Prefix.Linen: de Lino
+ROG.Prefix.Brocade: de Brocado
+ROG.Prefix.Rawhide: de Cuero Crudo
+ROG.Prefix.Tanned: Curtido
+ROG.Prefix.Cured: Tratado
+ROG.Prefix.Bronze: de Bronce
+ROG.Prefix.Copper: de Cobre
+ROG.Prefix.Brass: de Latón
+ROG.Prefix.FineAlloy: de Aleación Fina
+ROG.Prefix.Iron: de Hierro
+ROG.Prefix.Steel: de Acero
+ROG.Prefix.Rowan: de Serbal
+ROG.Prefix.Elm: de Olmo
+ROG.Prefix.Ash: de Fresno
 
 # ================================
 # PREFIXES
@@ -401,6 +426,7 @@ ROG.BaseName.WarScythe: Guadaña de Guerra
 ROG.BaseName.SmallShield: Escudo Pequeño
 ROG.BaseName.MediumShield: Escudo Mediano
 ROG.BaseName.LargeShield: Escudo Grande
+ROG.BaseName.Staff: Bastón
 ROG.BaseName.MaulerStaff: Bastón de Magullador
 ROG.BaseName.Quarterstaff: Bastón
 ROG.BaseName.ShodQuarterstaff: Bastón Herrado

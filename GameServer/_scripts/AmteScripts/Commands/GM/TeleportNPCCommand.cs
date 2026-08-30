@@ -114,6 +114,7 @@ namespace DOL.GS.Scripts
                             GuildName = "Douanier",
                             Realm = 0,
                             Model = 40,
+                            ModelDb = 40,
                             Price = Money.GetMoney(0, 0, price, 0, 0),
                             IsRenaissance = isRenaissance
 
@@ -139,13 +140,18 @@ namespace DOL.GS.Scripts
                             Name = "Nouveau téléporteur",
                             Realm = 0,
                             Model = 40,
+                            ModelDb = 40,
                             Text = "Texte à définir.{5}",
                             IsRenaissance = isRenaissance
                         };
                     }
 
                     if (!npc.IsPeaceful)
+                    {
                         npc.Flags ^= GameNPC.eFlags.PEACE;
+                        npc.FlagsDb = (uint)npc.Flags;
+                    }
+
                     npc.LoadedFromScript = false;
                     npc.AddToWorld();
                     npc.SaveIntoDatabase();
@@ -196,11 +202,20 @@ namespace DOL.GS.Scripts
                         if (min > 500) min = 500;
                         npc.Range = min;
                         npc.Realm = 0;
+
                         if (!npc.IsPeaceful)
+                        {
                             npc.Flags ^= GameNPC.eFlags.PEACE;
+                            npc.FlagsDb = (uint)npc.Flags;
+                        }
                         if (!npc.IsDontShowName)
+                        {
                             npc.Flags ^= GameNPC.eFlags.DONTSHOWNAME;
+                            npc.FlagsDb = (uint)npc.Flags;
+                        }
+
                         npc.Model = 1;
+                        npc.ModelDb = 1;
                         npc.SaveIntoDatabase();
                         player.Out.SendMessage("Le rayon est maintenant de " + min + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     }

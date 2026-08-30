@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Magico
+ROG.ItemFormat.Focus: {1} {2} {0}
+ROG.ItemFormat.Tiered.Focus: {2} {3} {1} {0}
+ROG.ItemFormat.CustomTiered.Focus: {2} {3} {0} {1}
+
 ROG.ItemFormat: {1} {0}
 ROG.ItemFormat.Tiered: {2} {1} {0}
 ROG.MobDropFormat: {1} di {0}
 ROG.ItemFormat.CustomTiered: {2} {0} {1}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: di Lana
+ROG.Prefix.Linen: di Lino
+ROG.Prefix.Brocade: di Broccato
+ROG.Prefix.Rawhide: di Cuoio Grezzo
+ROG.Prefix.Tanned: Conciato
+ROG.Prefix.Cured: Trattato
+ROG.Prefix.Bronze: di Bronzo
+ROG.Prefix.Copper: di Rame
+ROG.Prefix.Brass: di Ottone
+ROG.Prefix.FineAlloy: di Lega Fine
+ROG.Prefix.Iron: di Ferro
+ROG.Prefix.Steel: d'Acciaio
+ROG.Prefix.Rowan: di Sorbo
+ROG.Prefix.Elm: di Olmo
+ROG.Prefix.Ash: di Frassino
 
 # ================================
 # PREFIXES
@@ -401,6 +426,7 @@ ROG.BaseName.WarScythe: Falce da Guerra
 ROG.BaseName.SmallShield: Brocchiero
 ROG.BaseName.MediumShield: Scudo Medio
 ROG.BaseName.LargeShield: Scudo Torre
+ROG.BaseName.Staff: Bastone
 ROG.BaseName.MaulerStaff: Bastone da Lottatore
 ROG.BaseName.Quarterstaff: Bastone Ferrato
 ROG.BaseName.ShodQuarterstaff: Bastone Ferrato Rinforzato

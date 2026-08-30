@@ -1,6 +1,7 @@
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS;
+using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
 using DOL.GS.Scripts;
 using DOL.Language;
@@ -21,7 +22,8 @@ namespace DOL.GS.Commands
         "Genistar.Command.Help.Emote",
         "Genistar.Command.Help.VisibleWeapon",
         "Genistar.Command.Help.Equip",
-        "Genistar.Command.Help.RemoveWeapon")]
+        "Genistar.Command.Help.RemoveWeapon",
+        "Genistar.Command.Help.Abort")]
     [CmdAttribute(
         "&genistar",
         ePrivLevel.GM,
@@ -44,13 +46,8 @@ namespace DOL.GS.Commands
 
             string subCmd = args[1].ToLower();
 
-            if (subCmd == "care")
-            {
-                HandleCareRequest(client, player);
-                return;
-            }
-
-            GameNPC targetCreature = player.TargetObject as GameNPC;
+            GameObject targetObj = player.TargetObject;
+            GameNPC targetCreature = targetObj as GameNPC;
             DBGenistar dbRecord = null;
 
             if (targetCreature is GenistarNPC gNpc)
@@ -60,6 +57,54 @@ namespace DOL.GS.Commands
             else if (targetCreature is GenistarPet gPet)
             {
                 dbRecord = gPet.DBRecord;
+            }
+            else if (targetCreature is GenistarEgg gEgg)
+            {
+                dbRecord = gEgg.DBRecord;
+            }
+
+            if (dbRecord == null && targetObj is GenistarVisual visual)
+            {
+                foreach (GameNPC npc in visual.GetNPCsInRadius(200))
+                {
+                    if (npc is GenistarEgg egg && egg.DBRecord != null && egg.DBRecord.OwnerID == player.InternalID)
+                    {
+                        targetCreature = egg;
+                        dbRecord = egg.DBRecord;
+                        break;
+                    }
+                    if (npc is GenistarNPC adult && adult.DBRecord != null && adult.DBRecord.OwnerID == player.InternalID)
+                    {
+                        targetCreature = adult;
+                        dbRecord = adult.DBRecord;
+                        break;
+                    }
+                }
+            }
+
+            if (dbRecord == null && targetObj == null)
+            {
+                foreach (GameNPC npc in player.GetNPCsInRadius(300))
+                {
+                    if (npc is GenistarEgg egg && egg.DBRecord != null && egg.DBRecord.OwnerID == player.InternalID)
+                    {
+                        targetCreature = egg;
+                        dbRecord = egg.DBRecord;
+                        break;
+                    }
+                    if (npc is GenistarNPC adult && adult.DBRecord != null && adult.DBRecord.OwnerID == player.InternalID)
+                    {
+                        targetCreature = adult;
+                        dbRecord = adult.DBRecord;
+                        break;
+                    }
+                }
+            }
+
+            if (subCmd == "care" && player.TempProperties.getProperty<bool>("IsAfkCareMode", false))
+            {
+                GenistarLensMgr.DisengageCareMode(player, voluntary: true, silent: false);
+                return;
             }
 
             if (dbRecord == null || targetCreature == null)
@@ -87,6 +132,10 @@ namespace DOL.GS.Commands
 
             switch (subCmd)
             {
+                case "care":
+                    HandleCareRequest(player, targetCreature);
+                    break;
+
                 case "rename":
                     HandleRenameRequest(player, targetCreature, dbRecord, args);
                     break;
@@ -107,13 +156,17 @@ namespace DOL.GS.Commands
                     HandleRemoveWeaponRequest(player, targetCreature, dbRecord, args);
                     break;
 
+                case "abort":
+                    HandleAbortRequest(player, targetCreature, dbRecord);
+                    break;
+
                 default:
                     DisplaySyntax(client);
                     break;
             }
         }
 
-        private void HandleCareRequest(GameClient client, GamePlayer player)
+        private void HandleCareRequest(GamePlayer player, GameNPC creature)
         {
             string lang = player.Client?.Account?.Language ?? "EN";
 
@@ -123,29 +176,56 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            if (player.TempProperties.getProperty<bool>("IsAfkCareMode", false))
-            {
-                GenistarLensMgr.DisengageCareMode(player, voluntary: true, silent: false);
-                return;
-            }
-
-            GenistarEgg targetEgg = null;
-            foreach (GameNPC npc in player.GetNPCsInRadius(300))
-            {
-                if (npc is GenistarEgg egg && egg.DBRecord != null && egg.DBRecord.OwnerID == player.InternalID)
-                {
-                    targetEgg = egg;
-                    break;
-                }
-            }
-
-            if (targetEgg == null)
+            if (!(creature is GenistarEgg targetEgg))
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.Command.NearIncubator"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
+            if (!player.IsWithinRadius(targetEgg, 300))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.GenistarEgg.TooFarToCare"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
             GenistarLensMgr.EngageCareMode(player, targetEgg);
+        }
+
+        private void HandleAbortRequest(GamePlayer player, GameNPC creature, DBGenistar db)
+        {
+            string lang = player.Client?.Account?.Language ?? "EN";
+
+            if (!(creature is GenistarEgg egg))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.Command.CanAbortOnlyUnhatched"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (db.State != 0 && db.State != 1)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.Command.AbortAlreadyHatched"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            if (player.TempProperties.getProperty<GameObject>("AfkCareTarget", null) == egg)
+            {
+                GenistarLensMgr.DisengageCareMode(player, voluntary: true, silent: true);
+            }
+
+            int houseNum = db.HouseNumber;
+            int placeholderKey = db.PlaceholderKey;
+
+            GameServer.Database.DeleteObject(db);
+
+            Housing.House house = Housing.HouseMgr.GetHouse(houseNum);
+            if (house != null)
+            {
+                house.UpdateGenistarVisual(placeholderKey, 1293);
+            }
+
+            egg.RemoveFromWorld();
+
+            player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.Command.AbortSuccess"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
         }
 
         private void HandleRenameRequest(GamePlayer player, GameNPC creature, DBGenistar db, string[] args)

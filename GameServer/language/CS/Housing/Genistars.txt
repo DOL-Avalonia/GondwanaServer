@@ -1,7 +1,6 @@
 # /Genistar System
 Genistar.GenistarPet.LevelUp:				Tvůj Genistar dosáhl úrovně {0}.
 Genistar.GenistarPet.Examine:				Prohlížíš si {0}. {1} je {2} a je to mazlíček Genistar. Chceš-li tohoto tvora přejmenovat nebo mu dát pokyn k emoci, použij na cíl příkaz /genistar.
-Genistar.GenistarPet.CantEquip:				Tento předmět nemůže být vybaven Genistarem.
 Genistar.GenistarPet.PackFull:				Tvůj batoh byl plný! Kontejner s {0} spadl na zem.
 Genistar.GenistarPet.PackSuccess:			{0} se vrací do svého přenosného kontejneru v tvém inventáři.
 Genistar.GenistarPet.Died:					Tvůj Genistar zemřel! Vrať jeho ostatky do inkubátoru v tvém obydlí do 1 hodiny, jinak bude navždy ztracen.
@@ -39,6 +38,7 @@ Genistar.GenistarEgg.StasisCollapsed:		Stázové pole zkolabovalo! Tvor je přip
 Genistar.GenistarEgg.StasisActive:			[Stáze aktivní]: Životaschopnost vyžaduje dalších {0} sekund přímé /afk péče.
 Genistar.GenistarEgg.WeaveLocks:			Genetická struktura se uzamyká! Skořápka začíná praskat!
 Genistar.GenistarEgg.TooFar:				Odstoupil jsi příliš daleko od inkubátoru a přestal ses o něj starat. Stázové pole se automaticky znovu aktivuje.
+Genistar.GenistarEgg.TooFarToCare:			Inkubátor je mimo dosah. Přistup blíž, abys o něj mohl pečovat.
 
 Genistar.Lifecycle.Degraded:				Genetický materiál tvého poraženého Genistara zdegradoval natolik, že ho nelze zachránit. Tvůj inkubátor v obydlí je volný.
 Genistar.Lifecycle.EmbryoFailed:			Genetická sekvence zkolabovala! Embryo se nevytvořilo.
@@ -83,12 +83,16 @@ Genistar.Command.Help.Emote:				/genistar emote <Action> - Spouští rutiny fyzi
 Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Přepíná slot viditelné zbraně (Pouze humanoidi).
 Genistar.Command.Help.Equip:				/genistar equip <ze slotu batohu> - Vybaví předmět (zbraň nebo brnění) z batohu přímo Genistarovi.
 Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Získá vybavení zpět od Genistara.
+Genistar.Command.Help.Abort:				/genistar abort - Zruší inkubaci Genistara a zničí vejce.
 Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <množství> - [GM] Přímá manipulace se zkušenostmi cílové formy života.
 
 Genistar.Command.TargetVisual:				Musíš mít v přímém cíli jednoho ze svých živých Genistarů.
 Genistar.Command.RejectsTelemetry:			Tato forma života odmítá tvou telemetrii; poslouchá pouze svého skutečného genetického pána.
 Genistar.Command.PhysicalState:				Tvůj současný fyzický stav zabraňuje intenzivnímu alchymistickému soustředění.
 Genistar.Command.NearIncubator:				Abys mohl promítat pole AFK péče, musíš stát poblíž svého inkubátoru v obydlí.
+Genistar.Command.CanAbortOnlyUnhatched:		Proces inkubace můžeš zrušit pouze u nevylíhnutého vejce Genistara.
+Genistar.Command.AbortAlreadyHatched:		Tento Genistar se již vylíhl nebo není ve stavu inkubace.
+Genistar.Command.AbortSuccess:				Inkubační proces byl zrušen. Místo je nyní volné.
 Genistar.Command.NameLimit:					Volací znak překračuje limity pro vykreslování nad hlavou. Maximum je 20 znaků.
 Genistar.Command.NameRestricted:			Tento podpis je omezen komunikačními protokoly říše. Přístup odepřen.
 Genistar.Command.RenameDialogReset:			Autorizuješ vymazání vlastní telemetrie a resetování '{0}' zpět na biologický základ: '{1}'?

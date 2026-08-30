@@ -415,6 +415,8 @@ namespace DOL.GS
 
             var oldSlot = (eInventorySlot)item.SlotPosition;
             int removedCount = item.Count;
+            ItemUnique uniqueTemplate = item.Template as ItemUnique;
+            bool sharedUnique = uniqueTemplate != null && item.IsStackable;
 
             if (!base.RemoveItem(item))
                 return false;
@@ -430,11 +432,19 @@ namespace DOL.GS
             {
                 if (deleteObject)
                 {
-                    if (GameServer.Database.DeleteObject(item) == false)
+                    ItemTemplate origTemplate = item.Template;
+                    // Prevent the DOL ORM from cascade-deleting the shared template
+                    if (sharedUnique) item.Template = null;
+
+                    bool deleted = GameServer.Database.DeleteObject(item);
+
+                    if (sharedUnique) item.Template = origTemplate;
+
+                    if (deleted == false)
                     {
                         m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.ErrorDeletingItemDatabase"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         Log.ErrorFormat("Error deleting item {0}:{1} for player {2} from the database during RemoveItem!", item.Id_nb, item.Name, m_player.Name);
-                        lock( m_items )
+                        lock (m_items)
                             m_items.Add(oldSlot, item);
                         item.SlotPosition = savePosition;
                         item.OwnerID = saveOwnerID;
@@ -1884,10 +1894,27 @@ namespace DOL.GS
                 return false;
             }
 
-            // 32-38 = Armor, 42=Shield. Weapons=1-26,45.
-            if (!GlobalConstants.IsArmor(targetItem.Object_Type) && !GlobalConstants.IsWeapon(targetItem.Object_Type) && targetItem.Object_Type != (int)eObjectType.Instrument)
+            // Define exact bounds for Armors vs Weapons (including Shields and Instruments)
+            bool isArmor = GlobalConstants.IsArmor(targetItem.Object_Type);
+            bool isWeapon = GlobalConstants.IsWeapon(targetItem.Object_Type) || targetItem.Object_Type == (int)eObjectType.Shield || targetItem.Object_Type == (int)eObjectType.Instrument;
+
+            if (!isArmor && !isWeapon)
             {
                 m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternArmorWeaponOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            string patternId = pattern.Id_nb.ToLower();
+
+            if (patternId.Contains("weapon") && !isWeapon)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternWeaponOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
+
+            if (patternId.Contains("armor") && !isArmor)
+            {
+                m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.PatternArmorOnly"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 

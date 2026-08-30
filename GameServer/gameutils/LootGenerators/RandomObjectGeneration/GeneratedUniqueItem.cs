@@ -855,10 +855,6 @@ namespace DOL.GS
                 }
             }
 
-            // Non-magical items lose their capitalization styling
-            if (number == 0 || !fAddedBonus)
-                this.Name = this.Name.ToLower();
-
             ReorderBonuses();
         }
 
@@ -5028,7 +5024,12 @@ namespace DOL.GS
             eProperty bonus = GetPropertyFromBonusLine(utiLine);
             //Console.WriteLine($"HighUti: {utiLine} bonus: {bonus}");
             WriteMagicalName(bonus);
-            //Console.WriteLine($"Item name: {Name}");
+
+            // If no magical prefix was assigned, assign a flavor material prefix
+            if (!m_named)
+            {
+                WriteMaterialName();
+            }
         }
 
         public int GetHighestUtilitySingleLine()
@@ -6485,18 +6486,19 @@ namespace DOL.GS
         {
             if (hPropertyToMagicPrefix.TryGetValue(property, out string prefix) && !m_named)
             {
-                if (!string.IsNullOrEmpty(prefix) && this.Name.StartsWith("[ROG]|"))
+                int rogIndex = this.Name.IndexOf("[ROG]|");
+                if (!string.IsNullOrEmpty(prefix) && rogIndex != -1)
                 {
                     string safePrefix = prefix.Replace(" ", "").Replace("'", "");
-                    string restOfName = this.Name.Substring(6);
+                    string beforeRog = this.Name.Substring(0, rogIndex);
+                    string restOfName = this.Name.Substring(rogIndex + 6);
 
-                    // Construct the final formula (e.g., "[ROG]Mighty|1_CryptsAndUndead|Sword")
-                    this.Name = $"[ROG]{safePrefix}|{restOfName}";
+                    // Construct the final formula (e.g., "Focus[ROG]Mighty|1_CryptsAndUndead|Staff")
+                    this.Name = $"{beforeRog}[ROG]{safePrefix}|{restOfName}";
+                    m_named = true;
+                    return true;
                 }
-                m_named = true;
-                return true;
             }
-
             return false;
         }
 
@@ -6668,6 +6670,51 @@ namespace DOL.GS
                     this.Extension = GetNonTorsoExtensionForLevel(this.Level);
                 else if (slot == eInventorySlot.TorsoArmor)
                     this.Extension = GetTorsoExtensionForLevel(this.Level);
+            }
+        }
+
+        public void WriteMaterialName()
+        {
+            string prefix = GetRandomMaterialPrefix();
+            int rogIndex = this.Name.IndexOf("[ROG]|");
+            if (!string.IsNullOrEmpty(prefix) && rogIndex != -1)
+            {
+                string beforeRog = this.Name.Substring(0, rogIndex);
+                string restOfName = this.Name.Substring(rogIndex + 6);
+
+                this.Name = $"{beforeRog}[ROG]{prefix}|{restOfName}";
+                m_named = true;
+            }
+        }
+
+        private string GetRandomMaterialPrefix()
+        {
+            eObjectType type = (eObjectType)this.Object_Type;
+            switch (type)
+            {
+                case eObjectType.Cloth:
+                    return new[] { "Woolen", "Linen", "Brocade" }[Util.Random(2)];
+                case eObjectType.Leather:
+                    return new[] { "Rawhide", "Tanned", "Cured" }[Util.Random(2)];
+                case eObjectType.Studded:
+                case eObjectType.Chain:
+                case eObjectType.Scale:
+                    return new[] { "Bronze", "Copper", "Brass" }[Util.Random(2)];
+                case eObjectType.Plate:
+                    return new[] { "FineAlloy", "Iron", "Steel" }[Util.Random(2)];
+                case eObjectType.Shield:
+                case eObjectType.Staff:
+                case eObjectType.MaulerStaff:
+                case eObjectType.Longbow:
+                case eObjectType.RecurvedBow:
+                case eObjectType.CompositeBow:
+                case eObjectType.Fired:
+                case eObjectType.Crossbow:
+                case eObjectType.Instrument:
+                case eObjectType.Scythe:
+                    return new[] { "Rowan", "Elm", "Ash" }[Util.Random(2)];
+                default:
+                    return new[] { "Copper", "Bronze", "Iron" }[Util.Random(2)];
             }
         }
 
@@ -7021,6 +7068,9 @@ namespace DOL.GS
                 case 3239:
                 case 3688:
                 case 3731:
+                case 4313:
+                case 4350:
+                case 4391:
                     return "Harp";
                 case 328:
                 case 329:

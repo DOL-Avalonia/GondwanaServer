@@ -55,9 +55,10 @@ namespace DOL.GS
         /// </summary>
         protected object m_vaultSync = new object();
 
-        public object LockObject()
+        public virtual object LockObject(GamePlayer player)
         {
-            return m_vaultSync;
+            var cache = VaultItemCacheManager.GetCache(this, player);
+            return cache != null ? cache.SyncRoot : m_vaultSync;
         }
 
         /// <summary>
@@ -134,24 +135,11 @@ namespace DOL.GS
         /// </summary>
         public virtual Dictionary<int, InventoryItem> GetClientInventory(GamePlayer player)
         {
-            var inventory = new Dictionary<int, InventoryItem>();
-            int slotOffset = -FirstDBSlot + FirstClientSlot;
-            foreach (InventoryItem item in DBItems(player))
-            {
-                if (item != null)
-                {
-                    if (!inventory.ContainsKey(item.SlotPosition + slotOffset))
-                    {
-                        inventory.Add(item.SlotPosition + slotOffset, GameInventoryItem.Create(item) ?? item);
-                    }
-                    else
-                    {
-                        log.ErrorFormat("GAMEVAULT: Duplicate item {0}, owner {1}, position {2}", item.Name, item.OwnerID, (item.SlotPosition + slotOffset));
-                    }
-                }
-            }
+            var cache = VaultItemCacheManager.GetCache(this, player);
+            if (cache != null) return cache.GetItems(this, player);
 
-            return inventory;
+            // Use the extension method since GameStaticItem doesn't have this method
+            return this.GetClientItems(player);
         }
 
         /// <summary>
@@ -293,7 +281,7 @@ namespace DOL.GS
 
             // let's move it
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 this.NotifyPlayers(this, player, _observers, this.MoveItem(player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot, count));
             }
@@ -323,7 +311,7 @@ namespace DOL.GS
                 return false;
             }
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 this.NotifyPlayers(this, player, _observers, updated);
             }
@@ -362,6 +350,7 @@ namespace DOL.GS
         /// </summary>
         public virtual bool OnAddItem(GamePlayer player, InventoryItem item)
         {
+            VaultItemCacheManager.GetCache(this, player)?.ForceValidateCache();
             return true;
         }
 
@@ -370,6 +359,7 @@ namespace DOL.GS
         /// </summary>
         public virtual bool OnRemoveItem(GamePlayer player, InventoryItem item)
         {
+            VaultItemCacheManager.GetCache(this, player)?.ForceValidateCache();
             return true;
         }
 

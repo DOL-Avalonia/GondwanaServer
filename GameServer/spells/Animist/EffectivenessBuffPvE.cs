@@ -1,3 +1,4 @@
+using DOL.AI.Brain;
 using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
@@ -16,7 +17,7 @@ namespace DOL.GS.Spells
 
         /// <summary>
         /// Perform validation checks before allowing the player to cast.
-        /// Enforces strictly PvE-only restrictions.
+        /// Enforces strictly PvE-only restrictions and custom Pet targeting rules.
         /// </summary>
         public override bool CheckBeginCast(GameLiving selectedTarget, bool quiet)
         {
@@ -37,12 +38,54 @@ namespace DOL.GS.Spells
                 }
             }
 
+            if (Spell.LifeDrainReturn == 1 && Spell.Target.ToLower() == "pet")
+            {
+                GameLiving actualTarget = selectedTarget;
+                if (actualTarget == null || !(Caster.IsControlledNPC(actualTarget as GameNPC) || (actualTarget as GameNPC)?.GetLivingOwner() == Caster))
+                {
+                    if (Caster.ControlledBrain != null && Caster.ControlledBrain.Body != null)
+                        actualTarget = Caster.ControlledBrain.Body;
+                }
+
+                if (actualTarget is GameNPC npcTarget)
+                {
+                    GameLiving owner = npcTarget.GetLivingOwner() ?? (npcTarget as GamePet)?.Owner;
+                    bool isPet = owner != null || npcTarget is GamePet || npcTarget.Brain is IControlledBrain;
+                    if (isPet)
+                    {
+                        if (!(npcTarget is TurretPet))
+                        {
+                            if (!quiet) MessageToCaster(LanguageMgr.GetTranslation((Caster as GamePlayer)?.Client, "SpellHandler.EffectivenessBuffPvE.OnlyTurrets"), eChatType.CT_SpellResisted);
+                            return false;
+                        }
+                    }
+                }
+            }
+
             return base.CheckBeginCast(selectedTarget, quiet);
         }
 
         /// <summary>
-        /// When the applied effect starts on the target.
+        /// Applies the effect to the target.
+        /// Custom feature: If Spell.LifeDrainReturn == 1, it filters out all pets EXCEPT the caster's own Animist Turrets.
         /// </summary>
+        public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
+        {
+            if (Spell.LifeDrainReturn == 1 && target is GameNPC npcTarget)
+            {
+                GameLiving owner = npcTarget.GetLivingOwner() ?? (npcTarget as GamePet)?.Owner;
+                bool isPet = owner != null || npcTarget is GamePet || npcTarget.Brain is IControlledBrain;
+
+                if (isPet)
+                {
+                    if (!(npcTarget is TurretPet))
+                        return false;
+                }
+            }
+
+            return base.ApplyEffectOnTarget(target, effectiveness);
+        }
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);

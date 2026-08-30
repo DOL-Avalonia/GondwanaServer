@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:	Imunitatea lui {0} împotriva vrăjil
 SpellHandler.GatewayPersonalBind.CantUseHere:	Nu poți folosi acest obiect aici!
 SpellHandler.GatewayPersonalBind.MustStandStill:	Trebuie să stai pe loc pentru a folosi acest obiect!
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Ai fost recent în luptă și nu poți folosi acest obiect!
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Această vrajă poate afecta doar turelele animistului.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:		Deja pregătești o vrajă la distanță.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Deja pregătești o vrajă neîntreruptibilă.

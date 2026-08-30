@@ -19,7 +19,7 @@ namespace DOL.GS
 
         public const string EXPLORER_ITEM_LIST = "MarketExplorerItems";
 
-        public object LockObject()
+        public object LockObject(GamePlayer player)
         {
             return new object(); // not applicable for a Market Explorer
         }

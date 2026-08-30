@@ -2,7 +2,6 @@
 # /Genistar System
 Genistar.GenistarPet.LevelUp:				Your Genistar has reached level {0}.
 Genistar.GenistarPet.Examine:				You examine {0}. {1} is {2} and it's a Genistar pet. To rename this creature or issue emotes, use /genistar on your target.
-Genistar.GenistarPet.CantEquip:				This item cannot be equipped by a Genistar.
 Genistar.GenistarPet.PackFull:				Your backpack was full! {0}'s container dropped to the floor.
 Genistar.GenistarPet.PackSuccess:			{0} returns to its portable container in your inventory.
 Genistar.GenistarPet.Died:					Your Genistar has died! Return its remains to your housing incubator within 1 hour, or it will be lost forever.
@@ -40,6 +39,7 @@ Genistar.GenistarEgg.StasisCollapsed:		The stasis field has collapsed! The creat
 Genistar.GenistarEgg.StasisActive:			[Stasis Active]: Viability requires {0} more seconds of direct /afk care.
 Genistar.GenistarEgg.WeaveLocks:			The genetic weave locks! The shell begins to fracture!
 Genistar.GenistarEgg.TooFar:				You stepped too far from the incubator and stopped caring for it. The stasis field automatically re-engages.
+Genistar.GenistarEgg.TooFarToCare:			The incubator is out of reach. Step closer to nurture it.
 
 Genistar.Lifecycle.Degraded:				The genetic material of your defeated Genistar has degraded beyond recovery. Your housing incubator is free.
 Genistar.Lifecycle.EmbryoFailed:			The genetic sequence collapsed! The embryo failed to form.
@@ -84,12 +84,16 @@ Genistar.Command.Help.Emote:				/genistar emote <Action> - Triggers physical ske
 Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Switches the visible weapon slot (Humanoids only).
 Genistar.Command.Help.Equip:				/genistar equip <from backpack slot> - Equips an item (weapon or armor) directly from your backpack to the Genistar.
 Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Retrieves gear from the Genistar.
+Genistar.Command.Help.Abort:				/genistar abort - Abort the Genistar's incubation and destroy the egg.
 Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <amount> - [GM] Directly manipulates target lifeform experience.
 
 Genistar.Command.TargetVisual:				You must establish a direct visual target on one of your live Genistars.
 Genistar.Command.RejectsTelemetry:			This lifeform rejects your telemetry; it obeys only its true genetic master.
 Genistar.Command.PhysicalState:				Your current physical state prevents intense alchemical focus.
 Genistar.Command.NearIncubator:				You must be standing near your housing incubator to project an AFK Care field.
+Genistar.Command.CanAbortOnlyUnhatched:		You can only abort the incubation process of an unhatched Genistar egg.
+Genistar.Command.AbortAlreadyHatched:		This Genistar has already hatched or is not in an incubating state.
+Genistar.Command.AbortSuccess:				You have aborted the incubation process. The placeholder is now free.
 Genistar.Command.NameLimit:					Call-sign exceeds overhead rendering limits. Maximum 20 characters.
 Genistar.Command.NameRestricted:			That signature is restricted by the Realm's communication protocols. Access denied.
 Genistar.Command.RenameDialogReset:			Do you authorize scrubbing custom telemetry and resetting '{0}' back to its biological baseline: '{1}'?

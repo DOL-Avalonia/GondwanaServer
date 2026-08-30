@@ -1,7 +1,6 @@
 # /Genistar System
 Genistar.GenistarPet.LevelUp:				Genistar của bạn đã đạt cấp {0}.
 Genistar.GenistarPet.Examine:				Bạn xem xét {0}. {1} là {2} và nó là một thú cưng Genistar. Để đổi tên sinh vật này hoặc ra lệnh biểu cảm, hãy sử dụng lệnh /genistar lên mục tiêu.
-Genistar.GenistarPet.CantEquip:				Vật phẩm này không thể được trang bị cho Genistar.
 Genistar.GenistarPet.PackFull:				Ba lô của bạn đã đầy! Vật chứa của {0} đã rơi xuống đất.
 Genistar.GenistarPet.PackSuccess:			{0} trở về vật chứa di động trong túi đồ của bạn.
 Genistar.GenistarPet.Died:					Genistar của bạn đã chết! Hãy đưa phần còn lại của nó vào buồng ấp trong nhà của bạn trong vòng 1 giờ, nếu không nó sẽ bị mất vĩnh viễn.
@@ -39,6 +38,7 @@ Genistar.GenistarEgg.StasisCollapsed:		Trường ngưng đọng đã sụp đổ
 Genistar.GenistarEgg.StasisActive:			[Ngưng Đọng Kích Hoạt]: Khả năng sống sót yêu cầu thêm {0} giây chăm sóc /afk trực tiếp.
 Genistar.GenistarEgg.WeaveLocks:			Cấu trúc di truyền được khóa lại! Lớp vỏ bắt đầu nứt rạn!
 Genistar.GenistarEgg.TooFar:				Bạn đã bước đi quá xa buồng ấp và ngừng chăm sóc nó. Trường ngưng đọng tự động kích hoạt lại.
+Genistar.GenistarEgg.TooFarToCare:			Lò ấp nằm ngoài tầm với. Hãy tiến lại gần để chăm sóc.
 
 Genistar.Lifecycle.Degraded:				Vật liệu di truyền của Genistar bị đánh bại đã xuống cấp không thể phục hồi. Buồng ấp trong nhà của bạn hiện đã trống.
 Genistar.Lifecycle.EmbryoFailed:			Trình tự di truyền đã sụp đổ! Phôi thai không thể hình thành.
@@ -83,12 +83,16 @@ Genistar.Command.Help.Emote:				/genistar emote <Action> - Kích hoạt chuỗi 
 Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Chuyển đổi ô vũ khí hiển thị (Chỉ dành cho hình Người).
 Genistar.Command.Help.Equip:				/genistar equip <từ ô ba lô> - Trang bị một vật phẩm (vũ khí hoặc áo giáp) trực tiếp từ ba lô của bạn cho Genistar.
 Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Thu hồi trang bị từ Genistar.
+Genistar.Command.Help.Abort:				/genistar abort - Hủy quá trình ấp của Genistar và phá hủy quả trứng.
 Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <số lượng> - [GM] Thao tác trực tiếp với kinh nghiệm của dạng sống mục tiêu.
 
 Genistar.Command.TargetVisual:				Bạn phải thiết lập mục tiêu hiển thị trực tiếp lên một trong các Genistar đang sống của bạn.
 Genistar.Command.RejectsTelemetry:			Dạng sống này từ chối thông số đo đạc từ xa của bạn; nó chỉ tuân theo người chủ di truyền đích thực của nó.
 Genistar.Command.PhysicalState:				Trạng thái vật lý hiện tại của bạn ngăn cản sự tập trung giả kim thuật cường độ cao.
 Genistar.Command.NearIncubator:				Bạn phải đứng gần buồng ấp trong nhà để phóng chiếu trường Chăm sóc AFK.
+Genistar.Command.CanAbortOnlyUnhatched:		Bạn chỉ có thể hủy quá trình ấp của một quả trứng Genistar chưa nở.
+Genistar.Command.AbortAlreadyHatched:		Genistar này đã nở hoặc không ở trong trạng thái ấp.
+Genistar.Command.AbortSuccess:				Bạn đã hủy quá trình ấp trứng. Vị trí này hiện đã trống.
 Genistar.Command.NameLimit:					Tên gọi vượt quá giới hạn hiển thị trên đầu. Tối đa 20 ký tự.
 Genistar.Command.NameRestricted:			Chữ ký đó bị hạn chế bởi các giao thức liên lạc của Vương quốc. Truy cập bị từ chối.
 Genistar.Command.RenameDialogReset:			Bạn có ủy quyền xóa thông số đo đạc từ xa tùy chỉnh và thiết lập lại '{0}' về cơ sở sinh học của nó: '{1}' không?

@@ -1987,9 +1987,13 @@ namespace DOL.Language
                 }
             }
 
-            if (messageKey.StartsWith("[ROG]"))
+            int rogIndex = messageKey.IndexOf("[ROG]");
+            if (rogIndex != -1 && !messageKey.Contains("[ROG]BloodVial") && !messageKey.Contains("[ROG]PlayerVial"))
             {
-                string[] parts = messageKey.Substring(5).Split('|');
+                string focusPrefix = messageKey.Substring(0, rogIndex);
+                string rogString = messageKey.Substring(rogIndex);
+
+                string[] parts = rogString.Substring(5).Split('|');
                 if (parts.Length >= 2)
                 {
                     string prefixKey = parts[0];
@@ -2062,6 +2066,14 @@ namespace DOL.Language
                     }
 
                     // Combine them depending on the language's grammar
+                    bool hasFocus = focusPrefix.Trim().Equals("Focus", StringComparison.OrdinalIgnoreCase);
+                    string translatedFocus = "";
+                    if (hasFocus)
+                    {
+                        if (!TryGetTranslation(out translatedFocus, language, "ROG.FocusPrefix"))
+                            translatedFocus = "Focus";
+                    }
+
                     string combinedName = translatedBaseName;
 
                     if (!string.IsNullOrEmpty(translatedTier) || !string.IsNullOrEmpty(translatedPrefix))
@@ -2072,21 +2084,31 @@ namespace DOL.Language
                         if (isCustomTier)
                         {
                             formatKey = string.IsNullOrEmpty(translatedTier) ? "ROG.ItemFormat" : "ROG.ItemFormat.CustomTiered";
-                            format = string.IsNullOrEmpty(translatedTier) ? "{0} {1}" : "{1} {0} {2}";
+                            if (hasFocus) formatKey += ".Focus";
+
+                            if (string.IsNullOrEmpty(translatedTier))
+                                format = hasFocus ? "{0} {2} {1}" : "{0} {1}";
+                            else
+                                format = hasFocus ? "{1} {0} {3} {2}" : "{1} {0} {2}";
                         }
                         else
                         {
                             formatKey = string.IsNullOrEmpty(translatedTier) ? "ROG.ItemFormat" : "ROG.ItemFormat.Tiered";
-                            format = string.IsNullOrEmpty(translatedTier) ? "{0} {1}" : "{0} {1} {2}";
+                            if (hasFocus) formatKey += ".Focus";
+
+                            if (string.IsNullOrEmpty(translatedTier))
+                                format = hasFocus ? "{0} {2} {1}" : "{0} {1}";
+                            else
+                                format = hasFocus ? "{0} {1} {3} {2}" : "{0} {1} {2}";
                         }
 
                         if (TryGetTranslation(out string tFormat, language, formatKey))
                             format = tFormat;
 
                         if (string.IsNullOrEmpty(translatedTier))
-                            combinedName = string.Format(format, translatedPrefix, translatedBaseName).Trim();
+                            combinedName = string.Format(format, translatedPrefix, translatedBaseName, translatedFocus).Trim();
                         else
-                            combinedName = string.Format(format, translatedPrefix, translatedTier, translatedBaseName).Trim();
+                            combinedName = string.Format(format, translatedPrefix, translatedTier, translatedBaseName, translatedFocus).Trim();
 
                         combinedName = combinedName.Replace("  ", " ").Trim();
                     }

@@ -16,13 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Reflection;
 using DOL.Database;
-using DOL.GS.Housing;
-using log4net;
-using DOL.Language;
 using DOL.GS.Finance;
+using DOL.GS.Housing;
+using DOL.Language;
+using log4net;
+using System;
+using System.Numerics;
+using System.Reflection;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
@@ -57,7 +58,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 return;
             }
 
-            lock (conMerchant.LockObject())
+            lock (conMerchant.LockObject(client.Player))
             {
                 long totalConMoney = conMerchant.TotalMoney;
 

@@ -166,6 +166,7 @@ Salvage.IsAllowedToBeginWork.BackpackItems:		Ihr könnt nur Gegenstände verwert
 Salvage.IsAllowedToBeginWork.EndCurrentAction:		Ihr müsst erst Eure laufende Handlung beenden, bevor Ihr verwerten könnt!
 Salvage.IsAllowedToBeginWork.NotEnoughSkill:		Ihr habt nicht genug Erfahrung um {0} verwerten zu können!
 Salvage.Proceed.GetBackMaterial:			Ihr bekommt {0} {1} durch die Verwertung von {2} zurück.
+Salvage.IsAllowedToBeginWork.MineralSkillReq:		Du benötigst mindestens {0} in Metallverarbeitung, Edelsteinschleifen, Rüstungsschmieden, Waffenschmieden oder Pfeilmacherei, um {1} zu verwerten.
 
 # /SpellCrafting
 SpellCrafting.ApplySpellcraftGems.ImbuedItem:		{0} verzaubert einen Gegenstand.

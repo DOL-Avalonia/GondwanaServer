@@ -1,7 +1,6 @@
 # /Genistar System
 Genistar.GenistarPet.LevelUp:				Genistar-ul tău a atins nivelul {0}.
 Genistar.GenistarPet.Examine:				Examinezi {0}. {1} este {2} și este un animal de companie Genistar. Pentru a redenumi această creatură sau a-i da comenzi de expresie (emote), folosește /genistar pe ținta ta.
-Genistar.GenistarPet.CantEquip:				Acest obiect nu poate fi echipat de un Genistar.
 Genistar.GenistarPet.PackFull:				Rucsacul tău era plin! Recipientul lui {0} a căzut pe jos.
 Genistar.GenistarPet.PackSuccess:			{0} se întoarce în recipientul său portabil din inventarul tău.
 Genistar.GenistarPet.Died:					Genistar-ul tău a murit! Returnează-i rămășițele în incubatorul locuinței tale în termen de 1 oră, altfel va fi pierdut pentru totdeauna.
@@ -39,6 +38,7 @@ Genistar.GenistarEgg.StasisCollapsed:		Câmpul de stază a colapsat! Creatura es
 Genistar.GenistarEgg.StasisActive:			[Stază Activă]: Viabilitatea necesită încă {0} secunde de îngrijire directă /afk.
 Genistar.GenistarEgg.WeaveLocks:			Țesutul genetic se fixează! Cochilia începe să se fractureze!
 Genistar.GenistarEgg.TooFar:				Te-ai îndepărtat prea mult de incubator și ai încetat să îl mai îngrijești. Câmpul de stază se reactivează automat.
+Genistar.GenistarEgg.TooFarToCare:			Incubatorul nu este la îndemână. Apropie-te pentru a-l îngriji.
 
 Genistar.Lifecycle.Degraded:				Materialul genetic al Genistar-ului tău învins s-a degradat dincolo de posibilitatea recuperării. Incubatorul din locuința ta este liber.
 Genistar.Lifecycle.EmbryoFailed:			Secvența genetică a colapsat! Embrionul nu a reușit să se formeze.
@@ -83,12 +83,16 @@ Genistar.Command.Help.Emote:				/genistar emote <Action> - Declanșează rutine 
 Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Schimbă slotul armei vizibile (Doar humanoizi).
 Genistar.Command.Help.Equip:				/genistar equip <din slotul rucsacului> - Echipează un obiect (armă sau armură) direct din rucsac pe Genistar.
 Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Preia echipamentul de la Genistar.
+Genistar.Command.Help.Abort:				/genistar abort - Oprește incubarea Genistar-ului și distruge oul.
 Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <cantitate> - [GM] Manipulează direct experiența formei de viață vizate.
 
 Genistar.Command.TargetVisual:				Trebuie să stabilești o țintă vizuală directă pe unul dintre Genistar-urile tale active.
 Genistar.Command.RejectsTelemetry:			Această formă de viață respinge telemetria ta; se supune doar adevăratului său maestru genetic.
 Genistar.Command.PhysicalState:				Starea ta fizică actuală împiedică o concentrare alchimică intensă.
 Genistar.Command.NearIncubator:				Trebuie să stai lângă incubatorul locuinței pentru a proiecta un câmp de îngrijire AFK.
+Genistar.Command.CanAbortOnlyUnhatched:		Poți anula procesul de incubare doar pentru un ou de Genistar neeclozat.
+Genistar.Command.AbortAlreadyHatched:		Acest Genistar a eclozat deja sau nu se află în stare de incubare.
+Genistar.Command.AbortSuccess:				Ai anulat procesul de incubare. Spațiul este acum liber.
 Genistar.Command.NameLimit:					Semnul de apel depășește limitele de afișare deasupra capului. Maximum 20 de caractere.
 Genistar.Command.NameRestricted:			Acea semnătură este restricționată de protocoalele de comunicare ale Regatului. Acces respins.
 Genistar.Command.RenameDialogReset:			Autorizezi ștergerea telemetriei personalizate și resetarea lui '{0}' la baza sa biologică: '{1}'?

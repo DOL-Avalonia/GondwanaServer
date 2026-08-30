@@ -916,6 +916,28 @@ namespace DOL.GS.Housing
                     SendUpdate();
                 }
             }
+
+            if (OutdoorItems.TryGetValue(dictKey, out OutdoorItem outdoorItem))
+            {
+                outdoorItem.Model = newModel;
+                outdoorItem.DatabaseItem.Model = newModel;
+
+                if (newModel == 1293)
+                {
+                    var placeholderTmpl = GameServer.Database.FindObjectByKey<ItemTemplate>("genistar_placeholder");
+                    if (placeholderTmpl != null)
+                    {
+                        outdoorItem.BaseItem = placeholderTmpl;
+                        outdoorItem.DatabaseItem.BaseItemID = placeholderTmpl.Id_nb;
+                    }
+                    else
+                    {
+                        outdoorItem.DatabaseItem.BaseItemID = "genistar_placeholder";
+                    }
+                }
+
+                GameServer.Database.SaveObject(outdoorItem.DatabaseItem);
+            }
         }
 
         /// <summary>

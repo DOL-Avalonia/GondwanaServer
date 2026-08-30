@@ -135,9 +135,15 @@ namespace DOL.GS.Scripts
                     ((GameNPC)npc).CurrentRegion = player.CurrentRegion;
                     ((GameNPC)npc).Name = "Nouveau pnj";
                     ((GameNPC)npc).Realm = 0;
+
                     if (!((GameNPC)npc).IsPeaceful)
+                    {
                         ((GameNPC)npc).Flags ^= GameNPC.eFlags.PEACE;
+                        ((GameNPC)npc).FlagsDb = (uint)((GameNPC)npc).Flags;
+                    }
+
                     ((GameNPC)npc).Model = 40;
+                    ((GameNPC)npc).ModelDb = 40;
                     ((GameNPC)npc).IsRenaissance = isRenaissance;
                     textnpc.Interact_Text = "Texte à définir.";
                     ((GameNPC)npc).AddToWorld();

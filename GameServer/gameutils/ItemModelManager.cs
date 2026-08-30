@@ -113,7 +113,15 @@ namespace DOL.GS
                 case "angel": return new[] {4833,4832,4834,4833}[body];
                 case "midona": return new[] {4837,4838,4839,4840}[body];
                 case "tentacled": return new[] {4818,4819,4820,4818}[body];
+
+                case "hothead":
+                case "sunburst":
+                case "headorbit":
+                case "eyesfire":
+                case "eyesblue":
+                case "eyesgreen":
                 case "eyesvfx": return new[] {4600,4601,4602,4600}[body];
+
                 case "headless": return 4816;
                 case "krampus": return 4817;
             }
@@ -173,11 +181,11 @@ namespace DOL.GS
             Epic2H[eCharacterClass.Occultist] = new[] { 3312 }; DF2H[eCharacterClass.Occultist] = new[] { 4408 };
 
             // 1H ONLY (Right Hand)
-            Epic1H[eCharacterClass.Bard] = new[] { 3235, 3236, 3237, 3238, 3239, 3240 }; DF1H[eCharacterClass.Bard] = new[] { 4346, 4347, 4348, 4349, 4350, 4351 };
+            Epic1H[eCharacterClass.Bard] = new[] { 3235, 3236, 2114, 2115, 3239, 2117 }; DF1H[eCharacterClass.Bard] = new[] { 4346, 4347, 2114, 2115, 4350, 2117 };
             Epic1H[eCharacterClass.Cleric] = new[] { 3282 }; DF1H[eCharacterClass.Cleric] = new[] { 4393 };
             Epic1H[eCharacterClass.Druid] = new[] { 3247, 3248 }; DF1H[eCharacterClass.Druid] = new[] { 4358, 4359 };
             Epic1H[eCharacterClass.Mercenary] = new[] { 3283, 3284, 3285 }; DF1H[eCharacterClass.Mercenary] = new[] { 4394, 4395, 4396 };
-            Epic1H[eCharacterClass.Minstrel] = new[] { 3276, 3277, 3278, 3279, 3280, 3281 }; DF1H[eCharacterClass.Minstrel] = new[] { 4387, 4388, 4389, 4390, 4391, 4392 };
+            Epic1H[eCharacterClass.Minstrel] = new[] { 3276, 3277, 2114, 2115, 3280, 2117 }; DF1H[eCharacterClass.Minstrel] = new[] { 4387, 4388, 2114, 2115, 4391, 2117 };
             Epic1H[eCharacterClass.Reaver] = new[] { 3289, 3290, 3291, 3292, 3293 }; DF1H[eCharacterClass.Reaver] = new[] { 4400, 4401, 4402, 4403, 4404 };
             Epic1H[eCharacterClass.Warden] = new[] { 3249, 3250 }; DF1H[eCharacterClass.Warden] = new[] { 4360, 4361 };
             Epic1H[eCharacterClass.Heretic] = new[] { 3286, 3287, 3288 }; DF1H[eCharacterClass.Heretic] = new[] { 4397, 4398, 4399 };
@@ -332,21 +340,21 @@ namespace DOL.GS
                     case eObjectType.CrushingWeapon:
                     case eObjectType.Hammer:
                     case eObjectType.Blunt:
-                        if (is2H) return new[] { 2113, 2206, 2567, 2215, 3449, 3448 }[Util.Random(6)];
-                        return new[] { 1671, 1672, 2205, 2214, 2198, 3447, 3453 }[Util.Random(7)];
+                        if (is2H) return new[] { 2113, 2206, 2567, 2215, 3449, 3448 }[Util.Random(5)];
+                        return new[] { 1671, 1672, 2205, 2214, 2198, 3447, 3453 }[Util.Random(6)];
                     case eObjectType.SlashingWeapon:
                     case eObjectType.Sword:
                     case eObjectType.Blades:
-                        if (is2H) return new[] { 2204, 2208, 2196 }[Util.Random(3)];
-                        return new[] { 2112, 2195, 2203, 2209 }[Util.Random(4)];
+                        if (is2H) return new[] { 2204, 2208, 2196 }[Util.Random(2)];
+                        return new[] { 2112, 2195, 2203, 2209 }[Util.Random(3)];
                     case eObjectType.Axe:
                     case eObjectType.LeftAxe:
-                        if (is2H) return new[] { 2217, 2110, 3452 }[Util.Random(3)];
-                        return new[] { 2109, 2216, 3451 }[Util.Random(3)];
+                        if (is2H) return new[] { 2217, 2110, 3452 }[Util.Random(2)];
+                        return new[] { 2109, 2216, 3451 }[Util.Random(2)];
                     case eObjectType.ThrustWeapon:
                     case eObjectType.Piercing:
-                        if (is2H) return new[] { 1660, 1661, 1662, 2191 }[Util.Random(4)];
-                        return new[] { 1668, 1669, 2190, 2467, 2468, 1807 }[Util.Random(6)];
+                        if (is2H) return new[] { 1660, 1661, 1662, 2191 }[Util.Random(3)];
+                        return new[] { 1668, 1669, 2190, 2467, 2468, 1807 }[Util.Random(5)];
                     case eObjectType.HandToHand:
                         return Util.Chance(50) ? 2190 : 2197;
                     case eObjectType.Flexible:
@@ -354,29 +362,29 @@ namespace DOL.GS
                     case eObjectType.MaulerStaff:
                         return 1659;
                     case eObjectType.Staff:
-                        return new[] { 1658, 2199, 1659 }[Util.Random(3)];
+                        return new[] { 1658, 2199, 1659 }[Util.Random(2)];
                     case eObjectType.PolearmWeapon:
                     case eObjectType.Spear:
                     case eObjectType.CelticSpear:
-                        return new[] { 1660, 1661, 1662, 2191 }[Util.Random(4)];
+                        return new[] { 1660, 1661, 1662, 2191 }[Util.Random(3)];
                     case eObjectType.TwoHandedWeapon:
                     case eObjectType.LargeWeapons:
-                        if (dmg == eDamageType.Slash) return new[] { 2204, 2208, 2196 }[Util.Random(3)];
-                        if (dmg == eDamageType.Crush) return new[] { 2113, 2206, 2567, 2215, 3449, 3448 }[Util.Random(6)];
-                        return new[] { 1660, 1661, 1662, 2191 }[Util.Random(4)];
+                        if (dmg == eDamageType.Slash) return new[] { 2204, 2208, 2196 }[Util.Random(2)];
+                        if (dmg == eDamageType.Crush) return new[] { 2113, 2206, 2567, 2215, 3449, 3448 }[Util.Random(5)];
+                        return new[] { 1660, 1661, 1662, 2191 }[Util.Random(3)];
                     case eObjectType.Scythe:
-                        return new[] { 2213, 2111, 3450 }[Util.Random(3)];
+                        return new[] { 2213, 2111, 3450 }[Util.Random(2)];
                     case eObjectType.Longbow:
                     case eObjectType.RecurvedBow:
                     case eObjectType.CompositeBow:
                     case eObjectType.Fired:
-                        return new[] { 2207, 3243, 3365 }[Util.Random(3)];
+                        return new[] { 2207, 3243, 3365 }[Util.Random(2)];
                     case eObjectType.FistWraps:
                         return 3575;
                     case eObjectType.Crossbow:
                         return 1964;
                     case eObjectType.Instrument:
-                        return new[] { 2114, 2115, 2116, 2117 }[Util.Random(4)];
+                        return new[] { 2114, 2115, 2116, 2117 }[Util.Random(3)];
                 }
             }
             else if (template == "aerus" || template == "volcanus" || template == "symbol" || template == "aerusweapons" || template == "volcanusweapons" || template == "symbolweapons")
@@ -442,7 +450,7 @@ namespace DOL.GS
                     case eObjectType.Crossbow:
                         return 1964;
                     case eObjectType.Instrument:
-                        return new[] { 2114, 2115, 2116, 2117 }[Util.Random(4)];
+                        return new[] { 2114, 2115, 2116, 2117 }[Util.Random(3)];
                 }
             }
 
@@ -527,12 +535,16 @@ namespace DOL.GS
                         else if (dmg == eDamageType.Thrust) offset = isOffhand ? 33 : 34;
                         else offset = isOffhand ? 31 : 32;
                         break;
-                    case eObjectType.Instrument: offset = 35; break;
+                    case eObjectType.Instrument:
+                        if (template.Contains("pict")) return new[] { 2979, 2980, 2981, 4313 }[Util.Random(3)];
+                        if (template.Contains("dragonsworn")) return 3848;
+                        if (template.Contains("dragonslayer")) return new[] { 3908, 3949, 3985 }[Util.Random(2)];
+                        // Lab (3653) and ScorchedLab (3696) strictly use the Harp at offset +35
+                        offset = 35;
+                        break;
                     case eObjectType.Shield:
-                        if (isGroupA || template.Contains("dragonslayer")) {
-                            int sz = GetMaxShieldSizeFromClass(cClass);
-                            offset = 35 + sz;
-                        }
+                        int sz = GetMaxShieldSizeFromClass(cClass);
+                        offset = 14 + sz;
                         break;
                 }
                 if (offset != -1) return b + offset;
@@ -655,6 +667,11 @@ namespace DOL.GS
             if (wDist_model > 0)
             {
                 template.AddNPCEquipment(eInventorySlot.DistanceWeapon, (ushort)wDist_model, color, 0);
+
+                if (cClass == eCharacterClass.Bard || cClass == eCharacterClass.Minstrel)
+                {
+                    if (Util.Chance(50)) visibleSlot = GameLiving.eActiveWeaponSlot.Distance;
+                }
             }
 
             npc.Inventory = template;
@@ -898,6 +915,18 @@ namespace DOL.GS
             headeffect = 0;
             name = material.ToString();
             canAddExtension = false;
+
+            switch (material)
+            {
+                case eObjectType.Cloth: name = "Cloth"; break;
+                case eObjectType.Leather: name = "Leather"; break;
+                case eObjectType.Studded: name = "Studded"; break;
+                case eObjectType.Chain: name = "Chain"; break;
+                case eObjectType.Scale: name = "Scale"; break;
+                case eObjectType.Reinforced: name = "Reinforced"; break;
+                case eObjectType.Plate: name = "Plate"; break;
+                default: name = material.ToString(); break;
+            }
 
             if (pattern.StartsWith("Class", StringComparison.OrdinalIgnoreCase) && (material == eObjectType.Cloth || material == eObjectType.Leather || material == eObjectType.Studded || material == eObjectType.Reinforced))
             {
@@ -1281,7 +1310,7 @@ namespace DOL.GS
 
         #endregion
 
-        #region Armor and Weapon Pattern models
+        #region Armor Pattern models
 
         private static int GetPossessedModel(int realm, int mat, int slot)
         {
@@ -4219,45 +4248,26 @@ namespace DOL.GS
 
         public static int GetInstrumentModelForLevel(int Level, eRealm realm)
         {
-            List<int> validModels = new List<int>();
-            validModels.Add(227);
-            validModels.Add(228);
-            validModels.Add(325);
-            if (Level > 10)
-            {
-                validModels.Add(2974);
-                validModels.Add(2975);
-                validModels.Add(2973);
-            }
-            if (Level > 20)
-            {
-                validModels.Add(2970);
-                validModels.Add(2971);
-                validModels.Add(2972);
-            }
+            List<int> validModels = new List<int> { 227, 228, 325, 4313 };
+
+            if (Level > 10) validModels.AddRange(new[] { 2973, 2974, 2975 });
+            if (Level > 20) validModels.AddRange(new[] { 2970, 2971, 2972 });
             if (Level > 30)
             {
-                if (realm == eRealm.Albion)
-                {
-                    validModels.Add(2976);
-                    validModels.Add(2977);
-                    validModels.Add(2978);
-                }
-                else if (realm == eRealm.Hibernia)
-                {
-                    validModels.Add(2979);
-                    validModels.Add(2980);
-                    validModels.Add(2981);
-                }
-
+                if (realm == eRealm.Albion) validModels.AddRange(new[] { 2976, 2977, 2978 });
+                else if (realm == eRealm.Hibernia) validModels.AddRange(new[] { 2979, 2980, 2981 });
             }
+
             if (Level > 40)
             {
-                validModels.Add(2114);
-                validModels.Add(2115);
-                validModels.Add(2116);
-                validModels.Add(2117);
+                if (Util.Chance(15))
+                {
+                    validModels.Clear();
+                    validModels.AddRange(new[] { 2114, 2115, 2116, 2117 });
+                    return validModels[Util.Random(validModels.Count - 1)];
+                }
             }
+
             if (Level > 50 && Util.Chance(1))
             {
                 validModels.Add(3688);
@@ -4278,6 +4288,7 @@ namespace DOL.GS
                         validModels.Add(3239);
                 }
             }
+
             return validModels[Util.Random(validModels.Count - 1)];
         }
 

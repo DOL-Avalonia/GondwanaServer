@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:		{0}'s Debuff Immunity has worn off.
 SpellHandler.GatewayPersonalBind.CantUseHere:	You can't use that here!
 SpellHandler.GatewayPersonalBind.MustStandStill:	You must be standing still to use this item!
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	You have been in combat recently and cannot use this item!
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		This spell can only affect Animist Turrets.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:			You are already preparing a Range spell.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	You are already preparing an Uninterruptable spell.

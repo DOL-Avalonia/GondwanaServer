@@ -176,8 +176,9 @@ Salvage.BeginWork.NoRoom:				Vous n'avez pas assez de place dans votre inventair
 Salvage.BeginWork.NoSalvage:				Vous ne pouvez pas démonter {0} !
 Salvage.BeginWork.Salvaging:				Démontage: {0}
 Salvage.IsAllowedToBeginWork.BackpackItems:		Vous pouvez seulement démonter les objets qui se trouvent dans votre sac à dos !
-Salvage.IsAllowedToBeginWork.EndCurrentAction:		Vous devez terminer votre action courante avant de commencer un autre démontage !
-Salvage.IsAllowedToBeginWork.NotEnoughSkill:		Vous n'avez pas assez de connaissance pour démonter {0} !
+Salvage.IsAllowedToBeginWork.EndCurrentAction:	Vous devez terminer votre action courante avant de commencer un autre démontage !
+Salvage.IsAllowedToBeginWork.NotEnoughSkill:	Vous n'avez pas assez de connaissance pour démonter {0} !
+Salvage.IsAllowedToBeginWork.MineralSkillReq:	Vous avez besoin d'au moins {0} en Travail du métal, Taille de gemmes, Fabrication d'armures, Fabrication d'armes ou Fabrication de flèches pour démonter {1}.
 Salvage.Proceed.GetBackMaterial:			Vous obtenez {0} {1} après le démontage de {2}.
 Salvage.Proceed.CantfindItem:				Impossible de trouver les matériaux (" {0} ") nécessaires pour démonter cet objet !
 Salvage.Proceed.ItemRecipeNotimplemented:		Cette formule de démontage d'objets (" {0} ") n'a pas encore été implémentée.
@@ -189,8 +190,9 @@ Salvage.Proceed.ErrorRetrievingSalvage2:		Erreur lors de la récupération des d
 Salvage.Proceed.ErrorFindingRawMaterial:		Erreur lors de la recherche de la matière première nécessaire pour le démontage de cet objet !
 Salvage.Proceed.ErrorFindingItem:			Erreur lors de la recherche de l'objet à démonter !
 Salvage.BeginWork.NoSalvageCombat:			Vous ne pouvez pas démonter un objet en combat.
-Salvage.BeginWork.ItemIndestructible:			.  Cet objet est indestructible
-Salvage.BeginWork.NoSecondarySkill:			.  Vous n'avez pas la compétence secondaire requise
+Salvage.BeginWork.ItemIndestructible:			.  Cet objet est indestructible.
+Salvage.BeginWork.NoSecondarySkill:			.  Vous n'avez pas la compétence secondaire requise.
+Salvage.BeginWork.ZeroReturn:				. Le démantèlement n'a rapporté aucun matériau.
 
 # /SpellCrafting
 SpellCrafting.ApplySpellcraftGems.ImbuedItem:		{0} à imprégné un objet.

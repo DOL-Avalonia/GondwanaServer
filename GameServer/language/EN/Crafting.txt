@@ -173,8 +173,9 @@ Salvage.BeginWork.NoRoom:				You don't have enough room in your inventory...
 Salvage.BeginWork.NoSalvage:				You can't salvage {0}!
 Salvage.BeginWork.Salvaging:				Salvaging: {0}
 Salvage.IsAllowedToBeginWork.BackpackItems:		You can only salvage items in your backpack!
-Salvage.IsAllowedToBeginWork.EndCurrentAction:		You must end your current action before you salvage anything!
-Salvage.IsAllowedToBeginWork.NotEnoughSkill:		You don't have enough skill to salvage the {0}!
+Salvage.IsAllowedToBeginWork.EndCurrentAction:	You must end your current action before you salvage anything!
+Salvage.IsAllowedToBeginWork.NotEnoughSkill:	You don't have enough skill to salvage the {0}!
+Salvage.IsAllowedToBeginWork.MineralSkillReq:	You need at least {0} in Metalworking, Gemcutting, Armorcraft, Weaponcraft or Fletching to salvage {1}.
 Salvage.Proceed.GetBackMaterial:			You get back {0} {1} after salvaging the {2}.
 Salvage.Proceed.CantfindItem:				Can't find material (" {0} ") needed to salvage this item!
 Salvage.Proceed.ItemRecipeNotimplemented:		This items salvage recipe (" {0} ") not implemented yet.
@@ -188,6 +189,7 @@ Salvage.Proceed.ErrorFindingItem:			Error finding the item to salvage!
 Salvage.BeginWork.NoSalvageCombat:			You can't salvage while in combat.
 Salvage.BeginWork.ItemIndestructible:			.  This item is indestructible
 Salvage.BeginWork.NoSecondarySkill:			.  You do not have the required secondary skill
+Salvage.BeginWork.ZeroReturn:				. Salvaging yielded no materials.
 
 # /SpellCrafting
 SpellCrafting.ApplySpellcraftGems.ImbuedItem:		{0} imbued 1 item.

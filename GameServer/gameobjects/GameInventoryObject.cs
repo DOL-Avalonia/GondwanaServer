@@ -16,10 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-using System;
-using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.PacketHandler;
+using log4net;
+using System;
+using System.Collections.Generic;
 
 namespace DOL.GS
 {
@@ -28,7 +29,7 @@ namespace DOL.GS
     /// </summary>
     public interface IGameInventoryObject
     {
-        object LockObject();
+        object LockObject(GamePlayer player);
         int FirstClientSlot { get; }
         int LastClientSlot { get; }
         int FirstDBSlot { get; }
@@ -103,7 +104,7 @@ namespace DOL.GS
 
         public static IDictionary<int, InventoryItem> MoveItem(this IGameInventoryObject thisObject, GamePlayer player, eInventorySlot fromClientSlot, eInventorySlot toClientSlot, ushort count)
         {
-            lock (thisObject.LockObject())
+            lock (thisObject.LockObject(player))
             {
                 if (!GetItemInSlot(fromClientSlot, out InventoryItem fromItem))
                 {
@@ -131,6 +132,8 @@ namespace DOL.GS
             IDictionary<int, InventoryItem> MoveItemInner(InventoryItem fromItem, InventoryItem toItem)
             {
                 Dictionary<int, InventoryItem> updatedItems = new Dictionary<int, InventoryItem>(2);
+                EnsureUniqueTemplatePersisted(fromItem);
+                EnsureUniqueTemplatePersisted(toItem);
 
                 // Blood Vials Combination across all Inventory Objects (bags, vaults, etc.)
                 if (fromItem != null && toItem != null &&
@@ -157,17 +160,17 @@ namespace DOL.GS
 
                 if (toItem == null)
                     MoveItemToEmptySlot(thisObject, player, fromClientSlot, toClientSlot, fromItem, count, updatedItems);
-                else if (toItem.IsStackable && fromItem.Count <= toItem.MaxCount && toItem.Count < toItem.MaxCount && toItem.Name.Equals(fromItem.Name))
+                else if (toItem.IsStackable && fromItem!.Count <= toItem.MaxCount && toItem.Count < toItem.MaxCount && toItem.Name.Equals(fromItem.Name))
                 {
                     // `count` is inconsistent here.
                     // With account vaults, it seems to always be 0, so we can treat it as an error if it isn't.
                     // With consignment merchants, it takes the stack's size, but stacking / splitting is disallowed anyway.
                     // Others... ?
-                    if (count != 0)
+                    /*if (count != 0)
                     {
                         SendUnsupportedActionMessage(player);
                         return updatedItems;
-                    }
+                    }*/
 
                     StackItems(thisObject, player, fromClientSlot, toClientSlot, fromItem, toItem, count, updatedItems);
                 }
@@ -273,6 +276,60 @@ namespace DOL.GS
 
             thisObject.OnAddItem(player, item);
             return new Dictionary<int, InventoryItem>{{ emptySlot, item }};
+        }
+
+        /// <summary>
+        /// A stackable ItemUnique template (e.g. full blood vials "vf_*") can be shared by several
+        /// InventoryItem stacks, possibly across players. Stock DOL cascade-deletes the ItemUnique
+        /// when ANY InventoryItem referencing it is deleted (Relation AutoDelete=true).
+        /// This restores the template row if other stacks still reference it.
+        /// </summary>
+        public static void RestoreSharedUniqueIfStillReferenced(ItemUnique unique)
+        {
+            if (unique == null || string.IsNullOrEmpty(unique.Id_nb))
+                return;
+
+            try
+            {
+                if (GameServer.Database.FindObjectByKey<ItemUnique>(unique.Id_nb) != null)
+                    return;
+
+                var stillUsed = DOLDB<InventoryItem>.SelectObjects(DB.Column(nameof(InventoryItem.UTemplate_Id)).IsEqualTo(unique.Id_nb));
+
+                if (stillUsed != null && stillUsed.Count > 0)
+                {
+                    unique.AllowAdd = true;
+                    unique.IsPersisted = false;
+                    if (!GameServer.Database.AddObject(unique))
+                        LogManager.GetLogger(typeof(GameInventoryObjectExtensions))
+                            .ErrorFormat("Failed to resurrect shared ItemUnique '{0}' ({1})", unique.Id_nb, unique.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogManager.GetLogger(typeof(GameInventoryObjectExtensions))
+                    .Error("RestoreSharedUniqueIfStillReferenced failed for " + unique.Id_nb, ex);
+            }
+        }
+
+        /// <summary>
+        /// Self-heal: if an item references a unique template whose DB row was lost to a previous
+        /// cascade delete (ghost item), re-insert the row so the upcoming saves succeed.
+        /// </summary>
+        private static void EnsureUniqueTemplatePersisted(InventoryItem item)
+        {
+            if (item?.Template is not ItemUnique unique || string.IsNullOrEmpty(unique.Id_nb))
+                return;
+            try
+            {
+                if (GameServer.Database.FindObjectByKey<ItemUnique>(unique.Id_nb) == null)
+                {
+                    unique.AllowAdd = true;
+                    unique.IsPersisted = false;
+                    GameServer.Database.AddObject(unique);
+                }
+            }
+            catch { }
         }
 
         private static void MoveItemToEmptySlot(this IGameInventoryObject thisObject, GamePlayer player, eInventorySlot fromClientSlot, eInventorySlot toClientSlot, InventoryItem fromItem, ushort count, Dictionary<int, InventoryItem> updatedItems)
@@ -538,13 +595,21 @@ namespace DOL.GS
             }
 
             bool removeSuccess = false;
+            ItemUnique fromUnique = fromItem.Template as ItemUnique;
+            bool fromUniqueShared = fromUnique != null && fromItem.IsStackable;
             if (thisObject.IsVaultInventorySlot((ushort)fromClientSlot))
             {
                 if (fromItem.Count - countToMove <= 0)
                 {
                     try
                     {
-                        if (GameServer.Database.DeleteObject(fromItem))
+                        if (fromUniqueShared) fromItem.Template = null;
+
+                        bool deleted = GameServer.Database.DeleteObject(fromItem);
+
+                        if (fromUniqueShared) fromItem.Template = fromUnique;
+
+                        if (deleted)
                         {
                             if (fromItem.Template is ItemUnique u && !fromItem.IsStackable) { try { if (u.IsPersisted) GameServer.Database.DeleteObject(u); } catch { } }
                             thisObject.OnRemoveItem(player, fromItem);
@@ -577,7 +642,14 @@ namespace DOL.GS
                     {
                         if (player.Inventory.RemoveItem(fromItem))
                         {
-                            if (fromItem.Template is ItemUnique u && !fromItem.IsStackable) { try { if (u.IsPersisted) GameServer.Database.DeleteObject(u); } catch { } }
+                            if (fromUniqueShared)
+                            {
+                                RestoreSharedUniqueIfStillReferenced(fromUnique);
+                            }
+                            else if (fromUnique != null)
+                            {
+                                try { if (fromUnique.IsPersisted) GameServer.Database.DeleteObject(fromUnique); } catch { }
+                            }
                             fromItem = null;
                             removeSuccess = true;
                         }

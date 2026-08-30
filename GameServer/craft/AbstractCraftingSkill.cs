@@ -536,7 +536,7 @@ namespace DOL.GS
                         var dbItems = vault.DBItems(player);
                         var updatedItems = new Dictionary<int, InventoryItem>();
 
-                        lock (vault.LockObject())
+                        lock (vault.LockObject(player))
                         {
                             foreach (var slotKvp in bagKvp.Value)
                             {

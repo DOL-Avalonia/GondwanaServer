@@ -55,6 +55,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Timers;
@@ -12427,7 +12428,7 @@ namespace DOL.GS
                 StorageBagVault vault = new StorageBagVault(this, bag);
                 var dbItems = vault.DBItems(this);
 
-                int emptySlots = vault.VaultSize - dbItems.Count;
+                int emptySlots = vault.VaultSize - dbItems.Count();
                 if (template.IsStackable)
                 {
                     foreach (var vItem in dbItems)
@@ -12452,7 +12453,7 @@ namespace DOL.GS
                 var dbItems = vault.DBItems(this);
                 Dictionary<int, InventoryItem> updatedItems = new Dictionary<int, InventoryItem>();
 
-                lock (vault.LockObject())
+                lock (vault.LockObject(this))
                 {
                     if (template.IsStackable)
                     {
@@ -12569,7 +12570,7 @@ namespace DOL.GS
                 var dbItems = vault.DBItems(this);
                 Dictionary<int, InventoryItem> updatedItems = new Dictionary<int, InventoryItem>();
 
-                lock (vault.LockObject())
+                lock (vault.LockObject(this))
                 {
                     if (item.IsStackable)
                     {
@@ -13500,7 +13501,7 @@ namespace DOL.GS
                 {
                     if (ControlledBody is GameNPC petBody)
                     {
-                        var destination = Position.TurnedAround() + Vector.Create(Orientation, length: 64, z: 10);
+                        var destination = Position.TurnedAround() + DOL.GS.Geometry.Vector.Create(Orientation, length: 64, z: 10);
                         petBody.MoveWithoutRemovingFromWorld(destination, false);
 
                         if (petBody.ControlledNpcList != null)
@@ -15542,7 +15543,7 @@ namespace DOL.GS
             else
             {
                 gameItem = new WorldInventoryItem(item);
-                gameItem.Position = Position + Vector.Create(Orientation, length: 30);
+                gameItem.Position = Position + DOL.GS.Geometry.Vector.Create(Orientation, length: 30);
 
                 gameItem.AddOwner(this);
                 gameItem.AddToWorld();

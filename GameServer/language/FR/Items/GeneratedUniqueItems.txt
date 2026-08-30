@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Magique
+ROG.ItemFormat.Focus: {1} {2} {0}
+ROG.ItemFormat.Tiered.Focus: {2} {3} {1} {0}
+ROG.ItemFormat.CustomTiered.Focus: {2} {3} {0} {1}
+
 ROG.ItemFormat: {1} {0}
 ROG.ItemFormat.Tiered: {2} {1} {0}
 ROG.MobDropFormat: {1} de {0}
 ROG.ItemFormat.CustomTiered: {2} {0} {1}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: en Laine
+ROG.Prefix.Linen: en Lin
+ROG.Prefix.Brocade: en Brocart
+ROG.Prefix.Rawhide: en Peau Brute
+ROG.Prefix.Tanned: Tannée
+ROG.Prefix.Cured: Cuite
+ROG.Prefix.Bronze: en Bronze
+ROG.Prefix.Copper: en Cuivre
+ROG.Prefix.Brass: en Laiton
+ROG.Prefix.FineAlloy: en Alliage Fin
+ROG.Prefix.Iron: en Fer
+ROG.Prefix.Steel: en Acier
+ROG.Prefix.Rowan: en Sorbier
+ROG.Prefix.Elm: en Orme
+ROG.Prefix.Ash: en Frêne
 
 # ================================
 # PREFIXES
@@ -316,21 +341,21 @@ ROG.BaseName.ReinforcedBreastplate: Plastron renforcé
 ROG.BaseName.ReinforcedJerkin: Pourpoint renforcé
 ROG.BaseName.ReinforcedVest: Gilet renforcé
 
-ROG.BaseName.ScaleCap: Chapeau d'écailles
-ROG.BaseName.ScaleCoif: Coiffe d'écailles
-ROG.BaseName.ScaleHelm: Heaume d'écailles
-ROG.BaseName.ScaleSleeves: Manches d'écailles
-ROG.BaseName.ScaleArms: Bras d'écailles
-ROG.BaseName.ScaleBoots: Bottes d'écailles
-ROG.BaseName.ScaleGloves: Gants d'écailles
-ROG.BaseName.ScaleGauntlets: Gantelets d'écailles
-ROG.BaseName.ScalePants: Jambarts d'écailles
-ROG.BaseName.ScaleLegs: Jambières d'écailles
-ROG.BaseName.ScaleLeggings: Jambières d'écailles
-ROG.BaseName.ScaleHauberk: Haubert d'écailles
-ROG.BaseName.ScaleBreastplate: Plastron d'écailles
-ROG.BaseName.ScaleJerkin: Pourpoint d'écailles
-ROG.BaseName.ScaleVest: Gilet d'écailles
+ROG.BaseName.ScaleCap: Chapeau en écailles
+ROG.BaseName.ScaleCoif: Coiffe en écailles
+ROG.BaseName.ScaleHelm: Heaume en écailles
+ROG.BaseName.ScaleSleeves: Manches en écailles
+ROG.BaseName.ScaleArms: Bras en écailles
+ROG.BaseName.ScaleBoots: Bottes en écailles
+ROG.BaseName.ScaleGloves: Gants en écailles
+ROG.BaseName.ScaleGauntlets: Gantelets en écailles
+ROG.BaseName.ScalePants: Jambarts en écailles
+ROG.BaseName.ScaleLegs: Jambières en écailles
+ROG.BaseName.ScaleLeggings: Jambières en écailles
+ROG.BaseName.ScaleHauberk: Haubert en écailles
+ROG.BaseName.ScaleBreastplate: Plastron en écailles
+ROG.BaseName.ScaleJerkin: Pourpoint en écailles
+ROG.BaseName.ScaleVest: Gilet en écailles
 
 # ================================
 # BASE ITEM NAMES (Weapons)
@@ -407,6 +432,7 @@ ROG.BaseName.WarScythe: Faux de Guerre
 ROG.BaseName.SmallShield: Petit Bouclier
 ROG.BaseName.MediumShield: Bouclier Moyen
 ROG.BaseName.LargeShield: Grand Bouclier
+ROG.BaseName.Staff: Bâton
 ROG.BaseName.MaulerStaff: Bâton de Mauler
 ROG.BaseName.Quarterstaff: Bâton
 ROG.BaseName.ShodQuarterstaff: Bâton Ferré

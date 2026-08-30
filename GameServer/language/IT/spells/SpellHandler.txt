@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:	La inmunidad de {0} contra hechizos d
 SpellHandler.GatewayPersonalBind.CantUseHere:	No puedes usar este objeto aquí.
 SpellHandler.GatewayPersonalBind.MustStandStill:	Debes quedarte quieto para usar este objeto.
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Has estado en combate recientemente y no puedes usar este objeto.
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Questo incantesimo ha effetto solo sulle torrette dell'animista.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:		Ya estás preparando un hechizo a distancia.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Ya estás preparando un hechizo ininterrumpible.

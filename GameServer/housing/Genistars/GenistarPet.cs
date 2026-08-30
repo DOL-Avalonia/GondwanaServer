@@ -331,7 +331,7 @@ namespace DOL.GS.Scripts
                 }
                 else
                 {
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Genistar.GenistarPet.CantEquip"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Genistar.Equip.CantEquip"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
             }

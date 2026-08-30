@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Magische
+ROG.ItemFormat.Focus: {0} {2} {1}
+ROG.ItemFormat.Tiered.Focus: {0} {1} {3} {2}
+ROG.ItemFormat.CustomTiered.Focus: {1} {0} {3} {2}
+
 ROG.ItemFormat: {0} {1}
 ROG.ItemFormat.Tiered: {0} {1} {2}
 ROG.MobDropFormat: {0}'s {1}
 ROG.ItemFormat.CustomTiered: {1} {0} {2}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: Wollen
+ROG.Prefix.Linen: Linnen
+ROG.Prefix.Brocade: Brokaten
+ROG.Prefix.Rawhide: Ruwhuiden
+ROG.Prefix.Tanned: Gelooide
+ROG.Prefix.Cured: Geharde
+ROG.Prefix.Bronze: Bronzen
+ROG.Prefix.Copper: Koperen
+ROG.Prefix.Brass: Messing
+ROG.Prefix.FineAlloy: Fijnlegering
+ROG.Prefix.Iron: IJzeren
+ROG.Prefix.Steel: Stalen
+ROG.Prefix.Rowan: Lijsterbes
+ROG.Prefix.Elm: Iepen
+ROG.Prefix.Ash: Essen
 
 # ================================
 # PREFIXES
@@ -401,6 +426,7 @@ ROG.BaseName.WarScythe: Oorlogszeis
 ROG.BaseName.SmallShield: Klein Schild
 ROG.BaseName.MediumShield: Gemiddeld Schild
 ROG.BaseName.LargeShield: Groot Schild
+ROG.BaseName.Staff: Magiërsstaf
 ROG.BaseName.MaulerStaff: Ranselstaf
 ROG.BaseName.Quarterstaff: Vechtstok
 ROG.BaseName.ShodQuarterstaff: Beslagen Vechtstok

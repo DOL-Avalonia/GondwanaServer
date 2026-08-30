@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:	Die Immunität von {0} gegen Schwäch
 SpellHandler.GatewayPersonalBind.CantUseHere:	Sie können diesen Gegenstand hier nicht benutzen!
 SpellHandler.GatewayPersonalBind.MustStandStill:	Sie müssen stillstehen, um diesen Gegenstand zu benutzen!
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Sie waren kürzlich im Kampf und können diesen Gegenstand nicht benutzen!
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Dieser Zauber wirkt sich nur auf Animisten-Türme aus.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:		Sie bereiten bereits einen Fernzauber vor.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Sie bereiten bereits einen nicht unterbrechbaren Zauber vor.

@@ -181,7 +181,7 @@ namespace DOL.GS.Scripts
                         bool bagChanged = false;
                         Dictionary<int, InventoryItem> updatedItems = new Dictionary<int, InventoryItem>();
 
-                        lock (vault.LockObject())
+                        lock (vault.LockObject(player))
                         {
                             foreach (var vItem in itemsInBag)
                             {

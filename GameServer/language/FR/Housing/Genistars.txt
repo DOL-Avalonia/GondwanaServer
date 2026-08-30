@@ -2,7 +2,6 @@
 # /Genistar System
 Genistar.GenistarPet.LevelUp:				Votre génistar a atteint le niveau {0}.
 Genistar.GenistarPet.Examine:				Vous examinez {0}. {1} est {2} et c'est un familier génistar. Pour renommer cette créature ou envoyer des émotes, utilisez /genistar sur votre cible.
-Genistar.GenistarPet.CantEquip:				Cet objet ne peut pas être équipé par un Génistar.
 Genistar.GenistarPet.PackFull:				Votre sac était plein ! Le conteneur de {0} est tombé au sol.
 Genistar.GenistarPet.PackSuccess:			{0} retourne dans son conteneur portable dans votre inventaire.
 Genistar.GenistarPet.Died:					Votre Génistar est mort ! Retournez ses restes à votre incubateur de maison sous 1 heure, sinon il sera perdu à jamais.
@@ -40,6 +39,7 @@ Genistar.GenistarEgg.StasisCollapsed:		Le champ de stase s'est effondré ! La cr
 Genistar.GenistarEgg.StasisActive:			[Stase Active] : La viabilité nécessite encore {0} secondes de soins directs /afk.
 Genistar.GenistarEgg.WeaveLocks:			La trame génétique se verrouille ! La coquille commence à se fracturer !
 Genistar.GenistarEgg.TooFar:				Vous vous êtes trop éloigné de l'incubateur. Le champ de stase se réactive automatiquement.
+Genistar.GenistarEgg.TooFarToCare:			L'incubateur est hors de portée. Approchez-vous pour vous en occuper.
 
 Genistar.Lifecycle.Degraded:				Le matériel génétique de votre Génistar a été détruit. Votre incubateur de maison est libre.
 Genistar.Lifecycle.EmbryoFailed:			La séquence génétique s'est effondrée ! L'embryon n'a pas pu se former.
@@ -84,12 +84,16 @@ Genistar.Command.Help.Emote:				/genistar emote <Action> - Déclenche des routin
 Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Change l'arme visible affichée (Humanoïdes uniquement).
 Genistar.Command.Help.Equip:				/genistar equip <emplacement sac à dos> - Équipe un objet (arme ou armure) directement depuis votre inventaire sur le Génistar.
 Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Récupère l'équipement du Génistar.
+Genistar.Command.Help.Abort:				/genistar abort - Interrompt l'incubation du Genistar et détruit l'œuf.
 Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <montant> - [MJ] Manipule directement l'expérience de la forme de vie ciblée.
 
 Genistar.Command.TargetVisual:				Vous devez établir une ligne de vue directe sur l'un de vos Génistars en vie.
 Genistar.Command.RejectsTelemetry:			Cette forme de vie rejette votre télémétrie ; elle n'obéit qu'à son maître génétique.
 Genistar.Command.PhysicalState:				Votre état physique actuel empêche toute concentration alchimique intense.
 Genistar.Command.NearIncubator:				Vous devez être près de votre incubateur de maison pour projeter un champ AFK Care.
+Genistar.Command.CanAbortOnlyUnhatched:		Vous ne pouvez interrompre le processus d'incubation que pour un œuf de Genistar non éclos.
+Genistar.Command.AbortAlreadyHatched:		Ce Genistar a déjà éclos ou n'est pas en phase d'incubation.
+Genistar.Command.AbortSuccess:				Vous avez interrompu le processus d'incubation. L'emplacement est désormais libre.
 Genistar.Command.NameLimit:					L'indicatif dépasse les limites d'affichage. 20 caractères maximum.
 Genistar.Command.NameRestricted:			Cette signature est restreinte par les protocoles de communication du Royaume. Accès refusé.
 Genistar.Command.RenameDialogReset:			Autorisez-vous la purge de la télémétrie personnalisée et la réinitialisation de '{0}' à sa base biologique : '{1}' ?

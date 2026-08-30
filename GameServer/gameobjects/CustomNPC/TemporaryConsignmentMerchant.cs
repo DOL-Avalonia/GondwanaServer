@@ -33,7 +33,7 @@ namespace DOL.GS
 {
     public class TemporaryConsignmentMerchant : GameConsignmentMerchant
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// The Player is buying an Item from the merchant
@@ -82,7 +82,7 @@ namespace DOL.GS
 
             InventoryItem item = null;
 
-            lock (LockObject())
+            lock (LockObject(player))
             {
 
                 if (fromClientSlot != eInventorySlot.Invalid)

@@ -1,0 +1,37 @@
+
+# ConsignmentBanker
+ConsignmentBanker.Interact.HelpRetrieve:				I can help you retrieve items from a repossessed house. What would you like to access?
+ConsignmentBanker.Cmd.Consignment:						Consignment
+ConsignmentBanker.Cmd.Vaults:							Vaults
+ConsignmentBanker.Cmd.Vault:							Vault
+ConsignmentBanker.Cmd.ArchivedGenistars:				Archived Genistars
+ConsignmentBanker.Cmd.Recover:							Recover
+ConsignmentBanker.Cmd.Personal:							Personal
+ConsignmentBanker.Cmd.Guild:							Guild
+ConsignmentBanker.Cmd.PersonalConsignment:				Personal Consignment
+ConsignmentBanker.Cmd.GuildConsignment:					Guild Consignment
+ConsignmentBanker.Cmd.PersonalVaults:					Personal Vaults
+ConsignmentBanker.Cmd.GuildVaults:						Guild Vaults
+ConsignmentBanker.Cmd.PersonalVault:					Personal Vault
+ConsignmentBanker.Cmd.GuildVault:						Guild Vault
+ConsignmentBanker.Cmd.ArchivedGenistarsPersonal:		Archived Genistars (Personal)
+ConsignmentBanker.Cmd.ArchivedGenistarsGuild:			Archived Genistars (Guild)
+ConsignmentBanker.Whisper.CannotAccessMerchant:			I cannot access this consignment merchant. You may not have one, or you may already have an active house.
+ConsignmentBanker.Whisper.WhichVault:					Which vault?
+ConsignmentBanker.Whisper.CannotAccessVault:			I cannot access this vault. You may have an active house.
+ConsignmentBanker.Recover.NoValidOwner:					You don't have a valid owner ID or Guild.
+ConsignmentBanker.Recover.MustOwnHouse:					You must own a house to recover your Genistar.
+ConsignmentBanker.Recover.AlreadyCarryGenistar:			You already carry a Genistar item in your inventory. You must drop it in your garden first.
+ConsignmentBanker.Recover.NoArchivedGenistars:			I could not find any archived Genistars for you.
+ConsignmentBanker.Recover.HouseNotSupportGenistar:		Your current house does not support Genistars.
+ConsignmentBanker.Recover.MaxCapacityGenistars:			Your house is already at its maximum capacity of {0} Genistars.
+ConsignmentBanker.Recover.WhichGenistar:				Which Genistar would you like to recover?
+ConsignmentBanker.Recover.Level:						Level
+ConsignmentBanker.Recover.InvalidSelection:				Invalid selection.
+ConsignmentBanker.Recover.NoGardenSlot:					Could not allocate a garden slot for your Genistar.
+ConsignmentBanker.Recover.RecoveredGenistar:			Recovered {0}. It has been placed safely in your backpack.
+ConsignmentBanker.Recover.BackpackFull:					Your backpack is full! Make space to recover the Genistar.
+ConsignmentBanker.Master.Interact:						Why hello {0}. I am the master consignment banker. I can help you recover possessions from repossessed houses. What would you like to access?
+ConsignmentBanker.Master.CannotAccessPersonalMerchant:	I cannot access this merchant at this time. You may already have an active house.
+ConsignmentBanker.Master.CannotAccessMerchant:			I cannot access this merchant at this time.
+ConsignmentBanker.Master.CannotAccessVault:				I cannot access this vault.

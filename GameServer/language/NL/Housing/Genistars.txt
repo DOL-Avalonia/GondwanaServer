@@ -1,7 +1,6 @@
 # /Genistar System
 Genistar.GenistarPet.LevelUp:				Je Genistar heeft level {0} bereikt.
 Genistar.GenistarPet.Examine:				Je onderzoekt {0}. {1} is {2} en het is een Genistar-huisdier. Om dit wezen te hernoemen of emotes te geven, gebruik je /genistar op je doelwit.
-Genistar.GenistarPet.CantEquip:				Dit item kan niet worden uitgerust door een Genistar.
 Genistar.GenistarPet.PackFull:				Je rugzak zat vol! De container van {0} is op de grond gevallen.
 Genistar.GenistarPet.PackSuccess:			{0} keert terug naar zijn draagbare container in je inventaris.
 Genistar.GenistarPet.Died:					Je Genistar is gestorven! Breng zijn overblijfselen binnen 1 uur terug naar je huis-incubator, anders is hij voorgoed verloren.
@@ -39,6 +38,7 @@ Genistar.GenistarEgg.StasisCollapsed:		Het stasis-veld is ingestort! Het wezen i
 Genistar.GenistarEgg.StasisActive:			[Stasis Actief]: Levensvatbaarheid vereist nog {0} seconden directe /afk-zorg.
 Genistar.GenistarEgg.WeaveLocks:			Het genetische weefsel wordt vergrendeld! De schaal begint te breken!
 Genistar.GenistarEgg.TooFar:				Je bent te ver bij de incubator vandaan gestapt en bent gestopt met de verzorging. Het stasis-veld wordt automatisch opnieuw geactiveerd.
+Genistar.GenistarEgg.TooFarToCare:			De incubator is buiten bereik. Kom dichterbij om hem te verzorgen.
 
 Genistar.Lifecycle.Degraded:				Het genetische materiaal van je verslagen Genistar is onherstelbaar afgebroken. Je huis-incubator is vrij.
 Genistar.Lifecycle.EmbryoFailed:			De genetische sequentie is ingestort! Het embryo kon zich niet vormen.
@@ -83,12 +83,16 @@ Genistar.Command.Help.Emote:				/genistar emote <Action> - Activeert fysieke ske
 Genistar.Command.Help.VisibleWeapon:		/genistar visibleweapon <right|left|two|distance> - Wisselt de zichtbare wapenslot (Alleen humanoïden).
 Genistar.Command.Help.Equip:				/genistar equip <vanaf rugzak slot> - Rust een item (wapen of pantser) rechtstreeks vanuit je rugzak uit op de Genistar.
 Genistar.Command.Help.RemoveWeapon:			/genistar removeweapon <right|left|shield|two|distance|armor> - Haalt uitrusting terug van de Genistar.
+Genistar.Command.Help.Abort:				/genistar abort - Breekt de incubatie van de Genistar af en vernietigt het ei.
 Genistar.Command.Help.Exp:					/genistar exp <add|sub|set> <aantal> - [GM] Manipuleert direct de ervaring van de doelwit-levensvorm.
 
 Genistar.Command.TargetVisual:				Je moet een direct visueel doelwit vaststellen op een van je levende Genistars.
 Genistar.Command.RejectsTelemetry:			Deze levensvorm weigert jouw telemetrie; het gehoorzaamt alleen zijn ware genetische meester.
 Genistar.Command.PhysicalState:				Je huidige fysieke toestand verhindert intense alchemistische focus.
 Genistar.Command.NearIncubator:				Je moet in de buurt van je huis-incubator staan om een AFK-zorgveld te projecteren.
+Genistar.Command.CanAbortOnlyUnhatched:		Je kunt het incubatieproces alleen afbreken bij een nog niet uitgekomen Genistar-ei.
+Genistar.Command.AbortAlreadyHatched:		Deze Genistar is al uitgekomen of bevindt zich niet in een incubatiestatus.
+Genistar.Command.AbortSuccess:				Je hebt het incubatieproces afgebroken. De plek is nu vrij.
 Genistar.Command.NameLimit:					Roepnaam overschrijdt de visuele renderinglimieten. Maximaal 20 tekens.
 Genistar.Command.NameRestricted:			Die handtekening wordt beperkt door de communicatieprotocollen van het Rijk. Toegang geweigerd.
 Genistar.Command.RenameDialogReset:			Geef je toestemming voor het wissen van aangepaste telemetrie en het resetten van '{0}' naar de biologische basis: '{1}'?

@@ -2,7 +2,7 @@
 # Server Intro RPG message
 ServerRPGMessage.ShortDescription:		Benvenuto in Arcanum, un mondo forgiato dalle ceneri della Grande Guerra Magica! In questo coinvolgente regno RP/PvP, regni frammentati lottano per la sopravvivenza mentre le Gilde dettano legge. Consulta i sacri principi e le regole del server su www.arcanum-server.com. Affila le tue lame, prepara i tuoi incantesimi e goditi il tuo viaggio in Arcanum!
 ServerRPGMessage.Lore1:					Benvenuto in Arcanum!
-ServerRPGMessage.Lore2:					Duemila anni fa, Arcanum era uno scintillante reticolo di cittadelle fluttuanti e fucine di mana. Poi arrivò la Grande Guerra Magica. I continenti furono lacerati, lasciando un mondo sfregiato e indebolito. Da queste rovine sorsero tre regni: Valeria, Skeldheim e Sylvaris. Oggi i re governano sulla carta, ma sono le Gilde a governare veramente le terre frammentate, mentre i fuorilegge si ritagliano i propri imperi nell'oscuro Sottosuolo. Scegli saggiamente la tua strada.
+ServerRPGMessage.Lore2:					Duemila anni fa, Arcanum era uno scintillante reticolo di cittadelle fluttuanti e fucine di mana. Poi arrivò la Grande Guerra Magica. I continenti furono lacerati, lasciando un mondo sfregiato e indebolito. Da queste rovine sorsero tre regni: Albion, Midgard e Hibernia. Oggi i re governano sulla carta, ma sono le Gilde a governare veramente le terre frammentate, mentre i fuorilegge si ritagliano i propri imperi nell'oscuro Sottosuolo. Scegli saggiamente la tua strada.
 ServerRPGMessage.FeaturesHeader:		--------- CARATTERISTICHE DEL SERVER ---------
 ServerRPGMessage.FeatureEvents1:		[Eventi Dinamici e Missioni]
 ServerRPGMessage.FeatureEvents2:		Partecipa a eventi che alterano il mondo e cacce a boss leggendari.

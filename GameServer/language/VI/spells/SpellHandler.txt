@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:	Miễn nhiễm phép suy yếu của 
 SpellHandler.GatewayPersonalBind.CantUseHere:	Bạn không thể dùng vật phẩm này ở đây!
 SpellHandler.GatewayPersonalBind.MustStandStill:	Bạn phải đứng yên để sử dụng vật phẩm này!
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Bạn vừa tham chiến gần đây và không thể dùng vật phẩm này!
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Phép thuật này chỉ có thể tác động lên các trụ của Animist.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:		Bạn đã chuẩn bị một phép tầm xa.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Bạn đã chuẩn bị một phép không thể bị gián đoạn.

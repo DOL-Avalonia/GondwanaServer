@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:		L'Immunité aux sorts d'affaiblissem
 SpellHandler.GatewayPersonalBind.CantUseHere:	Vous ne pouvez pas utiliser cet objet ici !
 SpellHandler.GatewayPersonalBind.MustStandStill:	Vous devez être immobile pour utiliser cet objet !
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Vous avez été en combat récemment et ne pouvez pas utiliser cet objet !
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Ce sort ne peut affecter que les tourelles d'Animiste.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:			Vous êtes déjà en train de préparer un sort à distance.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Vous êtes déjà en train de préparer un sort non-interruptible.

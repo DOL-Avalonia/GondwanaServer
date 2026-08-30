@@ -1,0 +1,37 @@
+
+# ConsignmentMerchant
+ConsignmentBanker.Interact.HelpRetrieve:				Je peux vous aider à récupérer des objets d'une maison saisie. À quoi souhaitez-vous accéder ?
+ConsignmentBanker.Cmd.Consignment:						Consignation
+ConsignmentBanker.Cmd.Vaults:							Coffres
+ConsignmentBanker.Cmd.Vault:							Coffre
+ConsignmentBanker.Cmd.ArchivedGenistars:				Génistars Archivés
+ConsignmentBanker.Cmd.Recover:							Récupérer
+ConsignmentBanker.Cmd.Personal:							Personnel
+ConsignmentBanker.Cmd.Guild:							Guilde
+ConsignmentBanker.Cmd.PersonalConsignment:				Consignation Personnelle
+ConsignmentBanker.Cmd.GuildConsignment:					Consignation de Guilde
+ConsignmentBanker.Cmd.PersonalVaults:					Coffres Personnels
+ConsignmentBanker.Cmd.GuildVaults:						Coffres de Guilde
+ConsignmentBanker.Cmd.PersonalVault:					Coffre Personnel
+ConsignmentBanker.Cmd.GuildVault:						Coffre de Guilde
+ConsignmentBanker.Cmd.ArchivedGenistarsPersonal:		Génistars Archivés (Personnel)
+ConsignmentBanker.Cmd.ArchivedGenistarsGuild:			Génistars Archivés (Guilde)
+ConsignmentBanker.Whisper.CannotAccessMerchant:			Je ne peux pas accéder à ce marchand de consignation. Vous n'en avez peut-être pas, ou vous avez déjà une maison active.
+ConsignmentBanker.Whisper.WhichVault:					Quel coffre ?
+ConsignmentBanker.Whisper.CannotAccessVault:			Je ne peux pas accéder à ce coffre. Vous avez peut-être une maison active.
+ConsignmentBanker.Recover.NoValidOwner:					Vous n'avez pas d'identifiant de propriétaire ou de guilde valide.
+ConsignmentBanker.Recover.MustOwnHouse:					Vous devez posséder une maison pour récupérer votre Genistar.
+ConsignmentBanker.Recover.AlreadyCarryGenistar:			Vous transportez déjà un objet Genistar dans votre inventaire. Vous devez d'abord le déposer dans votre jardin.
+ConsignmentBanker.Recover.NoArchivedGenistars:			Je n'ai trouvé aucun Génistar archivé pour vous.
+ConsignmentBanker.Recover.HouseNotSupportGenistar:		Votre maison actuelle ne prend pas en charge les Génistars.
+ConsignmentBanker.Recover.MaxCapacityGenistars:			Votre maison est déjà à sa capacité maximale de {0} Génistars.
+ConsignmentBanker.Recover.WhichGenistar:				Quel Génistar souhaitez-vous récupérer ?
+ConsignmentBanker.Recover.Level:						Niveau
+ConsignmentBanker.Recover.InvalidSelection:				Sélection invalide.
+ConsignmentBanker.Recover.NoGardenSlot:					Impossible d'attribuer un emplacement de jardin pour votre Genistar.
+ConsignmentBanker.Recover.RecoveredGenistar:			{0} récupéré. Il a été placé en toute sécurité dans votre sac à dos.
+ConsignmentBanker.Recover.BackpackFull:					Votre sac à dos est plein ! Faites de la place pour récupérer le Génistar.
+ConsignmentBanker.Master.Interact:						Bonjour {0}. Je suis le maître banquier de consignation. Je peux vous aider à récupérer des biens de maisons saisies. À quoi souhaitez-vous accéder ?
+ConsignmentBanker.Master.CannotAccessPersonalMerchant:	Je ne peux pas accéder à ce marchand pour le moment. Vous avez peut-être déjà une maison active.
+ConsignmentBanker.Master.CannotAccessMerchant:			Je ne peux pas accéder à ce marchand pour le moment.
+ConsignmentBanker.Master.CannotAccessVault:				Je ne peux pas accéder à ce coffre.

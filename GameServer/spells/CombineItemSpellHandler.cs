@@ -1020,7 +1020,7 @@ namespace DOL.spells
                             StorageBagVault vault = new StorageBagVault(player, bagItem);
                             if (!bagUpdatedItems.ContainsKey(bagItem.ObjectId)) bagUpdatedItems[bagItem.ObjectId] = new Dictionary<int, InventoryItem>();
 
-                            lock (vault.LockObject())
+                            lock (vault.LockObject(player))
                             {
                                 if (item.Count <= toRemove)
                                 {

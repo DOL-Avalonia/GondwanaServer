@@ -190,6 +190,16 @@ namespace DOL.GS.Scripts
             BagItem.LoadItemsFromDb();
         }
 
+        public override Dictionary<int, InventoryItem> GetClientInventory(GamePlayer player)
+        {
+            return this.GetClientItems(player);
+        }
+
+        public override object LockObject(GamePlayer player)
+        {
+            return BagItem.CachedItems;
+        }
+
         public override bool Interact(GamePlayer player)
         {
             if (player.ActiveInventoryObject != null)
@@ -297,7 +307,7 @@ namespace DOL.GS.Scripts
         public bool DoMoveItem(GamePlayer player, ushort fromSlot, ushort toSlot, ushort count)
         {
             bool success = false;
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 var updatedItems = GameInventoryObjectExtensions.MoveItem(this, player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot, count);
 
@@ -338,7 +348,7 @@ namespace DOL.GS.Scripts
         /// <summary>
         /// List of items in the vault.
         /// </summary>
-        public override IList<InventoryItem> DBItems(GamePlayer player = null)
+        public override IEnumerable<InventoryItem> DBItems(GamePlayer player = null)
         {
             if (!BagItem.IsLoaded) BagItem.LoadItemsFromDb();
             lock (BagItem.CachedItems)

@@ -46,9 +46,10 @@ namespace DOL.GS
 
         public bool houseRequired = true;
 
-        public object LockObject()
+        public virtual object LockObject(GamePlayer player)
         {
-            return m_vaultSync;
+            var cache = VaultItemCacheManager.GetCache(this, player);
+            return cache != null ? cache.SyncRoot : m_vaultSync;
         }
 
         /// <summary>
@@ -183,6 +184,9 @@ namespace DOL.GS
         /// </summary>
         public virtual Dictionary<int, InventoryItem> GetClientInventory(GamePlayer player)
         {
+            var cache = VaultItemCacheManager.GetCache(this, player);
+            if (cache != null) return cache.GetItems(this, player);
+
             return this.GetClientItems(player);
         }
 
@@ -199,27 +203,8 @@ namespace DOL.GS
         /// </summary>
         public virtual long TotalMoney
         {
-            get
-            {
-                lock (m_moneyLock)
-                {
-                    return m_totalMoney;
-                }
-            }
-            set
-            {
-                lock (m_moneyLock)
-                {
-                    m_totalMoney = value;
-                    HouseConsignmentMerchant merchant;
-                    if (houseRequired)
-                        merchant = DOLDB<HouseConsignmentMerchant>.SelectObject(DB.Column(nameof(HouseConsignmentMerchant.HouseNumber)).IsEqualTo(HouseNumber));
-                    else
-                        merchant = DOLDB<HouseConsignmentMerchant>.SelectObject(DB.Column(nameof(HouseConsignmentMerchant.OwnerID)).IsEqualTo(OwnerID));
-                    merchant.Money = m_totalMoney;
-                    GameServer.Database.SaveObject(merchant);
-                }
-            }
+            get => ConsignmentStateManager.GetState(OwnerID)?.GetTotalMoney() ?? 0;
+            set => ConsignmentStateManager.GetState(OwnerID)?.SetTotalMoney(value);
         }
 
         /// <summary>
@@ -310,7 +295,7 @@ namespace DOL.GS
 
             // let's move it
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 if (fromClientSlot == toClientSlot)
                 {
@@ -418,13 +403,10 @@ namespace DOL.GS
         /// </summary>
         public virtual bool OnAddItem(GamePlayer player, InventoryItem item)
         {
-            player.TempProperties.setProperty(ITEM_BEING_ADDED, item); // For objects that support doing something when added (setting a price, for example).
-
-            if (ServerProperties.Properties.MARKET_ENABLE_LOG)
-            {
-                log.DebugFormat("CM: {0}:{1} adding '{2}' to consignment merchant on lot {3}.", player.Name, player.Client.Account.Name, item.Name, HouseNumber);
-            }
-            return MarketCache.AddItem(item);
+            player.TempProperties.setProperty(ITEM_BEING_ADDED, item);
+            bool res = MarketCache.AddItem(item);
+            VaultItemCacheManager.GetCache(this, player)?.ForceValidateCache();
+            return res;
         }
 
         /// <summary>
@@ -432,13 +414,11 @@ namespace DOL.GS
         /// </summary>
         public virtual bool OnRemoveItem(GamePlayer player, InventoryItem item)
         {
-            if (ServerProperties.Properties.MARKET_ENABLE_LOG)
-            {
-                log.DebugFormat("CM: {0}:{1} removing '{2}' from consignment merchant on lot {3}.", player.Name, player.Client.Account.Name, item.Name, HouseNumber);
-            }
             item.OwnerLot = 0;
             item.SellPrice = 0;
-            return MarketCache.RemoveItem(item);
+            bool res = MarketCache.RemoveItem(item);
+            VaultItemCacheManager.GetCache(this, player)?.ForceValidateCache();
+            return res;
         }
 
 
@@ -615,7 +595,7 @@ namespace DOL.GS
 
             InventoryItem item = null;
 
-            lock (LockObject())
+            lock (LockObject(player))
             {
 
                 if (fromClientSlot != eInventorySlot.Invalid)

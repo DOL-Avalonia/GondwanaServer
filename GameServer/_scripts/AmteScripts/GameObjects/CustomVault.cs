@@ -158,7 +158,7 @@ namespace DOL.GS
                 }
             }
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 this.NotifyPlayers(this, player, _observers, this.MoveItem(player, (eInventorySlot) fromSlot, (eInventorySlot) toSlot, count));
             }
@@ -188,7 +188,7 @@ namespace DOL.GS
                 return false;
             }
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 this.NotifyPlayers(this, player, _observers, updated);
             }

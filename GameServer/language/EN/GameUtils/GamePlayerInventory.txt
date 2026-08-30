@@ -51,7 +51,9 @@ GameUtils.GamePlayerInventory.PatternRemoved:							Pattern removed from {0}.
 GameUtils.GamePlayerInventory.PatternTemplateNotFound:					Error: Could not find template '{0}'.
 GameUtils.GamePlayerInventory.PatternScrubbed:							You have scrubbed the pattern clean.
 GameUtils.GamePlayerInventory.PatternNoMask:							You cannot apply this pattern to a Mask.
-GameUtils.GamePlayerInventory.PatternArmorWeaponOnly:					This pattern can only be applied to Armor or Weapons.
+GameUtils.GamePlayerInventory.PatternArmorWeaponOnly:					This pattern can only be applied to Armors or Weapons.
+GameUtils.GamePlayerInventory.PatternArmorOnly:							This pattern can only be applied to Armors.
+GameUtils.GamePlayerInventory.PatternWeaponOnly:						This pattern can only be applied to Weapons.
 GameUtils.GamePlayerInventory.PatternNotRecognized:						This pattern is not recognized by the system.
 GameUtils.GamePlayerInventory.PatternInvalidForType:					This pattern cannot be applied to this specific item type.
 GameUtils.GamePlayerInventory.PatternSmartApplied:						You have applied the {0} to {1}.

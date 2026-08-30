@@ -145,7 +145,7 @@ namespace DOL.GS
             if (_hookedItem == null || CurrentHouse != player.CurrentHouse || CurrentHouse.CanEmptyHookpoint(player) == false)
                 return false;
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 foreach (GamePlayer observer in _observers.Values)
                 {

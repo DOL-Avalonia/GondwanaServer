@@ -2,7 +2,7 @@
 # Server Intro RPG message
 ServerRPGMessage.ShortDescription:		Vítejte v Arcanu, světě zrozeném z popela Velké magické války! V této pohlcující RP/PvP říši bojují rozpadlá království o přežití, zatímco gildy diktují zákony. Přečtěte si prosím posvátné zásady a pravidla serveru na www.arcanum-server.com. Nabruste své čepele, připravte si kouzla a užijte si cestu v Arcanu!
 ServerRPGMessage.Lore1:					Vítejte v Arcanu!
-ServerRPGMessage.Lore2:					Před dvěma tisíci lety bylo Arcanum zářící sítí létajících citadel a manových kovaren. Pak přišla Velká magická válka. Kontinenty byly roztrhány a zanechaly za sebou zjizvený a oslabený svět. Z těchto trosek povstaly tři říše: Valeria, Skeldheim a Sylvaris. Dnes králové vládnou pouze na papíře, ale jsou to gildy, kdo skutečně vládne roztříštěným zemím, zatímco psanci si budují svá vlastní impéria v temném Podzemí. Zvolte svou cestu moudře.
+ServerRPGMessage.Lore2:					Před dvěma tisíci lety bylo Arcanum zářící sítí létajících citadel a manových kovaren. Pak přišla Velká magická válka. Kontinenty byly roztrhány a zanechaly za sebou zjizvený a oslabený svět. Z těchto trosek povstaly tři říše: Albion, Midgard a Hibernia. Dnes králové vládnou pouze na papíře, ale jsou to gildy, kdo skutečně vládne roztříštěným zemím, zatímco psanci si budují svá vlastní impéria v temném Podzemí. Zvolte svou cestu moudře.
 ServerRPGMessage.FeaturesHeader:		--------- FUNKCE SERVERU ---------
 ServerRPGMessage.FeatureEvents1:		[Dynamické události a úkoly]
 ServerRPGMessage.FeatureEvents2:		Zúčastněte se událostí, které mění svět, a legendárních lovů bossů.

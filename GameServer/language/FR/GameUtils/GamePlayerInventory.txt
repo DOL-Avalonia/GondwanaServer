@@ -52,6 +52,8 @@ GameUtils.GamePlayerInventory.PatternTemplateNotFound:						Erreur : Impossible 
 GameUtils.GamePlayerInventory.PatternScrubbed:								Vous avez nettoyé l'objet de son empreinte.
 GameUtils.GamePlayerInventory.PatternNoMask:								Vous ne pouvez pas appliquer cette empreinte d'objet sur un Masque.
 GameUtils.GamePlayerInventory.PatternArmorWeaponOnly:						Cette empreinte d'objet ne peut être appliqué que sur des Armures ou des Armes.
+GameUtils.GamePlayerInventory.PatternArmorOnly:								Cette empreinte d'objet ne peut être appliqué que sur des Armures.
+GameUtils.GamePlayerInventory.PatternWeaponOnly:							Cette empreinte d'objet ne peut être appliqué que sur des Armes.
 GameUtils.GamePlayerInventory.PatternNotRecognized:							Cette empreinte d'objet n'est pas reconnue par le système.
 GameUtils.GamePlayerInventory.PatternInvalidForType:						Cette empreinte d'objet ne peut pas être appliquée sur ce type spécifique d'objet.
 GameUtils.GamePlayerInventory.PatternSmartApplied:							Vous avez appliqué {0} sur {1}.

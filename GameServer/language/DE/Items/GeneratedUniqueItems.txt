@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Fokus
+ROG.ItemFormat.Focus: {0} {2} {1}
+ROG.ItemFormat.Tiered.Focus: {0} {1} {3} {2}
+ROG.ItemFormat.CustomTiered.Focus: {1} {0} {3} {2}
+
 ROG.ItemFormat: {0} {1}
 ROG.ItemFormat.Tiered: {0} {1} {2}
 ROG.MobDropFormat: {0}s {1}
 ROG.ItemFormat.CustomTiered: {1} {0} {2}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: Woll
+ROG.Prefix.Linen: Leinen
+ROG.Prefix.Brocade: Brokat
+ROG.Prefix.Rawhide: Rohleder
+ROG.Prefix.Tanned: Gegerbt
+ROG.Prefix.Cured: Gehärtet
+ROG.Prefix.Bronze: Bronze
+ROG.Prefix.Copper: Kupfer
+ROG.Prefix.Brass: Messing
+ROG.Prefix.FineAlloy: Feinlegierungs
+ROG.Prefix.Iron: Eisen
+ROG.Prefix.Steel: Stahl
+ROG.Prefix.Rowan: Ebereschen
+ROG.Prefix.Elm: Ulmen
+ROG.Prefix.Ash: Eschen
 
 # ================================
 # PREFIXES
@@ -407,6 +432,7 @@ ROG.BaseName.WarScythe: Kriegssense
 ROG.BaseName.SmallShield: Kleiner Schild
 ROG.BaseName.MediumShield: Mittlerer Schild
 ROG.BaseName.LargeShield: Großer Schild
+ROG.BaseName.Staff: Magierstab
 ROG.BaseName.MaulerStaff: Prüglerstab
 ROG.BaseName.Quarterstaff: Kampfstab
 ROG.BaseName.ShodQuarterstaff: Beschlagener Kampfstab

@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Magic
+ROG.ItemFormat.Focus: {1} {2} {0}
+ROG.ItemFormat.Tiered.Focus: {2} {3} {1} {0}
+ROG.ItemFormat.CustomTiered.Focus: {2} {3} {0} {1}
+
 ROG.ItemFormat: {1} {0}
 ROG.ItemFormat.Tiered: {2} {1} {0}
 ROG.MobDropFormat: {1} de la {0}
 ROG.ItemFormat.CustomTiered: {2} {0} {1}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: de Lână
+ROG.Prefix.Linen: de In
+ROG.Prefix.Brocade: de Brocart
+ROG.Prefix.Rawhide: din Piele Brută
+ROG.Prefix.Tanned: Tăbăcit
+ROG.Prefix.Cured: Tratat
+ROG.Prefix.Bronze: de Bronz
+ROG.Prefix.Copper: de Cupru
+ROG.Prefix.Brass: de Alamă
+ROG.Prefix.FineAlloy: din Aliaj Fin
+ROG.Prefix.Iron: de Fier
+ROG.Prefix.Steel: de Oțel
+ROG.Prefix.Rowan: de Scoruș
+ROG.Prefix.Elm: de Ulm
+ROG.Prefix.Ash: de Frasin
 
 # ================================
 # PREFIXES
@@ -401,6 +426,7 @@ ROG.BaseName.WarScythe: Coasă de Război
 ROG.BaseName.SmallShield: Scut Mic
 ROG.BaseName.MediumShield: Scut Mediu
 ROG.BaseName.LargeShield: Scut Mare
+ROG.BaseName.Staff: Toiag
 ROG.BaseName.MaulerStaff: Toiag de Bătăuș
 ROG.BaseName.Quarterstaff: Toiag de Luptă
 ROG.BaseName.ShodQuarterstaff: Toiag Ferecat

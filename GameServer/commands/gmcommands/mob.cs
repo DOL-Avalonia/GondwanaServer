@@ -70,6 +70,7 @@ namespace DOL.GS.Commands
          "'/mob movehere' move mob to player's location.",
          "'/mob location' say location information in the chat window.",
          "'/mob remove [true]' to remove this mob from the DB; specify true to also remove loot templates (if no other mobs of same name exist).",
+         "'/mob remove radius <number> [true]' to remove multiple mobs within radius from the DB.",
          "'/mob ghost' makes this mob ghost-like.",
          "'/mob stealth' makes the mob stealthed (invisible).",
          "'/mob torch' turns this mobs torch on and off.",
@@ -178,6 +179,7 @@ namespace DOL.GS.Commands
                     && args[1] != "copytextnpc"
                     && args[1] != "select"
                     && args[1] != "reload"
+                    && args[1] != "remove"
                     && args[1] != "findname"
                     && args[1] != "respawn" )
                 {
@@ -393,7 +395,51 @@ namespace DOL.GS.Commands
 
             if (isNewSyntax)
             {
-                mob = new GameNPC();
+                var dummyTemplate = NpcTemplateMgr.GetTemplate(2000000000);
+                string theType = "DOL.GS.GameNPC";
+
+                if (dummyTemplate != null && !string.IsNullOrEmpty(dummyTemplate.ClassType))
+                {
+                    theType = dummyTemplate.ClassType;
+                }
+
+                foreach (Assembly script in ScriptMgr.GameServerScripts)
+                {
+                    try
+                    {
+                        mob = (GameNPC)script.CreateInstance(theType, true);
+                        if (mob != null) break;
+                    }
+                    catch { }
+                }
+
+                if (mob == null)
+                {
+                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        try
+                        {
+                            mob = (GameNPC)assembly.CreateInstance(theType, true);
+                            if (mob != null) break;
+                        }
+                        catch { }
+                    }
+                }
+
+                if (mob == null)
+                {
+                    client.Out.SendMessage("Warning: Could not create instance of " + theType + ". Defaulting to GameNPC.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    mob = new GameNPC();
+                }
+
+                if (dummyTemplate != null)
+                {
+                    mob.LoadTemplate(dummyTemplate);
+                }
+                else
+                {
+                    client.Out.SendMessage("Warning: Dummy NPC Template 2000000000 not found in database/memory.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
 
                 if (paramsFoundIndex > 2)
                     name = String.Join(" ", args, 2, paramsFoundIndex - 2);
@@ -405,16 +451,6 @@ namespace DOL.GS.Commands
                 if (args.Length > paramsFoundIndex + 3)
                     int.TryParse(args[paramsFoundIndex + 3], out range);
 
-                var dummyTemplate = NpcTemplateMgr.GetTemplate(2000000000);
-                if (dummyTemplate != null)
-                {
-                    mob.NPCTemplate = dummyTemplate;
-                }
-                else
-                {
-                    client.Out.SendMessage("Warning: Dummy NPC Template 2000000000 not found in database/memory.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-
                 mob.Position = client.Player.Position;
                 mob.Name = name;
                 mob.Model = model;
@@ -425,6 +461,7 @@ namespace DOL.GS.Commands
                 if (aggro > 0 || range > 0)
                 {
                     mob.Flags &= ~GameNPC.eFlags.PEACE;
+                    mob.FlagsDb = (uint)mob.Flags;
 
                     if (mob.Brain is IOldAggressiveBrain aggroBrain)
                     {
@@ -435,12 +472,20 @@ namespace DOL.GS.Commands
                 else
                 {
                     mob.Flags |= GameNPC.eFlags.PEACE;
+                    mob.FlagsDb = (uint)mob.Flags;
                 }
             }
             else
             {
+                // OLD WAY SYNTAX
+                var dummyTemplate = NpcTemplateMgr.GetTemplate(2000000000);
                 string theType = "DOL.GS.GameNPC";
                 byte realm = 0;
+
+                if (dummyTemplate != null && !string.IsNullOrEmpty(dummyTemplate.ClassType))
+                {
+                    theType = dummyTemplate.ClassType;
+                }
 
                 if (args.Length > 2)
                     theType = args[2];
@@ -458,7 +503,7 @@ namespace DOL.GS.Commands
                 {
                     try
                     {
-                        mob = (GameNPC)script.CreateInstance(theType, false);
+                        mob = (GameNPC)script.CreateInstance(theType, true);
                         if (mob != null) break;
                     }
                     catch (Exception e)
@@ -469,17 +514,40 @@ namespace DOL.GS.Commands
 
                 if (mob == null)
                 {
-                    client.Out.SendMessage("There was an error creating an instance of " + theType + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    return;
+                    foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        try
+                        {
+                            mob = (GameNPC)assembly.CreateInstance(theType, true);
+                            if (mob != null) break;
+                        }
+                        catch { }
+                    }
+                }
+
+                if (mob == null)
+                {
+                    client.Out.SendMessage("Warning: Could not create instance of " + theType + ". Defaulting to standard GameNPC.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    mob = new GameNPC();
+                }
+
+                if (dummyTemplate != null)
+                {
+                    mob.LoadTemplate(dummyTemplate);
+                }
+                else
+                {
+                    client.Out.SendMessage("Warning: Dummy NPC Template 2000000000 not found in database/memory.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
 
                 mob.Position = client.Player.Position;
                 mob.Level = 1;
                 mob.Realm = (eRealm)realm;
                 mob.Name = "New Mob";
-                mob.Model = 408;
-                mob.ModelDb = 408;
+                mob.Model = mob.Model == 0 ? (ushort)408 : mob.Model;
+                mob.ModelDb = mob.Model;
                 mob.Flags |= GameNPC.eFlags.PEACE;
+                mob.FlagsDb = (uint)mob.Flags;
             }
 
             mob.MaxSpeedBase = 200;
@@ -1172,53 +1240,96 @@ namespace DOL.GS.Commands
 
         private void remove(GameClient client, GameNPC targetMob, string[] args)
         {
-            string mobName = targetMob.Name;
-            string typeOfMob = targetMob.GetType().FullName;
-            targetMob.StopAttack();
-            targetMob.StopCurrentSpellcast();
-            targetMob.DeleteFromDatabase();
-            targetMob.Delete();
+            List<GameNPC> mobsToRemove = new List<GameNPC>();
+            bool removeLootTemplates = false;
 
-            if (args.Length > 2 && args[2] == "true")
+            if (args.Length > 2 && args[2].ToLower() == "radius")
             {
-                var mobs = DOLDB<Mob>.SelectObject(DB.Column(nameof(Mob.Name)).IsEqualTo(mobName));
-
-                if (mobs == null)
+                if (args.Length >= 4 && ushort.TryParse(args[3], out ushort radius))
                 {
-                    var deleteLoots = DOLDB<MobXLootTemplate>.SelectObjects(DB.Column(nameof(MobXLootTemplate.MobName)).IsEqualTo(mobName));
+                    mobsToRemove.AddRange(client.Player.GetNPCsInRadius(radius).Cast<GameNPC>());
 
-                    GameServer.Database.DeleteObject(deleteLoots);
-
-                    var deleteLootTempl = DOLDB<LootTemplate>.SelectObjects(DB.Column(nameof(LootTemplate.TemplateName)).IsEqualTo(mobName));
-
-                    GameServer.Database.DeleteObject(deleteLootTempl);
-
-                    DisplayMessage(client, "Removed MobXLootTemplate and LootTemplate entries for " + mobName + " from DB.");
+                    if (args.Length > 4 && args[4].ToLower() == "true")
+                        removeLootTemplates = true;
+                }
+                else
+                {
+                    DisplaySyntax(client, args[1]);
+                    return;
                 }
             }
-
-            if (typeOfMob == "DOL.GS.Scripts.AreaEffect")
-                GameServer.Database.DeleteObject(GameServer.Database.SelectObjects<DBAreaEffect>(DB.Column("MobID").IsEqualTo(targetMob.InternalID)));
-
-            if (targetMob.MobGroups != null)
+            else
             {
-                foreach (MobGroup group in targetMob.MobGroups)
+                if (targetMob == null)
                 {
-                    MobGroupManager.Instance.RemoveMobFromGroup(targetMob, group.GroupId);
-                    if (group.NPCs.Count == 0)
-                    {
-                        client.Out.SendCustomDialog($"MobGroup {group.GroupId} is empty. Delete?", ((player, response) =>
-                        {
-                            if (response != 0x01)
-                                return;
+                    client.Out.SendMessage("You must have a target or specify a radius. (e.g. /mob remove radius 1000)", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
 
-                            client.Out.SendMessage(MobGroupManager.Instance.RemoveGroupsAndMobs(group.GroupId) ? $"MobGroup {group.GroupId} deleted." : $"There was an error while trying to delete MobGroup {group.GroupId}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        }));
+                mobsToRemove.Add(targetMob);
+
+                if (args.Length > 2 && args[2].ToLower() == "true")
+                    removeLootTemplates = true;
+            }
+
+            if (mobsToRemove.Count == 0)
+            {
+                client.Out.SendMessage("No targetable mobs found to remove.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            int removeCount = 0;
+
+            foreach (GameNPC mob in mobsToRemove)
+            {
+                string mobName = mob.Name;
+                string typeOfMob = mob.GetType().FullName;
+
+                mob.StopAttack();
+                mob.StopCurrentSpellcast();
+                mob.DeleteFromDatabase();
+                mob.Delete();
+
+                if (removeLootTemplates)
+                {
+                    var mobs = DOLDB<Mob>.SelectObject(DB.Column(nameof(Mob.Name)).IsEqualTo(mobName));
+
+                    if (mobs == null)
+                    {
+                        var deleteLoots = DOLDB<MobXLootTemplate>.SelectObjects(DB.Column(nameof(MobXLootTemplate.MobName)).IsEqualTo(mobName));
+                        GameServer.Database.DeleteObject(deleteLoots);
+
+                        var deleteLootTempl = DOLDB<LootTemplate>.SelectObjects(DB.Column(nameof(LootTemplate.TemplateName)).IsEqualTo(mobName));
+                        GameServer.Database.DeleteObject(deleteLootTempl);
+
+                        DisplayMessage(client, "Removed MobXLootTemplate and LootTemplate entries for " + mobName + " from DB.");
                     }
                 }
+
+                if (typeOfMob == "DOL.GS.Scripts.AreaEffect")
+                    GameServer.Database.DeleteObject(GameServer.Database.SelectObjects<DBAreaEffect>(DB.Column("MobID").IsEqualTo(mob.InternalID)));
+
+                if (mob.MobGroups != null)
+                {
+                    foreach (MobGroup group in mob.MobGroups)
+                    {
+                        MobGroupManager.Instance.RemoveMobFromGroup(mob, group.GroupId);
+                        if (group.NPCs.Count == 0)
+                        {
+                            client.Out.SendCustomDialog($"MobGroup {group.GroupId} is empty. Delete?", ((player, response) =>
+                            {
+                                if (response != 0x01)
+                                    return;
+
+                                client.Out.SendMessage(MobGroupManager.Instance.RemoveGroupsAndMobs(group.GroupId) ? $"MobGroup {group.GroupId} deleted." : $"There was an error while trying to delete MobGroup {group.GroupId}.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }));
+                        }
+                    }
+                }
+                removeCount++;
             }
 
-            client.Out.SendMessage("Target Mob removed from DB.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            client.Out.SendMessage($"{removeCount} Target Mob(s) removed from DB.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
         private void flags(GameClient client, GameNPC targetMob, string[] args)

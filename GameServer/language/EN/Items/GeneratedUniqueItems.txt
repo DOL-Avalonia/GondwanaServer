@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Focus
+ROG.ItemFormat.Focus: {0} {2} {1}
+ROG.ItemFormat.Tiered.Focus: {0} {1} {3} {2}
+ROG.ItemFormat.CustomTiered.Focus: {1} {0} {3} {2}
+
 ROG.ItemFormat: {0} {1}
 ROG.ItemFormat.Tiered: {0} {1} {2}
 ROG.MobDropFormat: {0}'s {1}
 ROG.ItemFormat.CustomTiered: {1} {0} {2}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: Woolen
+ROG.Prefix.Linen: Linen
+ROG.Prefix.Brocade: Brocade
+ROG.Prefix.Rawhide: Rawhide
+ROG.Prefix.Tanned: Tanned
+ROG.Prefix.Cured: Cured
+ROG.Prefix.Bronze: Bronze
+ROG.Prefix.Copper: Copper
+ROG.Prefix.Brass: Brass
+ROG.Prefix.FineAlloy: Fine Alloy
+ROG.Prefix.Iron: Iron
+ROG.Prefix.Steel: Steel
+ROG.Prefix.Rowan: Rowan
+ROG.Prefix.Elm: Elm
+ROG.Prefix.Ash: Ash
 
 # ================================
 # PREFIXES
@@ -407,6 +432,7 @@ ROG.BaseName.WarScythe: War Scythe
 ROG.BaseName.SmallShield: Small Shield
 ROG.BaseName.MediumShield: Medium Shield
 ROG.BaseName.LargeShield: Large Shield
+ROG.BaseName.Staff: Staff
 ROG.BaseName.MaulerStaff: Mauler Staff
 ROG.BaseName.Quarterstaff: Quarterstaff
 ROG.BaseName.ShodQuarterstaff: Shod Quarterstaff

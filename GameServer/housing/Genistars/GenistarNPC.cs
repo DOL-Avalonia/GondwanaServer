@@ -337,7 +337,7 @@ namespace DOL.GS.Scripts
             }
 
             // Invalid Item
-            player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.GenistarNPC.CantEquip"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.Equip.CantEquip"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return false;
         }
 

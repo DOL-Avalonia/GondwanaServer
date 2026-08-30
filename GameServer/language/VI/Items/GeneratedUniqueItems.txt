@@ -1,7 +1,32 @@
+
+ROG.FocusPrefix: Phép Thuật
+ROG.ItemFormat.Focus: {1} {2} {0}
+ROG.ItemFormat.Tiered.Focus: {2} {3} {1} {0}
+ROG.ItemFormat.CustomTiered.Focus: {2} {3} {0} {1}
+
 ROG.ItemFormat: {1} {0}
 ROG.ItemFormat.Tiered: {2} {0} {1}
 ROG.MobDropFormat: {1} của {0}
 ROG.ItemFormat.CustomTiered: {0} {2} {1}
+
+# ================================
+# MATERIAL PREFIXES
+# ================================
+ROG.Prefix.Woolen: bằng Len
+ROG.Prefix.Linen: bằng Vải Lanh
+ROG.Prefix.Brocade: bằng Gấm
+ROG.Prefix.Rawhide: Da Thô
+ROG.Prefix.Tanned: Da Thuộc
+ROG.Prefix.Cured: Đã Xử Lý
+ROG.Prefix.Bronze: bằng Đồng Đỏ
+ROG.Prefix.Copper: bằng Đồng
+ROG.Prefix.Brass: bằng Đồng Thau
+ROG.Prefix.FineAlloy: Hợp Kim Tốt
+ROG.Prefix.Iron: bằng Sắt
+ROG.Prefix.Steel: bằng Thép
+ROG.Prefix.Rowan: Gỗ Rowan
+ROG.Prefix.Elm: Gỗ Du
+ROG.Prefix.Ash: Gỗ Tần Bì
 
 # ================================
 # PREFIXES
@@ -401,6 +426,7 @@ ROG.BaseName.WarScythe: Lưỡi Hái Chiến Tranh
 ROG.BaseName.SmallShield: Khiên Nhỏ
 ROG.BaseName.MediumShield: Khiên Vừa
 ROG.BaseName.LargeShield: Khiên Lớn
+ROG.BaseName.Staff: Gậy pháp sư
 ROG.BaseName.MaulerStaff: Trượng Đập
 ROG.BaseName.Quarterstaff: Quyền Trượng
 ROG.BaseName.ShodQuarterstaff: Quyền Trượng Đúc

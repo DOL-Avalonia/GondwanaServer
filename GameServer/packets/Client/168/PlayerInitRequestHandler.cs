@@ -289,7 +289,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGenistar1") + "\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGenistar2");
 
-                string servercommands =
+                string servercommands1 =
                     "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ServerCommandsHeader") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdHelp") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdLanguage") + "\n\n" +
@@ -297,7 +297,9 @@ namespace DOL.GS.PacketHandler.Client.v168
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdMarket") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCraft") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCombineList") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEvent") + "\n\n" +
+                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEvent");
+
+                string servercommands2 =
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEpicMount") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdVol") + "\n\n" +
                     LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdFaceMob") + "\n\n" +
@@ -322,7 +324,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.Out.SendMessage(features1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 player.Out.SendMessage(features2, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 player.Out.SendMessage(features3, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(servercommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(servercommands1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                player.Out.SendMessage(servercommands2, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 player.Out.SendMessage(guildcommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
             }
 

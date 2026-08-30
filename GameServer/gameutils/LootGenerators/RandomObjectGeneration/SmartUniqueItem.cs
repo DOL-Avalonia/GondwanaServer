@@ -135,9 +135,15 @@ namespace DOL.GS
 
             string tierKey = item.GetQualityTierPrefixKey();
 
+            string focusStr = "";
+            if (item.Bonus1Type == (int)eProperty.AllFocusLevels && item.Object_Type == (int)eObjectType.Staff)
+            {
+                focusStr = "Focus ";
+            }
+
             // Build the 4-part Dynamic ROG tag
-            // Structure: Prefix | Tier | BaseName | MobName
-            item.Name = $"[ROG]{prefixKey}|{tierKey}|{baseNameKey}|{mobName}";
+            // Structure: Focus(optional) + [ROG]Prefix | Tier | BaseName | MobName
+            item.Name = $"{focusStr}[ROG]{prefixKey}|{tierKey}|{baseNameKey}|{mobName}";
 
             item.AllowAdd = true;
 

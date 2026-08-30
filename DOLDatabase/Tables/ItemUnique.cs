@@ -140,7 +140,7 @@ namespace DOL.Database
 
                 return true;
             }
-            set { base.Dirty = true; }
+            set { base.Dirty = value; }
         }
     }
 }

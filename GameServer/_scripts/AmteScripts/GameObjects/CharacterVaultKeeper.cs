@@ -123,7 +123,7 @@ namespace DOL.GS
                 return false;
             }
 
-            lock (m_vaultSync)
+            lock (LockObject(player))
             {
                 this.NotifyPlayers(this, player, _observers, updated);
             }

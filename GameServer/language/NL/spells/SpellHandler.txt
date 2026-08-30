@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:	De immuniteit van {0} tegen verzwakki
 SpellHandler.GatewayPersonalBind.CantUseHere:	Je kunt dit voorwerp hier niet gebruiken!
 SpellHandler.GatewayPersonalBind.MustStandStill:	Je moet stil staan om dit voorwerp te gebruiken!
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Je was recent in gevecht en kunt dit voorwerp niet gebruiken!
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Deze spreuk heeft alleen effect op Animist-turrets.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:		Je bereidt al een afstandsspreuk voor.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Je bereidt al een ononderbreekbare spreuk voor.

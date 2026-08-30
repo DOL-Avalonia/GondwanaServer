@@ -303,6 +303,7 @@ SpellHandler.DebuffImmunity.TargetWornOff:	Imunita {0} vůči oslabujícím kouz
 SpellHandler.GatewayPersonalBind.CantUseHere:	Tento předmět zde nemůžete použít!
 SpellHandler.GatewayPersonalBind.MustStandStill:	Pro použití tohoto předmětu musíte stát na místě!
 SpellHandler.GatewayPersonalBind.RecentlyInCombat:	Nedávno jste byli v boji a tento předmět nelze použít!
+SpellHandler.EffectivenessBuffPvE.OnlyTurrets:		Toto kouzlo může ovlivnit pouze věže animistů.
 
 SpellHandler.Warlock.AlreadyPreparingRangeSpell:		Již připravujete dálkové kouzlo.
 SpellHandler.Warlock.AlreadyPreparingUninterruptableSpell:	Již připravujete nepřerušitelné kouzlo.
