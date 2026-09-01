@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				Căldura focului de tabără îți perm
 
 Items.Specialitems.StorageBag.NoBag:				Nu te uiți la o geantă!
 Items.Specialitems.StorageBag.BadItem:				Nu poți pune acest obiect în această geantă!
+Items.Specialitems.StorageBag.BadTargetItem:		Acest sac nu poate conține obiectul pe care dorești să-l schimbi.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Obiectul tău {0} se sparge după ce a fost declanșat la moarte!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Nu s-a putut distruge obiectul din anumite motive!

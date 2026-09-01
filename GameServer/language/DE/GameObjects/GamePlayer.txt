@@ -124,6 +124,7 @@ GameObjects.GamePlayer.Die.LoseExperience:	Ihr verliert einige Erfahrung!
 GameObjects.GamePlayer.Die.ReleaseToReturn:	Ihr seid tot. Gebt /release ein, um an der Stelle ins Leben zurückzukehren, wo Ihr Eure Seele zuletzt gebunden habt.
 GameObjects.GamePlayer.Die.YouKilled:	Ihr habt gerade {0} getötet !
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Euer {0} hat durch Euren Tod an Haltbarkeit verloren.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:			Du verlierst beim Sterben {0} Erfahrung.
 GameObjects.GamePlayer.Die.ArenaDefeated:			Ihr wurdet besiegt! Ihr werdet automatisch wiederbelebt, wenn das Spiel voranschreitet.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:	Ihr könnt unter Wasser nicht atmen und nehmt deshalb Schaden!

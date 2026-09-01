@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				Hơi ấm của lửa trại giúp bạ
 
 Items.Specialitems.StorageBag.NoBag:				Bạn không đang xem một chiếc túi nào!
 Items.Specialitems.StorageBag.BadItem:				Bạn không thể đặt vật phẩm này vào túi này!
+Items.Specialitems.StorageBag.BadTargetItem:		Túi này không thể chứa vật phẩm mà bạn muốn trao đổi.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		{0} của bạn vỡ nát sau khi được kích hoạt lúc tử vong!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Không thể phá hủy vật phẩm vì một lý do nào đó!

@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				De warmte van het kampvuur zorgt ervoor
 
 Items.Specialitems.StorageBag.NoBag:				Je bekijkt geen tas!
 Items.Specialitems.StorageBag.BadItem:				Je kunt dit voorwerp niet in deze tas stoppen!
+Items.Specialitems.StorageBag.BadTargetItem:		Deze tas kan het voorwerp dat je wilt ruilen niet bevatten.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Je {0} versplintert nadat het bij de dood is geactiveerd!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Het voorwerp kon om de een of andere reden niet worden vernietigd!

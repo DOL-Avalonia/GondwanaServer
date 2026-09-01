@@ -278,6 +278,16 @@ namespace DOL.GS.Scripts
                     return false;
                 }
             }
+            else if (fromVault)
+            {
+                InventoryItem itemInToSlot = player.Inventory.GetItem((eInventorySlot)toSlot);
+
+                if (itemInToSlot != null && !gameVault.CanAddItem(player, itemInToSlot))
+                {
+                    player.SendTranslatedMessage("Items.Specialitems.StorageBag.BadTargetItem", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
 
             return DoMoveItem(player, fromSlot, toSlot, count);
         }

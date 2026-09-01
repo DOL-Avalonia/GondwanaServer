@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				Teplo z táboráku ti umožňuje rychle
 
 Items.Specialitems.StorageBag.NoBag:				Neprohlížíš si žádnou tašku!
 Items.Specialitems.StorageBag.BadItem:				Tento předmět do této tašky vložit nemůžeš!
+Items.Specialitems.StorageBag.BadTargetItem:		Tento batoh nemůže pojmout předmět, který chcete vyměnit.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Tvůj {0} se roztříštil po spuštění při smrti!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Z nějakého důvodu se předmět nepodařilo zničit!

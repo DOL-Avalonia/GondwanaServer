@@ -22,6 +22,7 @@ GameUtils.GamePlayerInventory.CannotPutItemFromThisRealm:					Vous ne pouvez pas
 GameUtils.GamePlayerInventory.PotionVialFull:								Cette fiole est déjà pleine !
 GameUtils.GamePlayerInventory.CombinePotions:								Vous combinez les potions ({0}/{1}).
 GameUtils.GamePlayerInventory.RefillPotion:									Vous remplissez la potion ({0}/{1}).
+GameUtils.GamePlayerInventory.CannotMixBloodVials:							Vous ne pouvez pas mélanger des fioles contenant du sang de différentes créatures !
 GameUtils.GamePlayerInventory.PatternRemovalInvalid:						Le Suppresseur d'empreinte d'objet ne peut pas être utilisé sur cet objet.
 GameUtils.GamePlayerInventory.InventoryFull:								Votre inventaire est plein.
 GameUtils.GamePlayerInventory.PatternCreated:								Vous avez créé {0}.

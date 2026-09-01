@@ -109,20 +109,21 @@ GameObjects.GamePlayer.CommandNpcAttack.Denfensive:                ¡Ordenas a {
 GameObjects.GamePlayer.CraftItem.DontHaveAbilityMake:              No tienes la habilidad necesaria para fabricar este objeto.
 GameObjects.GamePlayer.CurrentTitle.TitleCleared:                  Se ha eliminado tu título.
 
-GameObjects.GamePlayer.Die.CorpseLies:             {0} ha muerto. Su cadáver yace en el suelo.
-GameObjects.GamePlayer.Die.DeadRVR:                Has caído en batalla por tu reino y no pierdes experiencia.
-GameObjects.GamePlayer.Die.DeathN1:                Esta es tu primera muerte en este nivel. Tus pérdidas de experiencia y constitución se reducen en gran medida.
-GameObjects.GamePlayer.Die.DeathN2:                Esta es tu segunda muerte en este nivel. Tus pérdidas de experiencia y constitución se reducen.
-GameObjects.GamePlayer.Die.DuelDefeated:           ¡{0} ha sido derrotado por {1} en un duelo!
-GameObjects.GamePlayer.Die.DuelWinner:             ¡{0} gana el duelo!
-GameObjects.GamePlayer.Die.Killed:                 {0} acaba de ser asesinado.
-GameObjects.GamePlayer.Die.KilledBy:               {0} acaba de ser asesinado por {1}.
-GameObjects.GamePlayer.Die.KilledByLocation:       {0} acaba de ser asesinado por {1} en {2}.
-GameObjects.GamePlayer.Die.KilledLocation:         {0} acaba de ser asesinado en {1}.
-GameObjects.GamePlayer.Die.LoseExperience:         Pierdes experiencia.
-GameObjects.GamePlayer.Die.ReleaseToReturn:        Has muerto. Escribe “/release” para volver a tu piedra de alma.
-GameObjects.GamePlayer.Die.YouKilled:              Has matado a {0}.
+GameObjects.GamePlayer.Die.CorpseLies:				{0} ha muerto. Su cadáver yace en el suelo.
+GameObjects.GamePlayer.Die.DeadRVR:					Has caído en batalla por tu reino y no pierdes experiencia.
+GameObjects.GamePlayer.Die.DeathN1:					Esta es tu primera muerte en este nivel. Tus pérdidas de experiencia y constitución se reducen en gran medida.
+GameObjects.GamePlayer.Die.DeathN2:					Esta es tu segunda muerte en este nivel. Tus pérdidas de experiencia y constitución se reducen.
+GameObjects.GamePlayer.Die.DuelDefeated:			¡{0} ha sido derrotado por {1} en un duelo!
+GameObjects.GamePlayer.Die.DuelWinner:				¡{0} gana el duelo!
+GameObjects.GamePlayer.Die.Killed:					{0} acaba de ser asesinado.
+GameObjects.GamePlayer.Die.KilledBy:				{0} acaba de ser asesinado por {1}.
+GameObjects.GamePlayer.Die.KilledByLocation:		{0} acaba de ser asesinado por {1} en {2}.
+GameObjects.GamePlayer.Die.KilledLocation:			{0} acaba de ser asesinado en {1}.
+GameObjects.GamePlayer.Die.LoseExperience:			Pierdes experiencia.
+GameObjects.GamePlayer.Die.ReleaseToReturn:			Has muerto. Escribe “/release” para volver a tu piedra de alma.
+GameObjects.GamePlayer.Die.YouKilled:				Has matado a {0}.
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:	La condición de tu {0} disminuyó al morir.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:			Pierdes {0} de experiencia al morir.
 GameObjects.GamePlayer.Die.ArenaDefeated:			¡Has sido derrotado! Serás resucitado automáticamente cuando la partida avance.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  ¡No puedes respirar bajo el agua y tragas agua!

@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				Durch die Wärme des Lagerfeuers regene
 
 Items.Specialitems.StorageBag.NoBag:				Du betrachtest keine Tasche!
 Items.Specialitems.StorageBag.BadItem:				Du kannst diesen Gegenstand nicht in diese Tasche legen!
+Items.Specialitems.StorageBag.BadTargetItem:		Diese Tasche kann den Gegenstand, den du tauschen möchtest, nicht aufnehmen.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Dein {0} zersplittert, nachdem es durch deinen Tod ausgelöst wurde!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Gegenstand konnte aus irgendeinem Grund nicht zerstört werden!

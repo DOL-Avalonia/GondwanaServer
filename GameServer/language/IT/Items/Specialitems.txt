@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				Il calore del falò ti permette di recu
 
 Items.Specialitems.StorageBag.NoBag:				Non stai guardando una borsa!
 Items.Specialitems.StorageBag.BadItem:				Non puoi mettere questo oggetto in questa borsa!
+Items.Specialitems.StorageBag.BadTargetItem:		Questa borsa non può contenere l'oggetto che desideri scambiare.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		Il tuo {0} si frantuma dopo essersi attivato alla morte!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		Impossibile distruggere l'oggetto per qualche motivo!

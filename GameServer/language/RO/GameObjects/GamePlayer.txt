@@ -123,6 +123,7 @@ GameObjects.GamePlayer.Die.LoseExperience:         Pierzi experiență.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Ai murit. Tastează „/release” pentru a te întoarce la piatra sufletelor.
 GameObjects.GamePlayer.Die.YouKilled:              L-ai/ai ucis-o pe {0}.
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:	{0} al tău a pierdut condiție la moartea ta.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:			Pierzi {0} puncte de experiență la moarte.
 GameObjects.GamePlayer.Die.ArenaDefeated:			Ai fost învins! Vei fi înviat automat pe măsură ce meciul progresează.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Nu poți respira sub apă și înghiți apă!

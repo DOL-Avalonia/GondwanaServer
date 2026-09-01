@@ -123,6 +123,7 @@ GameObjects.GamePlayer.Die.LoseExperience:         Perdi esperienza.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Sei morto. Digita “/release” per tornare alla tua pietra d'anima.
 GameObjects.GamePlayer.Die.YouKilled:              Hai ucciso {0}.
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Il tuo {0} ha perso condizione in seguito alla tua morte.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:			Perdi {0} punti esperienza morendo.
 GameObjects.GamePlayer.Die.ArenaDefeated:			Sei stato sconfitto! Verrai resuscitato automaticamente col proseguire della partita.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Non puoi respirare sott'acqua e ingoi acqua!

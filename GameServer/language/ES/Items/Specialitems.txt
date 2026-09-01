@@ -42,6 +42,7 @@ Items.Specialitems.FirecampHeatRegen:				El calor de la hoguera te permite recup
 
 Items.Specialitems.StorageBag.NoBag:				¡No estás viendo una bolsa!
 Items.Specialitems.StorageBag.BadItem:				¡No puedes poner este objeto en esta bolsa!
+Items.Specialitems.StorageBag.BadTargetItem:		Esta bolsa no puede contener el objeto que deseas intercambiar.
 
 Items.Specialitems.DieTriggerSpell.Destroyed:		¡Tu {0} se hace añicos tras activarse al morir!
 Items.Specialitems.DieTriggerSpell.FailDestroy:		¡Fallo al destruir el objeto por alguna razón!

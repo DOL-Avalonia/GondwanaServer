@@ -22,6 +22,7 @@ GameUtils.GamePlayerInventory.CannotPutItemFromThisRealm:				You cannot put an i
 GameUtils.GamePlayerInventory.PotionVialFull:							This potion vial is already full!
 GameUtils.GamePlayerInventory.CombinePotions:							You combine the potions ({0}/{1}).
 GameUtils.GamePlayerInventory.RefillPotion:								You refill the potion ({0}/{1}).
+GameUtils.GamePlayerInventory.CannotMixBloodVials:						You cannot mix vials containing blood from different creatures!
 GameUtils.GamePlayerInventory.PatternRemovalInvalid:					The removal pattern cannot be used on this item.
 GameUtils.GamePlayerInventory.InventoryFull:							Your inventory is full.
 GameUtils.GamePlayerInventory.PatternCreated:							You have created {0}.

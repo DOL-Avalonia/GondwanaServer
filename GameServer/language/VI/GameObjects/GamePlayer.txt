@@ -123,6 +123,7 @@ GameObjects.GamePlayer.Die.LoseExperience:         Bạn mất kinh nghiệm.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Bạn đã chết. Gõ “/release” để trở về đá linh hồn.
 GameObjects.GamePlayer.Die.YouKilled:              Bạn đã giết {0}.
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:	{0} của bạn đã bị giảm độ bền sau khi bạn chết.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:			Bạn mất {0} điểm kinh nghiệm khi chết.
 GameObjects.GamePlayer.Die.ArenaDefeated:			Bạn đã bị đánh bại! Bạn sẽ tự động được hồi sinh khi trận đấu tiếp diễn.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Bạn không thể thở dưới nước và đang nuốt nước!

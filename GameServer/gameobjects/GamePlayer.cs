@@ -10151,14 +10151,18 @@ namespace DOL.GS
                 }
 
                 // first penalty is 5% of expforlevel, second penalty comes from release
-                int xpLossPercent;
-                if (Level < 40)
+                int xpLossPercent = 0;
+
+                if (Level >= Properties.PVE_EXP_LOSS_LEVEL)
                 {
-                    xpLossPercent = MaxLevel - Level;
-                }
-                else
-                {
-                    xpLossPercent = MaxLevel - 40;
+                    if (Level < 40)
+                    {
+                        xpLossPercent = MaxLevel - Level;
+                    }
+                    else
+                    {
+                        xpLossPercent = MaxLevel - 40;
+                    }
                 }
 
                 if (realmDeath) //Live PvP servers have 3 con loss on pvp death, can be turned off in server properties -Unty
@@ -10224,6 +10228,7 @@ namespace DOL.GS
                     long xpLoss = (ExperienceForNextLevel - ExperienceForCurrentLevel) * xpLossPercent / 1000;
                     GainExperience(eXPSource.Other, -xpLoss, 0, 0, 0, false, true, 1);
                     TempProperties.setProperty(DEATH_EXP_LOSS_PROPERTY, xpLoss);
+                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.ExpLostOnDeath"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 }
                 GameEventMgr.AddHandler(this, GamePlayerEvent.Revive, new DOLEventHandler(OnRevive));
             }
@@ -13589,7 +13594,7 @@ namespace DOL.GS
                 Quit(true);
                 SaveIntoDatabase();
                 //now ban him
-                if (ServerProperties.Properties.BAN_HACKERS)
+                if (Properties.BAN_HACKERS)
                 {
                     DBBannedAccount b = new DBBannedAccount();
                     b.Author = "SERVER";
@@ -15592,6 +15597,7 @@ namespace DOL.GS
             if (floorObject is WorldInventoryItem)
             {
                 WorldInventoryItem floorItem = floorObject as WorldInventoryItem;
+                string translatedName = LanguageMgr.TranslateItemName(Client.Account.Language, floorItem!.Item.Name);
 
                 lock (floorItem!)
                 {
@@ -15616,6 +15622,8 @@ namespace DOL.GS
                         GamePlayer theTreasurer = mybattlegroup.GetBGTreasurer();
                         if (theTreasurer.CanSeeObject(floorObject))
                         {
+                            string treasurerLang = theTreasurer.Client.Account.Language;
+                            string nameForTreasurer = LanguageMgr.TranslateItemName(treasurerLang, floorItem.Item.Name);
                             bool good = false;
                             if (floorItem.Item.IsStackable)
                                 good = theTreasurer.Inventory.AddTemplate(floorItem.Item, floorItem.Item.Count, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
@@ -15626,31 +15634,42 @@ namespace DOL.GS
                             {
                                 if (floorItem.Item.IsStackable) good = TryAddToStorageBagTemplate(floorItem.Item, floorItem.Item.Count);
                                 else good = TryAddToStorageBag(floorItem.Item) && floorItem.Item.Count == 0;
-
                                 if (good)
                                 {
-                                    theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", floorItem.Item.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                    theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(treasurerLang,
+                                        "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", nameForTreasurer),
+                                        eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                                 }
                                 else
                                 {
-                                    theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(treasurerLang,
+                                        "GameObjects.GamePlayer.PickupObject.BackpackFull"),
+                                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     return false;
                                 }
                             }
-                            theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouGet", floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                            theTreasurer.Out.SendMessage(LanguageMgr.GetTranslation(treasurerLang, "GameObjects.GamePlayer.PickupObject.YouGet", nameForTreasurer), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
                             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                             {
-                                if (!(this == player))
+                                if (this != player)
                                 {
-                                    player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp",
-                                        player.GetPersonalizedName(this), floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    string nameForReceiver = LanguageMgr.TranslateItemName(player.Client.Account.Language, floorItem.Item.Name);
+                                    player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp", player.GetPersonalizedName(this), nameForReceiver), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 }
                             }
                             InventoryLogging.LogInventoryAction("", "(ground)", this, eInventoryActionType.Loot, floorItem.Item, floorItem.Item.IsStackable ? floorItem.Item.Count : 1);
                         }
                         else
                         {
-                            mybattlegroup.SendMessageToBattleGroupMembers(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.NoOneWantsThis", floorObject.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            foreach (GamePlayer bgPlayer in mybattlegroup.GetPlayersInTheBattleGroup())
+                            {
+                                bgPlayer.Out.SendMessage(LanguageMgr.GetTranslation(bgPlayer.Client.Account.Language,
+                                    "GameObjects.GamePlayer.PickupObject.NoOneWantsThis",
+                                    LanguageMgr.TranslateItemName(bgPlayer.Client.Account.Language, floorObject.Name)),
+                                    eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
                         }
                     }
                     else if (group != null && group.AutosplitLoot)
@@ -15692,25 +15711,39 @@ namespace DOL.GS
                                 if (floorItem.Item.IsStackable) good = TryAddToStorageBagTemplate(floorItem.Item, floorItem.Item.Count);
                                 else good = TryAddToStorageBag(floorItem.Item) && floorItem.Item.Count == 0;
 
+                                string memberLang = eligibleMember.Client.Account.Language;
+                                string nameForMember = LanguageMgr.TranslateItemName(memberLang, floorItem.Item.Name);
                                 if (good)
                                 {
-                                    eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", floorItem.Item.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                    eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(memberLang,
+                                        "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", nameForMember),
+                                        eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                                 }
                                 else
                                 {
-                                    eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.BackpackFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    eligibleMember.Out.SendMessage(LanguageMgr.GetTranslation(memberLang,
+                                        "GameObjects.GamePlayer.PickupObject.BackpackFull"),
+                                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                     return false;
                                 }
                             }
                             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                             {
-                                if (!(this == player))
+                                if (this != player && (player.Group == null || player.Group != Group))
                                 {
-                                    player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp",
-                                        player.GetPersonalizedName(this), floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                    string nameForReceiver = LanguageMgr.TranslateItemName(player.Client.Account.Language, floorItem.Item.Name);
+                                    player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language,
+                                        "GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp",
+                                        player.GetPersonalizedName(this), nameForReceiver),
+                                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 }
                             }
-                            group.SendMessageToGroupMembers(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.Autosplit", floorItem.Item.GetName(1, true), eligibleMember.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+                            foreach (GamePlayer groupPlayer in Group.GetPlayersInTheGroup())
+                            {
+                                string nameForReceiver = LanguageMgr.TranslateItemName(groupPlayer.Client.Account.Language, floorItem.Item.Name);
+                                groupPlayer.Out.SendMessage(LanguageMgr.GetTranslation(groupPlayer.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.Autosplit", nameForReceiver, groupPlayer.GetPersonalizedName(eligibleMember)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            }
                             InventoryLogging.LogInventoryAction("", "(ground)", this, eInventoryActionType.Loot, floorItem.Item, floorItem.Item.IsStackable ? floorItem.Item.Count : 1);
                         }
                     }
@@ -15729,7 +15762,7 @@ namespace DOL.GS
 
                             if (good)
                             {
-                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", floorItem.Item.GetName(1, false)), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.ReceiveItem.ReceiveAllInBag", translatedName), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                             }
                             else
                             {
@@ -15737,13 +15770,13 @@ namespace DOL.GS
                                 return false;
                             }
                         }
-                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouGet", floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouGet", translatedName), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
                         {
-                            if (!(this == player))
+                            if (this != player)
                             {
-                                player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp",
-                                    player.GetPersonalizedName(this), floorItem.Item.GetName(1, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                string nameForReceiver = LanguageMgr.TranslateItemName(player.Client.Account.Language, floorItem.Item.Name);
+                                player.MessageFromArea(this, LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp", player.GetPersonalizedName(this), nameForReceiver), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                             }
                         }
                         InventoryLogging.LogInventoryAction("", "(ground)", this, eInventoryActionType.Loot, floorItem.Item, floorItem.Item.IsStackable ? floorItem.Item.Count : 1);

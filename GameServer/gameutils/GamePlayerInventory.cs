@@ -1068,6 +1068,24 @@ namespace DOL.GS
                 fromItem.SlotPosition > (int)eInventorySlot.LastBackpack)
                 return false;
 
+            // Blood Vials Backpack Combinations
+            if (fromItem.Id_nb != null && fromItem.Id_nb.StartsWith("vt_") &&
+                toItem.Id_nb != null && toItem.Id_nb.StartsWith("vt_"))
+            {
+                if (fromItem.PackageID == toItem.PackageID)
+                {
+                    if (LootGeneratorBloodVials.CombineVials(m_player, fromItem, toItem))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    m_player.Out.SendMessage(LanguageMgr.GetTranslation(m_player.Client.Account.Language, "GameUtils.GamePlayerInventory.CannotMixBloodVials"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return false;
+                }
+            }
+
             if (IsStackablePotion(fromItem) && IsStackablePotion(toItem))
             {
                 if (fromItem.Name.Equals(toItem.Name, StringComparison.OrdinalIgnoreCase))

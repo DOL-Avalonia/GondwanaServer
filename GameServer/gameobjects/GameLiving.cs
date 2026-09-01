@@ -981,8 +981,6 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual int GetWeaponStat(InventoryItem weapon)
         {
-            if (this is GameNPC && this.Level <= 1)
-                return GetModifiedStrengthForLowLevel();
             return GetModified(eProperty.Strength);
         }
 
@@ -1654,7 +1652,7 @@ namespace DOL.GS
                 if ((this is GamePlayer) && Realm == eRealm.Albion
                     && (GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.TwoHandedWeapon)
                         || GameServer.ServerRules.IsObjectTypesEqual((eObjectType)weapon.Object_Type, eObjectType.PolearmWeapon))
-                    && ServerProperties.Properties.ENABLE_ALBION_ADVANCED_WEAPON_SPEC)
+                    && Properties.ENABLE_ALBION_ADVANCED_WEAPON_SPEC)
                 {
                     // Albion dual spec penalty, which sets minimum damage to the base damage spec
                     if (weapon.Type_Damage == (int)eDamageType.Crush)
@@ -1708,6 +1706,17 @@ namespace DOL.GS
             stats.VarianceMax = specVariance.high;
             stats.BaseWeaponSkill = GetWeaponSkill(weapon);
             stats.SkillFactor = stats.BaseWeaponSkill * stats.SpecModifier;
+
+            if (this is GameNPC && Level <= 3)
+            {
+                double myEffectiveLevel = Level;
+                if (Level == 0) myEffectiveLevel = 2.3;
+                else if (Level == 1) myEffectiveLevel = 1.13;
+                else if (Level == 2) myEffectiveLevel = 0.41;
+                else if (Level == 3) myEffectiveLevel = 0.26;
+                stats.SkillFactor *= (myEffectiveLevel * 6.0);
+            }
+
             return stats;
         }
         
@@ -5217,13 +5226,6 @@ namespace DOL.GS
             }
             return 0;
         }
-
-        public int GetModifiedStrengthForLowLevel()
-        {
-            return (m_propertyCalc[(int)eProperty.Strength] as StatCalculator)!.CalcStrengthValueForMobLowLevel(this);
-        }
-
-
 
         //Eden : secondary resists, such AoM, vampiir magic resistance etc, should not apply in CC duration, disease, debuff etc, using a new function
         public virtual int GetModifiedBase(eProperty property)

@@ -124,6 +124,7 @@ GameObjects.GamePlayer.Die.LoseExperience:					You lose some experience!
 GameObjects.GamePlayer.Die.ReleaseToReturn:					You have died.  Type /release to return to your last bindpoint.	
 GameObjects.GamePlayer.Die.YouKilled:						You just killed {0}!
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:			Your {0} lost condition upon your death.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:					You lose {0} experience upon dying.
 GameObjects.GamePlayer.Die.ArenaDefeated:					You have been defeated! You will be automatically resurrected when the match progresses.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:	You cannot breathe underwater and take damage!

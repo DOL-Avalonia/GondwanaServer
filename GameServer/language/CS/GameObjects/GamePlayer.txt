@@ -123,6 +123,7 @@ GameObjects.GamePlayer.Die.LoseExperience:         Přicházíš o zkušenosti.
 GameObjects.GamePlayer.Die.ReleaseToReturn:        Jsi mrtvý/mrtvá. Napiš „/release“ pro návrat ke svému kameni duší.
 GameObjects.GamePlayer.Die.YouKilled:              Zabil/a jsi {0}.
 GameObjects.GamePlayer.Die.ConditionLostOnDeath:	Tvému předmětu {0} se po tvé smrti snížila kondice.
+GameObjects.GamePlayer.Die.ExpLostOnDeath:			Při úmrtí ztrácíte {0} zkušeností.
 GameObjects.GamePlayer.Die.ArenaDefeated:			Byl jsi poražen! Budeš automaticky oživen, jakmile zápas pokročí.
 
 GameObjects.GamePlayer.DrowningTimerCallback.CannotBreath:  Pod vodou nemůžeš dýchat a polykáš vodu!

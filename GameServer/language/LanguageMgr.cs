@@ -2139,6 +2139,24 @@ namespace DOL.Language
             return messageKey;
         }
 
+        /// <summary>
+        /// Translates a raw item name that may contain a [ROG] formula
+        /// </summary>
+        public static string TranslateItemName(string language, string rawName)
+        {
+            if (string.IsNullOrEmpty(rawName))
+                return rawName;
+            int rogIndex = rawName.IndexOf("[ROG]");
+            if (rogIndex == -1)
+                return GetItemNameMessage(language, rawName);
+            string rogPart = rawName.Substring(rogIndex);
+
+            if (rogPart.StartsWith("[ROG]BloodVial|") || rogPart.StartsWith("[ROG]PlayerVial|"))
+                return rawName.Substring(0, rogIndex) + GetItemNameMessage(language, rogPart);
+
+            return GetItemNameMessage(language, rawName);
+        }
+
         public static string GetItemDescMessage(string language, string messageKey, params object[] args)
         {
             if (string.IsNullOrEmpty(messageKey))

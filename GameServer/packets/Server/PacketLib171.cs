@@ -132,6 +132,8 @@ namespace DOL.GS.PacketHandler
                                 name = ((DBLanguageGameObject)translation).Name;
                         }
                     }
+
+                    name = LanguageMgr.TranslateItemName(m_gameClient?.Account?.Language ?? LanguageMgr.DefaultLanguage, name);
                 }
                 pak.WritePascalString(name);
 
