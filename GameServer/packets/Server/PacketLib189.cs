@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Linq;
 using log4net;
@@ -34,7 +16,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.88 clients
@@ -43,12 +25,11 @@ namespace DOL.GS.PacketHandler
         public PacketLib189(GameClient client)
             : base(client)
         {
-
         }
 
         public override void SendLivingEquipmentUpdate(GameLiving living)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.EquipmentUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.EquipmentUpdate)))
             {
 
                 ICollection<InventoryItem> items = null;
@@ -147,7 +128,7 @@ namespace DOL.GS.PacketHandler
         {
             //ChatUtil.SendDebugMessage(m_gameClient, string.Format("SendItemsPartialUpdate: windowType: {0}, {1}", windowType, items == null ? "nothing" : items[0].Name));
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
                 GameVault houseVault = m_gameClient.Player.ActiveInventoryObject as GameVault;
                 pak.WriteByte((byte)(items.Count));
@@ -177,7 +158,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="preAction"></param>
         protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
                 GameVault houseVault = m_gameClient.Player.ActiveInventoryObject as GameVault;
 
@@ -415,7 +396,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendHouse(House house)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseCreate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseCreate)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
                 pak.WriteShort((ushort)house.Position.Z);
@@ -453,7 +434,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendGarden(House house)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseChangeGarden)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseChangeGarden)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
                 pak.WriteShort(0); // sheduled for repossession (in hours) new in 1.89b+
@@ -478,7 +459,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendGarden(House house, int i)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseChangeGarden)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseChangeGarden)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
                 pak.WriteShort(0); // sheduled for repossession (in hours) new in 1.89b+
@@ -499,7 +480,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendHouseOccupied(House house, bool flagHouseOccuped)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseChangeGarden)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseChangeGarden)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
                 pak.WriteShort(0); // sheduled for repossession (in hours) new in 1.89b+
@@ -515,7 +496,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendEnterHouse(House house)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseEnter)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseEnter)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
                 pak.WriteShort((ushort)25000);         //constant!

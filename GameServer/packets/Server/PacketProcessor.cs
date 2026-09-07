@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 #define LOGACTIVESTACKS
 
 using System;
@@ -43,7 +25,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Sync Lock Object
@@ -80,9 +62,18 @@ namespace DOL.GS.PacketHandler
         /// </summary>
         protected PacketPreprocessing m_packetPreprocessor;
 
-        protected PacketProcessor()
+        private readonly DrainArray<OutPacket> _outQueue = new();
+
+        private struct OutPacket
         {
+            public byte Kind; // 1 = TCP packet, 2 = TCP raw buffer, 3 = UDP packet, 4 = UDP raw buffer
+            public GSTCPPacketOut Tcp;
+            public GSUDPPacketOut Udp;
+            public byte[] Buffer;
+            public bool UdpForced;
         }
+
+        protected PacketProcessor() { }
 
         /// <summary>
         /// Constructs a new PacketProcessor
@@ -266,7 +257,7 @@ namespace DOL.GS.PacketHandler
                 if (type.GetInterface("DOL.GS.PacketHandler.IPacketHandler") == null)
                     continue;
 
-                if (!type.Namespace.ToLower().EndsWith(version.ToLower()))
+                if (!type.Namespace!.ToLower().EndsWith(version.ToLower()))
                     continue;
 
                 var packethandlerattribs =
@@ -292,24 +283,18 @@ namespace DOL.GS.PacketHandler
             m_tcpSendBuffer = null;
             m_udpSendBuffer = null;
             m_client.Server.ReleasePacketBuffer(tcp);
+            _outQueue.DrainTo(static (p, _) => { }, (object)null);
         }
 
         #region TCP
 
         /// <summary>
-        /// Holds the TCP send buffer
+        /// True while the client is fully in game and the loop can drain us.
         /// </summary>
-        protected byte[] m_tcpSendBuffer;
-
-        /// <summary>
-        /// The client TCP packet send queue
-        /// </summary>
-        protected readonly Queue<byte[]> m_tcpQueue = new Queue<byte[]>(256);
-
-        /// <summary>
-        /// Indicates whether data is currently being sent to the client
-        /// </summary>
-        protected bool m_sendingTcp;
+        private bool UseQueue()
+        {
+            return GameLoop.IsRunning && m_client.ClientState is GameClient.eClientState.Playing;
+        }
 
         /// <summary>
         /// Sends a packet via TCP
@@ -317,16 +302,16 @@ namespace DOL.GS.PacketHandler
         /// <param name="packet">The packet to be sent</param>
         public void SendTCP(GSTCPPacketOut packet)
         {
-            //Fix the packet size
             packet.WritePacketLength();
-
             SavePacket(packet);
 
-            //Get the packet buffer
-            byte[] buf = packet.GetBuffer(); //packet.WritePacketLength sets the Capacity
+            if (!UseQueue())
+            {
+                SendTcpBuffer(packet.GetBuffer());
+                return;
+            }
 
-            //Send the buffer
-            SendTCP(buf);
+            _outQueue.Add(new OutPacket { Kind = 1, Tcp = packet });
         }
 
         /// <summary>
@@ -335,27 +320,87 @@ namespace DOL.GS.PacketHandler
         /// <param name="buf">Buffer containing the data to be sent</param>
         public void SendTCP(byte[] buf)
         {
-            if (m_tcpSendBuffer == null)
+            if (!UseQueue())
+            {
+                SendTcpBuffer(buf);
+                return;
+            }
+
+            _outQueue.Add(new OutPacket { Kind = 2, Buffer = buf });
+        }
+
+        public void SendTCPRaw(GSTCPPacketOut packet)
+        {
+            SendTCP((byte[])packet.GetBuffer().Clone());
+        }
+
+        public virtual void SendUDP(GSUDPPacketOut packet, bool isForced)
+        {
+            packet.WritePacketLength();
+            SavePacket(packet);
+
+            if (!UseQueue())
+            {
+                SendUdpBuffer(packet.GetBuffer(), isForced);
+                return;
+            }
+
+            _outQueue.Add(new OutPacket { Kind = 3, Udp = packet, UdpForced = isForced });
+        }
+
+        public void SendUDP(byte[] buf, bool isForced)
+        {
+            if (!UseQueue())
+            {
+                SendUdpBuffer(buf, isForced);
+                return;
+            }
+
+            _outQueue.Add(new OutPacket { Kind = 4, Buffer = buf, UdpForced = isForced });
+        }
+
+        public void SendUDPRaw(GSUDPPacketOut packet)
+        {
+            SendUDP((byte[])packet.GetBuffer().Clone(), false);
+        }
+
+        /// <summary>Called once per tick per client by ClientService (game loop worker).</summary>
+        public void SendPendingPackets()
+        {
+            if (!_outQueue.Any)
                 return;
 
-            //Check if client is connected
-            if (!m_client.Socket.Connected)
-                return;
+            _outQueue.DrainTo(static (pkt, proc) => proc.DispatchQueued(pkt), this);
+        }
+
+        private void DispatchQueued(OutPacket p)
+        {
+            switch (p.Kind)
+            {
+                case 1: SendTcpBuffer(p.Tcp.GetBuffer()); break;
+                case 2: SendTcpBuffer(p.Buffer); break;
+                case 3: SendUdpBuffer(p.Udp.GetBuffer(), p.UdpForced); break;
+                case 4: SendUdpBuffer(p.Buffer, p.UdpForced); break;
+            }
+        }
+
+        protected byte[] m_tcpSendBuffer;
+        protected readonly Queue<byte[]> m_tcpQueue = new Queue<byte[]>(256);
+        protected bool m_sendingTcp;
+
+        private void SendTcpBuffer(byte[] buf)
+        {
+            if (m_tcpSendBuffer == null) return;
+            if (!m_client.Socket.Connected) return;
 
             if (log.IsDebugEnabled)
-                log.Debug(Marshal.ToHexDump(
-                              string.Format("<=== <{2}> Packet 0x{0:X2} (0x{1:X2}) length: {3}", buf[2], buf[2] ^ 168,
-                                            (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length),
-                              buf));
+                log.Debug(Marshal.ToHexDump(string.Format("<=== <{2}> Packet 0x{0:X2} (0x{1:X2}) length: {3}", buf[2], buf[2] ^ 168, (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length), buf));
 
             if (buf.Length > 2048)
             {
                 if (log.IsErrorEnabled)
                 {
-                    string desc =
-                        String.Format(
-                            "Sending packets longer than 2048 cause client to crash, check Log for stacktrace. Packet code: 0x{0:X2}, account: {1}, packet size: {2}.",
-                            buf[2], (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length);
+                    string desc = String.Format("Sending packets longer than 2048 cause client to crash, check Log for stacktrace. Packet code: 0x{0:X2}, account: {1}, packet size: {2}.", buf[2], (m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint, buf.Length);
                     log.Error(Marshal.ToHexDump(desc, buf) + "\n" + Environment.StackTrace);
 
                     if (Properties.IGNORE_TOO_LONG_OUTCOMING_PACKET)
@@ -364,11 +409,9 @@ namespace DOL.GS.PacketHandler
                         m_client.Out.SendMessage("ALERT: Error sending an update to your client. Oversize packet detected and discarded. Please /report this issue!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
                     }
                     else
-                    {
                         GameServer.Instance.Disconnect(m_client);
-                    }
-                    return;
                 }
+                return;
             }
 
             m_encoding.EncryptPacket(buf, 0, false);
@@ -386,27 +429,20 @@ namespace DOL.GS.PacketHandler
                         m_tcpQueue.Enqueue(buf);
                         return;
                     }
-
                     m_sendingTcp = true;
                 }
 
                 Buffer.BlockCopy(buf, 0, m_tcpSendBuffer, 0, packetLength);
-
                 var start = GameTimer.GetTickCount();
-
                 m_client.Socket.BeginSend(m_tcpSendBuffer, 0, packetLength, SocketFlags.None, m_asyncTcpCallback, m_client);
-
                 var took = GameTimer.GetTickCount() - start;
                 if (took > 100 && log.IsWarnEnabled)
                     log.WarnFormat("SendTCP.BeginSend took {0}ms! (TCP to client: {1})", took, m_client);
             }
             catch (Exception e)
             {
-                // assure that no exception is thrown into the upper layers and interrupt game loops!
                 if (log.IsWarnEnabled)
-                    log.Warn("It seems <" + ((m_client.Account != null) ? m_client.Account.Name : "???") +
-                             "> went linkdead. Closing connection. (SendTCP, " + e.GetType() + ": " + e.Message + ")");
-                //DOLConsole.WriteWarning(e.ToString());
+                    log.Warn("It seems <" + ((m_client.Account != null) ? m_client.Account.Name : "???") + "> went linkdead. Closing connection. (SendTCP, " + e.GetType() + ": " + e.Message + ")");
                 GameServer.Instance.Disconnect(m_client);
             }
         }
@@ -524,9 +560,10 @@ namespace DOL.GS.PacketHandler
 
             if (packetLength > buffer.Length)
                 return (pak, packetLength);
-            Buffer.BlockCopy(pak, 0, buffer, 0, packetLength);
 
+            Buffer.BlockCopy(pak, 0, buffer, 0, packetLength);
             int i = packetLength;
+
             while (packetQueue.Count > 0 && i + headerSize < buffer.Length)
             {
                 pak = packetQueue.Peek();
@@ -540,15 +577,6 @@ namespace DOL.GS.PacketHandler
                 packetQueue.Dequeue();
             }
             return (buffer, i);
-        }
-
-        /// <summary>
-        /// Send the packet via TCP without changing any portion of the packet
-        /// </summary>
-        /// <param name="packet">Packet to send</param>
-        public void SendTCPRaw(GSTCPPacketOut packet)
-        {
-            SendTCP((byte[])packet.GetBuffer().Clone());
         }
 
         #endregion
@@ -585,58 +613,30 @@ namespace DOL.GS.PacketHandler
         /// </summary>
         /// <param name="packet">Packet to be sent</param>
         /// <param name="isForced">Force UDP packet if <code>true</code>, else packet can be sent over TCP</param>
-        public virtual void SendUDP(GSUDPPacketOut packet, bool isForced)
+        private void SendUdpBuffer(byte[] buf, bool isForced)
         {
-            //Fix the packet size
-            packet.WritePacketLength();
+            var packetSize = (buf[0] << 8 | buf[1]) + 5;
 
-            SavePacket(packet);
-
-            SendUDP(packet.GetBuffer(), isForced);
-        }
-
-        /// <summary>
-        /// Send the packet via UDP
-        /// </summary>
-        /// <param name="buf">Packet to be sent</param>
-        /// <param name="isForced">Force UDP packet if <code>true</code>, else packet can be sent over TCP</param>
-        public void SendUDP(byte[] buf, bool isForced)
-        {
-            // log.WarnFormat("Send UDP: {0}, confirm:{1}, endpoint: {2}", isForced, m_client.UdpConfirm, m_client.UdpEndPoint);
-
-            //No udp available, send via TCP instead!
-            //bool flagLostUDP = false;
-            var packetSize = (buf[0] << 8 | buf[1]) + 5; // udp packet size
             if (m_client.UdpEndPoint == null || !(isForced || m_client.UdpConfirm))
             {
-                // log.WarnFormat("UDP sent over TCP");
                 var newbuf = new byte[packetSize - 2];
                 newbuf[0] = buf[0];
                 newbuf[1] = buf[1];
-
                 Buffer.BlockCopy(buf, 4, newbuf, 2, packetSize - 4);
-                SendTCP(newbuf);
+                SendTcpBuffer(newbuf);
                 return;
             }
 
             if (m_client.ClientState == GameClient.eClientState.Playing)
             {
-                if ((DateTime.Now.Ticks - m_client.UdpPingTime) > 60 * 1000 * 10_000L) // 1min
-                {
-                    //flagLostUDP = true;
+                if ((DateTime.Now.Ticks - m_client.UdpPingTime) > 60 * 1000 * 10_000L)
                     m_client.UdpConfirm = false;
-                }
             }
 
-            //increase our UDP counter when it reaches 0xFFFF
-            //and increases, it will automaticallys switch back to 0x00
             m_udpCounter++;
-
-            //fill the udpCounter
             buf[2] = (byte)(m_udpCounter >> 8);
             buf[3] = (byte)m_udpCounter;
             m_encoding.EncryptPacket(buf, 0, true);
-
             Statistics.BytesOut += packetSize;
             Statistics.PacketsOut++;
 
@@ -647,7 +647,6 @@ namespace DOL.GS.PacketHandler
                     m_udpQueue.Enqueue(buf);
                     return;
                 }
-
                 m_sendingUdp = true;
             }
 
@@ -658,11 +657,9 @@ namespace DOL.GS.PacketHandler
             catch (Exception e)
             {
                 int count = m_udpQueue.Count;
-
                 lock (m_udpQueue)
                 {
                     m_udpQueue.Clear();
-
                     m_sendingUdp = false;
                 }
                 if (log.IsErrorEnabled)
@@ -716,15 +713,6 @@ namespace DOL.GS.PacketHandler
                 if (log.IsErrorEnabled)
                     log.Error("AsyncUdpSendCallback (" + count + ")", e);
             }
-        }
-
-        /// <summary>
-        /// Send the UDP packet without changing any portion of the packet
-        /// </summary>
-        /// <param name="packet">Packet to be sent</param>
-        public void SendUDPRaw(GSUDPPacketOut packet)
-        {
-            SendUDP((byte[])packet.GetBuffer().Clone(), false);
         }
 
         #endregion
@@ -845,21 +833,12 @@ namespace DOL.GS.PacketHandler
             return (ushort)(val2 - ((val1 + val2) << 8));
         }
 
-        public void HandlePacketTimeout(object sender, ElapsedEventArgs e)
-        {
-            string source = ((m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint);
-            if (log.IsErrorEnabled)
-                log.Error("Thread " + m_handlerThreadID + " - Handler " + m_activePacketHandler.GetType() +
-                          " takes too much time (>10000ms) <" + source + "> " + "!");
-        }
-
 #if LOGACTIVESTACKS
         /// <summary>
         /// Holds a list of all currently active handler threads!
         /// This list is updated in the HandlePacket method
         /// </summary>
         public static Hashtable m_activePacketThreads = Hashtable.Synchronized(new Hashtable());
-#endif
 
         /// <summary>
         /// Retrieves a textual description of all active packet handler thread stacks
@@ -867,7 +846,6 @@ namespace DOL.GS.PacketHandler
         /// <returns>A string with the stacks</returns>
         public static string GetConnectionThreadpoolStacks()
         {
-#if LOGACTIVESTACKS
             var builder = new StringBuilder();
             //When enumerating over a synchronized hashtable, we need to
             //lock it's syncroot! Only for reading, not for writing locking
@@ -910,11 +888,8 @@ namespace DOL.GS.PacketHandler
                 }
             }
             return builder.ToString();
-#else
-			return "LOGACTIVESTACKS is not defined in PacketProcessor";
-#endif
         }
-
+#endif
 
         public void HandlePacket(GSPacketIn packet)
         {
@@ -955,30 +930,8 @@ namespace DOL.GS.PacketHandler
 
             if (packetHandler != null)
             {
-                Timer monitorTimer = null;
-                if (log.IsDebugEnabled)
-                {
-                    try
-                    {
-                        monitorTimer = new Timer(10000);
-                        m_activePacketHandler = packetHandler;
-                        m_handlerThreadID = Thread.CurrentThread.ManagedThreadId;
-                        monitorTimer.Elapsed += HandlePacketTimeout;
-                        monitorTimer.Start();
-                    }
-                    catch (Exception e)
-                    {
-                        if (log.IsErrorEnabled)
-                            log.Error("Starting packet monitor timer", e);
-
-                        if (monitorTimer != null)
-                        {
-                            monitorTimer.Stop();
-                            monitorTimer.Close();
-                            monitorTimer = null;
-                        }
-                    }
-                }
+                m_activePacketHandler = packetHandler;
+                m_handlerThreadID = Thread.CurrentThread.ManagedThreadId;
 
 #if LOGACTIVESTACKS
                 //Put the current thread into the active thread list!
@@ -987,17 +940,14 @@ namespace DOL.GS.PacketHandler
                 m_activePacketThreads.Add(Thread.CurrentThread, m_client);
 #endif
                 var start = GameTimer.GetTickCount();
-                try
-                {
-                    packetHandler.HandlePacket(m_client, packet);
-                }
+
+                try { packetHandler.HandlePacket(m_client, packet); }
                 catch (Exception e)
                 {
                     if (log.IsErrorEnabled)
                     {
                         string client = (m_client == null ? "null" : m_client.ToString());
-                        log.Error(
-                            "Error while processing packet (handler=" + packetHandler.GetType().FullName + "  client: " + client + ")", e);
+                        log.Error("Error while processing packet (handler=" + packetHandler.GetType().FullName + "  client: " + client + ")", e);
                     }
                 }
 #if LOGACTIVESTACKS
@@ -1010,18 +960,13 @@ namespace DOL.GS.PacketHandler
                 }
 #endif
                 var timeUsed = GameTimer.GetTickCount() - start;
-                if (monitorTimer != null)
-                {
-                    monitorTimer.Stop();
-                    monitorTimer.Close();
-                }
                 m_activePacketHandler = null;
+
                 if (timeUsed > 1000)
                 {
                     string source = ((m_client.Account != null) ? m_client.Account.Name : m_client.TcpEndpoint);
                     if (log.IsWarnEnabled)
-                        log.Warn("(" + source + ") Handle packet Thread " + Thread.CurrentThread.ManagedThreadId + " " + packetHandler +
-                                 " took " + timeUsed + "ms!");
+                        log.Warn("(" + source + ") Handle packet Thread " + Thread.CurrentThread.ManagedThreadId + " " + packetHandler + " took " + timeUsed + "ms!");
                 }
             }
         }

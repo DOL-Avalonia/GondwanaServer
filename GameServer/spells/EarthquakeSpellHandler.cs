@@ -28,16 +28,18 @@ namespace DOL.GS.Spells
 
         private void SendPacketTo(GamePlayer player, float newIntensity)
         {
-            GSTCPPacketOut pak = new GSTCPPacketOut(0x47);
-            pak.WriteIntLowEndian(unk1);
-            pak.WriteIntLowEndian((uint)Position.X);
-            pak.WriteIntLowEndian((uint)Position.Y);
-            pak.WriteIntLowEndian((uint)Position.Z);
-            pak.Write(BitConverter.GetBytes(radius), 0, sizeof(float));
-            pak.Write(BitConverter.GetBytes(newIntensity), 0, sizeof(float));
-            pak.Write(BitConverter.GetBytes(duration), 0, sizeof(float));
-            pak.Write(BitConverter.GetBytes(delay), 0, sizeof(float));
-            player.Out.SendTCP(pak);
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(0x47))
+            {
+                pak.WriteIntLowEndian(unk1);
+                pak.WriteIntLowEndian((uint)Position.X);
+                pak.WriteIntLowEndian((uint)Position.Y);
+                pak.WriteIntLowEndian((uint)Position.Z);
+                pak.Write(BitConverter.GetBytes(radius), 0, sizeof(float));
+                pak.Write(BitConverter.GetBytes(newIntensity), 0, sizeof(float));
+                pak.Write(BitConverter.GetBytes(duration), 0, sizeof(float));
+                pak.Write(BitConverter.GetBytes(delay), 0, sizeof(float));
+                player.Out.SendTCP(pak);
+            }
         }
 
         private void SendPacketToAll()

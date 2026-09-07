@@ -69,7 +69,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static DateTime m_lastAccountCreateTime;
         private static readonly Dictionary<string, LockCount> m_locks = new Dictionary<string, LockCount>();
@@ -293,7 +293,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     {
                         playerAccount = GameServer.Database.FindObjectByKey<Account>(userName);
 
-                        client.PingTime = DateTime.Now.Ticks;
+                        client.PingTime = GameLoop.GameLoopTime;
 
                         if (playerAccount == null)
                         {

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Timers;
 using AmteScripts.Managers;
 using Discord;
 using DOL.AI.Brain;
@@ -40,7 +39,7 @@ namespace DOL.GS.Scripts
         public bool InFinalSafeAreaJourney { get; set; }
         public string ungroupText;
 
-        public Timer ResetTimer { get; set; }
+        public ECSGameTimer ResetTimer { get; private set; }
 
         private GamePlayer? m_playerFollow;
         
@@ -239,12 +238,7 @@ namespace DOL.GS.Scripts
                 LinkedGroupMob = data.LinkedGroupMob;
                 AreaToEnter = data.AreaToEnter;
                 TimerBeforeReset = data.TimerBeforeReset;
-                ResetTimer = new Timer();
-                if (TimerBeforeReset == 0)
-                    ResetTimer.Interval = 1;
-                else
-                    ResetTimer.Interval = TimerBeforeReset * 1000;
-                ResetTimer.Elapsed += ResetTimer_Elapsed;
+                ResetTimer = new ECSGameTimer(this, OnResetTimerTick);
             }
             else
             {
@@ -276,9 +270,15 @@ namespace DOL.GS.Scripts
             base.DeleteFromDatabase();
         }
 
-        private void ResetTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private int OnResetTimerTick(ECSGameTimer timer)
         {
             ResetFollow();
+            return 0;
+        }
+
+        public void StartResetTimer()
+        {
+            ResetTimer?.Start(TimerBeforeReset <= 0 ? 1 : TimerBeforeReset * 1000);
         }
 
         public void ResetFollow()

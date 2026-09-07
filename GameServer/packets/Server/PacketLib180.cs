@@ -1,31 +1,10 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
+using DOL.GS.Styles;
+using log4net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-
-using DOL.GS.RealmAbilities;
-using DOL.GS.Styles;
-using DOL.GS.Effects;
-
-using log4net;
 
 namespace DOL.GS.PacketHandler
 {
@@ -50,7 +29,7 @@ namespace DOL.GS.PacketHandler
             if (player == null || player.ObjectState != GameObject.eObjectState.Active)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ControlledHorse)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.ControlledHorse)))
             {
 
                 if (player.HasHorse)
@@ -86,7 +65,7 @@ namespace DOL.GS.PacketHandler
         {
             if (player == null || player.ObjectState != GameObject.eObjectState.Active)
                 return;
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ControlledHorse)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.ControlledHorse)))
             {
                 if (!flag || !player.HasHorse)
                 {
@@ -151,7 +130,7 @@ namespace DOL.GS.PacketHandler
             if (playerToCreate.IsVisibleTo(m_gameClient.Player) == false)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.PlayerCreate172)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.PlayerCreate172)))
             {
 
                 pak.WriteShort((ushort)playerToCreate.Client.SessionID);
@@ -234,7 +213,7 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte((byte)(first == 0 ? 99 : 0x03)); //subtype
                 pak.WriteByte((byte)first);
                 SendTCP(pak);
-                pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate));
+                pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate));
                 pak.WriteByte(0x01); //subcode
                 pak.WriteByte((byte)maxSkills); //number of entry
                 pak.WriteByte(0x03); //subtype
@@ -251,7 +230,7 @@ namespace DOL.GS.PacketHandler
                 return;
 
             // Get Skills as "Usable Skills" which are in network order ! (with forced update)
-            List<Tuple<Skill, Skill>> usableSkills = m_gameClient.Player.GetAllUsableSkills(true);
+            List<Tuple<Skill, Skill>> usableSkills = m_gameClient.Player.GetAllUsableSkills(true).ToList();
             usableSkills.RemoveAll(kv => kv.Item1.Hidden);
 
             bool sent = false; // set to true once we can't send packet anymore !
@@ -262,7 +241,7 @@ namespace DOL.GS.PacketHandler
             {
                 int packetEntry = 0; // needed to tell client how much skill we send
                                      // using pak
-                using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate)))
+                using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate)))
                 {
                     // Write header
                     pak.WriteByte(0x01); //subcode for skill

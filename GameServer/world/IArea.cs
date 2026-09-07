@@ -31,7 +31,7 @@ namespace DOL.GS
     /// - Area.Cricle
     /// - Area.Square
     /// </summary>
-    public interface IArea : ITranslatableObject
+    public interface IArea : ITranslatableObject, IPooledList<IArea>
     {
         /// <summary>
         /// Returns the ID of this zone

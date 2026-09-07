@@ -1,21 +1,3 @@
-/*
-* DAWN OF LIGHT - The first free open source DAoC server emulator
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*
-*/
 using System;
 using log4net;
 using DOL.GS.Quests;
@@ -57,7 +39,7 @@ namespace DOL.GS.PacketHandler
 
         protected override async Task SendQuestWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest, bool offer)
         {
-            await using GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Dialog));
+            await using GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
             pak.WriteShort((offer) ? (byte)0x22 : (byte)0x21); // Dialog
             pak.WriteShort(quest.Quest.Id);
             pak.WriteShort((ushort)questNPC.ObjectID);
@@ -171,18 +153,18 @@ namespace DOL.GS.PacketHandler
                     value1 = 0;
                     value2 = 0;
                     /*
-					must contain the quality of gem for spell craft and think same for tincture
-					*/
+                    must contain the quality of gem for spell craft and think same for tincture
+                    */
                     break;
                 case (int)eObjectType.GardenObject:
                     value1 = 0;
                     value2 = template.SPD_ABS;
                     /*
-					Value2 byte sets the width, only lower 4 bits 'seem' to be used (so 1-15 only)
+                    Value2 byte sets the width, only lower 4 bits 'seem' to be used (so 1-15 only)
 
-					The byte used for "Hand" (IE: Mini-delve showing a weapon as Left-Hand
-					usabe/TwoHanded), the lower 4 bits store the height (1-15 only)
-					*/
+                    The byte used for "Hand" (IE: Mini-delve showing a weapon as Left-Hand
+                    usabe/TwoHanded), the lower 4 bits store the height (1-15 only)
+                    */
                     break;
 
                 default:
@@ -228,16 +210,16 @@ namespace DOL.GS.PacketHandler
             int questIndex = 1;
             foreach (var quest in m_gameClient.Player.QuestList)
                 await SendQuestPacket(quest, questIndex++);
-            
+
             while (questIndex <= 25)
                 await SendQuestPacket(null, questIndex++);
         }
 
         protected override async Task SendQuestPacket(IQuestPlayerData data, int index)
         {
-            await using GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry));
+            await using GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry));
             string name = $"{data.Quest.Name} (Level {data.Quest.MinLevel})";
-                
+
             GamePlayer receiver = m_gameClient.Player;
             string desc = data.Quest.Description ?? string.Empty;
 

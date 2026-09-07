@@ -64,9 +64,10 @@ namespace DOL.GS
     /// This class is the baseclass for all Non Player Characters like
     /// Monsters, Merchants, Guards, Steeds ...
     /// </summary>
-    public partial class GameNPC : GameLiving, ITranslatableObject
+    public partial class GameNPC : GameLiving, ITranslatableObject, IPooledList<GameNPC>
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        public override Zone.eGameObjectType GameObjectType => Zone.eGameObjectType.NPC;
 
         /// <summary>
         /// Constant for determining if already at a point
@@ -6882,7 +6883,9 @@ namespace DOL.GS
         /// <summary>
         /// Cooldown for triggers, triggers cannot run while this is not finished
         /// </summary>
-        private System.Timers.Timer TriggerCooldownTimer = new();
+        private long _triggerCooldownUntil;
+        private long _triggerPlayerLostDeadline;
+        private ECSGameTimer _triggerPlayerLostTimer;
         GamePlayer TriggerPlayer;
 
         string BeforeTriggerPathID = "";
@@ -6952,10 +6955,8 @@ namespace DOL.GS
                 return;
             }
 
-            if (TriggerCooldownTimer is { Enabled: true })
-            {
+            if (_triggerCooldownUntil > GameLoop.GameLoopTime)
                 return;
-            }
 
             if (trigger == eAmbientTrigger.interact && living == null)
             {
@@ -6989,11 +6990,7 @@ namespace DOL.GS
             }
 
             if (chosen.TimerBetweenTriggers > 0)
-            {
-                TriggerCooldownTimer.Interval = chosen.TimerBetweenTriggers;
-                TriggerCooldownTimer.AutoReset = false;
-                TriggerCooldownTimer.Start();
-            }
+                _triggerCooldownUntil = GameLoop.GameLoopTime + chosen.TimerBetweenTriggers;
 
             if (useTimer && trigger == eAmbientTrigger.interact && chosen.InteractTimerDelay > 0)
             {
@@ -7015,7 +7012,8 @@ namespace DOL.GS
                     FireAmbientSentence(trigger, living, chosen, false);
                 };
                 TriggerPlayer = living as GamePlayer;
-                TriggerPlayerLostTimer.Start();
+                _triggerPlayerLostTimer?.Stop();
+                _triggerPlayerLostTimer = new ECSGameTimer(this, TriggerPlayerLostTick, 20000);
                 return;
             }
 
@@ -7039,7 +7037,8 @@ namespace DOL.GS
                 PathID = pathPoint.PathID;
                 MoveOnPath(MaxSpeed);
                 TriggerPlayer = living as GamePlayer;
-                TriggerPlayerLostTimer.Start();
+                _triggerPlayerLostTimer?.Stop();
+                _triggerPlayerLostTimer = new ECSGameTimer(this, TriggerPlayerLostTick, 20000);
             }
 
             //Yell
@@ -7272,6 +7271,21 @@ namespace DOL.GS
             {
                 Say(text);
             }
+        }
+
+        private int TriggerPlayerLostTick(ECSGameTimer t)
+        {
+            if (TriggerPlayer == null) return 0;
+            if (TriggerPlayer.IsWithinRadius(this, 1500)) return 20000;
+            foreach (var ambient in ambientTexts)
+                ambient.InteractTriggerTimer?.Stop();
+            RemoveFromWorld();
+            LoadFromDatabase(GameServer.Database.FindObjectByKey<Mob>(InternalID));
+            AddToWorld();
+            CurrentWayPoint = null;
+            PathID = BeforeTriggerPathID;
+            TriggerPlayer = null;
+            return 0;
         }
         #endregion
 

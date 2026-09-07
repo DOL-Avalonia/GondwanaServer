@@ -31,45 +31,36 @@ namespace DOL.GS
         /// <summary>
         /// Mob X Ambient Behaviour Cache indexed by Mob Name
         /// </summary>
-        private List<MobXAmbientBehaviour> ambientBehaviour;
+        private Dictionary<string, MobXAmbientBehaviour[]> _byName;
 
         /// <summary>
         /// Retrieve MobXambiemtBehaviour Objects from Mob Name
         /// </summary>
         public MobXAmbientBehaviour[] this[string index]
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(index))
-                {
-                    return Array.Empty<MobXAmbientBehaviour>();
-                }
-
-                return ambientBehaviour
-                    .Where(x => x.Source.Equals(index, StringComparison.InvariantCultureIgnoreCase))
-                    .ToArray();
-            }
-        }
+            => !string.IsNullOrEmpty(index) && _byName.TryGetValue(index.ToLowerInvariant(), out var val)
+                ? val
+                : Array.Empty<MobXAmbientBehaviour>();
 
         /// <summary>
         /// Call it after delete or add a trigger
         /// </summary>
-        public void Reload(IObjectDatabase database)
+        public void Reload(IObjectDatabase db)
         {
-            if (database == null)
-            {
-                throw new ArgumentNullException(nameof(database));
-            }
+            if (db == null)
+                throw new ArgumentNullException(nameof(db));
 
-            ambientBehaviour = database.SelectAllObjects<MobXAmbientBehaviour>().ToList();
+            var next = db.SelectAllObjects<MobXAmbientBehaviour>()
+                .GroupBy(x => x.Source)
+                .ToDictionary(g => g.Key.ToLowerInvariant(), g => g.ToArray());
+            _byName = next;
         }
 
         /// <summary>
         /// Create a new Instance of <see cref="MobAmbientBehaviourManager"/>
         /// </summary>
-        public MobAmbientBehaviourManager(IObjectDatabase database)
+        public MobAmbientBehaviourManager(IObjectDatabase db)
         {
-            Reload(database);
+            Reload(db);
         }
     }
 }

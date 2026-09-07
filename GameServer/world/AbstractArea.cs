@@ -536,34 +536,7 @@ namespace DOL.GS
                 }
                 stormPoint.AddToWorld();
 
-                new RegionTimer(stormPoint, (t) =>
-                {
-                    if (stormPoint.ObjectState != GameObject.eObjectState.Active) return 0;
-
-                    Spell spell = SkillBase.GetSpellByID(activeSpellID);
-                    ushort effectID = (ushort)(spell != null ? spell.ClientEffect : activeSpellID);
-
-                    foreach (GamePlayer player in Region.GetPlayersInRadius(randomPoint, (ushort)WorldMgr.VISIBILITY_DISTANCE, false, false))
-                    {
-                        player.Out.SendSpellEffectAnimation(stormPoint, stormPoint, effectID, 0, false, 1);
-                    }
-
-                    if (spell != null)
-                    {
-                        SpellLine line = SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells);
-                        ISpellHandler handler = ScriptMgr.CreateSpellHandler(stormPoint, spell, line);
-                        if (handler != null)
-                        {
-                            handler.StartSpell(stormPoint);
-                        }
-                    }
-                    return 0;
-                }).Start(250);
-
-                new RegionTimer(stormPoint, t => {
-                    if (stormPoint.ObjectState == GameObject.eObjectState.Active) stormPoint.Delete();
-                    return 0;
-                }).Start(3000);
+                new StormLifecycleTimer(stormPoint, activeSpellID).Start(250);
             }
 
             int baseFreq = DbArea.EffectFrequency;
@@ -615,5 +588,44 @@ namespace DOL.GS
         #endregion
 
         public abstract void LoadFromDatabase(DBArea area);
+
+        private sealed class StormLifecycleTimer : ECSGameTimerWrapperBase
+        {
+            private readonly GameNPC _storm;
+            private readonly int _spellId;
+            private byte _phase;
+
+            public StormLifecycleTimer(GameNPC storm, int spellId) : base(storm)
+            {
+                _storm = storm;
+                _spellId = spellId;
+            }
+
+            protected override int OnTick(ECSGameTimer timer)
+            {
+                if (_storm.ObjectState != GameObject.eObjectState.Active)
+                    return 0;
+
+                if (_phase == 0)
+                {
+                    _phase = 1;
+                    Spell spell = SkillBase.GetSpellByID(_spellId);
+                    ushort effID = (ushort)(spell != null ? spell.ClientEffect : _spellId);
+                    foreach (GamePlayer player in _storm.CurrentRegion.GetPlayersInRadius(
+                        _storm.Coordinate, (ushort)WorldMgr.VISIBILITY_DISTANCE, false, false))
+                        player.Out.SendSpellEffectAnimation(_storm, _storm, effID, 0, false, 1);
+                    if (spell != null)
+                    {
+                        ISpellHandler h = ScriptMgr.CreateSpellHandler(_storm, spell,
+                            SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
+                        h?.StartSpell(_storm);
+                    }
+                    return 2750;
+                }
+
+                _storm.Delete();
+                return 0;
+            }
+        }
     }
 }

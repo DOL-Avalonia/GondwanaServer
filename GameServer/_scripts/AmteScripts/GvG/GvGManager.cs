@@ -27,21 +27,22 @@ namespace DOL.GS.Scripts
             }
         }
 
-        // Timer to check the schedule
-        private static System.Timers.Timer _gvgTimer;
+        private static ECSGameTimer _gvgTimer;
 
         // Debug mode internal trackers
         private static DateTime _debugPhaseStartTime;
         private static bool _debugNextPhaseOpen = false;
 
         [ScriptLoadedEvent]
-        public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
+        public static void OnScriptCompiled(DOLEvent e, object s, EventArgs a)
         {
-            DateTime parisTime = GetParisTime();
-            _isOpen = (parisTime.Hour >= 10);
-            _gvgTimer = new System.Timers.Timer(20000);
-            _gvgTimer.Elapsed += (s, ev) => EvaluateSchedule();
-            _gvgTimer.Start();
+            _isOpen = GetParisTime().Hour >= 10;
+        }
+
+        [GameServerStartedEvent]
+        public static void OnServerStarted(DOLEvent e, object s, EventArgs a)
+        {
+            _gvgTimer = new ECSGameTimer(null, static t => { EvaluateSchedule(); return 20_000; }, 20_000);
         }
 
         public static void ToggleDebugMode()

@@ -316,8 +316,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 house.KeptMoney += moneyToAdd;
 
                                 // save the house and the player
-                                house.SaveIntoDatabase();
-                                player.SaveIntoDatabase();
+                                System.Threading.Tasks.Task.Run(() => { house.SaveIntoDatabase(); player.SaveIntoDatabase(); });
 
                                 // notify the player of what we took and how long they are prepaid for
                                 string depositMoneyMsg = LanguageMgr.GetTranslation(player.Client.Account.Language, "DialogResponseHandler.DepositInLockbox", Money.GetString(moneyToAdd, player.Client.Account.Language));

@@ -72,12 +72,17 @@ namespace DOL.UnitTests.Gameserver
 
         public FakeTimeManager() : base("FakeTimer") { }
 
-        public override long CurrentTime => fakeTime;
-        public override bool Start() => true;
-        protected override void InsertTimer(GameTimer t, int offsetTick) { }
-        protected override void RemoveTimer(GameTimer t) { }
+        public new long CurrentTime
+        {
+            get => fakeTime;
+            set => fakeTime = value;
+        }
 
-        protected override void Init() { }
+        public new bool Start() => true;
+        //protected override void InsertTimer(GameTimer t, int offsetTick) { }
+        //protected override void RemoveTimer(GameTimer t) { }
+
+        //protected override void Init() { }
     }
 
     public class FakeServer : GameServer

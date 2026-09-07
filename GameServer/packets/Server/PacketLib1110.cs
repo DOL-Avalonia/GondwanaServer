@@ -1,33 +1,8 @@
-/*
-* DAWN OF LIGHT - The first free open source DAoC server emulator
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*
-*/
 using System.IO;
 using System.Reflection;
-using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
 using DOL.GS.Effects;
-using DOL.GS.RealmAbilities;
-using DOL.GS.Styles;
 using log4net;
-using System.Numerics;
-using DOL.GS.Spells;
-using DOL.GS.Delve;
 using DOL.GS.Geometry;
 
 namespace DOL.GS.PacketHandler
@@ -35,7 +10,7 @@ namespace DOL.GS.PacketHandler
     [PacketLib(1110, GameClient.eClientVersion.Version1110)]
     public class PacketLib1110 : PacketLib1109
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public PacketLib1110(GameClient client)
             : base(client)
@@ -43,12 +18,12 @@ namespace DOL.GS.PacketHandler
         }
 
         /// <summary>
-		/// New system in v1.110+ for delve info. delve is cached by client in extra file, stored locally.
-		/// </summary>
-		/// <param name="info"></param>
-		public override void SendDelveInfo(string info)
+        /// New system in v1.110+ for delve info. delve is cached by client in extra file, stored locally.
+        /// </summary>
+        /// <param name="info"></param>
+        public override void SendDelveInfo(string info)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.DelveInfo)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.DelveInfo)))
             {
                 pak.WriteString(info, 2048);
                 pak.WriteByte(0); // 0-terminated
@@ -63,7 +38,7 @@ namespace DOL.GS.PacketHandler
                 return;
             }
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.UpdateIcons)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.UpdateIcons)))
             {
                 long initPos = pak.Position;
 
@@ -162,7 +137,7 @@ namespace DOL.GS.PacketHandler
         {
             if (siegeWeapon == null)
                 return;
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.SiegeWeaponAnimation)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.SiegeWeaponAnimation)))
             {
                 pak.WriteInt((uint)siegeWeapon.ObjectID);
                 var aimCoordinate = siegeWeapon.AimCoordinate;
@@ -187,14 +162,14 @@ namespace DOL.GS.PacketHandler
         {
             if (siegeWeapon == null)
                 return;
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.SiegeWeaponAnimation)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.SiegeWeaponAnimation)))
             {
                 var targetPosition = siegeWeapon.TargetObject.Position;
-                if(targetPosition == Position.Nowhere) targetPosition = siegeWeapon.GroundTargetPosition;
-                pak.WriteInt((uint) siegeWeapon.ObjectID);
-                pak.WriteInt((uint) (targetPosition.X));
-                pak.WriteInt((uint) (targetPosition.Y));
-                pak.WriteInt((uint) (targetPosition.Z + 50));
+                if (targetPosition == Position.Nowhere) targetPosition = siegeWeapon.GroundTargetPosition;
+                pak.WriteInt((uint)siegeWeapon.ObjectID);
+                pak.WriteInt((uint)(targetPosition.X));
+                pak.WriteInt((uint)(targetPosition.Y));
+                pak.WriteInt((uint)(targetPosition.Z + 50));
                 pak.WriteInt((uint)(siegeWeapon.TargetObject == null ? 0 : siegeWeapon.TargetObject.ObjectID));
                 pak.WriteShort(siegeWeapon.Effect);
                 pak.WriteShort((ushort)(timer)); // timer is no longer ( value / 100 )

@@ -15,7 +15,7 @@ namespace DOL.GS.Scripts
     {
         public void OnCommand(GameClient client, string[] args)
         {
-            if (client == null || client.Player == null || client.ClientState != DOL.GS.GameClient.eClientState.Playing) return;
+            if (client == null || client.Player == null || client.ClientState != GameClient.eClientState.Playing) return;
 
             uint unk1 = 0;
             float radius, intensity, duration, delay = 0;
@@ -76,33 +76,39 @@ namespace DOL.GS.Scripts
                 }
                 catch { }
             }
-            GSTCPPacketOut pak = new GSTCPPacketOut(0x47);
-            pak.WriteIntLowEndian(unk1);
-            pak.WriteIntLowEndian((uint)x);
-            pak.WriteIntLowEndian((uint)y);
-            pak.WriteIntLowEndian((uint)z);
-            pak.Write(BitConverter.GetBytes(radius), 0, sizeof(System.Single));
-            pak.Write(BitConverter.GetBytes(intensity), 0, sizeof(System.Single));
-            pak.Write(BitConverter.GetBytes(duration), 0, sizeof(System.Single));
-            pak.Write(BitConverter.GetBytes(delay), 0, sizeof(System.Single));
-            client.Out.SendTCP(pak);
+
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(0x47))
+            {
+                pak.WriteIntLowEndian(unk1);
+                pak.WriteIntLowEndian((uint)x);
+                pak.WriteIntLowEndian((uint)y);
+                pak.WriteIntLowEndian((uint)z);
+                pak.Write(BitConverter.GetBytes(radius), 0, sizeof(Single));
+                pak.Write(BitConverter.GetBytes(intensity), 0, sizeof(Single));
+                pak.Write(BitConverter.GetBytes(duration), 0, sizeof(Single));
+                pak.Write(BitConverter.GetBytes(delay), 0, sizeof(Single));
+                client.Out.SendTCP(pak);
+            }
 
             foreach (GamePlayer player in client.Player.GetPlayersInRadius((ushort)radius))
             {
                 if (player == client.Player)
                     continue;
-                GSTCPPacketOut pakBis = new GSTCPPacketOut(0x47);
-                pakBis.WriteIntLowEndian(unk1);
-                pakBis.WriteIntLowEndian((uint)x);
-                pakBis.WriteIntLowEndian((uint)y);
-                pakBis.WriteIntLowEndian((uint)z);
-                pakBis.Write(BitConverter.GetBytes(radius), 0, sizeof(System.Single));
-                int distance = (int)player.Coordinate.DistanceTo(client.Player.Position);
-                float newIntensity = intensity * (1 - distance / radius);
-                pakBis.Write(BitConverter.GetBytes(newIntensity), 0, sizeof(System.Single));
-                pakBis.Write(BitConverter.GetBytes(duration), 0, sizeof(System.Single));
-                pakBis.Write(BitConverter.GetBytes(delay), 0, sizeof(System.Single));
-                player.Out.SendTCP(pakBis);
+
+                using (var pakBis = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(0x47))
+                {
+                    pakBis.WriteIntLowEndian(unk1);
+                    pakBis.WriteIntLowEndian((uint)x);
+                    pakBis.WriteIntLowEndian((uint)y);
+                    pakBis.WriteIntLowEndian((uint)z);
+                    pakBis.Write(BitConverter.GetBytes(radius), 0, sizeof(Single));
+                    int distance = (int)player.Coordinate.DistanceTo(client.Player.Position);
+                    float newIntensity = intensity * (1 - distance / radius);
+                    pakBis.Write(BitConverter.GetBytes(newIntensity), 0, sizeof(Single));
+                    pakBis.Write(BitConverter.GetBytes(duration), 0, sizeof(Single));
+                    pakBis.Write(BitConverter.GetBytes(delay), 0, sizeof(Single));
+                    player.Out.SendTCP(pakBis);
+                }
             }
 
             return;

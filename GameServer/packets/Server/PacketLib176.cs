@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,7 +32,7 @@ namespace DOL.GS.PacketHandler
             if (m_gameClient.Player == null)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.FindGroupUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.FindGroupUpdate)))
             {
                 if (list != null)
                 {
@@ -100,7 +82,7 @@ namespace DOL.GS.PacketHandler
             if (obj.IsVisibleTo(m_gameClient.Player) == false)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ObjectCreate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.ObjectCreate)))
             {
                 pak.WriteShort((ushort)obj.ObjectID);
 
@@ -173,7 +155,7 @@ namespace DOL.GS.PacketHandler
 
         protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
                 pak.WriteByte((byte)(slots == null ? 0 : slots.Count));
                 pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); //bit0 is hood up bit4 to 7 is active quiver
@@ -296,7 +278,7 @@ namespace DOL.GS.PacketHandler
             if (m_gameClient.Player == null || living.IsVisibleTo(m_gameClient.Player) == false)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.EquipmentUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.EquipmentUpdate)))
             {
                 ICollection<InventoryItem> items = null;
                 if (living.Inventory != null)
@@ -369,7 +351,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendHouse(House house)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseCreate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseCreate)))
             {
                 pak.WriteShort((ushort)house.HouseNumber);
                 pak.WriteShort((ushort)house.Position.Z);
@@ -398,7 +380,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendEnterHouse(House house)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseEnter)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HouseEnter)))
             {
 
                 pak.WriteShort((ushort)house.HouseNumber);
@@ -463,14 +445,16 @@ namespace DOL.GS.PacketHandler
         {
             if (player == null) return;
 
-            GSTCPPacketOut pak = new GSTCPPacketOut((byte)eServerPackets.VisualEffect);
-            pak.WriteShort((ushort)player.ObjectID);
-            pak.WriteByte(0xC); // show Banner
-            pak.WriteByte((byte)((banner != null) ? 0 : 1)); // 0-enable, 1-disable
-            int emblem = banner?.Emblem ?? 0;
-            int newEmblemBitMask =((emblem & 0x010000) << 8) | (emblem & 0xFFFF);
-            pak.WriteInt((uint)newEmblemBitMask);
-            SendTCP(pak);
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init((byte)eServerPackets.VisualEffect))
+            {
+                pak.WriteShort((ushort)player.ObjectID);
+                pak.WriteByte(0xC); // show Banner
+                pak.WriteByte((byte)((banner != null) ? 0 : 1)); // 0-enable, 1-disable
+                int emblem = banner?.Emblem ?? 0;
+                int newEmblemBitMask = ((emblem & 0x010000) << 8) | (emblem & 0xFFFF);
+                pak.WriteInt((uint)newEmblemBitMask);
+                SendTCP(pak);
+            }
         }
 
         public override void SendPlayerCreate(GamePlayer playerToCreate)

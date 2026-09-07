@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -48,7 +30,7 @@ namespace DOL.GS.PacketHandler
             if (text == null)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.DetailWindow)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.DetailWindow)))
             {
                 pak.WriteByte(0); // new in 1.75
                 if (caption == null)
@@ -68,7 +50,7 @@ namespace DOL.GS.PacketHandler
         public override void SendPlayerTitles()
         {
             var titles = m_gameClient.Player.Titles;
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.DetailWindow)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.DetailWindow)))
             {
                 pak.WriteByte(1); // new in 1.75
                 pak.WritePascalString("Player Statistics"); //window caption
@@ -104,7 +86,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendPlayerTitleUpdate(GamePlayer player)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VisualEffect)))
             {
                 pak.WriteShort((ushort)player.ObjectID);
                 pak.WriteByte(0x0B); // subcode
@@ -132,7 +114,7 @@ namespace DOL.GS.PacketHandler
             if (player == null)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate)))
             {
                 pak.WriteByte(0x03); //subcode
                 pak.WriteByte(0x0e); //number of entry
@@ -230,7 +212,7 @@ namespace DOL.GS.PacketHandler
                 baseStats[i] = player.GetBaseStat(stat);
                 itemStats[i] = player.GetModifiedFromItems(prop);
                 itemCaps[i] = (byte)StatCalculator.GetItemBonusCap(player, (eProperty)updateStats[i]);
-                
+
                 int acuityItemBonus = 0;
                 if (player.CharacterClass.ClassType != eClassType.PureTank && (int)updateStats[i] == (int)player.CharacterClass.ManaStat)
                 {
@@ -246,21 +228,21 @@ namespace DOL.GS.PacketHandler
                     baseStats[i] -= player.TotalConstitutionLostAtDeath;
             }
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.StatsUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.StatsUpdate)))
             {
                 // base
                 baseStats.Foreach(s => pak.WriteShort((ushort)s));
                 pak.WriteShort(0);
-                
+
                 buffStats.Foreach(s => pak.WriteShort((ushort)s));
                 pak.WriteShort(0);
-                
+
                 itemStats.Foreach(s => pak.WriteShort((ushort)s));
                 pak.WriteShort(0);
 
                 itemCaps.Foreach(s => pak.WriteByte((byte)s));
                 pak.WriteByte(0);
-                
+
                 abilityStats.Foreach(s => pak.WriteByte((byte)s));
                 pak.WriteByte(0);
 
@@ -306,7 +288,7 @@ namespace DOL.GS.PacketHandler
             var primMagicAbs = player.GetModifiedBase(eProperty.MagicAbsorption);
             var itemMagicAbs = player.ItemBonus[eProperty.MagicAbsorption];
             var buffMagicAbs = primMagicAbs - itemMagicAbs;
-            
+
             foreach (var (stat, i) in updateResists.Select((stat, i) => (stat, i)))
             {
                 var prop = (eProperty)stat;
@@ -335,7 +317,7 @@ namespace DOL.GS.PacketHandler
             }
 
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.StatsUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.StatsUpdate)))
             {
                 racial.Foreach(s => pak.WriteShort((ushort)s));
                 buffs.Foreach(s => pak.WriteShort((ushort)s));
@@ -373,7 +355,7 @@ namespace DOL.GS.PacketHandler
             if (m_gameClient.Player == null || playerToCreate.IsVisibleTo(m_gameClient.Player) == false)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.PlayerCreate172)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.PlayerCreate172)))
             {
                 pak.WriteShort((ushort)playerToCreate.Client.SessionID);
                 pak.WriteShort((ushort)playerToCreate.ObjectID);
@@ -421,7 +403,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendLoginGranted(byte color)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.LoginGranted)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.LoginGranted)))
             {
                 pak.WriteByte(0x01); //isSI
                 pak.WriteByte(ParseVersion((int)m_gameClient.Version, true));

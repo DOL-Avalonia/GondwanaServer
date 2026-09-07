@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Timers;
 using System.Numerics;
 using DOL.Database;
 using DOL.GameEvents;
@@ -51,8 +50,8 @@ namespace DOL.GS.Scripts
         public int DeactivatedFamilySound { get; set; }
 
         public bool isActivated;
-        private Timer proximityTimer;
-        private Timer activationTimer;
+        private ECSGameTimer proximityTimer;
+        private ECSGameTimer activationTimer;
         public int ActivatedDuration { get; set; }
 
         private void ShowSecondaryModel()
@@ -323,9 +322,8 @@ namespace DOL.GS.Scripts
 
             if (PickOnTouch)
             {
-                proximityTimer = new Timer(1500);
-                proximityTimer.Elapsed += (sender, e) => CheckPlayerProximity();
-                proximityTimer.Start();
+                proximityTimer ??= new ECSGameTimer(this, t => { CheckPlayerProximity(); return 1500; });
+                proximityTimer.Start(1500);
             }
 
             return true;
@@ -335,9 +333,7 @@ namespace DOL.GS.Scripts
         {
             if (proximityTimer != null)
             {
-                proximityTimer.Stop();
-                proximityTimer.Dispose();
-                proximityTimer = null;
+                proximityTimer?.Stop();
             }
 
             if (!string.IsNullOrEmpty(SwitchFamily))
@@ -541,9 +537,8 @@ namespace DOL.GS.Scripts
 
             if (ActivatedDuration > 0)
             {
-                activationTimer = new Timer(ActivatedDuration * 1000);
-                activationTimer.Elapsed += (sender, e) => DeactivateSwitchFamily();
-                activationTimer.Start();
+                activationTimer ??= new ECSGameTimer(this, t => { DeactivateSwitchFamily(); return 0; });
+                activationTimer.Start(ActivatedDuration * 1000);
             }
         }
 
@@ -567,7 +562,7 @@ namespace DOL.GS.Scripts
 
         private void DeactivateSwitchFamily()
         {
-            activationTimer.Stop();
+            activationTimer?.Stop();
 
             lock (ChestsByFamily)
             {
@@ -1047,10 +1042,6 @@ namespace DOL.GS.Scripts
             }
         }
 
-        private void Repop_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            AddToWorld();
-        }
         #endregion
 
         #region Serrure

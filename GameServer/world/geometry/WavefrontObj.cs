@@ -15,7 +15,7 @@ namespace DOL.GS.Geometry
     /// </summary>
     public static class WavefrontObjFile
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public static (Vector3[], List<(int, int, int)[]>) Load(Zone zone, string filename)
         {

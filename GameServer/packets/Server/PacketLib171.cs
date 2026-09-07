@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using System;
 using System.Reflection;
 
@@ -39,7 +20,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Constructs a new PacketLib for Version 1.71 clients
@@ -54,7 +35,7 @@ namespace DOL.GS.PacketHandler
         {
             if (m_gameClient.Player == null) return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.PositionAndObjectID)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.PositionAndObjectID)))
             {
                 pak.WriteShort((ushort)m_gameClient.Player.ObjectID); //This is the player's objectid not Sessionid!!!
                 pak.WriteShort((ushort)m_gameClient.Player.Position.Z);
@@ -87,7 +68,7 @@ namespace DOL.GS.PacketHandler
             if (obj.IsVisibleTo(m_gameClient.Player) == false)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ObjectCreate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.ObjectCreate)))
             {
                 pak.WriteShort((ushort)obj.ObjectID);
                 if (obj is GameStaticItem)
@@ -171,7 +152,7 @@ namespace DOL.GS.PacketHandler
                 return;
             }
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.NPCCreate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.NPCCreate)))
             {
                 int speed = 0;
                 ushort speedZ = 0;
@@ -190,7 +171,7 @@ namespace DOL.GS.PacketHandler
                 }
                 else
                     npcFlags = npc.Flags;
-                
+
                 if (!npc.IsAtTargetLocation)
                 {
                     speed = npc.CurrentSpeed;
@@ -255,7 +236,7 @@ namespace DOL.GS.PacketHandler
                 {
                     if (npc.Event is { InstancedConditionType: not InstancedConditionTypes.All })
                     {
-                        add += $"-EV.{npc.Event.Owner.Name}";
+                        add += $"-EV.{npc.Event.Owner?.Name}";
                     }
                 }
 
@@ -266,6 +247,7 @@ namespace DOL.GS.PacketHandler
 
                 if ((byte)questIndicator >= 0x20)
                     questIndicator = eQuestIndicator.None;
+                //When Renaissance is available, it triggers this (0x08)
                 if (questIndicator == eQuestIndicator.Available)
                     flags2 |= 0x08;//hex 8 - quest available
                 if (questIndicator == eQuestIndicator.Finish)
@@ -320,7 +302,7 @@ namespace DOL.GS.PacketHandler
         public override void SendFindGroupWindowUpdate(GamePlayer[] list)
         {
             if (m_gameClient.Player == null) return;
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.FindGroupUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.FindGroupUpdate)))
             {
                 if (list != null)
                 {
@@ -364,7 +346,7 @@ namespace DOL.GS.PacketHandler
 
         protected override async Task SendQuestPacket(IQuestPlayerData quest, int index)
         {
-            await using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.QuestEntry)))
+            await using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry)))
             {
                 pak.WriteByte((byte)index);
                 if (quest.Status != eQuestStatus.InProgress)
@@ -415,7 +397,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendLivingDataUpdate(GameLiving living, bool updateStrings)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ObjectDataUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.ObjectDataUpdate)))
             {
                 pak.WriteShort((ushort)living.ObjectID);
                 pak.WriteByte(0);
@@ -442,7 +424,7 @@ namespace DOL.GS.PacketHandler
         public override void SendPlayerFreeLevelUpdate()
         {
             GamePlayer player = m_gameClient.Player;
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VisualEffect)))
             {
                 pak.WriteShort((ushort)player.ObjectID);
                 pak.WriteByte(0x09); // subcode
@@ -476,7 +458,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendRegionColorScheme(byte color)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VisualEffect)))
             {
                 pak.WriteShort(0); // not used
                 pak.WriteByte(0x05); // subcode

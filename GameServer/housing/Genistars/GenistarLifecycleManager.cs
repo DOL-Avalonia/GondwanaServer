@@ -10,105 +10,130 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Scripts
 {
     public class GenistarLifecycleManager
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-        private static Timer m_cleanupTimer;
+        private static ECSGameTimer _cleanupTimer;
 
         [ScriptLoadedEvent]
-        public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
+        public static void OnScriptCompiled(DOLEvent e, object s, EventArgs a)
+            => GenistarLensMgr.InitializeLenses();
+
+        [GameServerStartedEvent]
+        public static void OnServerStarted(DOLEvent e, object s, EventArgs a)
         {
-            m_cleanupTimer = new Timer(CleanupRoutine, null, 15 * 60 * 1000, 15 * 60 * 1000);
-            GenistarLensMgr.InitializeLenses();
+            _cleanupTimer = new ECSGameTimer(null, static t =>
+            {
+                Task.Run(CleanupRoutineOffThread);
+                return 900_000;
+            }, 900_000);
         }
 
         [ScriptUnloadedEvent]
-        public static void OnScriptUnloaded(DOLEvent e, object sender, EventArgs args)
+        public static void OnScriptUnloaded(DOLEvent e, object s, EventArgs a)
         {
-            if (m_cleanupTimer != null)
-            {
-                m_cleanupTimer.Dispose();
-                m_cleanupTimer = null;
-            }
+            _cleanupTimer?.Stop();
+            _cleanupTimer = null;
         }
 
-        private static void CleanupRoutine(object state)
+        private static void CleanupRoutineOffThread()
         {
             try
             {
-                long currentTime = GameTimer.GetTickCount();
-                IList<DBGenistar> deadGenistars = GameServer.Database.SelectObjects<DBGenistar>(
-                    DB.Column("State").IsEqualTo((int)eGenistarState.Dead).Or(DB.Column("State").IsEqualTo((int)eGenistarState.Recovering)));
+                List<DBGenistar> expired = CollectExpiredGenistars();
+                if (expired.Count == 0)
+                    return;
 
-                foreach (DBGenistar gen in deadGenistars)
+                // Apply world mutations ON the game loop.
+                GameLoopService.Instance.Post(static list =>
                 {
-                    if (gen.TimerEnd > 0 && currentTime > gen.TimerEnd)
+                    foreach (var gen in list)
                     {
-                        GamePlayer owner = WorldMgr.GetClientByPlayerID(gen.OwnerID, true, false)?.Player;
-                        if (owner != null)
-                        {
-                            owner.Out.SendMessage(LanguageMgr.GetTranslation(owner.Client.Account.Language, "Genistar.Lifecycle.Degraded"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-
-                            InventoryItem remainsItem = null;
-                            lock (owner.Inventory)
-                            {
-                                for (int i = (int)eInventorySlot.FirstBackpack; i <= (int)eInventorySlot.LastBackpack; i++)
-                                {
-                                    var item = owner.Inventory.GetItem((eInventorySlot)i);
-                                    if (item != null && item.Id_nb.StartsWith("genistar_remains") && item.PackageID == gen.GenistarID)
-                                    {
-                                        remainsItem = item;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (remainsItem != null)
-                            {
-                                ItemUnique uT = remainsItem.Template as ItemUnique;
-                                owner.Inventory.RemoveItem(remainsItem);
-                                if (uT != null) GameServer.Database.DeleteObject(uT);
-                            }
-                        }
-                        else
-                        {
-                            var offlineItems = GameServer.Database.SelectObjects<InventoryItem>(
-                                DB.Column("OwnerID").IsEqualTo(gen.OwnerID).And(
-                                DB.Column("PackageID").IsEqualTo(gen.GenistarID)));
-
-                            foreach (var item in offlineItems)
-                            {
-                                if (item.Id_nb.StartsWith("genistar_remains") || item.Id_nb.StartsWith("genistar_pet"))
-                                {
-                                    ItemUnique uT = item.Template as ItemUnique;
-                                    GameServer.Database.DeleteObject(item);
-                                    if (uT != null) GameServer.Database.DeleteObject(uT);
-                                }
-                            }
-                        }
-
-                        var orphanedUniques = GameServer.Database.SelectObjects<ItemUnique>(DB.Column("PackageID").IsEqualTo(gen.GenistarID));
-                        foreach (var uT in orphanedUniques)
-                        {
-                            GameServer.Database.DeleteObject(uT);
-                        }
-
-                        House house = HouseMgr.GetHouse(gen.HouseNumber);
-                        if (house != null)
-                        {
-                            house.UpdateGenistarVisual(gen.PlaceholderKey, 1293);
-                        }
-
-                        GameServer.Database.DeleteObject(gen);
+                        try { ApplyGenistarCleanup(gen); }
+                        catch (Exception ex) { log.Error($"Genistar cleanup failed for {gen.GenistarID}", ex); }
                     }
-                }
+                }, expired);
             }
             catch (Exception ex)
             {
-                log.Error("Error in GenistarLifecycleManager.CleanupRoutine", ex);
+                log.Error("Genistar cleanup scan failed", ex);
             }
+        }
+
+        private static List<DBGenistar> CollectExpiredGenistars()
+        {
+            // NOTE: TimerEnd is stored from GameTimer.GetTickCount() (now = GameLoop time),
+            // which resets on server restart. This was already true with the old Stopwatch;
+            // consider migrating TimerEnd to a DateTime column later.
+            long now = GameTimer.GetTickCountLong();
+            var result = new List<DBGenistar>();
+            var candidates = GameServer.Database.SelectObjects<DBGenistar>(
+                DB.Column("State").IsEqualTo((int)eGenistarState.Dead)
+                  .Or(DB.Column("State").IsEqualTo((int)eGenistarState.Recovering)));
+
+            foreach (DBGenistar gen in candidates)
+                if (gen.TimerEnd > 0 && now > gen.TimerEnd)
+                    result.Add(gen);
+
+            return result;
+        }
+
+        private static void ApplyGenistarCleanup(DBGenistar gen)
+        {
+            GamePlayer owner = WorldMgr.GetClientByPlayerID(gen.OwnerID, true, false)?.Player;
+
+            if (owner != null)
+            {
+                owner.Out.SendMessage(LanguageMgr.GetTranslation(owner.Client.Account.Language,
+                    "Genistar.Lifecycle.Degraded"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+
+                InventoryItem remains = null;
+                lock (owner.Inventory)
+                {
+                    for (int i = (int)eInventorySlot.FirstBackpack; i <= (int)eInventorySlot.LastBackpack; i++)
+                    {
+                        var itm = owner.Inventory.GetItem((eInventorySlot)i);
+                        if (itm != null && itm.Id_nb.StartsWith("genistar_remains") && itm.PackageID == gen.GenistarID)
+                        {
+                            remains = itm;
+                            break;
+                        }
+                    }
+                }
+                if (remains != null)
+                {
+                    ItemUnique uT = remains.Template as ItemUnique;
+                    owner.Inventory.RemoveItem(remains);
+                    if (uT != null)
+                        GameServer.Database.DeleteObject(uT);
+                }
+            }
+            else
+            {
+                foreach (var item in GameServer.Database.SelectObjects<InventoryItem>(
+                    DB.Column("OwnerID").IsEqualTo(gen.OwnerID)
+                      .And(DB.Column("PackageID").IsEqualTo(gen.GenistarID))))
+                {
+                    if (item.Id_nb.StartsWith("genistar_remains") || item.Id_nb.StartsWith("genistar_pet"))
+                    {
+                        ItemUnique uT = item.Template as ItemUnique;
+                        GameServer.Database.DeleteObject(item);
+                        if (uT != null)
+                            GameServer.Database.DeleteObject(uT);
+                    }
+                }
+            }
+
+            foreach (var uT in GameServer.Database.SelectObjects<ItemUnique>(
+                DB.Column("PackageID").IsEqualTo(gen.GenistarID)))
+                GameServer.Database.DeleteObject(uT);
+
+            HouseMgr.GetHouse(gen.HouseNumber)?.UpdateGenistarVisual(gen.PlaceholderKey, 1293);
+            GameServer.Database.DeleteObject(gen);
         }
 
         public static void ProcessEmbryoCreation(GamePlayer player, int houseNumber, string baseTemplateId, int eruditionLevel, int dictKey)

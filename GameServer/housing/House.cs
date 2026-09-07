@@ -54,7 +54,7 @@ namespace DOL.GS.Housing
         }
     }
 
-    public class House
+    public class House : IPooledList<House>
     {
         /// <summary>
         /// Defines a logger for this class.

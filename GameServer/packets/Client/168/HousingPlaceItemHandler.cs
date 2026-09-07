@@ -16,17 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 using DOL.Database;
 using DOL.GS.Geometry;
 using DOL.GS.Housing;
 using DOL.GS.ServerProperties;
 using DOL.GS.Utils;
-using System.Linq;
 using DOL.Language;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
@@ -368,7 +369,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             }
 
                             // save the house
-                            house.SaveIntoDatabase();
+                            System.Threading.Tasks.Task.Run(() => { house.SaveIntoDatabase();});
                             break;
                         }
                     case 2: // WALL OBJECT

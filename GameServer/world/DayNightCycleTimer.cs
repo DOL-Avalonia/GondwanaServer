@@ -22,7 +22,7 @@ namespace DOL.GS
         private const double NIGHT_INCREMENT_FACTOR = 1.25; // Night runs 25% faster
         private const int UPDATE_INTERVAL_MS = 500;
 
-        private Timer _updateTimer;
+        private ECSGameTimer _updateTimer;
         private long _lastTickCount;
         private readonly object _lock = new object();
 
@@ -32,19 +32,15 @@ namespace DOL.GS
 
         public void Init()
         {
-            // Default start: Noon
             ChangeGameTime(Properties.WORLD_DAY_INCREMENT, 0.5);
-
-            _updateTimer = new Timer(OnUpdateTimer, null, UPDATE_INTERVAL_MS, UPDATE_INTERVAL_MS);
+            _updateTimer = new ECSGameTimer(null,
+                t => { UpdateGameTime(); return UPDATE_INTERVAL_MS; }, UPDATE_INTERVAL_MS);
         }
 
         public void Stop()
         {
-            if (_updateTimer != null)
-            {
-                _updateTimer.Dispose();
-                _updateTimer = null;
-            }
+            _updateTimer?.Stop();
+            _updateTimer = null;
         }
 
         /// <summary>

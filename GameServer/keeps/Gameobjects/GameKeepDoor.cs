@@ -29,6 +29,7 @@ namespace DOL.GS.Keeps
 
         protected int m_oldMaxHealth;
         protected byte m_oldHealthPercent;
+        protected ECSGameTimer m_keepDoorHealthRegenTimer;
 
         private bool _relicMessage75, _relicMessage50, _relicMessage25;
 
@@ -203,7 +204,7 @@ namespace DOL.GS.Keeps
         {
             if (damageAmount > 0 && IsAlive)
             {
-                Component.Keep.LastAttackedByEnemyTick = CurrentRegion.Time;
+                Component.Keep.LastAttackedByEnemyTick = GameLoop.GameLoopTime;
                 base.TakeDamage(source, damageType, damageAmount, criticalAmount);
 
                 if (m_oldHealthPercent != HealthPercent)
@@ -348,7 +349,7 @@ namespace DOL.GS.Keeps
                 {
                     var keepdistance = float.MaxValue;
                     var gatedistance = float.MaxValue;
-                    foreach (GameKeepComponent c in Component.Keep.KeepComponents)
+                    foreach (GameKeepComponent c in Component.Keep!.KeepComponents)
                     {
                         if ((GameKeepComponent.eComponentSkin)c.Skin == GameKeepComponent.eComponentSkin.Keep)
                             keepdistance = (float)Coordinate.DistanceTo(c.Position);
@@ -425,13 +426,13 @@ namespace DOL.GS.Keeps
         /// </summary>
         public override void StartHealthRegeneration()
         {
-            if (!IsAttackableDoor || m_healthRegenerationTimer != null && m_healthRegenerationTimer.IsAlive || Health >= MaxHealth)
+            if (!IsAttackableDoor || m_keepDoorHealthRegenTimer != null && m_keepDoorHealthRegenTimer.IsAlive || Health >= MaxHealth)
                 return;
 
-            m_healthRegenerationTimer = new RegionTimer(this, new RegionTimerCallback(HealthRegenerationTimerCallback), REPAIR_INTERVAL);
+            m_keepDoorHealthRegenTimer = new ECSGameTimer(this, HealthRegenerationTimerCallback, REPAIR_INTERVAL);
         }
 
-        protected override int HealthRegenerationTimerCallback(RegionTimer timer)
+        protected virtual int HealthRegenerationTimerCallback(ECSGameTimer timer)
         {
             if (Component?.Keep == null || HealthPercent >= 100)
             {

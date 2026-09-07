@@ -90,63 +90,26 @@ namespace DOL.GS.Commands
                     if (!CanVol(Source, player))
                         CancelVol(Source);
                 }
-                else
+                else if (player.TempProperties.getProperty<object>(PLAYER_VOL_TIMER, null) is ECSGameTimer timer)
                 {
-                    RegionTimer Timer = player.TempProperties.getProperty<object>(PLAYER_VOL_TIMER, null) as RegionTimer;
-                    if (Timer != null)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Vol.Move"),
-                                               eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-
-                        Timer.Stop();
-
-                        player.Out.SendCloseTimerWindow();
-                        player.TempProperties.removeProperty(PLAYER_VOL_TIMER);
-                    }
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Commands.Players.Vol.Move"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    timer.Stop();
+                    player.Out.SendCloseTimerWindow();
+                    player.TempProperties.removeProperty(PLAYER_VOL_TIMER);
                 }
             }
         }
 
         public static bool CanVol(GamePlayer stealer, GamePlayer target)
         {
-            if (target == null || (target is GameNPC))
-            {
-                return false;
-            }
-
-            if (stealer.TempProperties.getProperty<bool>("ArenaParticipant", false) || target.TempProperties.getProperty<bool>("ArenaParticipant", false))
-            {
-                return false;
-            }
-
-            if (stealer == target)
-            {
-                return false;
-            }
-
-            if (stealer.Client.Account.PrivLevel < target.Client.Account.PrivLevel)
+            if (target == null || target is GameNPC || target.TempProperties.getProperty<bool>("ArenaParticipant", false) || target.TempProperties.getProperty<bool>("ArenaParticipant", false) || stealer == target || stealer.Client.Account.PrivLevel < target.Client.Account.PrivLevel)
             {
                 return false;
             }
 
             if (stealer.Client.Account.PrivLevel <= 1)
             {
-                if (!stealer.IsStealthed)
-                {
-                    return false;
-                }
-
-                if (stealer.GuildID == target.GuildID && stealer.GuildID != string.Empty)
-                {
-                    return false;
-                }
-
-                if (stealer.Group != null && stealer.Group.IsInTheGroup(target as GameLiving))
-                {
-                    return false;
-                }
-
-                if (stealer.Level < 25 || target.Level < 20)
+                if (!stealer.IsStealthed || (stealer.GuildID == target.GuildID && stealer.GuildID != string.Empty) || (stealer.Group != null && stealer.Group.IsInTheGroup(target as GameLiving)) || (stealer.Level < 25 || target.Level < 20))
                 {
                     return false;
                 }
@@ -215,7 +178,7 @@ namespace DOL.GS.Commands
 
         public static void CancelVol(GamePlayer Player)
         {
-            CancelVol(Player, Player.TempProperties.getProperty<object>(PLAYER_VOL_TIMER, null) as RegionTimer);
+            CancelVol(Player, Player.TempProperties.getProperty<object>(PLAYER_VOL_TIMER, null) as ECSGameTimer);
         }
 
         private static void DisableRobbing(GamePlayer player, int duration)
@@ -227,7 +190,7 @@ namespace DOL.GS.Commands
             player.DisableSkill(SkillBase.GetAbility(Abilities.Vol), dur);
         }
 
-        public static void CancelVol(GamePlayer Player, RegionTimer Timer)
+        public static void CancelVol(GamePlayer Player, ECSGameTimer Timer)
         {
             DisableRobbing(Player, VolAbilityHandler.DISABLE_DURATION_CHEST);
             DisableRobbing(Player, VolAbilityHandler.DISABLE_DURATION_PLAYER);
@@ -386,8 +349,7 @@ namespace DOL.GS.Commands
                                    eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 Player.Out.SendTimerWindow(LanguageMgr.GetTranslation(Player.Client.Account.Language, "Commands.Players.Vol.StealChestWindow"), volTime);
 
-                RegionTimer Timer = new RegionTimer(Player);
-                Timer.Callback = new RegionTimerCallback(VolTargetChest);
+                var Timer = new ECSGameTimer(Player, VolTargetChest);
                 Timer.Properties.setProperty(PLAYER_STEALER, Player);
                 Timer.Properties.setProperty("TREASURE_CHEST_TARGET", chestTarget);
                 Timer.Start(volTime * 1000);
@@ -427,8 +389,7 @@ namespace DOL.GS.Commands
                                        eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 Player.Out.SendTimerWindow(LanguageMgr.GetTranslation(Player.Client.Account.Language, "Commands.Players.Vol.StealWindow", TargetRealName), VolTime);
 
-                RegionTimer Timer = new RegionTimer(Player);
-                Timer.Callback = new RegionTimerCallback(VolTarget);
+                var Timer = new ECSGameTimer(Player, VolTarget);
                 Timer.Properties.setProperty(PLAYER_STEALER, Player);
                 Timer.Properties.setProperty(TARGET_STOLE, Target);
                 Timer.Start(VolTime * 1000);
@@ -445,7 +406,7 @@ namespace DOL.GS.Commands
             }
         }
 
-        public int VolTarget(RegionTimer Timer)
+        public int VolTarget(ECSGameTimer Timer)
         {
             GamePlayer stealer = (GamePlayer)Timer.Properties.getProperty<object>(PLAYER_STEALER, null);
             GamePlayer target = (GamePlayer)Timer.Properties.getProperty<object>(TARGET_STOLE, null);
@@ -509,7 +470,7 @@ namespace DOL.GS.Commands
         /// Timer callback for chest-steal attempts.
         /// This callback is invoked after the timer expires and then executes the chest steal logic.
         /// </summary>
-        private int VolTargetChest(RegionTimer Timer)
+        private int VolTargetChest(ECSGameTimer Timer)
         {
             GamePlayer stealer = Timer.Properties.getProperty<object>(PLAYER_STEALER, null) as GamePlayer;
             PVPChest chest = Timer.Properties.getProperty<object>("TREASURE_CHEST_TARGET", null) as PVPChest;

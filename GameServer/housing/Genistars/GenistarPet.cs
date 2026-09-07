@@ -13,6 +13,8 @@ namespace DOL.GS.Scripts
     public class GenistarPet : GamePet
     {
         public DBGenistar DBRecord { get; private set; }
+        private byte _cachedLevel;
+        private long _cachedLevelExpiry;
 
         public GenistarPet(GamePlayer owner) : base(new GenistarPetBrain(owner))
         {
@@ -82,7 +84,16 @@ namespace DOL.GS.Scripts
 
         public override byte Level
         {
-            get => DBRecord == null ? base.Level : CalculateGenistarLevel(DBRecord.OwnerID, DBRecord.GenistarExperience);
+            get
+            {
+                if (DBRecord == null) return base.Level;
+                if (GameLoop.GameLoopTime >= _cachedLevelExpiry)
+                {
+                    _cachedLevel = GenistarPet.CalculateGenistarLevel(DBRecord.OwnerID, DBRecord.GenistarExperience);
+                    _cachedLevelExpiry = GameLoop.GameLoopTime + 10000;
+                }
+                return _cachedLevel;
+            }
             set => base.Level = value;
         }
 

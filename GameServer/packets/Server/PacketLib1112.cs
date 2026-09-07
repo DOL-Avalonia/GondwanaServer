@@ -1,33 +1,9 @@
-/*
-* DAWN OF LIGHT - The first free open source DAoC server emulator
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*
-*/
 using System;
 using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-
 using DOL.Database;
-using DOL.GS.RealmAbilities;
 using DOL.GS.Styles;
-
 using log4net;
-
 
 namespace DOL.GS.PacketHandler
 {
@@ -62,7 +38,7 @@ namespace DOL.GS.PacketHandler
             {
                 int packetEntry = 0; // needed to tell client how much skill we send
                                      // using pak
-                using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate)))
+                using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate)))
                 {
                     // Write header
                     pak.WriteByte(0x01); //subcode for skill
@@ -237,7 +213,7 @@ namespace DOL.GS.PacketHandler
             foreach (var spXsl in spellsXLines)
             {
                 // Prepare packet
-                using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate)))
+                using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate)))
                 {
                     // Add Line Header
                     pak.WriteByte(0x02); //subcode
@@ -284,7 +260,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Footer packet
-            using (GSTCPPacketOut pak3 = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate)))
+            using (GSTCPPacketOut pak3 = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate)))
             {
                 pak3.WriteByte(0x02); //subcode
                 pak3.WriteByte(0x00);
@@ -573,7 +549,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="player"></param>
         public override void SendPlayerForgedPosition(GamePlayer player)
         {
-            using (GSUDPPacketOut pak = new GSUDPPacketOut(GetPacketCode(eServerPackets.PlayerPosition)))
+            using (GSUDPPacketOut pak = PooledObjectFactory.GetForTick<GSUDPPacketOut>().Init(GetPacketCode(eServerPackets.PlayerPosition)))
             {
                 // PID
                 pak.WriteShort((ushort)player.Client.SessionID);
@@ -690,6 +666,5 @@ namespace DOL.GS.PacketHandler
             // Update Cache
             m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(player.CurrentRegionID, (ushort)player.ObjectID)] = GameTimer.GetTickCount();
         }
-
     }
 }

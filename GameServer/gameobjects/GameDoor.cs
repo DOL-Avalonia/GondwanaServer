@@ -20,10 +20,8 @@ namespace DOL.GS
         private bool m_openDead = false;
         private int originalPunishSpellValue;
 
-        /// <summary>
-        /// The timed action that will close the door
-        /// </summary>
-        private CloseDoorAction m_closeDoorAction;
+        protected ECSGameTimer m_closeDoorTimer;
+        protected ECSGameTimer m_doorHealthRegenTimer;
 
         public override bool CanBeOpenedViaInteraction => Locked == 0;
 
@@ -146,9 +144,8 @@ namespace DOL.GS
             {
                 lock (m_stateLock)
                 {
-                    m_closeDoorAction ??= new CloseDoorAction(this);
-                    if (!m_closeDoorAction.IsAlive)
-                        m_closeDoorAction.Start(CLOSE_DOOR_TIME);
+                    if (m_closeDoorTimer == null || !m_closeDoorTimer.IsAlive)
+                        m_closeDoorTimer = new ECSGameTimer(this, CloseDoorTimerCallback, CLOSE_DOOR_TIME);
                 }
             }
         }
@@ -214,9 +211,8 @@ namespace DOL.GS
             {
                 lock (m_stateLock)
                 {
-                    m_closeDoorAction ??= new CloseDoorAction(this);
-                    if (!m_closeDoorAction.IsAlive)
-                        m_closeDoorAction.Start(CLOSE_DOOR_TIME);
+                    if (m_closeDoorTimer == null || !m_closeDoorTimer.IsAlive)
+                        m_closeDoorTimer = new ECSGameTimer(this, CloseDoorTimerCallback, CLOSE_DOOR_TIME);
                 }
             }
         }
@@ -226,11 +222,17 @@ namespace DOL.GS
             if (!m_openDead)
                 State = eDoorState.Closed;
 
-            if (m_closeDoorAction != null)
+            if (m_closeDoorTimer != null && m_closeDoorTimer.IsAlive)
             {
-                m_closeDoorAction.Stop();
-                m_closeDoorAction = null;
+                m_closeDoorTimer.Stop();
+                m_closeDoorTimer = null;
             }
+        }
+
+        protected virtual int CloseDoorTimerCallback(ECSGameTimer timer)
+        {
+            Close();
+            return 0;
         }
 
         public override int Health
@@ -262,14 +264,14 @@ namespace DOL.GS
 
         public override void StartHealthRegeneration()
         {
-            if (m_healthRegenerationTimer != null && m_healthRegenerationTimer.IsAlive) return;
+            if (m_doorHealthRegenTimer != null && m_doorHealthRegenTimer.IsAlive) return;
             if (Health >= MaxHealth) return;
 
-            m_healthRegenerationTimer = new RegionTimer(this, new RegionTimerCallback(HealthRegenerationTimerCallback), REPAIR_INTERVAL);
+            m_doorHealthRegenTimer = new ECSGameTimer(this, HealthRegenerationTimerCallback, REPAIR_INTERVAL);
         }
 
         // RegionTimer properly handled safely now instead of static memory leak!
-        protected virtual int HealthRegenerationTimerCallback(RegionTimer timer)
+        protected virtual int HealthRegenerationTimerCallback(ECSGameTimer timer)
         {
             if (HealthPercent >= 100)
             {
@@ -325,28 +327,6 @@ namespace DOL.GS
             {
                 foreach (GameLiving living in attackerGroup.GetMembersInTheGroup())
                     (living as GamePlayer)?.Out.SendMessage(LanguageMgr.GetTranslation(attackerPlayer.Client.Account.Language, "DoorRequestHandler.GameDoor.NowOpen", Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            }
-        }
-
-        /// <summary>
-        /// The action that closes the door after specified duration
-        /// </summary>
-        protected class CloseDoorAction : RegionAction
-        {
-            /// <summary>
-            /// Constructs a new close door action
-            /// </summary>
-            /// <param name="door">The door that should be closed</param>
-            public CloseDoorAction(GameDoor door) : base(door) { }
-
-            /// <summary>
-            /// This function is called to close the door 10 seconds after it was opened
-            /// </summary>
-            public override void OnTick()
-            {
-                GameDoor door = (GameDoor)m_actionSource;
-                door.Close();
-                Stop();
             }
         }
     }

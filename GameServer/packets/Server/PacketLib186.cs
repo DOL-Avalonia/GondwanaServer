@@ -1,21 +1,3 @@
-/*
-* DAWN OF LIGHT - The first free open source DAoC server emulator
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*
-*/
 using DOL.GS.Geometry;
 using System;
 using log4net;
@@ -75,7 +57,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendCombatAnimation(GameObject attacker, GameObject defender, ushort weaponID, ushort shieldID, int style, byte stance, byte result, byte targetHealthPercent)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CombatAnimation)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.CombatAnimation)))
             {
                 if (attacker != null)
                     pak.WriteShort((ushort)attacker.ObjectID);
@@ -107,7 +89,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendMinotaurRelicRealm(byte id, byte realm)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MinotaurRelicRealm)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.MinotaurRelicRealm)))
             {
                 pak.WriteByte(id);
                 pak.WriteByte(realm);
@@ -118,7 +100,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendMinotaurRelicMapRemove(byte id)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MinotaurRelicMapRemove)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.MinotaurRelicMapRemove)))
             {
                 pak.WriteIntLowEndian((uint)id);
                 SendTCP(pak);
@@ -127,7 +109,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendMinotaurRelicMapUpdate(byte id, Position position)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MinotaurRelicMapUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.MinotaurRelicMapUpdate)))
             {
 
                 pak.WriteIntLowEndian((uint)id);
@@ -142,7 +124,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendMinotaurRelicWindow(GamePlayer player, int effect, bool flag)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VisualEffect)))
             {
 
                 pak.WriteShort((ushort)player.ObjectID);
@@ -164,7 +146,7 @@ namespace DOL.GS.PacketHandler
 
         public override void SendMinotaurRelicBarUpdate(GamePlayer player, int xp)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VisualEffect)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VisualEffect)))
             {
 
                 pak.WriteShort((ushort)player.ObjectID);

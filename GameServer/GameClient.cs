@@ -40,7 +40,7 @@ namespace DOL.GS
     /// <summary>
     /// Represents a single connection to the game server
     /// </summary>
-    public class GameClient : BaseClient, ICustomParamsValuable
+    public class GameClient : BaseClient, ICustomParamsValuable, IPooledList<GameClient>, IServiceObject
     {
         #region eClientAddons enum
 
@@ -173,7 +173,18 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        public ServiceObjectId ServiceObjectId { get; } = new(ServiceObjectType.Client);
+
+        /// <summary>
+        /// Next GameLoop time at which ClientService refreshes this player's world view.
+        /// </summary>
+        public long NextWorldUpdateTick { get; set; }
+
+        /// <summary>
+        /// Region the caches were last built for; cleared on region change.
+        /// </summary>
+        public Region LastWorldUpdateRegion { get; set; }
 
         /// <summary>
         /// This variable holds the accountdata
@@ -220,7 +231,7 @@ namespace DOL.GS
         /// <summary>
         /// Holds the time of the last ping
         /// </summary>
-        protected long m_pingTime = DateTime.Now.Ticks; // give ping time on creation
+        protected long m_pingTime = GameLoop.GameLoopTime; // give ping time on creation
 
         /// <summary>
         /// This variable holds all info about the active player
@@ -245,7 +256,7 @@ namespace DOL.GS
         /// <summary>
         /// Holds the time of the last UDP ping
         /// </summary>
-        protected long m_udpPingTime = DateTime.Now.Ticks;
+        protected long m_udpPingTime = GameLoop.GameLoopTime;
 
         /// <summary>
         /// Custom Account Params
@@ -334,7 +345,7 @@ namespace DOL.GS
                 if ((oldState != eClientState.Playing && value == eClientState.Playing) ||
                     (oldState != eClientState.CharScreen && value == eClientState.CharScreen))
                 {
-                    PingTime = DateTime.Now.Ticks;
+                    PingTime = GameLoop.GameLoopTime;
                 }
 
                 m_clientState = value;

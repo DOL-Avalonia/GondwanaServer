@@ -51,7 +51,8 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        public virtual Zone.eGameObjectType GameObjectType => Zone.eGameObjectType.ITEM;
 
         #region State/Random/Type
 
@@ -358,7 +359,9 @@ namespace DOL.GS
         }
 
         #endregion
-        
+
+        private SubZoneObject _subZoneObject;
+
         /// <summary>
         /// Holds the realm of this object
         /// </summary>
@@ -447,6 +450,18 @@ namespace DOL.GS
                 owner = owner.Owner;
             }
             return false;
+        }
+
+        public SubZoneObject SubZoneObject
+        {
+            get
+            {
+                SubZoneObject existing = _subZoneObject;
+                if (existing != null)
+                    return existing;
+                SubZoneObject created = new(this);
+                return System.Threading.Interlocked.CompareExchange(ref _subZoneObject, created, null) ?? created;
+            }
         }
 
         public bool CanRespawnWithinEvent

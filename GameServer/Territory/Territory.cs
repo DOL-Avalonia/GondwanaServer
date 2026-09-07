@@ -33,6 +33,7 @@ namespace DOL.Territories
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         private string guild_id;
+        private ECSGameTimer m_expirationTimer;
 
         public Territory(Zone zone, List<IArea> areas, GameNPC boss, TerritoryDb db)
         {
@@ -332,9 +333,6 @@ namespace DOL.Territories
             }
         }
 
-
-        private Timer m_expirationTimer;
-
         public DateTime? ClaimedTime
         {
             get;
@@ -484,49 +482,44 @@ namespace DOL.Territories
         private void StartExpireTimer()
         {
             m_expirationTimer?.Stop();
-            if (!string.IsNullOrEmpty(guild_id) && m_expiration > 0)
-            {
-                DateTime now = DateTime.Now;
-                if (ClaimedTime == null)
-                {
-                    log.Warn($"Territory {Name} ({ID}) owned by guild {OwnerGuild?.Name} ({guild_id}) has an expiration but no claim timestamp ; timer starts now");
-                    ClaimedTime = DateTime.Now;
-                    SaveIntoDatabaseUnsafe();
-                }
-                DateTime expire = ClaimedTime.Value.AddMinutes(m_expiration);
+            m_expirationTimer = null;
 
-                if (expire <= now)
+            if (string.IsNullOrEmpty(guild_id) || m_expiration <= 0)
+                return;
+
+            if (ClaimedTime == null)
+            {
+                log.Warn($"Territory {Name} ({ID}) owned by guild {OwnerGuild?.Name} ({guild_id}) has an expiration but no claim timestamp ; timer starts now");
+                ClaimedTime = DateTime.Now;
+                SaveIntoDatabaseUnsafe();
+            }
+
+            var exp = ClaimedTime.Value.AddMinutes(m_expiration);
+            if (exp <= DateTime.Now)
+            {
+                OwnerGuild?.SendMessageToGuildMembersKey("GameUtils.Guild.Territory.TerritoryExpired", eChatType.CT_Guild, eChatLoc.CL_ChatWindow, Name);
+                ReleaseTerritory();
+                return;
+            }
+
+            m_expirationTimer = new ECSGameTimer(Boss, t =>
+            {
+                Guild expiredGuild;
+                lock (m_lockObject)
                 {
-                    OwnerGuild?.SendMessageToGuildMembersKey("GameUtils.Guild.Territory.TerritoryExpired", eChatType.CT_Guild, eChatLoc.CL_ChatWindow, Name);
+                    m_expirationTimer = null;
+                    expiredGuild = m_ownerGuild;
                     ReleaseTerritory();
                 }
-                else
+                if (expiredGuild != null)
                 {
-                    m_expirationTimer = new Timer();
-                    m_expirationTimer.Elapsed += ExpireTimerCallback;
-                    m_expirationTimer.Interval = (expire - now).TotalMilliseconds;
-                    m_expirationTimer.Start();
+                    expiredGuild.SendMessageToGuildMembersKey("GameUtils.Guild.Territory.TerritoryExpired",
+                        eChatType.CT_Guild, eChatLoc.CL_ChatWindow, Name);
+                    foreach (var p in expiredGuild.GetListOfOnlineMembers())
+                        p.Out.SendSoundEffect(9219, p.Position, 0);
                 }
-            }
-        }
-
-        private void ExpireTimerCallback(object sender, ElapsedEventArgs args)
-        {
-            Guild guild;
-
-            lock (m_lockObject)
-            {
-                m_expirationTimer?.Stop();
-                m_expirationTimer = null;
-                guild = m_ownerGuild;
-                ReleaseTerritory();
-            }
-            guild?.SendMessageToGuildMembersKey("GameUtils.Guild.Territory.TerritoryExpired", eChatType.CT_Guild, eChatLoc.CL_ChatWindow, Name);
-
-            foreach (var player in guild.GetListOfOnlineMembers())
-            {
-                player.Out.SendSoundEffect(9219, player.Position, 0);
-            }
+                return 0;
+            }, (int)Math.Min(int.MaxValue, (exp - DateTime.Now).TotalMilliseconds));
         }
 
         private void ChangeMagicAndPhysicalResistance(GameNPC mob, int value)

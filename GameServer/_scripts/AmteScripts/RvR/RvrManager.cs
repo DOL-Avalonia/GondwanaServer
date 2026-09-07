@@ -557,18 +557,13 @@ namespace AmteScripts.Managers
 
         private void SaveScore()
         {
-            if (!Directory.Exists("temp"))
-                Directory.CreateDirectory("temp");
-            var lines = new string[]
+            string[] lines = [DateTime.Now.ToString("o"), Scores[eRealm.Albion].ToString(),
+        Scores[eRealm.Hibernia].ToString(), Scores[eRealm.Midgard].ToString(),
+        winnerName, _currentMasterMap?.ToString() ?? ""];
+            System.Threading.Tasks.Task.Run(() =>
             {
-                DateTime.Now.ToString("o"),
-                Scores.TryGetValue(eRealm.Albion, out var a) ? a.ToString() : "0",
-                Scores.TryGetValue(eRealm.Hibernia, out var h) ? h.ToString() : "0",
-                Scores.TryGetValue(eRealm.Midgard, out var m) ? m.ToString() : "0",
-                winnerName ?? string.Empty,
-                _currentMasterMap?.ToString() ?? string.Empty
-            };
-            File.WriteAllLines("temp/RvRScore.dat", lines);
+                try { File.WriteAllLines("temp/RvRScore.dat", lines); } catch { }
+            });
         }
 
         private MapType? ReadLastMasterMapFromFile()

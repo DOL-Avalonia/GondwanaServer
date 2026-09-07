@@ -707,6 +707,15 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("server", "rog_server_name", "Prefix for ROG item descriptions", "Global ROG")]
         public static string ROG_SERVER_NAME = "Global ROG";
 
+        [ServerProperty("system", "game_loop_tick_rate", "Game loop ticks per second (20 = 50ms ticks, 50 = 20ms ticks).", 20)]
+        public static int GAME_LOOP_TICK_RATE;
+
+        [ServerProperty("system", "game_loop_parallel_timers", "Run timer callbacks in parallel across all CPU cores. Keep FALSE until your custom timer callbacks are verified thread-safe, then enable for maximum performance.", false)]
+        public static bool GAME_LOOP_PARALLEL_TIMERS;
+
+        [ServerProperty("system", "game_loop_long-tick_threshold_ms", "xxxx", 25)]
+        public static int GAME_LOOP_LONG_TICK_THRESHOLD_MS;
+
         #endregion
 
         #region WORLD

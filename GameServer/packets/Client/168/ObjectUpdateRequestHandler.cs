@@ -29,7 +29,7 @@ namespace DOL.GS.PacketHandler.Client.v168
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
@@ -41,7 +41,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             //housing
             if (client.Player.CurrentRegion.HousingEnabled)
-                WorldUpdateThread.UpdatePlayerHousing(client.Player, GameTimer.GetTickCount() + 60000);
+                ClientService.UpdatePlayerHousing(client.Player, GameTimer.GetTickCount() + 60000);
         }
     }
 }

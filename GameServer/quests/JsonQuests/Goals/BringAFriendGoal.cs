@@ -69,7 +69,7 @@ namespace DOL.GS.Quests
             if (base.EndGoal(questData, goalData, force))
             {
                 if (lastFriend != null)
-                    lastFriend.ResetTimer.Start();
+                    lastFriend.StartResetTimer();
                 return true;
             }
             return false;

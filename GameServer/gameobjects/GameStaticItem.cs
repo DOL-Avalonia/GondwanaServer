@@ -31,7 +31,7 @@ namespace DOL.GS
     /// <summary>
     /// This class represents a static Item in the gameworld
     /// </summary>
-    public class GameStaticItem : GameObject, ITranslatableObject
+    public class GameStaticItem : GameObject, ITranslatableObject, IPooledList<GameStaticItem>
     {
         /// <summary>
         /// The emblem of the Object

@@ -10,7 +10,7 @@ namespace DOL.GS
 {
     public abstract class GameDoorBase : GameLiving, IDoor
     {
-        //public override eGameObjectType GameObjectType => eGameObjectType.Door; --> TO DO from OPENDAOC
+        public override eGameObjectType GameObjectType => eGameObjectType.DOOR;
         private int m_doorId;
         protected eDoorState m_state = eDoorState.Closed;
         protected readonly object m_stateLock = new object();

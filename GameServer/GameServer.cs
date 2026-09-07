@@ -750,6 +750,11 @@ namespace DOL.GS
                 GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 
                 //---------------------------------------------------------------
+                // Start the Game Loop (replaces the old region timer threads)
+                if (!InitComponent(GameLoop.Init(), "Game Loop"))
+                    return false;
+
+                //---------------------------------------------------------------
                 //Open the server, players can now connect if webhook, inform Discord!
                 m_status = eGameServerStatus.GSS_Open;
 
@@ -1126,6 +1131,7 @@ namespace DOL.GS
         {
             //Stop new clients from logging in
             m_status = eGameServerStatus.GSS_Closed;
+            GameLoop.Exit();
 
             log.Info("GameServer.Stop() - enter method");
 

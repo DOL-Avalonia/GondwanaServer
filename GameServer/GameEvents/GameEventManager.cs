@@ -28,7 +28,9 @@ namespace DOL.GameEvents
         private readonly int dueTime = 5000;
         private readonly int period = 10000;
         private static GameEventManager instance;
-        private System.Threading.Timer timer;
+        private ECSGameTimer _timeCheckTimer;
+        private int _timeCheckRunning;
+        private volatile bool _timeCheckSuspended;
         private Random _RNG;
 
         public static GameEventManager Instance => instance ?? (instance = new GameEventManager());
@@ -86,7 +88,23 @@ namespace DOL.GameEvents
             return true;
         }
 
-        private async void TimeCheck(object o)
+        private void RunTimeCheck()
+        {
+            if (_timeCheckSuspended)
+                return;
+
+            if (Interlocked.Exchange(ref _timeCheckRunning, 1) == 1)
+                return; // previous check still running
+
+            _ = Task.Run(async () =>
+            {
+                try { await TimeCheckAsync(); }
+                catch (Exception ex) { log.Error("Event TimeCheck failed", ex); }
+                finally {Interlocked.Exchange(ref _timeCheckRunning, 0); }
+            });
+        }
+
+        private async Task TimeCheckAsync()
         {
             var now = DateTimeOffset.UtcNow;
             List<GameEvent> events;
@@ -159,8 +177,6 @@ namespace DOL.GameEvents
 
                 ev.ChanceLastTimeChecked = now;
             }
-
-            Instance.timer.Change(Instance.period, Instance.period);
         }
 
         public void PlayerEntersArea(GamePlayer player, IArea area)
@@ -372,7 +388,8 @@ namespace DOL.GameEvents
             log.Info(string.Format("{0} Events Loaded", Instance.Events.Count()));
 
             CreateMissingRelationObjects(Instance.Events.Values.Select(ev => ev.ID));
-            Instance.timer = new System.Threading.Timer(Instance.TimeCheck, Instance, Instance.dueTime, Instance.period);
+            Instance._timeCheckTimer = new ECSGameTimer(null, static _ => { Instance.RunTimeCheck();
+                return Instance.period; }, Instance.dueTime);
 
             // Evaluate and start uncompleted Onetime events
             foreach (var ev in Instance._onetimeEvents.Where(e => !e.IsCompleted))
@@ -652,7 +669,7 @@ namespace DOL.GameEvents
         public void ResetEventsFromId(string id)
         {
             // TODO: review this, this is awful
-            Instance.timer.Change(Timeout.Infinite, 0);
+            Instance._timeCheckSuspended = true;
             List<string> resetIds = new List<string>();
             var ids = this.GetDependentEventsFromRootEvent(id);
 
@@ -709,7 +726,7 @@ namespace DOL.GameEvents
                 log.Error(string.Format("Reset called by Event: {0} but not Event Resets", id));
             }
 
-            Instance.timer.Change(Instance.period, Instance.period);
+            Instance._timeCheckSuspended = false;
         }
 
         private IEnumerable<GamePlayer> GetPlayersInEventZones(IEnumerable<string> eventZones)

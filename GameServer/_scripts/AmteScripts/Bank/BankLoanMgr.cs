@@ -14,14 +14,18 @@ namespace DOL.GS.Scripts
 {
     public static class BankLoanMgr
     {
-        private static System.Threading.Timer m_loanTimer;
-        private static int m_currentInterval = 60000; // Track interval state
+        private static ECSGameTimer m_loanTimer;
         private static int m_isCheckingLoans = 0;
 
-        [ScriptLoadedEvent]
-        public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
+        [GameServerStartedEvent]
+        public static void OnServerStarted(DOLEvent e, object s, EventArgs a)
         {
-            m_loanTimer = new System.Threading.Timer(CheckPeriodicLoans, null, 60000, 60000);
+            m_loanTimer = new ECSGameTimer(null, static t =>
+            {
+                System.Threading.Tasks.Task.Run(() => CheckPeriodicLoans(null));
+
+                return Properties.BANK_LOAN_DEBUG ? 15_000 : 60_000;
+            }, 60_000);
         }
 
         public static InventoryItem FindCoupon(GamePlayer player, long cost, bool isHouseMerchant)
@@ -239,14 +243,6 @@ namespace DOL.GS.Scripts
             try
             {
                 bool debug = Properties.BANK_LOAN_DEBUG;
-
-                int targetInterval = debug ? 15000 : 60000;
-                if (m_currentInterval != targetInterval)
-                {
-                    m_currentInterval = targetInterval;
-                    m_loanTimer.Change(m_currentInterval, m_currentInterval);
-                }
-
                 var banks = GameServer.Database.SelectAllObjects<DBBanque>();
                 foreach (var bank in banks)
                 {

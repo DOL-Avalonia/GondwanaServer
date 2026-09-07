@@ -1,27 +1,7 @@
-/*
-* DAWN OF LIGHT - The first free open source DAoC server emulator
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*
-*/
 using System;
 using System.Collections;
 using System.IO;
 using System.Reflection;
-
-using DOL.Language;
 using DOL.GS.Effects;
 using DOL.GS.Quests;
 using log4net;
@@ -35,7 +15,7 @@ namespace DOL.GS.PacketHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         protected byte icons;
         public byte Icons
@@ -58,7 +38,7 @@ namespace DOL.GS.PacketHandler
         {
             if (m_gameClient.Player == null)
                 return;
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterPointsUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.CharacterPointsUpdate)))
             {
                 pak.WriteInt((uint)m_gameClient.Player.RealmPoints);
                 pak.WriteShort(m_gameClient.Player.LevelPermill);
@@ -78,7 +58,7 @@ namespace DOL.GS.PacketHandler
         {
             if (m_gameClient.Player == null)
                 return;
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterStatusUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.CharacterStatusUpdate)))
             {
                 pak.WriteByte(m_gameClient.Player.HealthPercent);
                 pak.WriteByte(m_gameClient.Player.ManaPercent);
@@ -104,7 +84,7 @@ namespace DOL.GS.PacketHandler
             if (m_gameClient.Player == null)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.UpdateIcons)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.UpdateIcons)))
             {
                 long initPos = pak.Position;
 
@@ -208,7 +188,7 @@ namespace DOL.GS.PacketHandler
                 mlXPPercent = 100.0; // ML10 has no MLXP, so always 100%
             }
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut((byte)eServerPackets.MasterLevelWindow))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init((byte)eServerPackets.MasterLevelWindow))
             {
                 pak.WriteByte((byte)mlXPPercent); // MLXP (blue bar)
                 pak.WriteByte((byte)Math.Min(mlStepPercent, 100)); // Step percent (red bar)
@@ -238,7 +218,7 @@ namespace DOL.GS.PacketHandler
         /// <param name="player"></param>
         public override void SendPlayerForgedPosition(GamePlayer player)
         {
-            using (GSUDPPacketOut pak = new GSUDPPacketOut(GetPacketCode(eServerPackets.PlayerPosition)))
+            using (GSUDPPacketOut pak = PooledObjectFactory.GetForTick<GSUDPPacketOut>().Init(GetPacketCode(eServerPackets.PlayerPosition)))
             {
                 // PID
                 pak.WriteShort((ushort)player.Client.SessionID);

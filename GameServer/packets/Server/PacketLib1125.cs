@@ -1,22 +1,4 @@
-﻿/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using DOL.Database;
+﻿using DOL.Database;
 using DOL.GS.Effects;
 using DOL.GS.Finance;
 using DOL.GS.Geometry;
@@ -54,7 +36,7 @@ namespace DOL.GS.PacketHandler
         public override void SendVersionAndCryptKey()
         {
             //Construct the new packet
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CryptKey)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.CryptKey)))
             {
                 pak.WritePascalStringIntLE((((int)m_gameClient.Version) / 1000) + "." + (((int)m_gameClient.Version) - 1000) + m_gameClient.MinorRev, 0x20);
                 //// Same as the trailing two bytes sent in first client to server packet
@@ -69,7 +51,7 @@ namespace DOL.GS.PacketHandler
         /// </summary>        
         public override void SendLoginGranted(byte color)
         {
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.LoginGranted)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.LoginGranted)))
             {
                 pak.WritePascalString(m_gameClient.Account.Name);
                 pak.WritePascalString(GameServer.Instance.Configuration.ServerNameShort); //server name
@@ -85,7 +67,7 @@ namespace DOL.GS.PacketHandler
         /// </summary>        
         public override void SendRealm(eRealm realm)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.Realm)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Realm)))
             {
                 pak.WriteByte((byte)realm);
                 pak.Fill(0, 12);
@@ -105,7 +87,7 @@ namespace DOL.GS.PacketHandler
 
             int firstSlot = (byte)realm * 100;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.CharacterOverview)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.CharacterOverview)))
             {
                 //pak.Fillstring(GameClient.Account.Name, 24);
                 pak.Fill(0, 8);
@@ -394,7 +376,7 @@ namespace DOL.GS.PacketHandler
         /// </summary>
         public override void SendUDPInitReply()
         {
-            using (var pak = new GSUDPPacketOut(GetPacketCode(eServerPackets.UDPInitReply)))
+            using (var pak = PooledObjectFactory.GetForTick<GSUDPPacketOut>().Init(GetPacketCode(eServerPackets.UDPInitReply)))
             {
 
                 if (!m_gameClient.Socket.Connected) // not using RC4, wont accept UDP packets anyway.
@@ -413,7 +395,7 @@ namespace DOL.GS.PacketHandler
             if (m_gameClient.Player == null)
                 return;
 
-            using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.VariousUpdate)))
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.VariousUpdate)))
             {
                 pak.WriteByte(0x06); // subcode - player group window
                                      // a 06 00 packet is sent when logging in.
@@ -503,7 +485,7 @@ namespace DOL.GS.PacketHandler
         /// </summary>
         public override void SendMarketExplorerWindow(IList<InventoryItem> items, byte page, byte maxpage)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MarketExplorerWindow)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.MarketExplorerWindow)))
             {
                 pak.WriteByte((byte)items.Count);
                 pak.WriteByte(page);
@@ -521,25 +503,35 @@ namespace DOL.GS.PacketHandler
                         case (int)eObjectType.Bolt:
                         case (int)eObjectType.Poison:
                         case (int)eObjectType.GenericItem:
-                            value1 = item.PackSize;
-                            value2 = item.SPD_ABS; break;
+                            {
+                                value1 = item.PackSize;
+                                value2 = item.SPD_ABS; break;
+                            }
                         case (int)eObjectType.Thrown:
-                            value1 = item.DPS_AF;
-                            value2 = item.PackSize; break;
+                            {
+                                value1 = item.DPS_AF;
+                                value2 = item.PackSize; break;
+                            }
                         case (int)eObjectType.Instrument:
                             value1 = (item.DPS_AF == 2 ? 0 : item.DPS_AF); // 0x00 = Lute ; 0x01 = Drum ; 0x03 = Flute
                             value2 = 0; break; // unused
                         case (int)eObjectType.Shield:
-                            value1 = item.Type_Damage;
-                            value2 = item.DPS_AF; break;
+                            {
+                                value1 = item.Type_Damage;
+                                value2 = item.DPS_AF; break;
+                            }
                         case (int)eObjectType.GardenObject:
                         case (int)eObjectType.HouseWallObject:
                         case (int)eObjectType.HouseFloorObject:
-                            value1 = 0;
-                            value2 = item.SPD_ABS; break;
+                            {
+                                value1 = 0;
+                                value2 = item.SPD_ABS; break;
+                            }
                         default:
-                            value1 = item.DPS_AF;
-                            value2 = item.SPD_ABS; break;
+                            {
+                                value1 = item.DPS_AF;
+                                value2 = item.SPD_ABS; break;
+                            }
                     }
                     pak.WriteByte((byte)value1);
                     pak.WriteByte((byte)value2);
@@ -621,13 +613,13 @@ namespace DOL.GS.PacketHandler
 
         /// <summary>
         /// 1125d+ Merchant window
-        /// </summary>    
+        /// </summary>  
         public override void SendMerchantWindow(MerchantCatalog catalog, eMerchantWindowType windowType)
         {
             foreach (var page in catalog.GetAllPages())
             {
                 if (page.Currency.Equals(Currency.Copper) == false) windowType = ConvertCurrencyToMerchantWindowType(page.Currency);
-                using (GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MerchantWindow)))
+                using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.MerchantWindow)))
                 {
                     pak.WriteByte((byte)page.EntryCount); //Item count on this page
                     pak.WriteByte((byte)windowType);
@@ -694,7 +686,7 @@ namespace DOL.GS.PacketHandler
                                 pak.WriteByte((byte)(item.Hand << 6));
                             }
 
-                            pak.WriteByte((byte)((item.Type_Damage << 6) | item.Object_Type));
+                            pak.WriteByte((byte)((item.Type_Damage > 3 ? 0 : item.Type_Damage << 6) | item.Object_Type));
                             //1 if item cannot be used by your class (greyed out)
                             if (m_gameClient.Player != null && m_gameClient.Player.HasAbilityToUseItem(item))
                             {
@@ -721,7 +713,7 @@ namespace DOL.GS.PacketHandler
         /// </summary> 
         public override void SendFurniture(House house)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HousingItem)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HousingItem)))
             {
                 pak.WriteShortLowEndian((ushort)house.HouseNumber);
                 pak.WriteByte((byte)house.IndoorItems.Count);
@@ -742,7 +734,7 @@ namespace DOL.GS.PacketHandler
         /// </summary>        
         public override void SendFurniture(House house, int i)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HousingItem)))
+            using (var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.HousingItem)))
             {
                 pak.WriteShortLowEndian((ushort)house.HouseNumber);
                 pak.WriteByte(0x01); //cnt

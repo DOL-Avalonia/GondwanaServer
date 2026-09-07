@@ -35,6 +35,7 @@ namespace DOL.Territories
         public static readonly ushort NEUTRAL_EMBLEM = 256;
         private readonly string BOSS_CLASS = "DOL.GS.Scripts.TerritoryBoss";
         private static Dictionary<Timer, Territory> m_TerritoriesAttacked;
+        private static readonly Dictionary<Territory, long> m_territoriesAttackedUntil = new();
 
         public static TerritoryManager Instance => instance ?? (instance = new TerritoryManager());
 
@@ -55,25 +56,25 @@ namespace DOL.Territories
 
         public void TerritoryAttacked(Territory territory, GamePlayer player)
         {
-            if (!m_TerritoriesAttacked.ContainsValue(territory))
+            long now = GameLoop.GameLoopTime;
+            lock (m_territoriesAttackedUntil)
             {
-                Timer timer = new Timer(20000);
-                timer.Elapsed += TerritoryAttackedCallback;
-                timer.Enabled = true;
-                m_TerritoriesAttacked.Add(timer, territory);
-                territory.OwnerGuild?.SendMessageToGuildMembersKey("TerritoryManager.Territory.Attacked", eChatType.CT_Important, eChatLoc.CL_SystemWindow, territory.Name);
+                if (m_territoriesAttackedUntil.TryGetValue(territory, out long until) && until > now)
+                    return;
+                m_territoriesAttackedUntil[territory] = now + 20000;
+            }
+            territory.OwnerGuild?.SendMessageToGuildMembersKey("TerritoryManager.Territory.Attacked",
+                eChatType.CT_Important, eChatLoc.CL_SystemWindow, territory.Name);
 
-                if (territory.OwnerGuild != null)
+            if (territory.OwnerGuild != null)
+            {
+                foreach (var client in WorldMgr.GetAllPlayingClients())
                 {
-                    foreach (var client in WorldMgr.GetAllPlayingClients())
+                    if (client.Player.Guild == territory.OwnerGuild)
                     {
-                        if (client.Player.Guild == territory.OwnerGuild)
-                        {
-                            client.Player.Out.SendSoundEffect(9213, client.Player.Position, 0);
-                        }
+                        client.Player.Out.SendSoundEffect(9213, client.Player.Position, 0);
                     }
                 }
-
             }
         }
 
@@ -557,18 +558,18 @@ namespace DOL.Territories
 
                 if (guild.TryPayTerritoryTax(Money.GetMoney(0, 0, tax, 0, 0)))
                 {
-                    players.Foreach(p => p.Out.SendMessage(Language.LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Guild.TerritoryPaid", tax),
+                    players.Foreach(p => p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Guild.TerritoryPaid", tax),
                                                            eChatType.CT_Guild, eChatLoc.CL_SystemWindow));
                     int mp = count * Properties.DAILY_MERIT_POINTS;
                     guild.GainMeritPoints(mp);
-                    players.Foreach(p => p.Out.SendMessage(Language.LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Guild.TerritoryMeritPoints", mp),
+                    players.Foreach(p => p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Guild.TerritoryMeritPoints", mp),
                                                            eChatType.CT_Guild, eChatLoc.CL_SystemWindow));
                 }
                 else
                 {
                     players.Foreach(p =>
                     {
-                        p.Out.SendMessage(Language.LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Guild.TerritoryNoMoney"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
+                        p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "Commands.Players.Guild.TerritoryNoMoney"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
                         p.Out.SendSoundEffect(9214, p.Position, 0);
                     });
 

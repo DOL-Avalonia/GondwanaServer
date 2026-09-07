@@ -26,10 +26,11 @@ namespace DOL.GameEvents
         private object _db;
         private GamePlayer owner;
 
-        public Timer RandomTextTimer { get; }
-        public Timer RemainingTimeTimer { get; }
-
-        public Timer ResetFamilyTimer { get; }
+        public ECSGameTimer RandomTextTimer { get; }
+        public ECSGameTimer RemainingTimeTimer { get; }
+        public ECSGameTimer ResetFamilyTimer { get; }
+        private int _randomTextIntervalMs;
+        private int _remainingTimeIntervalMs;
 
         public Dictionary<string, ushort> StartEffects;
         public Dictionary<string, ushort> EndEffects;
@@ -51,9 +52,9 @@ namespace DOL.GameEvents
             IsInstanceMaster = false;
             _db = ev._db;
             ID = ev.ID;
-            RandomTextTimer = new Timer();
-            RemainingTimeTimer = new Timer();
-            ResetFamilyTimer = new Timer();
+            RandomTextTimer = new ECSGameTimer(null, OnRandomTextTick);
+            RemainingTimeTimer = new ECSGameTimer(null, OnRemainingTimeTick);
+            ResetFamilyTimer = new ECSGameTimer(null, OnResetFamilyTick);
             Owner = ev.Owner;
 
             EventAreas = ev.EventAreas;
@@ -103,26 +104,17 @@ namespace DOL.GameEvents
             IsCompleted = ev.IsCompleted;
             EventFamilyOrdering = ev.EventFamilyOrdering;
             ActionCancelQuestId = ev.ActionCancelQuestId;
-            if (TimeBeforeReset > 0)
-            {
-                ResetFamilyTimer.Interval = ((long)TimeBeforeReset) * 1000;
-                ResetFamilyTimer.Elapsed += ResetFamilyTimer_Elapsed;
-            }
 
             if (RandTextInterval.HasValue && RandomText != null && this.EventZones?.Any() == true)
             {
-                this.RandomTextTimer.Interval = ((long)RandTextInterval.Value.TotalMinutes).ToTimerMilliseconds();
-                this.RandomTextTimer.Elapsed += RandomTextTimer_Elapsed;
-                this.RandomTextTimer.AutoReset = true;
-                this.HasHandomText = true;
+                _randomTextIntervalMs = (int)RandTextInterval.Value.TotalMilliseconds;
+                HasHandomText = true;
             }
 
             if (RemainingTimeText != null && RemainingTimeInterval.HasValue && this.EventZones?.Any() == true)
             {
-                this.HasRemainingTimeText = true;
-                this.RemainingTimeTimer.Interval = ((long)RemainingTimeInterval.Value.TotalMinutes).ToTimerMilliseconds();
-                this.RemainingTimeTimer.AutoReset = true;
-                this.RemainingTimeTimer.Elapsed += RemainingTimeTimer_Elapsed;
+                _remainingTimeIntervalMs = (int)RemainingTimeInterval.Value.TotalMilliseconds;
+                HasRemainingTimeText = true;
             }
             FamilyFailText = ev.FamilyFailText;
 
@@ -214,9 +206,9 @@ namespace DOL.GameEvents
         {
             _db = db.Clone();
             ID = db.ObjectId;
-            this.RandomTextTimer = new Timer();
-            this.RemainingTimeTimer = new Timer();
-            this.ResetFamilyTimer = new Timer();
+            this.RandomTextTimer = new ECSGameTimer(null, OnRandomTextTick);
+            this.RemainingTimeTimer = new ECSGameTimer(null, OnRemainingTimeTick);
+            this.ResetFamilyTimer = new ECSGameTimer(null, OnResetFamilyTick);
             _eventFamily = new List<Child>();
             IsInstanceMaster = true;
 
@@ -1010,9 +1002,9 @@ namespace DOL.GameEvents
             }
             else
             {
-                if (TimeBeforeReset > 0 && !ResetFamilyTimer.Enabled)
+                if (TimeBeforeReset > 0 && !ResetFamilyTimer.IsAlive)
                 {
-                    ResetFamilyTimer.Start();
+                    ResetFamilyTimer.Start(TimeBeforeReset * 1000);
                 }
                 return false;
             }
@@ -1550,12 +1542,12 @@ namespace DOL.GameEvents
 
             if (HasHandomText)
             {
-                RandomTextTimer.Start();
+                RandomTextTimer.Start(_randomTextIntervalMs);
             }
 
             if (HasRemainingTimeText)
             {
-                RemainingTimeTimer.Start();
+                RemainingTimeTimer.Start(_remainingTimeIntervalMs);
             }
 
             foreach (var mob in Mobs)
@@ -1624,8 +1616,6 @@ namespace DOL.GameEvents
             if (db.TimerBeforeReset != 0)
             {
                 TimeBeforeReset = db.TimerBeforeReset;
-                ResetFamilyTimer.Interval = ((long)TimeBeforeReset) * 1000;
-                ResetFamilyTimer.Elapsed += ResetFamilyTimer_Elapsed;
             }
 
             //Handle invalid ChronoType
@@ -1643,18 +1633,14 @@ namespace DOL.GameEvents
 
             if (RandTextInterval.HasValue && RandomText != null && this.EventZones?.Any() == true)
             {
-                this.RandomTextTimer.Interval = ((long)RandTextInterval.Value.TotalMinutes).ToTimerMilliseconds();
-                this.RandomTextTimer.Elapsed += RandomTextTimer_Elapsed;
-                this.RandomTextTimer.AutoReset = true;
-                this.HasHandomText = true;
+                _randomTextIntervalMs = (int)RandTextInterval.Value.TotalMilliseconds;
+                HasHandomText = true;
             }
 
             if (RemainingTimeText != null && RemainingTimeInterval.HasValue && this.EventZones?.Any() == true)
             {
-                this.HasRemainingTimeText = true;
-                this.RemainingTimeTimer.Interval = ((long)RemainingTimeInterval.Value.TotalMinutes).ToTimerMilliseconds();
-                this.RemainingTimeTimer.AutoReset = true;
-                this.RemainingTimeTimer.Elapsed += RemainingTimeTimer_Elapsed;
+                _remainingTimeIntervalMs = (int)RemainingTimeInterval.Value.TotalMilliseconds;
+                HasRemainingTimeText = true;
             }
 
             if (MobNamesToKill?.Any() == true && EndingConditionTypes.Contains(EndingConditionType.Kill))
@@ -1817,48 +1803,52 @@ namespace DOL.GameEvents
                 .Where(p => p != null && p.CurrentZone != null && eventZones.Contains(p.CurrentZone.ID.ToString()));
         }
 
-        private void RemainingTimeTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private int OnRandomTextTick(ECSGameTimer timer)
         {
-            foreach (var player in GetPlayersInEventZones(this.EventZones))
+            try
             {
-                string message = this.GetFormattedRemainingTimeText(player.Client.Account.Language, player);
-                NotifyPlayerSecondary(player, this.SecondaryAnnonceType, message);
+                var rand = new Random(DateTime.Now.Millisecond);
+                foreach (var player in GetPlayersInEventZones(this.EventZones))
+                {
+                    string message = this.GetFormattedRandomText(player.Client.Account.Language, player);
+                    NotifyPlayerSecondary(player, this.SecondaryAnnonceType, message);
+                }
+                if (!string.IsNullOrEmpty(this.RandomEventSound))
+                {
+                    var sounds = this.RandomEventSound.Split('|').Select(int.Parse).ToArray();
+                    int soundIndex = rand.Next(0, sounds.Length);
+                    foreach (var player in GetPlayersInEventZones(this.EventZones))
+                        player.Out.SendSoundEffect((ushort)sounds[soundIndex], player.Position, 0);
+                }
             }
+            catch (Exception ex) { log.Error("Event random text tick", ex); }
+            return _randomTextIntervalMs;
+        }
 
-            if (this.RemainingTimeEvSound > 0)
+        private int OnRemainingTimeTick(ECSGameTimer timer)
+        {
+            try
             {
                 foreach (var player in GetPlayersInEventZones(this.EventZones))
                 {
-                    player.Out.SendSoundEffect((ushort)this.RemainingTimeEvSound, player.Position, 0);
+                    string message = this.GetFormattedRemainingTimeText(player.Client.Account.Language, player);
+                    NotifyPlayerSecondary(player, this.SecondaryAnnonceType, message);
                 }
-            }
-        }
-
-        private void RandomTextTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            var rand = new Random(DateTime.Now.Millisecond);
-            int index = rand.Next(0, this.RandomText.Count());
-
-            foreach (var player in GetPlayersInEventZones(this.EventZones))
-            {
-                string message = this.GetFormattedRandomText(player.Client.Account.Language, player);
-                NotifyPlayerSecondary(player, this.SecondaryAnnonceType, message);
-            }
-
-            if (!string.IsNullOrEmpty(this.RandomEventSound))
-            {
-                var sounds = this.RandomEventSound.Split('|').Select(int.Parse).ToArray();
-                int soundIndex = rand.Next(0, sounds.Length);
-                foreach (var player in GetPlayersInEventZones(this.EventZones))
+                if (this.RemainingTimeEvSound > 0)
                 {
-                    player.Out.SendSoundEffect((ushort)sounds[soundIndex], player.Position, 0);
+                    foreach (var player in GetPlayersInEventZones(this.EventZones))
+                        player.Out.SendSoundEffect((ushort)this.RemainingTimeEvSound, player.Position, 0);
                 }
             }
+            catch (Exception ex) { log.Error("Event remaining time tick", ex); }
+            return _remainingTimeIntervalMs;
         }
 
-        private void ResetFamilyTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private int OnResetFamilyTick(ECSGameTimer timer)
         {
-            ResetChildren();
+            try { ResetChildren(); }
+            catch (Exception ex) { log.Error("Event family reset tick", ex); }
+            return 0;
         }
 
         public void StopChildren()

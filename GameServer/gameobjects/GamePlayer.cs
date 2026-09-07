@@ -68,9 +68,10 @@ namespace DOL.GS
     /// <summary>
     /// This class represents a player inside the game
     /// </summary>
-    public class GamePlayer : GameLiving
+    public class GamePlayer : GameLiving, IPooledList<GamePlayer>
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        public override Zone.eGameObjectType GameObjectType => Zone.eGameObjectType.PLAYER;
 
         private static long reputationDaysDurationInSeconds = Properties.REPUTATION_DAYS_INTERVAL * 86400;
 

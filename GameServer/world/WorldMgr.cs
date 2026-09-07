@@ -198,13 +198,7 @@ namespace DOL.GS
         /// <summary>
         /// Timer for ping timeout checks
         /// </summary>
-        private static Timer m_pingCheckTimer;
-
-        /// <summary>
-        /// This thread is used to update the NPCs around a player
-        /// as fast as possible
-        /// </summary>
-        private static Thread m_WorldUpdateThread;
+        private static ECSGameTimer m_pingCheckTimer;
 
         /// <summary>
         /// This constant defines the day constant
@@ -220,7 +214,7 @@ namespace DOL.GS
         /// A timer that will send the daytime to all playing
         /// clients after a certain intervall;
         /// </summary>
-        private static Timer m_dayResetTimer;
+        private static ECSGameTimer _dayResetTimer;
 
         /// <summary>
         /// Region ID INI field
@@ -292,11 +286,6 @@ namespace DOL.GS
         /// Does this zone contain Lava
         /// </summary>
         private const string ENTRY_ZONE_LAVA = "IsLava";
-
-        /// <summary>
-        /// Relocation threads for relocation of zones
-        /// </summary>
-        private static Thread m_relocationThread;
 
         /// <summary>
         /// Holds all region timers
@@ -540,12 +529,6 @@ namespace DOL.GS
                     log.Info("Total Bind Points: " + bindpoints);
                 }
 
-                m_WorldUpdateThread = new Thread(new ThreadStart(WorldUpdateThread.WorldUpdateThreadStart));
-                m_WorldUpdateThread.Priority = ThreadPriority.AboveNormal;
-                m_WorldUpdateThread.Name = "NpcUpdate";
-                m_WorldUpdateThread.IsBackground = true;
-                m_WorldUpdateThread.Start();
-
                 m_dayNightCycle = new DayNightCycle();
 
                 m_dayNightCycle.NewDayStarted += (s, e) =>
@@ -555,13 +538,8 @@ namespace DOL.GS
 
                 m_dayNightCycle.Init();
 
-                m_dayResetTimer = new Timer(new TimerCallback(DayReset), null, 15 * 60 * 1000, 15 * 60 * 1000);
-                m_pingCheckTimer = new Timer(new TimerCallback(PingCheck), null, 10 * 1000, 0); // every 10s a check
-
-                m_relocationThread = new Thread(new ThreadStart(RelocateRegions));
-                m_relocationThread.Name = "RelocateReg";
-                m_relocationThread.IsBackground = true;
-                m_relocationThread.Start();
+                _dayResetTimer = new ECSGameTimer(null, t => { DayReset(null); return 15 * 60 * 1000; }, 15 * 60 * 1000);
+                m_pingCheckTimer = new ECSGameTimer(null, PingCheckTick, 10 * 1000);
             }
             catch (Exception e)
             {
@@ -587,52 +565,37 @@ namespace DOL.GS
         /// perform the ping timeout check and disconnect clients that timed out
         /// </summary>
         /// <param name="sender"></param>
-        private static void PingCheck(object sender)
+        private static int PingCheckTick(ECSGameTimer timer)
         {
             try
             {
+                long now = GameLoop.GameLoopTime;
                 foreach (GameClient client in GetAllClients())
                 {
                     try
                     {
-                        // check ping timeout if we are in charscreen or in playing state
-                        if (client.ClientState == GameClient.eClientState.CharScreen ||
-                            client.ClientState == GameClient.eClientState.Playing)
+                        if (client.ClientState is GameClient.eClientState.CharScreen
+                            or GameClient.eClientState.Playing)
                         {
-                            if (client.PingTime + PING_TIMEOUT * 1000 * 1000 * 10 < DateTime.Now.Ticks)
+                            if (now - client.PingTime > PING_TIMEOUT * 1000)
                             {
                                 if (log.IsWarnEnabled)
                                     log.Warn("Ping timeout for client " + client.Account.Name);
                                 GameServer.Instance.Disconnect(client);
                             }
                         }
-                        else
+                        else if (now - client.PingTime > 10 * 60 * 1000)
                         {
-                            // in all other cases client gets 10min to get wether in charscreen or playing state
-                            if (client.PingTime + 10 * 60 * 10000000L < DateTime.Now.Ticks)
-                            {
-                                if (log.IsWarnEnabled)
-                                    log.Warn("Hard timeout for client " + client.Account.Name + " (" + client.ClientState + ")");
-                                GameServer.Instance.Disconnect(client);
-                            }
+                            if (log.IsWarnEnabled)
+                                log.Warn("Hard timeout for client " + client.Account.Name);
+                            GameServer.Instance.Disconnect(client);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        if (log.IsErrorEnabled)
-                            log.Error("PingCheck", ex);
-                    }
+                    catch (Exception ex) { log.Error("PingCheck", ex); }
                 }
             }
-            catch (Exception e)
-            {
-                if (log.IsErrorEnabled)
-                    log.Error("PingCheck callback", e);
-            }
-            finally
-            {
-                m_pingCheckTimer.Change(10 * 1000, Timeout.Infinite);
-            }
+            catch (Exception e) { log.Error("PingCheck callback", e); }
+            return 10 * 1000;
         }
 
 #if NETFRAMEWORK
@@ -643,49 +606,7 @@ namespace DOL.GS
         }
 #endif
 
-        public static string GetFormattedRelocateRegionsStackTrace()
-        {
-            return Util.GetFormattedStackTraceFrom(m_relocationThread);
-        }
-
-        private static void RelocateRegions()
-        {
-            log.InfoFormat("started RelocateRegions() thread ID:{0}", Thread.CurrentThread.ManagedThreadId);
-            while (m_relocationThread != null && m_relocationThread.IsAlive)
-            {
-                try
-                {
-                    Thread.Sleep(200); // check every 200ms for needed relocs
-                    var start = GameTimer.GetTickCount();
-
-                    var regionsClone = m_regions.Values;
-
-                    foreach (Region region in regionsClone)
-                    {
-                        if (region.NumPlayers > 0 && (region.LastRelocationTime + Zone.MAX_REFRESH_INTERVAL) * 10 * 1000 < DateTime.Now.Ticks)
-                        {
-                            region.Relocate();
-                        }
-                    }
-                    var took = GameTimer.GetTickCount() - start;
-                    if (took > 500)
-                    {
-                        if (log.IsWarnEnabled)
-                            log.WarnFormat("RelocateRegions() took {0}ms", took);
-                    }
-                }
-                catch (ThreadInterruptedException)
-                {
-                    //On Thread interrupt exit!
-                    return;
-                }
-                catch (Exception e)
-                {
-                    log.Error(e.ToString());
-                }
-            }
-            log.InfoFormat("stopped RelocateRegions() thread ID:{0}", Thread.CurrentThread.ManagedThreadId);
-        }
+        public static string GetFormattedRelocateRegionsStackTrace() => "(RelocationService — runs on the game loop)";
 
         /// <summary>
         /// This timer callback resets the day on all clients
@@ -813,10 +734,7 @@ namespace DOL.GS
         }
 #endif
 
-        public static string GetFormattedWorldUpdateStackTrace()
-        {
-            return Util.GetFormattedStackTraceFrom(m_WorldUpdateThread);
-        }
+        public static string GetFormattedWorldUpdateStackTrace() => "(ClientService — runs on the game loop)";
 
         private static uint m_lastWorldObjectUpdateTick = 0;
 
@@ -839,23 +757,13 @@ namespace DOL.GS
 
                 if (m_pingCheckTimer != null)
                 {
-                    m_pingCheckTimer.Dispose();
+                    m_pingCheckTimer.Stop();
                     m_pingCheckTimer = null;
                 }
-                if (m_dayResetTimer != null)
+                if (_dayResetTimer != null)
                 {
-                    m_dayResetTimer.Dispose();
-                    m_dayResetTimer = null;
-                }
-                if (m_WorldUpdateThread != null)
-                {
-                    m_WorldUpdateThread.Interrupt();
-                    m_WorldUpdateThread = null;
-                }
-                if (m_relocationThread != null)
-                {
-                    m_relocationThread.Interrupt();
-                    m_relocationThread = null;
+                    _dayResetTimer.Stop();
+                    _dayResetTimer = null;
                 }
 
                 //Stop all mobMgrs
@@ -1056,6 +964,9 @@ namespace DOL.GS
                     {
                         m_clients[i] = obj;
                         obj.SessionID = i + 1;
+                        obj.NextWorldUpdateTick = 0;
+                        obj.LastWorldUpdateRegion = null;
+                        ServiceObjectStore.Add(obj);
                         return i + 1;
                     }
             }
@@ -1265,6 +1176,12 @@ namespace DOL.GS
             }
             if (client == null)
                 return;
+
+            ServiceObjectStore.Remove(client);
+            client.GameObjectUpdateArray.Clear();
+            client.HouseUpdateArray.Clear();
+            client.LastWorldUpdateRegion = null;
+
             if (client.Player == null)
                 return;
             //client.Player.RemoveFromWorld();

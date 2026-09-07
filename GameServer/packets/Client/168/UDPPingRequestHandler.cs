@@ -50,7 +50,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
             // unsure what this value is now thats sent in 1.125
             // Its just a ping back letting the server know that UDP connection is still alive
-            client.UdpPingTime = DateTime.Now.Ticks;
+            client.UdpPingTime = GameLoop.GameLoopTime;
             client.UdpConfirm = true;
         }
     }
