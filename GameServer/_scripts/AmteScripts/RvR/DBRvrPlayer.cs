@@ -17,6 +17,12 @@ namespace DOL.Database
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
+        public Position GetOldPosition()
+            => Position.Create((ushort)OldRegion, OldX, OldY, OldZ, (ushort)OldHeading);
+
+        public Position GetOldBindPosition()
+            => Position.Create((ushort)OldBindRegion, OldBindX, OldBindY, OldBindZ, (ushort)OldBindHeading);
+
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
         {

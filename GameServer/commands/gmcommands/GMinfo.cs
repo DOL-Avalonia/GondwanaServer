@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -262,26 +243,18 @@ namespace DOL.GS.Commands
                         info.Add("InView: " + target.TargetInView);
                     }
 
-                    if (target.Brain != null && target.Brain is StandardMobBrain)
-                    {
-                        Dictionary<GameLiving, long> aggroList = (target.Brain as StandardMobBrain).AggroTable;
-
-                        if (aggroList.Count > 0)
-                        {
-                            info.Add("");
-                            info.Add("Aggro List:");
-
-                            foreach (GameLiving living in aggroList.Keys)
-                                info.Add(living.Name + ": " + aggroList[living]);
-                        }
-                    }
-
-                    if (target.Attackers != null && target.Attackers.Count > 0)
+                    if (target.Brain is StandardMobBrain smb && smb.HasAggro)
                     {
                         info.Add("");
-                        info.Add("Attacker List:");
-
-                        foreach (GameLiving attacker in target.Attackers)
+                        info.Add("Aggro List (base / effective):");
+                        foreach (var (living, baseAggro, effectiveAggro) in smb.GetAggroListDebug())
+                            info.Add($"{living.Name}: {baseAggro} / {effectiveAggro}");
+                    }
+                    if (target.AttackerTracker.Count > 0)
+                    {
+                        info.Add("");
+                        info.Add($"Attacker List ({target.AttackerTracker.MeleeCount} melee):");
+                        foreach (GameLiving attacker in target.AttackerTracker.Attackers)
                             info.Add(attacker.Name);
                     }
 

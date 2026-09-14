@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using Discord;
 using System;
 using System.Collections.Generic;
@@ -348,10 +330,14 @@ namespace DOL.GS.Spells
             set { m_stage = value; }
         }
         protected int m_stage = 0;
+
         /// <summary>
         /// Use to store Time when the delayedcast started
         /// </summary>
         protected long m_started = 0;
+
+        protected long m_castEndTick = 0;
+
         /// <summary>
         /// Shall we start the reuse timer
         /// </summary>
@@ -818,20 +804,20 @@ namespace DOL.GS.Spells
             int step1 = time / 3;
             int step3 = step1;
 
-            step1 = step1.Clamp(1, ServerProperties.Properties.SPELL_INTERRUPT_MAXSTAGELENGTH);
-            step3 = step3.Clamp(1, ServerProperties.Properties.SPELL_INTERRUPT_MAXSTAGELENGTH);
+            step1 = step1.Clamp(1, Properties.SPELL_INTERRUPT_MAXSTAGELENGTH);
+            step3 = step3.Clamp(1, Properties.SPELL_INTERRUPT_MAXSTAGELENGTH);
 
             int step2 = time - step1 - step3;
             byte step2_substeps = 0;
-            if (step2 > ServerProperties.Properties.SPELL_INTERRUPT_MAX_INTERMEDIATE_STAGELENGTH)
+            if (step2 > Properties.SPELL_INTERRUPT_MAX_INTERMEDIATE_STAGELENGTH)
             {
-                step2_substeps = (byte)((step2 / ServerProperties.Properties.SPELL_INTERRUPT_MAX_INTERMEDIATE_STAGELENGTH) + 1);
+                step2_substeps = (byte)((step2 / Properties.SPELL_INTERRUPT_MAX_INTERMEDIATE_STAGELENGTH) + 1);
                 step2 /= step2_substeps;
             }
             if (step2 < 1)
                 step2 = 1;
 
-            if (Caster is GamePlayer casterPlayer && ServerProperties.Properties.ENABLE_DEBUG)
+            if (Caster is GamePlayer casterPlayer && Properties.ENABLE_DEBUG)
             {
                 casterPlayer.Out.SendMessage($"[DEBUG] spell time = {time}, step1 = {step1}, step2 = {step2}, step3 = {step3}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
@@ -839,6 +825,7 @@ namespace DOL.GS.Spells
             m_castTimer = new DelayedCastTimer(Caster, this, target, step2, step3, step2_substeps);
             m_castTimer.Start(step1);
             m_started = Caster.CurrentRegion.Time;
+            m_castEndTick = m_started + time;
             SendCastAnimation();
 
             Caster.Notify(GameLivingEvent.CastStarting, m_caster, new CastingEventArgs(this));
@@ -1263,6 +1250,8 @@ namespace DOL.GS.Spells
             return true;
         }
 
+        #region Line of sight
+
         /// <summary>
         /// Does the area we are in force an LoS check on everything?
         /// </summary>
@@ -1281,6 +1270,139 @@ namespace DOL.GS.Spells
             return false;
         }
 
+        /// <summary>
+        /// True when the effect of this spell must wait for a client line-of-sight answer before being applied:
+        /// cone spells, point-blank AoE, or caster / target standing in an area flagged CheckLOS (keeps, towers...).
+        /// Everywhere else the effect is applied immediately (no packet).
+        /// </summary>
+        protected virtual bool NeedsEndOfCastLosCheck(GameLiving target)
+        {
+            if (target == null || target == Caster)
+                return false;
+
+            string spellTarget = Spell.Target.ToLowerInvariant();
+            if (spellTarget == "cone")
+                return true;
+            if (spellTarget == "enemy" && Spell.Radius > 0 && Spell.Range == 0) // PBAoE
+                return true;
+
+            return MustCheckLOS(Caster) || MustCheckLOS(target);
+        }
+
+        /// <summary>
+        /// True when a resist (message, interrupt, combat timers) should only be applied after the client confirmed
+        /// the player target is really in view. Limited to CheckLOS areas to save packets in open-field fights.
+        /// Change the condition to "target is GamePlayer &amp;&amp; target != Caster" if you want it everywhere.
+        /// </summary>
+        protected virtual bool NeedsResistLosCheck(GameLiving target)
+        {
+            return target is GamePlayer && target != Caster && (MustCheckLOS(Caster) || MustCheckLOS(target));
+        }
+
+        protected enum eSpellLosCheckKind : byte { EndOfCast, Resist }
+
+        private SpellLosCheckListener m_endOfCastLosCheckListener;
+        private DuringCastLosCheckListener m_duringCastLosCheckListener;
+        private SpellLosCheckListener m_resistLosCheckListener;
+
+        /// <summary>
+        /// Asks a client whether the caster can see <paramref name="target"/> before applying the spell to it.
+        /// Returns false when nobody can answer: the caller must then apply the effect directly (old behaviour).
+        /// The answer arrives in <see cref="OnEndOfCastLosCheck"/> (synchronously when cached).
+        /// </summary>
+        protected bool StartEndOfCastLosCheck(GameLiving target, double effectiveness)
+            => StartSpellLosCheck(ref m_endOfCastLosCheckListener, eSpellLosCheckKind.EndOfCast, target, effectiveness);
+
+        /// <summary>
+        /// Same for the "spell resisted" feedback (some spells only show it when the target was visible)
+        /// .</summary>
+        protected bool StartResistLosCheck(GameLiving target)
+            => StartSpellLosCheck(ref m_resistLosCheckListener, eSpellLosCheckKind.Resist, target, 1.0);
+
+        /// <summary>
+        /// Asks the best available client whether the caster still sees its target while the cast bar is running.
+        /// Deduplicated / cached by the LosCheckHandler: at most one packet per (caster, target) pair every few seconds.
+        /// </summary>
+        private void StartDuringCastLosCheck(GameLiving target)
+        {
+            if (target == null || target == Caster)
+                return;
+
+            bool involvesPlayer = Caster is GamePlayer || target is GamePlayer
+                                  || Caster.GetPlayerOwner() != null || target.GetPlayerOwner() != null;
+
+            // mob vs mob in the open field is not worth a packet
+            if (!involvesPlayer && !MustCheckLOS(Caster))
+                return;
+
+            GamePlayer losChecker = LosCheckHandler.FindLosChecker(Caster, target);
+            if (losChecker == null)
+                return;
+
+            m_duringCastLosCheckListener ??= new DuringCastLosCheckListener(this);
+            losChecker.Out.SendLosCheckRequest(Caster, target, m_duringCastLosCheckListener);
+        }
+
+        private sealed class DuringCastLosCheckListener : ILosCheckListener
+        {
+            private readonly SpellHandler _handler;
+
+            public DuringCastLosCheckListener(SpellHandler handler)
+            {
+                _handler = handler;
+            }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                if (response != LosCheckResponse.False) // timeouts never interrupt a cast
+                    return;
+                if (!_handler.IsCasting || _handler.Interrupted)
+                    return;
+                if (_handler.Target == null || (ushort)_handler.Target.ObjectID != targetId) // target changed meanwhile
+                    return;
+
+                if (_handler.Caster is GamePlayer casterPlayer)
+                {
+                    _handler.MessageToCaster(LanguageMgr.GetTranslation(casterPlayer.Client, "SpellHandler.CheckLOSPlayerToTarget.CantSeeTarget"), eChatType.CT_SpellResisted);
+                    if (_handler.Spell.IsFocus && _handler.Spell.IsHarmful)
+                        _handler.FocusSpellAction(null, _handler.Caster, null);
+                }
+
+                _handler.InterruptCasting();
+            }
+        }
+
+        private bool StartSpellLosCheck(ref SpellLosCheckListener listener, eSpellLosCheckKind kind, GameLiving target, double effectiveness)
+        {
+            if (target == null || Caster == null || target == Caster) return false;
+
+            GamePlayer losChecker = LosCheckHandler.FindLosChecker(Caster, target);
+            if (losChecker == null) return false;
+
+            listener ??= new SpellLosCheckListener(this, kind);
+            listener.AddPending(target, effectiveness);
+
+            if (losChecker.Out.SendLosCheckRequest(Caster, target, listener)) return true;
+
+            listener.RemovePending(target);
+            return false;
+        }
+
+        /// <summary>
+        /// Called with the answer of <see cref="StartEndOfCastLosCheck"/>.
+        /// Override in spell handlers that use it.
+        /// </summary>
+        public virtual void OnEndOfCastLosCheck(GameLiving target, double effectiveness, LosCheckResponse response) { }
+
+        /// <summary>
+        /// Called with the answer of <see cref="StartResistLosCheck"/>.
+        /// Default: show the resist unless the client said "not visible".
+        /// </summary>
+        protected virtual void OnResistLosCheck(GameLiving target, LosCheckResponse response)
+        {
+            if (response != LosCheckResponse.False)
+                ApplySpellResistedEffects(target);
+        }
 
         /// <summary>
         /// Check the Line of Sight from you to your pet
@@ -1312,7 +1434,7 @@ namespace DOL.GS.Spells
             if ((response & 0x100) == 0x100) // In view?
                 return;
 
-            if (ServerProperties.Properties.ENABLE_DEBUG)
+            if (Properties.ENABLE_DEBUG)
             {
                 MessageToCaster(LanguageMgr.GetTranslation(player.Client, "SpellHandler.CheckLOSPlayerToTarget.LoSInterrupt"), eChatType.CT_System);
                 log.Debug("LoS Interrupt in CheckLOSPlayerToTarget");
@@ -1344,7 +1466,7 @@ namespace DOL.GS.Spells
             if ((response & 0x100) == 0x100) // In view?
                 return;
 
-            if (ServerProperties.Properties.ENABLE_DEBUG)
+            if (Properties.ENABLE_DEBUG)
             {
                 MessageToCaster(LanguageMgr.GetTranslation(player.Client, "SpellHandler.CheckLOSNPCToTarget.LoSInterrupt"), eChatType.CT_System);
                 log.Debug("LoS Interrupt in CheckLOSNPCToTarget");
@@ -1352,6 +1474,72 @@ namespace DOL.GS.Spells
 
             InterruptCasting();
         }
+
+        /// <summary>
+        /// Remembers, per target, the effectiveness to apply once the LoS answer arrives
+        /// (fixes the shared "LOS Effectivness" TempProperty bug).
+        /// </summary>
+        protected sealed class SpellLosCheckListener : ILosCheckListener
+        {
+            private readonly SpellHandler _handler;
+            private readonly eSpellLosCheckKind _kind;
+            private readonly List<PendingEntry> _pending = new(2);
+            private readonly object _lock = new object();
+
+            private readonly record struct PendingEntry(ushort TargetId, double Effectiveness);
+
+            public SpellLosCheckListener(SpellHandler handler, eSpellLosCheckKind kind) { _handler = handler; _kind = kind; }
+
+            public void AddPending(GameLiving target, double effectiveness)
+            {
+                lock (_lock) _pending.Add(new PendingEntry((ushort)target.ObjectID, effectiveness));
+            }
+
+            public void RemovePending(GameLiving target)
+            {
+                ushort targetId = (ushort)target.ObjectID;
+                lock (_lock)
+                {
+                    for (int i = _pending.Count - 1; i >= 0; i--)
+                    {
+                        if (_pending[i].TargetId == targetId) { _pending.RemoveAt(i); break; }
+                    }
+                }
+            }
+
+            private bool TryTakePending(ushort targetId, out double effectiveness)
+            {
+                lock (_lock)
+                {
+                    for (int i = 0; i < _pending.Count; i++)
+                    {
+                        if (_pending[i].TargetId != targetId) continue;
+                        effectiveness = _pending[i].Effectiveness;
+                        _pending.RemoveAt(i);
+                        return true;
+                    }
+                }
+                effectiveness = 0;
+                return false;
+            }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                GameLiving target = _handler.Caster?.CurrentRegion?.GetObject(targetId) as GameLiving;
+
+                while (TryTakePending(targetId, out double effectiveness))
+                {
+                    if (target == null) continue;
+                    if (_kind == eSpellLosCheckKind.EndOfCast)
+                        _handler.OnEndOfCastLosCheck(target, effectiveness, response);
+                    else
+                        _handler.OnResistLosCheck(target, response);
+                }
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Checks after casting before spell is executed
         /// </summary>
@@ -1594,28 +1782,8 @@ namespace DOL.GS.Spells
                             return false;
                         }
 
-                        if (ServerProperties.Properties.CHECK_LOS_DURING_CAST)
-                        {
-                            // If the area forces an LoS check then we do it, otherwise we only check
-                            // if caster or target is a player
-                            // This will generate an interrupt if LOS check fails
-
-                            if (Caster is GamePlayer casterPlayer)
-                            {
-                                casterPlayer.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(CheckLOSPlayerToTarget));
-                            }
-                            else if (target is GamePlayer targetPlayer)
-                            {
-                                targetPlayer.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(CheckLOSNPCToTarget));
-                            }
-                            else if (MustCheckLOS(Caster))
-                            {
-                                GamePlayer checkerPlayer = Caster.CurrentRegion.GetPlayersInRadius(Caster.Coordinate, WorldMgr.VISIBILITY_DISTANCE, false, true).Cast<GamePlayer>().FirstOrDefault(p => Caster.IsVisibleTo(p) && target.IsVisibleTo(p));
-                                
-                                if (checkerPlayer != null)
-                                    checkerPlayer.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(CheckLOSNPCToTarget));
-                            }
-                        }
+                        if (Properties.CHECK_LOS_DURING_CAST)
+                            StartDuringCastLosCheck(target);
 
                         if (!GameServer.ServerRules.IsAllowedToAttack(Caster, target, quiet))
                         {
@@ -3857,11 +4025,13 @@ namespace DOL.GS.Spells
             return 100 - CalculateToHitChance(target);
         }
 
+        public virtual void OnSpellResisted(GameLiving target) => ApplySpellResistedEffects(target);
+
         /// <summary>
-        /// When spell was resisted
+        /// Animation, messages, notification, interrupt and combat timers of a resisted spell
+        /// (no LoS logic, no virtual call).
         /// </summary>
-        /// <param name="target">the target that resisted the spell</param>
-        public virtual void OnSpellResisted(GameLiving target)
+        protected void ApplySpellResistedEffects(GameLiving target)
         {
             SendSpellResistAnimation(target);
             SendSpellResistMessages(target);
@@ -4106,6 +4276,11 @@ namespace DOL.GS.Spells
         public GameLiving Caster => m_caster;
         public bool IsCasting
             => m_castTimer != null && m_castTimer.IsAlive;
+
+        public bool IsCastEndingSoon(int milliseconds)
+        {
+            return IsCasting && Caster.CurrentRegion != null && m_castEndTick - Caster.CurrentRegion.Time <= milliseconds;
+        }
 
         public virtual bool HasPositiveEffect => m_spell.IsHelpful;
 
@@ -4625,11 +4800,11 @@ namespace DOL.GS.Spells
                 missrate += target.GetModified(eProperty.DefensiveBonus);
             if (caster is GamePlayer && target is GamePlayer)
             {
-                missrate = (int)(missrate * ServerProperties.Properties.PVP_BASE_MISS_MULTIPLIER);
+                missrate = (int)(missrate * Properties.PVP_BASE_MISS_MULTIPLIER);
             }
             else
             {
-                missrate = (int)(missrate * ServerProperties.Properties.PVE_BASE_MISS_MULTIPLIER);
+                missrate = (int)(missrate * Properties.PVE_BASE_MISS_MULTIPLIER);
             }
 
             if (caster.EffectList.GetOfType<AdrenalineMageSpellEffect>() != null)
@@ -4641,8 +4816,8 @@ namespace DOL.GS.Spells
 
             if (!(caster is GamePlayer && target is GamePlayer))
             {
-                hitchance -= (int)(m_caster.GetConLevel(target) * ServerProperties.Properties.PVE_SPELL_CONHITPERCENT);
-                hitchance += Math.Max(0, target.Attackers.Count - 1) * ServerProperties.Properties.MISSRATE_REDUCTION_PER_ATTACKERS;
+                hitchance -= (int)(m_caster.GetConLevel(target) * Properties.PVE_SPELL_CONHITPERCENT);
+                hitchance += Math.Max(0, target.AttackerTracker.Count - 1) * Properties.MISSRATE_REDUCTION_PER_ATTACKERS;
             }
 
             // [Freya] Nidel: Harpy Cloak : They have less chance of landing melee attacks, and spells have a greater chance of affecting them.

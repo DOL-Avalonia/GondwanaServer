@@ -5,95 +5,70 @@ using log4net;
 namespace DOL.GS
 {
     /// <summary>
-    /// LEGACY TIMER BRIDGE (Gondwana GameLoop port).
-    /// The old bucket-wheel timer and its per-region threads are gone.
-    /// Every legacy GameTimer (RegionTimer, RegionTimerAction, RegionAction,
-    /// DelayedCastTimer, PulsingEffectTimer, CraftAction, ...) is now a thin
-    /// wrapper around an ECSGameTimer, ticked by TimerService on the GameLoop.
-    /// Public API is preserved so no derived script needs to change.
+    /// Legacy timer base class. Since the GameLoop migration this class no longer
+    /// owns any thread: every GameTimer — and therefore every RegionTimer,
+    /// RegionAction, RegionTimerAction and PulsingEffectTimer — is executed by
+    /// TimerService on the game loop, through an internal ECSGameTimer.
+    ///
+    /// The nested TimeManager survives only as a compile shim for Region/WorldMgr:
+    /// it starts no thread and simply exposes the game loop clock. This means
+    /// Region.Time, GameTimer.GetTickCount() and ECSGameTimer all share ONE clock.
+    ///
+    /// Phase 2 goal: migrate call sites to ECSGameTimer directly, then delete
+    /// this file together with RegionTimer/RegionAction/RegionTimerAction.
     /// </summary>
     public abstract class GameTimer
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        private readonly InnerTimer _inner;
+        private int _interval;
 
-        // Kept for source compatibility (some old code references these constants).
-        public static readonly long TIMER_DISABLED = long.MinValue;
-        public static readonly long TIMER_RESCHEDULED = 0x40000000;
-
-        private readonly TimeManager m_time;
-        private ECSGameTimer m_inner;
-        private int m_interval;
-        private volatile bool m_alive;
-
+        /// <param name="time">Kept for source compatibility. Ignored: all timers run on the GameLoop.</param>
         protected GameTimer(TimeManager time)
         {
-            // Old code threw on null; we tolerate it and fall back to the shared stub.
-            m_time = time ?? TimeManager.Default;
+            _inner = new InnerTimer(this);
         }
 
-        /// <summary>Repeat interval in ms. 0 = one-shot. Can be changed inside OnTick().</summary>
+        /// <summary>
+        /// Legacy repeat interval. OnTick implementations may change it;
+        /// a value of 0 stops the timer after the current tick.
+        /// </summary>
         public virtual int Interval
         {
-            get => m_interval;
-            set => m_interval = value < 0 ? 0 : value;
+            get => _interval;
+            set => _interval = value;
         }
 
+        /// <summary>Legacy property, no longer meaningful. Kept for compatibility.</summary>
         public long MaxInterval => int.MaxValue;
 
-        public bool IsAlive => m_alive && m_inner is { IsAlive: true };
+        public bool IsAlive => _inner.IsAlive;
 
-        /// <summary>Milliseconds until next tick, or -1 if not running.</summary>
-        public int TimeUntilElapsed => (!m_alive || m_inner == null) ? -1 : m_inner.TimeUntilElapsed;
+        /// <summary>Milliseconds until the next tick, or -1 when stopped.</summary>
+        public int TimeUntilElapsed => _inner.IsAlive ? _inner.TimeUntilElapsed : -1;
 
+        /// <summary>
+        /// Legacy semantics preserved: the first tick fires after 'initialDelay',
+        /// then the timer repeats every 'Interval' ms (0 = one-shot).
+        /// </summary>
         public virtual void Start(int initialDelay)
         {
             if (initialDelay < 1)
                 initialDelay = 1;
-
-            m_alive = true;
-            m_inner ??= new ECSGameTimer(null, InnerTick);
-            m_inner.Start(initialDelay); // also reschedules if already running
+            _inner.Start(initialDelay);
         }
 
         public virtual void Stop()
         {
-            m_alive = false;
-            m_inner?.Stop();
+            _inner.Stop();
         }
 
         public abstract void OnTick();
 
-        private int InnerTick(ECSGameTimer timer)
-        {
-            if (!m_alive)
-                return 0;
+        public override string ToString() => $"{GetType().FullName} interval:{_interval}";
 
-            try
-            {
-                OnTick();
-            }
-            catch (Exception e)
-            {
-                if (log.IsErrorEnabled)
-                {
-                    string desc;
-                    try { desc = ToString(); }
-                    catch (Exception ee) { desc = GetType().FullName + " (ToString failed: " + ee.Message + ")"; }
-                    log.Error("Legacy timer callback error (" + desc + ")", e);
-                }
-
-                m_alive = false;
-                return 0;
-            }
-
-            if (!m_alive)
-                return 0;
-
-            // Legacy semantics: after a tick, reschedule using Interval; 0 stops (one-shot).
-            return m_interval;
-        }
-
-        /// <summary>Unified monotonic clock (was a Stopwatch; now the GameLoop clock).</summary>
+        /// <summary>
+        /// Unified monotonic clock (was a Stopwatch; now the GameLoop clock).
+        /// </summary>
         public static uint GetTickCount()
         {
             return (uint)GameLoop.GameLoopTime;
@@ -104,47 +79,60 @@ namespace DOL.GS
             return GameLoop.GameLoopTime;
         }
 
-        public override string ToString()
+        /// <summary>
+        /// The bridge that actually runs on TimerService.
+        /// </summary>
+        private sealed class InnerTimer : ECSGameTimer
         {
-            return $"{GetType().FullName} interval:{m_interval} alive:{IsAlive} manager:'{m_time.Name}'";
+            private readonly GameTimer _owner;
+
+            public InnerTimer(GameTimer owner) : base(null)
+            {
+                _owner = owner;
+                Callback = Tick;
+            }
+
+            private int Tick(ECSGameTimer timer)
+            {
+                _owner.OnTick();
+                // Honor Stop() called from inside OnTick (e.g. PulsingEffectTimer),
+                // otherwise repeat using the legacy Interval contract.
+                return IsAlive ? _owner.Interval : 0;
+            }
+
+            public override string ToString() => _owner.ToString();
         }
 
         /// <summary>
-        /// Compatibility stub. Regions still hold a TimeManager reference and call
-        /// Start()/Stop()/CurrentTime on it, but it no longer owns any thread.
-        /// CurrentTime is now the GameLoop clock, which unifies Region.Time,
-        /// GameTimer.GetTickCount() and GameLoop.GameLoopTime into ONE clock.
+        /// Compile shim for Region.cs / WorldMgr.cs. No thread, no buckets.
+        /// Region.StartRegionMgr()/StopRegionMgr() become no-ops and Region.Time
+        /// returns the game loop clock.
         /// </summary>
         public class TimeManager
         {
-            public static readonly TimeManager Default = new("GameLoop");
+            public TimeManager(string name) { Name = name; }
 
-            private readonly string m_name;
-
-            public TimeManager(string name)
-            {
-                m_name = string.IsNullOrEmpty(name) ? "GameLoop" : name;
-            }
-
-            public string Name => m_name;
-            public virtual long CurrentTime => GameLoop.GameLoopTime;
-            public bool Running => true;
+            public string Name { get; }
+            public bool Running { get; private set; }
+            public long CurrentTime => GameLoop.GameLoopTime;
             public int ActiveTimers => 0;
             public long InvokedCount => 0;
-            public long MaxInterval => int.MaxValue;
 
-            public virtual bool Start() => true;   // no thread anymore
-            public bool Stop() => true;            // no thread anymore
-            public int CountTimers() => 0;
+            public virtual bool Start()
+            {
+                Running = true;
+                return true;
+            }
+
+            public bool Stop()
+            {
+                Running = false;
+                return true;
+            }
 
             public string GetFormattedStackTrace()
             {
-                return "(legacy timers now run on the GameLoop TimerService)";
-            }
-
-            public override string ToString()
-            {
-                return $"time manager:'{m_name}' (GameLoop bridge) time:{CurrentTime}";
+                return "(all timers run on the GameLoop)";
             }
         }
     }

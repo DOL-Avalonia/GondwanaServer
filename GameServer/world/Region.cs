@@ -635,7 +635,7 @@ namespace DOL.GS
             banner.CurrentRegion = this;
             banner.CurrentRegionID = ID;
             banner.LoadedFromScript = true;
-            RegionTimer zoneTimer = new RegionTimer(banner);
+            ECSGameTimer zoneTimer = new ECSGameTimer(banner);
             zoneTimer.Interval = Properties.GUILD_COMBAT_ZONE_DURATION * 1000;
             zoneTimer.Callback = CombatZoneTimerCallback;
             zoneTimer.Start(zoneTimer.Interval);
@@ -643,7 +643,7 @@ namespace DOL.GS
             SpawnCombatZoneBoundaryBanners(banner, zone);
         }
 
-        private int CombatZoneTimerCallback(RegionTimer timer)
+        private int CombatZoneTimerCallback(ECSGameTimer timer)
         {
             var banner = (CombatZoneBanner)timer.Owner;
 
@@ -660,16 +660,16 @@ namespace DOL.GS
             if (radius <= 0) return;
 
             // ~10 minis when radius = 1000, proportional otherwise
-            double k = 10.0 / (2.0 * System.Math.PI * 1000.0);
-            int count = (int)System.Math.Round((2.0 * System.Math.PI * radius) * k);
-            count = System.Math.Max(6, System.Math.Min(64, count));
+            double k = 10.0 / (2.0 * Math.PI * 1000.0);
+            int count = (int)Math.Round((2.0 * Math.PI * radius) * k);
+            count = Math.Max(6, Math.Min(64, count));
 
-            int ringRadius = System.Math.Max(64, radius - 60);
+            int ringRadius = Math.Max(64, radius - 60);
             var center = centerBanner.Position;
 
             for (int i = 0; i < count; i++)
             {
-                double t = (2.0 * System.Math.PI * i) / count;
+                double t = (2.0 * Math.PI * i) / count;
                 Angle outward = Angle.Radians(t);
                 Vector offset = Vector.Create(outward, ringRadius);
 

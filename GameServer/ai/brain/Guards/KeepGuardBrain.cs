@@ -13,7 +13,7 @@ namespace DOL.AI.Brain
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public GameKeepGuard guard;
         /// <summary>
@@ -184,9 +184,6 @@ namespace DOL.AI.Brain
             return 0;
         }
 
-        public override bool AggroLOS
-        {
-            get { return true; }
-        }
+        protected override bool CheckLosBeforeAggro => false;
     }
 }

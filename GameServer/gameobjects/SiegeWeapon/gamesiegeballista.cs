@@ -1,24 +1,6 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System;
-using DOL.GS.Spells;
-using System.Collections;
+using DOL.GS.PacketHandler;
+using DOL.Language;
+
 /*1,Ballista,1,ammo,0.46,1
 2,Catapult,2,ammo,0.39,1
 3,Trebuchet,2,ammo,1.03,1
@@ -39,54 +21,155 @@ using System.Collections;
 namespace DOL.GS
 {
     /// <summary>
-    /// GameMovingObject is a base class for boats and siege weapons.
+    /// Field ballista: asks the operator's client for line of sight before firing, then deals ranged damage.
     /// </summary>
     public class GameSiegeBallista : GameSiegeWeapon
     {
-        public GameSiegeBallista()
-            : base()
+        /// <summary>
+        /// Damage against structures;
+        /// living targets and siege weapons take three times this value.
+        /// </summary>
+        private const int BASE_DAMAGE = 75;
+
+        private readonly FireLosCheckListener m_fireLosCheckListener;
+
+        // Time (GameLoop time) until which we consider a LoS answer to be pending. Every request is answered or times out,
+        // this only prevents a double request while the operator spams the fire button.
+        private long m_fireLosPendingUntil;
+
+        public GameSiegeBallista() : base()
         {
             MeleeDamageType = eDamageType.Thrust;
             Name = "field ballista";
             AmmoType = 0x18;
-            this.Model = 0x0A55;
-            this.Effect = 0x089A;
-            ActionDelay = new int[]{
-                0,//none
-				5000,//aiming
-				10000,//arming
-				0,//loading
-				1100//fireing
-			};//en ms
-            /*SpellLine siegeWeaponSpellLine = SkillBase.GetSpellLine(GlobalSpellsLines.SiegeWeapon_Spells);
-			IList spells = SkillBase.GetSpellList(siegeWeaponSpellLine.KeyName);
-			if (spells != null)
-			{
-				foreach (Spell spell in spells)
-				{
-					if (spell.ID == 2430) //TODO good id for balista
-					{
-						if(spell.Level <= Level)
-						{
-							m_spellHandler = ScriptMgr.CreateSpellHandler(this, spell, siegeWeaponSpellLine);
-						}
-						break;
-					}
-				}
-			}*/
+            Model = 0x0A55;
+            Effect = 0x089A;
+            ActionDelay = new int[] { 0, 5000, 10000, 0, 1100 };
+            m_fireLosCheckListener = new FireLosCheckListener(this);
+        }
+
+        public override void Fire()
+        {
+            // Not ready, nobody at the controls or no living target:
+            // let the base weapon print its messages ("not ready...") or handle a ground target.
+            if (CurrentState != eState.Ready)
+            {
+                base.Fire();
+                return;
+            }
+
+            GamePlayer operatorPlayer = Owner as GamePlayer;
+            GameLiving target = TargetObject as GameLiving;
+            if (operatorPlayer == null || target == null)
+            {
+                base.Fire();
+                return;
+            }
+
+            if (m_fireLosPendingUntil > GameLoop.GameLoopTime)
+                return; // an answer is already on its way
+
+            m_fireLosPendingUntil = GameLoop.GameLoopTime + LosCheckHandler.Timeout * 2;
+
+            // Cached / geometry-resolved answers call OnFireLosResponse synchronously, before this returns.
+            if (!operatorPlayer.Out.SendLosCheckRequest(this, target, m_fireLosCheckListener))
+            {
+                // Nobody can answer (should not happen for a playing client): never block the player's action.
+                m_fireLosPendingUntil = 0;
+                base.Fire();
+            }
+        }
+
+        private void OnFireLosResponse(LosCheckResponse response, ushort targetId)
+        {
+            m_fireLosPendingUntil = 0;
+
+            if (ObjectState != eObjectState.Active)
+                return;
+
+            GamePlayer operatorPlayer = Owner as GamePlayer;
+            if (operatorPlayer == null)
+                return;
+
+            // The operator re-aimed at something else while we were waiting: ignore this answer.
+            if (TargetObject == null || (ushort)TargetObject.ObjectID != targetId)
+                return;
+
+            if (response == LosCheckResponse.False)
+            {
+                operatorPlayer.Out.SendMessage(LanguageMgr.GetTranslation(operatorPlayer.Client.Account.Language, "GameSiegeWeapon.TargetOutOfSight"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            // quiet == false: the server rules print the reason to the player themselves when the attack is refused.
+            if (TargetObject is GameLiving living && !GameServer.ServerRules.IsAllowedToAttack(operatorPlayer, living, false))
+                return;
+
+            base.Fire();
         }
 
         public override void DoDamage()
         {
-            //todo remove ammo + spell in db and uncomment
-            //m_spellHandler.StartSpell(player);
-            base.DoDamage();//anim mut be called after damage
+            base.DoDamage();
+
+            if (TargetObject is not GameLiving target || !target.IsAlive || target.ObjectState != eObjectState.Active)
+                return;
+
+            GameLiving attacker = Owner ?? this;
+            if (!GameServer.ServerRules.IsAllowedToAttack(attacker, target, true))
+                return;
+
+            int damageAmount = CalcDamageToTarget(target) + Util.Random(50);
+
+            AttackData ad = new AttackData();
+            ad.Attacker = attacker;
+            ad.Target = target;
+            ad.AttackType = AttackData.eAttackType.Ranged;
+            ad.AttackResult = eAttackResult.HitUnstyled;
+            ad.Damage = damageAmount;
+            ad.DamageType = MeleeDamageType;
+
+            target.TakeDamage(attacker, MeleeDamageType, damageAmount, 0);
+            target.OnAttackedByEnemy(ad);
+
+            if (Owner is GamePlayer operatorPlayer)
+            {
+                operatorPlayer.Out.SendMessage($"The {Name} hits {operatorPlayer.GetPersonalizedName(target)} for {damageAmount} damage!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+            }
+
+            foreach (GamePlayer player in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                player.Out.SendCombatAnimation(this, target, 0x0000, 0x0000, 0x00, 0x00, 0x14, target.HealthPercent);
         }
-        public override bool ReceiveItem(GameLiving source, DOL.Database.InventoryItem item)
+
+        /// <summary>
+        /// Base damage is meant for doors / keep components; players, NPCs and other siege weapons take triple.
+        /// </summary>
+        public virtual int CalcDamageToTarget(GameLiving target)
+        {
+            if (target is GameSiegeWeapon || target is GamePlayer || target is GameNPC)
+                return BASE_DAMAGE * 3;
+            return BASE_DAMAGE;
+        }
+
+        public override bool ReceiveItem(GameLiving source, Database.InventoryItem item)
         {
             //todo check if bullet
             return base.ReceiveItem(source, item);
         }
 
+        private sealed class FireLosCheckListener : ILosCheckListener
+        {
+            private readonly GameSiegeBallista _ballista;
+
+            public FireLosCheckListener(GameSiegeBallista ballista)
+            {
+                _ballista = ballista;
+            }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                _ballista.OnFireLosResponse(response, targetId);
+            }
+        }
     }
 }

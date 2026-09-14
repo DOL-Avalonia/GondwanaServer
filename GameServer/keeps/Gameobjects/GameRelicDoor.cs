@@ -31,6 +31,8 @@ namespace DOL.GS.Keeps
     {
         #region properties
 
+        public override Zone.eGameObjectType GameObjectType => Zone.eGameObjectType.DOOR;
+
         private int m_doorID;
         /// <summary>
         /// The door index which is unique

@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Reflection;
 using System.Collections;
@@ -1093,32 +1075,28 @@ namespace DOL.AI.Brain
                 m_orderAttackTarget = null;
             }
 
-            lock ((m_aggroTable as ICollection).SyncRoot)
+            // Pet-specific pruning: mezzed or hard-rooted (99% snare) targets are dropped.
+            // Dead / far / not-attackable entries are already pruned by GondwanaThreatStrategy inside base.CalculateNextAttackTarget().
+            List<GameLiving> removable = null;
+            foreach (GameLiving living in m_aggroTable.GetUnordered())
             {
-                IDictionaryEnumerator aggros = m_aggroTable.GetEnumerator();
-                List<GameLiving> removable = new List<GameLiving>();
-                while (aggros.MoveNext())
-                {
-                    GameLiving living = (GameLiving)aggros.Key;
+                bool remove = living.IsMezzed
+                    || !living.IsAlive
+                    || living.ObjectState != GameObject.eObjectState.Active
+                    || !GameMath.IsWithinRadius2D(Body, living, MAX_AGGRO_LIST_DISTANCE)
+                    || !GameServer.ServerRules.IsAllowedToAttack(Body, living, true);
 
-                    if (living.IsMezzed ||
-                        living.IsAlive == false ||
-                        living.ObjectState != GameObject.eObjectState.Active ||
-                        !GameMath.IsWithinRadius2D(Body, living, MAX_AGGRO_LIST_DISTANCE) ||
-                        GameServer.ServerRules.IsAllowedToAttack(this.Body, living, true) == false)
-                    {
-                        removable.Add(living);
-                    }
-                    else
-                    {
-                        GameSpellEffect root = SpellHandler.FindEffectOnTarget(living, "SpeedDecrease");
-                        if (root != null && root.Spell.Value == 99)
-                        {
-                            removable.Add(living);
-                        }
-                    }
+                if (!remove)
+                {
+                    GameSpellEffect root = SpellHandler.FindEffectOnTarget(living, "SpeedDecrease");
+                    if (root != null && root.Spell.Value == 99) remove = true;
                 }
 
+                if (remove) (removable ??= new List<GameLiving>()).Add(living);
+            }
+
+            if (removable != null)
+            {
                 foreach (GameLiving living in removable)
                 {
                     RemoveFromAggroList(living);

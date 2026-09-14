@@ -375,6 +375,12 @@ namespace DOL.Tests
         {
             if (SendCheckLOSMgrMethod != null) SendCheckLOSMgrMethod(this, source, target, callback);
         }
+        public Func<TestPacketLib, GameObject, GameObject, ILosCheckListener, bool> SendLosCheckRequestMethod { get; set; }
+        public bool SendLosCheckRequest(GameObject source, GameObject target, ILosCheckListener listener)
+        {
+            if (SendLosCheckRequestMethod != null) return SendLosCheckRequestMethod(this, source, target, listener);
+            return true;
+        }
         public Action<TestPacketLib, GamePlayer, string> SendGuildLeaveCommandMethod { get; set; }
         public void SendGuildLeaveCommand(GamePlayer invitingPlayer, string inviteMessage)
         {

@@ -103,13 +103,8 @@ namespace AmteScripts.Managers
 
         public void Start()
         {
-            var region = WorldMgr.GetRegion(1);
-            if (region != null)
-            {
-                var loopTimer = new RegionTimer(region.TimeManager);
-                loopTimer.Callback = TickCheck;
-                loopTimer.Start(2000);
-            }
+            var t = new ECSGameTimer(null, TickCheck);
+            t.Start(2000);
         }
 
         public ArenaSession GetOrCreateSession(ushort regionId, GameNPC master = null)
@@ -323,7 +318,7 @@ namespace AmteScripts.Managers
             return eArchetype.Tank; // Everything else (PureTank, Hybrids like Paladin/Thane/Champion/Mauler)
         }
 
-        private int TickCheck(RegionTimer timer)
+        private int TickCheck(ECSGameTimer timer)
         {
             foreach (var session in _sessions.Values.ToList())
             {

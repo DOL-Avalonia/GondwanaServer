@@ -798,6 +798,24 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("world", "los_mgr_enable", "Whether to enable server-side LOS check (NOTE: This cannot be reloaded with /serverproperties, and will need a server restart)", (bool)true)]
         public static bool LOS_MGR_ENABLE;
 
+        [ServerProperty("npc", "los_check_timeout", "Milliseconds to wait for a client line-of-sight answer before the request is reported as Timeout.", 1000)]
+        public static int LOS_CHECK_TIMEOUT;
+
+        [ServerProperty("npc", "los_check_cache_lifetime", "Milliseconds a line-of-sight answer stays cached while neither object moved. 0 disables the cache.", 5000)]
+        public static int LOS_CHECK_CACHE_LIFETIME;
+
+        [ServerProperty("npc", "los_check_use_server_geometry", "Answer line-of-sight requests with the server-side zone meshes (LosCheckMgr, needs LOS_MGR_ENABLE) when data exists for the zone, instead of asking a client. No packet is sent in that case.", false)]
+        public static bool LOS_CHECK_USE_SERVER_GEOMETRY;
+
+        [ServerProperty("npc", "check_los_before_npc_cast", "NPCs ask a line-of-sight check before casting a spell on a target.", true)]
+        public static bool CHECK_LOS_BEFORE_NPC_CAST;
+
+        [ServerProperty("npc", "max_player_aggro_los_checks_per_think", "Maximum line-of-sight requests one NPC may send about players per brain think (anti packet storm).", 5)]
+        public static int MAX_PLAYER_AGGRO_LOS_CHECKS_PER_THINK;
+
+        [ServerProperty("npc", "max_npc_aggro_los_checks_per_think", "Maximum line-of-sight requests one NPC may send about other NPCs (pets) per brain think.", 3)]
+        public static int MAX_NPC_AGGRO_LOS_CHECKS_PER_THINK;
+
         /// <summary>
         /// HPs gained per champion's level
         /// </summary>

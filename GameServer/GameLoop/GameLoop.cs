@@ -111,6 +111,7 @@ namespace DOL.GS
             _tickSequence = new();
             AddStep(GameLoopService.Instance, GameLoopService.Instance.Tick);
             AddStep(TimerService.Instance, TimerService.Instance.Tick);
+            AddStep(CastingService.Instance, CastingService.Instance.Tick);
             AddStep(ZoneService.Instance, ZoneService.Instance.Tick);
             AddStep(RolloverSchedulerService.Instance, RolloverSchedulerService.Instance.Tick);
             AddStep(ClientService.Instance, ClientService.Instance.Tick);

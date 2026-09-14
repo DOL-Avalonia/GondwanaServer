@@ -41,7 +41,7 @@ namespace DOL.GS.Quests
         public override void AbortGoal(PlayerQuest questData)
         {
             var tempKey = $"QUEST_TIMER_{Quest.Id}-{GoalId}";
-            var timer = questData.Owner.TempProperties.getProperty<RegionTimer>(tempKey);
+            var timer = questData.Owner.TempProperties.getProperty<ECSGameTimer>(tempKey);
             if (timer != null)
             {
                 timer.Stop();
@@ -55,12 +55,12 @@ namespace DOL.GS.Quests
         private void StartTimer(PlayerQuest questData, PlayerGoalState goalData)
         {
             var tempKey = $"QUEST_TIMER_{Quest.Id}-{GoalId}";
-            if (questData.Owner.TempProperties.getProperty<RegionTimer>(tempKey) != null)
+            if (questData.Owner.TempProperties.getProperty<ECSGameTimer>(tempKey) != null)
                 return;
             if (m_seconds <= 600)
                 questData.Owner.Out.SendTimerWindow(Description, m_seconds);
-            var timer = new RegionTimer(questData.Owner, _timer =>
-                {
+            var timer = new ECSGameTimer(questData.Owner, _timer =>
+            {
                     AdvanceGoal(questData, goalData);
                     if (m_seconds <= 600)
                         questData.Owner.Out.SendCloseTimerWindow();

@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using DOL.AI.Brain;
@@ -34,7 +16,7 @@ namespace DOL.GS.Keeps
     /// </summary>
     public class GameKeepGuard : GameNPC, IKeepItem
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private Patrol m_Patrol = null;
         public Patrol PatrolGroup
@@ -201,16 +183,112 @@ namespace DOL.GS.Keeps
             }
         }
 
+        #region Line of sight (LosCheckHandler based)
+
+        private GuardLosCheckListener m_startAttackLosCheck;
+        private GuardLosCheckListener m_stopAttackLosCheck;
+        private GuardLosCheckListener m_healLosCheck;
+        private GuardLosCheckListener m_nukeLosCheck;
+
+        // When the checker did not answer (timeout) we wait KEEP_GUARD_LOS_CHECK_TIME seconds before asking again about the same target.
+        private GameLiving m_losRetryTarget;
+        private long m_nextLosRetryTick;
+
+        private static int LosRetryDelayMs => Math.Max(1000, Properties.KEEP_GUARD_LOS_CHECK_TIME * 1000);
+
+        /// <summary>Best player able to answer a LoS question about the target: the target itself, its owner, or a player nearby.</summary>
+        private GamePlayer FindLosChecker(GameLiving target)
+        {
+            return Brain?.GetLosChecker(target) ?? LosCheckHandler.FindLosChecker(this, target);
+        }
+
         /// <summary>
-        /// We need an event after an attack is finished so we know when players are unreachable by archery
+        /// Starts a LoS check toward the target for the given listener.
+        /// Returns true when an answer is (or already was) on its way, false when nobody can answer.
+        /// Note: cached / geometry-resolved answers call the listener synchronously, before this method returns.
         /// </summary>
-        /// <param name="e"></param>
-        /// <param name="sender"></param>
-        /// <param name="arguments"></param>
+        private bool RequestLosCheck(ref GuardLosCheckListener listener, Action<GameLiving, LosCheckResponse> onResponse, GameLiving target)
+        {
+            if (target == null)
+                return false;
+
+            listener ??= new GuardLosCheckListener(this, onResponse);
+
+            if (!listener.TryBegin(target))
+                return true; // a check is already pending for this listener
+
+            GamePlayer losChecker = FindLosChecker(target);
+            if (losChecker != null && losChecker.Out.SendLosCheckRequest(this, target, listener))
+                return true;
+
+            listener.Cancel();
+            return false;
+        }
+
+        private sealed class GuardLosCheckListener : ILosCheckListener
+        {
+            private readonly GameKeepGuard _guard;
+            private readonly Action<GameLiving, LosCheckResponse> _onResponse;
+            private GameLiving _pendingTarget;
+            private long _pendingSince;
+
+            public GuardLosCheckListener(GameKeepGuard guard, Action<GameLiving, LosCheckResponse> onResponse)
+            {
+                _guard = guard;
+                _onResponse = onResponse;
+            }
+
+            public bool TryBegin(GameLiving target)
+            {
+                if (target == null)
+                    return false;
+
+                // Every request is answered or times out; the age test is only a safety net against a stuck state.
+                if (_pendingTarget != null && GameLoop.GameLoopTime - _pendingSince < LosCheckHandler.Timeout * 2)
+                    return false;
+
+                _pendingTarget = target;
+                _pendingSince = GameLoop.GameLoopTime;
+                return true;
+            }
+
+            public void Cancel()
+            {
+                _pendingTarget = null;
+            }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                GameLiving target = _pendingTarget;
+                _pendingTarget = null;
+
+                if (target == null || (ushort)target.ObjectID != targetId)
+                    return;
+                if (_guard.ObjectState != GameObject.eObjectState.Active || !_guard.IsAlive)
+                    return;
+
+                try
+                {
+                    _onResponse(target, response);
+                }
+                catch (Exception e)
+                {
+                    if (log.IsErrorEnabled)
+                        log.Error($"LoS callback failed for keep guard {_guard.Name} (target {target.Name}, response {response})", e);
+                }
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Called after every attack of archers, lords and casters. Handles the out-of-range melee case and asks for a
+        /// LoS re-check while shooting / moving, so a guard stops firing at a target that went behind a wall.
+        /// </summary>
         public static void AttackFinished(DOLEvent e, object sender, EventArgs arguments)
         {
             GameKeepGuard guard = sender as GameKeepGuard;
-            if (guard.TargetObject == null)
+            if (guard == null || guard.TargetObject == null)
                 return;
             if (!guard.AttackState)
                 return;
@@ -218,6 +296,8 @@ namespace DOL.GS.Keeps
                 return;
 
             AttackFinishedEventArgs afargs = arguments as AttackFinishedEventArgs;
+            if (afargs == null)
+                return;
 
             if (guard.ActiveWeaponSlot != eActiveWeaponSlot.Distance && !guard.IsMoving)
             {
@@ -225,16 +305,21 @@ namespace DOL.GS.Keeps
                 if (result == eAttackResult.OutOfRange)
                 {
                     guard.StopAttack();
-                    lock (guard.Attackers)
+
+                    GameLiving nextTarget = null;
+                    foreach (GameLiving living in guard.AttackerTracker.Attackers)
                     {
-                        foreach (GameLiving living in guard.Attackers)
+                        if (living.IsAlive && guard.IsWithinRadius(living, guard.AttackRange))
                         {
-                            if (guard.IsWithinRadius(living, guard.AttackRange))
-                            {
-                                guard.StartAttack(living);
-                                return;
-                            }
+                            nextTarget = living;
+                            break;
                         }
+                    }
+
+                    if (nextTarget != null)
+                    {
+                        guard.StartAttack(nextTarget);
+                        return;
                     }
 
                     if (guard.IsWithinRadius(guard.TargetObject, guard.AttackRangeDistance))
@@ -260,21 +345,13 @@ namespace DOL.GS.Keeps
                 }
             }
 
-            GamePlayer player = guard.TargetObject as GamePlayer;
-
-            if (player == null && guard.TargetObject is GameNPC targetNpc)
-            {
-                if (targetNpc is not GameKeepGuard)
-                    player = targetNpc.GetPlayerOwner();
-            }
-
-            player?.Out.SendCheckLOS(guard, guard.TargetObject, new CheckLOSResponse(guard.GuardStopAttackCheckLOS));
+            guard.RequestStopAttackLosCheck(guard.TargetObject as GameLiving);
         }
 
         /// <summary>
-        /// Override for StartAttack which chooses Ranged or Melee attack
+        /// Guards only start attacking once a client confirmed the target is in line of sight.
+        /// The LosCheckHandler caches answers, so repeated calls from the brain cost nothing when nobody moved.
         /// </summary>
-        /// <param name="attackTarget"></param>
         public override void StartAttack(GameObject attackTarget)
         {
             if (IsPortalKeepGuard)
@@ -285,139 +362,68 @@ namespace DOL.GS.Keeps
 
             if (AttackState || CurrentSpellHandler != null)
                 return;
-
-            if (attackTarget is GameLiving == false)
+            if (attackTarget is not GameLiving target || !target.IsAlive)
                 return;
-            GameLiving target = attackTarget as GameLiving;
-            if (target == null || target.IsAlive == false)
-                return;
-
-            //we dont send LOS checks for people we cant attack
             if (!GameServer.ServerRules.IsAllowedToAttack(this, target, true))
                 return;
 
-            //Prevent spam for LOS to same target multiple times
-
-            GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(LAST_LOS_TARGET_PROPERTY, null);
-            long lastTick = this.TempProperties.getProperty<long>(LAST_LOS_TICK_PROPERTY);
-
-            if (lastTarget != null && lastTarget == attackTarget)
-            {
-                if (lastTick != 0 && CurrentRegion.Time - lastTick < ServerProperties.Properties.KEEP_GUARD_LOS_CHECK_TIME * 1000)
-                    return;
-            }
-
-            GamePlayer LOSChecker = (attackTarget as GameLiving)?.GetController() as GamePlayer;
-            if (LOSChecker == null)
-            {
-                // try to find another player to use for checking line of site
-                foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                {
-                    LOSChecker = player;
-                    break;
-                }
-            }
-
-            if (LOSChecker == null)
-            {
+            long now = CurrentRegion?.Time ?? 0;
+            if (ReferenceEquals(m_losRetryTarget, target) && m_nextLosRetryTick > now)
                 return;
-            }
 
-            lock (LOS_LOCK)
-            {
-                int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
-
-                if (count > 10)
-                {
-                    log.DebugFormat("{0} LOS count check exceeds 10, aborting LOS check!", Name);
-
-                    // Now do a safety check.  If it's been a while since we sent any check we should clear count
-                    if (lastTick == 0 || CurrentRegion.Time - lastTick > ServerProperties.Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
-                    {
-                        log.Debug("LOS count reset!");
-                        TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, 0);
-                    }
-
-                    return;
-                }
-
-                count++;
-                TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, count);
-
-                TempProperties.setProperty(LAST_LOS_TARGET_PROPERTY, attackTarget);
-                TempProperties.setProperty(LAST_LOS_TICK_PROPERTY, CurrentRegion.Time);
-                TargetObject = attackTarget;
-            }
-
-            LOSChecker.Out.SendCheckLOS(this, attackTarget, new CheckLOSResponse(this.GuardStartAttackCheckLOS));
+            TargetObject = target;
+            RequestLosCheck(ref m_startAttackLosCheck, OnStartAttackLosResponse, target);
         }
 
-        /// <summary>
-        /// We only attack if we have LOS
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="response"></param>
-        /// <param name="targetOID"></param>
-        public void GuardStartAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
+        private void OnStartAttackLosResponse(GameLiving target, LosCheckResponse response)
         {
-            lock (LOS_LOCK)
-            {
-                int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
-                count--;
-                TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, Math.Max(0, count));
-            }
+            if (target == null)
+                return;
 
-            if ((response & 0x100) == 0x100)
+            switch (response)
             {
-                if (this is GuardArcher || this is GuardLord)
-                {
-                    if (ActiveWeaponSlot != eActiveWeaponSlot.Distance)
-                    {
-                        if (CanUseRanged)
-                            SwitchToRanged(TargetObject);
-                    }
-                }
+                case LosCheckResponse.True:
+                    m_losRetryTarget = null;
+                    if (AttackState || CurrentSpellHandler != null)
+                        return;
+                    if (!target.IsAlive || !GameServer.ServerRules.IsAllowedToAttack(this, target, true))
+                        return;
 
-                base.StartAttack(TargetObject);
-            }
-            else if (TargetObject != null && TargetObject is GameLiving)
-            {
-                (this.Brain as KeepGuardBrain).RemoveFromAggroList(TargetObject as GameLiving);
+                    if ((this is GuardArcher || this is GuardLord) && ActiveWeaponSlot != eActiveWeaponSlot.Distance && CanUseRanged)
+                        SwitchToRanged(target);
+
+                    TargetObject = target;
+                    base.StartAttack(target);
+                    break;
+
+                case LosCheckResponse.False:
+                    m_losRetryTarget = null;
+                    (Brain as KeepGuardBrain)?.RemoveFromAggroList(target);
+                    if (TargetObject == target)
+                        TargetObject = null;
+                    break;
+
+                default: // Timeout: the checker did not answer; retry later instead of spamming it
+                    m_losRetryTarget = target;
+                    m_nextLosRetryTick = (CurrentRegion?.Time ?? 0) + LosRetryDelayMs;
+                    break;
             }
         }
 
-        /// <summary>
-        /// If we don't have LOS we stop attack
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="response"></param>
-        /// <param name="targetOID"></param>
-        public void GuardStopAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
+        private void RequestStopAttackLosCheck(GameLiving target)
         {
-            if ((response & 0x100) != 0x100)
-            {
-                StopAttack();
-
-                if (TargetObject != null && TargetObject is GameLiving)
-                {
-                    (this.Brain as KeepGuardBrain).RemoveFromAggroList(TargetObject as GameLiving);
-                }
-            }
+            RequestLosCheck(ref m_stopAttackLosCheck, OnStopAttackLosResponse, target);
         }
 
-        public void GuardStartSpellHealCheckLOS(GamePlayer player, ushort response, ushort targetOID)
+        private void OnStopAttackLosResponse(GameLiving target, LosCheckResponse response)
         {
-            if ((response & 0x100) == 0x100 && HealTarget != null)
-            {
-                Spell healSpell = GetGuardHealSmallSpell(Realm);
+            if (response != LosCheckResponse.False) // only a definite "hidden" answer stops the attack
+                return;
+            if (target == null || TargetObject != target)
+                return;
 
-                if (healSpell != null && !IsStunned && !IsMezzed)
-                {
-                    StopAttack();
-                    TargetObject = HealTarget;
-                    CastSpell(healSpell, GuardSpellLine);
-                }
-            }
+            StopAttack();
+            (Brain as KeepGuardBrain)?.RemoveFromAggroList(target);
         }
 
         private Spell GetGuardHealSmallSpell(eRealm realm)
@@ -438,20 +444,15 @@ namespace DOL.GS.Keeps
         public void CheckAreaForHeals()
         {
             GameLiving target = null;
-            GamePlayer LOSChecker = null;
 
             foreach (GamePlayer player in GetPlayersInRadius(2000))
             {
-                LOSChecker = player;
-
-                if (!player.IsAlive) continue;
-                if (GameServer.ServerRules.IsSameRealm(player, this, true))
+                if (!player.IsAlive)
+                    continue;
+                if (GameServer.ServerRules.IsSameRealm(player, this, true) && player.HealthPercent < Properties.KEEP_HEAL_THRESHOLD)
                 {
-                    if (player.HealthPercent < Properties.KEEP_HEAL_THRESHOLD)
-                    {
-                        target = player;
-                        break;
-                    }
+                    target = player;
+                    break;
                 }
             }
 
@@ -459,71 +460,97 @@ namespace DOL.GS.Keeps
             {
                 foreach (GameNPC npc in GetNPCsInRadius(2000))
                 {
-                    if (npc is GameSiegeWeapon) continue;
-                    if (GameServer.ServerRules.IsSameRealm(npc, this, true))
+                    if (npc is GameSiegeWeapon)
+                        continue;
+                    if (GameServer.ServerRules.IsSameRealm(npc, this, true) && npc.HealthPercent < Properties.KEEP_HEAL_THRESHOLD)
                     {
-                        if (npc.HealthPercent < Properties.KEEP_HEAL_THRESHOLD)
-                        {
-                            target = npc;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (target != null)
-            {
-                if (LOSChecker == null)
-                {
-                    foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                    {
-                        LOSChecker = player;
+                        target = npc;
                         break;
                     }
                 }
-                if (LOSChecker == null)
-                    return;
-                if (!target.IsAlive) return;
-
-                HealTarget = target;
-                LOSChecker.Out.SendCheckLOS(this, target, new CheckLOSResponse(GuardStartSpellHealCheckLOS));
             }
+
+            if (target == null || !target.IsAlive)
+                return;
+
+            HealTarget = target;
+            RequestLosCheck(ref m_healLosCheck, OnHealLosResponse, target);
+        }
+
+        private void OnHealLosResponse(GameLiving target, LosCheckResponse response)
+        {
+            if (response == LosCheckResponse.False) // a friendly heal is allowed on timeout
+                return;
+            if (target == null || HealTarget != target || !target.IsAlive)
+                return;
+
+            Spell healSpell = GetGuardHealSmallSpell(Realm);
+            if (healSpell == null || IsStunned || IsMezzed)
+                return;
+
+            StopAttack();
+            TargetObject = target;
+            CastSpell(healSpell, GuardSpellLine);
         }
 
         public void CheckForNuke()
         {
             GameLiving target = TargetObject as GameLiving;
-            if (target == null) return;
-            if (!target.IsAlive) return;
-            if (target is GamePlayer && !GameServer.KeepManager.IsEnemy(this, target as GamePlayer, true)) return;
-            if (!IsWithinRadius(target, WorldMgr.VISIBILITY_DISTANCE)) { TargetObject = null; return; }
-            GamePlayer LOSChecker = null;
-            if (target is GamePlayer) LOSChecker = target as GamePlayer;
-            else
+            if (target == null || !target.IsAlive)
+                return;
+            if (target is GamePlayer playerTarget && !GameServer.KeepManager.IsEnemy(this, playerTarget, true))
+                return;
+            if (!IsWithinRadius(target, WorldMgr.VISIBILITY_DISTANCE))
             {
-                foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                {
-                    LOSChecker = player;
-                    break;
-                }
+                TargetObject = null;
+                return;
             }
-            if (LOSChecker == null) return;
-            LOSChecker.Out.SendCheckLOS(this, target, new CheckLOSResponse(GuardStartSpellNukeCheckLOS));
+
+            RequestLosCheck(ref m_nukeLosCheck, OnNukeLosResponse, target);
         }
 
-        public void GuardStartSpellNukeCheckLOS(GamePlayer player, ushort response, ushort targetOID)
+        private void OnNukeLosResponse(GameLiving target, LosCheckResponse response)
         {
-            if ((response & 0x100) == 0x100)
+            if (response != LosCheckResponse.True) // hostile spell: only fire on a confirmed line of sight
+                return;
+            if (target == null || TargetObject != target || !target.IsAlive)
+                return;
+
+            switch (Realm)
             {
-                switch (Realm)
-                {
-                    case eRealm.None:
-                    case eRealm.Albion: LaunchSpell(47, "Pyromancy"); break;
-                    case eRealm.Midgard: LaunchSpell(48, "Runecarving"); break;
-                    case eRealm.Hibernia: LaunchSpell(47, "Way of the Eclipse"); break;
-                }
+                case eRealm.None:
+                case eRealm.Albion:
+                    LaunchSpell(47, "Pyromancy");
+                    break;
+                case eRealm.Midgard:
+                    LaunchSpell(48, "Runecarving");
+                    break;
+                case eRealm.Hibernia:
+                    LaunchSpell(47, "Way of the Eclipse");
+                    break;
             }
         }
+
+        #region Legacy callbacks (kept only so that older scripts still compile)
+
+        private static LosCheckResponse ToLosResponse(ushort legacyResponse)
+        {
+            return (legacyResponse & 0x100) == 0x100 ? LosCheckResponse.True : LosCheckResponse.False;
+        }
+
+        [Obsolete("Line of sight now goes through the LosCheckHandler (see StartAttack).")]
+        public void GuardStartAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID) => OnStartAttackLosResponse(TargetObject as GameLiving, ToLosResponse(response));
+
+        [Obsolete("Line of sight now goes through the LosCheckHandler (see AttackFinished).")]
+        public void GuardStopAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID) => OnStopAttackLosResponse(TargetObject as GameLiving, ToLosResponse(response));
+
+        [Obsolete("Line of sight now goes through the LosCheckHandler (see CheckAreaForHeals).")]
+        public void GuardStartSpellHealCheckLOS(GamePlayer player, ushort response, ushort targetOID) => OnHealLosResponse(HealTarget, ToLosResponse(response));
+
+        [Obsolete("Line of sight now goes through the LosCheckHandler (see CheckForNuke).")]
+        public void GuardStartSpellNukeCheckLOS(GamePlayer player, ushort response, ushort targetOID) => OnNukeLosResponse(TargetObject as GameLiving, ToLosResponse(response));
+
+        #endregion
 
         private void LaunchSpell(int spellLevel, string spellLineName)
         {
@@ -697,8 +724,8 @@ namespace DOL.GS.Keeps
 
             if (IsPortalKeepGuard && (Brain as KeepGuardBrain != null))
             {
-                (this.Brain as KeepGuardBrain).AggroRange = 2000;
-                (this.Brain as KeepGuardBrain).AggroLevel = 99;
+                (this.Brain as KeepGuardBrain)!.AggroRange = 2000;
+                (this.Brain as KeepGuardBrain)!.AggroLevel = 99;
             }
 
             GameEventMgr.AddHandler(this, GameLivingEvent.AttackFinished, new DOLEventHandler(AttackFinished));
@@ -759,7 +786,7 @@ namespace DOL.GS.Keeps
         /// </summary>
         /// <param name="respawnTimer"></param>
         /// <returns></returns>
-        protected override int RespawnTimerCallback(RegionTimer respawnTimer)
+        protected override int RespawnTimerCallback(ECSGameTimer respawnTimer)
         {
             int temp = base.RespawnTimerCallback(respawnTimer);
             RefreshTemplate();

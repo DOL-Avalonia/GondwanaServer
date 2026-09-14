@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Reflection;
@@ -89,6 +71,28 @@ namespace DOL.AI
         }
 
         /// <summary>
+        /// Picks a player able to answer a client LoS request between the body and <paramref name="target"/>:
+        /// the target itself if it is a player, its owner, our own owner (pets), otherwise a random nearby player.
+        /// Returns null when nobody can answer; callers then proceed without LoS (old behaviour).
+        /// </summary>
+        public virtual GamePlayer GetLosChecker(GameObject target)
+        {
+            GameNPC body = Body;
+            if (body == null || target == null || target == body) return null;
+
+            if (target is GamePlayer targetPlayer && LosCheckHandler.CanReplyToLosChecks(targetPlayer))
+                return targetPlayer;
+
+            if (target is GameLiving targetLiving && targetLiving.GetPlayerOwner() is GamePlayer targetOwner && LosCheckHandler.CanReplyToLosChecks(targetOwner))
+                return targetOwner;
+
+            if (this is Brain.IControlledBrain && body.GetPlayerOwner() is GamePlayer ourOwner && LosCheckHandler.CanReplyToLosChecks(ourOwner))
+                return ourOwner;
+
+            return LosCheckHandler.FindRandomLosChecker(body);
+        }
+
+        /// <summary>
         /// Returns weather this brain is active or not
         /// </summary>
         public virtual bool IsActive
@@ -144,6 +148,24 @@ namespace DOL.AI
                 m_brainTimer = null;
             }
             return true;
+        }
+
+        /// <summary>
+        /// Asks the brain to Think() on the very next game loop tick instead of waiting the full ThinkInterval.
+        /// Called when a mob gets its first aggro entry (e.g. an asynchronous LOS answer).
+        /// </summary>
+        public virtual void WakeUp()
+        {
+            lock (m_LockObject)
+            {
+                if (m_brainTimer == null || !m_brainTimer.IsAlive)
+                    return;
+
+                if (m_brainTimer.TimeUntilElapsed <= 100)
+                    return;
+
+                m_brainTimer.Start(1);
+            }
         }
 
         /// <summary>

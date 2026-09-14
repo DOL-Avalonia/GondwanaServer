@@ -1056,7 +1056,7 @@ namespace DOL.GS
         /// <returns>conlevel</returns>
         public double GetConLevel(GameObject compare)
         {
-            return GetConLevel(EffectiveLevel, compare.EffectiveLevel);
+            return compare == null ? 0 : LegacyConLevelGrid.GetConLevel(EffectiveLevel, compare.EffectiveLevel);
             //			return (compare.Level - Level) / ((double)(Level / 10 + 1));
         }
 
@@ -1073,10 +1073,7 @@ namespace DOL.GS
         /// <returns>conlevel</returns>
         public static double GetConLevel(int level, int compareLevel)
         {
-            int constep = Math.Max(1, (level + 9) / 10);
-            double stepping = 1.0 / constep;
-            int leveldiff = level - compareLevel;
-            return 0 - leveldiff * stepping;
+            return LegacyConLevelGrid.GetConLevel(level, compareLevel);
         }
 
         /// <summary>

@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using DOL.AI.Brain;
@@ -43,8 +25,6 @@ namespace DOL.GS.Spells
 
             base.FinishSpellCast(target, force);
         }
-
-        private const string LOSEFFECTIVENESS = "LOS Effectivness";
 
         public override double CalculateDamageBase(GameLiving target)
         {
@@ -80,73 +60,34 @@ namespace DOL.GS.Spells
         {
             if (target == null) return false;
 
-            bool spellOK = true;
+            if (NeedsEndOfCastLosCheck(target) && StartEndOfCastLosCheck(target, effectiveness))
+                return true;
 
-            if (Spell.Target.ToLower() == "cone" || (Spell.Target == "enemy" && Spell.Radius > 0 && Spell.Range == 0))
-            {
-                spellOK = false;
-            }
-
-            if (spellOK == false || MustCheckLOS(Caster))
-            {
-                GamePlayer checkPlayer = target.GetController() as GamePlayer ?? Caster.GetController() as GamePlayer;
-                if (checkPlayer != null)
-                {
-                    checkPlayer.TempProperties.setProperty(LOSEFFECTIVENESS + target.ObjectID, effectiveness);
-                    checkPlayer.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(DealDamageCheckLOS));
-                }
-                else
-                {
-                    DealDamage(target, effectiveness);
-                }
-            }
-            else
-            {
-                DealDamage(target, effectiveness);
-            }
+            DealDamage(target, effectiveness);
             return true;
         }
 
-        protected virtual void DealDamageCheckLOS(GamePlayer player, ushort response, ushort targetOID)
+        public override void OnEndOfCastLosCheck(GameLiving target, double effectiveness, LosCheckResponse response)
         {
-            if (player == null || Caster.ObjectState != GameObject.eObjectState.Active)
+            if (Caster == null || Caster.ObjectState != GameObject.eObjectState.Active)
                 return;
 
-            if ((response & 0x100) == 0x100)
+            if (response == LosCheckResponse.False)
             {
-                try
-                {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
-                    {
-                        double effectiveness = player.TempProperties.getProperty<double>(LOSEFFECTIVENESS + target.ObjectID, 1.0);
-                        DealDamage(target, effectiveness);
-                        player.TempProperties.removeProperty(LOSEFFECTIVENESS + target.ObjectID);
-                        // Due to LOS check delay the actual cast happens after FinishSpellCast does a notify, so we notify again
-                        GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
-                    }
-                }
-                catch (Exception e)
-                {
-                    m_castFailed = true;
-
-                    if (log.IsErrorEnabled)
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
-                }
-            }
-            else
-            {
+                // single target spell whose target is hidden: tell the caster why nothing happened
                 if (Spell.Target.ToLower() == "enemy" && Spell.Radius == 0 && Spell.Range != 0)
-                {
-                    m_castFailed = true;
                     MessageToCaster(LanguageMgr.GetTranslation((m_caster as GamePlayer)?.Client, "SpellHandler.CheckLOSPlayerToTarget.CantSeeTarget"), eChatType.CT_SpellResisted);
-                }
+                return;
             }
+
+            DealDamage(target, effectiveness);
+            GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
         }
 
         protected virtual void DealDamage(GameLiving target, double effectiveness)
         {
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+                return;
 
             // calc damage
             AttackData ad = CalculateDamageToTarget(target, effectiveness);
@@ -159,43 +100,11 @@ namespace DOL.GS.Spells
             target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, Caster);
         }
 
-        /*
-		 * We need to send resist spell los check packets because spell resist is calculated first, and
-		 * so you could be inside keep and resist the spell and be interupted when not in view
-		 */
         public override void OnSpellResisted(GameLiving target)
         {
-            if (target is GamePlayer)
-            {
-                GamePlayer player = target as GamePlayer;
-                player!.Out.SendCheckLOS(Caster, player, new CheckLOSResponse(ResistSpellCheckLOS));
-            }
-            else
-            {
-                SpellResisted(target);
-            }
-        }
+            if (NeedsResistLosCheck(target) && StartResistLosCheck(target))
+                return; // the base class applies the resist once the client confirmed the target is in view
 
-        private void ResistSpellCheckLOS(GamePlayer player, ushort response, ushort targetOID)
-        {
-            if ((response & 0x100) == 0x100)
-            {
-                try
-                {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
-                        SpellResisted(target);
-                }
-                catch (Exception e)
-                {
-                    if (log.IsErrorEnabled)
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
-                }
-            }
-        }
-
-        private void SpellResisted(GameLiving target)
-        {
             base.OnSpellResisted(target);
         }
 

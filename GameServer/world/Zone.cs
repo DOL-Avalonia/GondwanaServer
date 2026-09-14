@@ -19,10 +19,17 @@ namespace DOL.GS
         private const ushort SUBZONE_SIZE = (ushort)(65536 / SUBZONE_NBR_ON_ZONE_SIDE);
         private static readonly ushort SUBZONE_SHIFT = (ushort)Math.Round(Math.Log(SUBZONE_SIZE) / Math.Log(2));
         private static readonly ushort SUBZONE_ARRAY_Y_SHIFT = (ushort)Math.Round(Math.Log(SUBZONE_NBR_ON_ZONE_SIDE) / Math.Log(2));
-
+        private static readonly int OBJECT_TYPE_COUNT = Enum.GetValues<eGameObjectType>().Length;
         public const ushort MAX_REFRESH_INTERVAL = 2000;
 
-        public enum eGameObjectType : byte { ITEM = 0, NPC = 1, PLAYER = 2, DOOR = 3, }
+        public enum eGameObjectType : byte
+        {
+            ITEM = 0,
+            NPC = 1,
+            PLAYER = 2,
+            DOOR = 3,
+            KEEP_COMPONENT = 4,
+        }
 
         private readonly SubZone[] _subZones = new SubZone[SUBZONE_NBR];
         private int _objectCount;
@@ -81,7 +88,7 @@ namespace DOL.GS
         {
             Array.Clear(_subZones, 0, _subZones.Length);
             m_Region = null;
-            DOL.Events.GameEventMgr.RemoveAllHandlersForObject(this);
+            Events.GameEventMgr.RemoveAllHandlersForObject(this);
         }
 
         public virtual LanguageDataObject.eTranslationIdentifier TranslationIdentifier => LanguageDataObject.eTranslationIdentifier.eZone;
@@ -184,6 +191,9 @@ namespace DOL.GS
         {
             int subZoneIndex = GetSubZoneIndex(obj.Coordinate);
 
+            if (obj.GameObjectType == eGameObjectType.ITEM && obj is not GameStaticItem && log.IsWarnEnabled)
+                log.Warn($"Zone {ID}: {obj.GetType().FullName} '{obj.Name}' classified as ITEM but is not a GameStaticItem — missing GameObjectType override?");
+
             if (subZoneIndex < 0 || subZoneIndex >= SUBZONE_NBR)
             {
                 if (log.IsDebugEnabled)
@@ -214,7 +224,7 @@ namespace DOL.GS
                 if (subZone == null)
                     continue;
 
-                for (int t = 0; t < 4; t++)
+                for (int t = 0; t < OBJECT_TYPE_COUNT; t++)
                 {
                     WriteLockedLinkedList<GameObject> list = subZone[(eGameObjectType)t];
 

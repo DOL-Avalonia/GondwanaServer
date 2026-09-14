@@ -679,8 +679,17 @@ namespace DOL.GS.PacketHandler
         
         void SendCustomDialog(string msg, CustomDialogResponse callback);
         Task SendCustomDialog(Task<string> msg, CustomDialogResponse callback);
+
+        /// <summary>
+        /// New LoS API: goes through the player's LosCheckHandler (deduplication, cache, timeout, server geometry).
+        /// Returns false when nothing could be requested.
+        /// </summary>
+        bool SendLosCheckRequest(GameObject source, GameObject target, ILosCheckListener listener);
+        [Obsolete("Use SendLosCheckRequest(source, target, ILosCheckListener). Still works (adapter over LosCheckHandler).")]
         void SendCheckLOS(GameObject Checker, GameObject Target, CheckLOSResponse callback);
+        [Obsolete("Use SendLosCheckRequest(source, target, ILosCheckListener). Still works (adapter over LosCheckHandler).")]
         void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback);
+
         void SendGuildLeaveCommand(GamePlayer invitingPlayer, string inviteMessage);
         void SendGuildInviteCommand(GamePlayer invitingPlayer, string inviteMessage);
         Task SendQuestOfferWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest);

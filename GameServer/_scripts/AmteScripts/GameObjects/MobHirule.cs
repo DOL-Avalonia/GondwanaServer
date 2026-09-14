@@ -28,7 +28,7 @@ namespace DOL.GS
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region Variables/Properties
 
@@ -109,7 +109,7 @@ namespace DOL.GS
 
         #region Combat
 
-        public int HiruleNukeandStun(RegionTimer timer)
+        public int HiruleNukeandStun(ECSGameTimer timer)
         {
             //AOE Stun
             CastSpell(Stun, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
@@ -119,18 +119,12 @@ namespace DOL.GS
         }
 
         // What happens when the HiruleNuke timer is filled
-        public int HiruleNuke(RegionTimer timer)
+        public int HiruleNuke(ECSGameTimer timer)
         {
             //AOE Nuke
             CastSpell(Nuke, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
             return 0;
         }
-
-        public void HiruleGlare(object timer)
-        {
-            ActionHiruleGlare(m_hiruleTarget);
-        }
-
 
         public override void LoadFromDatabase(DataObject obj)
         {
@@ -269,7 +263,7 @@ namespace DOL.GS
             if (false && Util.Random(1) < 1)
             {
                 //Glare
-                Timer timer = new Timer(new TimerCallback(HiruleGlare), null, 30, 0);
+                new ECSGameTimer(this, timer => { ActionHiruleGlare(m_hiruleTarget); return 0; }, 30);
             }
             else
             {
@@ -477,7 +471,7 @@ namespace DOL.AI.Brain
         {
             MobHirule hirule = Body as MobHirule;
             //If at full HP we reset stages
-            if (hirule.HealthPercent == 100 && hirule.stage != 0)
+            if (hirule!.HealthPercent == 100 && hirule.stage != 0)
                 hirule.stage = 0;
 
 
@@ -501,10 +495,8 @@ namespace DOL.AI.Brain
                 hirule.HiruleTarget = CalculateNextAttackTarget();
                 if (hirule.HiruleTarget != null)
                 {
-                    new RegionTimer(hirule, new RegionTimerCallback(hirule.HiruleNuke), 5000);
+                    new ECSGameTimer(hirule, t => { hirule.CastSpell(MobHirule.Nuke, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells)); return 0; }, 5000);
                     hirule.stage = 1;
-
-
                 }
             }
 
@@ -526,7 +518,7 @@ namespace DOL.AI.Brain
                 hirule.HiruleTarget = CalculateNextAttackTarget();
                 if (hirule.HiruleTarget != null)
                 {
-                    new RegionTimer(hirule, new RegionTimerCallback(hirule.HiruleNuke), 5000);
+                    new ECSGameTimer(hirule, hirule.HiruleNuke, 5000);
                     hirule.stage = 2;
                 }
             }
@@ -555,7 +547,7 @@ namespace DOL.AI.Brain
                 hirule.HiruleTarget = CalculateNextAttackTarget();
                 if (hirule.HiruleTarget != null)
                 {
-                    new RegionTimer(hirule, new RegionTimerCallback(hirule.HiruleNukeandStun), 5000);
+                    new ECSGameTimer(hirule, hirule.HiruleNukeandStun, 5000);
                     hirule.stage = 3;
                 }
             }
@@ -576,7 +568,7 @@ namespace DOL.AI.Brain
                 hirule.HiruleTarget = CalculateNextAttackTarget();
                 if (hirule.HiruleTarget != null)
                 {
-                    new RegionTimer(hirule, new RegionTimerCallback(hirule.HiruleNukeandStun), 5000);
+                    new ECSGameTimer(hirule, hirule.HiruleNukeandStun, 5000);
                     hirule.stage = 4;
                     foreach (GamePlayer player in hirule.GetPlayersInRadius((ushort)(WorldMgr.VISIBILITY_DISTANCE + 1500)))
                     {

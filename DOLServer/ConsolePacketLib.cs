@@ -239,8 +239,9 @@ namespace DOLGameServerConsole
         public void SendWarmapUpdate(ICollection<IGameKeep> list) { }
         public void SendWarmapDetailUpdate(List<List<byte>> fights, List<List<byte>> groups) { }
         public void SendWarmapBonuses() { }
-        public void SendCheckLOS(GameObject Checker, GameObject Target, DOL.GS.PacketHandler.CheckLOSResponse callback) { }
-        public void SendCheckLOS(GameObject source, GameObject target, DOL.GS.PacketHandler.CheckLOSMgrResponse callback) { }
+        public bool SendLosCheckRequest(GameObject source, GameObject target, ILosCheckListener listener) { return true; }
+        public void SendCheckLOS(GameObject Checker, GameObject Target, CheckLOSResponse callback) { }
+        public void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback) { }
         public void SendLivingDataUpdate(GameLiving living, bool updateStrings) { }
         public void SendPlayerTitles() { }
         public void SendPlayerTitleUpdate(GamePlayer player) { }

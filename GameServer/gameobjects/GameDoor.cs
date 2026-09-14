@@ -15,7 +15,6 @@ namespace DOL.GS
         /// On live this is usually 5 seconds
         /// </summary>
         protected const int CLOSE_DOOR_TIME = 8000;
-
         private const int REPAIR_INTERVAL = 1000; // Heals every 1 second when broken
         private bool m_openDead = false;
         private int originalPunishSpellValue;

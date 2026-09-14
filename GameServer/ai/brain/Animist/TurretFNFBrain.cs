@@ -1,31 +1,16 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System.Collections;
 using System.Collections.Generic;
 using DOL.GS;
+using log4net;
 using DOL.GS.Spells;
 
 namespace DOL.AI.Brain
 {
     public class TurretFNFBrain : TurretBrain
     {
-        private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+
+        protected override bool CanAddToAggroListFromMultipleLosChecks => true;
 
         public TurretFNFBrain(GameLiving owner) : base(owner)
         {
@@ -40,35 +25,32 @@ namespace DOL.AI.Brain
             List<GameLiving> newTargets = new List<GameLiving>();
             List<GameLiving> oldTargets = new List<GameLiving>();
             base.CalculateNextAttackTarget();
-            lock ((m_aggroTable as ICollection).SyncRoot)
+
+            foreach (GameLiving living in m_aggroTable.GetUnordered())
             {
-                foreach (GameLiving living in m_aggroTable.Keys)
-                {
-                    if (!living.IsAlive || living.CurrentRegion != Body.CurrentRegion || living.ObjectState != GameObject.eObjectState.Active)
-                        continue;
+                if (!living.IsAlive || living.CurrentRegion != Body.CurrentRegion || living.ObjectState != GameObject.eObjectState.Active)
+                    continue;
 
-                    if (living.IsMezzed || living.IsStealthed)
-                        continue;
+                if (living.IsMezzed || living.IsStealthed)
+                    continue;
 
-                    if (!Body.IsWithinRadius2D(living, MAX_AGGRO_DISTANCE))
-                        continue;
+                if (!Body.IsWithinRadius2D(living, MAX_AGGRO_DISTANCE))
+                    continue;
 
-                    if (!Body.IsWithinRadius2D(living, ((TurretPet)Body).TurretSpell.Range))
-                        continue;
+                if (!Body.IsWithinRadius2D(living, ((TurretPet)Body).TurretSpell.Range))
+                    continue;
 
-                    if (((TurretPet)Body).TurretSpell.SpellType != "SpeedDecrease" && SpellHandler.FindEffectOnTarget(living, "SpeedDecrease") != null)
-                        continue;
+                if (((TurretPet)Body).TurretSpell.SpellType != "SpeedDecrease" && SpellHandler.FindEffectOnTarget(living, "SpeedDecrease") != null)
+                    continue;
 
-                    if (((TurretPet)Body).TurretSpell.SpellType == "SpeedDecrease" && living.HasAbility(Abilities.RootImmunity))
-                        continue;
+                if (((TurretPet)Body).TurretSpell.SpellType == "SpeedDecrease" && living.HasAbility(Abilities.RootImmunity))
+                    continue;
 
-                    GameNPC npc = living as GameNPC;
-                    long amount;
-                    if ((living.GetType().Name == "GuardNPC" || living.GetType().Name == "GuardOutlaw") && !((StandardMobBrain)npc.Brain).AggroTable.TryGetValue(Owner, out amount))
-                        continue;
+                GameNPC npc = living as GameNPC;
+                if ((living.GetType().Name == "GuardNPC" || living.GetType().Name == "GuardOutlaw") && !((StandardMobBrain)npc!.Brain).IsInAggroList(Owner))
+                    continue;
 
-                    newTargets.Add(living);
-                }
+                newTargets.Add(living);
             }
 
             foreach (GamePlayer living in Body.GetPlayersInRadius((ushort)((TurretPet)Body).TurretSpell.Range, Body.CurrentRegion.IsDungeon ? false : true))
@@ -116,8 +98,7 @@ namespace DOL.AI.Brain
                 if (((TurretPet)Body).TurretSpell.SpellType == "SpeedDecrease" && (living.HasAbility(Abilities.RootImmunity) || living.HasAbility(Abilities.DamageImmunity)))
                     continue;
 
-                long amount;
-                if ((living.GetType().Name == "GuardNPC" || living.GetType().Name == "GuardOutlaw") && !((StandardMobBrain)living.Brain).AggroTable.TryGetValue(Owner, out amount))
+                if ((living.GetType().Name == "GuardNPC" || living.GetType().Name == "GuardOutlaw") && !((StandardMobBrain)living.Brain).IsInAggroList(Owner))
                     continue;
 
                 if (LivingHasEffect(living, ((TurretPet)Body).TurretSpell))

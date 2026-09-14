@@ -1,22 +1,3 @@
-/*
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using AmteScripts.Managers;
 using AmteScripts.PvP.CTF;
 using Discord;
@@ -77,17 +58,17 @@ namespace DOL.GS
 
         private readonly object m_LockObject = new object();
 
-        private Timer kickoutTimer;
+        private ECSGameTimer kickoutTimer;
 
-        private Timer reputationRecoveryTimer;
+        private ECSGameTimer reputationRecoveryTimer;
 
-        private RegionTimer _afkDelayTimer;
-        private RegionTimer _afkKickoutTimer;
-        private RegionTimer _afkXpBufferTimer;
-        private RegionTimer _afkXpTickTimer;
+        private ECSGameTimer _afkDelayTimer;
+        private ECSGameTimer _afkKickoutTimer;
+        private ECSGameTimer _afkXpBufferTimer;
+        private ECSGameTimer _afkXpTickTimer;
 
         private bool _isAfkDelayElapsed;
-        private RegionTimer _afkAttackAnimTimer;
+        private ECSGameTimer _afkAttackAnimTimer;
         private bool _isAfkAttackMode;
 
         private bool stayStealth = false;
@@ -185,22 +166,39 @@ namespace DOL.GS
 
 
         /// <summary>
-        /// Gets or sets the targetObject's visibility
+        /// Client-side "target in view" flag. Targets standing basically inside the player are always considered
+        /// in view: the client sometimes reports "not in view" for overlapping objects (same safeguard as OpenDAoC).
         /// </summary>
         public override bool TargetInView
         {
-            get { return m_targetInView; }
-            set { m_targetInView = value; }
+            get
+            {
+                GameObject target = TargetObject;
+                if (target != null && target.CurrentRegion == CurrentRegion && GetDistanceTo(target) <= TargetInViewAlwaysTrueMinRange)
+                    return true;
+                return m_targetInView;
+            }
+            set => m_targetInView = value;
         }
 
-        public RegionTimer AfkDelayTimer
+        /// <summary>
+        /// Distance under which the target is always considered in view (moving players get a little more slack).
+        /// </summary>
+        public virtual int TargetInViewAlwaysTrueMinRange => TargetObject is GamePlayer { IsMoving: true } ? 100 : 64;
+
+        /// <summary>
+        /// Handles every line-of-sight request this client has to answer (deduplication, caching, timeout).
+        /// </summary>
+        public LosCheckHandler LosCheckHandler { get; }
+
+        public ECSGameTimer AfkDelayTimer
         {
-            get => _afkDelayTimer ?? (_afkDelayTimer = new RegionTimer(this));
+            get => _afkDelayTimer ?? (_afkDelayTimer = new ECSGameTimer(this));
         }
 
-        public Timer KickoutTimer
+        public ECSGameTimer KickoutTimer
         {
-            get => this.kickoutTimer ?? (this.kickoutTimer = new Timer());
+            get => this.kickoutTimer ?? (this.kickoutTimer = new ECSGameTimer(this));
         }
 
         public bool IsAfkDelayElapsed
@@ -828,14 +826,14 @@ namespace DOL.GS
         /// <summary>
         /// quit timer
         /// </summary>
-        protected RegionTimer m_quitTimer;
+        protected ECSGameTimer m_quitTimer;
 
         /// <summary>
         /// Timer callback for quit
         /// </summary>
         /// <param name="callingTimer">the calling timer</param>
         /// <returns>the new intervall</returns>
-        protected virtual int QuitTimerCallback(RegionTimer callingTimer)
+        protected virtual int QuitTimerCallback(ECSGameTimer callingTimer)
         {
             if (!IsAlive || ObjectState != eObjectState.Active)
             {
@@ -847,7 +845,7 @@ namespace DOL.GS
 
             if (Client.Account.PrivLevel > 1) // GMs can always insta quit
                 bInstaQuit = true;
-            else if (ServerProperties.Properties.DISABLE_QUIT_TIMER && Client.Player.InCombat == false)  // Players can only insta quit if they aren't in combat
+            else if (Properties.DISABLE_QUIT_TIMER && Client.Player.InCombat == false)  // Players can only insta quit if they aren't in combat
                 bInstaQuit = true;
 
             if (bInstaQuit == false)
@@ -917,7 +915,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="callingTimer">the timer</param>
         /// <returns>0</returns>
-        protected int LinkdeathTimerCallback(RegionTimer callingTimer)
+        protected int LinkdeathTimerCallback(ECSGameTimer callingTimer)
         {
             //If we died during our callback time we release
             try
@@ -997,8 +995,8 @@ namespace DOL.GS
                 int secondsToQuit = QuitTime;
                 if (log.IsInfoEnabled)
                     log.InfoFormat("Linkdead player {0}({1}) will quit in {2}", Name, Client.Account.Name, secondsToQuit);
-                RegionTimer timer = new RegionTimer(this); // make sure it is not stopped!
-                timer.Callback = new RegionTimerCallback(LinkdeathTimerCallback);
+                ECSGameTimer timer = new ECSGameTimer(this); // make sure it is not stopped!
+                timer.Callback = LinkdeathTimerCallback;
                 timer.Start(1 + secondsToQuit * 1000);
             }
 
@@ -1042,6 +1040,7 @@ namespace DOL.GS
         /// </summary>
         protected virtual void CleanupOnDisconnect()
         {
+            LosCheckHandler?.Reset();
             DropTerritoryRelicsOnDeath(null);
             StopAttack();
             // remove all stealth handlers
@@ -1061,7 +1060,7 @@ namespace DOL.GS
 
             if (reputationRecoveryTimer != null)
             {
-                reputationRecoveryTimer.Stop();
+                reputationRecoveryTimer?.Stop();
                 reputationRecoveryTimer = null;
             }
 
@@ -1203,6 +1202,8 @@ namespace DOL.GS
         /// <param name="forced">true if Quit can not be prevented!</param>
         public virtual bool Quit(bool forced)
         {
+            LosCheckHandler?.Reset();
+
             var wsd = SpellHandler.FindEffectOnTarget(this, "WarlockSpeedDecrease");
             if (!forced)
             {
@@ -1216,7 +1217,7 @@ namespace DOL.GS
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Quit.CantQuitMount"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
-                if (IsMoving && !ServerProperties.Properties.DISABLE_QUIT_TIMER)
+                if (IsMoving && !Properties.DISABLE_QUIT_TIMER)
                 {
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Quit.CantQuitStanding"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
@@ -1277,8 +1278,8 @@ namespace DOL.GS
 
                 if (m_quitTimer == null)
                 {
-                    m_quitTimer = new RegionTimer(this);
-                    m_quitTimer.Callback = new RegionTimerCallback(QuitTimerCallback);
+                    m_quitTimer = new ECSGameTimer(this);
+                    m_quitTimer.Callback = QuitTimerCallback;
                     m_quitTimer.Start(1);
                 }
 
@@ -1369,29 +1370,18 @@ namespace DOL.GS
         protected virtual int CombatTimerInterval { get { return 11000; } }
 
         /// <summary>
-        /// Combat Timer Lock
-        /// </summary>
-        private object m_CombatTimerLock = new object();
-
-        /// <summary>
         /// Combat Timer
         /// </summary>
-        private RegionTimerAction<GamePlayer> m_CombatTimer = null;
+        private ECSGameTimer m_CombatTimer;
 
         /// <summary>
         /// Reset and Restart Combat Timer
         /// </summary>
         protected virtual void ResetInCombatTimer()
         {
-            lock (m_CombatTimerLock)
-            {
-                if (m_CombatTimer == null)
-                {
-                    m_CombatTimer = new RegionTimerAction<GamePlayer>(this, p => p.Out.SendUpdateMaxSpeed());
-                }
-                m_CombatTimer.Stop();
-                m_CombatTimer.Start(CombatTimerInterval);
-            }
+            m_CombatTimer ??= new ECSGameTimer(this, _ => { Out.SendUpdateMaxSpeed(); return 0; });
+            m_CombatTimer.Stop();
+            m_CombatTimer.Start(CombatTimerInterval);
         }
         #endregion
 
@@ -1547,7 +1537,7 @@ namespace DOL.GS
         /// <summary>
         /// The release timer for this player
         /// </summary>
-        protected RegionTimer m_releaseTimer;
+        protected ECSGameTimer m_releaseTimer;
 
         /// <summary>
         /// Stops release timer and closes timer window
@@ -1987,7 +1977,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="callingTimer"></param>
         /// <returns></returns>
-        protected virtual int ReleaseTimerCallback(RegionTimer callingTimer)
+        protected virtual int ReleaseTimerCallback(ECSGameTimer callingTimer)
         {
             if (IsAlive)
                 return 0;
@@ -2095,17 +2085,19 @@ namespace DOL.GS
         /// <summary>
         /// The timer that will be started when the player wants to pray
         /// </summary>
-        protected RegionTimerAction<GameGravestone> m_prayAction;
+        protected ECSGameTimer m_prayTimer;
+
         /// <summary>
         /// The delay to wait until xp is regained, in milliseconds
         /// </summary>
         protected virtual ushort PrayDelay { get { return 5000; } }
+
         /// <summary>
         /// Gets the praying-state of this living
         /// </summary>
         public virtual bool IsPraying
         {
-            get { return m_prayAction != null && m_prayAction.IsAlive; }
+            get { return m_prayTimer != null && m_prayTimer.IsAlive; }
         }
 
         /// <summary>
@@ -2137,20 +2129,29 @@ namespace DOL.GS
                 return;
             }
 
-            if (m_prayAction != null)
-                m_prayAction.Stop();
+            if (m_prayTimer != null)
+                m_prayTimer.Stop();
 
-            m_prayAction = new RegionTimerAction<GameGravestone>(gravestone, stn =>
+            m_prayTimer = new ECSGameTimer(this, _ =>
             {
-                if (stn.XPValue > 0)
+                if (gravestone != null && gravestone.XPValue > 0)
                 {
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Pray.GainBack"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                    GainExperience(eXPSource.Praying, stn.XPValue);
+                    GainExperience(eXPSource.Praying, gravestone.XPValue);
                 }
-                stn.XPValue = 0;
-                stn.Delete();
+
+                if (gravestone != null)
+                {
+                    gravestone.XPValue = 0;
+                    gravestone.Delete();
+                }
+
+                m_prayTimer = null;
+
+                return 0;
             });
-            m_prayAction.Start(PrayDelay);
+
+            m_prayTimer.Start(PrayDelay);
 
             Sit(true);
             Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Pray.Begin"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -2169,8 +2170,9 @@ namespace DOL.GS
         {
             if (!IsPraying)
                 return;
-            m_prayAction.Stop();
-            m_prayAction = null;
+
+            m_prayTimer.Stop();
+            m_prayTimer = null;
         }
         #endregion
 
@@ -2646,7 +2648,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="callingTimer">the timer</param>
         /// <returns>the new time</returns>
-        protected override int HealthRegenerationTimerCallback(RegionTimer callingTimer)
+        protected override int HealthRegenerationTimerCallback(ECSGameTimer callingTimer)
         {
             // I'm not sure what the point of this is.
             if (Client.ClientState != GameClient.eClientState.Playing)
@@ -2707,7 +2709,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="selfRegenerationTimer">the timer</param>
         /// <returns>the new time</returns>
-        protected override int PowerRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
+        protected override int PowerRegenerationTimerCallback(ECSGameTimer selfRegenerationTimer)
         {
             if (Client.ClientState != GameClient.eClientState.Playing)
                 return PowerRegenerationPeriod;
@@ -2722,7 +2724,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="selfRegenerationTimer">the timer</param>
         /// <returns>the new time</returns>
-        protected override int EnduranceRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
+        protected override int EnduranceRegenerationTimerCallback(ECSGameTimer selfRegenerationTimer)
         {
             if (Client.ClientState != GameClient.eClientState.Playing)
                 return EnduranceRegenerationPeriod;
@@ -8153,7 +8155,7 @@ namespace DOL.GS
             TurnTo(attacker.Coordinate);
             Out.SendPlayerPositionAndObjectID();
 
-            new WeaponOnTargetAction(this, attacker, weapon, null, 1.0, 0, CounterAttackStyle).OnTick();
+            new WeaponOnTargetAction(this, attacker, weapon, null, 1.0, 0, CounterAttackStyle).Execute();
 
             if (attacker is GamePlayer targetPlayer)
             {
@@ -9260,8 +9262,8 @@ namespace DOL.GS
         /// <summary>
         /// Radioactive / Damned Area Logic
         /// </summary>
-        protected RegionTimer m_radioactiveTimer;
-        protected RegionTimer m_decontaminationTimer;
+        protected ECSGameTimer m_radioactiveTimer;
+        protected ECSGameTimer m_decontaminationTimer;
         protected int m_radioactiveStage = 0;
         protected long m_radioactiveDecayStartTick;
         protected const string DAMNED_SPEED_DEBUFF = "DamnedSpeedDebuff";
@@ -9318,7 +9320,7 @@ namespace DOL.GS
 
             if (IsImmuneToRadiation())
             {
-                m_radioactiveTimer = new RegionTimer(this, RadioactiveTimerCallback);
+                m_radioactiveTimer = new ECSGameTimer(this, RadioactiveTimerCallback);
                 m_radioactiveTimer.Start(1000);
                 return;
             }
@@ -9346,7 +9348,7 @@ namespace DOL.GS
                     m_radioactiveStage = 0;
             }
 
-            m_radioactiveTimer = new RegionTimer(this, RadioactiveTimerCallback);
+            m_radioactiveTimer = new ECSGameTimer(this, RadioactiveTimerCallback);
             m_radioactiveTimer.Start(1000);
         }
 
@@ -9399,11 +9401,11 @@ namespace DOL.GS
 
             Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CursedArea.Timer.Decon"), (ushort)duration);
 
-            m_decontaminationTimer = new RegionTimer(this, DecontaminationTimerCallback);
+            m_decontaminationTimer = new ECSGameTimer(this, DecontaminationTimerCallback);
             m_decontaminationTimer.Start(duration * 1000);
         }
 
-        protected virtual int DecontaminationTimerCallback(RegionTimer timer)
+        protected virtual int DecontaminationTimerCallback(ECSGameTimer timer)
         {
             m_radioactiveStage = 0;
             m_decontaminationTimer = null;
@@ -9422,7 +9424,7 @@ namespace DOL.GS
             return false;
         }
 
-        protected virtual int RadioactiveTimerCallback(RegionTimer timer)
+        protected virtual int RadioactiveTimerCallback(ECSGameTimer timer)
         {
             if (!IsAlive || ObjectState != eObjectState.Active)
             {
@@ -10135,8 +10137,8 @@ namespace DOL.GS
                 else
                 {
                     Out.SendTimerWindow(LanguageMgr.GetTranslation(Client.Account.Language, "System.ReleaseTimer"), (m_automaticRelease ? RELEASE_MINIMUM_WAIT : RELEASE_TIME));
-                    m_releaseTimer = new RegionTimer(this);
-                    m_releaseTimer.Callback = new RegionTimerCallback(ReleaseTimerCallback);
+                    m_releaseTimer = new ECSGameTimer(this);
+                    m_releaseTimer.Callback = ReleaseTimerCallback;
                     m_releaseTimer.Start(1000);
 
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.Die.ReleaseToReturn"), eChatType.CT_YouDied, eChatLoc.CL_SystemWindow);
@@ -10499,22 +10501,20 @@ namespace DOL.GS
                 foreach (GamePlayer player in Group.GetPlayersInTheGroup())
                 {
                     if (player == this) continue;
-                    if (enemy.Attackers.Contains(player)) continue;
-                    if (this.IsWithinRadius(player, WorldMgr.MAX_EXPFORKILL_DISTANCE))
-                    {
+                    if (enemy.AttackerTracker.ContainsAttacker(player)) continue;
+
+                    if (IsWithinRadius(player, WorldMgr.MAX_EXPFORKILL_DISTANCE))
                         Notify(GameLivingEvent.EnemyKilled, player, new EnemyKilledEventArgs(enemy));
-                    }
 
-                    if (player.Attackers.Contains(enemy))
-                        player.RemoveAttacker(enemy);
+                    if (player.AttackerTracker.ContainsAttacker(enemy)) player.RemoveAttacker(enemy);
 
-                    if (player.ControlledBrain != null && player.ControlledBrain.Body.Attackers.Contains(enemy))
-                        player.ControlledBrain.Body.RemoveAttacker(enemy);
+                    GameNPC petBody = player.ControlledBrain?.Body;
+                    if (petBody != null && petBody.AttackerTracker.ContainsAttacker(enemy)) petBody.RemoveAttacker(enemy);
                 }
             }
 
-            if (ControlledBrain != null && ControlledBrain.Body.Attackers.Contains(enemy))
-                ControlledBrain.Body.RemoveAttacker(enemy);
+            GameNPC myPet = ControlledBrain?.Body;
+            if (myPet != null && myPet.AttackerTracker.ContainsAttacker(enemy)) myPet.RemoveAttacker(enemy);
 
             base.EnemyKilled(enemy);
         }
@@ -10650,21 +10650,6 @@ namespace DOL.GS
             Out.SendDisableSkill(skills);
         }
 
-        /// <summary>
-        /// The next spell
-        /// </summary>
-        protected Spell m_nextSpell;
-        /// <summary>
-        /// The next spell line
-        /// </summary>
-        protected SpellLine m_nextSpellLine;
-        /// <summary>
-        /// The next spell target
-        /// </summary>
-        protected GameLiving m_nextSpellTarget;
-        /// <summary>
-        /// A lock for the spellqueue
-        /// </summary>
         protected object m_spellQueueAccessMonitor = new object();
 
         /// <summary>
@@ -10672,12 +10657,7 @@ namespace DOL.GS
         /// </summary>
         public void ClearSpellQueue()
         {
-            lock (m_spellQueueAccessMonitor)
-            {
-                m_nextSpell = null;
-                m_nextSpellLine = null;
-                m_nextSpellTarget = null;
-            }
+            castingComponent.ClearFollowUp();
         }
 
         private void FinalizeItemCast(ISpellHandler handler)
@@ -10730,43 +10710,35 @@ namespace DOL.GS
         {
             FinalizeItemCast(handler);
 
+            Spell nextSpell; SpellLine nextLine; GameLiving nextTarget; InventoryItem nextItem;
+            ISpellHandler next = null;
+
             lock (m_spellQueueAccessMonitor)
             {
-                Spell nextSpell = m_nextSpell;
-                SpellLine nextSpellLine = m_nextSpellLine;
-                GameLiving nextSpellTarget = m_nextSpellTarget;
-                // warlock
-                if (nextSpell != null)
+                m_runningSpellHandler = null;
+                if (castingComponent.TryTakeFollowUp(out nextSpell, out nextLine, out nextTarget, out nextItem) && nextSpell != null)
                 {
                     if (nextSpell.IsSecondary)
                     {
-                        GameSpellEffect effect = SpellHandler.FindEffectOnTarget(this, "Powerless");
-                        if (effect == null)
-                            effect = SpellHandler.FindEffectOnTarget(this, "Range");
-                        if (effect == null)
-                            effect = SpellHandler.FindEffectOnTarget(this, "Uninterruptable");
-
-                        if (effect != null)
-                            effect.Cancel(false);
+                        GameSpellEffect effect = SpellHandler.FindEffectOnTarget(this, "Powerless")
+                                              ?? SpellHandler.FindEffectOnTarget(this, "Range")
+                                              ?? SpellHandler.FindEffectOnTarget(this, "Uninterruptable");
+                        effect?.Cancel(false);
                     }
-
+                    next = ScriptMgr.CreateSpellHandler(this, nextSpell, nextLine);
+                    m_runningSpellHandler = next;
                 }
-                m_runningSpellHandler = null;
-                m_nextSpell = null;         // avoid restarting nextspell by reentrance from spellhandler
-                m_nextSpellLine = null;
-                m_nextSpellTarget = null;
+            }
 
-                if (nextSpell != null)
-                    m_runningSpellHandler = ScriptMgr.CreateSpellHandler(this, nextSpell, nextSpellLine);
-            }
-            if (m_runningSpellHandler != null)
-            {
-                m_runningSpellHandler.CastingCompleteEvent += new CastingCompleteCallback(OnAfterSpellCastSequence);
-                if (m_nextSpellTarget != null)
-                    m_runningSpellHandler.CastSpell(m_nextSpellTarget);
-                else
-                    m_runningSpellHandler.CastSpell();
-            }
+            if (next == null)
+                return;
+
+            next.CastingCompleteEvent += new CastingCompleteCallback(OnAfterSpellCastSequence);
+
+            if (nextTarget != null && nextTarget.ObjectState == eObjectState.Active)
+                next.CastSpell(nextTarget, nextItem);
+
+            else next.CastSpell(nextItem);
         }
 
         private static bool IsAscendanceBlockedSpell(Spell spell)
@@ -10937,24 +10909,19 @@ namespace DOL.GS
                                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.AlreadyPlaySong"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                                 return false;
                             }
-                            if (SpellQueue)
+                            if (SpellQueue || castingComponent.IsCurrentCastEndingSoon())
                             {
-                                if (spell.SpellType.ToLower() == "archery")
+                                if (SpellQueue)
                                 {
-                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.FollowSpell", spell.Name), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                                    if (spell.SpellType.ToLower() == "archery")
+                                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.FollowSpell", spell.Name), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                                    else
+                                        Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.AlreadyCastFollow"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                                 }
-                                else
-                                {
-                                    Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.AlreadyCastFollow"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                                }
-
-                                m_nextSpell = spell;
-                                m_nextSpellLine = line;
-                                m_nextSpellTarget = TargetObject as GameLiving;
+                                castingComponent.QueueFollowUp(spell, line, TargetObject as GameLiving, useItem);
                                 return true;
                             }
-                            else Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.AlreadyCastNoQueue"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-
+                            Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.AlreadyCastNoQueue"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
                             return false;
                         }
                         else if (m_runningSpellHandler is PrimerSpellHandler)
@@ -10972,8 +10939,7 @@ namespace DOL.GS
                                     {
                                         cloneSpell = spell.Copy();
                                         cloneSpell.PowerType = Spell.ePowerType.None;
-                                        m_nextSpell = cloneSpell;
-                                        m_nextSpellLine = line;
+                                        castingComponent.QueueFollowUp(cloneSpell, line, TargetObject as GameLiving, useItem);
                                         casted = true;
                                     }
                                     else if (m_runningSpellHandler is RangeSpellHandler)
@@ -10981,16 +10947,14 @@ namespace DOL.GS
                                         cloneSpell = spell.Copy();
                                         cloneSpell.PowerType = Spell.ePowerType.None;
                                         cloneSpell.OverrideRange = m_runningSpellHandler.Spell.Range;
-                                        m_nextSpell = cloneSpell;
-                                        m_nextSpellLine = line;
+                                        castingComponent.QueueFollowUp(cloneSpell, line, TargetObject as GameLiving, useItem);
                                         casted = true;
                                     }
                                     else if (m_runningSpellHandler is UninterruptableSpellHandler)
                                     {
                                         cloneSpell = spell.Copy();
                                         cloneSpell.PowerType = Spell.ePowerType.None;
-                                        m_nextSpell = cloneSpell;
-                                        m_nextSpellLine = line;
+                                        castingComponent.QueueFollowUp(cloneSpell, line, TargetObject as GameLiving, useItem);
                                         casted = true;
                                     }
                                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.PrepareSecondarySpell"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
@@ -11115,9 +11079,8 @@ namespace DOL.GS
                                     if (SpellQueue && !(m_runningSpellHandler is ChamberSpellHandler))
                                     {
                                         Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.CastSpell.PrepareSecondarySpell"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-                                        m_nextSpell = spell;
                                         spell.OverrideRange = m_runningSpellHandler.Spell.Range;
-                                        m_nextSpellLine = line;
+                                        castingComponent.QueueFollowUp(spell, line, TargetObject as GameLiving, useItem);
                                         casted = true;
                                     }
                                 }
@@ -11680,16 +11643,16 @@ namespace DOL.GS
                                     effect.Cancel(false);
 
                                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.WhistleMount"), eChatType.CT_Emote, eChatLoc.CL_SystemWindow);
-                                m_whistleMountTimer = new RegionTimer(this);
+                                m_whistleMountTimer = new ECSGameTimer(this);
 
                                 if (isEpicFlyingMount)
                                 {
                                     TempProperties.setProperty("epicModelId", epicModelId);
                                     TempProperties.setProperty("epicMountName", epicMountName);
-                                    m_whistleMountTimer.Callback = new RegionTimerCallback(WhistleEpicFlyingMountTimerCallback);
+                                    m_whistleMountTimer.Callback = WhistleEpicFlyingMountTimerCallback;
                                 }
                                 else
-                                    m_whistleMountTimer.Callback = new RegionTimerCallback(WhistleMountTimerCallback);
+                                    m_whistleMountTimer.Callback = WhistleMountTimerCallback;
 
                                 m_whistleMountTimer.Start(5000);
                             }
@@ -11779,7 +11742,7 @@ namespace DOL.GS
 
                 #endregion
 
-                if (useItem.SpellID != 0 || useItem.SpellID1 != 0 || useItem.PoisonSpellID != 0) // don't return without firing events
+                if (useItem!.SpellID != 0 || useItem.SpellID1 != 0 || useItem.PoisonSpellID != 0) // don't return without firing events
                 {
                     if (IsSitting)
                     {
@@ -12275,7 +12238,7 @@ namespace DOL.GS
                 return false;
             }
             
-            int requiredLevel = useItem.Template.LevelRequirement > 0 ? useItem.Template.LevelRequirement : Math.Min(MaxLevel, useItem.Level);
+            int requiredLevel = useItem.Template!.LevelRequirement > 0 ? useItem.Template.LevelRequirement : Math.Min(MaxLevel, useItem.Level);
             if (requiredLevel > Level)
             {
                 Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.UseSlot.NotEnouthPower"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -13264,12 +13227,9 @@ namespace DOL.GS
             IsJumping = false;
             m_invulnerabilityTick = 0;
             m_pve_invulnerabilityTick = 0;
-            m_healthRegenerationTimer = new RegionTimer(this);
-            m_powerRegenerationTimer = new RegionTimer(this);
-            m_enduRegenerationTimer = new RegionTimer(this);
-            m_healthRegenerationTimer.Callback = new RegionTimerCallback(HealthRegenerationTimerCallback);
-            m_powerRegenerationTimer.Callback = new RegionTimerCallback(PowerRegenerationTimerCallback);
-            m_enduRegenerationTimer.Callback = new RegionTimerCallback(EnduranceRegenerationTimerCallback);
+            m_healthRegenerationTimer = new ECSGameTimer(this, HealthRegenerationTimerCallback);
+            m_powerRegenerationTimer = new ECSGameTimer(this, PowerRegenerationTimerCallback);
+            m_enduRegenerationTimer = new ECSGameTimer(this, EnduranceRegenerationTimerCallback);
             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 if (player == null) continue;
@@ -13997,8 +13957,8 @@ namespace DOL.GS
                 {
                     if (m_lavaBurningTimer == null)
                     {
-                        m_lavaBurningTimer = new RegionTimer(this);
-                        m_lavaBurningTimer.Callback = new RegionTimerCallback(LavaBurnTimerCallback);
+                        m_lavaBurningTimer = new ECSGameTimer(this);
+                        m_lavaBurningTimer.Callback = LavaBurnTimerCallback;
                         m_lavaBurningTimer.Interval = 2000;
                         m_lavaBurningTimer.Start(1);
                     }
@@ -14040,7 +14000,7 @@ namespace DOL.GS
         protected long m_beginDrowningTick;
         protected waterBreath m_currentWaterBreathState;
 
-        protected int DrowningTimerCallback(RegionTimer callingTimer)
+        protected int DrowningTimerCallback(ECSGameTimer callingTimer)
         {
             if (!IsAlive || ObjectState != eObjectState.Active)
                 return 0;
@@ -14060,16 +14020,17 @@ namespace DOL.GS
             return 3000;
         }
 
-        protected int HoldingBreathTimerCallback(RegionTimer callingTimer)
+        protected int HoldingBreathTimerCallback(ECSGameTimer callingTimer)
         {
             m_holdBreathTimer = null;
             Diving(waterBreath.Drowning);
             return 0;
         }
 
-        protected RegionTimer m_drowningTimer;
-        protected RegionTimer m_holdBreathTimer;
-        protected RegionTimer m_lavaBurningTimer;
+        protected ECSGameTimer m_drowningTimer;
+        protected ECSGameTimer m_holdBreathTimer;
+        protected ECSGameTimer m_lavaBurningTimer;
+
         /// <summary>
         /// The diving state of this player
         /// </summary>
@@ -14132,8 +14093,8 @@ namespace DOL.GS
                     if (m_holdBreathTimer == null)
                     {
                         Out.SendTimerWindow("Holding Breath", 30);
-                        m_holdBreathTimer = new RegionTimer(this);
-                        m_holdBreathTimer.Callback = new RegionTimerCallback(HoldingBreathTimerCallback);
+                        m_holdBreathTimer = new ECSGameTimer(this);
+                        m_holdBreathTimer.Callback = HoldingBreathTimerCallback;
                         m_holdBreathTimer.Start(30001);
                     }
                     break;
@@ -14142,8 +14103,8 @@ namespace DOL.GS
                     if (m_drowningTimer == null)
                     {
                         Out.SendTimerWindow("Drowning", 15);
-                        m_drowningTimer = new RegionTimer(this);
-                        m_drowningTimer.Callback = new RegionTimerCallback(DrowningTimerCallback);
+                        m_drowningTimer = new ECSGameTimer(this);
+                        m_drowningTimer.Callback = DrowningTimerCallback;
                         m_drowningTimer.Start(1);
                     }
                     break;
@@ -14153,7 +14114,7 @@ namespace DOL.GS
             //	Out.SendUpdateMaxSpeed();
         }
 
-        protected int LavaBurnTimerCallback(RegionTimer callingTimer)
+        protected int LavaBurnTimerCallback(ECSGameTimer callingTimer)
         {
             if (!IsAlive || ObjectState != eObjectState.Active || !IsSwimming)
                 return 0;
@@ -14454,7 +14415,7 @@ namespace DOL.GS
                 //Stop praying if the player stands up...
                 if (IsPraying)
                 {
-                    m_prayAction.Stop();
+                    m_prayTimer.Stop();
                 }
             }
             //Update the client
@@ -15927,7 +15888,7 @@ namespace DOL.GS
             return player.IsWithinRadius(obj, WorldMgr.VISIBILITY_DISTANCE);
         }
 
-        protected RegionTimer m_consumeTimer;
+        protected ECSGameTimer m_consumeTimer;
 
         public static bool IsPureMeleeClass(eCharacterClass characterClass)
         {
@@ -15962,7 +15923,7 @@ namespace DOL.GS
                 bool isPureMelee = CharacterClass != null && IsPureMeleeClass((eCharacterClass)CharacterClass.ID);
                 int tickRate = isPureMelee ? 1200 : 1500;
 
-                m_consumeTimer = new RegionTimer(this, new RegionTimerCallback(ConsumeTimerCallback));
+                m_consumeTimer = new ECSGameTimer(this, ConsumeTimerCallback);
                 m_consumeTimer.Start(tickRate);
             }
             else if (!needsTimer && m_consumeTimer != null)
@@ -16021,7 +15982,7 @@ namespace DOL.GS
             TempProperties.removeProperty("BypassUnequip");
         }
 
-        protected virtual int ConsumeTimerCallback(RegionTimer timer)
+        protected virtual int ConsumeTimerCallback(ECSGameTimer timer)
         {
             bool isPureMelee = CharacterClass != null && IsPureMeleeClass((eCharacterClass)CharacterClass.ID);
             int nextTick = isPureMelee ? 1200 : 1500;
@@ -17157,123 +17118,110 @@ namespace DOL.GS
         protected const string UNCOVER_STEALTH_ACTION_PROP = "UncoverStealthAction";
 
         /// <summary>
-        /// Uncovers the player if a mob is too close
+        /// Lets nearby hostile NPCs try to uncover a stealthed player every 2 seconds.
+        /// When an NPC "sees" the player, the player's own client is asked for a real line-of-sight answer (walls, doors,
+        /// keep floors...). Answers are cached by the LosCheckHandler, so this costs at most one packet per NPC.
+        /// A timeout (client not answering) does NOT protect the stealther, only a real "hidden" answer does.
         /// </summary>
-        protected class UncoverStealthAction : RegionAction
+        protected class UncoverStealthAction : ECSGameTimerWrapperBase, ILosCheckListener
         {
-            /// <summary>
-            /// Constructs a new uncover stealth action
-            /// </summary>
-            /// <param name="actionSource">The action source</param>
-            public UncoverStealthAction(GamePlayer actionSource)
-                : base(actionSource)
-            {
-            }
+            public UncoverStealthAction(GamePlayer actionSource) : base(actionSource) { }
 
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                GamePlayer player = (GamePlayer)m_actionSource;
-                if (player.Client.Account.PrivLevel > 1) return;
-
-                bool checklos = false;
-                foreach (AbstractArea area in player.CurrentAreas)
-                {
-                    if (area.CheckLOS)
-                    {
-                        checklos = true;
-                        break;
-                    }
-                }
+                GamePlayer player = (GamePlayer)Owner;
+                if (player.Client.Account.PrivLevel > 1 || !player.IsStealthed)
+                    return 0; // nothing to do anymore: stop this timer (Stealth(true) creates a new one)
 
                 foreach (GameNPC npc in player.GetNPCsInRadius(1024))
                 {
-                    // Friendly mobs do not uncover stealthed players
-                    if (!GameServer.ServerRules.IsAllowedToAttack(npc, player, true)) continue;
-
-                    // Npc with player owner don't uncover
-                    if (npc.GetPlayerOwner() != null) continue;
+                    if (!player.IsStealthed)
+                        break;
+                    if (!GameServer.ServerRules.IsAllowedToAttack(npc, player, true))
+                        continue;
+                    if (npc.GetPlayerOwner() != null) // pets never uncover
+                        continue;
 
                     double npcLevel = Math.Max(npc.Level, 1.0);
                     double stealthLevel = player.GetModifiedSpecLevel(Specs.Stealth);
                     double detectRadius = 125.0 + ((npcLevel - stealthLevel) * 20.0);
-
-                    // we have detect hidden and enemy don't = higher range
                     if (npc.HasAbility(Abilities.DetectHidden) && player.EffectList.GetOfType<CamouflageEffect>() == null)
-                    {
                         detectRadius += 125;
-                    }
-
-                    if (detectRadius < 126) detectRadius = 126;
+                    if (detectRadius < 126)
+                        detectRadius = 126;
 
                     double distanceToPlayer = npc.GetDistanceTo(player);
-
                     if (distanceToPlayer > detectRadius)
                         continue;
 
-                    double fieldOfView = 90.0;  //90 degrees  = standard FOV
-                    double fieldOfListen = 120.0; //120 degrees = standard field of listening
+                    double fieldOfView = 90.0;
+                    double fieldOfListen = 120.0;
                     if (npc.Level > 50)
-                    {
                         fieldOfListen += (npc.Level - player.Level) * 3;
-                    }
 
                     var angle = npc.GetAngleTo(player.Coordinate);
-
-                    //player in front
                     fieldOfView /= 2.0;
                     bool canSeePlayer = (angle.InDegrees >= 360 - fieldOfView || angle.InDegrees < fieldOfView);
-
-                    //If npc can not see nor hear the player, continue the loop
                     fieldOfListen /= 2.0;
-                    if (canSeePlayer == false &&
-                        !(angle.InDegrees >= (45 + 60) - fieldOfListen && angle.InDegrees < (45 + 60) + fieldOfListen) &&
-                        !(angle.InDegrees >= (360 - 45 - 60) - fieldOfListen && angle.InDegrees < (360 - 45 - 60) + fieldOfListen))
+                    if (canSeePlayer == false
+                        && !(angle.InDegrees >= (45 + 60) - fieldOfListen && angle.InDegrees < (45 + 60) + fieldOfListen)
+                        && !(angle.InDegrees >= (360 - 45 - 60) - fieldOfListen && angle.InDegrees < (360 - 45 - 60) + fieldOfListen))
                         continue;
 
                     double chanceMod = 1.0;
-
-                    //Chance to detect player decreases after 125 coordinates!
                     if (distanceToPlayer > 125)
                         chanceMod = 1f - (distanceToPlayer - 125.0) / (detectRadius - 125.0);
-
                     double chanceToUncover = 0.1 + (npc.Level - stealthLevel) * 0.01 * chanceMod;
-                    if (chanceToUncover < 0.01) chanceToUncover = 0.01;
+                    if (chanceToUncover < 0.01)
+                        chanceToUncover = 0.01;
 
-                    if (Util.ChanceDouble(chanceToUncover))
+                    if (!Util.ChanceDouble(chanceToUncover))
+                        continue;
+
+                    if (canSeePlayer)
                     {
-                        if (canSeePlayer)
-                        {
-                            if (checklos)
-                            {
-                                player.Out.SendCheckLOS(player, npc, new CheckLOSResponse(player.UncoverLOSHandler));
-                            }
-                            else
-                            {
-                                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.Stealth.Uncover", npc.GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                                player.Stealth(false);
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            npc.TurnTo(player, 10000);
-                        }
+                        // Nobody could answer the request (should not happen for a playing client): uncover immediately, like before.
+                        if (!player.Out.SendLosCheckRequest(player, npc, this))
+                            Uncover(player, npc);
+                    }
+                    else
+                    {
+                        npc.TurnTo(player, 10000);
                     }
                 }
+
+                return player.IsStealthed ? timer.Interval : 0;
+            }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                if (response == LosCheckResponse.False)
+                    return;
+
+                GamePlayer player = Owner as GamePlayer;
+                if (player == null || !player.IsStealthed || player.CurrentRegion == null)
+                    return;
+
+                GameObject npc = player.CurrentRegion.GetObject(targetId);
+                if (npc == null)
+                    return;
+
+                Uncover(player, npc);
+            }
+
+            private static void Uncover(GamePlayer player, GameObject npc)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.Stealth.Uncover", player.GetPersonalizedName(npc)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Stealth(false);
             }
         }
-        /// <summary>
-        /// This handler is called by the unstealth check of mobs
-        /// </summary>
+
+        [Obsolete("Legacy CheckLOSResponse callback. Uncovering is handled by UncoverStealthAction (ILosCheckListener).")]
         public void UncoverLOSHandler(GamePlayer player, ushort response, ushort targetOID)
         {
-            GameObject target = CurrentRegion.GetObject(targetOID);
-
-            if ((target == null) || (player.IsStealthed == false)) return;
-
+            GameObject target = CurrentRegion?.GetObject(targetOID);
+            if (target == null || player == null || !player.IsStealthed)
+                return;
             if ((response & 0x100) == 0x100)
             {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.Stealth.Uncover", player.GetPersonalizedName(target)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -18283,7 +18231,7 @@ namespace DOL.GS
 
         #region AFK and AFK XP methods
 
-        internal class AfkSpellImpactTimer : RegionAction
+        internal class AfkSpellImpactTimer : ECSGameTimerWrapperBase
         {
             private readonly GamePlayer _caster;
             private readonly GameLiving _target;
@@ -18297,15 +18245,15 @@ namespace DOL.GS
                 _clientEffect = clientEffect;
             }
 
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
                 if (_caster == null || !_caster.IsAlive || _caster.ObjectState != GameObject.eObjectState.Active)
-                    return;
+                    return 0;
 
                 GameLiving target = _target ?? _caster;
 
                 if (target.ObjectState != GameObject.eObjectState.Active)
-                    return;
+                    return 0;
 
                 foreach (GamePlayer vis in target.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
@@ -18314,6 +18262,7 @@ namespace DOL.GS
 
                     vis.Out.SendSpellEffectAnimation(_caster, target, _clientEffect, 1, false, 1);
                 }
+                return 0;
             }
         }
 
@@ -18697,7 +18646,7 @@ namespace DOL.GS
                     Out.SendMessage(LanguageMgr.GetTranslation(Client.Account.Language, "GameObjects.GamePlayer.AfkXp.StartingIn", bufferMs / 1000), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
 
-                _afkXpBufferTimer = new RegionTimer(this, _ =>
+                _afkXpBufferTimer = new ECSGameTimer(this, _ =>
                 {
                     if (!IsFightingTrainingDummyInRange() || GetActiveAfkToken() == null || !IsAfkActive())
                     {
@@ -18721,7 +18670,7 @@ namespace DOL.GS
             if (tickMs < 0) tickMs = int.MaxValue;
             if (tickMs == 0) tickMs = 1000;
 
-            _afkXpTickTimer = new RegionTimer(this, _ =>
+            _afkXpTickTimer = new ECSGameTimer(this, _ =>
             {
                 if (!IsAfkActive() || !IsFightingTrainingDummyInRange())
                 {
@@ -18792,7 +18741,7 @@ namespace DOL.GS
 
             SetAfkAttackVisualState(true);
             _afkAttackAnimTimer?.Stop();
-            _afkAttackAnimTimer = new RegionTimer(this, _ =>
+            _afkAttackAnimTimer = new ECSGameTimer(this, _ =>
             {
                 if (!_isAfkAttackMode)
                     return 0;
@@ -19059,7 +19008,7 @@ namespace DOL.GS
         {
             // 1) small “become AFK” debounce (30s)
             _afkDelayTimer?.Stop();
-            _afkDelayTimer = new RegionTimer(this, _ =>
+            _afkDelayTimer = new ECSGameTimer(this, _ =>
             {
                 _isAfkDelayElapsed = true;
                 MaybeStartAfkXp();
@@ -19075,7 +19024,7 @@ namespace DOL.GS
             if (kickoutMs < 0) kickoutMs = int.MaxValue;
 
             _afkKickoutTimer?.Stop();
-            _afkKickoutTimer = new RegionTimer(this, _ =>
+            _afkKickoutTimer = new ECSGameTimer(this, _ =>
             {
                 OnAfkTimerTimeout();
                 return 0;
@@ -19091,7 +19040,7 @@ namespace DOL.GS
             }
 
             _afkDelayTimer?.Stop();
-            _afkDelayTimer = new RegionTimer(this, _ =>
+            _afkDelayTimer = new ECSGameTimer(this, _ =>
             {
                 _isAfkDelayElapsed = true;
                 MaybeStartAfkXp();
@@ -19746,7 +19695,7 @@ namespace DOL.GS
         /// <summary>
         /// The timer to call invulnerability expired callbacks
         /// </summary>
-        protected class InvulnerabilityTimer : RegionAction
+        protected class InvulnerabilityTimer : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// Defines a logger for this class.
@@ -19774,16 +19723,17 @@ namespace DOL.GS
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
                 try
                 {
-                    m_callback((GamePlayer)m_actionSource);
+                    m_callback((GamePlayer)Owner);
                 }
                 catch (Exception e)
                 {
                     log.Error("InvulnerabilityTimer callback", e);
                 }
+                return 0;
             }
         }
 
@@ -20131,7 +20081,7 @@ namespace DOL.GS
 
         #region Controlled Mount
 
-        protected RegionTimer m_whistleMountTimer;
+        protected ECSGameTimer m_whistleMountTimer;
         protected ControlledHorse m_controlledHorse;
 
         public bool HasHorse
@@ -20210,7 +20160,7 @@ namespace DOL.GS
             m_whistleMountTimer = null;
         }
 
-        protected int WhistleMountTimerCallback(RegionTimer callingTimer)
+        protected int WhistleMountTimerCallback(ECSGameTimer callingTimer)
         {
             StopWhistleTimers();
             IsOnHorse = true;
@@ -20219,7 +20169,7 @@ namespace DOL.GS
             return 0;
         }
 
-        protected int WhistleEpicFlyingMountTimerCallback(RegionTimer callingTimer)
+        protected int WhistleEpicFlyingMountTimerCallback(ECSGameTimer callingTimer)
         {
             StopWhistleTimers();
 
@@ -21081,6 +21031,7 @@ namespace DOL.GS
             m_rangeAttackAmmo = new WeakRef(null);
             m_rangeAttackTarget = new WeakRef(null);
             m_client = client;
+            LosCheckHandler = new LosCheckHandler(this);
             m_dbCharacter = dbChar;
             this.IsAfkDelayElapsed = true;
             this.IsAllowToVolInThisArea = true;
@@ -21335,42 +21286,30 @@ namespace DOL.GS
 
         private void ConfigureReputationTimer()
         {
-            if (this.Reputation < 0 && Properties.IS_REPUTATION_RECOVERY_ACTIVATED && Properties.REPUTATION_DAYS_INTERVAL > 0 && Properties.REPUTATION_POINTS_RECOVERY > 0)
+            if (Reputation >= 0 || !Properties.IS_REPUTATION_RECOVERY_ACTIVATED ||
+                Properties.REPUTATION_DAYS_INTERVAL <= 0 || Properties.REPUTATION_POINTS_RECOVERY <= 0)
+                return;
+
+            long remainingSeconds = GetRemainingIntervalReputationTime();
+            if (remainingSeconds <= 0)
             {
-                long remainingTime = this.GetRemainingIntervalReputationTime();
-
-                if (remainingTime <= 0)
-                {
-                    this.RecoverReputation(Properties.REPUTATION_POINTS_RECOVERY);
-                    remainingTime = reputationDaysDurationInSeconds;
-                }
-
-                if (this.reputationRecoveryTimer == null)
-                {
-                    //Number of days expressed in ms	
-                    this.reputationRecoveryTimer = new Timer(remainingTime * 1000);
-                    this.reputationRecoveryTimer.Elapsed += this.HandleReputationTimerElapsed;
-                    this.reputationRecoveryTimer.AutoReset = false;
-                    this.reputationRecoveryTimer.Start();
-                }
-                else
-                {
-                    this.reputationRecoveryTimer.Stop();
-                    this.reputationRecoveryTimer.Interval = remainingTime * 1000;
-                    this.reputationRecoveryTimer.Start();
-                }
+                RecoverReputation(Properties.REPUTATION_POINTS_RECOVERY);
+                remainingSeconds = reputationDaysDurationInSeconds;
             }
+
+            reputationRecoveryTimer ??= new ECSGameTimer(this, ReputationRecoveryTick);
+            reputationRecoveryTimer.Stop();
+            reputationRecoveryTimer.Start((int)Math.Min(int.MaxValue, remainingSeconds * 1000));
         }
 
-        private void HandleReputationTimerElapsed(object sender, ElapsedEventArgs e)
+        private int ReputationRecoveryTick(ECSGameTimer timer)
         {
-            this.RecoverReputation(Properties.REPUTATION_POINTS_RECOVERY);
-            if (Reputation < 0)
-            {
-                this.OutlawTimeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
-                this.reputationRecoveryTimer.Interval = reputationDaysDurationInSeconds * 1000;
-                this.reputationRecoveryTimer.Start();
-            }
+            RecoverReputation(Properties.REPUTATION_POINTS_RECOVERY);
+            if (Reputation >= 0)
+                return 0;
+
+            OutlawTimeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            return (int)Math.Min(int.MaxValue, reputationDaysDurationInSeconds * 1000);
         }
 
         public void RecoverReputation(int amount)

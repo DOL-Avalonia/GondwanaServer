@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.GS.Geometry;
 using DOL.Language;
 using System.Numerics;
@@ -33,86 +15,55 @@ namespace DOL.GS.PacketHandler.Client.v168
             ushort flag = packet.ReadShort();
             //			ushort unk2 = packet.ReadShort();
 
-            new ChangeGroundTargetHandler(client.Player, groundX, groundY, groundZ, flag).Start(1);
+            GamePlayer player = client.Player;
+
+            new ECSGameTimer(player, timer =>
+            {
+                HandleGroundTargetChange((GamePlayer)timer.Owner, groundX, groundY, groundZ, flag);
+                return 0;
+            }, 1);
         }
 
         /// <summary>
-        /// Handles ground target changes
+        /// Handles ground target changes. Runs on the game loop.
         /// </summary>
-        protected class ChangeGroundTargetHandler : RegionAction
+        private static void HandleGroundTargetChange(GamePlayer player, int groundX, int groundY, int groundZ, ushort flag)
         {
-            protected readonly ushort m_flag;
+            player.GroundTargetInView = ((flag & 0x100) != 0);
+            player.GroundTargetPosition = Position.Create(player.Position.RegionID, groundX, groundY, groundZ);
 
-            /// <summary>
-            /// The new ground X
-            /// </summary>
-            protected readonly int m_x;
+            if (!player.GroundTargetInView)
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player, "PlayerGroundTargetHandler.GroundTargetNotVisible"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-            /// <summary>
-            /// The new ground Y
-            /// </summary>
-            protected readonly int m_y;
-
-            /// <summary>
-            /// The new ground Z
-            /// </summary>
-            protected readonly int m_z;
-
-            /// <summary>
-            /// Constructs a new ChangeGroundTargetHandler
-            /// </summary>
-            /// <param name="actionSource">The action source</param>
-            /// <param name="x">The new ground X</param>
-            /// <param name="y">The new ground Y</param>
-            /// <param name="z">The new ground Z</param>
-            /// <param name="flag"></param>
-            public ChangeGroundTargetHandler(GamePlayer actionSource, int x, int y, int z, ushort flag) : base(actionSource)
+            if (player.SiegeWeapon != null)
             {
-                m_x = x;
-                m_y = y;
-                m_z = z;
-                m_flag = flag;
+                player.SiegeWeapon.Move();
+                return;
             }
 
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
+            if (player.Steed != null && player.Steed.MAX_PASSENGERS >= 1)
             {
-                var player = (GamePlayer)m_actionSource;
-                player.GroundTargetInView = ((m_flag & 0x100) != 0);
-                player.GroundTargetPosition = Position.Create(player.Position.RegionID, m_x, m_y, m_z);
+                if (player.Steed is GameTaxiBoat) return;
 
-                if (!player.GroundTargetInView)
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player, "PlayerGroundTargetHandler.GroundTargetNotVisible"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
-                if (player.SiegeWeapon != null)
+                if (player.Steed is GameBoat)
+                // Ichi - && player.GroundTarget.Z > player.CurrentZone.ZoneRegion.WaterLevel) return;
                 {
-                    player.SiegeWeapon.Move();
-                    return;
-                }
-                if (player.Steed != null && player.Steed.MAX_PASSENGERS >= 1)
-                {
-                    if (player.Steed is GameTaxiBoat) return;
-                    if (player.Steed is GameBoat)
-                    // Ichi - && player.GroundTarget.Z > player.CurrentZone.ZoneRegion.WaterLevel) return;
+                    if (player.Steed.OwnerID == player.InternalID)
                     {
-                        if (player.Steed.OwnerID == player.InternalID)
-                        {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(player, "PlayerGroundTargetHandler.BoatMoveOrder"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                            player.Steed.PathTo(player.GroundTargetPosition.Coordinate, player.Steed.MaxSpeed);
-                            return;
-                        }
-                    }
-
-                    if (player.Steed.MAX_PASSENGERS > 8 && player.Steed.CurrentRiders.Length < player.Steed.REQUIRED_PASSENGERS)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player, "PlayerGroundTargetHandler.NotEnoughPassengers", player.Steed.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player, "PlayerGroundTargetHandler.BoatMoveOrder"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        player.Steed.PathTo(player.GroundTargetPosition.Coordinate, player.Steed.MaxSpeed);
                         return;
                     }
-                    player.Steed.PathTo(player.GroundTargetPosition.Coordinate, player.Steed.MaxSpeed);
+                }
+
+                if (player.Steed.MAX_PASSENGERS > 8 && player.Steed.CurrentRiders.Length < player.Steed.REQUIRED_PASSENGERS)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player, "PlayerGroundTargetHandler.NotEnoughPassengers", player.Steed.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
+
+                player.Steed.PathTo(player.GroundTargetPosition.Coordinate, player.Steed.MaxSpeed);
+                return;
             }
         }
     }

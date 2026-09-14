@@ -1603,7 +1603,14 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        [Obsolete("Shouldn't be used in favor of new LoS Check Manager")]
+        public virtual bool SendLosCheckRequest(GameObject source, GameObject target, ILosCheckListener listener)
+        {
+            GamePlayer player = m_gameClient.Player;
+            if (player == null || player.LosCheckHandler == null) return false;
+            return player.LosCheckHandler.StartLosCheck(source, target, listener);
+        }
+
+        [Obsolete("Use SendLosCheckRequest(source, target, ILosCheckListener). Still works (adapter over LosCheckHandler).")]
         public virtual void SendCheckLOS(GameObject Checker, GameObject Target, CheckLOSResponse callback)
         {
             if (m_gameClient.Player == null)
@@ -1628,11 +1635,15 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(0x00); // ?
                 SendTCP(pak);
             }
+
+            if (callback == null || Checker == null || Target == null) return;
+            SendLosCheckRequest(Checker, Target, new LegacyLosCheckListener(callback));
         }
 
+        [Obsolete("Use SendLosCheckRequest(source, target, ILosCheckListener). Still works (adapter over LosCheckHandler).")]
         public virtual void SendCheckLOS(GameObject source, GameObject target, CheckLOSMgrResponse callback)
         {
-            if (m_gameClient.Player == null)
+            /*if (m_gameClient.Player == null)
                 return;
 
             int TargetOID = (target != null ? target.ObjectID : 0);
@@ -1656,7 +1667,10 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(0x00); // ?
                 pak.WriteShort(0x00); // ?
                 SendTCP(pak);
-            }
+            }*/
+
+            if (callback == null || source == null || target == null) return;
+            SendLosCheckRequest(source, target, new LegacyLosCheckMgrListener(callback));
         }
 
         public virtual async Task SendQuestUpdate(IQuestPlayerData quest)

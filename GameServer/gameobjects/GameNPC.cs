@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using AmteScripts.Managers;
 using DOL.AI;
 using DOL.AI.Brain;
@@ -81,7 +63,7 @@ namespace DOL.GS
         public ushort DamageTypeCounter { get; set; }
         public eDamageType LastDamageType { get; set; }
         public ushort DamageTypeLimit { get; set; }
-        private RegionTimer ambientTextTimer;
+        private ECSGameTimer ambientTextTimer;
         private bool hasImunity = false;
         public eDamageType ImunityDomage = eDamageType.GM;
         private Dictionary<MobXAmbientBehaviour, short> ambientXNbUse = new Dictionary<MobXAmbientBehaviour, short>();
@@ -309,7 +291,7 @@ namespace DOL.GS
         public bool BossTasksIgnored { get; set; }
         protected long m_lastAblativeHitTime = 0;
         protected double m_lastPlayerEnhancementMultiplier = 1.0;
-        protected RegionTimer m_bossDynamicStatsTimer = null;
+        protected ECSGameTimer m_bossDynamicStatsTimer = null;
 
         /// <summary>
         /// Safely exposes the cached enhancement multiplier for external scripts like SpellHandler.
@@ -1312,7 +1294,7 @@ namespace DOL.GS
         /// <summary>
         /// Timer with purpose of follow updating
         /// </summary>
-        protected RegionTimer m_followTimer;
+        protected ECSGameTimer m_followTimer;
         /// <summary>
         /// Property entry on follow timer, wether the follow target is in range
         /// </summary>
@@ -1352,20 +1334,18 @@ namespace DOL.GS
         /// </summary>
         public override GameObject TargetObject
         {
-            get
-            {
-                return base.TargetObject;
-            }
+            get { return base.TargetObject; }
             set
             {
                 GameObject previousTarget = TargetObject;
                 GameObject newTarget = value;
-
                 base.TargetObject = newTarget;
-
-                if (previousTarget != null && newTarget != previousTarget)
-                    previousTarget.Notify(GameNPCEvent.SwitchedTarget, this,
-                                          new SwitchedTargetEventArgs(previousTarget, newTarget));
+                if (newTarget != previousTarget)
+                {
+                    m_lastNegativeLosCheckTarget = null;
+                    if (previousTarget != null)
+                        previousTarget.Notify(GameNPCEvent.SwitchedTarget, this, new SwitchedTargetEventArgs(previousTarget, newTarget));
+                }
             }
         }
 
@@ -1448,7 +1428,7 @@ namespace DOL.GS
         /// <summary>
         /// Restores the NPC heading after some time
         /// </summary>
-        protected class RestoreHeadingAction : RegionAction
+        protected class RestoreHeadingAction : ECSGameTimerWrapperBase
         {
             private readonly Angle m_oldOrientation;
             protected readonly Coordinate m_oldPosition;
@@ -1467,20 +1447,21 @@ namespace DOL.GS
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                GameNPC npc = (GameNPC)m_actionSource;
+                GameNPC npc = (GameNPC)timer.Owner;
 
                 npc.TempProperties.removeProperty(RESTORE_HEADING_ACTION_PROP);
 
-                if (npc.ObjectState != eObjectState.Active) return;
-                if (!npc.IsAlive) return;
-                if (npc.AttackState) return;
-                if (npc.IsMoving) return;
-                if (npc.Equals(m_oldPosition)) return;
-                if (npc.Orientation == m_oldOrientation) return; // already set? oO
+                if (npc.ObjectState != eObjectState.Active) return 0;
+                if (!npc.IsAlive) return 0;
+                if (npc.AttackState) return 0;
+                if (npc.IsMoving) return 0;
+                if (npc.Equals(m_oldPosition)) return 0;
+                if (npc.Orientation == m_oldOrientation) return 0; // already set? oO
                 
                 npc.TurnTo(m_oldOrientation);
+                return 0;
             }
         }
 
@@ -1495,34 +1476,17 @@ namespace DOL.GS
         /// <summary>
         /// Delayed action that fires an event when an NPC arrives at its target
         /// </summary>
-        protected class ArriveAtTargetAction : RegionAction
+        protected class ArriveAtTargetAction : ECSGameTimerWrapperBase
         {
-            private Action<GameNPC> m_goToNodeCallback;
-
-            /// <summary>
-            /// Constructs a new ArriveAtTargetAction
-            /// </summary>
-            /// <param name="actionSource">The action source</param>
+            private readonly Action<GameNPC> m_goToNodeCallback;
             public ArriveAtTargetAction(GameNPC actionSource, Action<GameNPC> goToNodeCallback = null)
-                : base(actionSource)
+                : base(actionSource) { m_goToNodeCallback = goToNodeCallback; }
+            protected override int OnTick(ECSGameTimer timer)
             {
-                m_goToNodeCallback = goToNodeCallback;
-            }
-
-            /// <summary>
-            /// This function is called when the Mob arrives at its target spot
-            /// This time was estimated using walking speed and distance.
-            /// It fires the ArriveAtTarget event
-            /// </summary>
-            public override void OnTick()
-            {
-                GameNPC npc = (GameNPC)m_actionSource;
-                if (m_goToNodeCallback != null)
-                {
-                    m_goToNodeCallback(npc);
-                    return;
-                }
+                GameNPC npc = (GameNPC)timer.Owner;
+                if (m_goToNodeCallback != null) { m_goToNodeCallback(npc); return 0; }
                 npc._OnArrivedAtTarget();
+                return 0;
             }
         }
 
@@ -1799,7 +1763,7 @@ namespace DOL.GS
                 }
             }
             //sirru
-            else if (m_attackers.Count == 0 && this.Spells.Count > 0 && this.TargetObject != null && GameServer.ServerRules.IsAllowedToAttack(this, (this.TargetObject as GameLiving), true))
+            else if (AttackerTracker.Count == 0 && this.Spells.Count > 0 && this.TargetObject != null && GameServer.ServerRules.IsAllowedToAttack(this, (this.TargetObject as GameLiving), true))
             {
                 if (TargetObject.Realm == 0 || Realm == 0)
                     m_lastAttackTickPvE = CurrentRegion.Time;
@@ -1820,10 +1784,10 @@ namespace DOL.GS
         /// <summary>
         /// Keep following a specific object at a max distance
         /// </summary>
-        protected virtual int FollowTimerCallback(RegionTimer callingTimer)
+        protected virtual int FollowTimerCallback(ECSGameTimer callingTimer)
         {
             if (IsCasting)
-                return ServerProperties.Properties.GAMENPC_FOLLOWCHECK_TIME;
+                return Properties.GAMENPC_FOLLOWCHECK_TIME;
 
             bool wasInRange = m_followTimer.Properties.getProperty(FOLLOW_TARGET_IN_RANGE, false);
             m_followTimer.Properties.removeProperty(FOLLOW_TARGET_IN_RANGE);
@@ -2069,7 +2033,7 @@ namespace DOL.GS
         /// <summary>
         /// Delays movement to the next waypoint
         /// </summary>
-        protected class WaypointDelayAction : RegionAction
+        protected class WaypointDelayAction : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// Constructs a new WaypointDelayAction
@@ -2083,11 +2047,11 @@ namespace DOL.GS
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                GameNPC npc = (GameNPC)m_actionSource;
+                GameNPC npc = (GameNPC)timer.Owner;
                 if (!npc.IsMovingOnPath)
-                    return;
+                    return 0;
                 PathPoint oldPathPoint = npc.CurrentWayPoint;
                 PathPoint nextPathPoint = npc.CurrentWayPoint.Next;
                 if ((npc.CurrentWayPoint.Type == ePathType.Path_Reverse) && (npc.CurrentWayPoint.FiredFlag))
@@ -2131,6 +2095,7 @@ namespace DOL.GS
                 {
                     npc.StopMovingOnPath();
                 }
+                return 0;
             }
         }
         #endregion
@@ -3435,8 +3400,7 @@ namespace DOL.GS
             {
                 if (m_bossDynamicStatsTimer == null)
                 {
-                    m_bossDynamicStatsTimer = new RegionTimer(this, new RegionTimerCallback(BossDynamicStatsCallback));
-                    m_bossDynamicStatsTimer.Start(1500);
+                    m_bossDynamicStatsTimer = new ECSGameTimer(this, BossDynamicStatsCallback, 1500);
                 }
             }
 
@@ -3570,6 +3534,8 @@ namespace DOL.GS
         /// <returns>true if the npc has been successfully removed</returns>
         public override bool RemoveFromWorld()
         {
+            ClearLosChecks();
+
             if (m_bossDynamicStatsTimer != null)
             {
                 m_bossDynamicStatsTimer.Stop();
@@ -3690,8 +3656,7 @@ namespace DOL.GS
                 if (oldRegionID != newRegion && newRegion != 0)
                 {
                     if (m_followTimer != null) m_followTimer.Stop();
-                    m_followTimer = new RegionTimer(this);
-                    m_followTimer.Callback = new RegionTimerCallback(FollowTimerCallback);
+                    m_followTimer = new ECSGameTimer(this, FollowTimerCallback);
                 }
             }
         }
@@ -4276,28 +4241,134 @@ namespace DOL.GS
         /// </summary>
         public const int CHARMED_NOEXP_TIMEOUT = 60000;
 
-        public const string LAST_LOS_TARGET_PROPERTY = "last_LOS_checkTarget";
-        public const string LAST_LOS_TICK_PROPERTY = "last_LOS_checkTick";
-        public const string NUM_LOS_CHECKS_INPROGRESS = "num_LOS_progress";
+        #region Line of sight (LosCheckHandler)
 
-        protected object LOS_LOCK = new object();
-
-        protected GameObject m_targetLOSObject = null;
+        private NpcAttackLosCheckListener m_startAttackLosCheckListener;
+        private NpcAttackLosCheckListener m_rangedAttackLosCheckListener;
+        private NpcSpellLosCheckListener m_spellLosCheckListener;
+        private GameLiving m_lastNegativeLosCheckTarget;
 
         /// <summary>
-        /// Starts a melee attack on a target
+        /// Last target a LoS request said this NPC cannot see
+        /// (cleared when the target changes or a later check succeeds).
         /// </summary>
-        /// <param name="target">The object to attack</param>
+        public GameLiving LastNegativeLosCheckTarget => m_lastNegativeLosCheckTarget;
+
+        /// <summary>
+        /// Forget every pending LoS request of this NPC.
+        /// </summary>
+        public void ClearLosChecks()
+        {
+            m_spellLosCheckListener?.Clear();
+            m_lastNegativeLosCheckTarget = null;
+        }
+
+        private enum eNpcLosCheckKind : byte { StartAttack, RangedAttackFinished }
+
+        /// <summary>
+        /// LoS answers for pets: attack only visible targets, stop shooting at hidden ones.
+        /// </summary>
+        private sealed class NpcAttackLosCheckListener : ILosCheckListener
+        {
+            private readonly GameNPC _npc;
+            private readonly eNpcLosCheckKind _kind;
+
+            public NpcAttackLosCheckListener(GameNPC npc, eNpcLosCheckKind kind) { _npc = npc; _kind = kind; }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                if (_npc.ObjectState != eObjectState.Active || !_npc.IsAlive) return;
+
+                GameObject target = _npc.CurrentRegion?.GetObject(targetId);
+                if (target == null || _npc.TargetObject != target) return;   // target changed meanwhile
+
+                switch (_kind)
+                {
+                    case eNpcLosCheckKind.StartAttack:
+                        if (response == LosCheckResponse.False)
+                            (_npc.Brain as IOldAggressiveBrain)?.RemoveFromAggroList(target as GameLiving);
+                        else
+                            _npc.ContinueStartAttack(target);   // True, or Timeout: never leave a pet frozen
+                        break;
+
+                    case eNpcLosCheckKind.RangedAttackFinished:
+                        if (response == LosCheckResponse.False)
+                            _npc.StopAttack();
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Spells an NPC wants to cast but which wait for a LoS confirmation (replaces the LOSTEMPCHECKER TempProperties).
+        /// One pending spell per target; no more "10 casts swallowed" blackout: we cast the instant the answer arrives.
+        /// </summary>
+        private sealed class NpcSpellLosCheckListener : ILosCheckListener
+        {
+            private readonly GameNPC _npc;
+            private readonly Dictionary<ushort, PendingSpell> _pending = new();
+            private readonly object _lock = new object();
+
+            private readonly record struct PendingSpell(Spell Spell, SpellLine Line);
+
+            public NpcSpellLosCheckListener(GameNPC npc) { _npc = npc; }
+
+            public void Clear() { lock (_lock) _pending.Clear(); }
+
+            /// <summary>
+            /// True when the cast is now handled by the LoS check
+            /// (request sent, or one already pending for this target).
+            /// </summary>
+            public bool Request(GamePlayer losChecker, Spell spell, SpellLine line, GameLiving target)
+            {
+                ushort targetId = (ushort)target.ObjectID;
+
+                lock (_lock)
+                {
+                    if (_pending.ContainsKey(targetId)) return true;
+                    _pending[targetId] = new PendingSpell(spell, line);
+                }
+
+                if (losChecker.Out.SendLosCheckRequest(_npc, target, this)) return true;
+
+                lock (_lock) _pending.Remove(targetId);
+                return false;
+            }
+
+            public void HandleLosCheckResponse(GamePlayer losChecker, LosCheckResponse response, ushort sourceId, ushort targetId)
+            {
+                PendingSpell pending;
+                lock (_lock)
+                {
+                    if (!_pending.Remove(targetId, out pending)) return;
+                }
+
+                if (_npc.ObjectState != eObjectState.Active || !_npc.IsAlive) return;
+                if (_npc.CurrentRegion?.GetObject(targetId) is not GameLiving target) return;
+
+                switch (response)
+                {
+                    case LosCheckResponse.True:
+                        _npc.m_lastNegativeLosCheckTarget = null;
+                        _npc.CastSpellWithoutLosCheck(pending.Spell, pending.Line, target);
+                        break;
+
+                    case LosCheckResponse.False:
+                        _npc.m_lastNegativeLosCheckTarget = target;
+                        _npc.Notify(GameLivingEvent.CastFailed, _npc, new CastFailedEventArgs(null, CastFailedEventArgs.Reasons.TargetNotInView));
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
         public override void StartAttack(GameObject target)
         {
-            if (target == null)
-                return;
+            if (target == null) return;
 
             GamePlayer pTarget = target as GamePlayer ?? (target as GameLiving)?.GetPlayerOwner();
-            if (pTarget != null && pTarget.TempProperties.getProperty<bool>("ArenaParticipant", false))
-            {
-                return;
-            }
+            if (pTarget != null && pTarget.TempProperties.getProperty<bool>("ArenaParticipant", false)) return;
 
             if (IsReturningHome)
             {
@@ -4307,84 +4378,15 @@ namespace DOL.GS
 
             TargetObject = target;
 
-            long lastTick = this.TempProperties.getProperty<long>(LAST_LOS_TICK_PROPERTY);
-
-            if (Properties.ALWAYS_CHECK_PET_LOS &&
-                Brain is IControlledBrain &&
-                (target as GameLiving)?.GetController() is GamePlayer targetPlayer)
+            if (Properties.ALWAYS_CHECK_PET_LOS && Brain is IControlledBrain && target is GameLiving livingTarget && livingTarget.GetController() is GamePlayer losChecker)
             {
-                GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(LAST_LOS_TARGET_PROPERTY, null);
-                if (lastTarget != null && lastTarget == target)
-                {
-                    if (lastTick != 0 && CurrentRegion.Time - lastTick < Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
-                        return;
-                }
-
-                lock (LOS_LOCK)
-                {
-                    int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
-
-                    if (count > 10)
-                    {
-                        log.DebugFormat("{0} LOS count check exceeds 10, aborting LOS check!", Name);
-
-                        // Now do a safety check.  If it's been a while since we sent any check we should clear count
-                        if (lastTick == 0 || CurrentRegion.Time - lastTick > Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
-                        {
-                            log.Debug("LOS count reset!");
-                            TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, 0);
-                        }
-
-                        return;
-                    }
-
-                    count++;
-                    TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, count);
-
-                    TempProperties.setProperty(LAST_LOS_TARGET_PROPERTY, target);
-                    TempProperties.setProperty(LAST_LOS_TICK_PROPERTY, CurrentRegion.Time);
-                    m_targetLOSObject = target;
-
-                }
-
-                targetPlayer.Out.SendCheckLOS(this, target, new CheckLOSResponse(this.NPCStartAttackCheckLOS));
-                return;
+                m_startAttackLosCheckListener ??= new NpcAttackLosCheckListener(this, eNpcLosCheckKind.StartAttack);
+                if (losChecker.Out.SendLosCheckRequest(this, target, m_startAttackLosCheckListener))
+                    return;
             }
 
             ContinueStartAttack(target);
         }
-
-        /// <summary>
-        /// We only attack if we have LOS
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="response"></param>
-        /// <param name="targetOID"></param>
-        public void NPCStartAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
-        {
-            lock (LOS_LOCK)
-            {
-                int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
-                count--;
-                TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, Math.Max(0, count));
-            }
-
-            if ((response & 0x100) == 0x100)
-            {
-                // make sure we didn't switch targets
-                if (TargetObject != null && m_targetLOSObject != null && TargetObject == m_targetLOSObject)
-                    ContinueStartAttack(m_targetLOSObject);
-            }
-            else
-            {
-                if (m_targetLOSObject != null && m_targetLOSObject is GameLiving && Brain != null && Brain is IOldAggressiveBrain)
-                {
-                    // there will be a think delay before mob attempts to attack next target
-                    (Brain as IOldAggressiveBrain)!.RemoveFromAggroList(m_targetLOSObject as GameLiving);
-                }
-            }
-        }
-
 
         public virtual void ContinueStartAttack(GameObject target)
         {
@@ -4422,60 +4424,19 @@ namespace DOL.GS
             }
         }
 
-
         public override void RangedAttackFinished()
         {
             base.RangedAttackFinished();
 
-            if (Properties.ALWAYS_CHECK_PET_LOS &&
-                Brain is IControlledBrain &&
-                (TargetObject is GamePlayer || (TargetObject is GameNPC && (TargetObject as GameNPC)!.Brain != null && (TargetObject as GameNPC)!.Brain is IControlledBrain)))
-            {
-                GamePlayer player = null;
+            if (!Properties.ALWAYS_CHECK_PET_LOS || Brain is not IControlledBrain)
+                return;
 
-                if (TargetObject is GamePlayer)
-                {
-                    player = TargetObject as GamePlayer;
-                }
-                else if (TargetObject is GameNPC && (TargetObject as GameNPC)!.Brain != null && (TargetObject as GameNPC)!.Brain is IControlledBrain)
-                {
-                    if (((TargetObject as GameNPC)!.Brain as IControlledBrain)!.Owner is GamePlayer)
-                    {
-                        player = ((TargetObject as GameNPC)!.Brain as IControlledBrain)!.Owner as GamePlayer;
-                    }
-                }
+            if (TargetObject is not GameLiving target || target.GetController() is not GamePlayer losChecker)
+                return;
 
-                if (player != null)
-                {
-                    player.Out.SendCheckLOS(this, TargetObject, new CheckLOSResponse(NPCStopRangedAttackCheckLOS));
-                    if (Properties.ENABLE_DEBUG)
-                    {
-                        log.Debug(Name + " sent LOS check to player " + player.Name);
-                    }
-                }
-            }
+            m_rangedAttackLosCheckListener ??= new NpcAttackLosCheckListener(this, eNpcLosCheckKind.RangedAttackFinished);
+            losChecker.Out.SendLosCheckRequest(this, target, m_rangedAttackLosCheckListener);
         }
-
-
-        /// <summary>
-        /// If we don't have LOS we stop attack
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="response"></param>
-        /// <param name="targetOID"></param>
-        public void NPCStopRangedAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
-        {
-            if ((response & 0x100) != 0x100)
-            {
-                if (Properties.ENABLE_DEBUG)
-                {
-                    log.Debug(Name + " FAILED stop ranged attack LOS check to player " + player.Name);
-                }
-
-                StopAttack();
-            }
-        }
-
 
         public void SetLastMeleeAttackTick()
         {
@@ -4487,7 +4448,7 @@ namespace DOL.GS
 
         private void StartMeleeAttackTimer()
         {
-            if (m_attackers.Count == 0)
+            if (AttackerTracker.Count == 0)
             {
                 if (SpellTimer == null)
                     SpellTimer = new SpellAction(this);
@@ -4532,7 +4493,7 @@ namespace DOL.GS
             return damage;
         }
 
-        private int AmbientTextTypeCallback(RegionTimer regionTimer)
+        private int AmbientTextTypeCallback(ECSGameTimer timer)
         {
             if (hasImunity)
             {
@@ -4565,7 +4526,7 @@ namespace DOL.GS
             }
             ambientTextTimer.Stop();
             ambientTextTimer = null;
-            return 1000;
+            return 0;
         }
 
         /// <summary>
@@ -4588,7 +4549,7 @@ namespace DOL.GS
         /// <summary>
         /// Heartbeat timer that dynamically scales current Health when players enter/leave
         /// </summary>
-        protected virtual int BossDynamicStatsCallback(RegionTimer timer)
+        protected virtual int BossDynamicStatsCallback(ECSGameTimer timer)
         {
             if (!IsAlive || ObjectState != eObjectState.Active)
                 return 0;
@@ -5423,19 +5384,9 @@ namespace DOL.GS
             return CurrentZone != null && !CurrentZone.IsDungeon;
         }
 
-        private bool IsObjectGreyCon(GamePlayer player, GameNPC mob)
+        private static bool IsObjectGreyCon(GamePlayer player, GameNPC mob)
         {
-            int playerLevel = player.Level;
-            int mobLevel = mob.Level;
-
-            if (playerLevel < GameLiving.NoXPForLevel.Length)
-            {
-                return mobLevel <= GameLiving.NoXPForLevel[playerLevel];
-            }
-            else
-            {
-                return player.GetConLevel(mob) <= -3;
-            }
+            return LegacyConLevelGrid.IsGreyCon(player.EffectiveLevel, mob.EffectiveLevel);
         }
 
         /// <summary>
@@ -5640,7 +5591,7 @@ namespace DOL.GS
         /// <summary>
         /// A timer that will respawn this mob
         /// </summary>
-        protected RegionTimer m_respawnTimer;
+        protected ECSGameTimer m_respawnTimer;
         /// <summary>
         /// The sync object for respawn timer modifications
         /// </summary>
@@ -5777,24 +5728,15 @@ namespace DOL.GS
             if (this.EventID != null && !CanRespawnWithinEvent)
                 return;
 
-            if (time > 0)
+            if (time <= 0) return;
+            lock (m_respawnTimerLock)
             {
-                lock (m_respawnTimerLock)
-                {
-                    if (m_respawnTimer == null)
-                    {
-                        m_respawnTimer = new RegionTimer(this);
-                        m_respawnTimer.Callback = new RegionTimerCallback(RespawnTimerCallback);
-                    }
-                    else if (m_respawnTimer.IsAlive)
-                    {
-                        m_respawnTimer.Stop();
-                    }
-                    // register Mob as "respawning"
-                    CurrentRegion.MobsRespawning.TryAdd(this, time);
-
-                    m_respawnTimer.Start(time);
-                }
+                if (m_respawnTimer == null)
+                    m_respawnTimer = new ECSGameTimer(this, RespawnTimerCallback);
+                else if (m_respawnTimer.IsAlive)
+                    m_respawnTimer.Stop();
+                CurrentRegion.MobsRespawning.TryAdd(this, time);
+                m_respawnTimer.Start(time);
             }
         }
 
@@ -5812,7 +5754,7 @@ namespace DOL.GS
             }
         }
 
-        protected virtual int RespawnTimerCallback(RegionTimer respawnTimer)
+        protected virtual int RespawnTimerCallback(ECSGameTimer respawnTimer)
         {
             Spawn();
             return 0;
@@ -5823,7 +5765,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="selfRegenerationTimer">the regeneration timer</param>
         /// <returns>the new interval</returns>
-        protected override int HealthRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
+        protected override int HealthRegenerationTimerCallback(ECSGameTimer selfRegenerationTimer)
         {
             int period = m_healthRegenerationPeriod;
             if (!InCombat)
@@ -6637,7 +6579,7 @@ namespace DOL.GS
         /// <summary>
         /// The spell action of this living
         /// </summary>
-        public class SpellAction : RegionAction
+        public class SpellAction : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// Constructs a new attack action
@@ -6651,197 +6593,95 @@ namespace DOL.GS
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                GameNPC owner = null;
-                if (m_actionSource != null && m_actionSource is GameNPC)
-                    owner = (GameNPC)m_actionSource;
-                else
-                {
-                    Stop();
-                    return;
-                }
-
-                if (owner.TargetObject == null || !owner.AttackState)
-                {
-                    Stop();
-                    return;
-                }
+                if (timer.Owner is not GameNPC owner) return 0;
+                if (owner.TargetObject == null || !owner.AttackState) return 0;
 
                 //If we started casting a spell, stop the timer and wait for
                 //GameNPC.OnAfterSpellSequenceCast to start again
-                if (owner.Brain is StandardMobBrain && ((StandardMobBrain)owner.Brain).CheckSpells(StandardMobBrain.eCheckSpellType.Offensive))
-                {
-                    Stop();
-                    return;
-                }
-                else
-                {
-                    //If we aren't a distance NPC, lets make sure we are in range to attack the target!
-                    if (owner.ActiveWeaponSlot != eActiveWeaponSlot.Distance && !owner.IsWithinRadius(owner.TargetObject, STICKMINIMUMRANGE))
-                        ((GameNPC)owner).Follow(owner.TargetObject, STICKMINIMUMRANGE, STICKMAXIMUMRANGE);
-                }
-
-                if (owner.Brain != null)
-                {
-                    Interval = Math.Min(1500, owner.Brain.CastInterval);
-                }
-                else
-                {
-                    Interval = 1500;
-                }
+                if (owner.Brain is StandardMobBrain smb && smb.CheckSpells(StandardMobBrain.eCheckSpellType.Offensive))
+                    return 0;
+                if (owner.ActiveWeaponSlot != eActiveWeaponSlot.Distance && !owner.IsWithinRadius(owner.TargetObject, STICKMINIMUMRANGE))
+                    owner.Follow(owner.TargetObject, STICKMINIMUMRANGE, STICKMAXIMUMRANGE);
+                return owner.Brain != null ? Math.Min(1500, owner.Brain.CastInterval) : 1500;
             }
         }
 
-        private const string LOSTEMPCHECKER = "LOSTEMPCHECKER";
-        private const string LOSCURRENTSPELL = "LOSCURRENTSPELL";
-        private const string LOSCURRENTLINE = "LOSCURRENTLINE";
-        private const string LOSSPELLTARGET = "LOSSPELLTARGET";
-
+        /// <summary>
+        /// Mob_Spells are cloned and scaled to the NPC level
+        /// (kept from the old implementation).
+        /// </summary>
+        private Spell PrepareNpcSpell(Spell spell, SpellLine line)
+        {
+            if (line.KeyName != GlobalSpellsLines.Mob_Spells) return spell;
+            Spell scaled = (Spell)spell.Clone();
+            scaled.Level = Level;
+            return scaled;
+        }
 
         /// <summary>
-        /// Cast a spell, with optional LOS check
+        /// Casts <paramref name="spell"/> on TargetObject;
+        /// when <paramref name="checkLOS"/> a client first confirms the line of sight.
         /// </summary>
-        /// <param name="spell"></param>
-        /// <param name="line"></param>
-        /// <param name="checkLOS"></param>
         public virtual bool CastSpell(Spell spell, SpellLine line, bool checkLOS)
         {
-            if (IsIncapacitated)
-                return false;
+            if (spell == null || line == null || IsIncapacitated) return false;
+            if (m_runningSpellHandler != null && !spell.IsInstantCast) return false;
 
-            if (checkLOS)
+            Spell spellToCast = PrepareNpcSpell(spell, line);
+            GameLiving target = TargetObject as GameLiving;
+
+            if (checkLOS && Properties.CHECK_LOS_BEFORE_NPC_CAST && target != null && target != this && spellToCast.RequiresLosCheck)
             {
-                return CastSpell(spell, line);
-            }
-            else
-            {
-                Spell spellToCast = null;
-
-                if (line.KeyName == GlobalSpellsLines.Mob_Spells)
+                GamePlayer losChecker = Brain?.GetLosChecker(target) ?? LosCheckHandler.FindLosChecker(this, target);
+                if (losChecker != null)
                 {
-                    // NPC spells will get the level equal to their caster
-                    spellToCast = (Spell)spell.Clone();
-                    spellToCast.Level = Level;
+                    m_spellLosCheckListener ??= new NpcSpellLosCheckListener(this);
+                    if (m_spellLosCheckListener.Request(losChecker, spellToCast, line, target))
+                    {
+                        // A cached/server answer may already have been delivered synchronously (spell cast, or target marked hidden).
+                        // Otherwise the cast happens when the client answers. Report "casting" unless we know the target is hidden,
+                        // so the brain falls back to melee only in that case.
+                        return m_lastNegativeLosCheckTarget != target;
+                    }
                 }
-                else
-                {
-                    spellToCast = spell;
-                }
-
-                return base.CastSpell(spellToCast, line);
             }
+
+            return CastSpellWithoutLosCheck(spellToCast, line, target);
         }
+
+        public override bool CastSpell(Spell spell, SpellLine line) => CastSpell(spell, line, true);
 
         /// <summary>
-        /// Cast a spell with LOS check to a player
+        /// The real cast on a specific target
+        /// (temporarily swaps TargetObject like the brains do).
         /// </summary>
-        /// <param name="spell"></param>
-        /// <param name="line"></param>
-        /// <returns>Whether the spellcast started successfully</returns>
-        public override bool CastSpell(Spell spell, SpellLine line)
+        private bool CastSpellWithoutLosCheck(Spell spell, SpellLine line, GameLiving target)
         {
-            if (IsIncapacitated)
-                return false;
+            GameObject previousTarget = TargetObject;
+            bool swapped = false;
 
-            if ((m_runningSpellHandler != null && !spell.IsInstantCast) || TempProperties.getProperty<Spell>(LOSCURRENTSPELL, null) != null)
-                return false;
-
-            bool casted = false;
-            Spell spellToCast = null;
-
-            if (line.KeyName == GlobalSpellsLines.Mob_Spells)
-            {
-                // NPC spells will get the level equal to their caster
-                spellToCast = (Spell)spell.Clone();
-                spellToCast.Level = Level;
-            }
-            else
-            {
-                spellToCast = spell;
-            }
-
-            // Let's do a few checks to make sure it doesn't just wait on the LOS check
-            int tempProp = TempProperties.getProperty<int>(LOSTEMPCHECKER);
-
-            if (tempProp <= 0)
-            {
-                GamePlayer LOSChecker = TargetObject as GamePlayer;
-
-                if (LOSChecker == null && this is GamePet pet)
-                {
-                    if (pet.Owner is GamePlayer player)
-                        LOSChecker = player;
-                    else if (pet.Owner is CommanderPet petComm && petComm.Owner is GamePlayer owner)
-                        LOSChecker = owner;
-                }
-
-                if (LOSChecker == null)
-                {
-                    foreach (GamePlayer ply in GetPlayersInRadius(350))
-                    {
-                        if (ply != null)
-                        {
-                            LOSChecker = ply;
-                            break;
-                        }
-                    }
-                }
-
-                if (LOSChecker == null)
-                {
-                    TempProperties.setProperty(LOSTEMPCHECKER, 0);
-                    casted = base.CastSpell(spellToCast, line);
-                }
-                else
-                {
-                    TempProperties.setProperty(LOSTEMPCHECKER, 10);
-                    TempProperties.setProperty(LOSCURRENTSPELL, spellToCast);
-                    TempProperties.setProperty(LOSCURRENTLINE, line);
-                    TempProperties.setProperty(LOSSPELLTARGET, TargetObject);
-                    LOSChecker.Out.SendCheckLOS(LOSChecker, this, new CheckLOSResponse(StartSpellAttackCheckLOS));
-                    casted = true;
-                }
-            }
-            else
-                TempProperties.setProperty(LOSTEMPCHECKER, tempProp - 1);
-
-            return casted;
-        }
-
-        public void StartSpellAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
-        {
-            SpellLine line = TempProperties.getProperty<SpellLine>(LOSCURRENTLINE, null);
-            Spell spell = TempProperties.getProperty<Spell>(LOSCURRENTSPELL, null);
-            GameObject target = TempProperties.getProperty<GameObject>(LOSSPELLTARGET, null);
-            GameObject lasttarget = TargetObject;
-
-            TempProperties.removeProperty(LOSSPELLTARGET);
-            TempProperties.removeProperty(LOSTEMPCHECKER);
-            TempProperties.removeProperty(LOSCURRENTLINE);
-            TempProperties.removeProperty(LOSCURRENTSPELL);
-            TempProperties.setProperty(LOSTEMPCHECKER, 0);
-
-            if ((response & 0x100) == 0x100 && line != null && spell != null)
+            if (target != null && previousTarget != target)
             {
                 TargetObject = target;
+                swapped = true;
+            }
 
-                GameLiving living = TargetObject as GameLiving;
-
-                if (living != null && living.EffectList.GetOfType<NecromancerShadeEffect>() != null)
+            try
+            {
+                // Necromancer in shade form: the spell goes to the pet (kept from the old implementation).
+                if (TargetObject is GamePlayer shade && shade.EffectList.GetOfType<NecromancerShadeEffect>() != null && shade.ControlledBrain?.Body != null)
                 {
-                    if (living is GamePlayer && (living as GamePlayer)!.ControlledBrain != null)
-                    {
-                        TargetObject = (living as GamePlayer)!.ControlledBrain.Body;
-                    }
+                    TargetObject = shade.ControlledBrain.Body;
+                    swapped = true;
                 }
 
-                base.CastSpell(spell, line);
-                TargetObject = lasttarget;
+                return base.CastSpell(spell, line);
             }
-            else
+            finally
             {
-                Notify(GameLivingEvent.CastFailed, this, new CastFailedEventArgs(null, CastFailedEventArgs.Reasons.TargetNotInView));
+                if (swapped) TargetObject = previousTarget;
             }
         }
 
@@ -6877,8 +6717,6 @@ namespace DOL.GS
                 return controlledBrain.Owner.GetPersonalizedName(obj);
             return base.GetPersonalizedName(obj);
         }
-
-        System.Timers.Timer TriggerPlayerLostTimer = new System.Timers.Timer(20000);
 
         /// <summary>
         /// Cooldown for triggers, triggers cannot run while this is not finished
@@ -6963,7 +6801,7 @@ namespace DOL.GS
                 return;
             }
 
-            TriggerPlayerLostTimer.Stop();
+            _triggerPlayerLostTimer?.Stop();
             MobXAmbientBehaviour chosen;
             if (preChosen != null)
             {
@@ -7087,10 +6925,8 @@ namespace DOL.GS
             //TriggerTimer
             if (chosen.TriggerTimer > 0)
             {
-                if (ambientTextTimer != null)
-                    ambientTextTimer.Stop();
-                ambientTextTimer = new RegionTimer(this, new RegionTimerCallback(AmbientTextTypeCallback));
-                ambientTextTimer.Start(chosen.TriggerTimer * 1000);
+                ambientTextTimer?.Stop();
+                ambientTextTimer = new ECSGameTimer(this, AmbientTextTypeCallback, chosen.TriggerTimer * 1000);
             }
 
             string controller = GetLivingOwner()?.Name ?? string.Empty;
@@ -7534,7 +7370,6 @@ namespace DOL.GS
         public GameNPC()
             : this(new StandardMobBrain())
         {
-            TriggerPlayerLostTimer.Elapsed += TriggerPlayerLostTimer_Elapsed;
         }
 
         public GameNPC(ABrain defaultBrain) : base()
@@ -7568,7 +7403,6 @@ namespace DOL.GS
                 m_ownBrain = defaultBrain;
                 m_ownBrain.Body = this;
             }
-            TriggerPlayerLostTimer.Elapsed += TriggerPlayerLostTimer_Elapsed;
         }
 
         /// <summary>
@@ -7586,7 +7420,6 @@ namespace DOL.GS
             if (template is NpcTemplate npcTemplate)
                 npcTemplate.ReplaceMobValues = true;
 
-            TriggerPlayerLostTimer.Elapsed += TriggerPlayerLostTimer_Elapsed;
             LoadTemplate(template);
         }
 

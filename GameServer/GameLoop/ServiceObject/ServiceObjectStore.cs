@@ -11,6 +11,7 @@ namespace DOL.GS
                 { ServiceObjectType.Timer, new ShardedServiceObjectArray<ECSGameTimer>(8192) },
                 { ServiceObjectType.Client, new ServiceObjectArray<GameClient>(1024) },
                 { ServiceObjectType.SubZoneObject, new ServiceObjectArray<SubZoneObject>(32768) },
+                { ServiceObjectType.CastingComponent,new ServiceObjectArray<CastingComponent>(1024) },
             }.ToFrozenDictionary();
 
         public static bool Add<T>(T serviceObject) where T : class, IServiceObject

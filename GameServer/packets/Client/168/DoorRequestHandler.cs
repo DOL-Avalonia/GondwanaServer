@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System.Linq;
 using System.Collections.Generic;
 
@@ -115,7 +97,13 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             // Schedule the Door Action unconditionally. We will handle privileges and range directly inside the Tick.
-            new ChangeDoorAction(client.Player, doorID, doorState, radius).Start(1);
+            GamePlayer player = client.Player;
+
+            new ECSGameTimer(player, timer =>
+            {
+                HandleDoorChange((GamePlayer)timer.Owner, doorID, doorState, radius);
+                return 0; // Return 0 to stop the timer from ticking again
+            }, 1);
         }
 
 
@@ -131,6 +119,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                 player.Out.SendMessage("Added keep door position to the database!", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
             }
+
             var door = new DBDoor();
             door.ObjectId = null;
             door.InternalID = m_handlerDoorID;
@@ -153,117 +142,79 @@ namespace DOL.GS.PacketHandler.Client.v168
         }
 
         /// <summary>
-        /// Handles the door state change actions
+        /// Handles the door state change actions. Runs on the game loop.
         /// </summary>
-        protected class ChangeDoorAction : RegionAction
+        private static void HandleDoorChange(GamePlayer player, int doorId, byte doorState, int radius)
         {
-            /// <summary>
-            /// The target door Id
-            /// </summary>
-            protected readonly int m_doorId;
+            IDoor mydoor = DoorMgr.GetDoorByID(doorId);
 
-            /// <summary>
-            /// The door state
-            /// </summary>
-            protected readonly int m_doorState;
-
-            /// <summary>
-            /// allowed distance to door
-            /// </summary>
-            protected readonly int m_radius;
-
-            /// <summary>
-            /// Constructs a new ChangeDoorAction
-            /// </summary>
-            /// <param name="actionSource">The action source</param>
-            /// <param name="doorId">The target door Id</param>
-            /// <param name="doorState">The door state</param>
-            /// /// <param name="radius">Interaction radius</param>
-            public ChangeDoorAction(GamePlayer actionSource, int doorId, int doorState, int radius)
-                : base(actionSource)
+            if (mydoor != null)
             {
-                m_doorId = doorId;
-                m_doorState = doorState;
-                m_radius = radius;
-            }
+                bool isEnemy = false;
 
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
-            {
-                var player = (GamePlayer)m_actionSource;
-                IDoor mydoor = DoorMgr.GetDoorByID(m_doorId);
-
-                if (mydoor != null)
+                if (mydoor is GameKeepDoor kDoor)
                 {
-                    bool isEnemy = false;
-
-                    if (mydoor is GameKeepDoor kDoor)
-                    {
-                        isEnemy = GameServer.KeepManager.IsEnemy(kDoor, player);
-                    }
-                    else
-                    {
-                        isEnemy = (player.Realm != mydoor.Realm && mydoor.Realm != eRealm.None && mydoor.Realm != (eRealm)6);
-                    }
-
-                    if (isEnemy && player.Client.Account.PrivLevel == 1)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.GameKeepDoor.DoorLocked", mydoor.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        return;
-                    }
-
-                    if (mydoor is GameKeepDoor keepDoor)
-                    {
-                        keepDoor.Interact(player);
-                    }
-                    else
-                    {
-                        if (player.Client.Account.PrivLevel == 1 && !player.IsWithinRadius(mydoor.Position, m_radius))
-                        {
-                            player.Out.SendMessage(
-                                LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.OnTick.TooFarAway", mydoor.Name),
-                                eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                            return;
-                        }
-
-                        if (!mydoor.Interact(player))
-                        {
-                            Stop();
-                            return;
-                        }
-
-                        if (m_doorState == 0x01)
-                            mydoor.Open(player);
-                        else
-                            mydoor.Close(player);
-                    }
+                    isEnemy = GameServer.KeepManager.IsEnemy(kDoor, player);
                 }
                 else
                 {
-                    //new frontiers we don't want this, i.e. relic gates etc
-                    if (player.CurrentRegionID == 163 && player.Client.Account.PrivLevel == 1)
-                        return;
-                    /*
-					//create a bug report
-					BugReport report = new BugReport();
-					report.DateSubmitted = DateTime.Now;
-					report.ID = GameServer.Database.GetObjectCount<BugReport>() + 1;
-					report.Message = "There is a missing door at location Region: " + player.CurrentRegionID + " X:" + player.X + " Y: " + player.Y + " Z: " + player.Z;
-					report.Submitter = player.Name;
-					GameServer.Database.AddObject(report);
-					 */
-
-                    player.Out.SendDebugMessage("Door {0} not found in door list, opening via GM door hack.", m_doorId);
-
-                    //else basic quick hack
-                    var door = new GameDoor();
-                    door.DoorID = m_doorId;
-                    door.Position = player.Position.With(door.Orientation);
-                    door.Realm = eRealm.Door;
-                    door.Open(player);
+                    isEnemy = (player.Realm != mydoor.Realm && mydoor.Realm != eRealm.None && mydoor.Realm != (eRealm)6);
                 }
+
+                if (isEnemy && player.Client.Account.PrivLevel == 1)
+                {
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.GameKeepDoor.DoorLocked", mydoor.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
+
+                if (mydoor is GameKeepDoor keepDoor)
+                {
+                    keepDoor.Interact(player);
+                }
+                else
+                {
+                    if (player.Client.Account.PrivLevel == 1 && !player.IsWithinRadius(mydoor.Position, radius))
+                    {
+                        player.Out.SendMessage(
+                            LanguageMgr.GetTranslation(player.Client.Account.Language, "DoorRequestHandler.OnTick.TooFarAway", mydoor.Name),
+                            eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+
+                    if (!mydoor.Interact(player))
+                    {
+                        return;
+                    }
+
+                    if (doorState == 0x01)
+                        mydoor.Open(player);
+                    else
+                        mydoor.Close(player);
+                }
+            }
+            else
+            {
+                //new frontiers we don't want this, i.e. relic gates etc
+                if (player.CurrentRegionID == 163 && player.Client.Account.PrivLevel == 1)
+                    return;
+                /*
+                //create a bug report
+                BugReport report = new BugReport();
+                report.DateSubmitted = DateTime.Now;
+                report.ID = GameServer.Database.GetObjectCount<BugReport>() + 1;
+                report.Message = "There is a missing door at location Region: " + player.CurrentRegionID + " X:" + player.X + " Y: " + player.Y + " Z: " + player.Z;
+                report.Submitter = player.Name;
+                GameServer.Database.AddObject(report);
+                 */
+
+                player.Out.SendDebugMessage("Door {0} not found in door list, opening via GM door hack.", doorId);
+
+                //else basic quick hack
+                var door = new GameDoor();
+                door.DoorID = doorId;
+                door.Position = player.Position.With(door.Orientation);
+                door.Realm = eRealm.Door;
+                door.Open(player);
             }
         }
     }

@@ -364,7 +364,7 @@ namespace DOL.GS.Scripts
             base.StartAttack(attackTarget);
         }
 
-        protected override int FollowTimerCallback(RegionTimer callingTimer)
+        protected override int FollowTimerCallback(ECSGameTimer callingTimer)
         {
             if (IsCasting)
                 return ServerProperties.Properties.GAMENPC_FOLLOWCHECK_TIME;

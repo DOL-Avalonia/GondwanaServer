@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +5,7 @@ using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.Language;
 using DOL.Events;
+using log4net;
 using DOL.GS.ServerProperties;
 
 namespace DOL.GS.Spells
@@ -33,14 +16,10 @@ namespace DOL.GS.Spells
     [SpellHandler("DirectDamageWithDebuff")]
     public class DirectDamageDebuffSpellHandler : AbstractResistDebuff
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public override eProperty Property1 { get { return Caster.GetResistTypeForDamage(Spell.DamageType); } }
         public override string DebuffTypeName { get { return GlobalConstants.DamageTypeToName(Spell.DamageType); } }
-
-        #region LOS on Keeps
-
-        private const string LOSEFFECTIVENESS = "LOS Effectivness";
 
         /// <summary>
         /// execute direct effect
@@ -49,85 +28,29 @@ namespace DOL.GS.Spells
         /// <param name="effectiveness">factor from 0..1 (0%-100%)</param>
         public override bool OnDirectEffect(GameLiving target, double effectiveness)
         {
-            if (target == null) return false;
+            if (target == null)
+                return false;
 
-            bool spellOK = true;
-            //cone spells
-            if (Spell.Target == "Frontal" || (Spell.Target == "enemy" && Spell.Radius > 0 && Spell.Range == 0))
-                spellOK = false;
+            if (NeedsEndOfCastLosCheck(target) && StartEndOfCastLosCheck(target, effectiveness))
+                return true;
 
-            if (!spellOK || CheckLOS(Caster))
-            {
-                GamePlayer player = null;
-                if (target is GamePlayer)
-                {
-                    player = target as GamePlayer;
-                }
-                else
-                {
-                    if (Caster is GamePlayer)
-                        player = Caster as GamePlayer;
-                    else if (Caster is GameNPC && (Caster as GameNPC)!.Brain is AI.Brain.IControlledBrain)
-                    {
-                        AI.Brain.IControlledBrain brain = (Caster as GameNPC)!.Brain as AI.Brain.IControlledBrain;
-                        //Ryan: edit for BD
-                        if (brain!.Owner is GamePlayer)
-                            player = (GamePlayer)brain.Owner;
-                        else
-                            player = (GamePlayer)((AI.Brain.IControlledBrain)((GameNPC)brain.Owner).Brain).Owner;
-                    }
-                }
-                if (player != null)
-                {
-                    player.TempProperties.setProperty(LOSEFFECTIVENESS, effectiveness);
-                    player.Out.SendCheckLOS(Caster, target, new CheckLOSResponse(DealDamageCheckLOS));
-                }
-                else
-                    DealDamage(target, effectiveness);
-            }
-            else DealDamage(target, effectiveness);
+            DealDamage(target, effectiveness);
             return true;
         }
 
-        private bool CheckLOS(GameLiving living)
+        public override void OnEndOfCastLosCheck(GameLiving target, double effectiveness, LosCheckResponse response)
         {
-            foreach (AbstractArea area in living.CurrentAreas)
-            {
-                if (area.CheckLOS)
-                    return true;
-            }
-            return false;
-        }
-
-        private void DealDamageCheckLOS(GamePlayer player, ushort response, ushort targetOID)
-        {
-            if (player == null) // Hmm
+            if (Caster == null || Caster.ObjectState != GameObject.eObjectState.Active)
                 return;
-            if ((response & 0x100) == 0x100)
-            {
-                try
-                {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
-                    {
-                        double effectiveness = (double)player.TempProperties.getProperty<object>(LOSEFFECTIVENESS, null);
-                        DealDamage(target, effectiveness);
+            if (response == LosCheckResponse.False)
+                return;
 
-                        // Due to LOS check delay the actual cast happens after FinishSpellCast does a notify, so we notify again
-                        GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
-                    }
-                }
-                catch (Exception e)
-                {
-                    if (log.IsErrorEnabled)
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
-                }
-            }
+            DealDamage(target, effectiveness);
+            GameEventMgr.Notify(GameLivingEvent.CastFinished, m_caster, new CastingEventArgs(this, target, m_lastAttackData));
         }
 
         public override bool ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            // do not apply debuff to keep components or doors
             if ((target is Keeps.GameKeepComponent) == false && (target is Keeps.GameKeepDoor) == false)
             {
                 if (!base.ApplyEffectOnTarget(target, effectiveness))
@@ -135,15 +58,15 @@ namespace DOL.GS.Spells
             }
 
             if ((Spell.Duration > 0 && Spell.Target != "area") || Spell.Concentration > 0)
-            {
                 OnDirectEffect(target, effectiveness);
-            }
+
             return true;
         }
 
         private void DealDamage(GameLiving target, double effectiveness)
         {
-            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active) return;
+            if (!target.IsAlive || target.ObjectState != GameLiving.eObjectState.Active)
+                return;
 
             if (target is Keeps.GameKeepDoor || target is Keeps.GameKeepComponent)
             {
@@ -163,43 +86,14 @@ namespace DOL.GS.Spells
 			if (target.IsAlive)
 				base.ApplyEffectOnTarget(target, effectiveness);*/
         }
-        /*
-		 * We need to send resist spell los check packets because spell resist is calculated first, and
-		 * so you could be inside keep and resist the spell and be interupted when not in view
-		 */
+
         public override void OnSpellResisted(GameLiving target)
         {
-            if (target is GamePlayer && Caster.TempProperties.getProperty("player_in_keep_property", false))
-            {
-                GamePlayer player = target as GamePlayer;
-                player!.Out.SendCheckLOS(Caster, player, new CheckLOSResponse(ResistSpellCheckLOS));
-            }
-            else SpellResisted(target);
-        }
+            if (NeedsResistLosCheck(target) && StartResistLosCheck(target))
+                return;
 
-        private void ResistSpellCheckLOS(GamePlayer player, ushort response, ushort targetOID)
-        {
-            if ((response & 0x100) == 0x100)
-            {
-                try
-                {
-                    GameLiving target = Caster.CurrentRegion.GetObject(targetOID) as GameLiving;
-                    if (target != null)
-                        SpellResisted(target);
-                }
-                catch (Exception e)
-                {
-                    if (log.IsErrorEnabled)
-                        log.Error(string.Format("targetOID:{0} caster:{1} exception:{2}", targetOID, Caster, e));
-                }
-            }
-        }
-
-        private void SpellResisted(GameLiving target)
-        {
             base.OnSpellResisted(target);
         }
-        #endregion
 
         /// <summary>
         /// Delve Info

@@ -39,6 +39,7 @@ namespace DOL.GS.Keeps
     public class GameKeepComponent : GameLiving, IComparable, IGameKeepComponent
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        public override Zone.eGameObjectType GameObjectType => Zone.eGameObjectType.KEEP_COMPONENT;
 
         protected readonly ushort INVISIBLE_MODEL = 150;
 

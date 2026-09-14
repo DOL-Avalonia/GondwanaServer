@@ -164,9 +164,10 @@ namespace DOL.GS.Scripts
             if (time < 0)
                 time = 1;
             if (time >= 864000000) return;
-            RegionTimer SortieTimer = new RegionTimer(player, SortiePrison);
-            SortieTimer.Properties.setProperty("player", player);
-            SortieTimer.Start((int)time);
+            ECSGameTimer sortieTimer = new ECSGameTimer(player, SortiePrison);
+            sortieTimer.Properties.setProperty("player", player);
+            sortieTimer.Start((int)time);
+            player.TempProperties.setProperty("JailTimer", sortieTimer);
         }
 
         private static void PlayerRevive(DOLEvent e, object sender, EventArgs args)
@@ -205,7 +206,7 @@ namespace DOL.GS.Scripts
             GameEventMgr.RemoveHandler(player, GamePlayerEvent.RegionChanged, PlayerRevive);
         }
 
-        private static int SortiePrison(RegionTimer timer)
+        private static int SortiePrison(ECSGameTimer timer)
         {
             GamePlayer player = timer.Properties.getProperty<GamePlayer>("player", null);
             if (player == null ||
@@ -330,7 +331,7 @@ namespace DOL.GS.Scripts
             if (sortie == DateTime.MinValue) return;
 
             // Stop existing timer if there is one
-            RegionTimer oldTimer = player.TempProperties.getProperty<RegionTimer>("JailTimer", null);
+            ECSGameTimer oldTimer = player.TempProperties.getProperty<ECSGameTimer>("JailTimer", null);
             if (oldTimer != null)
             {
                 oldTimer.Stop();
@@ -341,10 +342,10 @@ namespace DOL.GS.Scripts
             time = (prisoner.Sortie.Ticks - DateTime.Now.Ticks) / 10000;
             if (time <= 0 || time >= 864000000) return;
 
-            RegionTimer SortieTimer = new RegionTimer(player, SortiePrison, 1);
-            SortieTimer.Properties.setProperty("player", player);
-            SortieTimer.Start((int)time);
-            player.TempProperties.setProperty("JailTimer", SortieTimer);
+            ECSGameTimer sortieTimer = new ECSGameTimer(player, SortiePrison);
+            sortieTimer.Properties.setProperty("player", player);
+            sortieTimer.Start((int)time);
+            player.TempProperties.setProperty("JailTimer", sortieTimer);
         }
 
         /// <summary>
@@ -482,7 +483,7 @@ namespace DOL.GS.Scripts
             PlayerXPrisoner.Remove(player);
             player.TempProperties.removeProperty("JailMgr");
 
-            RegionTimer oldTimer = player.TempProperties.getProperty<RegionTimer>("JailTimer", null);
+            ECSGameTimer oldTimer = player.TempProperties.getProperty<ECSGameTimer>("JailTimer", null);
             if (oldTimer != null)
             {
                 oldTimer.Stop();

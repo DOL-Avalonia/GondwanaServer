@@ -78,6 +78,7 @@ namespace AmteScripts.Managers
         private Dictionary<ushort, IList<string>> RvrStats = new Dictionary<ushort, IList<string>>();
         private Dictionary<eRealm, int> Scores = new Dictionary<eRealm, int>();
         private Dictionary<GamePlayer, short> kills = new Dictionary<GamePlayer, short>();
+        private static readonly object _rvrScoreFileLock = new object();
         private int checkScore = 0;
         private int checkNumberOfPlayer = 0;
         private string winnerName = "";
@@ -92,7 +93,7 @@ namespace AmteScripts.Managers
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         private static RvrManager _instance;
-        private static RegionTimer _timer;
+        private static ECSGameTimer _timer;
 
         public static RvrManager Instance { get { return _instance; } }
 
@@ -101,12 +102,8 @@ namespace AmteScripts.Managers
         {
             log.Info("RvRManger: Started");
             _instance = new RvrManager();
-            foreach (var realm in _RvRRealms)
-                _instance.Scores[realm] = 0;
-            _timer = new RegionTimer(WorldMgr.GetRegion(1).TimeManager)
-            {
-                Callback = _instance._CheckRvr
-            };
+            foreach (var realm in _RvRRealms) _instance.Scores[realm] = 0;
+            _timer = new ECSGameTimer(null, _instance._CheckRvr);
             _timer.Start(10000);
         }
 
@@ -379,7 +376,7 @@ namespace AmteScripts.Managers
 
         private DateTime lastHoldingUpdate = DateTime.Now;
 
-        private int _CheckRvr(RegionTimer callingtimer)
+        private int _CheckRvr(ECSGameTimer callingtimer)
         {
             Console.WriteLine("Check RVR");
             DateTime currentTime = DateTime.Now;
@@ -557,12 +554,25 @@ namespace AmteScripts.Managers
 
         private void SaveScore()
         {
-            string[] lines = [DateTime.Now.ToString("o"), Scores[eRealm.Albion].ToString(),
-        Scores[eRealm.Hibernia].ToString(), Scores[eRealm.Midgard].ToString(),
-        winnerName, _currentMasterMap?.ToString() ?? ""];
+            string[] lines =
+            {
+        DateTime.Now.ToString("o"),
+        Scores[eRealm.Albion].ToString(),
+        Scores[eRealm.Hibernia].ToString(),
+        Scores[eRealm.Midgard].ToString(),
+        winnerName, _currentMasterMap?.ToString() ?? ""};
+
             System.Threading.Tasks.Task.Run(() =>
             {
-                try { File.WriteAllLines("temp/RvRScore.dat", lines); } catch { }
+                lock (_rvrScoreFileLock)
+                {
+                    try
+                    {
+                        Directory.CreateDirectory("temp");
+                        File.WriteAllLines(Path.Combine("temp", "RvRScore.dat"), lines);
+                    }
+                    catch (Exception ex) { log.Warn("[RvR] Score save failed.", ex); }
+                }
             });
         }
 
@@ -772,22 +782,27 @@ namespace AmteScripts.Managers
                 m.RvRTerritory.Reset();
             });
 
-            this._maps.Values.Foreach(map =>
+            foreach (var regionId in _maps.Values.Select(m => m.RegionId).Distinct().ToList())
             {
-                var characters = GameServer.Database.SelectObjects<DOLCharacters>(c => c.Region == +map.RegionId);
+                foreach (var cl in WorldMgr.GetClientsOfRegion(regionId).ToList())
+                {
+                    try { RemovePlayer(cl, true); }
+                    catch (Exception ex) { log.Error($"[RvR] Close: failed to evict {cl?.Player?.Name}", ex); }
+                }
+            }
+
+            foreach (var map in _maps.Values)
+            {
+                var characters = GameServer.Database.SelectObjects<DOLCharacters>(c => c.Region == map.RegionId);
                 foreach (DOLCharacters chr in characters)
                 {
-                    var client = WorldMgr.GetClientByPlayerID(chr.ObjectId, true, false);
-                    if (client != null)
+                    if (WorldMgr.GetClientByPlayerID(chr.ObjectId, true, false) == null)
                     {
-                        RemovePlayer(client);
-                    }
-                    else
-                    {
-                        RemovePlayer(chr);
+                        try { RemovePlayer(chr); }
+                        catch (Exception ex) { log.Error($"[RvR] Close: failed to reset offline char {chr.Name}", ex); }
                     }
                 }
-            });
+            }
 
             string message = string.Format("RvR Scores for the {0} :\n", DateTime.Now.Date.ToString("MM/dd/yyyy"));
             message += messageScore;
@@ -805,7 +820,7 @@ namespace AmteScripts.Managers
                     int maxKillsScore = maxKills;
                     int peakP = PeakPlayerCount;
 
-                    new RegionTimer(championPlayer, new RegionTimerCallback(timer =>
+                    new ECSGameTimer(championPlayer, timer =>
                     {
                         try
                         {
@@ -840,7 +855,7 @@ namespace AmteScripts.Managers
                         }
 
                         return 0;
-                    })).Start(5000);
+                    }, 5000);
                 }
                 NewsMgr.CreateNews("GameObjects.GamePlayer.RvR.Champion", 0, eNewsType.RvRGlobal, false, true, countKilledPlayers, champion, maxKills);
                 message += string.Format(LanguageMgr.GetTranslation("EN", "GameObjects.GamePlayer.RvR.Champion", countKilledPlayers, champion, maxKills));
@@ -983,61 +998,80 @@ namespace AmteScripts.Managers
 
         public void RemovePlayer(GameClient client, bool force = false)
         {
-            if (client.Player != null)
-                RemovePlayer(client.Player);
-        }
-
-        private void RemovePlayer(GamePlayer player, RvrPlayer rvrPlayer, bool force = false)
-        {
-            if (rvrPlayer == null)
-            {
-                if (player.Client.Account.PrivLevel <= 1)
-                {
-                    GameServer.Instance.Logger.Error("Player " + player.Name + " (" + player.InternalID + ") logged into RvR but RvR data was not found, potentially lost their guild info");
-                }
-                else if (!force) // By default, don't boot GMs
-                {
-                    return;
-                }
-
-                player.MoveTo(_stuckSpawn);
-                if (player.Guild != null && player.Guild.GuildType == Guild.eGuildType.RvRGuild)
-                    player.Guild.RemovePlayer("RVR", player);
-                player.RealGuild = null;
-                player.SaveIntoDatabase();
-            }
-            else
-            {
-                rvrPlayer.ResetCharacter(player);
-                if (player.Client.Account.PrivLevel <= 1 || force)
-                    player.MoveTo(Position.Create((ushort)rvrPlayer.OldRegion, rvrPlayer.OldX, rvrPlayer.OldY, rvrPlayer.OldZ, (ushort)rvrPlayer.OldHeading));
-                if (player.Guild != null)
-                    player.Guild.RemovePlayer("RVR", player);
-                player.RealGuild = null;
-                if (!string.IsNullOrWhiteSpace(rvrPlayer.GuildID))
-                {
-                    var guild = GuildMgr.GetGuildByGuildID(rvrPlayer.GuildID);
-                    if (guild != null)
-                    {
-                        guild.AddPlayer(player, guild.GetRankByID(rvrPlayer.GuildRank), true);
-
-                        foreach (var i in player.Inventory.AllItems.Where(i => i.Emblem != 0))
-                            i.Emblem = guild.Emblem;
-                    }
-                }
-                player.SaveIntoDatabase();
-                rvrPlayer.PvPSession = "None";
-                GameServer.Database.DeleteObject(rvrPlayer);
-            }
+            if (client?.Player != null)
+                RemovePlayer(client.Player, force);
         }
 
         public void RemovePlayer(GamePlayer player, bool force = false)
         {
-            if (player.Client.Account.PrivLevel == (uint)ePrivLevel.GM)
-                return;
+            if (player == null) return;
+
             player.IsInRvR = false;
             var rvr = GameServer.Database.SelectObject<RvrPlayer>(r => r.PlayerID == player.InternalID);
-            RemovePlayer(player, rvr);
+            RemovePlayer(player, rvr, force);
+        }
+
+        private void RemovePlayer(GamePlayer player, RvrPlayer rvrPlayer, bool force = false)
+        {
+            try
+            {
+                if (player.Guild is { GuildType: Guild.eGuildType.RvRGuild })
+                    player.Guild.RemovePlayer("RVR", player);
+                player.RealGuild = null;
+
+                Position destination;
+
+                if (rvrPlayer == null)
+                {
+                    destination = _stuckSpawn;
+                }
+                else
+                {
+                    destination = rvrPlayer.GetOldPosition();
+                    player.BindPosition = rvrPlayer.GetOldBindPosition();
+
+                    if (!string.IsNullOrWhiteSpace(rvrPlayer.GuildID))
+                    {
+                        var guild = GuildMgr.GetGuildByGuildID(rvrPlayer.GuildID);
+                        if (guild != null)
+                        {
+                            guild.AddPlayer(player, guild.GetRankByID(rvrPlayer.GuildRank), true);
+                            foreach (var item in player.Inventory.AllItems.Where(i => i.Emblem != 0))
+                                item.Emblem = guild.Emblem;
+                        }
+                    }
+                }
+
+                bool moved = false;
+                if (player.ObjectState == GameObject.eObjectState.Active
+                    && player.Client != null
+                    && player.Client.IsPlaying)
+                {
+                    if (player.Client.Account.PrivLevel <= 1 || force)
+                    {
+                        moved = player.MoveTo(destination);
+                    }
+                }
+
+                if (!moved && (player.Client?.Account?.PrivLevel <= 1 || force))
+                {
+                    player.DBCharacter?.SetPosition(destination);
+                }
+
+                player.SaveIntoDatabase();
+            }
+            catch (Exception ex)
+            {
+                log.Error($"[RvR] RemovePlayer failed for {player?.Name}", ex);
+            }
+            finally
+            {
+                if (rvrPlayer != null)
+                {
+                    rvrPlayer.PvPSession = "None";
+                    GameServer.Database.DeleteObject(rvrPlayer);
+                }
+            }
         }
 
         public void RemovePlayer(DOLCharacters ch)

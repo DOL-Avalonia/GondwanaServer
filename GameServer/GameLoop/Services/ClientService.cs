@@ -111,24 +111,22 @@ namespace DOL.GS
 
         private static void UpdatePlayerWorld(GamePlayer player, uint nowTicks)
         {
-            player.RecordPositionHistory();   // ← RewindTime source of truth, unchanged.
-
+            player.RecordPositionHistory();
             if (ServerProperties.Properties.WORLD_PLAYERTOPLAYER_UPDATE_INTERVAL > 0)
-                UpdatePlayerOtherPlayers(player, nowTicks);
+                try { UpdatePlayerOtherPlayers(player, nowTicks); } catch (Exception e) { log.Error($"UpdatePlayerOtherPlayers failed for {player.Name}", e); }
             if (ServerProperties.Properties.WORLD_NPC_UPDATE_INTERVAL > 0)
-                UpdatePlayerNPCs(player, nowTicks);
+                try { UpdatePlayerNPCs(player, nowTicks); } catch (Exception e) { log.Error($"UpdatePlayerNPCs failed for {player.Name}", e); }
             if (ServerProperties.Properties.WORLD_OBJECT_UPDATE_INTERVAL > 0)
             {
-                UpdatePlayerItems(player, nowTicks);
-                UpdatePlayerDoors(player, nowTicks);
-                UpdatePlayerHousing(player, nowTicks);
+                try { UpdatePlayerItems(player, nowTicks); } catch (Exception e) { log.Error($"UpdatePlayerItems failed for {player.Name}", e); }
+                try { UpdatePlayerDoors(player, nowTicks); } catch (Exception e) { log.Error($"UpdatePlayerDoors failed for {player.Name}", e); }
+                try { UpdatePlayerHousing(player, nowTicks); } catch (Exception e) { log.Error($"UpdatePlayerHousing failed for {player.Name}", e); }
             }
         }
 
         private static void UpdatePlayerOtherPlayers(GamePlayer player, uint nowTicks)
         {
-            var players = new HashSet<GamePlayer>(
-                player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GamePlayer>());
+            var players = new HashSet<GamePlayer>(player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>());
             try
             {
                 foreach (var objEntry in player.Client.GameObjectUpdateArray.ToArray())
@@ -185,8 +183,7 @@ namespace DOL.GS
             if (all)
                 player.LastNPCUpdateAllTick = nowTicks;
 
-            var query = player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE)
-                .Cast<GameNPC>().Where(n => n.IsVisibleTo(player));
+            var query = player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GameNPC>().Where(n => n.IsVisibleTo(player));
             if (!all)
                 query = query.Where(n => n.IsMoving);
 
@@ -199,7 +196,7 @@ namespace DOL.GS
 
         private static void UpdatePlayerItems(GamePlayer player, uint nowTicks)
         {
-            var objs = player.GetItemsInRadius(WorldMgr.OBJ_UPDATE_DISTANCE).Cast<GameStaticItem>().ToArray();
+            var objs = player.GetItemsInRadius(WorldMgr.OBJ_UPDATE_DISTANCE).OfType<GameStaticItem>().ToArray();
             try
             {
                 foreach (var objEntry in player.Client.GameObjectUpdateArray.ToArray())
@@ -241,8 +238,7 @@ namespace DOL.GS
 
         private static void UpdatePlayerDoors(GamePlayer player, uint nowTicks)
         {
-            var doors = player.GetDoorsInRadius(WorldMgr.OBJ_UPDATE_DISTANCE)
-                .Cast<IDoor>().OfType<GameObject>().Where(o => o.IsVisibleTo(player)).ToArray();
+            var doors = player.GetDoorsInRadius(WorldMgr.OBJ_UPDATE_DISTANCE).OfType<GameObject>().Where(o => o is IDoor && o.IsVisibleTo(player)).ToArray();
             try
             {
                 foreach (var objEntry in player.Client.GameObjectUpdateArray.ToArray())
@@ -250,23 +246,19 @@ namespace DOL.GS
                     var objKey = objEntry.Key;
                     if (objKey is null) continue;
                     GameObject obj = WorldMgr.GetRegion(objKey.Item1)?.GetObject(objKey.Item2);
-                    if (obj is IDoor && !doors.Contains(obj)
-                        && (nowTicks - objEntry.Value) >= GetPlayerItemUpdateInterval)
+                    if (obj is IDoor && !doors.Contains(obj) && (nowTicks - objEntry.Value) >= GetPlayerItemUpdateInterval)
                         player.Client.GameObjectUpdateArray.TryRemove(objKey, out _);
                 }
             }
-            catch (Exception e)
-            {
-                if (log.IsErrorEnabled)
-                    log.ErrorFormat("Error cleaning Doors cache Player: {0}, Ex: {1}", player.Name, e);
-            }
+            catch (Exception e) { if (log.IsErrorEnabled) log.ErrorFormat("Error cleaning Doors cache Player: {0}, Ex: {1}", player.Name, e); }
+
             try
             {
-                foreach (IDoor ldoor in doors)
+                foreach (GameObject doorObj in doors)
                 {
-                    if (player.Client.GameObjectUpdateArray.TryGetValue(
-                        new Tuple<ushort, ushort>(((GameObject)ldoor).CurrentRegionID, (ushort)ldoor.ObjectID),
-                        out long lastUpdate))
+                    IDoor ldoor = (IDoor)doorObj;
+                    var key = new Tuple<ushort, ushort>(doorObj.CurrentRegionID, (ushort)ldoor.ObjectID);
+                    if (player.Client.GameObjectUpdateArray.TryGetValue(key, out long lastUpdate))
                     {
                         if ((nowTicks - lastUpdate) >= GetPlayerItemUpdateInterval)
                             player.SendDoorUpdate(ldoor);
@@ -275,11 +267,7 @@ namespace DOL.GS
                         player.SendDoorUpdate(ldoor);
                 }
             }
-            catch (Exception e)
-            {
-                if (log.IsErrorEnabled)
-                    log.ErrorFormat("Error updating Doors Player: {0}, Ex: {1}", player.Name, e);
-            }
+            catch (Exception e) { if (log.IsErrorEnabled) log.ErrorFormat("Error updating Doors Player: {0}, Ex: {1}", player.Name, e); }
         }
 
         // Kept public static: external callers previously used WorldUpdateThread.UpdatePlayerHousing.

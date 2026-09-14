@@ -1687,21 +1687,18 @@ namespace DOL.GS.Commands
                             {
                                 case "all":
                                     {
-                                        foreach (GameClient allplayer in WorldMgr.GetAllPlayingClients())
+                                        foreach (GameClient allplayer in WorldMgr.GetAllPlayingClients().ToList())
                                         {
-                                            if (allplayer.Account.PrivLevel == 1)
-                                            {
-                                                allplayer.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Player.KickAllPlayers", client.Player.Name, client.Account.PrivLevel), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                                            if (allplayer.Account.PrivLevel != 1) continue;
+                                            allplayer.Out.SendMessage(LanguageMgr.GetTranslation(client, "Commands.GM.Player.KickAllPlayers", client.Player.Name, client.Account.PrivLevel), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
-                                                allplayer.Player.DropTerritoryRelicsOnDeath(null);
-                                                allplayer.Out.SendPlayerQuit(true);
-                                                allplayer.Player.SaveIntoDatabase();
-                                                allplayer.Player.Quit(true);
-                                                return;
-                                            }
+                                            allplayer.Player.DropTerritoryRelicsOnDeath(null);
+                                            allplayer.Out.SendPlayerQuit(true);
+                                            allplayer.Player.SaveIntoDatabase();
+                                            allplayer.Player.Quit(true);
                                         }
+                                        break;
                                     }
-                                    break;
 
                                 default:
                                     {

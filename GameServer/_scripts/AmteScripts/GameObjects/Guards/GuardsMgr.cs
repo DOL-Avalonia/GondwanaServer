@@ -15,7 +15,7 @@ namespace AmteScripts.Managers
 {
     class GuardsMgr
     {
-        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         private static readonly Dictionary<string, GuardXGuild> _attackGuildIDs = new Dictionary<string, GuardXGuild>();
 
         public static Dictionary<string, int> AttackGuildIDs

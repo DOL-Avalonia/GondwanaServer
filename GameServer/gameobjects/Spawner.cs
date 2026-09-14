@@ -79,7 +79,7 @@ namespace DOL.GS
         /// <summary>
         /// Timer to reset the adds after a reset
         /// </summary>
-        private RegionTimer addsResetTimer;
+        private ECSGameTimer addsResetTimer;
 
         /// <summary>
         /// On resetting, time to keep the adds alive before despawning
@@ -617,12 +617,7 @@ namespace DOL.GS
                     loadedAdds = new List<GameNPC>(mobGroup.NPCs);
                     addsGroup = mobGroup;
                     isAddsActiveStatus = HealthPercent >= percentLifeAddsActivity;
-                    Task.Run(async () =>
-                    {
-                        //Delay animation on mob added to world
-                        await Task.Delay(500);
-                        RefreshAddsActiveStatus();
-                    });
+                    new ECSGameTimer(this, timer => { RefreshAddsActiveStatus(); return 0; }, 500);
                 }
             }
             else
@@ -730,11 +725,7 @@ namespace DOL.GS
             {
                 if (loadedAdds != null && addsResetTimer == null)
                 {
-                    addsResetTimer = new RegionTimer(this, timer =>
-                    {
-                        Cleanup();
-                        return 0;
-                    }, MILLISECONDS_BEFORE_RESET_ADDS);
+                    addsResetTimer = new ECSGameTimer(this, timer => { Cleanup(); return 0; }, MILLISECONDS_BEFORE_RESET_ADDS);
                 }
             }
         }

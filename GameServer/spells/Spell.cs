@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Language;
@@ -33,7 +15,7 @@ namespace DOL.GS
     /// </summary>
     public class Spell : Skill, ICustomParamsValuable
     {
-        private static readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
         
         public enum ePowerType
         {
@@ -95,6 +77,8 @@ namespace DOL.GS
         protected bool m_isShearable = false;
         // tooltip
         protected ushort m_tooltipId = 0;
+        // LosCheckhandler
+        private bool? m_requiresLosCheck;
         // params
         protected Dictionary<string, List<string>> m_paramCache = null;
 
@@ -470,6 +454,37 @@ namespace DOL.GS
         {
             get { return m_durationScaledByRace; }
             set { m_durationScaledByRace = value; }
+        }
+
+        /// <summary>
+        /// True when a caster should confirm line of sight before casting this on a target
+        /// (port of OpenDAoC Spell.RequiresLosCheck).
+        /// </summary>
+        public bool RequiresLosCheck
+        {
+            get
+            {
+                if (m_requiresLosCheck.HasValue) return m_requiresLosCheck.Value;
+
+                bool result = Range > 0;
+                if (result)
+                {
+                    switch (Target.ToLowerInvariant())
+                    {
+                        case "self":
+                        case "group":
+                        case "cone":
+                        case "pet":
+                        case "controlled":
+                        case "ground":
+                            result = false;
+                            break;
+                    }
+                }
+
+                m_requiresLosCheck = result;
+                return result;
+            }
         }
 
         #endregion

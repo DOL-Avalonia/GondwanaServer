@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
@@ -27,6 +9,7 @@ using DOL.Language;
 using System;
 using System.Collections;
 using System.Numerics;
+using System.Threading;
 
 namespace DOL.GS
 {
@@ -149,11 +132,14 @@ namespace DOL.GS
             set { m_timesrepaired = value; }
         }
 
-        protected RegionTimer m_decayTimer;
+        protected ECSGameTimer m_decayTimer;
+
         /// <summary>
         /// The lock object for lazy regen timers initialization
         /// </summary>
         protected readonly object m_decayTimerLock = new object();
+
+        protected ECSGameTimer m_controlRangeTimer;
 
         private ushort m_ammoSlot;
         public ushort AmmoSlot
@@ -167,10 +153,7 @@ namespace DOL.GS
             get { return 3 * (this.MaxHealth / 10); }
         }
 
-        public int DeductHp
-        {
-            get { return -this.MaxHealth / 10; }
-        }
+        public int DecayDeductHp => MaxHealth / 10;
 
         private string m_itemId;
         public string ItemId
@@ -214,12 +197,16 @@ namespace DOL.GS
             player.SiegeWeapon = this;
             player.Out.SendSiegeWeaponInterface(this, SiegeWeaponTimer.TimeUntilElapsed / 100);
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameSiegeWeapon.TakeControl", GetName(0, false)), eChatType.CT_Say, eChatLoc.CL_SystemWindow);
+
+            StartControlRangeCheck();
             if ((CurrentState & GameSiegeWeapon.eState.Armed) != GameSiegeWeapon.eState.Armed)
                 Arm();
 
         }
+
         public virtual void ReleaseControl()
         {
+            StopControlRangeCheck();
             if (Owner is GamePlayer player)
             {
                 player.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameSiegeWeapon.NoLongerControlling", GetName(0, false)), eChatType.CT_Say, eChatLoc.CL_SystemWindow);
@@ -345,14 +332,15 @@ namespace DOL.GS
             }
             if (TargetObject != null) GroundTargetPosition = TargetObject.Position;
             if (GroundTargetPosition == Position.Nowhere) return;
-            new RegionTimer(this, new RegionTimerCallback(MakeDelayedDamage), GetActionDelay(SiegeTimer.eAction.Fire));
+            new ECSGameTimer(this, MakeDelayedDamage, GetActionDelay(SiegeTimer.eAction.Fire));
+
             BroadcastFireAnimation(GetActionDelay(SiegeTimer.eAction.Fire));
             if (Owner != null)
                 Owner.SendMessage(LanguageMgr.GetTranslation(ownerPlayer!.Client.Account.Language, "GameSiegeWeapon.YouFireWeapon", GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             Arm();
         }
 
-        private int MakeDelayedDamage(RegionTimer callingTimer)
+        private int MakeDelayedDamage(ECSGameTimer callingTimer)
         {
             DoDamage();
             return 0;
@@ -479,7 +467,24 @@ namespace DOL.GS
             }
             BroadcastAnimation();
         }
+
+        private void StartControlRangeCheck()
+        {
+            if (ObjectState != eObjectState.Active) return;
+            m_controlRangeTimer ??= new ECSGameTimer(this, ControlRangeTimerCallback);
+            if (!m_controlRangeTimer.IsAlive) m_controlRangeTimer.Start(1500);
+        }
+
+        private void StopControlRangeCheck() { m_controlRangeTimer?.Stop(); }
+
+        private int ControlRangeTimerCallback(ECSGameTimer t)
+        {
+            if (Owner == null) return 0;
+            if (!this.IsWithinRadius(Owner, SIEGE_WEAPON_CONTROLE_DISTANCE)) { ReleaseControl(); return 0; }
+            return 1500;
+        }
         #endregion
+
         #region override function
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
@@ -543,15 +548,11 @@ namespace DOL.GS
 
         private void StartDecay()
         {
-            if (ObjectState != eObjectState.Active)
-                return;
+            if (ObjectState != eObjectState.Active) return;
             lock (m_decayTimerLock)
             {
                 if (m_decayTimer == null)
-                {
-                    m_decayTimer = new RegionTimer(this);
-                    m_decayTimer.Callback = new RegionTimerCallback(DecayTimerCallback);
-                }
+                    m_decayTimer = new ECSGameTimer(this, DecayTimerCallback);
                 else if (m_decayTimer.IsAlive)
                     return;
                 m_decayTimer.Start(DECAYPERIOD);
@@ -569,9 +570,9 @@ namespace DOL.GS
             }
         }
 
-        private int DecayTimerCallback(RegionTimer callingTimer)
+        private int DecayTimerCallback(ECSGameTimer callingTimer)
         {
-            TakeDamage(this, eDamageType.Natural, DeductHp, 0);
+            TakeDamage(this, eDamageType.Natural, DecayDeductHp, 0);
             return DECAYPERIOD;
         }
 
@@ -591,7 +592,7 @@ namespace DOL.GS
     }
     #endregion
     #region siegeTimer
-    public class SiegeTimer : RegionAction
+    public class SiegeTimer : ECSGameTimerWrapperBase
     {
         public enum eAction : byte
         {
@@ -602,66 +603,30 @@ namespace DOL.GS
             Fire = 0x04,
         }
 
-        /// <summary>
-        /// Constructs a new UseSlotAction
-        /// </summary>
-        /// <param name="siegeWeapon">The siege weapon</param>
-        public SiegeTimer(GameSiegeWeapon siegeWeapon)
-            : base(siegeWeapon)
-        {
-            m_siegeWeapon = siegeWeapon;
-        }
-
-        private eAction m_currentAction;
         private GameSiegeWeapon m_siegeWeapon;
+        public eAction CurrentAction { get; set; }
+        public GameSiegeWeapon SiegeWeapon { get => m_siegeWeapon; set => m_siegeWeapon = value; }
 
-        public eAction CurrentAction
-        {
-            get { return m_currentAction; }
-            set { m_currentAction = value; }
-        }
-        public GameSiegeWeapon SiegeWeapon
-        {
-            get { return m_siegeWeapon; }
-            set { m_siegeWeapon = value; }
-        }
+        public SiegeTimer(GameSiegeWeapon siegeWeapon) : base(siegeWeapon) { m_siegeWeapon = siegeWeapon; }
 
-        public override void OnTick()
+
+        protected override int OnTick(ECSGameTimer timer)
         {
-            if (SiegeWeapon.Owner is GamePlayer player)
-                player.SendMessage("Action = " + CurrentAction, eChatType.CT_Say, eChatLoc.CL_SystemWindow);
-            else return;
+            if (SiegeWeapon.Owner is not GamePlayer player)
+                return 0;
+
             switch (CurrentAction)
             {
-                case eAction.Arming:
-                    {
-                        SiegeWeapon.Armed();
-                        break;
-                    }
-                case eAction.Aiming:
-                    {
-                        SiegeWeapon.Aimed();
-                        break;
-                    }
-                case eAction.Loading:
-                    {
-                        //todo set ammo
-                        break;
-                    }
-                case eAction.Fire:
-                    {
-                        SiegeWeapon.DoDamage();
-                        break;
-                    }
-                default: break;
+                case eAction.Arming: SiegeWeapon.Armed(); break;
+                case eAction.Aiming: SiegeWeapon.Aimed(); break;
+                case eAction.Loading: break;
+                case eAction.Fire: SiegeWeapon.DoDamage(); break;
             }
 
-            if (SiegeWeapon.Owner != null)
-            {
-                player.Out.SendSiegeWeaponInterface(this.SiegeWeapon, 0);
-            }
+            player.Out.SendSiegeWeaponInterface(SiegeWeapon, 0);
             if ((SiegeWeapon.CurrentState & GameSiegeWeapon.eState.Armed) != GameSiegeWeapon.eState.Armed)
                 SiegeWeapon.Arm();
+            return 0;
         }
     }
     #endregion

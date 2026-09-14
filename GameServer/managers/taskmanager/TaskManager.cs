@@ -1,655 +1,299 @@
-﻿/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
-using System;
-using DOL.GS;
+﻿using System;
+using System.Collections.Frozen;
+using System.Collections.Generic;
+using System.Reflection;
 using DOL.Database;
-using DOLDatabase.Tables;
-using DOL.GS.ServerProperties;
-using Discord;
 using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
 using DOL.Language;
+using DOLDatabase.Tables;
+using log4net;
 
 namespace DOL.GS
 {
+    /// <summary>
+    /// Data-driven task manager. One TaskDefinition per task (thresholds, category, messages, tokens),
+    /// accessors bound once with delegates instead of reflection on every kill.
+    /// Public API is unchanged: EnsureTaskData, UpdateTaskProgress, GetMaxLevel, GetNextLevelThreshold.
+    /// </summary>
     public static class TaskManager
     {
-        public static TaskXPlayer EnsureTaskData(GamePlayer player)
-        {
-            if (!Properties.ENABLE_TASK_SYSTEM)
-                return null;
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
-            var taskData = GameServer.Database.SelectObject<TaskXPlayer>(t => t.PlayerId == player.InternalID);
-            if (taskData != null)
-            {
-                return taskData;
-            }
-            
-            // TODO: remove this
-            taskData = GameServer.Database.SelectObject<TaskXPlayer>(t => t.PlayerName == player.Name);
-            if (taskData != null)
-            {
-                return taskData;
-            }
-            
-            taskData = new TaskXPlayer
-            {
-                PlayerId = player.InternalID,
-                PlayerName = player.Name
-            };
-            GameServer.Database.AddObject(taskData);
-            return taskData;
+        public const string STANDARD_SAFEGUARD = "Standard";
+        private const int DEFAULT_MAX_LEVEL = 5;
+
+        private enum TaskCategory : byte { None, PvP, PvE, Crafting }
+
+        private sealed class TaskDefinition
+        {
+            public string Name;
+            public TaskCategory Category;
+            public int MaxLevel;
+            public int[] Thresholds;
+            public string TokenIdPrefix;
+            public string LogKey;
+            public eChatType LogChatType;
+            public string SpecialTokenKey;
+            public string CompletionMessageKey;
+            public bool TrackStats;
+            public Func<TaskXPlayer, string> GetProgress;
+            public Action<TaskXPlayer, string> SetProgress;
+            public Func<TaskXPlayer, int> GetStats;
+            public Action<TaskXPlayer, int> SetStats;
+            public bool HasProgress => GetProgress != null && SetProgress != null;
+            public bool HasStats => GetStats != null && SetStats != null;
         }
 
-        public static void UpdateTaskProgress(GamePlayer player, string taskName, int progress)
+        private static readonly FrozenDictionary<string, TaskDefinition> _definitions = BuildDefinitions();
+
+        private static FrozenDictionary<string, TaskDefinition> BuildDefinitions()
         {
-            if (!Properties.ENABLE_TASK_SYSTEM)
-                return;
+            var d = new Dictionary<string, TaskDefinition>(StringComparer.Ordinal);
+            int[] creature = [15, 25, 50, 80, 140];
+            int[] special = [20, 40, 60, 85, 120];
 
-            var taskData = player.TaskXPlayer ?? EnsureTaskData(player);
-
-            var prop = taskData.GetType().GetProperty(taskName);
-            if (prop == null) { player?.Out?.SendMessage($"[TaskManager] Unknown task '{taskName}'.", eChatType.CT_System, eChatLoc.CL_SystemWindow); return; }
-
-            string raw = Convert.ToString(prop.GetValue(taskData)) ?? "0|0";
-            if (!raw.Contains("|")) raw = "0|0";
-
-            var parts = raw.Split('|');
-            int level = 0, currentProgress = 0;
-            if (parts.Length > 0 && !int.TryParse(parts[0], out level)) level = 0;
-            if (parts.Length > 1 && !int.TryParse(parts[1], out currentProgress)) currentProgress = 0;
-
-            var maxLevel = GetMaxLevel(taskName);
-            var nextLevelThreshold = GetNextLevelThreshold(player, taskName, level);
-
-            switch (taskName)
+            void A(string name, TaskCategory cat, int[] thresholds, bool stats = false, eChatType? logType = null,
+                   string token = null, bool specialMsg = false, bool completionMsg = false, int maxLevel = DEFAULT_MAX_LEVEL)
             {
-                case "KillEnemyPlayersGroup":
-                    taskData.KillEnemyPlayersGroupStats++;
-                    break;
-                case "KillEnemyPlayersAlone":
-                    taskData.KillEnemyPlayersAloneStats++;
-                    break;
-                case "KillKeepGuards":
-                    taskData.KillKeepGuardsStats++;
-                    break;
-                case "RvRChampionOfTheDay":
-                    taskData.RvRChampionOfTheDayStats++;
-                    break;
-                case "KillTerritoryGuards":
-                    taskData.KillTerritoryGuardsStats++;
-                    break;
-                case "KillTerritoryBoss":
-                    taskData.KillTerritoryBossStats++;
-                    break;
-                case "CapturedRelics":
-                    taskData.CapturedRelicsStats++;
-                    break;
-                case "KillCreaturesInDungeons":
-                    taskData.KillCreaturesInDungeonsStats++;
-                    break;
-                case "KillOutdoorsCreatures":
-                    taskData.KillOutdoorsCreaturesStats++;
-                    break;
-                case "SuccessfulItemCombinations":
-                    taskData.SuccessfulItemCombinationsStats++;
-                    break;
-                case "MasteredCrafts":
-                    taskData.MasteredCraftsStats++;
-                    break;
-                case "MasterpieceCrafted":
-                    taskData.MasterpieceCraftedStats++;
-                    break;
-                case "ItemsSoldToPlayers":
-                    taskData.ItemsSoldToPlayersStats++;
-                    break;
-                case "SuccessfulPvPThefts":
-                    taskData.SuccessfulPvPTheftsStats++;
-                    break;
-                case "OutlawPlayersSentToJail":
-                    taskData.OutlawPlayersSentToJailStats++;
-                    break;
-                case "EnemiesKilledInAdrenalineMode":
-                    taskData.EnemiesKilledInAdrenalineModeStats++;
-                    break;
-                case "EnemyKilledInDuel":
-                    taskData.EnemyKilledInDuelStats++;
-                    break;
-                case "QuestsCompleted":
-                    taskData.QuestsCompletedStats++;
-                    break;
-            }
-
-            if (level >= maxLevel)
-            {
-                GameServer.Database.SaveObject(taskData);
-                return;
-            }
-
-            currentProgress += progress;
-            bool levelUp = false;
-            if (level < TaskManager.GetMaxLevel(taskName) && currentProgress >= GetNextLevelThreshold(player, taskName, level))
-            {
-                level++;
-                currentProgress = 0;
-                levelUp = true;
-
-                if (IsPvPTask(taskName))
+                d[name] = new TaskDefinition
                 {
-                    UpdateCompletionToken(player, taskData, "TurnInPvPGvGTaskToken", 1);
-                }
-                else if (IsPvETask(taskName))
-                {
-                    UpdateCompletionToken(player, taskData, "TurnInPvETaskToken", 1);
-                }
-                else if (IsCraftingTask(taskName))
-                {
-                    UpdateCompletionToken(player, taskData, "TurnInCraftingTaskToken", 1);
-                }
-
-                string specialTaskMessage = taskName switch
-                {
-                    "EpicBossesSlaughtered" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EpicBossesSlaughteredSpecialToken", level),
-                    "ItemsSoldToPlayers" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.ItemsSoldToPlayersSpecialToken", level),
-                    "SuccessfulPvPThefts" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.SuccessfulPvPTheftsSpecialToken", level),
-                    "OutlawPlayersSentToJail" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.OutlawPlayersSentToJailSpecialToken", level),
-                    "EnemiesKilledInAdrenalineMode" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EnemiesKilledInAdrenalineModeSpecialToken", level),
-                    "EnemyKilledInDuel" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EnemyKilledInDuelSpecialToken", level),
-                    "QuestsCompleted" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.QuestsCompletedSpecialToken", level),
-                    _ => string.Empty
+                    Name = name,
+                    Category = cat,
+                    Thresholds = thresholds,
+                    MaxLevel = maxLevel,
+                    TrackStats = stats,
+                    TokenIdPrefix = token,
+                    LogKey = logType.HasValue ? $"Tasks.{name}Log" : null,
+                    LogChatType = logType ?? eChatType.CT_System,
+                    SpecialTokenKey = specialMsg ? $"Tasks.{name}SpecialToken" : null,
+                    CompletionMessageKey = completionMsg ? $"Tasks.{name}Message" : null
                 };
-
-                if (!string.IsNullOrEmpty(specialTaskMessage))
-                {
-                    player.Out.SendMessage(specialTaskMessage, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
-                }
-                GiveTaskToken(player, taskName, level);
             }
 
-            taskData.GetType().GetProperty(taskName)!.SetValue(taskData, $"{level}|{currentProgress}");
-            GameServer.Database.SaveObject(taskData);
+            // PvP / RvR / GvG
+            A("KillEnemyPlayersGroup", TaskCategory.PvP, [30, 60, 100, 200, 400], true, eChatType.CT_ScreenCenterSmaller);
+            A("KillEnemyPlayersAlone", TaskCategory.PvP, [20, 40, 80, 150, 300], true, eChatType.CT_ScreenCenterSmaller);
+            A("KillKeepGuards", TaskCategory.PvP, [25, 50, 90, 150, 220], true, eChatType.CT_System);
+            A("TakeKeeps", TaskCategory.PvP, [3, 6, 12, 20, 30], logType: eChatType.CT_ScreenCenterSmaller);
+            A("RvRChampionOfTheDay", TaskCategory.PvP, [1, 2, 4, 7, 12], true);
+            A("KillTerritoryGuards", TaskCategory.PvP, [25, 50, 90, 150, 220], true, eChatType.CT_System);
+            A("KillTerritoryBoss", TaskCategory.PvP, [5, 10, 15, 30, 60], true, eChatType.CT_System);
+            A("CapturedRelics", TaskCategory.PvP, [4, 8, 12, 20, 30], true, eChatType.CT_System);
 
-            string message = taskName switch
-            {
-                "KillEnemyPlayersGroup" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersGroupLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "KillEnemyPlayersAlone" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillEnemyPlayersAloneLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "TakeKeeps" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.TakeKeepsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                _ => string.Empty
-            };
-            if (!string.IsNullOrEmpty(message))
-            {
-                player.Out.SendMessage(message, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
-            }
-            string logmessage = taskName switch
-            {
-                "KillKeepGuards" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillKeepGuardsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "KillTerritoryGuards" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillTerritoryGuardsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "KillTerritoryBoss" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.KillTerritoryBossLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "CapturedRelics" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.CapturedRelicsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "SuccessfulItemCombinations" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.SuccessfulItemCombinationsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "MasteredCrafts" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.MasteredCraftsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "MasterpieceCrafted" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.MasterpieceCraftedLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "EpicBossesSlaughtered" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EpicBossesSlaughteredLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "ItemsSoldToPlayers" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.ItemsSoldToPlayersLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "SuccessfulPvPThefts" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.SuccessfulPvPTheftsLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "OutlawPlayersSentToJail" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.OutlawPlayersSentToJailLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "EnemiesKilledInAdrenalineMode" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EnemiesKilledInAdrenalineModeLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "EnemyKilledInDuel" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.EnemyKilledInDuelLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                "QuestsCompleted" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.QuestsCompletedLog", (levelUp ? nextLevelThreshold : currentProgress), nextLevelThreshold),
-                _ => string.Empty
-            };
-            if (!string.IsNullOrEmpty(logmessage))
-            {
-                player.Out.SendMessage(logmessage, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            }
+            // PvE
+            A("KillCreaturesInDungeons", TaskCategory.PvE, [40, 80, 140, 220, 400], true);
+            A("KillOutdoorsCreatures", TaskCategory.PvE, [50, 100, 200, 350, 700], true);
+            foreach (string t in new[] { "Animal", "Demon", "Dragon", "Elemental", "Giant", "Humanoid", "Insect", "Magical", "Reptile", "Plant", "Undead" })
+                A($"Kill{t}Creatures", TaskCategory.PvE, creature);
+
+            // Crafting
+            A("SuccessfulItemCombinations", TaskCategory.Crafting, [30, 50, 80, 110, 160], true, eChatType.CT_System);
+            A("MasteredCrafts", TaskCategory.Crafting, [40, 60, 100, 150, 200], true, eChatType.CT_System);
+            A("MasterpieceCrafted", TaskCategory.Crafting, [2, 4, 8, 15, 25], true, eChatType.CT_System);
+
+            // Special (give their own token)
+            A("EpicBossesSlaughtered", TaskCategory.None, [15, 25, 50, 80, 120], logType: eChatType.CT_System, token: "TaskToken_Demon_Slayer_lv", specialMsg: true);
+            A("ItemsSoldToPlayers", TaskCategory.None, [25, 40, 75, 110, 150], true, eChatType.CT_System, "TaskToken_Trader_lv", true);
+            A("SuccessfulPvPThefts", TaskCategory.None, special, true, eChatType.CT_System, "TaskToken_Thief_lv", true);
+            A("OutlawPlayersSentToJail", TaskCategory.None, special, true, eChatType.CT_System, "TaskToken_Bounty_Hunter_lv", true);
+            A("EnemiesKilledInAdrenalineMode", TaskCategory.None, special, true, eChatType.CT_System, "TaskToken_Wrath_lv", true);
+            A("EnemyKilledInDuel", TaskCategory.None, [40, 60, 100, 150, 200], true, eChatType.CT_System, "TaskToken_Duelist_lv", true);
+            A("QuestsCompleted", TaskCategory.None, [15, 25, 50, 80, 120], true, eChatType.CT_System, "TaskToken_Adventurer_lv", true);
+
+            // Completion tokens
+            A("TurnInPvPGvGTaskToken", TaskCategory.None, [1, 3, 6, 12, 18], token: "TaskToken_PvPGvG_lv", completionMsg: true);
+            A("TurnInPvETaskToken", TaskCategory.None, [1, 3, 5, 10, 18, 28], token: "TaskToken_PvE_lv", completionMsg: true, maxLevel: 6);
+            A("TurnInCraftingTaskToken", TaskCategory.None, [1, 2, 3, 4, 5], token: "TaskToken_Crafting_lv", completionMsg: true);
+
+            foreach (TaskDefinition def in d.Values)
+                BindAccessors(def);
+
+            return d.ToFrozenDictionary();
         }
 
-        private static void GiveTaskToken(GamePlayer player, string taskName, int level)
+        private static void BindAccessors(TaskDefinition d)
         {
-            string itemTemplateId = taskName switch
+            Type t = typeof(TaskXPlayer);
+            PropertyInfo p = t.GetProperty(d.Name, BindingFlags.Public | BindingFlags.Instance);
+
+            if (p == null || !p.CanRead || !p.CanWrite)
+                log.Warn($"[TaskManager] TaskXPlayer has no read/write property '{d.Name}', task disabled.");
+            else if (p.PropertyType == typeof(string))
             {
-                "EpicBossesSlaughtered" => $"TaskToken_Demon_Slayer_lv{level}",
-                "ItemsSoldToPlayers" => $"TaskToken_Trader_lv{level}",
-                "SuccessfulPvPThefts" => $"TaskToken_Thief_lv{level}",
-                "OutlawPlayersSentToJail" => $"TaskToken_Bounty_Hunter_lv{level}",
-                "EnemiesKilledInAdrenalineMode" => $"TaskToken_Wrath_lv{level}",
-                "EnemyKilledInDuel" => $"TaskToken_Duelist_lv{level}",
-                "QuestsCompleted" => $"TaskToken_Adventurer_lv{level}",
-                "TurnInPvPGvGTaskToken" => $"TaskToken_PvPGvG_lv{level}",
-                "TurnInPvETaskToken" => $"TaskToken_PvE_lv{level}",
-                "TurnInCraftingTaskToken" => $"TaskToken_Crafting_lv{level}",
-                _ => null
-            };
-
-            if (itemTemplateId == null)
-                return;
-
-            var itemTemplate = GameServer.Database.FindObjectByKey<ItemTemplate>(itemTemplateId);
-
-            if (itemTemplate == null)
-                return;
-
-            if (!player.Inventory.AddTemplate(GameInventoryItem.Create(itemTemplate), 1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
-            {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TextNPC.InventoryFullItemGround"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                var invItem = GameInventoryItem.Create(itemTemplate);
-                invItem.Count = 1;
-                player.CreateItemOnTheGround(invItem);
-                InventoryLogging.LogInventoryAction(player, "", $"(ground;{player.InternalID})", eInventoryActionType.Quest, invItem, 1);
+                d.GetProgress = (Func<TaskXPlayer, string>)Delegate.CreateDelegate(typeof(Func<TaskXPlayer, string>), p.GetGetMethod()!);
+                d.SetProgress = (Action<TaskXPlayer, string>)Delegate.CreateDelegate(typeof(Action<TaskXPlayer, string>), p.GetSetMethod()!);
             }
             else
             {
-                InventoryLogging.LogInventoryAction(player, "", $"(quest;{player.InternalID})", eInventoryActionType.Quest, itemTemplate, 1);
+                d.GetProgress = td => Convert.ToString(p.GetValue(td));
+                d.SetProgress = (td, v) => p.SetValue(td, Convert.ChangeType(v, p.PropertyType));
+            }
+
+            if (!d.TrackStats) return;
+
+            PropertyInfo s = t.GetProperty(d.Name + "Stats", BindingFlags.Public | BindingFlags.Instance);
+            if (s == null || !s.CanRead || !s.CanWrite)
+            {
+                log.Warn($"[TaskManager] TaskXPlayer has no read/write property '{d.Name}Stats', statistics disabled for this task.");
+                return;
+            }
+
+            if (s.PropertyType == typeof(int))
+            {
+                d.GetStats = (Func<TaskXPlayer, int>)Delegate.CreateDelegate(typeof(Func<TaskXPlayer, int>), s.GetGetMethod()!);
+                d.SetStats = (Action<TaskXPlayer, int>)Delegate.CreateDelegate(typeof(Action<TaskXPlayer, int>), s.GetSetMethod()!);
+            }
+            else
+            {
+                d.GetStats = td => Convert.ToInt32(s.GetValue(td));
+                d.SetStats = (td, v) => s.SetValue(td, Convert.ChangeType(v, s.PropertyType));
             }
         }
 
-        private static void UpdateCompletionToken(GamePlayer player, TaskXPlayer taskData, string tokenName, int points)
+        public static bool IsKnownTask(string name) => name != null && _definitions.ContainsKey(name);
+
+        public static TaskXPlayer EnsureTaskData(GamePlayer p)
         {
-            if (!Properties.ENABLE_TASK_SYSTEM)
+            if (!Properties.ENABLE_TASK_SYSTEM || p == null) return null;
+            var db = GameServer.Database;
+            var d = db.SelectObject<TaskXPlayer>(t => t.PlayerId == p.InternalID) ?? db.SelectObject<TaskXPlayer>(t => t.PlayerName == p.Name);
+            if (d != null) return d;
+            d = new TaskXPlayer { PlayerId = p.InternalID, PlayerName = p.Name };
+            db.AddObject(d);
+            return d;
+        }
+
+        /// <summary>Convenience: applies the con-level safeguard then awards progress. Returns false if the kill did not count.</summary>
+        public static bool TryAwardKill(GamePlayer killer, GameLiving enemy, string taskName, int progress = 1, bool isArena = false)
+        {
+            if (!Properties.ENABLE_TASK_SYSTEM || killer == null || enemy == null) return false;
+            if (!GameLiving.TaskSafeguardCheck(killer, enemy, taskName, isArena)) return false;
+            UpdateTaskProgress(killer, taskName, progress);
+            return true;
+        }
+
+        public static void UpdateTaskProgress(GamePlayer p, string taskName, int progress)
+        {
+            if (!Properties.ENABLE_TASK_SYSTEM || p == null) return;
+
+            if (taskName == null || !_definitions.TryGetValue(taskName, out TaskDefinition d) || !d.HasProgress)
+            {
+                p.Out?.SendMessage($"[TaskManager] Unknown task '{taskName}'.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
+            }
 
-            var prop = taskData.GetType().GetProperty(tokenName);
-            if (prop == null) return;
+            TaskXPlayer data = p.TaskXPlayer ?? EnsureTaskData(p);
+            if (data == null) return;
 
-            string raw = Convert.ToString(prop.GetValue(taskData)) ?? "0|0";
-            if (!raw.Contains("|")) raw = "0|0";
+            ParseProgress(d.GetProgress(data), out int level, out int current);
+            int nextThreshold = GetNextLevelThreshold(p, d, level);
 
-            var parts = raw.Split('|');
-            int level = 0, currentProgress = 0;
-            if (parts.Length > 0 && !int.TryParse(parts[0], out level)) level = 0;
-            if (parts.Length > 1 && !int.TryParse(parts[1], out currentProgress)) currentProgress = 0;
+            if (d.HasStats)
+                d.SetStats(data, d.GetStats(data) + 1);
 
-            currentProgress += points;
-            if (level < TaskManager.GetMaxLevel(tokenName) && currentProgress >= GetNextLevelThreshold(player, tokenName, level))
+            if (level >= d.MaxLevel)
+            {
+                GameServer.Database.SaveObject(data);
+                return;
+            }
+
+            current += progress;
+            bool leveledUp = false;
+
+            if (current >= nextThreshold)
             {
                 level++;
-                currentProgress = 0;
-                GiveTaskToken(player, tokenName, level);
+                current = 0;
+                leveledUp = true;
 
-                string message = tokenName switch
+                switch (d.Category)
                 {
-                    "TurnInPvPGvGTaskToken" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.TurnInPvPGvGTaskTokenMessage", level),
-                    "TurnInPvETaskToken" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.TurnInPvETaskTokenMessage", level),
-                    "TurnInCraftingTaskToken" => LanguageMgr.GetTranslation(player.Client.Account.Language, "Tasks.TurnInCraftingTaskTokenMessage", level),
-                    _ => string.Empty
-                };
-                if (!string.IsNullOrEmpty(message))
-                {
-                    player.Out.SendMessage(message, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+                    case TaskCategory.PvP: UpdateCompletionToken(p, data, "TurnInPvPGvGTaskToken", 1); break;
+                    case TaskCategory.PvE: UpdateCompletionToken(p, data, "TurnInPvETaskToken", 1); break;
+                    case TaskCategory.Crafting: UpdateCompletionToken(p, data, "TurnInCraftingTaskToken", 1); break;
                 }
+
+                if (d.SpecialTokenKey != null)
+                    p.Out.SendMessage(Translate(p, d.SpecialTokenKey, level), eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+
+                GiveTaskToken(p, d, level);
             }
-            taskData.GetType().GetProperty(tokenName)!.SetValue(taskData, $"{level}|{currentProgress}");
-        }
 
-        private static bool IsPvPTask(string taskName)
-        {
-            return taskName == "KillEnemyPlayersGroup" || taskName == "KillEnemyPlayersAlone" ||
-                   taskName == "KillKeepGuards" || taskName == "TakeKeeps" || taskName == "RvRChampionOfTheDay" ||
-                   taskName == "KillTerritoryGuards" || taskName == "KillTerritoryBoss" || taskName == "CapturedRelics";
-        }
+            d.SetProgress(data, $"{level}|{current}");
+            GameServer.Database.SaveObject(data);
 
-        private static bool IsPvETask(string taskName)
-        {
-            return taskName == "KillCreaturesInDungeons" || taskName == "KillOutdoorsCreatures" ||
-                   taskName == "KillAnimalCreatures" || taskName == "KillDemonCreatures" ||
-                   taskName == "KillDragonCreatures" || taskName == "KillElementalCreatures" ||
-                   taskName == "KillGiantCreatures" || taskName == "KillHumanoidCreatures" ||
-                   taskName == "KillInsectCreatures" || taskName == "KillMagicalCreatures" ||
-                   taskName == "KillReptileCreatures" || taskName == "KillPlantCreatures" ||
-                   taskName == "KillUndeadCreatures";
-        }
-
-        private static bool IsCraftingTask(string taskName)
-        {
-            return taskName == "SuccessfulItemCombinations" || taskName == "MasteredCrafts" ||
-                   taskName == "MasterpieceCrafted";
+            if (d.LogKey != null)
+                p.Out.SendMessage(Translate(p, d.LogKey, leveledUp ? nextThreshold : current, nextThreshold), d.LogChatType, eChatLoc.CL_SystemWindow);
         }
 
         public static int GetMaxLevel(string taskName)
+            => taskName != null && _definitions.TryGetValue(taskName, out TaskDefinition d) ? d.MaxLevel : DEFAULT_MAX_LEVEL;
+
+        public static int GetNextLevelThreshold(GamePlayer p, string taskName, int level)
         {
-            return taskName switch
-            {
-                "TurnInPvETaskToken" => 6,
-                "TurnInPvPGvGTaskToken" => 5,
-                "TurnInCraftingTaskToken" => 5,
-                _ => 5
-            };
+            if (p?.Client?.Account != null && p.Client.Account.PrivLevel > 1) return 1;
+            return taskName != null && _definitions.TryGetValue(taskName, out TaskDefinition d) ? ThresholdFor(d, level) : int.MaxValue;
         }
 
-        public static int GetNextLevelThreshold(GamePlayer player, string taskName, int level)
+        private static int GetNextLevelThreshold(GamePlayer p, TaskDefinition d, int level)
         {
-            if (player.Client.Account.PrivLevel > 1)
+            if (p?.Client?.Account != null && p.Client.Account.PrivLevel > 1) return 1;
+            return ThresholdFor(d, level);
+        }
+
+        private static int ThresholdFor(TaskDefinition d, int level)
+            => level >= 0 && level < d.Thresholds.Length ? d.Thresholds[level] : int.MaxValue;
+
+        private static void UpdateCompletionToken(GamePlayer p, TaskXPlayer data, string tokenTask, int points)
+        {
+            if (!Properties.ENABLE_TASK_SYSTEM || !_definitions.TryGetValue(tokenTask, out TaskDefinition d) || !d.HasProgress) return;
+
+            ParseProgress(d.GetProgress(data), out int level, out int current);
+            current += points;
+
+            if (level < d.MaxLevel && current >= GetNextLevelThreshold(p, d, level))
             {
-                return 1;
+                level++;
+                current = 0;
+                GiveTaskToken(p, d, level);
+                if (d.CompletionMessageKey != null)
+                    p.Out.SendMessage(Translate(p, d.CompletionMessageKey, level), eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
             }
 
-            return taskName switch
-            {
-                "KillEnemyPlayersGroup" => level switch
-                {
-                    0 => 30,
-                    1 => 60,
-                    2 => 100,
-                    3 => 200,
-                    4 => 400,
-                    _ => int.MaxValue
-                },
-                "KillEnemyPlayersAlone" => level switch
-                {
-                    0 => 20,
-                    1 => 40,
-                    2 => 80,
-                    3 => 150,
-                    4 => 300,
-                    _ => int.MaxValue
-                },
-                "KillKeepGuards" => level switch
-                {
-                    0 => 25,
-                    1 => 50,
-                    2 => 90,
-                    3 => 150,
-                    4 => 220,
-                    _ => int.MaxValue
-                },
-                "TakeKeeps" => level switch
-                {
-                    0 => 3,
-                    1 => 6,
-                    2 => 12,
-                    3 => 20,
-                    4 => 30,
-                    _ => int.MaxValue
-                },
-                "RvRChampionOfTheDay" => level switch
-                {
-                    0 => 1,
-                    1 => 2,
-                    2 => 4,
-                    3 => 7,
-                    4 => 12,
-                    _ => int.MaxValue
-                },
-                "KillTerritoryGuards" => level switch
-                {
-                    0 => 25,
-                    1 => 50,
-                    2 => 90,
-                    3 => 150,
-                    4 => 220,
-                    _ => int.MaxValue
-                },
-                "KillTerritoryBoss" => level switch
-                {
-                    0 => 5,
-                    1 => 10,
-                    2 => 15,
-                    3 => 30,
-                    4 => 60,
-                    _ => int.MaxValue
-                },
-                "CapturedRelics" => level switch
-                {
-                    0 => 4,
-                    1 => 8,
-                    2 => 12,
-                    3 => 20,
-                    4 => 30,
-                    _ => int.MaxValue
-                },
-                "TurnInPvPGvGTaskToken" => level switch
-                {
-                    0 => 1,
-                    1 => 3,
-                    2 => 6,
-                    3 => 12,
-                    4 => 18,
-                    _ => int.MaxValue
-                },
-                "KillCreaturesInDungeons" => level switch
-                {
-                    0 => 40,
-                    1 => 80,
-                    2 => 140,
-                    3 => 220,
-                    4 => 400,
-                    _ => int.MaxValue
-                },
-                "KillOutdoorsCreatures" => level switch
-                {
-                    0 => 50,
-                    1 => 100,
-                    2 => 200,
-                    3 => 350,
-                    4 => 700,
-                    _ => int.MaxValue
-                },
-                "KillAnimalCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillDemonCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillDragonCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillElementalCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillGiantCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillHumanoidCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillInsectCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillMagicalCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillReptileCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillPlantCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "KillUndeadCreatures" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 140,
-                    _ => int.MaxValue
-                },
-                "TurnInPvETaskToken" => level switch
-                {
-                    0 => 1,
-                    1 => 3,
-                    2 => 5,
-                    3 => 10,
-                    4 => 18,
-                    5 => 28,
-                    _ => int.MaxValue
-                },
-                "SuccessfulItemCombinations" => level switch
-                {
-                    0 => 30,
-                    1 => 50,
-                    2 => 80,
-                    3 => 110,
-                    4 => 160,
-                    _ => int.MaxValue
-                },
-                "MasteredCrafts" => level switch
-                {
-                    0 => 40,
-                    1 => 60,
-                    2 => 100,
-                    3 => 150,
-                    4 => 200,
-                    _ => int.MaxValue
-                },
-                "MasterpieceCrafted" => level switch
-                {
-                    0 => 2,
-                    1 => 4,
-                    2 => 8,
-                    3 => 15,
-                    4 => 25,
-                    _ => int.MaxValue
-                },
-                "TurnInCraftingTaskToken" => level switch
-                {
-                    0 => 1,
-                    1 => 2,
-                    2 => 3,
-                    3 => 4,
-                    4 => 5,
-                    _ => int.MaxValue
-                },
-                "EpicBossesSlaughtered" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 120,
-                    _ => int.MaxValue
-                },
-                "ItemsSoldToPlayers" => level switch
-                {
-                    0 => 25,
-                    1 => 40,
-                    2 => 75,
-                    3 => 110,
-                    4 => 150,
-                    _ => int.MaxValue
-                },
-                "SuccessfulPvPThefts" => level switch
-                {
-                    0 => 20,
-                    1 => 40,
-                    2 => 60,
-                    3 => 85,
-                    4 => 120,
-                    _ => int.MaxValue
-                },
-                "OutlawPlayersSentToJail" => level switch
-                {
-                    0 => 20,
-                    1 => 40,
-                    2 => 60,
-                    3 => 85,
-                    4 => 120,
-                    _ => int.MaxValue
-                },
-                "EnemiesKilledInAdrenalineMode" => level switch
-                {
-                    0 => 20,
-                    1 => 40,
-                    2 => 60,
-                    3 => 85,
-                    4 => 120,
-                    _ => int.MaxValue
-                },
-                "EnemyKilledInDuel" => level switch
-                {
-                    0 => 40,
-                    1 => 60,
-                    2 => 100,
-                    3 => 150,
-                    4 => 200,
-                    _ => int.MaxValue
-                },
-                "QuestsCompleted" => level switch
-                {
-                    0 => 15,
-                    1 => 25,
-                    2 => 50,
-                    3 => 80,
-                    4 => 120,
-                    _ => int.MaxValue
-                },
-                _ => int.MaxValue
-            };
+            d.SetProgress(data, $"{level}|{current}");
         }
+
+        private static void GiveTaskToken(GamePlayer p, TaskDefinition d, int level)
+        {
+            if (d.TokenIdPrefix == null) return;
+            ItemTemplate template = GameServer.Database.FindObjectByKey<ItemTemplate>(d.TokenIdPrefix + level);
+            if (template == null) return;
+
+            if (!p.Inventory.AddTemplate(GameInventoryItem.Create(template), 1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            {
+                p.Out.SendMessage(Translate(p, "TextNPC.InventoryFullItemGround"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                var item = GameInventoryItem.Create(template);
+                item.Count = 1;
+                p.CreateItemOnTheGround(item);
+                InventoryLogging.LogInventoryAction(p, "", $"(ground;{p.InternalID})", eInventoryActionType.Quest, item, 1);
+            }
+            else
+                InventoryLogging.LogInventoryAction(p, "", $"(quest;{p.InternalID})", eInventoryActionType.Quest, template, 1);
+        }
+
+        private static void ParseProgress(string raw, out int level, out int current)
+        {
+            level = 0;
+            current = 0;
+            if (string.IsNullOrEmpty(raw)) return;
+            int sep = raw.IndexOf('|');
+            if (sep < 0) return;
+            if (!int.TryParse(raw.AsSpan(0, sep), out level)) level = 0;
+            if (!int.TryParse(raw.AsSpan(sep + 1), out current)) current = 0;
+        }
+
+        private static string Translate(GamePlayer p, string key, params object[] args)
+            => LanguageMgr.GetTranslation(p.Client.Account.Language, key, args);
     }
 }

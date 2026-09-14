@@ -37,10 +37,15 @@ namespace DOL.GS
         private SchedulableServiceObjectArray<T> RouteItem(T item)
         {
             ShardedServiceObjectId id = item.ServiceObjectId;
-
             if (id.ShardIndex == -1)
-                id.ShardIndex = (int)((uint)Interlocked.Increment(ref _roundRobinCounter) % _shards.Count);
-
+            {
+                int shard;
+                if (item is ECSGameTimer timer && timer.Owner != null)
+                    shard = (timer.Owner.GetHashCode() & int.MaxValue) % _shards.Count;
+                else
+                    shard = (int)((uint)Interlocked.Increment(ref _roundRobinCounter) % _shards.Count);
+                id.ShardIndex = shard;
+            }
             return _shards[id.ShardIndex];
         }
 

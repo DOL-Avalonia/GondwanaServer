@@ -15,7 +15,7 @@ namespace DOL.Database
     [DataTable(TableName = "CoffrexPlayer")]
     public class CoffrexPlayer : DataObject
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)

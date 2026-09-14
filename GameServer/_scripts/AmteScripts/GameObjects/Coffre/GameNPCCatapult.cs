@@ -261,12 +261,12 @@ namespace DOL.GS.Scripts
 
             ReleaseControl();
 
-            RegionTimer bumpTimer = new RegionTimer(this, new RegionTimerCallback(DelayedBumpCallback));
+            ECSGameTimer bumpTimer = new ECSGameTimer(this, DelayedBumpCallback);
             bumpTimer.Properties.setProperty("target", player);
             bumpTimer.Start(100);
         }
 
-        protected virtual int DelayedBumpCallback(RegionTimer timer)
+        protected virtual int DelayedBumpCallback(ECSGameTimer timer)
         {
             GamePlayer player = timer.Properties.getProperty<GamePlayer>("target", null);
             if (player != null && player.IsAlive)

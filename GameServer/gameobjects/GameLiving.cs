@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using Discord;
 using System;
 using System.Collections;
@@ -610,16 +592,26 @@ namespace DOL.GS
         /// Holds the weaponslot to be used
         /// </summary>
         protected eActiveWeaponSlot m_activeWeaponSlot;
+
         /// <summary>
         /// AttackAction used for making an attack every weapon speed intervals
         /// </summary>
         protected AttackAction m_attackAction;
+
         /// <summary>
         /// The objects currently attacking this living
         /// To be more exact, the objects that are in combat
         /// and have this living as target.
         /// </summary>
-        protected readonly List<GameObject> m_attackers;
+        protected readonly AttackerTracker m_attackerTracker;
+
+        /// <summary>
+        /// Who is attacking us (thread-safe, self-expiring).
+        /// Use this in new code instead of Attackers.
+        /// </summary>
+        public AttackerTracker AttackerTracker => m_attackerTracker;
+
+        public CastingComponent castingComponent;
 
         /// <summary>
         /// Returns the current active weapon slot of this living
@@ -1242,20 +1234,7 @@ namespace DOL.GS
         /// </summary>
         public virtual bool InCombat
         {
-            get
-            {
-                if ((InCombatPvE || InCombatPvP) == false)
-                {
-                    if (Attackers.Count > 0)
-                    {
-                        Attackers.Clear();
-                    }
-
-                    return false;
-                }
-
-                return true;
-            }
+            get { return InCombatPvE || InCombatPvP; }
         }
 
         /// <summary>
@@ -1263,17 +1242,7 @@ namespace DOL.GS
         /// </summary>
         public virtual bool InCombatInLast(int milliseconds)
         {
-            if ((InCombatPvEInLast(milliseconds) || InCombatPvPInLast(milliseconds)) == false)
-            {
-                if (Attackers.Count > 0)
-                {
-                    Attackers.Clear();
-                }
-
-                return false;
-            }
-
-            return true;
+            return InCombatPvEInLast(milliseconds) || InCombatPvPInLast(milliseconds);
         }
 
         /// <summary>
@@ -1511,60 +1480,7 @@ namespace DOL.GS
         /// <summary>
         /// Holds the level of target at which no exp is given
         /// </summary>
-        public static readonly int[] NoXPForLevel =
-        {
-            -3,		//for level 0
-            -2,		//for level 1
-            -1,		//for level 2
-            0,		//for level 3
-            1,		//for level 4
-            2,		//for level 5
-            3,		//for level 6
-            4,		//for level 7
-            5,		//for level 8
-            6,		//for level 9
-            6,		//for level 10
-            6,		//for level 11
-            6,		//for level 12
-            7,		//for level 13
-            8,		//for level 14
-            9,		//for level 15
-            10,		//for level 16
-            11,		//for level 17
-            12,		//for level 18
-            13,		//for level 19
-            13,		//for level 20
-            13,		//for level 21
-            13,		//for level 22
-            14,		//for level 23
-            15,		//for level 24
-            16,		//for level 25
-            17,		//for level 26
-            18,		//for level 27
-            19,		//for level 28
-            20,		//for level 29
-            21,		//for level 30
-            22,		//for level 31
-            23,		//for level 32
-            24,		//for level 33
-            25,		//for level 34
-            25,		//for level 35
-            25,		//for level 36
-            25,		//for level 37
-            25,		//for level 38
-            25,		//for level 39
-            25,		//for level 40
-            26,		//for level 41
-            27,		//for level 42
-            28,		//for level 43
-            29,		//for level 44
-            30,		//for level 45
-            31,		//for level 46
-            32,		//for level 47
-            33,		//for level 48
-            34,		//for level 49
-            35,		//for level 50
-        };
+        public static readonly int[] NoXPForLevel = LegacyConLevelGrid.NoXPForLevel;
 
         #endregion
 
@@ -1573,32 +1489,18 @@ namespace DOL.GS
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public virtual bool IsObjectGreyCon(GameObject obj)
+        public static bool IsObjectGreyCon(GameObject source, GameObject target)
         {
-            return IsObjectGreyCon(this, obj);
+            return source != null && target != null && LegacyConLevelGrid.IsGreyCon(source.EffectiveLevel, target.EffectiveLevel);
         }
 
         /// <summary>
-        /// Checks whether target is grey con to source
+        /// true if <paramref name="target"/>
+        /// is grey to this living (no XP / loot / task credit).
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        static public bool IsObjectGreyCon(GameObject source, GameObject target)
+        public virtual bool IsObjectGreyCon(GameObject target)
         {
-            int sourceLevel = source.EffectiveLevel;
-            if (sourceLevel < GameLiving.NoXPForLevel.Length)
-            {
-                //if target level is less or equals to level that is grey to source
-                if (target.EffectiveLevel <= GameLiving.NoXPForLevel[sourceLevel])
-                    return true;
-            }
-            else
-            {
-                if (source.GetConLevel(target) <= -3)
-                    return true;
-            }
-            return false;
+            return target != null && LegacyConLevelGrid.IsGreyCon(EffectiveLevel, target.EffectiveLevel);
         }
 
         /// <summary>
@@ -2290,7 +2192,7 @@ namespace DOL.GS
             }
 
             TurnTo(attacker.Coordinate);
-            new WeaponOnTargetAction(this, attacker, weapon, null, 1.0, 0, CounterAttackStyle, true).OnTick();
+            new WeaponOnTargetAction(this, attacker, weapon, null, 1.0, 0, CounterAttackStyle, true).Execute();
             TurnTo(TargetObject.Coordinate);
 
             if (attacker is GamePlayer targetPlayer)
@@ -2313,8 +2215,6 @@ namespace DOL.GS
         {
             get => GetModified(eProperty.CounterAttack);
         }
-
-        private RegionAction InterruptTimer { get; set; }
 
         /// <summary>
         /// Starts the interrupt timer on this living.
@@ -2363,6 +2263,14 @@ namespace DOL.GS
                 return;
             }
 
+            long interruptExpire = GameLoop.GameLoopTime + duration;
+
+            if (attacker == null || attacker == this)
+            {
+                m_attackerTracker.SetSelfInterrupt(interruptExpire);
+            }
+            else m_attackerTracker.SetInterrupt(attacker, interruptExpire);
+
             if (InterruptTime < CurrentRegion.Time + duration)
                 InterruptTime = CurrentRegion.Time + duration;
 
@@ -2395,10 +2303,7 @@ namespace DOL.GS
         /// <summary>
         /// Yields true if interrupt action is running on this living.
         /// </summary>
-        public virtual bool IsBeingInterrupted
-        {
-            get { return (m_interruptTime > CurrentRegion.Time); }
-        }
+        public virtual bool IsBeingInterrupted => (CurrentRegion != null && m_interruptTime > CurrentRegion.Time) || m_attackerTracker.IsInterrupted(out _);
 
         /// <summary>
         /// Base chance this living can be interrupted
@@ -2541,7 +2446,7 @@ namespace DOL.GS
         /// <summary>
         /// The attack action of this living
         /// </summary>
-        protected class AttackAction : RegionAction
+        protected class AttackAction : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// Constructs a new attack action
@@ -2555,37 +2460,33 @@ namespace DOL.GS
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                GameLiving owner = (GameLiving)m_actionSource;
+                GameLiving owner = (GameLiving)timer.Owner;
 
                 if (owner.IsMezzed || owner.IsStunned)
                 {
-                    Interval = 100;
-                    return;
+                    return 100;
                 }
 
                 if (owner.IsCasting && !owner.CurrentSpellHandler.Spell.Uninterruptible)
                 {
-                    Interval = 100;
-                    return;
+                    return 100;
                 }
 
                 if (!owner.AttackState)
                 {
-                    AttackData ad = owner.TempProperties.getProperty<object>(LAST_ATTACK_DATA, null) as AttackData;
+                    AttackData ad_ = owner.TempProperties.getProperty<object>(LAST_ATTACK_DATA, null) as AttackData;
                     owner.TempProperties.removeProperty(LAST_ATTACK_DATA);
-                    if (ad != null && ad.Target != null)
-                        ad.Target.RemoveAttacker(owner);
-                    Stop();
-                    return;
+                    if (ad_ != null && ad_.Target != null)
+                        ad_.Target.RemoveAttacker(owner);
+                    return 0;
                 }
 
                 // Don't attack if gameliving is engaging
                 if (owner.IsEngaging)
                 {
-                    Interval = owner.AttackSpeed(owner.AttackWeapon); // while gameliving is engageing it doesn't attack.
-                    return;
+                    return owner.AttackSpeed(owner.AttackWeapon);
                 }
 
                 // Store all datas which must not change during the attack
@@ -2605,14 +2506,12 @@ namespace DOL.GS
                     eCheckRangeAttackStateResult rangeCheckresult = owner.CheckRangeAttackState(attackTarget);
                     if (rangeCheckresult == eCheckRangeAttackStateResult.Hold)
                     {
-                        Interval = 100;
-                        return; //Hold the shot another second
+                        return 100;
                     }
                     else if (rangeCheckresult == eCheckRangeAttackStateResult.Stop || attackTarget == null)
                     {
-                        owner.StopAttack(); //Stop the attack
-                        Stop();
-                        return;
+                        owner.StopAttack();
+                        return 0;
                     }
 
                     int model = (attackWeapon == null ? 0 : attackWeapon.Model);
@@ -2701,16 +2600,14 @@ namespace DOL.GS
                     // wait until target is selected
                     if (attackTarget == null || attackTarget == owner)
                     {
-                        Interval = 100;
-                        return;
+                        return 100;
                     }
 
-                    AttackData ad = owner.TempProperties.getProperty<object>(LAST_ATTACK_DATA, null) as AttackData;
-                    if (ad != null && ad.AttackResult == eAttackResult.Fumbled)
+                    AttackData ad_ = owner.TempProperties.getProperty<object>(LAST_ATTACK_DATA, null) as AttackData;
+                    if (ad_ != null && ad_.AttackResult == eAttackResult.Fumbled)
                     {
-                        Interval = owner.AttackSpeed(attackWeapon);
-                        ad.AttackResult = eAttackResult.Missed;
-                        return; //Don't start the attack if the last one fumbled
+                        ad_.AttackResult = eAttackResult.Missed;
+                        return owner.AttackSpeed(attackWeapon);
                     }
 
                     combatStyle = owner.GetStyleToUse(attackTarget);
@@ -2732,60 +2629,19 @@ namespace DOL.GS
 
                 if (attackTarget != null && !owner.IsWithinRadius(attackTarget, owner.AttackRange) && owner.ActiveWeaponSlot != eActiveWeaponSlot.Distance)
                 {
-                    if (owner is GameNPC && (owner as GameNPC)!.Brain is StandardMobBrain && ((owner as GameNPC)!.Brain as StandardMobBrain)!.AggroTable.Count > 0 && (owner as GameNPC)!.Brain is IControlledBrain == false)
+                    if (owner is GameNPC npc && npc.Brain is StandardMobBrain npcBrain && npc.Brain is not IControlledBrain && npcBrain.HasAggro)
                     {
-                        #region Attack another target in range
+                        // 1) free: value already computed by AggroTable during the last think
+                        GameLiving inRange = npcBrain.LastHighestThreatInAttackRange;
 
-                        GameNPC npc = owner as GameNPC;
-                        StandardMobBrain npc_brain = npc!.Brain as StandardMobBrain;
-                        GameLiving Possibly_target = null;
-                        long maxaggro = 0, aggro = 0;
-
-                        foreach (GamePlayer player_test in owner.GetPlayersInRadius((ushort)owner.AttackRange))
-                        {
-                            if (npc_brain!.AggroTable.ContainsKey(player_test))
-                            {
-                                aggro = npc_brain.GetAggroAmountForLiving(player_test);
-                                if (aggro <= 0) continue;
-                                if (aggro > maxaggro)
-                                {
-                                    Possibly_target = player_test;
-                                    maxaggro = aggro;
-                                }
-                            }
-                        }
-                        foreach (GameNPC target_possibility in owner.GetNPCsInRadius((ushort)owner.AttackRange))
-                        {
-                            if (npc_brain!.AggroTable.ContainsKey(target_possibility))
-                            {
-                                aggro = npc_brain.GetAggroAmountForLiving(target_possibility);
-                                if (aggro <= 0) continue;
-                                if (aggro > maxaggro)
-                                {
-                                    Possibly_target = target_possibility;
-                                    maxaggro = aggro;
-                                }
-                            }
-                        }
-
-                        if (Possibly_target == null)
-                        {
-                            Interval = 100;
-                            return;
-                        }
-                        else
-                        {
-                            attackTarget = Possibly_target;
-                        }
-
-                        #endregion
-
+                        // 2) fallback: one pass over the table, no radius scan of the zone
+                        if (inRange == null || !inRange.IsAlive || !owner.IsWithinRadius(inRange, owner.AttackRange))
+                            inRange = npcBrain.AggroTable.FindHighestBaseAggroWithin(owner, owner.AttackRange,
+                                l => l.IsAlive && GameServer.ServerRules.IsAllowedToAttack(owner, l, true));
+                        if (inRange == null) return 100;
+                        attackTarget = inRange;
                     }
-                    else
-                    {
-                        Interval = 100;
-                        return;
-                    }
+                    else return 100;
                 }
 
                 new WeaponOnTargetAction(owner, attackTarget, attackWeapon, leftWeapon, effectiveness, interruptDuration, combatStyle).Start(ticksToTarget);  // really start the attack
@@ -2793,8 +2649,7 @@ namespace DOL.GS
                 //Are we inactive?
                 if (owner.ObjectState != eObjectState.Active)
                 {
-                    Stop();
-                    return;
+                    return 0;
                 }
 
                 //switch to melee if range to target is less than 200
@@ -2814,8 +2669,7 @@ namespace DOL.GS
                     if (owner.RangedAttackState != eRangedAttackState.AimFireReload)
                     {
                         owner.StopAttack();
-                        Stop();
-                        return;
+                        return 0;
                     }
                     else
                     {
@@ -2865,18 +2719,18 @@ namespace DOL.GS
                             speed /= 2; // can start fire at the middle of the normal time
                         }
 
-                        Interval = speed;
+                        return speed;
                     }
                 }
                 else
                 {
                     if (leftHandSwingCount > 0)
                     {
-                        Interval = owner.AttackSpeed(attackWeapon, leftWeapon);
+                        return owner.AttackSpeed(attackWeapon, leftWeapon);
                     }
                     else
                     {
-                        Interval = owner.AttackSpeed(attackWeapon);
+                        return owner.AttackSpeed(attackWeapon);
                     }
                 }
             }
@@ -2886,7 +2740,7 @@ namespace DOL.GS
         /// <summary>
         /// The action when the weapon hurt the target
         /// </summary>
-        protected class WeaponOnTargetAction : RegionAction
+        protected class WeaponOnTargetAction : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// The target of the attack
@@ -2943,12 +2797,20 @@ namespace DOL.GS
                 m_isCounterAttack = isCounterAttack;
             }
 
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                GameLiving owner = (GameLiving)m_actionSource;
+                Execute();
+                return 0;
+            }
+
+            /// <summary>
+            /// Performs the swing(s). Public so CounterAttack can invoke it synchronously.
+            /// Body is unchanged from the old RegionAction.OnTick, except:
+            ///   m_actionSource -> Owner, and the trailing Stop(); return; is removed (one-shot).
+            /// </summary>
+            public void Execute()
+            {
+                GameLiving owner = (GameLiving)Owner;
                 Style style = m_combatStyle;
                 int leftHandSwingCount = 0;
                 AttackData mainHandAD = null;
@@ -3047,7 +2909,7 @@ namespace DOL.GS
                 // is out of range!
                 if (mainHandAD.Target != null && mainHandAD.AttackResult != eAttackResult.OutOfRange)
                 {
-                    mainHandAD.Target.AddAttacker(owner);
+                    mainHandAD.Target.AddAttacker(mainHandAD);
                     mainHandAD.Target.OnAttackedByEnemy(mainHandAD);
                 }
 
@@ -3182,7 +3044,6 @@ namespace DOL.GS
                     case eAttackResult.NoTarget:
                     case eAttackResult.TargetDead:
                         {
-                            Stop();
                             owner.OnTargetDeadOrNoTarget();
                             return;
                         }
@@ -3190,7 +3051,6 @@ namespace DOL.GS
                     case eAttackResult.NoValidTarget:
                         {
                             owner.StopAttack();
-                            Stop();
                             return;
                         }
                     case eAttackResult.OutOfRange:
@@ -3199,6 +3059,7 @@ namespace DOL.GS
 
                 // unstealth before attack animation
                 if (owner is GamePlayer)
+                {
                     if (((GamePlayer)owner).StayStealth)
                     {
                         ((GamePlayer)owner).StayStealth = false;
@@ -3207,6 +3068,7 @@ namespace DOL.GS
                     {
                         ((GamePlayer)owner).Stealth(false);
                     }
+                }
 
                 //Show the animation
                 if (mainHandAD.AttackResult != eAttackResult.HitUnstyled && mainHandAD.AttackResult != eAttackResult.HitStyle && leftHandAD != null)
@@ -3236,9 +3098,6 @@ namespace DOL.GS
                 //update internal heading, do not send update to client
                 if (owner is GameNPC)
                     (owner as GameNPC)!.TurnTo(mainHandAD.Target, false);
-
-                Stop();
-                return;
             }
         }
 
@@ -3808,7 +3667,7 @@ namespace DOL.GS
             double attackerConLevel = -GetConLevel(ad.Attacker);
             //			double levelModifier = -((ad.Attacker.Level - Level) / (Level / 10.0 + 1));
 
-            int attackerCount = m_attackers.Count;
+            int attackerCount = m_attackerTracker.MeleeCount;
 
             if (!defenseDisabled)
             {
@@ -3922,8 +3781,8 @@ namespace DOL.GS
                         int shieldSize = 0;
                         if (leftHand != null)
                             shieldSize = leftHand.Type_Damage;
-                        if (m_attackers.Count > shieldSize)
-                            guardchance /= (m_attackers.Count - shieldSize + 1);
+                        if (attackerCount > shieldSize)
+                            guardchance /= (attackerCount - shieldSize + 1);
                         if (ad.AttackType == AttackData.eAttackType.MeleeDualWield) guardchance /= 2;
 
                         double parrychance = double.MinValue;
@@ -3934,7 +3793,7 @@ namespace DOL.GS
                             parrychance += 0.05 * attackerConLevel;
                             if (parrychance > 0.99) parrychance = 0.99;
                             if (parrychance < 0.01) parrychance = 0.01;
-                            if (m_attackers.Count > 1) parrychance /= m_attackers.Count / 2;
+                            if (attackerCount > 1) parrychance /= attackerCount / 2;
                         }
 
                         if (Util.ChanceDouble(guardchance))
@@ -3961,7 +3820,7 @@ namespace DOL.GS
                             parrychance += 0.05 * attackerConLevel;
                             if (parrychance > 0.99) parrychance = 0.99;
                             if (parrychance < 0.01) parrychance = 0.01;
-                            if (m_attackers.Count > 1) parrychance /= m_attackers.Count / 2;
+                            if (attackerCount > 1) parrychance /= attackerCount / 2;
                         }
                         if (Util.ChanceDouble(parrychance))
                         {
@@ -4004,7 +3863,7 @@ namespace DOL.GS
                 // experimental missrate adjustment for number of attackers
                 if ((this is GamePlayer && ad.Attacker is GamePlayer) == false)
                 {
-                    missrate -= (Math.Max(0, Attackers.Count - 1) * ServerProperties.Properties.MISSRATE_REDUCTION_PER_ATTACKERS);
+                    missrate -= (Math.Max(0, m_attackerTracker.Count - 1) * Properties.MISSRATE_REDUCTION_PER_ATTACKERS);
                 }
 
                 // weapon/armor bonus
@@ -4521,7 +4380,7 @@ namespace DOL.GS
                 if (this is GameNPC && ActiveWeaponSlot == eActiveWeaponSlot.Distance && this.IsWithinRadius(ad.Attacker, 150))
                     ((GameNPC)this).SwitchToMelee(ad.Attacker);
 
-                AddAttacker(ad.Attacker);
+                AddAttacker(ad);
 
                 if (ad.Attacker.Realm == 0 || this.Realm == 0)
                 {
@@ -4658,20 +4517,12 @@ namespace DOL.GS
 
             //Notify our enemies that we were healed by other means than
             //natural regeneration, this allows for aggro on healers!
-            if (healthChanged > 0 && healthChangeType != eHealthChangeType.Regenerate)
+            if (healthChanged > 0 && healthChangeType != eHealthChangeType.Regenerate && m_attackerTracker.Count > 0)
             {
-                IList<GameObject> attackers;
-                lock (Attackers) { attackers = new List<GameObject>(m_attackers); }
                 EnemyHealedEventArgs args = new EnemyHealedEventArgs(this, changeSource, healthChangeType, healthChanged);
-                foreach (GameObject attacker in attackers)
-                {
-                    if (attacker is GameLiving)
-                    {
-                        (attacker as GameLiving)!.Notify(GameLivingEvent.EnemyHealed, attacker, args);
-                        // Desactivate XPGainer, Heal Rps implentation.
-                        //(attacker as GameLiving).AddXPGainer(changeSource, healthChanged);
-                    }
-                }
+                // pooled per-tick list, no allocation, no lock held while notifying
+                foreach (GameLiving attacker in m_attackerTracker.Attackers)
+                    attacker.Notify(GameLivingEvent.EnemyHealed, attacker, args);
             }
             return healthChanged;
         }
@@ -4719,113 +4570,100 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Returns the list of attackers
+        /// Compatibility snapshot (allocates a new list).
+        /// Prefer AttackerTracker in new code.
         /// </summary>
-        public List<GameObject> Attackers
+        public List<GameObject> Attackers => m_attackerTracker.GetAttackersAsGameObjects();
+
+        /// <summary>
+        /// Preferred: registers the attacker with the correct melee/ranged flag and expiry (one attack interval).
+        /// </summary>
+        public virtual void AddAttacker(AttackData ad)
         {
-            get { return m_attackers; }
+            if (ad == null || ad.Attacker == null || ad.Attacker == this) return;
+
+            int interval;
+            if (ad.AttackType == AttackData.eAttackType.Spell || ad.AttackType == AttackData.eAttackType.DoT)
+                interval = Properties.SPELL_INTERRUPT_DURATION;
+            else if (ad.WeaponSpeed > 0)
+                interval = ad.WeaponSpeed * 100;
+            else
+                interval = ad.Attacker.AttackSpeed(ad.Attacker.AttackWeapon);
+
+            if (interval <= 0) interval = AttackerTracker.DEFAULT_ATTACKER_LIFETIME;
+            m_attackerTracker.AddOrUpdate(ad.Attacker, ad.IsMeleeAttack, GameLoop.GameLoopTime + interval);
         }
 
         /// <summary>
-        /// Adds an attacker to the attackerlist
+        /// Legacy overload (no AttackData): melee is guessed from weapon slot + distance, 10s lifetime.
         /// </summary>
-        /// <param name="attacker">the attacker to add</param>
         public virtual void AddAttacker(GameObject attacker)
         {
-            lock (Attackers)
-            {
-                if (attacker == this) return;
-                if (m_attackers.Contains(attacker)) return;
-                m_attackers.Add(attacker);
-            }
+            if (attacker is not GameLiving living || living == this) return;
+            bool isMelee = living.ActiveWeaponSlot != eActiveWeaponSlot.Distance && IsWithinRadius(living, living.AttackRange + 64);
+            m_attackerTracker.AddOrUpdate(living, isMelee, GameLoop.GameLoopTime + AttackerTracker.DEFAULT_ATTACKER_LIFETIME);
         }
+
         /// <summary>
         /// Removes an attacker from the list
         /// </summary>
         /// <param name="attacker">the attacker to remove</param>
         public virtual void RemoveAttacker(GameObject attacker)
         {
-            //			log.Warn(Name + ": RemoveAttacker "+attacker.Name);
-            //			log.Error(Environment.StackTrace);
-            lock (Attackers)
-            {
-                m_attackers.Remove(attacker);
-            }
-            // If GM use viewloot, need remove the attacker from the xpGainers, else if he deco/reco
-            // and redo the action, he apears twice in the list and the bug is happen
-            //Console print attacker
-
-            if (Health == MaxHealth)
-                XPGainers.TryRemove(attacker, out var dmg);
+            if (attacker is GameLiving living) m_attackerTracker.Remove(living);
+            if (attacker != null && Health == MaxHealth) XPGainers.TryRemove(attacker, out _);
         }
+
+        public bool IsInterrupted(out GameLiving lastInterrupter) => m_attackerTracker.IsInterrupted(out lastInterrupter);
+        public bool IsSelfInterrupted() => m_attackerTracker.IsSelfInterrupted();
+        public bool IsInterruptedOrSelfInterrupted() => m_attackerTracker.IsInterruptedOrSelfInterrupted();
+
         /// <summary>
         /// Called when this living dies
         /// </summary>
         public virtual void Die(GameObject killer)
         {
-            if (this is GameNPC == false && this is GamePlayer == false)
+            if (this is not GameNPC && this is not GamePlayer)
             {
                 // deal out exp and realm points based on server rules
                 GameServer.ServerRules.OnLivingKilled(this, killer);
             }
 
             StopAttack();
+            castingComponent.ClearAll();
 
-            List<GameObject> clone;
-            lock (Attackers)
-            {
-                if (m_attackers.Contains(killer) == false)
-                    m_attackers.Add(killer);
-                clone = new List<GameObject>(m_attackers);
-            }
+            // make sure the killer is credited even if his last hit expired from the tracker
+            if (killer is GameLiving killerLiving && killerLiving != this)
+                m_attackerTracker.AddOrUpdate(killerLiving, false, GameLoop.GameLoopTime + AttackerTracker.MIN_ATTACKER_LIFETIME);
+
+            List<GameLiving> clone = m_attackerTracker.GetAttackersSnapshot();
             List<GamePlayer> playerAttackers = null;
 
-            foreach (GameLiving living in clone.OfType<GameLiving>())
+            foreach (GameLiving living in clone)
             {
-                // This is all weird - why filter for unique players to add to a list to call enemyKilled?
-                // Why not use a list of GameLiving instead?
-
                 GamePlayer playerOwner = living.GetPlayerOwner();
                 GamePlayer player = playerOwner ?? living as GamePlayer;
+                if (player == null) { living.EnemyKilled(this); continue; }
 
-                if (player == null)
-                {
-                    living.EnemyKilled(this);
-                    continue;
-                }
-                
-                if (playerAttackers == null)
-                    playerAttackers = new List<GamePlayer>{player};
-                else if (playerAttackers.Contains(player) == false)
-                    playerAttackers.Add(player);
-                
-                if (playerOwner != null)
-                {
-                    // Pet gets the killed message as well
-                    living.EnemyKilled(this);
-                }
+                if (playerAttackers == null) playerAttackers = new List<GamePlayer> { player };
+                else if (!playerAttackers.Contains(player)) playerAttackers.Add(player);
+
+                if (playerOwner != null) living.EnemyKilled(this);
 
                 if (player.Group != null)
                 {
                     foreach (GamePlayer groupPlayer in player.Group.GetPlayersInTheGroup())
                     {
-                        if (groupPlayer.IsWithinRadius(this, WorldMgr.MAX_EXPFORKILL_DISTANCE) && playerAttackers.Contains(groupPlayer) == false)
-                        {
+                        if (groupPlayer.IsWithinRadius(this, WorldMgr.MAX_EXPFORKILL_DISTANCE) && !playerAttackers.Contains(groupPlayer))
                             playerAttackers.Add(groupPlayer);
-                        }
                     }
                 }
             }
 
             if (playerAttackers != null)
-            {
-                foreach (GamePlayer player in playerAttackers)
-                {
-                    player.EnemyKilled(this);
-                }
-            }
+                foreach (GamePlayer player in playerAttackers) player.EnemyKilled(this);
 
-            m_attackers.Clear();
+            m_attackerTracker.Clear();
 
             // cancel all concentration effects
             ConcentrationEffects.CancelAll();
@@ -5455,15 +5293,15 @@ namespace DOL.GS
         /// <summary>
         /// GameTimer used for restoring hp
         /// </summary>
-        protected RegionTimer m_healthRegenerationTimer;
+        protected ECSGameTimer m_healthRegenerationTimer;
         /// <summary>
         /// GameTimer used for restoring mana
         /// </summary>
-        protected RegionTimer m_powerRegenerationTimer;
+        protected ECSGameTimer m_powerRegenerationTimer;
         /// <summary>
         /// GameTimer used for restoring endurance
         /// </summary>
-        protected RegionTimer m_enduRegenerationTimer;
+        protected ECSGameTimer m_enduRegenerationTimer;
 
         /// <summary>
         /// The default frequency of regenerating health in milliseconds
@@ -5505,120 +5343,52 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// The lock object for lazy regen timers initialization
-        /// </summary>
-        protected readonly object m_regenTimerLock = new object();
-
-        /// <summary>
         /// Starts the health regeneration
         /// </summary>
         public virtual void StartHealthRegeneration()
         {
-            if (ObjectState != eObjectState.Active)
+            if (ObjectState != eObjectState.Active || m_healthRegenerationTimer == null || m_healthRegenerationTimer.IsAlive)
                 return;
-            lock (m_regenTimerLock)
-            {
-                if (m_healthRegenerationTimer == null)
-                {
-                    m_healthRegenerationTimer = new RegionTimer(this);
-                    m_healthRegenerationTimer.Callback = new RegionTimerCallback(HealthRegenerationTimerCallback);
-                }
-                else if (m_healthRegenerationTimer.IsAlive)
-                {
-                    return;
-                }
-
-                m_healthRegenerationTimer.Start(HealthRegenerationPeriod);
-            }
+            m_healthRegenerationTimer.Start(HealthRegenerationPeriod);
         }
         /// <summary>
         /// Starts the power regeneration
         /// </summary>
         public virtual void StartPowerRegeneration()
         {
-            if (ObjectState != eObjectState.Active)
+            if (ObjectState != eObjectState.Active || m_powerRegenerationTimer == null || m_powerRegenerationTimer.IsAlive)
                 return;
-            lock (m_regenTimerLock)
-            {
-                if (m_powerRegenerationTimer == null)
-                {
-                    m_powerRegenerationTimer = new RegionTimer(this);
-                    m_powerRegenerationTimer.Callback = new RegionTimerCallback(PowerRegenerationTimerCallback);
-                }
-                else if (m_powerRegenerationTimer.IsAlive)
-                {
-                    return;
-                }
-
-                m_powerRegenerationTimer.Start(PowerRegenerationPeriod);
-            }
+            m_powerRegenerationTimer.Start(PowerRegenerationPeriod);
         }
         /// <summary>
         /// Starts the endurance regeneration
         /// </summary>
         public virtual void StartEnduranceRegeneration()
         {
-            if (ObjectState != eObjectState.Active)
+            if (ObjectState != eObjectState.Active || m_enduRegenerationTimer == null || m_enduRegenerationTimer.IsAlive)
                 return;
-            lock (m_regenTimerLock)
-            {
-                if (m_enduRegenerationTimer == null)
-                {
-                    m_enduRegenerationTimer = new RegionTimer(this);
-                    m_enduRegenerationTimer.Callback = new RegionTimerCallback(EnduranceRegenerationTimerCallback);
-                }
-                else if (m_enduRegenerationTimer.IsAlive)
-                {
-                    return;
-                }
-                m_enduRegenerationTimer.Start(EnduranceRegenerationPeriod);
-            }
+            m_enduRegenerationTimer.Start(EnduranceRegenerationPeriod);
         }
         /// <summary>
         /// Stop the health regeneration
         /// </summary>
-        public virtual void StopHealthRegeneration()
-        {
-            lock (m_regenTimerLock)
-            {
-                if (m_healthRegenerationTimer == null)
-                    return;
-                m_healthRegenerationTimer.Stop();
-                m_healthRegenerationTimer = null;
-            }
-        }
+        public virtual void StopHealthRegeneration() => m_healthRegenerationTimer?.Stop();
+
         /// <summary>
         /// Stop the power regeneration
         /// </summary>
-        public virtual void StopPowerRegeneration()
-        {
-            lock (m_regenTimerLock)
-            {
-                if (m_powerRegenerationTimer == null)
-                    return;
-                m_powerRegenerationTimer.Stop();
-                m_powerRegenerationTimer = null;
-            }
-        }
+        public virtual void StopPowerRegeneration() => m_powerRegenerationTimer?.Stop();
+
         /// <summary>
         /// Stop the endurance regeneration
         /// </summary>
-        public virtual void StopEnduranceRegeneration()
-        {
-            lock (m_regenTimerLock)
-            {
-                if (m_enduRegenerationTimer == null)
-                    return;
-                m_enduRegenerationTimer.Stop();
-                m_enduRegenerationTimer = null;
-            }
-        }
+        public virtual void StopEnduranceRegeneration() => m_enduRegenerationTimer?.Stop();
 
         /// <summary>
         /// Timer callback for the hp regeneration
         /// </summary>
         /// <param name="callingTimer">timer calling this function</param>
-        protected virtual int HealthRegenerationTimerCallback(RegionTimer callingTimer)
+        protected virtual int HealthRegenerationTimerCallback(ECSGameTimer callingTimer)
         {
             if (Health < MaxHealth)
             {
@@ -5675,7 +5445,7 @@ namespace DOL.GS
         /// Callback for the power regenerationTimer
         /// </summary>
         /// <param name="selfRegenerationTimer">timer calling this function</param>
-        protected virtual int PowerRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
+        protected virtual int PowerRegenerationTimerCallback(ECSGameTimer selfRegenerationTimer)
         {
             if (this is GamePlayer {CharacterClass.ID: (int)eCharacterClass.Vampiir or (> 59 and < 63 /* maulers */) })
             {
@@ -5732,7 +5502,7 @@ namespace DOL.GS
         /// Callback for the endurance regenerationTimer
         /// </summary>
         /// <param name="selfRegenerationTimer">timer calling this function</param>
-        protected virtual int EnduranceRegenerationTimerCallback(RegionTimer selfRegenerationTimer)
+        protected virtual int EnduranceRegenerationTimerCallback(ECSGameTimer selfRegenerationTimer)
         {
             if (Endurance < MaxEndurance)
             {
@@ -6394,8 +6164,33 @@ namespace DOL.GS
         /// True if the living is moving, else false.
         /// </summary>
         public virtual bool IsMoving => CurrentSpeed != 0;
-        
-        public virtual Motion Motion { get; set; } = new Motion();
+
+        private Motion m_motion = new Motion();
+        private long m_lastMovementTick;
+
+        public virtual Motion Motion
+        {
+            get => m_motion;
+            set
+            {
+                Motion previous = m_motion;
+                Motion next = value ?? new Motion();
+
+                if (previous == null || previous.Speed != 0 || next.Speed != 0
+                    || !previous.CurrentPosition.Coordinate.Equals(next.Start.Coordinate))
+                {
+                    m_lastMovementTick = GameLoop.GameLoopTime;
+                }
+                m_motion = next;
+            }
+        }
+
+        /// <summary>
+        /// GameLoop time (ms) of the last position change. A moving living always returns "now".
+        /// Used by LosCheckHandler to know whether a cached line-of-sight answer is still valid.
+        /// (Equivalent of OpenDAoC's movementComponent.LastMovementTick.)
+        /// </summary>
+        public virtual long LastMovementTick => IsMoving ? GameLoop.GameLoopTime : m_lastMovementTick;
 
         public bool IsWithinOrMovingIntoRadius(Position target, float distance, bool ignoreZ = false) => target.Region == CurrentRegion && IsWithinOrMovingIntoRadius(target.Coordinate, distance, ignoreZ);
         public bool IsWithinOrMovingIntoRadius(GameObject target, float distance, bool ignoreZ = false) => IsWithinOrMovingIntoRadius(target.Position, distance, ignoreZ);
@@ -7211,13 +7006,10 @@ namespace DOL.GS
             if (!base.RemoveFromWorld()) return false;
 
             StopAttack();
-            List<GameObject> temp;
-            lock (Attackers)
-            {
-                temp = new List<GameObject>(m_attackers);
-                m_attackers.Clear();
-            }
-            Util.ForEach(temp.OfType<GameLiving>(), o => o.EnemyKilled(this));
+            castingComponent.Stop();
+            List<GameLiving> temp = m_attackerTracker.GetAttackersSnapshot();
+            m_attackerTracker.Clear();
+            foreach (GameLiving o in temp) o.EnemyKilled(this);
             StopHealthRegeneration();
             StopPowerRegeneration();
             StopEnduranceRegeneration();
@@ -7329,6 +7121,8 @@ namespace DOL.GS
         /// </summary>
         public virtual void StopCurrentSpellcast()
         {
+            castingComponent.ClearFollowUp();
+
             if (m_runningSpellHandler != null)
                 m_runningSpellHandler.InterruptCasting();
         }
@@ -7560,85 +7354,45 @@ namespace DOL.GS
         public static bool TaskSafeguardCheck(GamePlayer player, GameLiving enemy, string taskName, bool isArena = false)
         {
             if (player == null || enemy == null) return false;
-
-            if (taskName != "EnemyKilledInDuel")
-            {
-                if (!player.IsWithinRadius(enemy, 3800))
-                    return false;
-            }
+            if (taskName != "EnemyKilledInDuel" && !player.IsWithinRadius(enemy, 3800)) return false;
 
             int groupSize = 1;
-            GamePlayer highestLevelPlayer = player;
-
+            int highestLevel = player.EffectiveLevel;
             if (player.Group != null)
             {
                 groupSize = player.Group.MemberCount;
                 foreach (GamePlayer member in player.Group.GetPlayersInTheGroup())
-                {
-                    if (member.Level > highestLevelPlayer.Level)
-                        highestLevelPlayer = member;
-                }
+                    if (member.EffectiveLevel > highestLevel) highestLevel = member.EffectiveLevel;
             }
 
-            // Tiers: 0 = Grey/Green, 1 = Blue, 2 = Yellow, 3 = Orange/Red/Purple
-            int groupConTier = 0;
-            int soloConTier = 0;
-
-            if (enemy is GamePlayer)
-            {
-                // PvP: Use Level Difference, exactly like the Adrenaline/Tension system.
-                int groupDiff = enemy.EffectiveLevel - highestLevelPlayer.EffectiveLevel;
-                int soloDiff = enemy.EffectiveLevel - player.EffectiveLevel;
-
-                groupConTier = groupDiff <= -5 ? 0 : (groupDiff <= -2 ? 1 : (groupDiff <= 2 ? 2 : 3));
-                soloConTier = soloDiff <= -5 ? 0 : (soloDiff <= -2 ? 1 : (soloDiff <= 2 ? 2 : 3));
-            }
-            else
-            {
-                // PvE: player.GetConLevel(enemy) returns a double.
-                // Decimals like -1.5 (Blue) are cleanly caught by evaluating the exact threshold.
-                double groupCon = highestLevelPlayer.GetConLevel(enemy);
-                groupConTier = groupCon >= 0.01 ? 3 : (groupCon >= -0.99 ? 2 : (groupCon >= -1.99 ? 1 : 0));
-
-                double soloCon = player.GetConLevel(enemy);
-                soloConTier = soloCon >= 0.01 ? 3 : (soloCon >= -0.99 ? 2 : (soloCon >= -1.99 ? 1 : 0));
-            }
-
+            int enemyLevel = enemy.EffectiveLevel;
+            bool pvp = enemy is GamePlayer;
+            int groupConTier = pvp ? LegacyConLevelGrid.GetPvPTaskTier(highestLevel, enemyLevel) : LegacyConLevelGrid.GetNpcTaskTier(highestLevel, enemyLevel);
+            int soloConTier = pvp ? LegacyConLevelGrid.GetPvPTaskTier(player.EffectiveLevel, enemyLevel) : LegacyConLevelGrid.GetNpcTaskTier(player.EffectiveLevel, enemyLevel);
             bool isBattlegroup = player.BattleGroup != null;
 
             if (taskName == "EnemyKilledInDuel")
-            {
-                if (isArena) return true;
-                return soloConTier >= 1; // Blue+
-            }
+                return isArena || soloConTier >= 1;
 
             if (taskName == "EnemiesKilledInAdrenalineMode")
             {
-                if (isBattlegroup)
-                {
-                    if (player.Group != null && groupSize >= 4) return groupConTier >= 3; // Orange+
-                    return groupConTier >= 2; // Yellow+
-                }
-                else
-                {
-                    if (groupSize >= 2 && groupSize <= 8) return groupConTier >= 2; // Yellow+
-                    return soloConTier >= 1; // Blue+
-                }
+                if (isBattlegroup) return (player.Group != null && groupSize >= 4) ? groupConTier >= 3 : groupConTier >= 2;
+                if (groupSize >= 2 && groupSize <= 8) return groupConTier >= 2;
+                return soloConTier >= 1;
             }
 
             if (taskName == "EpicBossesSlaughtered")
             {
-                if (groupSize >= 5 && groupSize <= 8) return groupConTier >= 3; // Orange+
-                if (groupSize >= 2 && groupSize <= 4) return groupConTier >= 2; // Yellow+
-                return soloConTier >= 1; // Blue+
+                if (groupSize >= 5 && groupSize <= 8) return groupConTier >= 3;
+                if (groupSize >= 2 && groupSize <= 4) return groupConTier >= 2;
+                return soloConTier >= 1;
             }
 
             if (isBattlegroup) return false;
             if (isArena) return true;
-
-            if (groupSize >= 5 && groupSize <= 8) return groupConTier >= 3; // Orange+
-            if (groupSize >= 2 && groupSize <= 4) return groupConTier >= 2; // Yellow+
-            return soloConTier >= 1; // Blue+
+            if (groupSize >= 5 && groupSize <= 8) return groupConTier >= 3;
+            if (groupSize >= 2 && groupSize <= 4) return groupConTier >= 2;
+            return soloConTier >= 1;
         }
 
         #endregion
@@ -7701,7 +7455,8 @@ namespace DOL.GS
             m_rangedAttackType = eRangedAttackType.Normal;
             m_effects = CreateEffectsList();
             m_concEffects = new ConcentrationList(this);
-            m_attackers = new List<GameObject>();
+            m_attackerTracker = new AttackerTracker(this);
+            castingComponent = new CastingComponent(this);
 
             m_health = 1;
             m_mana = 1;
@@ -7709,6 +7464,10 @@ namespace DOL.GS
             m_maxEndurance = 1;
 
             CanStealth = false;
+
+            m_healthRegenerationTimer = new ECSGameTimer(this, HealthRegenerationTimerCallback);
+            m_powerRegenerationTimer = new ECSGameTimer(this, PowerRegenerationTimerCallback);
+            m_enduRegenerationTimer = new ECSGameTimer(this, EnduranceRegenerationTimerCallback);
         }
     }
 }

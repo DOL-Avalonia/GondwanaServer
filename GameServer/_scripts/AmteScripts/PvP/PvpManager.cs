@@ -59,12 +59,15 @@ namespace AmteScripts.Managers
         // Time window, e.g. 14:00..22:00
         private static readonly TimeSpan _startTime = new TimeSpan(14, 0, 0);
         private static readonly TimeSpan _endTime = _startTime.Add(TimeSpan.FromHours(8));
+        private static readonly string ScoreDirectory = "temp";
+        private static readonly string ScoreFilePath = System.IO.Path.Combine(ScoreDirectory, "PvPScore.dat");
+        private static readonly object _scoreFileLock = new object();
         private const int _checkInterval = 30_000; // 30 seconds
         private const int _saveDelay = 5_000;
-        private static RegionTimer _timer;
-        private RegionTimer _saveTimer;
+        private static ECSGameTimer _timer;
+        private ECSGameTimer _saveTimer;
         private DateTime _startedTime = DateTime.Now;
-        private RegionTimer _ctfMapUpdateTimer;
+        private ECSGameTimer _ctfMapUpdateTimer;
         private int _playersInPvP = 0;
         public int PeakPlayerCount { get; private set; } = 0;
 
@@ -103,11 +106,11 @@ namespace AmteScripts.Managers
 
         // Boss Hunt Variables
         private List<GameNPC> _activeBosses = new List<GameNPC>();
-        private RegionTimer _bossHuntMapTimer;
+        private ECSGameTimer _bossHuntMapTimer;
 
         // King of the Hill Variables & Constants
         private KotHBanner _activeHill;
-        private RegionTimer _kothGameLoop;
+        private ECSGameTimer _kothGameLoop;
         private List<Spawn> _kothPotentialSpawns = new List<Spawn>();
         private Queue<Spawn> _kothRotationQueue = new Queue<Spawn>();
         private const int KOTH_TICK_RATE = 8000;
@@ -116,9 +119,9 @@ namespace AmteScripts.Managers
         private const int KOTH_MARKER_ID = 40;
 
         // Core Run Variables & Constants
-        private RegionTimer _coreRunCycleTimer;
-        private RegionTimer _coreRunMovementTimer;
-        private RegionTimer _coreRunDecayTimer;
+        private ECSGameTimer _coreRunCycleTimer;
+        private ECSGameTimer _coreRunMovementTimer;
+        private ECSGameTimer _coreRunDecayTimer;
         private GameNPC _coreRunAnchorNPC;
         private bool _isCoreRunRedLight = false;
         private CoreRunTore _coreRunToreArea;
@@ -139,8 +142,8 @@ namespace AmteScripts.Managers
         private const int MODEL_RED_LIGHT = 3498;
         private const int SPELL_GREEN_LIGHT = 25318;
         private const int SPELL_RED_LIGHT = 25317;
-        private const int CORE_RUN_EFFECT_AMOUNT = 2;
-        private const int CORE_RUN_EFFECT_FREQ = 1500;
+        private const int CORE_RUN_EFFECT_AMOUNT = 1;
+        private const int CORE_RUN_EFFECT_FREQ = 2200;
         private const int CORE_RUN_STORM_LEVEL = 60;
         private const int CORE_RUN_STORM_SIZE = 80;
         private const int CORE_RUN_EFFECT_VARIANCE = 20;
@@ -149,7 +152,7 @@ namespace AmteScripts.Managers
         private const int PREDATOR_MINIMUM_SESSION_SECONDS_LEFT = 300;
 
         // Biohazard Variables
-        private RegionTimer _biohazardTimer;
+        private ECSGameTimer _biohazardTimer;
         private int _biohazardTicks;
         private List<GameNPC> _biohazardSpawns = new List<GameNPC>();
         private List<BiohazardChest> _activeBiohazardChests = new List<BiohazardChest>();
@@ -241,7 +244,7 @@ namespace AmteScripts.Managers
         [NotNull] private readonly Dictionary<Guild, Group> _guildGroups = new Dictionary<Guild, Group>();
         [NotNull] private readonly object _groupsLock = new object();
         // Grace timer for PvP players who get linkdead so they don't lose their progress
-        [NotNull] private readonly ReaderWriterDictionary<string, RegionTimer> _graceTimers = new();
+        [NotNull] private readonly ReaderWriterDictionary<string, ECSGameTimer> _graceTimers = new();
         [NotNull] private readonly List<Guild> _allGuilds = new();
         [NotNull] private readonly List<GameFlagBasePad> _allBasePads = new List<GameFlagBasePad>();
         // Keep track of last guild of each player for scores to protect from griefing
@@ -250,7 +253,7 @@ namespace AmteScripts.Managers
         private static readonly ReaderWriterDictionary<string, PvPEntity> _allParticipants = new();
 
         private int _flagCounter = 0;
-        private RegionTimer _territoryOwnershipTimer = null;
+        private ECSGameTimer _territoryOwnershipTimer = null;
 
         private PvPPredatorManager _predatorManager = new();
         private long _predatorTimeLeft = 0;
@@ -264,15 +267,15 @@ namespace AmteScripts.Managers
         
         public eSessionTypes CurrentSessionType { get => IsOpen ? (eSessionTypes)(_activeSession?.SessionType ?? 0) : eSessionTypes.None; }
 
-        private RegionTimer _predatorTimer;
-        public bool IsPredatorEnabled { get => IsOpen ? _activeSession.MinTeamsForPredator >= 0 : false; }
+        private ECSGameTimer _predatorTimer;
+        public bool IsPredatorEnabled { get => IsOpen ? _activeSession!.MinTeamsForPredator >= 0 : false; }
 
         /// <summary>
         /// Called when a PvP linkdead player’s grace period expires.
         /// The callback removes the player from the PvP session (using the same cleanup as for quitting)
         /// and disconnects the client.
         /// </summary>
-        protected int LinkdeathPvPGraceCallback(GamePlayer player, RegionTimer timer)
+        protected int LinkdeathPvPGraceCallback(GamePlayer player, ECSGameTimer timer)
         {
             if (log.IsInfoEnabled)
                 log.InfoFormat("PvP grace period expired for linkdead player {0}({1}). Removing from PvP.", player.Name, player.Client.Account.Name);
@@ -280,9 +283,9 @@ namespace AmteScripts.Managers
             _graceTimers.Remove(player.InternalID);
 
             if (player.ObjectState == GameObject.eObjectState.Active)
-                PvpManager.Instance.KickPlayer(player);
+                KickPlayer(player);
             else
-                PvpManager.Instance.CleanupPlayer(player);
+                CleanupPlayer(player);
             return 0;
         }
 
@@ -336,11 +339,9 @@ namespace AmteScripts.Managers
                 return;
             
             int gracePeriodMs = 20 * 60 * 1000;
-            var timerRegion = WorldMgr.GetRegion(1);
-            var timer = new RegionTimer(timerRegion.TimeManager);
-
+            var timer = new ECSGameTimer(player, t => LinkdeathPvPGraceCallback(player, t));
             _graceTimers[player.InternalID] = timer;
-            
+
             if (CurrentSessionType is eSessionTypes.CaptureTheFlag)
             {
                 // Remove any FlagInventoryItem items from the player's backpack
@@ -362,9 +363,8 @@ namespace AmteScripts.Managers
             }
 
             _allParticipants.Remove(player.InternalID);
-            
-            timer.Callback = (t) => LinkdeathPvPGraceCallback(player, t);
-            timer.Start(1 + gracePeriodMs);
+
+            timer.Start(gracePeriodMs);
             if (log.IsInfoEnabled)
                 log.InfoFormat("Linkdead PvP player {0}({1}) will be removed in {2} minutes if not reconnected.", player.Name, player.Client.Account.Name, gracePeriodMs / 60000);
         }
@@ -375,33 +375,24 @@ namespace AmteScripts.Managers
             log.Info("PvpManager: Loading or Starting...");
 
             // Create the timer in region 1 for the open/close checks
-            var region = WorldMgr.GetRegion(1);
-            if (region != null)
-            {
-                _timer = new RegionTimer(region.TimeManager);
-                _timer.Callback = Instance.TickCheck;
-                _timer.Start(10_000); // start after 10s
-                Instance._saveTimer = new RegionTimer(region.TimeManager);
-                Instance._saveTimer.Callback = _ =>
-                {
-                    Instance._SaveScore();
-                    return 0;
-                };
-            }
-            else
-            {
-                log.Warn("PvpManager: Could not find Region(1) for timer!");
-            }
+            _timer = new ECSGameTimer(null, Instance.TickCheck);
+            _timer.Start(10000);
 
-            // Load the DB sessions
+            Instance._saveTimer = new ECSGameTimer(null, _ => { Instance._SaveScore(); return 0; });
+
             PvpSessionMgr.ReloadSessions();
 
-            if (File.Exists("temp/PvPScore.dat"))
+            try
             {
-                // Reopen saved session
-                Instance.Open(string.Empty, false);
+                Directory.CreateDirectory(ScoreDirectory);
+                if (File.Exists(ScoreFilePath))
+                    Instance.Open(string.Empty, false);
             }
-            
+            catch (Exception ex)
+            {
+                log.Error("[PvP] Could not restore previous session from score file on startup.", ex);
+            }
+
             GameEventMgr.AddHandler(GamePlayerEvent.GameEntered, Instance.OnPlayerLogin);
             GameEventMgr.AddHandler(GamePlayerEvent.RegionChanged, Instance.OnPlayerRegionChanged);
         }
@@ -468,7 +459,7 @@ namespace AmteScripts.Managers
             bool ignore = false;
             _graceTimers.FreezeWhile((d) =>
             {
-                if (d.TryGetValue(player.InternalID, out RegionTimer timer))
+                if (d.TryGetValue(player.InternalID, out ECSGameTimer timer))
                 {
                     if (timer.IsAlive)
                     {
@@ -568,7 +559,7 @@ namespace AmteScripts.Managers
         {
             if (sender is GamePlayer { IsInPvP: true } player)
             {
-                new RegionTimer(player, t =>
+                new ECSGameTimer(player, t =>
                 {
                     if (CurrentSessionType == eSessionTypes.TerritoryCapture)
                         UpdateAllTerritoryMarkers(player);
@@ -935,7 +926,7 @@ namespace AmteScripts.Managers
         private bool TryRestorePlayer(GamePlayer player, RvrPlayer rec)
         {
             bool wasLinkDead = false;
-            RegionTimer graceTimer;
+            ECSGameTimer graceTimer;
             if (_graceTimers.Remove(player.InternalID, out graceTimer))
             {
                 wasLinkDead = true;
@@ -1120,7 +1111,7 @@ namespace AmteScripts.Managers
         }
 
         #region Timer Check
-        private int TickCheck(RegionTimer timer)
+        private int TickCheck(ECSGameTimer timer)
         {
             if (!_isOpen)
             {
@@ -1240,28 +1231,7 @@ namespace AmteScripts.Managers
                 try
                 {
                     if (string.IsNullOrEmpty(sessionID))
-                    {
-                        try
-                        {
-                            sessionID = LoadScores();
-                        }
-                        catch (FileNotFoundException)
-                        {
-                            // fine
-                        }
-                        catch (Exception ex)
-                        {
-                            try
-                            {
-                                log.Error("Could not open file temp/PvPScore.dat: ", ex);
-                                File.Move("temp/PvPScore.dat", $"temp/PvPScore-error-{DateTime.Now:yy-MM-dd.hh-mm-ss}.dat");
-                            }
-                            catch (Exception ex2)
-                            {
-                                log.Error("Could not move temp/PvPScore.dat after error: ", ex2);
-                            }
-                        }
-                    }
+                        sessionID = TryLoadScores();
 
                     if (string.IsNullOrEmpty(sessionID))
                     {
@@ -1346,8 +1316,7 @@ namespace AmteScripts.Managers
                     var timerRegion = WorldMgr.GetRegion(1);
                     if (timerRegion != null)
                     {
-                        _ctfMapUpdateTimer = new RegionTimer(timerRegion.TimeManager);
-                        _ctfMapUpdateTimer.Callback = CTFMapUpdateCallback;
+                        _ctfMapUpdateTimer = new ECSGameTimer(null, CTFMapUpdateCallback);
                         _ctfMapUpdateTimer.Start(2000);
                     }
 
@@ -1384,10 +1353,8 @@ namespace AmteScripts.Managers
                     var reg = WorldMgr.GetRegion(1);
                     if (reg != null)
                     {
-                        _territoryOwnershipTimer = new RegionTimer(reg.TimeManager);
-                        _territoryOwnershipTimer.Callback = AwardTerritoryOwnershipPoints;
-                        _territoryOwnershipTimer.Interval = 20_000;
-                        _territoryOwnershipTimer.Start(10_000);
+                        _territoryOwnershipTimer = new ECSGameTimer(null, AwardTerritoryOwnershipPoints);
+                        _territoryOwnershipTimer.Start(10000);
                     }
                 }
 
@@ -1405,8 +1372,7 @@ namespace AmteScripts.Managers
                     var timerRegion = WorldMgr.GetRegion(1);
                     if (timerRegion != null)
                     {
-                        _bossHuntMapTimer = new RegionTimer(timerRegion.TimeManager);
-                        _bossHuntMapTimer.Callback = BossHuntMapUpdateCallback;
+                        _bossHuntMapTimer = new ECSGameTimer(null, BossHuntMapUpdateCallback);
                         _bossHuntMapTimer.Start(3000);
                     }
                 }
@@ -1442,8 +1408,7 @@ namespace AmteScripts.Managers
 
                     if (_activeHill != null)
                     {
-                        _kothGameLoop?.Stop();
-                        _kothGameLoop = new RegionTimer(_activeHill, KotHLoopCallback);
+                        _kothGameLoop = new ECSGameTimer(_activeHill, KotHLoopCallback);
                         _kothGameLoop.Start(KOTH_TICK_RATE);
                     }
                 }
@@ -1461,10 +1426,41 @@ namespace AmteScripts.Managers
             return true;
         }
 
+        /// <summary>
+        /// Safe wrapper around LoadScores: never throws, archives broken files.
+        /// </summary>
+        private string TryLoadScores()
+        {
+            lock (_scoreFileLock)
+            {
+                try
+                {
+                    Directory.CreateDirectory(ScoreDirectory);
+                    if (!File.Exists(ScoreFilePath))
+                        return string.Empty;
+                    return LoadScores();
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"[PvP] Could not load {ScoreFilePath}, archiving it.", ex);
+                    try
+                    {
+                        if (File.Exists(ScoreFilePath))
+                            File.Move(ScoreFilePath, Path.Combine(ScoreDirectory, $"PvPScore-error-{DateTime.Now:yy-MM-dd.HH-mm-ss}.dat"), true);
+                    }
+                    catch (Exception moveEx)
+                    {
+                        log.Warn($"[PvP] Could not archive broken score file {ScoreFilePath}.", moveEx);
+                    }
+                    return string.Empty;
+                }
+            }
+        }
+
         private string LoadScores()
         {
-            using var lines = File.ReadLines("temp/PvPScore.dat").GetEnumerator();
-                    
+            using var lines = File.ReadLines(ScoreFilePath).GetEnumerator();
+
             bool finished = !lines.MoveNext();
             if (finished)
                 return string.Empty;
@@ -1848,13 +1844,10 @@ namespace AmteScripts.Managers
                 }
                 _groupAreas.Clear();
 
-                try
+                lock (_scoreFileLock)
                 {
-                    File.Delete("temp/PvPScore.dat");
-                }
-                catch (FileNotFoundException)
-                {
-                    // fine
+                    try { File.Delete(ScoreFilePath); }
+                    catch (Exception ex) { log.Warn($"[PvP] Could not delete {ScoreFilePath} on close.", ex); }
                 }
 
                 foreach (var value in _allGuilds)
@@ -1874,50 +1867,48 @@ namespace AmteScripts.Managers
                 return true;
             }
         }
-        
+
         private void _SaveScore()
         {
-            Directory.CreateDirectory("temp");
-
-            Dictionary<Guild, PvPGroupScore> groupScores;
-            Dictionary<string, PvPScore> playerScores;
-            Dictionary<string, PvPScore> totalScores;
+            Dictionary<Guild, PvPGroupScore> gs;
+            Dictionary<string, PvPScore> ps, ts;
             bool forced;
+            string sessionId;
 
             lock (_sessionLock)
             {
-                if (!IsOpen)
-                    return;
-
-                groupScores = new(_groupScores.Select(gs => new KeyValuePair<Guild, PvPGroupScore>(gs.Key, new PvPGroupScore(gs.Value))));
-                playerScores = new(_soloScores.Select(kv => new KeyValuePair<string, PvPScore>(kv.Key, kv.Value.Copy())));
-                totalScores = new(_totalScores.Select(kv => new KeyValuePair<string, PvPScore>(kv.Key, kv.Value.Copy())));
+                if (!IsOpen) return;
+                sessionId = CurrentSession!.SessionID;
+                gs = new(_groupScores.Select(x => new KeyValuePair<Guild, PvPGroupScore>(x.Key, new PvPGroupScore(x.Value))));
+                ps = new(_soloScores.Select(x => new KeyValuePair<string, PvPScore>(x.Key, x.Value.Copy())));
+                ts = new(_totalScores.Select(x => new KeyValuePair<string, PvPScore>(x.Key, x.Value.Copy())));
                 forced = _isForcedOpen;
             }
 
-            var options = new FileStreamOptions();
-            options.Mode = FileMode.Create;
-            using StreamWriter file = File.CreateText("temp/PvPScore.dat");
-            file.WriteLine($"{CurrentSession.SessionID};{forced}");
-            file.WriteLine();
-            foreach (var (guild, score) in groupScores)
+            var sb = new System.Text.StringBuilder(4096);
+            sb.Append(sessionId).Append(';').Append(forced).Append('\n').Append('\n');
+            foreach (var (g, s) in gs)
             {
-                file.Write($"g;{guild.Name};");
-                file.Write(score.Serialize());
-                file.WriteLine();
-                foreach (var groupEntry in score.Scores)
+                sb.Append("g;").Append(g.Name).Append(';').Append(s.Serialize()).Append('\n');
+                foreach (var e in s.Scores) sb.Append(e.Value.Serialize()).Append('\n');
+                sb.Append('\n');
+            }
+            foreach (var (_, s) in ps) sb.Append("s;").Append(s.Serialize()).Append('\n');
+            foreach (var (_, s) in ts) sb.Append("ps;").Append(s.Serialize()).Append('\n');
+
+            lock (_scoreFileLock)
+            {
+                try
                 {
-                    file.WriteLine(groupEntry.Value.Serialize());
+                    Directory.CreateDirectory(ScoreDirectory);
+                    string tmp = ScoreFilePath + ".tmp";
+                    File.WriteAllText(tmp, sb.ToString());
+                    File.Move(tmp, ScoreFilePath, true);
                 }
-                file.WriteLine();
-            }
-            foreach (var (player, score) in playerScores)
-            {
-                file.WriteLine("s;" + score.Serialize());
-            }
-            foreach (var (player, score) in totalScores)
-            {
-                file.WriteLine("ps;" + score.Serialize());
+                catch (Exception ex)
+                {
+                    log.Error($"[PvP] Failed to save {ScoreFilePath}.", ex);
+                }
             }
         }
 
@@ -2460,12 +2451,7 @@ namespace AmteScripts.Managers
                 {
                     if (!_predatorManager.Active && _predatorTimer?.IsAlive != true)
                     {
-                        _predatorTimer = new RegionTimer(CurrentRegion.TimeManager);
-                        _predatorTimer.Callback = (time) =>
-                        {
-                            var interval = CheckPredator();
-                            return interval;
-                        };
+                        _predatorTimer = new ECSGameTimer(null, t => CheckPredator());
                         log.DebugFormat("[PVP] Starting predator check timer ({0:.##} seconds).", PREDATOR_CHECK_INTERVAL / 1000.0f);
                         _predatorTimer.Start(PREDATOR_CHECK_INTERVAL);
                     }
@@ -3122,11 +3108,7 @@ namespace AmteScripts.Managers
         private void ScheduleRulesPopup(GamePlayer player, int delay = 2000)
         {
             if (player == null) return;
-            new RegionTimer(player, t =>
-            {
-                SendPvPRules(player);
-                return 0;
-            }).Start(delay);
+            new ECSGameTimer(player, t => { SendPvPRules(player); return 0; }, delay);
         }
 
         /// <summary>
@@ -3580,7 +3562,7 @@ namespace AmteScripts.Managers
 
         #region CaptureTerritories Methods
 
-        private int AwardTerritoryOwnershipPoints(RegionTimer timer)
+        private int AwardTerritoryOwnershipPoints(ECSGameTimer timer)
         {
             // 1) Make sure session is open, type=5
             if (!_isOpen || CurrentSessionType is not eSessionTypes.TerritoryCapture)
@@ -3756,7 +3738,7 @@ namespace AmteScripts.Managers
             SaveScores();
         }
 
-        private int BossHuntMapUpdateCallback(RegionTimer timer)
+        private int BossHuntMapUpdateCallback(ECSGameTimer timer)
         {
             if (!IsOpen || CurrentSessionType != eSessionTypes.BossHunt)
                 return 0;
@@ -3845,11 +3827,11 @@ namespace AmteScripts.Managers
             }
             
             _kothGameLoop?.Stop();
-            _kothGameLoop = new RegionTimer(_activeHill, KotHLoopCallback);
+            _kothGameLoop = new ECSGameTimer(_activeHill, KotHLoopCallback);
             _kothGameLoop.Start(KOTH_TICK_RATE);
         }
 
-        private int KotHLoopCallback(RegionTimer timer)
+        private int KotHLoopCallback(ECSGameTimer timer)
         {
             if (!IsOpen || _activeHill == null) return 0;
 
@@ -4262,9 +4244,9 @@ namespace AmteScripts.Managers
             BroadcastCoreRunMessage("PvPManager.CoreRun.Begins", eChatType.CT_ScreenCenter);
             _coreRunToreArea.UpdateVisuals(false);
 
-            _coreRunCycleTimer = new RegionTimer(_coreRunAnchorNPC, CoreRunCycleCallback);
+            _coreRunCycleTimer = new ECSGameTimer(_coreRunAnchorNPC, CoreRunCycleCallback);
             _coreRunCycleTimer.Start(10000);
-            _coreRunDecayTimer = new RegionTimer(_coreRunAnchorNPC, CoreRunDecayCallback);
+            _coreRunDecayTimer = new ECSGameTimer(_coreRunAnchorNPC, CoreRunDecayCallback);
             _coreRunDecayTimer.Start(5200);
 
             GameEventMgr.AddHandler(AreaEvent.PlayerEnter, new DOLEventHandler(OnCoreRunAreaEnter));
@@ -4356,7 +4338,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        private int CoreRunCycleCallback(RegionTimer timer)
+        private int CoreRunCycleCallback(ECSGameTimer timer)
         {
             if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun || _coreRunToreArea == null) return 0;
 
@@ -4369,7 +4351,7 @@ namespace AmteScripts.Managers
                 BroadcastCoreRunDangerMessage("PvPManager.CoreRun.RedLight", eChatType.CT_ScreenCenter);
                 SnapshotTorePlayers();
 
-                _coreRunMovementTimer = new RegionTimer(_coreRunAnchorNPC, CoreRunMovementCheckCallback);
+                _coreRunMovementTimer = new ECSGameTimer(_coreRunAnchorNPC, CoreRunMovementCheckCallback);
                 _coreRunMovementTimer.Start(500);
 
                 return Util.Random(4500, 8000);
@@ -4404,7 +4386,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        private int CoreRunMovementCheckCallback(RegionTimer timer)
+        private int CoreRunMovementCheckCallback(ECSGameTimer timer)
         {
             if (!IsOpen || !_isCoreRunRedLight) return 0;
 
@@ -4566,7 +4548,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        private int CoreRunDecayCallback(RegionTimer timer)
+        private int CoreRunDecayCallback(ECSGameTimer timer)
         {
             if (!IsOpen || CurrentSessionType != eSessionTypes.CoreRun || _coreRunToreArea == null)
                 return 0;
@@ -4657,8 +4639,7 @@ namespace AmteScripts.Managers
             var timerRegion = WorldMgr.GetRegion(1);
             if (timerRegion != null)
             {
-                _biohazardTimer = new RegionTimer(timerRegion.TimeManager);
-                _biohazardTimer.Callback = BiohazardTimerCallback;
+                _biohazardTimer = new ECSGameTimer(null, BiohazardTimerCallback);
                 _biohazardTimer.Start(4000);
             }
         }
@@ -4791,7 +4772,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        private int BiohazardTimerCallback(RegionTimer timer)
+        private int BiohazardTimerCallback(ECSGameTimer timer)
         {
             try
             {
@@ -4877,7 +4858,7 @@ namespace AmteScripts.Managers
 
         #region CTF methods
 
-        private int CTFMapUpdateCallback(RegionTimer timer)
+        private int CTFMapUpdateCallback(ECSGameTimer timer)
         {
             if (!IsOpen || CurrentSessionType != eSessionTypes.CaptureTheFlag)
                 return 0;
