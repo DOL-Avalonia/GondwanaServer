@@ -138,7 +138,7 @@ namespace DOL.GS.Scripts
                         }
                     }
 
-                    new RegionTimer(this, _ =>
+                    new ECSGameTimer(this, _ =>
                     {
                         foreach (GamePlayer obs in this.GetPlayersInRadius((ushort)WorldMgr.VISIBILITY_DISTANCE))
                         {

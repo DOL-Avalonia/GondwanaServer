@@ -107,11 +107,7 @@ namespace DOL.GS.Quests
                         {
                             player.Inventory.RemoveCountFromStack(usedItem, 1);
                         }
-                        Task.Run(async () =>
-                        {
-                            string msg = await TranslateGoalText(player, m_text);
-                            player.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
-                        });
+                        GameLoopAsync.Then(TranslateGoalText(player, m_text), player, static (msg, p) => p.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg));
                     }
                 }
             }

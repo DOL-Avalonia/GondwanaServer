@@ -341,7 +341,7 @@ namespace DOL.GS.Spells
             if (point == Coordinate.Nowhere) return;
             if (Caster.CurrentRegion == null || Caster.CurrentRegion.GetZone(point) == null) return;
 
-            new RegionTimer(Caster, t =>
+            new ECSGameTimer(Caster, t =>
             {
                 if (!Caster.IsAlive || Caster.ObjectState != GameObject.eObjectState.Active) return 0;
 
@@ -382,7 +382,7 @@ namespace DOL.GS.Spells
                 stormPoint.AddToWorld();
 
                 // Delay effect burst matching exact Area delay mechanics natively
-                new RegionTimer(stormPoint, (st) =>
+                new ECSGameTimer(stormPoint, st =>
                 {
                     if (stormPoint.ObjectState != GameObject.eObjectState.Active) return 0;
 
@@ -458,20 +458,16 @@ namespace DOL.GS.Spells
                         }
                     }
                     return 0;
-                }).Start(250);
+                }, 250);
 
                 // Clean-up the NPC reliably
-                new RegionTimer(stormPoint, dt => {
-                    if (stormPoint.ObjectState == GameObject.eObjectState.Active)
-                    {
-                        stormPoint.RemoveFromWorld();
-                        stormPoint.Delete();
-                    }
+                new ECSGameTimer(stormPoint, dt =>
+                {
+                    if (stormPoint.ObjectState == GameObject.eObjectState.Active) { stormPoint.RemoveFromWorld(); stormPoint.Delete(); }
                     return 0;
-                }).Start(3000);
-
+                }, 3000);
                 return 0;
-            }).Start(delay);
+            }, delay);
         }
 
         public override bool CastSubSpells(GameLiving target)

@@ -90,7 +90,7 @@ namespace DOL.GS.Spells
             private set;
         }
 
-        public RegionTimer DurationTimer
+        public ECSGameTimer DurationTimer
         {
             get;
             private set;
@@ -187,7 +187,7 @@ namespace DOL.GS.Spells
 
             if (Spell.Duration > 0)
             {
-                DurationTimer = new RegionTimer(turret, _ =>
+                DurationTimer = new ECSGameTimer(turret, _ =>
                 {
                     CleanupTurret();
                     return 0;

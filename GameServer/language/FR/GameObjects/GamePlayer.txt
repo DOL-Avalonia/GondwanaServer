@@ -285,6 +285,7 @@ GameObjects.GamePlayer.PickupObject.NoOneWantsThis:			Personne dans le groupe ne
 GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:		{0} est trop loin pour être ramassé·e.
 GameObjects.GamePlayer.PickupObject.TooFarFromBoat:			Vous êtes trop loin du bateau pour embarquer.
 GameObjects.GamePlayer.PickupObject.YouGet:					Vous ramassez {0} et le mettez dans votre sac.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			Vous pouvez maintenant récupérer {0} !
 GameObjects.GamePlayer.PickupObject.YouPickUp:				Vous ramassez {0}.
 GameObjects.GamePlayer.PickupObject.YourLootShare:			votre part du butin est de {0}.
 GameObjects.GamePlayer.PickupObject.GuildDueTax:			Votre taxe de {0} va dans la caisse de guilde.

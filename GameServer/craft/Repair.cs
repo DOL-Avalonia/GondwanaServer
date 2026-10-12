@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Reflection;
 using DOL.Database;
@@ -74,26 +56,17 @@ namespace DOL.GS
 
             int workDuration = GetRepairTime(player, item);
             player.Out.SendTimerWindow(LanguageMgr.GetTranslation(player.Client.Account.Language, "Repair.BeginWork.Repairing", item.Name), workDuration);
-            player.CraftTimer = new RegionTimer(player);
-            player.CraftTimer.Callback = new RegionTimerCallback(Proceed);
-            player.CraftTimer.Properties.setProperty(AbstractCraftingSkill.PLAYER_CRAFTER, player);
-            player.CraftTimer.Properties.setProperty(PLAYER_PARTNER, tradePartner);
-            player.CraftTimer.Properties.setProperty(AbstractCraftingSkill.RECIPE_BEING_CRAFTED, item);
-            player.CraftTimer.Start(workDuration);
+
+            player.CraftTimer = new ECSGameTimer(player, _ => Proceed(player, tradePartner, item), workDuration * 1000);
             return 1;
         }
 
         /// <summary>
         /// Called when craft time is finished
         /// </summary>
-        /// <param name="timer"></param>
         /// <returns></returns>
-        protected static int Proceed(RegionTimer timer)
+        protected static int Proceed(GamePlayer player, GamePlayer tradePartner, InventoryItem item)
         {
-            GamePlayer player = (GamePlayer)timer.Properties.getProperty<object>(AbstractCraftingSkill.PLAYER_CRAFTER, null);
-            GamePlayer tradePartner = (GamePlayer)timer.Properties.getProperty<object>(PLAYER_PARTNER, null);
-            InventoryItem item = (InventoryItem)timer.Properties.getProperty<object>(AbstractCraftingSkill.RECIPE_BEING_CRAFTED, null);
-
             if (player == null || item == null)
             {
                 if (log.IsWarnEnabled)
@@ -243,24 +216,17 @@ namespace DOL.GS
 
             int workDuration = GetRepairTime(player, siegeWeapon);
             player.Out.SendTimerWindow(LanguageMgr.GetTranslation(player.Client.Account.Language, "Repair.BeginWork.Repairing", siegeWeapon.Name), workDuration);
-            player.CraftTimer = new RegionTimer(player);
-            player.CraftTimer.Callback = new RegionTimerCallback(ProceedSiegeWeapon);
-            player.CraftTimer.Properties.setProperty(AbstractCraftingSkill.PLAYER_CRAFTER, player);
-            player.CraftTimer.Properties.setProperty(AbstractCraftingSkill.RECIPE_BEING_CRAFTED, siegeWeapon);
-            player.CraftTimer.Start(workDuration * 1000);
+
+            player.CraftTimer = new ECSGameTimer(player, _ => ProceedSiegeWeapon(player, siegeWeapon), workDuration * 1000);
             return 1;
         }
 
         /// <summary>
         /// Called when craft time is finished
         /// </summary>
-        /// <param name="timer"></param>
         /// <returns></returns>
-        protected static int ProceedSiegeWeapon(RegionTimer timer)
+        protected static int ProceedSiegeWeapon(GamePlayer player, GameSiegeWeapon siegeWeapon)
         {
-            GamePlayer player = (GamePlayer)timer.Properties.getProperty<object>(AbstractCraftingSkill.PLAYER_CRAFTER, null);
-            GameSiegeWeapon siegeWeapon = (GameSiegeWeapon)timer.Properties.getProperty<object>(AbstractCraftingSkill.RECIPE_BEING_CRAFTED, null);
-
             if (player == null || siegeWeapon == null)
             {
                 if (log.IsWarnEnabled)

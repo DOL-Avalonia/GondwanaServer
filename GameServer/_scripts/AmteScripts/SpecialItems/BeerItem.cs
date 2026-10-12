@@ -130,27 +130,21 @@ namespace DOL.GS.Scripts
 
                 if (effect)
                 {
-                    //Timer de fin des effets
-                    RegionTimer EffectTimer = new RegionTimer(player, EffectCallback);
-                    EffectTimer.Properties.setProperty("Chope", item);
-
-                    if (item.Durability > 0)
-                        EffectTimer.Start(item.Durability * 1000);
-                    else
-                        EffectTimer.Start(60000 * 5); //5min
+                    int duration = item.Durability > 0 ? item.Durability * 1000 : 60000 * 5;
+                    new ECSGameTimer(player, t => EffectCallback(t, player, item), duration);
 
                     SendUpdates(player);
                 }
 
-                RegionTimer drinkTimer = new RegionTimer(player, DrinkCallback);
-                drinkTimer.Properties.setProperty("Chope", item);
-                drinkTimer.Start(6000);
+                new ECSGameTimer(player, t => DrinkCallback(t, player, item), 6000);
                 player.TempProperties.setProperty("Drink", true);
 
-                //Timer des emotes/phrases aléatoire
+                // Timer des emotes/phrases aléatoire
                 if (!Alcool)
                     return;
+
                 int RemainTime = player.TempProperties.getProperty("ChopeMaxTime", 0) - player.TempProperties.getProperty("Chopetime", 0);
+
                 if (RemainTime < item.Durability * 1000)
                 {
                     player.TempProperties.setProperty("ChopeMaxTime", item.Durability * 1000);
@@ -158,20 +152,16 @@ namespace DOL.GS.Scripts
                 }
                 else
                 {
-                    RegionTimer EmotesTimer = new RegionTimer(player, EmotesCallback, 5000);
-                    EmotesTimer.Start(5000);
+                    // EmotesCallback only needs the timer owner, so no lambda needed
+                    new ECSGameTimer(player, EmotesCallback, 5000);
                 }
             }
         }
 
-        private static int DrinkCallback(RegionTimer timer)
+        private static int DrinkCallback(ECSGameTimer timer, GamePlayer player, InventoryItem item)
         {
-            if (timer.Properties.getProperty<InventoryItem>("Chope", null) == null ||
-                !(timer.Owner is GamePlayer))
+            if (item == null || player == null)
                 return 0;
-
-            InventoryItem item = timer.Properties.getProperty<InventoryItem>("Chope", null);
-            GamePlayer player = (GamePlayer)timer.Owner;
 
             //Charge (nombre de fois qu'on peut boire)
             item.Charges--;
@@ -198,11 +188,11 @@ namespace DOL.GS.Scripts
         /// <summary>
         /// Phrase/Emote aléatoire
         /// </summary>
-        private static int EmotesCallback(RegionTimer timer)
+        private static int EmotesCallback(ECSGameTimer timer)
         {
-            if (!(timer.Owner is GameLiving))
+            if (!(timer.Owner is GameLiving living))
                 return 0;
-            GameLiving living = (GameLiving)timer.Owner;
+
             int time = living.TempProperties.getProperty("Chopetime", 5000);
 
             if (time > living.TempProperties.getProperty("ChopeMaxTime", 0))
@@ -229,14 +219,10 @@ namespace DOL.GS.Scripts
         /// <summary>
         /// Fin des effets
         /// </summary>
-        private static int EffectCallback(RegionTimer timer)
+        private static int EffectCallback(ECSGameTimer timer, GameLiving gameLiving, InventoryItem item)
         {
-            if (timer.Properties.getProperty<InventoryItem>("Chope", null) == null ||
-                !(timer.Owner is GameLiving))
+            if (item == null || gameLiving == null)
                 return 0;
-
-            InventoryItem item = timer.Properties.getProperty<InventoryItem>("Chope", null);
-            GameLiving gameLiving = (GameLiving)timer.Owner;
 
             if (item.Bonus1Type > 0 && item.Bonus1 != 0)
                 gameLiving.OtherBuffBonus[item.Bonus1Type] -= item.Bonus1;

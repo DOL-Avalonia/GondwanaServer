@@ -24,7 +24,6 @@ namespace AmteScripts.Managers
         public bool IsDroppedOnGround { get; set; }
         public bool IsDungeonRelic { get; private set; }
 
-        private RegionTimer _respawnTimer;
         private GameStaticItem _visualPad;
         private List<GameNPC> _activeProtectors = new List<GameNPC>();
 
@@ -281,7 +280,7 @@ namespace AmteScripts.Managers
             return false;
         }
 
-        private RegionTimer _returnTimer;
+        private ECSGameTimer _returnTimer;
 
         // When the drop timer expires, safely warp it back to spawn instead of deleting the outpost pad
         public void ReturnToSpawn()
@@ -334,14 +333,14 @@ namespace AmteScripts.Managers
             Position = Position.Create(region.ID, x, y, z, heading);
             AddToWorld();
 
-            _returnTimer = new RegionTimer(this, new RegionTimerCallback(t =>
+            _returnTimer?.Stop();
+            int dropDuration = Properties.GVG_RELIC_DROP_DURATION > 0 ? Properties.GVG_RELIC_DROP_DURATION : 30;
+
+            _returnTimer = new ECSGameTimer(this, _ =>
             {
                 ReturnToSpawn();
                 return 0;
-            }));
-
-            int dropDuration = Properties.GVG_RELIC_DROP_DURATION > 0 ? Properties.GVG_RELIC_DROP_DURATION : 30;
-            _returnTimer.Start(dropDuration * 1000);
+            }, dropDuration * 1000);
         }
 
         public void AttachToTerritory(Territory territory, TerRelicPadNPC pad)

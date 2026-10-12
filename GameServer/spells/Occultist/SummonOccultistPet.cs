@@ -36,11 +36,11 @@ namespace DOL.GS.Spells
 
             if (Caster is GamePlayer owner)
             {
-                new RegionTimer(owner, _ =>
+                new ECSGameTimer(owner, _ =>
                 {
                     SetupOccultistPet(owner);
                     return 0;
-                }).Start(1);
+                }, 1);
             }
         }
 

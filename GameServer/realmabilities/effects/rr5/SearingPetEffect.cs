@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,11 +25,11 @@ namespace DOL.GS.Effects
         private ISpellHandler pbaoe;					// The Spell handler
         private GamePlayer EffectOwner;			// Owner of the effect
         private GameNPC pet;					// The pet
-        private RegionTimer pulseTimer;				// Pulse timer
+        private ECSGameTimer pulseTimer;				// Pulse timer
         private int currentTick = 0;		// Count ticks
 
         public SearingPetEffect(GamePlayer owner)
-            : base(RealmAbilities.SearingPetAbility.DURATION)
+            : base(SearingPetAbility.DURATION)
         {
             EffectOwner = owner;
 
@@ -82,7 +63,7 @@ namespace DOL.GS.Effects
             {
                 pet = target as GameNPC;
                 pbaoe = ScriptMgr.CreateSpellHandler(EffectOwner, petSpell, petSpellLine);
-                pulseTimer = new RegionTimer(EffectOwner, new RegionTimerCallback(PulseTimer), 1000);
+                pulseTimer = new ECSGameTimer(EffectOwner, PulseTimer, 1000);
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
         }
@@ -94,7 +75,7 @@ namespace DOL.GS.Effects
 
             base.Stop();
         }
-        protected virtual int PulseTimer(RegionTimer timer)
+        protected virtual int PulseTimer(ECSGameTimer timer)
         {
             if (EffectOwner == null || pet == null || pbaoe == null)
             {

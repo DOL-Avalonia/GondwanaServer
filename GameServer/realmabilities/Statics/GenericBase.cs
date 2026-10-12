@@ -39,12 +39,15 @@ namespace DOL.GS.RealmAbilities.Statics
 
 		public override bool AddToWorld() 
         {
-			new RegionTimer(this, new RegionTimerCallback(PulseTimer),1000);
+            new ECSGameTimer(this, PulseTimer, 1000);
             GameEventMgr.AddHandler(m_caster, GamePlayerEvent.RemoveFromWorld, new DOLEventHandler(PlayerLeftWorld));
             return base.AddToWorld();
         }
-        protected virtual int PulseTimer(RegionTimer timer)
+        protected virtual int PulseTimer(ECSGameTimer timer)
         {
+            if (ObjectState != eObjectState.Active)
+                return 0;
+
             if (currentTick >= m_lifeTime || m_caster == null)
             {
                 this.RemoveFromWorld();

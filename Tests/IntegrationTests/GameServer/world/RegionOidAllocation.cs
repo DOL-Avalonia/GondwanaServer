@@ -1,24 +1,7 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Threading;
 using DOL.Database;
+using DOL.Timing;
 using DOL.GS;
 using NUnit.Framework;
 
@@ -34,7 +17,7 @@ namespace DOL.Integration.Server
         public int id;
         public object sync;
         public volatile bool finished;
-        public uint started;
+        public long started;
 
         [OneTimeSetUp]
         public void Init()
@@ -44,7 +27,7 @@ namespace DOL.Integration.Server
             data.Name = "reg data1";
             data.Description = "reg test1";
             data.Mobs = Array.Empty<Mob>();
-            m_reg = WorldMgr.RegisterRegion(new GameTimer.TimeManager("RegTest1"), data);
+            m_reg = WorldMgr.RegisterRegion(data);
             //WorldMgr.RegisterZone(5555, 5555, "test zone1", 0, 0, 16, 16);
             m_reg.StartRegionMgr();
         }
@@ -148,7 +131,7 @@ namespace DOL.Integration.Server
         {
             try
             {
-                started = GameTimer.GetTickCount();
+                started = MonotonicTime.NowMs;
                 Console.Out.WriteLine("[{0}] started", id);
                 AddRemoveObjects();
             }
@@ -159,7 +142,7 @@ namespace DOL.Integration.Server
             finally
             {
                 finished = true;
-                Console.Out.WriteLine("[{0}] finished in {1}ms", id, GameTimer.GetTickCount() - started);
+                Console.Out.WriteLine("[{0}] finished in {1}ms", id, MonotonicTime.NowMs - started);
             }
         }
     }

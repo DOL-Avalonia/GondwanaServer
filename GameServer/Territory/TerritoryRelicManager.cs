@@ -20,7 +20,7 @@ namespace AmteScripts.Managers
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(TerritoryRelicManager));
         public static Dictionary<int, TerritoryRelicStatic> ActiveRelics = new Dictionary<int, TerritoryRelicStatic>();
-        private static RegionTimer _mapUpdateTimer;
+        private static ECSGameTimer _mapUpdateTimer;
 
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
@@ -31,13 +31,7 @@ namespace AmteScripts.Managers
 
             if (_mapUpdateTimer == null)
             {
-                var reg = WorldMgr.GetRegion(1);
-                if (reg != null)
-                {
-                    _mapUpdateTimer = new RegionTimer(reg.TimeManager);
-                    _mapUpdateTimer.Callback = new RegionTimerCallback(t => { UpdateMapPins(); return 2000; });
-                    _mapUpdateTimer.Start(2000);
-                }
+                _mapUpdateTimer = new ECSGameTimer(null, t => { UpdateMapPins(); return 2000; }, 2000);
             }
         }
 
@@ -53,21 +47,11 @@ namespace AmteScripts.Managers
         {
             HideAllProtectors();
 
-            var reg = WorldMgr.GetRegion(1) ?? WorldMgr.GetAllRegions().FirstOrDefault();
-            if (reg != null)
-            {
-                RegionTimer startupTimer = new RegionTimer(reg.TimeManager);
-                startupTimer.Callback = new RegionTimerCallback(timer =>
-                {
-                    RestoreRelics();
-                    return 0;
-                });
-                startupTimer.Start(2500);
-            }
-            else
+            new ECSGameTimer(null, timer =>
             {
                 RestoreRelics();
-            }
+                return 0;
+            }, 2500);
         }
 
         public static void HideAllProtectors()
@@ -95,11 +79,6 @@ namespace AmteScripts.Managers
         private static void RestoreRelics()
         {
             HideAllProtectors();
-
-            /*if (TerritoryManager.Instance.Territories.Count == 0)
-            {
-                TerritoryManager.LoadTerritories(null, null, null);
-            }*/
 
             var allDbRelics = GameServer.Database.SelectAllObjects<DBMinotaurRelic>()
                         .Where(r => r.IsTerritoryRelic).ToList();

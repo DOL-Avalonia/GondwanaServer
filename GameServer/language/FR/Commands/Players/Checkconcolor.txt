@@ -1,0 +1,17 @@
+
+Commands.GM.Checkconcolor.Description:      Affiche le niveau de con (considération) côté serveur de votre cible (règles d'XP/butin/tâches).
+Commands.GM.Checkconcolor.Usage:            Usage: /checkconcolor
+Commands.GM.Checkconcolor.NeedTarget:       Cette commande nécessite une cible.
+Commands.GM.Checkconcolor.TargetVsYou:      [{0}] niveau {1} vs vous niveau {2}
+Commands.GM.Checkconcolor.ServerCon:        Valeur de con du serveur {2} : {0:0.00} -> {1} (utilisé pour combat / XP / tâches)
+Commands.GM.Checkconcolor.LiveCon:          Couleur serveur officiel : {0} (pour comparaison uniquement)
+Commands.GM.Checkconcolor.Grey:             Gris (pas d'XP, pas de butin, pas de validation de tâche) : {0}
+Commands.GM.Checkconcolor.TaskSolo:         Palier de tâche (solo) : {0} {1}
+Commands.GM.Checkconcolor.TaskGroup:        Palier de tâche (groupe de {0}, niveau max {1}) : {2} {3}
+Commands.GM.Checkconcolor.Yes:              OUI
+Commands.GM.Checkconcolor.No:               non
+Commands.GM.Checkconcolor.Tier.Grey:        (gris - ne compte jamais)
+Commands.GM.Checkconcolor.Tier.Green:       (vert - compte en solo uniquement)
+Commands.GM.Checkconcolor.Tier.Blue:        (bleu - compte en solo / petit groupe)
+Commands.GM.Checkconcolor.Tier.Yellow:      (jaune ou mieux - compte toujours)
+Commands.GM.Checkconcolor.ServerName:       actuel

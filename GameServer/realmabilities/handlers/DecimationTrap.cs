@@ -1,10 +1,11 @@
+using DOL.Database;
+using DOL.Events;
+using DOL.GS.Effects;
+using DOL.GS.Geometry;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using System;
 using System.Collections.Generic;
-using DOL.Database;
-using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
-using DOL.Events;
-using DOL.GS.Geometry;
 using System.Numerics;
 
 namespace DOL.GS.RealmAbilities
@@ -20,7 +21,7 @@ namespace DOL.GS.RealmAbilities
 		private int z;*/
         private Area.Circle traparea;
         private GameLiving owner;
-        private RegionTimer ticktimer;
+        private ECSGameTimer ticktimer;
         private const int TICKS = 6;
         private int effectiveness;
         private ushort region;
@@ -71,15 +72,13 @@ namespace DOL.GS.RealmAbilities
             {
                 player.RealmAbilityCastTimer.Stop();
                 player.RealmAbilityCastTimer = null;
-                player.Out.SendMessage("You cancel your Spell!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "DecimationTrapAbility.CancelCast"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
             }
 
             foreach (GamePlayer p in living.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 p.Out.SendSpellCastAnimation(living, Icon, 20);
 
-            player.RealmAbilityCastTimer = new RegionTimer(player);
-            player.RealmAbilityCastTimer.Callback = new RegionTimerCallback(startSpell);
-            player.RealmAbilityCastTimer.Start(2000);
+            player.RealmAbilityCastTimer = new ECSGameTimer(player, startSpell, 2000);
         }
 
         public override bool CheckRequirement(GamePlayer player)
@@ -87,7 +86,7 @@ namespace DOL.GS.RealmAbilities
             return player.Level >= 40;
         }
 
-        private int startSpell(RegionTimer timer)
+        private int startSpell(ECSGameTimer timer)
         {
             if (!owner.IsAlive)
                 return 0;
@@ -98,16 +97,14 @@ namespace DOL.GS.RealmAbilities
             region = owner.CurrentRegionID;
 
             GameEventMgr.AddHandler(traparea, AreaEvent.PlayerEnter, new DOLEventHandler(EventHandler));
-            ticktimer = new RegionTimer(owner);
-            ticktimer.Callback = new RegionTimerCallback(onTick);
-            ticktimer.Start(600000);
+            ticktimer = new ECSGameTimer(owner, onTick, 600000);
             getTargets();
             DisableSkill(owner);
 
             return 0;
         }
 
-        private int onTick(RegionTimer timer)
+        private int onTick(ECSGameTimer timer)
         {
             removeHandlers();
             return 0;

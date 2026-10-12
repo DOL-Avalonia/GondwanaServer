@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.Events;
 using DOL.GS;
 using DOL.GS.Effects;
@@ -516,33 +498,24 @@ namespace DOL.AI.Brain
         /// <summary>
         /// Timer for pet out of tether range.
         /// </summary>
-        private class TetherTimer : GameTimer
+        private sealed class TetherTimer : ECSGameTimerWrapperBase
         {
-            private NecromancerPet m_pet;
+            private readonly NecromancerPet m_pet;
             private int m_seconds = 10;
 
-            public TetherTimer(NecromancerPet pet)
-                : base(pet.CurrentRegion.TimeManager)
-            {
-                m_pet = pet;
-            }
+            public TetherTimer(NecromancerPet pet) : base(pet) { m_pet = pet; }
 
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                this.Interval = 1000;
-
                 if (m_seconds > 0)
                 {
-                    m_pet.Brain.Notify(GameNPCEvent.OutOfTetherRange, this,
-                        new TetherEventArgs(m_seconds));
-                    m_seconds -= 1;
+                    m_pet.Brain.Notify(GameNPCEvent.OutOfTetherRange, this, new TetherEventArgs(m_seconds));
+                    m_seconds--;
+                    return 1000;
                 }
-                else
-                {
-                    Stop();
-                    m_pet.Brain.Notify(GameNPCEvent.PetLost, this, null);
-                    m_pet.CutTether();
-                }
+                m_pet.Brain.Notify(GameNPCEvent.PetLost, this, null);
+                m_pet.CutTether();
+                return 0;
             }
         }
 

@@ -51,7 +51,7 @@ namespace DOL.GS.Scripts
                 InventoryLogging.LogInventoryAction(player, "", "(feu artifice)", eInventoryActionType.Other, item, 1);
 
                 Dictionary<int, GameNPC> mobs = CreateMobs(player);
-                RegionTimer timer = new RegionTimer(mobs[0], FeuCallback);
+                ECSGameTimer timer = new(mobs[0], FeuCallback);
                 timer.Properties.setProperty("mobs", mobs);
                 timer.Properties.setProperty("time", 0);
                 timer.Properties.setProperty("timemax", (int)(item.Durability / 2.5));
@@ -63,7 +63,7 @@ namespace DOL.GS.Scripts
             }
         }
 
-        private static int FeuCallback(RegionTimer callingTimer)
+        private static int FeuCallback(ECSGameTimer callingTimer)
         {
             Dictionary<int, GameNPC> mobs = callingTimer.Properties.getProperty<Dictionary<int, GameNPC>>("mobs", null);
             if (mobs == null)

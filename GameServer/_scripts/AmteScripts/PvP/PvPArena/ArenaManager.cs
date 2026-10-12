@@ -1,28 +1,32 @@
+using AmteScripts.PvP.Rewards;
 using DOL.Database;
 using DOL.Events;
+using DOL.GameEvents;
 using DOL.GS;
+using DOL.GS.Finance;
+using DOL.GS.Geometry;
 using DOL.GS.PacketHandler;
+using DOL.GS.Scripts;
+using DOL.GS.ServerProperties;
+using DOL.GS.Spells;
 using DOL.Language;
 using log4net;
 using System;
-using System.Text;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
-using DOL.GS.Spells;
-using AmteScripts.PvP.Rewards;
-using DOL.GS.ServerProperties;
-using DOL.GameEvents;
-using DOL.GS.Finance;
-using DOL.GS.Geometry;
-using DOL.GS.Scripts;
-using System.Collections.Immutable;
+using System.Text;
+using System.Threading;
 
 namespace AmteScripts.Managers
 {
-    public class ArenaManager
+    public class ArenaManager : IGameModule
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
+        public string Name => "Arena";
+        public long NextTick { get; set; }
+        internal readonly Lock Gate = new();
         public static ArenaManager Instance { get; } = new ArenaManager();
 
         public enum eArenaMode { None, Solo, TwoVsTwo, ThreeVsThree, FourVsFour }
@@ -31,6 +35,16 @@ namespace AmteScripts.Managers
 
         public const string ARENA_PARTICIPANT_PROP = "ArenaParticipant";
         public const string ARENA_WAITING_PROP = "ArenaWaiting";
+        private readonly Dictionary<ushort, bool> _hasSpawnsCache = new();
+
+        public void StartQueue(ArenaSession s, eArenaMode mode) => ModuleService.Run(() => StartQueueInternal(s, mode));
+        public void EnqueueSolo(ArenaSession s, GamePlayer p) => ModuleService.Run(() => EnqueueSoloInternal(s, p));
+        public void EnqueueGroup(ArenaSession s, Group g) => ModuleService.Run(() => EnqueueGroupInternal(s, g));
+        public void DequeuePlayer(ArenaSession s, GamePlayer p, bool intentional) => ModuleService.Run(() => DequeuePlayerInternal(s, p, intentional));
+        public void DisqualifyTeam(ArenaSession s, ArenaTeam t, string reason) => ModuleService.Run(() => DisqualifyTeamInternal(s, t, reason));
+        public void CancelSession(ArenaSession s, string reasonKey) => ModuleService.Run(() => CancelSessionInternal(s, reasonKey));
+        public void HandleDebugCommand(ArenaSession s, GamePlayer p, string cmd) => ModuleService.Run(() => HandleDebugCommandInternal(s, p, cmd));
+        public void OnPlayerLogin(GamePlayer p, RvrPlayer dbPlayer) => ModuleService.Run(() => OnPlayerLoginInternal(p, dbPlayer));
 
         public class ArenaBet
         {
@@ -93,7 +107,6 @@ namespace AmteScripts.Managers
 
         private ArenaManager()
         {
-            GameEventMgr.AddHandler(GamePlayerEvent.GameEntered, OnPlayerLogin);
             GameEventMgr.AddHandler(GamePlayerEvent.Quit, OnPlayerQuitOrRegionChange);
             GameEventMgr.AddHandler(GamePlayerEvent.Linkdeath, OnPlayerQuitOrRegionChange);
             GameEventMgr.AddHandler(GamePlayerEvent.RegionChanged, OnPlayerQuitOrRegionChange);
@@ -101,18 +114,21 @@ namespace AmteScripts.Managers
             GameEventMgr.AddHandler(GamePlayerEvent.Revive, OnPlayerRevive);
         }
 
-        public void Start()
-        {
-            var t = new ECSGameTimer(null, TickCheck);
-            t.Start(2000);
-        }
+        public void Start() => ModuleService.Instance.Register(this);
 
         public ArenaSession GetOrCreateSession(ushort regionId, GameNPC master = null)
         {
             lock (_lock)
             {
-                if (!_sessions.ContainsKey(regionId)) _sessions[regionId] = new ArenaSession { RegionID = regionId, ArenaMaster = master };
-                if (master != null) _sessions[regionId].ArenaMaster = master;
+                if (!_sessions.ContainsKey(regionId))
+                {
+                    _sessions[regionId] = new ArenaSession { RegionID = regionId, ArenaMaster = master };
+                }
+                if (master != null)
+                {
+                    _sessions[regionId].ArenaMaster = master;
+                }
+
                 return _sessions[regionId];
             }
         }
@@ -121,8 +137,14 @@ namespace AmteScripts.Managers
 
         public bool HasSpawns(ushort regionId)
         {
-            return WorldMgr.GetNPCsFromRegion(regionId).Count(n => n.Name.StartsWith("ARENA_SPAWN_LEFT_")) >= 4 &&
-                   WorldMgr.GetNPCsFromRegion(regionId).Count(n => n.Name.StartsWith("ARENA_SPAWN_RIGHT_")) >= 4;
+            lock (_lock)
+            {
+                if (_hasSpawnsCache.TryGetValue(regionId, out bool cached)) return cached;
+                GameNPC[] npcs = WorldMgr.GetNPCsFromRegion(regionId);
+                bool result = npcs.Count(n => n.Name.StartsWith("ARENA_SPAWN_LEFT_")) >= 4 && npcs.Count(n => n.Name.StartsWith("ARENA_SPAWN_RIGHT_")) >= 4;
+                _hasSpawnsCache[regionId] = result;
+                return result;
+            }
         }
 
         private void ResolveBets(ArenaSession session, ArenaTeam winner)
@@ -235,21 +257,25 @@ namespace AmteScripts.Managers
             session.ActiveBets.Clear();
         }
 
-        public void StartQueue(ArenaSession session, eArenaMode mode)
+        private void StartQueueInternal(ArenaSession session, eArenaMode mode)
         {
+            if (session.State != eArenaState.Idle) return;
+
             session.LeftSpawns = WorldMgr.GetNPCsFromRegion(session.RegionID).Where(n => n.Name.StartsWith("ARENA_SPAWN_LEFT_")).OrderBy(n => n.Name).ToList();
             session.RightSpawns = WorldMgr.GetNPCsFromRegion(session.RegionID).Where(n => n.Name.StartsWith("ARENA_SPAWN_RIGHT_")).OrderBy(n => n.Name).ToList();
 
             session.Mode = mode;
             session.State = eArenaState.Queuing;
             int mins = Properties.ARENA_QUEUE_MINUTES > 0 ? Properties.ARENA_QUEUE_MINUTES : 45;
-            session.NextStateTime = WorldMgr.GetRegion(session.RegionID).Time + (mins * 60 * 1000);
+            session.NextStateTime = GameLoop.GameLoopTime + (mins * 60 * 1000);
 
             BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Queue.Opened", c => new object[] {mode == eArenaMode.Solo ? LanguageMgr.GetTranslation(c.Account.Language, "ArenaManager.SoloVsSolo") : $"{session.TeamSize} vs {session.TeamSize}", session.ArenaMaster.Name, mins});
         }
 
-        public void EnqueueSolo(ArenaSession session, GamePlayer player)
+        private void EnqueueSoloInternal(ArenaSession session, GamePlayer player)
         {
+            if (session.State != eArenaState.Queuing) return;
+
             lock (_lock)
             {
                 if (!session.SoloQueue.Contains(player))
@@ -263,7 +289,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        public void EnqueueGroup(ArenaSession session, Group group)
+        private void EnqueueGroupInternal(ArenaSession session, Group group)
         {
             lock (_lock)
             {
@@ -280,7 +306,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        public void DequeuePlayer(ArenaSession session, GamePlayer player, bool intentional)
+        private void DequeuePlayerInternal(ArenaSession session, GamePlayer player, bool intentional)
         {
             lock (_lock)
             {
@@ -318,56 +344,57 @@ namespace AmteScripts.Managers
             return eArchetype.Tank; // Everything else (PureTank, Hybrids like Paladin/Thane/Champion/Mauler)
         }
 
-        private int TickCheck(ECSGameTimer timer)
+        public int Tick()
         {
-            foreach (var session in _sessions.Values.ToList())
+            lock (Gate)
             {
-                var region = WorldMgr.GetRegion(session.RegionID);
-                if (region == null) continue;
-                long now = region.Time;
+                ArenaSession[] sessions;
+                lock (_lock) sessions = _sessions.Values.ToArray();
+                long now = GameLoop.GameLoopTime;
+                bool anyRunning = false, anyActive = false;
 
-                if (session.State == eArenaState.Cooldown && now >= session.NextStateTime)
+                foreach (ArenaSession session in sessions)
                 {
-                    session.State = eArenaState.Idle;
-
-                    foreach (var chest in session.SpawnedChests)
+                    if (session.State == eArenaState.Cooldown && now >= session.NextStateTime)
                     {
-                        chest.RemoveFromWorld();
-                        chest.Delete();
+                        session.State = eArenaState.Idle;
+                        foreach (var chest in session.SpawnedChests) { chest.RemoveFromWorld(); chest.Delete(); }
+                        session.SpawnedChests.Clear();
+                        BroadcastRegion(session.RegionID, eChatType.CT_System, "ArenaManager.Match.Cleaned");
                     }
-                    session.SpawnedChests.Clear();
-                    BroadcastRegion(session.RegionID, eChatType.CT_System, "ArenaManager.Match.Cleaned");
-                }
-                else if (session.State == eArenaState.Queuing && now >= session.NextStateTime)
-                {
-                    TryStartTournament(session);
-                }
-                else if (session.State == eArenaState.Running)
-                {
-                    CheckDistanceViolations(session, now);
-
-                    if (session.CurrentTeamA != null && session.CurrentTeamB != null)
+                    else if (session.State == eArenaState.Queuing && now >= session.NextStateTime)
                     {
-                        if (session.IsBettingOpen && now >= session.BettingEndTime)
+                        TryStartTournament(session);
+                    }
+                    else if (session.State == eArenaState.Running)
+                    {
+                        CheckDistanceViolations(session, now);
+                        if (session.CurrentTeamA != null && session.CurrentTeamB != null)
                         {
-                            session.IsBettingOpen = false;
-                            BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Match.BetsClosed");
-                            UnlockTeam(session.CurrentTeamA);
-                            UnlockTeam(session.CurrentTeamB);
-                        }
-                        else if (!session.IsBettingOpen)
-                        {
-                            if (!session.IsDebugMode)
+                            if (session.IsBettingOpen && now >= session.BettingEndTime)
+                            {
+                                session.IsBettingOpen = false;
+                                BroadcastRegion(session.RegionID, eChatType.CT_Important, "ArenaManager.Match.BetsClosed");
+                                UnlockTeam(session.CurrentTeamA);
+                                UnlockTeam(session.CurrentTeamB);
+                            }
+                            else if (!session.IsBettingOpen && !session.IsDebugMode)
+                            {
                                 CheckCombatState(session, now);
+                            }
+                        }
+                        else if (now >= session.NextStateTime)
+                        {
+                            PrepareNextRound(session, now);
                         }
                     }
-                    else if (now >= session.NextStateTime)
-                    {
-                        PrepareNextRound(session, now);
-                    }
+
+                    if (session.State == eArenaState.Running) anyRunning = true;
+                    if (session.State != eArenaState.Idle) anyActive = true;
                 }
+
+                return anyRunning ? 2000 : anyActive ? 5000 : 10_000;
             }
-            return 2000;
         }
 
         private void TryStartTournament(ArenaSession session)
@@ -402,7 +429,7 @@ namespace AmteScripts.Managers
 
                 if (!canStart)
                 {
-                    CancelSession(session, "ArenaManager.Match.NotEnoughStart");
+                    CancelSessionInternal(session, "ArenaManager.Match.NotEnoughStart");
                     return;
                 }
 
@@ -475,14 +502,7 @@ namespace AmteScripts.Managers
                         RoleplayReward.ResetRPChain(p);
 
                         // Database persistence for Crash-Safety Using RvrPlayer Record
-                        RvrPlayer dbPlayer = GameServer.Database.SelectObject<RvrPlayer>(DB.Column("PlayerID").IsEqualTo(p.InternalID));
-                        bool isNew = false;
-                        if (dbPlayer == null)
-                        {
-                            dbPlayer = new RvrPlayer();
-                            dbPlayer.PlayerID = p.InternalID;
-                            isNew = true;
-                        }
+                        RvrPlayer dbPlayer = PvPRecordStore.Get(p.InternalID) ?? new RvrPlayer { PlayerID = p.InternalID };
 
                         dbPlayer.GuildID = p.GuildID ?? "";
                         dbPlayer.GuildRank = p.GuildRank != null ? p.GuildRank.RankLevel : 9;
@@ -508,8 +528,7 @@ namespace AmteScripts.Managers
 
                         dbPlayer.PvPSession = "Arena";
 
-                        if (isNew) GameServer.Database.AddObject(dbPlayer);
-                        else GameServer.Database.SaveObject(dbPlayer);
+                        PvPRecordStore.Save(dbPlayer);
 
                         if (p.Guild != null)
                         {
@@ -527,7 +546,7 @@ namespace AmteScripts.Managers
                 foreach (var t in session.ActiveTeams.OrderBy(x => Guid.NewGuid())) 
                     session.Bracket.Enqueue(t);
                 
-                session.NextStateTime = WorldMgr.GetRegion(session.RegionID).Time + 2000;
+                session.NextStateTime = GameLoop.GameLoopTime + 2000;
             }
         }
 
@@ -548,7 +567,7 @@ namespace AmteScripts.Managers
                 }
                 else
                 {
-                    CancelSession(session, "ArenaManager.Match.EndedNoTeams");
+                    CancelSessionInternal(session, "ArenaManager.Match.EndedNoTeams");
                     return;
                 }
             }
@@ -665,7 +684,7 @@ namespace AmteScripts.Managers
 
             session.State = eArenaState.Cooldown;
             int cdMins = Properties.ARENA_COOLDOWN_MINUTES > 0 ? Properties.ARENA_COOLDOWN_MINUTES : 60;
-            session.NextStateTime = WorldMgr.GetRegion(session.RegionID).Time + (cdMins * 60 * 1000);
+            session.NextStateTime = GameLoop.GameLoopTime + (cdMins * 60 * 1000);
             
             session.ActiveTeams.Clear();
             session.NextRoundTeams.Clear();
@@ -810,7 +829,6 @@ namespace AmteScripts.Managers
                 ConfigItemColor = color
             };
 
-            int duration = Properties.ARENA_QUEUE_MINUTES + 60;
             return chest;
         }
 
@@ -839,7 +857,7 @@ namespace AmteScripts.Managers
                         else
                         {
                             long timeLeft = session.OobWarnings[p.InternalID] - now;
-                            if (timeLeft <= 0) DisqualifyTeam(session, team, LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOBDisqualified", p.Name));
+                            if (timeLeft <= 0) DisqualifyTeamInternal(session, team, LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOBDisqualified", p.Name));
                             else if (timeLeft <= 5000 && timeLeft > 3000) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOB5Sec", "5"), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
                             else if (timeLeft <= 10000 && timeLeft > 8000) p.Out.SendMessage(LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.OOB10Sec", "10"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         }
@@ -853,7 +871,7 @@ namespace AmteScripts.Managers
             }
         }
 
-        public void DisqualifyTeam(ArenaSession session, ArenaTeam team, string reason)
+        private void DisqualifyTeamInternal(ArenaSession session, ArenaTeam team, string reason)
         {
             if (team.IsDisqualified) return;
             team.IsDisqualified = true;
@@ -879,10 +897,10 @@ namespace AmteScripts.Managers
             int minThreshold = session.Mode == eArenaMode.Solo ? Properties.ARENA_MIN_SOLO : Properties.ARENA_MIN_TEAMS;
 
             if (validTeams < minThreshold)
-                CancelSession(session, "ArenaManager.Match.TooManyLeft");
+                CancelSessionInternal(session, "ArenaManager.Match.TooManyLeft");
         }
 
-        public void CancelSession(ArenaSession session, string reasonKey)
+        private void CancelSessionInternal(ArenaSession session, string reasonKey)
         {
             if (session.State != eArenaState.Idle)
             {
@@ -1011,24 +1029,18 @@ namespace AmteScripts.Managers
             SetWaitState(p, false, true);
 
             // Recover Original Guild and DB Bind location using RvrPlayer Record
-            RvrPlayer dbPlayer = GameServer.Database.SelectObject<RvrPlayer>(DB.Column("PlayerID").IsEqualTo(p.InternalID));
+            RvrPlayer dbPlayer = PvPRecordStore.Get(p.InternalID);
+
             if (dbPlayer != null && dbPlayer.PvPSession == "Arena")
             {
                 string oldGuildId = dbPlayer.GuildID;
                 int oldGuildRank = dbPlayer.GuildRank;
                 dbPlayer.ResetCharacter(p);
                 p.SaveIntoDatabase();
-                GameServer.Database.DeleteObject(dbPlayer);
+                PvPRecordStore.Delete(p.InternalID);
 
-                if (!string.IsNullOrEmpty(oldGuildId))
-                {
-                    Guild restoredGuild = GuildMgr.GetGuildByGuildID(oldGuildId);
-                    if (restoredGuild != null)
-                    {
-                        DBRank restoredRank = restoredGuild.GetRankByID(oldGuildRank) ?? restoredGuild.GetRankByID(9);
-                        restoredGuild.AddPlayer(p, restoredRank, true);
-                    }
-                }
+                if (!string.IsNullOrEmpty(oldGuildId) && GuildMgr.GetGuildByGuildID(oldGuildId) is Guild g)
+                    g.AddPlayer(p, g.GetRankByID(oldGuildRank) ?? g.GetRankByID(9), true);
             }
 
             // Disband the auto-generated group if they weren't grouped before
@@ -1085,69 +1097,51 @@ namespace AmteScripts.Managers
             }
         }
 
-        private static void OnPlayerLogin(DOLEvent e, object sender, EventArgs args)
+        public void OnPlayerLoginInternal(GamePlayer p, RvrPlayer dbPlayer)
         {
-            if (sender is GamePlayer p)
-            {
-                RvrPlayer dbPlayer = GameServer.Database.SelectObject<RvrPlayer>(DB.Column("PlayerID").IsEqualTo(p.InternalID));
-                if (dbPlayer != null && dbPlayer.PvPSession == "Arena")
-                {
-                    string oldGuildId = dbPlayer.GuildID;
-                    int oldGuildRank = dbPlayer.GuildRank;
-                    dbPlayer.ResetCharacter(p);
-                    p.MoveTo(p.BindPosition);
-                    p.SaveIntoDatabase();
-
-                    GameServer.Database.DeleteObject(dbPlayer);
-
-                    if (!string.IsNullOrEmpty(oldGuildId))
-                    {
-                        Guild restoredGuild = GuildMgr.GetGuildByGuildID(oldGuildId);
-                        if (restoredGuild != null)
-                        {
-                            DBRank restoredRank = restoredGuild.GetRankByID(oldGuildRank) ?? restoredGuild.GetRankByID(9);
-                            restoredGuild.AddPlayer(p, restoredRank, true);
-                        }
-                    }
-
-                    p.TempProperties.removeProperty(ARENA_PARTICIPANT_PROP);
-                    p.TempProperties.removeProperty("ArenaQueued");
-                }
-            }
+            if (dbPlayer == null || dbPlayer.PvPSession != "Arena") return;
+            string oldGuildId = dbPlayer.GuildID; int oldRank = dbPlayer.GuildRank;
+            dbPlayer.ResetCharacter(p);
+            p.MoveTo(p.BindPosition);
+            p.SaveIntoDatabase();
+            PvPRecordStore.Delete(p.InternalID);
+            if (!string.IsNullOrEmpty(oldGuildId) && GuildMgr.GetGuildByGuildID(oldGuildId) is Guild g) g.AddPlayer(p, g.GetRankByID(oldRank) ?? g.GetRankByID(9), true);
+            p.TempProperties.removeProperty(ARENA_PARTICIPANT_PROP);
+            p.TempProperties.removeProperty("ArenaQueued");
         }
 
         private static void OnPlayerQuitOrRegionChange(DOLEvent e, object sender, EventArgs args)
         {
-            if (sender is GamePlayer p)
+            if (sender is not GamePlayer p) return;
+            ushort regId = p.TempProperties.getProperty<ushort>("ArenaRegion", 0);
+            if (e == GamePlayerEvent.RegionChanged && p.CurrentRegionID == regId) return;
+            // cheap early-out: 99.9% of region changes / quits are not arena players
+            if (!p.TempProperties.getProperty<bool>("ArenaQueued", false) && !p.TempProperties.getProperty<bool>(ARENA_PARTICIPANT_PROP, false)) return;
+
+            if (e == GamePlayerEvent.RegionChanged)
+                ModuleService.Run(() => Instance.HandleLeave(p, regId));
+            else
+                ModuleService.Sync(Instance.Gate, () => Instance.HandleLeave(p, regId));
+        }
+
+        private void HandleLeave(GamePlayer p, ushort regId)
+        {
+            ArenaSession session = GetSession(regId);
+            if (session != null && p.TempProperties.getProperty<bool>("ArenaQueued", false))
+                DequeuePlayerInternal(session, p, false);
+
+            if (!p.TempProperties.getProperty<bool>(ARENA_PARTICIPANT_PROP, false)) return;
+            if (session != null)
             {
-                ushort regId = p.TempProperties.getProperty<ushort>("ArenaRegion", 0);
-                if (e == GamePlayerEvent.RegionChanged && p.CurrentRegionID == regId) return;
-
-                if (p.TempProperties.getProperty<bool>("ArenaQueued", false))
-                {
-                    var session = Instance.GetSession(regId);
-                    if (session != null) Instance.DequeuePlayer(session, p, false);
-                }
-
-                if (p.TempProperties.getProperty<bool>(ARENA_PARTICIPANT_PROP, false))
-                {
-                    var session = Instance.GetSession(regId);
-                    if (session != null)
-                    {
-                        var allTeams = new List<ArenaTeam>(session.Bracket);
-                        allTeams.AddRange(session.NextRoundTeams);
-                        if (session.CurrentTeamA != null) allTeams.Add(session.CurrentTeamA);
-                        if (session.CurrentTeamB != null) allTeams.Add(session.CurrentTeamB);
-
-                        var team = allTeams.FirstOrDefault(t => t.Members.Contains(p));
-                        if (team != null && !team.IsDisqualified)
-                        {
-                            Instance.DisqualifyTeam(session, team, LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.MemberLeftRegion", p.Name));
-                        }
-                    }
-                    Instance.ClearParticipant(p, null);
-                }
+                var allTeams = new List<ArenaTeam>(session.Bracket);
+                allTeams.AddRange(session.NextRoundTeams);
+                if (session.CurrentTeamA != null) allTeams.Add(session.CurrentTeamA);
+                if (session.CurrentTeamB != null) allTeams.Add(session.CurrentTeamB);
+                var team = allTeams.FirstOrDefault(t => t.Members.Contains(p));
+                if (team != null && !team.IsDisqualified)
+                    DisqualifyTeamInternal(session, team, LanguageMgr.GetTranslation(p.Client.Account.Language, "ArenaManager.Match.MemberLeftRegion", p.Name));
             }
+            ClearParticipant(p, null);
         }
 
         private static void OnPlayerDying(DOLEvent e, object sender, EventArgs args)
@@ -1158,20 +1152,20 @@ namespace AmteScripts.Managers
             }
         }
 
-        public void HandleDebugCommand(ArenaSession session, GamePlayer player, string command)
+        private void HandleDebugCommandInternal(ArenaSession session, GamePlayer player, string command)
         {
             lock (_lock)
             {
                 if (command == "force shutdown")
                 {
-                    CancelSession(session, "ArenaManager.Debug.ForceShutdown");
+                    CancelSessionInternal(session, "ArenaManager.Debug.ForceShutdown");
                     player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "ArenaManager.Debug.ShutdownMsg"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     return;
                 }
 
                 if (command == "debug: start solo match" || command == "debug: start as spectator")
                 {
-                    CancelSession(session, "ArenaManager.Debug.Override");
+                    CancelSessionInternal(session, "ArenaManager.Debug.Override");
                     session.IsDebugMode = true;
                     session.State = eArenaState.Running;
                     session.Mode = eArenaMode.Solo;
@@ -1186,7 +1180,7 @@ namespace AmteScripts.Managers
                     session.ActiveTeams.Add(teamA);
                     session.CurrentTeamA = teamA;
                     session.CurrentTeamB = teamB;
-                    session.NextStateTime = WorldMgr.GetRegion(session.RegionID).Time + 3600000;
+                    session.NextStateTime = GameLoop.GameLoopTime + 3600000;
 
                     if (command == "debug: start solo match")
                     {
@@ -1284,14 +1278,7 @@ namespace AmteScripts.Managers
             p.TempProperties.setProperty(ARENA_PARTICIPANT_PROP, true);
             RoleplayReward.ResetRPChain(p);
 
-            RvrPlayer dbPlayer = GameServer.Database.SelectObject<RvrPlayer>(DB.Column("PlayerID").IsEqualTo(p.InternalID));
-            bool isNew = false;
-            if (dbPlayer == null)
-            {
-                dbPlayer = new RvrPlayer();
-                dbPlayer.PlayerID = p.InternalID;
-                isNew = true;
-            }
+            RvrPlayer dbPlayer = PvPRecordStore.Get(p.InternalID) ?? new RvrPlayer { PlayerID = p.InternalID };
 
             int randDist = Util.Random(50, 200);
             int randHeading = Util.Random(0, 4095);
@@ -1312,8 +1299,7 @@ namespace AmteScripts.Managers
 
             dbPlayer.PvPSession = "Arena";
 
-            if (isNew) GameServer.Database.AddObject(dbPlayer);
-            else GameServer.Database.SaveObject(dbPlayer);
+            PvPRecordStore.Save(dbPlayer);
 
             if (p.Guild != null) p.Guild.RemovePlayer("Arena", p);
 

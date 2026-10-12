@@ -1,26 +1,9 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
+using DOL.Database;
+using DOL.GS.PacketHandler;
+using DOL.Language;
+using log4net;
 using System;
 using System.Reflection;
-using DOL.GS.PacketHandler;
-using DOL.Database;
-using log4net;
 
 namespace DOL.GS
 {
@@ -31,7 +14,7 @@ namespace DOL.GS
     /// </summary>
     public class WorldInventoryItem : GameStaticItemTimed
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// The InventoryItem that is contained within
@@ -188,7 +171,7 @@ namespace DOL.GS
             {
                 if (m_item is IGameInventoryItem)
                 {
-                    (m_item as IGameInventoryItem).OnRemoveFromWorld();
+                    (m_item as IGameInventoryItem)!.OnRemoveFromWorld();
                 }
 
                 m_isRemoved = true;
@@ -210,7 +193,7 @@ namespace DOL.GS
         }
 
         #region PickUpTimer
-        private RegionTimer m_pickup;
+        private ECSGameTimer m_pickup;
 
         /// <summary>
         /// Starts a new pickuptimer with the given time (in seconds)
@@ -218,19 +201,8 @@ namespace DOL.GS
         /// <param name="time"></param>
         public void StartPickupTimer(int time)
         {
-            if (m_pickup != null)
-            {
-                m_pickup.Stop();
-                m_pickup = null;
-            }
-            m_pickup = new RegionTimer(this, new RegionTimerCallback(CallBack), time * 1000);
-        }
-
-        private int CallBack(RegionTimer timer)
-        {
-            m_pickup.Stop();
-            m_pickup = null;
-            return 0;
+            m_pickup ??= new ECSGameTimer(this, _ => { m_pickup = null; return 0; });
+            m_pickup.Start(time * 1000);
         }
 
         public void StopPickupTimer()
@@ -239,22 +211,15 @@ namespace DOL.GS
             {
                 if (player.ObjectState == eObjectState.Active)
                 {
-                    player.Out.SendMessage("You may now pick up " + Name + "!", eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.PickupObject.YouMayPickUp", Name), eChatType.CT_Loot, eChatLoc.CL_SystemWindow);
                 }
             }
-            m_pickup.Stop();
+            m_pickup?.Stop();
             m_pickup = null;
         }
 
-        public int GetPickupTime
-        {
-            get
-            {
-                if (m_pickup == null)
-                    return 0;
-                return m_pickup.TimeUntilElapsed;
-            }
-        }
+        public int GetPickupTime => m_pickup is { IsAlive: true } ? m_pickup.TimeUntilElapsed : 0;
+
         #endregion
 
         /// <summary>

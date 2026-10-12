@@ -179,10 +179,9 @@ namespace DOL.GS.Quests
                 GiveItem(player, StartItemTemplate);
 
             RefreshCustomIndicators(questData);
-            Task task = Task.CompletedTask;
             if (Visible)
             {
-                task.ContinueWith(async _ =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var translate = TranslateGoalText(player, Description);
                     await player.Out.SendQuestUpdate(questData);
@@ -197,7 +196,7 @@ namespace DOL.GS.Quests
 
             if (!string.IsNullOrWhiteSpace(MessageStarted))
             {
-                task.ContinueWith(async _ =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var results = await Task.WhenAll(
                         AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
@@ -221,8 +220,8 @@ namespace DOL.GS.Quests
                 return EndGoal(questData, goalData);
             }
             questData.SaveIntoDatabase();
-            
-            Task.Run(async () =>
+
+            GameLoopAsync.Fire(async () =>
             {
                 if (Visible)
                 {
@@ -244,7 +243,7 @@ namespace DOL.GS.Quests
             questData.SaveIntoDatabase();
             if (Visible)
             {
-                Task.Run(async () =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var player = questData.Owner;
                     var translate = TranslateGoalText(player, Description);
@@ -280,7 +279,7 @@ namespace DOL.GS.Quests
             var player = questData.Owner;
             if (goalState.State == eQuestGoalStatus.Aborted && !string.IsNullOrWhiteSpace(MessageAborted))
             {
-                Task.Run(async () =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var results = await Task.WhenAll(
                         AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
@@ -313,10 +312,9 @@ namespace DOL.GS.Quests
             goalData.State = eQuestGoalStatus.DoneAndActive;
 
             var player = questData.Owner;
-            var task = Task.CompletedTask;
             if (Visible)
             {
-                task = task.ContinueWith(async _ =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var translate = TranslateGoalText(player, Description);
                     await player.Out.SendQuestUpdate(questData);
@@ -330,7 +328,7 @@ namespace DOL.GS.Quests
 
             if (!string.IsNullOrWhiteSpace(MessageDone))
             {
-                task = task.ContinueWith(async _ =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var results = await Task.WhenAll(
                         AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
@@ -371,7 +369,7 @@ namespace DOL.GS.Quests
 
             if (!string.IsNullOrWhiteSpace(MessageCompleted))
             {
-                Task.Run(async () =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var results = await Task.WhenAll(
                         AutoTranslateManager.Translate(player, "[Quest {0}] {1}"),
@@ -379,12 +377,12 @@ namespace DOL.GS.Quests
                         Quest.GetNameForPlayer(player)
                     );
                     ChatUtil.SendImportant(player, string.Format(results[0], results[1], results[2]));
-                });
+                }, "Quest.GoalCompleted");
             }
 
             foreach (var e in GameEventManager.Instance.GetEventsStartedByQuest(Quest.Id + "-" + GoalId)!.Where(e => e.IsReady && e.StartConditionType == StartingConditionType.Quest))
             {
-                Task.Run(() => e.Start(player));
+                GameLoopPost.Run(static s => s.e.Start(s.player), (e, player));
             }
             if (!string.IsNullOrEmpty(EventId))
             {
@@ -401,7 +399,7 @@ namespace DOL.GS.Quests
                     }
                     if (StartEvent)
                     {
-                        Task.Run(() => questEvent.Start(player));
+                        GameLoopPost.Run(static s => s.questEvent.Start(s.player), (questEvent, player));
                     }
                 }
             }

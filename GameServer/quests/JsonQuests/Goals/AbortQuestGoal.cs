@@ -1,10 +1,11 @@
 ﻿using DOL.Events;
+using DOL.GS.Behaviour;
 using DOL.GS.PacketHandler;
 using DOL.Language;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DOL.GS.Behaviour;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
@@ -35,20 +36,24 @@ namespace DOL.GS.Quests
         public override PlayerGoalState ForceStartGoal(PlayerQuest questData)
         {
             var state = base.ForceStartGoal(questData);
-            new RegionTimer(questData.Owner, _timer =>
+            string text = m_text;
+
+            new ECSGameTimer(questData.Owner, _ =>
             {
                 questData.AbortQuest();
-                if (!string.IsNullOrWhiteSpace(m_text))
+
+                if (!string.IsNullOrWhiteSpace(text))
                 {
                     Task.Run(async () =>
                     {
-                        string msg = await TranslateGoalText(questData.Owner, m_text);
+                        string msg = await TranslateGoalText(questData.Owner, text);
                         ChatUtil.SendPopup(questData.Owner, msg);
                     });
                 }
 
                 return 0;
-            }).Start(1);
+            }, 1);
+
             return state;
         }
     }

@@ -94,11 +94,7 @@ namespace DOL.GS.Quests
             {
                 if (!string.IsNullOrWhiteSpace(m_text))
                 {
-                    Task.Run(async () =>
-                    {
-                        string msg = await TranslateGoalText(player, m_text);
-                        ChatUtil.SendPopup(player, msg);
-                    });
+                    GameLoopAsync.Then(TranslateGoalText(player, m_text), player, static (msg, p) => ChatUtil.SendPopup(p, msg));
                 }
 
                 for (int i = 0; i < delta && !goal.IsFinished && goal.Progress < ProgressTotal; i++)

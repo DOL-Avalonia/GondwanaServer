@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Reflection;
-
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
@@ -14,7 +13,7 @@ namespace DOL.GS.Quests
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         public enum eTDMissionType : int
         {
             Clear = 0,
@@ -509,11 +508,11 @@ namespace DOL.GS.Quests
         {
             if (m_owner is GamePlayer)
             {
-                (m_owner as GamePlayer).Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
+                (m_owner as GamePlayer)!.Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
             }
             else if (m_owner is Group)
             {
-                foreach (GamePlayer player in (m_owner as Group).GetPlayersInTheGroup())
+                foreach (GamePlayer player in (m_owner as Group)!.GetPlayersInTheGroup())
                 {
                     player.Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
                 }
@@ -526,8 +525,8 @@ namespace DOL.GS.Quests
     //system I've developed, and this script was partly finished so I adopted it ^^. 
     public class TaskDungeonInstance : Instance
     {
-        public TaskDungeonInstance(ushort ID, GameTimer.TimeManager time, RegionData dat)
-            : base(ID, time, dat)
+        public TaskDungeonInstance(ushort ID, RegionData dat)
+            : base(ID, dat)
         {
         }
 

@@ -47,6 +47,8 @@ Tasks.Level: Nivel {0}
 
 Tasks.KillEnemyPlayersGroupLog: Matad jugadores enemigos en grupo: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Matad jugadores enemigos en solitario: {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Matad criaturas de mazmorras: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Matad criaturas de exterior: {0}/{1}
 Tasks.KillKeepGuardsLog: Matad guardias de fortalezas: {0}/{1}
 Tasks.TakeKeepsLog: Tomad fortalezas: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Matad guardias de territorio: {0}/{1}

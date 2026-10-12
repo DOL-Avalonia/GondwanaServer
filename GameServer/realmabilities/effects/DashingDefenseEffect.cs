@@ -1,27 +1,10 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and//or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
+using DOL.Events;
+using DOL.GS.PacketHandler;
+using DOL.GS.RealmAbilities;
+using DOL.GS.SkillHandler;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections;
-using DOL.GS.PacketHandler;
-using DOL.Events;
-using DOL.GS.SkillHandler;
-using DOL.GS.RealmAbilities;
 using System.Collections.Generic;
 
 namespace DOL.GS.Effects
@@ -33,7 +16,7 @@ namespace DOL.GS.Effects
     {
 
         //private Int64 m_startTick;
-        private RegionTimer m_expireTimer;
+        private ECSGameTimer m_expireTimer;
         //private GamePlayer m_player;
         private Int32 m_effectDuration;
 
@@ -129,7 +112,7 @@ namespace DOL.GS.Effects
             m_guardSource.EffectList.Remove(this);
             m_guardTarget.EffectList.Remove(this);
 
-            m_guardTarget.TempProperties.removeProperty(RealmAbilities.DashingDefenseAbility.Dashing);
+            m_guardTarget.TempProperties.removeProperty(DashingDefenseAbility.Dashing);
 
             m_guardSource.Out.SendMessage(string.Format("You are no longer guarding {0}.", m_guardTarget.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             m_guardTarget.Out.SendMessage(string.Format("{0} is no longer guarding you.", m_guardSource.GetName(0, true)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -138,35 +121,21 @@ namespace DOL.GS.Effects
             return true;
         }
 
-        // <summary>
-        // Starts the timers for this effect
-        // <//summary>
         private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(GuardSource, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+            m_expireTimer = new ECSGameTimer(GuardSource, ExpireCallback, m_effectDuration * 1000);
         }
 
-        /// <summary>
-        /// Stops the timers for this effect
-        /// </summary>
         private void StopTimers()
         {
-
-            if (m_expireTimer != null)
-            {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
-            }
+            m_expireTimer?.Stop();
+            m_expireTimer = null;
         }
 
-        // <summary>
-        // Remaining Time of the effect in milliseconds
-        // <//summary>
-        private int ExpireCallback(RegionTimer timer)
+        private int ExpireCallback(ECSGameTimer timer)
         {
             Cancel(false);
-
             return 0;
         }
 
@@ -188,10 +157,8 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
-                if (timer == null || !timer.IsAlive)
-                    return 0;
-                return timer.TimeUntilElapsed;
+                ECSGameTimer timer = m_expireTimer;
+                return timer == null || !timer.IsAlive ? 0 : timer.TimeUntilElapsed;
             }
         }
 

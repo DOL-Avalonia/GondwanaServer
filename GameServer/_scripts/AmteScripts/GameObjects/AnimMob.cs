@@ -4,11 +4,11 @@ namespace DOL.GS.Scripts
 {
     public class AnimMob : AmteMob
     {
-        private RegionTimer mtimer;
+        private ECSGameTimer mtimer;
 
         protected ushort _SpellID;
 
-        public int Rplay(RegionTimer callingTimer)
+        public int Rplay(ECSGameTimer callingTimer)
         {
             //Si un joueur est présent dans un radius de 2k le mob se met en mouvement
             foreach (GamePlayer pl1 in GetPlayersInRadius(WorldMgr.OBJ_UPDATE_DISTANCE))
@@ -21,7 +21,7 @@ namespace DOL.GS.Scripts
             SetOwnBrain(new BlankBrain());
             if (!base.AddToWorld()) return false;
             //On démarre 
-            mtimer = new RegionTimer(this, Rplay);
+            mtimer = new ECSGameTimer(this, Rplay);
             mtimer.Start(3000);
             return true;
         }

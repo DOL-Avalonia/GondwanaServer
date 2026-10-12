@@ -132,11 +132,11 @@ namespace DOL.GS.Spells
             // Parry specialization (temporary) + parry chance
             if (target is GamePlayer pl)
             {
-                new RegionTimerAction<GamePlayer>(pl, p =>
+                new ECSGameTimer(pl, _ =>
                 {
-                    _tempParryLevel = CharacterClass.ModTempParry(p, apply, _tempParryLevel);
+                    _tempParryLevel = CharacterClass.ModTempParry(pl, apply, _tempParryLevel);
                     return 0;
-                }).Start(1);
+                }, 1);
             }
 
             if (apply)

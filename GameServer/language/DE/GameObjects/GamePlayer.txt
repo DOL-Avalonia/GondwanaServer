@@ -273,25 +273,26 @@ GameObjects.GamePlayer.OnSkillTrained.YouSpend:	Ihr verteilt {0} Punkte und spez
 GameObjects.GamePlayer.OpenSelfCraft.AlreadySelfCrafting:	Ihr seid gerade beim Arbeiten.
 GameObjects.GamePlayer.OpenSelfCraft.CanOnlyCraftBackpack:	Ihr könnt nur Gegenstände in Eurem Inventar bearbeiten!
 
-GameObjects.GamePlayer.PickupObject.Autosplit:	(Beuteteilung) {0} bekommt {1}.
-GameObjects.GamePlayer.PickupObject.BackpackFull:	Euer Rucksack ist voll. Ihr solltet erst etwas weglegen.
-GameObjects.GamePlayer.PickupObject.CantGetThat:	Ihr könnt das nicht bekommen!
-GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp:	{0} hebt {1} auf.
+GameObjects.GamePlayer.PickupObject.Autosplit:				(Beuteteilung) {0} bekommt {1}.
+GameObjects.GamePlayer.PickupObject.BackpackFull:			Euer Rucksack ist voll. Ihr solltet erst etwas weglegen.
+GameObjects.GamePlayer.PickupObject.CantGetThat:			Ihr könnt das nicht bekommen!
+GameObjects.GamePlayer.PickupObject.GroupMemberPicksUp:		{0} hebt {1} auf.
 GameObjects.GamePlayer.PickupObject.ItemBelowBGThreshold:	Dieser Gegenstand ist unter dem Lootlevel Eurer Kampfgruppe.
 GameObjects.GamePlayer.PickupObject.LootDoesntBelongYou:	Die Beute gehört Euch nicht - also Finger weg!
-GameObjects.GamePlayer.PickupObject.MustHaveTarget:	Ihr müsst erst etwas auswählen, um es nehmen zu können!
+GameObjects.GamePlayer.PickupObject.MustHaveTarget:			Ihr müsst erst etwas auswählen, um es nehmen zu können!
 GameObjects.GamePlayer.PickupObject.NoOneGroupWantsMoney:	Niemand in der Gruppe will das Geld haben.
-GameObjects.GamePlayer.PickupObject.NoOneWantsThis:	Keiner in der Gruppe will den Gegenstand [{0}].
-GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:	[{0}] zu weit weg, um es aufzuheben!
-GameObjects.GamePlayer.PickupObject.TooFarFromBoat:	Ihr seid zu weit weg vom Boot um einzusteigen!
-GameObjects.GamePlayer.PickupObject.YouGet:	Ihr steckt {0} in Euren Rucksack.
-GameObjects.GamePlayer.PickupObject.YouPickUp:	Ihr hebt {0} auf.
-GameObjects.GamePlayer.PickupObject.YourLootShare:	Euer Anteil an der Beute ist [{0}].
-GameObjects.GamePlayer.PickupObject.GuildDueTax:	Deine Steuer von {0} geht in die Gildenkasse.
-GameObjects.GamePlayer.PickupObject.CannotDepositHere:	{0} kann hier nicht abgelegt werden!
-GameObjects.GamePlayer.PickupObject.WaitToPickup:	Du musst noch {0} Sekunden warten, um {1} aufzuheben!
-GameObjects.GamePlayer.PickupObject.HeadPickedUp:	Du hast den Kopf von {0} geborgen.
-GameObjects.GamePlayer.PickupObject.HeadInventoryFull:	Du konntest den Kopf von {0} nicht bergen, dein Inventar ist voll!
+GameObjects.GamePlayer.PickupObject.NoOneWantsThis:			Keiner in der Gruppe will den Gegenstand [{0}].
+GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:		[{0}] zu weit weg, um es aufzuheben!
+GameObjects.GamePlayer.PickupObject.TooFarFromBoat:			Ihr seid zu weit weg vom Boot um einzusteigen!
+GameObjects.GamePlayer.PickupObject.YouGet:					Ihr steckt {0} in Euren Rucksack.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			Sie können {0} jetzt abholen!
+GameObjects.GamePlayer.PickupObject.YouPickUp:				Ihr hebt {0} auf.
+GameObjects.GamePlayer.PickupObject.YourLootShare:			Euer Anteil an der Beute ist [{0}].
+GameObjects.GamePlayer.PickupObject.GuildDueTax:			Deine Steuer von {0} geht in die Gildenkasse.
+GameObjects.GamePlayer.PickupObject.CannotDepositHere:		{0} kann hier nicht abgelegt werden!
+GameObjects.GamePlayer.PickupObject.WaitToPickup:			Du musst noch {0} Sekunden warten, um {1} aufzuheben!
+GameObjects.GamePlayer.PickupObject.HeadPickedUp:			Du hast den Kopf von {0} geborgen.
+GameObjects.GamePlayer.PickupObject.HeadInventoryFull:		Du konntest den Kopf von {0} nicht bergen, dein Inventar ist voll!
 
 GameObjects.GamePlayer.Pray.AlreadyPraying:	Ihr betet bereits!
 GameObjects.GamePlayer.Pray.Begin:	Ihr beginnt zu beten!

@@ -48,6 +48,8 @@ Tasks.Level: Úroveň {0}
 
 Tasks.KillEnemyPlayersGroupLog: Zabít nepřátelské hráče (ve skupině): {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Zabít nepřátelské hráče (solo): {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Zabít bytosti v kobkách: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Zabít bytosti ve volné přírodě: {0}/{1}
 Tasks.KillKeepGuardsLog: Zabít stráže pevnosti: {0}/{1}
 Tasks.TakeKeepsLog: Dobýt pevnosti: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Zabít stráže území: {0}/{1}

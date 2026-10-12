@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using System.Collections;
 using System.Reflection;
 using DOL.Language;
@@ -87,15 +68,15 @@ namespace DOL.GS.Commands
             AutoTranslator messageTranslator = new(player, message);
             foreach (GameClient c in WorldMgr.GetClientsOfRegion(player.CurrentRegionID))
             {
-                if (GameServer.ServerRules.IsAllowedToUnderstand(c.Player, player))
+                GamePlayer p = c.Player;
+                if (p == null || !GameServer.ServerRules.IsAllowedToUnderstand(p, player))
+                    continue;
+
+                GameLoopAsync.Then(Task.WhenAll(keyTranslator.Translate(p), messageTranslator.Translate(p)), (p, sender: player), static (r, s) =>
                 {
-                    Task.Run(async () => 
-                    {
-                        var results = await Task.WhenAll(keyTranslator.Translate(c.Player), messageTranslator.Translate(c.Player));
-                        c.Out.SendMessage(string.Format(results[0], c.Player.GetPersonalizedName(player), results[1]),
-                                          eChatType.CT_LFG, eChatLoc.CL_ChatWindow);
-                    });
-                }
+                    if (s.p.ObjectState == GameObject.eObjectState.Active)
+                        s.p.Out.SendMessage(string.Format(r[0], s.p.GetPersonalizedName(s.sender), r[1]), eChatType.CT_LFG, eChatLoc.CL_ChatWindow);
+                });
             }
         }
 

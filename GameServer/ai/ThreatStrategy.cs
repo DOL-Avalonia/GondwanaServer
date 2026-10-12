@@ -9,7 +9,7 @@ namespace DOL.AI.Brain
     /// Gondwana threat rules used by AggroTable.UpdateAndGetHighestThreat().
     /// Effective aggro = base aggro * min(500/distance, 1) * FollowingFriendMob.AggroMultiplier
     /// </summary>
-    public class GondwanaThreatStrategy : IThreatStrategy
+    public class ThreatStrategy : IThreatStrategy
     {
         protected readonly StandardMobBrain _owner;
 
@@ -19,7 +19,7 @@ namespace DOL.AI.Brain
         /// <summary>Distance under which aggro is not reduced (Gondwana legacy value).</summary>
         protected virtual double DistanceThreshold => 500.0;
 
-        public GondwanaThreatStrategy(StandardMobBrain owner)
+        public ThreatStrategy(StandardMobBrain owner)
         {
             _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         }

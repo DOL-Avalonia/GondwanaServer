@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Timer = System.Threading.Timer;
 
 using DOL.Database;
 using DOL.GS.PacketHandler;
@@ -288,11 +269,6 @@ namespace DOL.GS
         private const string ENTRY_ZONE_LAVA = "IsLava";
 
         /// <summary>
-        /// Holds all region timers
-        /// </summary>
-        private static GameTimer.TimeManager[] m_regionTimeManagers;
-
-        /// <summary>
         /// Initializes the most important things that is needed for some code
         /// </summary>
         /// <param name="regionsData">The loaded regions data</param>
@@ -396,18 +372,9 @@ namespace DOL.GS
             if (cpuCount < 1)
                 cpuCount = 1;
 
-            GameTimer.TimeManager[] timers = new GameTimer.TimeManager[cpuCount];
-            for (int i = 0; i < cpuCount; i++)
-            {
-                timers[i] = new GameTimer.TimeManager(string.Format("RegionTime{0}", (i + 1).ToString()));
-            }
-
-            m_regionTimeManagers = timers;
-
             for (int i = 0; i < regions.Count; i++)
             {
-                var region = regions[i];
-                RegisterRegion(timers[FastMath.Abs(i % (cpuCount * 2) - cpuCount) % cpuCount], region);
+                RegisterRegion(regions[i]);
             }
 
             log.DebugFormat("{0}MB - {1} Regions Loaded", GC.GetTotalMemory(true) / 1024 / 1024, m_regions.Count);
@@ -548,17 +515,6 @@ namespace DOL.GS
                 return false;
             }
             return true;
-        }
-
-        /// <summary>
-        /// Gets all region time managers
-        /// </summary>
-        /// <returns>A copy of region time managers array</returns>
-        public static GameTimer.TimeManager[] GetRegionTimeManagers()
-        {
-            GameTimer.TimeManager[] timers = m_regionTimeManagers;
-            if (timers == null) return Array.Empty<GameTimer.TimeManager>();
-            return (GameTimer.TimeManager[])timers.Clone();
         }
 
         /// <summary>
@@ -782,9 +738,9 @@ namespace DOL.GS
         /// <param name="time">Time manager for the region</param>
         /// <param name="data">The region data</param>
         /// <returns>Registered region</returns>
-        public static Region RegisterRegion(GameTimer.TimeManager time, RegionData data)
+        public static Region RegisterRegion(RegionData data)
         {
-            Region region = Region.Create(time, data);
+            Region region = Region.Create(data);
             m_regions.Add(data.Id, region);
             return region;
         }
@@ -1803,28 +1759,11 @@ namespace DOL.GS
                 return null;
             }
 
-            //Having selected the ID, we must select a time manager.
-            //For now, for simplicity so we can get the system running we will just take the first TimeManager
-            //in our list. This is because I don't want to risk causing an error by sharing an important resource
-            //like the TimeManager until I get some good testing and ensure work thus far is clean.
-
-            //Later, we will share the resources over the different threads.
-
-            int index = skinID % m_regionTimeManagers.Length;
-            GameTimer.TimeManager time = m_regionTimeManagers[index];
-
-            if (time == null)
-            {
-                log.Warn("TimeManager not found on instance create!");
-                return null;
-            }
-
-            //I've placed constructor info outside of the lock, to prevent a time delay on parallel threads.
-            ConstructorInfo info = instanceType.GetConstructor(new Type[] { typeof(ushort), typeof(GameTimer.TimeManager), typeof(RegionData) });
+            ConstructorInfo info = instanceType.GetConstructor(new[] { typeof(ushort), typeof(RegionData) });
 
             if (info == null)
             {
-                log.Error("Classtype " + instanceType + " did not have a cosntructor that matched the requirement!");
+                log.Error("Classtype " + instanceType + " did not have a constructor that matched the requirement!");
                 return null;
             }
 
@@ -1869,7 +1808,7 @@ namespace DOL.GS
                 //Having selected the data we need, create the Instance.
                 try
                 {
-                    instance = (BaseInstance)info.Invoke(new object[] { ID, time, data });//new Instance(ID, time, data);
+                    instance = (BaseInstance)info.Invoke(new object[] { ID, data });
                     regions.Add(ID, instance);
                 }
                 catch (Exception e)

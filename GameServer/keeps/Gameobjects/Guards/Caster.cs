@@ -1,20 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
@@ -26,45 +9,50 @@ namespace DOL.GS.Keeps
     public class GuardCaster : GameKeepGuard
     {
         public const int INTERVAL = 360 * 1000;
+        private ECSGameTimer m_effectTimer;
 
-        protected virtual int Timer(RegionTimer callingTimer)
+        protected virtual int Timer(ECSGameTimer timer)
         {
-            if (base.IsAlive)
-            {
-                foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                {
-                    player.Out.SendSpellCastAnimation(this, 4321, 30);
-                    RegionTimer timer = new RegionTimer(player, new RegionTimerCallback(ShowEffect), 3000);
-                }
-            }
+            if (!IsAlive || ObjectState != eObjectState.Active)
+                return 0;
+
+            foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                player.Out.SendSpellCastAnimation(this, 4321, 30);
+
+            new ECSGameTimer(this, ShowEffect, 3000);
             return INTERVAL;
         }
 
-        public int ShowEffect(RegionTimer timer)
+        public int ShowEffect(ECSGameTimer timer)
         {
-            if (base.IsAlive)
-            {
-                foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                {
-                    player.Out.SendSpellEffectAnimation(this, this, 4321, 0, false, 1);
-                }
-                foreach (GamePlayer player in this.GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
-                {
+            if (!IsAlive || ObjectState != eObjectState.Active)
+                return 0;
 
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GuardCaster.SkinsHardens", this.Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+            foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
+                player.Out.SendSpellEffectAnimation(this, this, 4321, 0, false, 1);
 
-                }
-            }
-            timer.Stop();
-            timer = null;
+            foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.INFO_DISTANCE))
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "GuardCaster.SkinsHardens", Name), eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
+
             return 0;
         }
 
         public override bool AddToWorld()
         {
             bool success = base.AddToWorld();
-            if (success) new RegionTimer(this, new RegionTimerCallback(Timer), INTERVAL);
+            if (success)
+            {
+                m_effectTimer?.Stop();
+                m_effectTimer = new ECSGameTimer(this, Timer, INTERVAL);
+            }
             return success;
+        }
+
+        public override bool RemoveFromWorld()
+        {
+            m_effectTimer?.Stop();
+            m_effectTimer = null;
+            return base.RemoveFromWorld();
         }
 
         protected override CharacterClass GetClass()

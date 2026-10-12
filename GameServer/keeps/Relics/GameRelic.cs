@@ -1,13 +1,14 @@
-using System;
-using System.Reflection;
-using System.Collections;
+using DOL.Database;
 using DOL.Events;
 using DOL.GS;
+using DOL.GS.Geometry;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
-using DOL.Database;
+using DOL.Language;
 using log4net;
-using DOL.GS.Geometry;
+using System;
+using System.Collections;
+using System.Reflection;
 
 namespace DOL.GS
 {
@@ -20,7 +21,7 @@ namespace DOL.GS
 
     public class GameRelic : GameStaticItem
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public const string PLAYER_CARRY_RELIC_WEAK = "IAmCarryingARelic";
         protected const int RelicEffectInterval = 4000;
@@ -30,10 +31,10 @@ namespace DOL.GS
         GamePlayer m_currentCarrier = null;
         GameRelicPad m_currentRelicPad = null;
         GameRelicPad m_returnRelicPad = null;
-        RegionTimer m_currentCarrierTimer;
+        ECSGameTimer m_currentCarrierTimer;
         DBRelic m_dbRelic;
         eRelicType m_relicType;
-        RegionTimer m_returnRelicTimer;
+        ECSGameTimer m_returnRelicTimer;
         long m_timeRelicOnGround = 0;
 
         protected int ReturnRelicInterval
@@ -148,23 +149,24 @@ namespace DOL.GS
         /// <returns></returns>
         public override bool Interact(GamePlayer player)
         {
+            string lang = player.Client.Account.Language;
             if (!base.Interact(player)) return false;
 
             if (!player.IsAlive)
             {
-                player.Out.SendMessage("You cannot pickup " + GetName(0, false) + ". You are dead!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.Interact.Dead", GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             if (IsMounted && player.Realm == Realm)
             {
-                player.Out.SendMessage("You cannot pickup " + GetName(0, false) + ". It is owned by your realm.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.Interact.OwnedByRealm", GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
             if (IsMounted && !RelicMgr.CanPickupRelicFromShrine(player, this))
             {
-                player.Out.SendMessage("You cannot pickup " + GetName(0, false) + ". You need to capture your realms " + (Enum.GetName(typeof(eRelicType), RelicType)) + " relic first.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.Interact.CaptureOwnFirst", GetName(0, false), Enum.GetName(typeof(eRelicType), RelicType)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
 
@@ -204,20 +206,22 @@ namespace DOL.GS
         /// <param name="player"></param>
         protected virtual void PlayerTakesRelic(GamePlayer player)
         {
+            string lang = player.Client.Account.Language;
+
             if (player.TempProperties.getProperty<object>(PLAYER_CARRY_RELIC_WEAK, null) != null)
             {
-                player.Out.SendMessage("You are already carrying a relic.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.PlayerTakesRelic.AlreadyCarrying"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
             if (player.IsStealthed)
             {
-                player.Out.SendMessage("You cannot carry a relic while stealthed.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.PlayerTakesRelic.Stealthed"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
             if (!player.IsAlive)
             {
-                player.Out.SendMessage("You are dead!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.PlayerTakesRelic.Dead"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -229,7 +233,7 @@ namespace DOL.GS
 
                 if (keep != null && keep.Realm != player.Realm)
                 {
-                    player.Out.SendMessage("You must capture this keep before taking a relic.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.PlayerTakesRelic.CaptureKeepFirst"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
                 }
             }
@@ -267,7 +271,7 @@ namespace DOL.GS
             }
             else
             {
-                player.Out.SendMessage("You dont have enough space in your backpack to carry this.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "GameRelic.PlayerTakesRelic.InventoryFull"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
         }
 
@@ -314,7 +318,7 @@ namespace DOL.GS
             {
                 // launch the reset timer if this relic is not dropped on a pad
                 m_timeRelicOnGround = CurrentRegion.Time;
-                m_returnRelicTimer = new RegionTimer(this, new RegionTimerCallback(ReturnRelicTick), RelicEffectInterval);
+                m_returnRelicTimer = new ECSGameTimer(this, ReturnRelicTick, RelicEffectInterval);
                 log.DebugFormat("{0} dropped, return timer for relic set to {1} seconds.", Name, ReturnRelicInterval / 1000);
 
                 // update the position of the worldObject Relic
@@ -327,7 +331,7 @@ namespace DOL.GS
         /// <summary>
         /// when the relic is lost and ReturnRelicInterval is elapsed
         /// </summary>
-        protected virtual int ReturnRelicTick(RegionTimer timer)
+        protected virtual int ReturnRelicTick(ECSGameTimer timer)
         {
             if (CurrentRegion.Time - m_timeRelicOnGround < ReturnRelicInterval)
             {
@@ -363,35 +367,21 @@ namespace DOL.GS
         /// <param name="player">Player to set the timer on. Timer stops if param is null</param>
         protected virtual void StartPlayerTimer(GamePlayer player)
         {
+            if (m_currentCarrierTimer != null)
+            {
+                if (player != null && log.IsWarnEnabled) log.Warn("GameRelic: PlayerTimer already set on a player, stopping timer!");
+                m_currentCarrierTimer.Stop();
+                m_currentCarrierTimer = null;
+            }
             if (player != null)
-            {
-                if (m_currentCarrierTimer != null)
-                {
-                    log.Warn("GameRelic: PlayerTimer already set on a player, stopping timer!");
-                    m_currentCarrierTimer.Stop();
-                    m_currentCarrierTimer = null;
-                }
-                m_currentCarrierTimer = new RegionTimer(player, new RegionTimerCallback(CarrierTimerTick));
-                m_currentCarrierTimer.Start(RelicEffectInterval);
-
-            }
-            else
-            {
-                if (m_currentCarrierTimer != null)
-                {
-                    m_currentCarrierTimer.Stop();
-                    m_currentCarrierTimer = null;
-                }
-            }
-
-
+                m_currentCarrierTimer = new ECSGameTimer(player, CarrierTimerTick, RelicEffectInterval);
         }
 
         /// <summary>
         /// The callback for the pulsing spelleffect
         /// </summary>
         /// <param name="timer">The ObjectTimerCallback object</param>
-        private int CarrierTimerTick(RegionTimer timer)
+        private int CarrierTimerTick(ECSGameTimer timer)
         {
             //update the relic position
             Update();
@@ -474,9 +464,25 @@ namespace DOL.GS
 
         public override IList GetExamineMessages(GamePlayer player)
         {
-
             IList messages = base.GetExamineMessages(player);
-            messages.Add((IsMounted) ? ("It is owned by " + ((player.Realm == Realm) ? "your realm" : GlobalConstants.RealmToName((eRealm)Realm)) + ".") : "It is without owner, take it!");
+            string lang = player.Client.Account.Language;
+
+            if (IsMounted)
+            {
+                if (player.Realm == Realm)
+                {
+                    messages.Add(LanguageMgr.GetTranslation(lang, "GameRelic.GetExamineMessages.OwnedByYourRealm"));
+                }
+                else
+                {
+                    messages.Add(LanguageMgr.GetTranslation(lang, "GameRelic.GetExamineMessages.OwnedByRealm", GlobalConstants.RealmToName((eRealm)Realm)));
+                }
+            }
+            else
+            {
+                messages.Add(LanguageMgr.GetTranslation(lang, "GameRelic.GetExamineMessages.NoOwner"));
+            }
+
             return messages;
         }
 
@@ -489,7 +495,7 @@ namespace DOL.GS
         {
             InternalID = obj.ObjectId;
             m_dbRelic = obj as DBRelic;
-            Position = Position.Create((ushort)m_dbRelic.Region, m_dbRelic.X, m_dbRelic.Y, m_dbRelic.Z, (ushort)m_dbRelic.Heading);
+            Position = Position.Create((ushort)m_dbRelic!.Region, m_dbRelic.X, m_dbRelic.Y, m_dbRelic.Z, (ushort)m_dbRelic.Heading);
             m_relicType = (eRelicType)m_dbRelic.relicType;
             Realm = (eRealm)m_dbRelic.Realm;
             m_originalRealm = (eRealm)m_dbRelic.OriginalRealm;
@@ -615,5 +621,4 @@ namespace DOL.GS
         #endregion
 
     }
-
 }

@@ -1,6 +1,7 @@
+using DOL.Events;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections.Generic;
-using DOL.Events;
 
 namespace DOL.GS.Effects
 {
@@ -12,10 +13,8 @@ namespace DOL.GS.Effects
         private const String m_delveString = "Grants the group a melee absorption bonus (Does not stack with Soldier's Barricade or Bedazzling Aura).";
         private GamePlayer m_player;
         private Int32 m_effectDuration;
-        private RegionTimer m_expireTimer;
+        private ECSGameTimer m_expireTimer;
         private int m_value;
-
-
 
         /// <summary>
         /// Default constructor for AmelioratingMelodiesEffect
@@ -81,39 +80,23 @@ namespace DOL.GS.Effects
             return true;
         }
 
-        /// <summary>
-        /// Starts the timers for this effect
-        /// </summary>
         private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_player, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+            m_expireTimer = new ECSGameTimer(m_player, ExpireCallback, m_effectDuration * 1000);
         }
 
-        /// <summary>
-        /// Stops the timers for this effect
-        /// </summary>
         private void StopTimers()
         {
-
-            if (m_expireTimer != null)
-            {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
-            }
+            m_expireTimer?.Stop();
+            m_expireTimer = null;
         }
 
-        /// <summary>
-        /// The callback for when the effect expires
-        /// </summary>
-        /// <param name="timer">The ObjectTimerCallback object</param>
-        private int ExpireCallback(RegionTimer timer)
+        private int ExpireCallback(ECSGameTimer timer)
         {
             Cancel(false);
-
             return 0;
         }
-
 
         /// <summary>
         /// Name of the effect
@@ -133,10 +116,8 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
-                if (timer == null || !timer.IsAlive)
-                    return 0;
-                return timer.TimeUntilElapsed;
+                ECSGameTimer timer = m_expireTimer;
+                return timer == null || !timer.IsAlive ? 0 : timer.TimeUntilElapsed;
             }
         }
 

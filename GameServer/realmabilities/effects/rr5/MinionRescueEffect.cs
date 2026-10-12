@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -45,18 +26,18 @@ namespace DOL.GS.Effects
 
         // Objects
         private GameNPC[] spirits;				// Array containing spirits
-        private RegionTimer[] spiritTimer;			// Array containing spirit timers
+        private ECSGameTimer[] spiritTimer;			// Array containing spirit timers
         private Spell spiritSpell;			// The spell to cast
         private SpellLine spiritSpellLine;	 	// The spell line
         private ISpellHandler stun;					// The spell handler
         private GamePlayer EffectOwner;			// Owner of the effect
 
         public MinionRescueEffect()
-            : base(RealmAbilities.MinionRescueAbility.DURATION)
+            : base(MinionRescueAbility.DURATION)
         {
             // Init NPC & Timer array
             spirits = new GameNPC[spiritCount];
-            spiritTimer = new RegionTimer[spiritCount];
+            spiritTimer = new ECSGameTimer[spiritCount];
 
             // Build spell
             DBSpell tSpell = new DBSpell();
@@ -90,7 +71,7 @@ namespace DOL.GS.Effects
                 stun = ScriptMgr.CreateSpellHandler(EffectOwner, spiritSpell, spiritSpellLine);
 
                 int targetCount = 0;
-                foreach (GamePlayer targetPlayer in EffectOwner.GetPlayersInRadius((ushort)RealmAbilities.MinionRescueAbility.SpellRadius))
+                foreach (GamePlayer targetPlayer in EffectOwner!.GetPlayersInRadius((ushort)MinionRescueAbility.SpellRadius))
                 {
                     if (targetCount == spiritCount) return;
                     if (targetPlayer.IsAlive && GameServer.ServerRules.IsAllowedToAttack(EffectOwner, targetPlayer, true))
@@ -130,12 +111,12 @@ namespace DOL.GS.Effects
             spirits[spiritId].SetOwnBrain(new StandardMobBrain());
             spirits[spiritId].AddToWorld();
             spirits[spiritId].TargetObject = targetPlayer;
-            spirits[spiritId].Follow(targetPlayer, 0, RealmAbilities.MinionRescueAbility.SpellRadius + 100);
-            spiritTimer[spiritId] = new RegionTimer(spirits[spiritId], new RegionTimerCallback(spiritCallBack), 200);
+            spirits[spiritId].Follow(targetPlayer, 0, MinionRescueAbility.SpellRadius + 100);
+            spiritTimer[spiritId] = new ECSGameTimer(spirits[spiritId], spiritCallBack, 200);
         }
 
         // Check distance between spirit and target
-        private int spiritCallBack(RegionTimer timer)
+        private int spiritCallBack(ECSGameTimer timer)
         {
             if (timer.Owner == null || !(timer.Owner is GameNPC))
             {

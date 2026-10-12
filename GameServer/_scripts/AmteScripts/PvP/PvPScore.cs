@@ -21,7 +21,10 @@ namespace AmteScripts.PvP
     public record PvPScore(bool IsSoloScore)
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
-        
+        private static readonly PropertyInfo[] s_props = typeof(PvPScore).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetIndexParameters().Length == 0 && p.GetCustomAttribute<IgnoreDataMemberAttribute>() == null).ToArray();
+        private static readonly object[] s_defaults = s_props.Select(p => p.GetCustomAttribute<DefaultValueAttribute>()?.Value).ToArray()!;
+        private static readonly Dictionary<string, PropertyInfo> s_byName = typeof(PvPScore).GetProperties().ToDictionary(p => p.Name);
+
         public PvPScore(string playerName, string playerID, bool isSoloScore) : this(isSoloScore)
         {
             PlayerName = playerName;
@@ -136,6 +139,7 @@ namespace AmteScripts.PvP
             }
         }
 
+        [DefaultValue(0)]
         public int Treasure_BroughtTreasuresPoints { get; set; }
         [DefaultValue(0)]
         public int Treasure_StolenTreasuresPoints { get; set; }
@@ -354,27 +358,22 @@ namespace AmteScripts.PvP
 
         public string Serialize()
         {
-            // TODO: Take a StreamWriter as parameter and write directly
-            var playerScoreType = typeof(PvPScore);
-            var properties = playerScoreType.GetProperties();
-            return string.Join(
-                ';', properties
-                    .Where(p => p.GetCustomAttribute(typeof(IgnoreDataMemberAttribute)) == null)
-                    .Select(p =>
-                    {
-                        object? value = p.GetValue(this);
+            StringBuilder sb = new(256);
+            for (int i = 0; i < s_props.Length; i++)
+            {
+                object value = s_props[i].GetValue(this)!;
+                if (value == null || Equals(s_defaults[i], value))
+                    continue;
 
-                        if (value == null || Equals(p.GetCustomAttribute<DefaultValueAttribute>()?.Value, value))
-                            return string.Empty;
-                        
-                        var str = Serialize(value);
-                        if (string.IsNullOrEmpty(str))
-                            return string.Empty;
-                        
-                        return p.Name + '=' + str;
-                    })
-                    .Where(s => !string.IsNullOrEmpty(s))
-            );
+                string str = Serialize(value);
+                if (string.IsNullOrEmpty(str))
+                    continue;
+                if (sb.Length > 0)
+                    sb.Append(';');
+
+                sb.Append(s_props[i].Name).Append('=').Append(str);
+            }
+            return sb.ToString();
         }
 
         private static IEnumerable<Item> ParseItems(string str)

@@ -15,7 +15,7 @@ namespace DOL.GS.RealmAbilities
 
         public const string Dashing = "Dashing";
 
-        //private RegionTimer m_expireTimer;
+        //private ECSGameTimer m_expireTimer;
         int m_duration = 1;
         int m_range = 1000;
         //private GamePlayer m_player;

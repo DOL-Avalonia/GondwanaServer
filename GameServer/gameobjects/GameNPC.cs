@@ -4204,15 +4204,15 @@ namespace DOL.GS
 
             if (announce)
             {
-                Task.Run(async () =>
+                var keyTranslator = new KeyTranslator("GameNPC.SayTo.SpeaksTo");
+                foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE))
                 {
-                    var keyTranslator = new KeyTranslator("GameNPC.SayTo.SpeaksTo");
-                    foreach (var player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE).Cast<GamePlayer>().Where(p => p != target))
-                    {
-                        var resultText = await keyTranslator.Translate(player, player.GetPersonalizedName(this), player.GetPersonalizedName(target));
-                        player.MessageFromArea(this, resultText, eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
-                    }
-                });
+                    if (player == null || player == target)
+                        continue;
+
+                    GameLoopAsync.Then(keyTranslator.Translate(player, player.GetPersonalizedName(this), player.GetPersonalizedName(target)), (player, npc: this), static (text, s) =>
+                    { if (s.player.ObjectState == GameObject.eObjectState.Active) s.player.MessageFromArea(s.npc, text, eChatType.CT_Spell, eChatLoc.CL_SystemWindow); });
+                }
             }
             
             if (translate)
@@ -7079,11 +7079,7 @@ namespace DOL.GS
             if (targetPlayer != null && trigger == eAmbientTrigger.interact)
             {
                 // for interact text we pop up a window
-                Task.Run(async () =>
-                {
-                    var translated = await AutoTranslateManager.Translate(targetPlayer, text);
-                    targetPlayer.Out.SendMessage(translated, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                });
+                GameLoopAsync.Message(targetPlayer, AutoTranslateManager.Translate(targetPlayer, text), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 return;
             }
 
@@ -7092,11 +7088,7 @@ namespace DOL.GS
             {
                 foreach (GamePlayer player in CurrentRegion.GetPlayersInRadius(Coordinate, 25000, false, false))
                 {
-                    Task.Run(async () =>
-                    {
-                        var displayed = await AutoTranslateManager.Translate(player, text);
-                        player.Out.SendMessage(displayed, eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
-                    });
+                    GameLoopAsync.Message(player, AutoTranslateManager.Translate(player, text), eChatType.CT_Broadcast, eChatLoc.CL_ChatWindow);
                 }
             }
             else if (chosen.Voice.StartsWith("y"))

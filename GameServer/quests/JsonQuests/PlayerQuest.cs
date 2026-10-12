@@ -90,11 +90,7 @@ namespace DOL.GS.Quests
 
             // happen when the quest has been removed
             if (VisibleGoals.Count == 0)
-                new RegionTimer(owner, _timer =>
-                {
-                    AbortQuest();
-                    return 0;
-                }).Start(1);
+                new ECSGameTimer(owner, _ => { AbortQuest(); return 0; }, 1);
         }
 
         public bool CheckQuestQualification(GamePlayer player) => Quest.CheckQuestQualification(player);
@@ -136,12 +132,12 @@ namespace DOL.GS.Quests
             DbQuest.Step = (int)eQuestStatus.Done;
             string questName = Quest.Name;
 
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
-                questName = await Quest.GetNameForPlayer(Owner) ?? Quest.Name;
-                string completedMsg = await LanguageMgr.Translate(Owner.Client.Player, "AbstractQuest.FinishQuest.Completed", questName);
+                string questName = await Quest.GetNameForPlayer(Owner) ?? Quest.Name;
+                string completedMsg = await LanguageMgr.Translate(Owner, "AbstractQuest.FinishQuest.Completed", questName);
                 Owner.Out.SendMessage(completedMsg, eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
-            });
+            }, "Quest.Finish");
 
             // move quest from active list to finished list...
             Owner.AddFinishedQuest(this);
@@ -150,7 +146,7 @@ namespace DOL.GS.Quests
             
             foreach (var e in GameEventManager.Instance.GetEventsStartedByQuest(Quest.Id + "-end").Where(e => e.IsReady && e.StartConditionType == StartingConditionType.Quest))
             {
-                Task.Run(() => e.Start(Owner));
+                GameLoopPost.Run(static s => s.e.Start(s.owner), (e, owner: Owner));
             }
             if (!string.IsNullOrEmpty(Quest.EndEventId))
             {
@@ -167,7 +163,7 @@ namespace DOL.GS.Quests
                     }
                     if (Quest.EndStartEvent)
                     {
-                        Task.Run(() => questEvent.Start(Owner));
+                        GameLoopPost.Run(static s => s.questEvent.Start(s.owner), (questEvent, owner: Owner));
                     }
                 }
             }

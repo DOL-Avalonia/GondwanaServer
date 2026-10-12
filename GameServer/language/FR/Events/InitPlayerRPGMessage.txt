@@ -1,8 +1,8 @@
 
 # Server Intro RPG message
-ServerRPGMessage.ShortDescription:		Bienvenue sur Arcanum, un monde forgé dans les cendres de la Grande Guerre Magique ! Dans ce royaume immersif RP/PvP, des royaumes fracturés luttent pour leur survie tandis que les Guildes dictent la loi. Veuillez consulter les règles sacrées et celles du serveur sur www.arcanum-server.com. Aiguisez vos lames, préparez vos sorts, et profitez de votre aventure sur Arcanum !
-ServerRPGMessage.Lore1:					Bienvenue sur Arcanum !
-ServerRPGMessage.Lore2:					Il y a deux mille ans, Arcanum était un réseau étincelant de citadelles volantes et de forges de mana. Puis vint la Grande Guerre Magique. Les continents furent déchirés, laissant un monde meurtri et aminci. De ces ruines, trois royaumes se sont élevés : Albion, Midgard et Hibernia. Aujourd'hui, les rois gouvernent sur le papier, mais ce sont les Guildes qui dirigent véritablement ces terres fracturées, tandis que les hors-la-loi bâtissent leurs propres empires dans le sombre Souterrain. Choisissez votre voie avec sagesse.
+ServerRPGMessage.ShortDescription:		Bienvenue sur {0}, un monde forgé dans les cendres de la Grande Guerre Magique ! Dans ce royaume immersif RP/PvP, des royaumes fracturés luttent pour leur survie tandis que les Guildes dictent la loi. Veuillez consulter les règles sacrées et celles du serveur sur www.{0}-server.com. Aiguisez vos lames, préparez vos sorts, et profitez de votre aventure sur {0} !
+ServerRPGMessage.Lore1:					Bienvenue sur {0} !
+ServerRPGMessage.Lore2:					Il y a deux mille ans, {0} était un réseau étincelant de citadelles volantes et de forges de mana. Puis vint la Grande Guerre Magique. Les continents furent déchirés, laissant un monde meurtri et aminci. De ces ruines, trois royaumes se sont élevés : Albion, Midgard et Hibernia. Aujourd'hui, les rois gouvernent sur le papier, mais ce sont les Guildes qui dirigent véritablement ces terres fracturées, tandis que les hors-la-loi bâtissent leurs propres empires dans le sombre Souterrain. Choisissez votre voie avec sagesse.
 ServerRPGMessage.FeaturesHeader:		--------- FONCTIONNALITÉS DU SERVEUR ---------
 ServerRPGMessage.FeatureEvents1:		[Événements Dynamiques & Quêtes]
 ServerRPGMessage.FeatureEvents2:		Participez à des événements modifiant le monde et à des chasses de boss légendaires.
@@ -63,4 +63,4 @@ ServerRPGMessage.GCCombatZone:			/gc combatzone : Créez une zone de combat PvP 
 ServerRPGMessage.GCJail:				/gc jailrelease <nom> : Payez une caution pour libérer un membre de votre guilde de prison.
 ServerRPGMessage.GCRent:				/gc houserent <on|off> : Activez/désactivez les paiements automatiques du loyer de la maison de guilde.
 ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Achetez et déployez des bannières tactiques pour améliorer vos membres ou les gardes de votre territoire.
-ServerRPGMessage.Outro:					Bonne chance, et que votre héritage sur Arcanum soit légendaire !
+ServerRPGMessage.Outro:					Bonne chance, et que votre héritage sur {0} soit légendaire !

@@ -110,12 +110,12 @@ namespace DOL.GS
         /// <summary>
         /// Tick timer
         /// </summary>
-        private RegionTimer m_timer;
+        private ECSGameTimer m_timer;
 
         /// <summary>
         /// Banner expiration timer
         /// </summary>
-        private RegionTimer m_expireTimer;
+        private ECSGameTimer m_expireTimer;
 
         private GuildBannerItem m_item;
         
@@ -128,7 +128,7 @@ namespace DOL.GS
             BannerItem = item;
             if (Properties.GUILD_BANNER_DURATION > 0)
             {
-                m_expireTimer = new RegionTimer(player, new RegionTimerCallback(BannerExpireCallback), Properties.GUILD_BANNER_DURATION * 1000);
+                m_expireTimer = new ECSGameTimer(player, BannerExpireCallback, Properties.GUILD_BANNER_DURATION * 1000);
             }
         }
 
@@ -175,10 +175,9 @@ namespace DOL.GS
             if (Guild != null)
                 Guild.ActiveGuildBanner = this;
             AddHandlers();
-                    
+
             m_timer?.Stop();
-            m_timer = new RegionTimer(CarryingPlayer, new RegionTimerCallback(TimerTick));
-            m_timer.Start(1);
+            m_timer = new ECSGameTimer(CarryingPlayer, TimerTick, 1);
         }
 
         protected bool CanStart(GamePlayer player)
@@ -245,7 +244,7 @@ namespace DOL.GS
             }
         }
 
-        private int TimerTick(RegionTimer timer)
+        private int TimerTick(ECSGameTimer timer)
         {
             if (CarryingPlayer != null)
             {
@@ -303,9 +302,8 @@ namespace DOL.GS
             PutAway();
         }
 
-        protected int LeaveGroupCallback(RegionTimer timer)
+        protected int LeaveGroupCallback(ECSGameTimer timer)
         {
-            timer.Stop();
             m_expireTimer = null;
             if (!Properties.GUILD_BANNER_ALLOW_SOLO)
             {
@@ -315,9 +313,8 @@ namespace DOL.GS
             return 0;
         }
 
-        protected int BannerExpireCallback(RegionTimer timer)
+        protected int BannerExpireCallback(ECSGameTimer timer)
         {
-            timer.Stop();
             m_expireTimer = null;
             PutAway();
             return 0;
@@ -340,7 +337,7 @@ namespace DOL.GS
                 CarryingPlayer.SendTranslatedMessage("GameUtils.Guild.Banner.LeavesGroup", eChatType.CT_Group, eChatLoc.CL_SystemWindow, Guild.Name);
                 (args as LeaveGroupEventArgs)?.Group.SendTranslatedMessageToGroupMembers("GameUtils.Guild.Banner.LeavesGroup", eChatType.CT_Group, eChatLoc.CL_SystemWindow, Guild.Name);
                 m_expireTimer?.Stop();
-                m_expireTimer = new RegionTimer(CarryingPlayer, LeaveGroupCallback, 30000);
+                m_expireTimer = new ECSGameTimer(CarryingPlayer, LeaveGroupCallback, 30000);
             }
             else
             {

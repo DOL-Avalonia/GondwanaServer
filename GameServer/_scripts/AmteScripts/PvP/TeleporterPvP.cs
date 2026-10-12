@@ -367,9 +367,7 @@ namespace DOL.GS.Scripts
         private void _TeleportSolo(GamePlayer player)
         {
             _isBusy = true;
-            var timer = new RegionTimer(this, TeleportSoloCallback);
-            timer.Properties.setProperty("player", player);
-            timer.Start(2000);
+            new ECSGameTimer(this, _ => { _isBusy = false; TeleportSoloCallback(player); return 0; }, 2000);
 
             // show cast animation to *nearby* players
             foreach (GamePlayer plr in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
@@ -379,10 +377,9 @@ namespace DOL.GS.Scripts
             }
         }
 
-        private int TeleportSoloCallback(RegionTimer timer)
+        private int TeleportSoloCallback(GamePlayer player)
         {
             _isBusy = false;
-            var player = timer.Properties.getProperty<GamePlayer>("player", null);
             if (player == null) return 0;
 
             if (player.InCombat)
@@ -458,15 +455,12 @@ namespace DOL.GS.Scripts
             }
 
             // Start a single timer for 2s => calls TeleportGroupCallback
-            RegionTimer TimerTL = new RegionTimer(this, TeleportGroupCallback);
-            TimerTL.Properties.setProperty("leader", leader);
-            TimerTL.Start(2000);
+            new ECSGameTimer(this, _ => TeleportGroupCallback(leader), 2000);
         }
 
-        private int TeleportGroupCallback(RegionTimer timer)
+        private int TeleportGroupCallback(GamePlayer leader)
         {
             _isBusy = false;
-            GamePlayer leader = timer.Properties.getProperty<GamePlayer>("leader", null);
             if (leader == null) return 0;
 
             if (leader.InCombat)

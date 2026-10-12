@@ -84,10 +84,14 @@ PvPManager.Rules.ExtraCommands:				=== Commandes Supplémentaires ===
 PvPManager.Rules.RenameCommand:				Utilisez '/gc rename <nom>' si vous êtes le chef de groupe pour renommer votre groupe/guilde.
 PvPManager.Rules.TerritoriesCommand:		Utilisez '/gc territories' ou '/gc subterritories' pour voir les objectifs, les options de capture, les propriétaires et les timers.
 
-PvPManager.Journal.CTFName:					[PvP] Tuez le porteur du drapeau en mouvement !
-PvPManager.Journal.CTFDesc:					Le porteur du drapeau ennemi est à découvert. Traquez-le !
-PvPManager.Journal.KotHName:				[PvP] Prenez le contrôle de la Colline et défendez-la !
-PvPManager.Journal.KotHDesc:				Déplacez-vous vers le lieu indiqué et sécurisez la zone pour votre équipe !
+PvPManager.Journal.CTF.AtBase.Name:			[PvP] Capturez le drapeau !
+PvPManager.Journal.CTF.AtBase.Desc:			Le drapeau est proche ! Allez le chercher !
+PvPManager.Journal.CTF.Carried.Name:		[PvP] Tuez le porteur du drapeau en mouvement !
+PvPManager.Journal.CTF.Carried.Desc:		Le porteur du drapeau ennemi est à découvert. Traquez-le !
+PvPManager.Journal.CTF.OnGround.Name:		[PvP] Drapeau tombé à terre !
+PvPManager.Journal.CTF.OnGround.Desc:		Le drapeau a été lâché ! Saisissez-le avant qu'il ne disparaisse.
+PvPManager.Journal.CTF.OnTempPad.Name:		[PvP] Drapeau sur un pad d'avant-poste !
+PvPManager.Journal.CTF.OnTempPad.Desc:		Le drapeau est sécurisé sur un avant-poste. Récupérez-le !
 
 PvP.Predator.Prey:							Proie: {0}
 PvP.Predator.PreyAssigned:					Vous avez une nouvelle proie: {0}
@@ -114,6 +118,8 @@ PvPManager.Score.Announce.Guild.3:			[PvP] La guilde {0} a gagné la troisième 
 PvPManager.Score.Announce.Player.1:			[PvP] Le joueur {0} a gagné la première place dans {1} avec {2} points!
 PvPManager.Score.Announce.Player.2:			[PvP] Le joueur {0} a gagné la deuxième place dans {1} avec {2} points!
 PvPManager.Score.Announce.Player.3:			[PvP] Le joueur {0} a gagné la troisième place dans {1} avec {2} points!
+PvPManager.Score.TasksProgression:			--------- Progression des Tâches PvP ---------
+PvPManager.Score.PredatorMenu:				----------- Tableau des Prédateurs -----------
 
 PvP.Score.PvPSoloKills:						Kills solo
 PvP.Score.PvPGrpKills:						Kills en groupe
@@ -188,3 +194,8 @@ PvP.Score.BioInfections.Short:						Infectés
 PvP.Score.BioZombieKills.Short:						KillsZombie
 PvP.Score.BioZombieDeaths.Short:					MortsZombie
 PvP.Score.Total.Short:                              Total
+
+PvPManager.Predator.Target:					Cible
+PvPManager.Predator.HuntedBy:				Traqué par
+PvPManager.Predator.NoTarget:				Aucune cible active
+PvPManager.Predator.Inactive:				Système prédateur inactif

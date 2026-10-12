@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -149,11 +131,6 @@ namespace DOL.GS
         private long m_lastRelocationTime = 0;
 
         /// <summary>
-        /// The region time manager
-        /// </summary>
-        protected readonly GameTimer.TimeManager m_timeManager;
-
-        /// <summary>
         /// The Region Mob's Respawn Timer Collection
         /// </summary>
         protected readonly ConcurrentDictionary<GameNPC, int> m_mobsRespawning = new ConcurrentDictionary<GameNPC, int>();
@@ -176,49 +153,28 @@ namespace DOL.GS
         /// <param name="time"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static Region Create(GameTimer.TimeManager time, RegionData data)
+        public static Region Create(RegionData data)
         {
             try
             {
-                Type t = typeof(Region);
-
-                if (string.IsNullOrEmpty(data.ClassType) == false)
+                if (!string.IsNullOrEmpty(data.ClassType))
                 {
-                    t = Type.GetType(data.ClassType);
-
-                    if (t == null)
-                    {
-                        t = ScriptMgr.GetType(data.ClassType);
-                    }
-
+                    Type t = Type.GetType(data.ClassType) ?? ScriptMgr.GetType(data.ClassType);
                     if (t != null)
                     {
-                        ConstructorInfo info = t.GetConstructor(new Type[] { typeof(GameTimer.TimeManager), typeof(RegionData) });
-
-                        Region r = (Region)info!.Invoke(new object[] { time, data });
-
-                        if (r != null)
+                        ConstructorInfo info = t.GetConstructor(new[] { typeof(RegionData) });
+                        if (info != null && info.Invoke(new object[] { data }) is Region r)
                         {
-                            // Success with requested classtype
                             log.InfoFormat("Created Region {0} using ClassType '{1}'", r.ID, data.ClassType);
                             return r;
                         }
-
-                        log.ErrorFormat("Failed to Invoke Region {0} using ClassType '{1}'", r!.ID, data.ClassType);
+                        log.ErrorFormat("ClassType '{0}' for region {1} has no (RegionData) constructor", data.ClassType, data.Id);
                     }
-                    else
-                    {
-                        log.ErrorFormat("Failed to find ClassType '{0}' for region {1}!", data.ClassType, data.Id);
-                    }
+                    else log.ErrorFormat("Failed to find ClassType '{0}' for region {1}!", data.ClassType, data.Id);
                 }
             }
-            catch (Exception ex)
-            {
-                log.ErrorFormat("Failed to start region {0} with requested classtype: {1}.  Exception: {2}!", data.Id, data.ClassType, ex.Message);
-            }
-
-            // Create region using default type
-            return new Region(time, data);
+            catch (Exception ex) { log.ErrorFormat("Failed to start region {0} with classtype {1}: {2}", data.Id, data.ClassType, ex.Message); }
+            return new Region(data);
         }
 
         /// <summary>
@@ -226,7 +182,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="time">The time manager for this region</param>
         /// <param name="data">The region data</param>
-        public Region(GameTimer.TimeManager time, RegionData data)
+        public Region(RegionData data)
         {
             m_regionData = data;
             m_objects = Array.Empty<GameObject>();
@@ -246,12 +202,10 @@ namespace DOL.GS
 
             m_Areas = new Dictionary<ushort, IArea>();
 
-            m_timeManager = time;
-
             List<string> list = null;
 
-            if (ServerProperties.Properties.DEBUG_LOAD_REGIONS != string.Empty)
-                list = Util.SplitCSV(ServerProperties.Properties.DEBUG_LOAD_REGIONS, true);
+            if (Properties.DEBUG_LOAD_REGIONS != string.Empty)
+                list = Util.SplitCSV(Properties.DEBUG_LOAD_REGIONS, true);
 
             if (list != null && list.Count > 0)
             {
@@ -267,7 +221,7 @@ namespace DOL.GS
                 }
             }
 
-            list = Util.SplitCSV(ServerProperties.Properties.DISABLED_REGIONS, true);
+            list = Util.SplitCSV(Properties.DISABLED_REGIONS, true);
             foreach (string region in list)
             {
                 if (region.ToString() == ID.ToString())
@@ -277,7 +231,7 @@ namespace DOL.GS
                 }
             }
 
-            list = Util.SplitCSV(ServerProperties.Properties.DISABLED_EXPANSIONS, true);
+            list = Util.SplitCSV(Properties.DISABLED_EXPANSIONS, true);
             foreach (string expansion in list)
             {
                 if (expansion.ToString() == m_regionData.Expansion.ToString())
@@ -524,19 +478,11 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Gets the region time manager
-        /// </summary>
-        public virtual GameTimer.TimeManager TimeManager
-        {
-            get { return m_timeManager; }
-        }
-
-        /// <summary>
         /// Gets the current region time in milliseconds
         /// </summary>
         public virtual long Time
         {
-            get { return m_timeManager.CurrentTime; }
+            get { return GameLoop.GameLoopTime; }
         }
 
         protected bool m_isDisabled = false;
@@ -635,10 +581,7 @@ namespace DOL.GS
             banner.CurrentRegion = this;
             banner.CurrentRegionID = ID;
             banner.LoadedFromScript = true;
-            ECSGameTimer zoneTimer = new ECSGameTimer(banner);
-            zoneTimer.Interval = Properties.GUILD_COMBAT_ZONE_DURATION * 1000;
-            zoneTimer.Callback = CombatZoneTimerCallback;
-            zoneTimer.Start(zoneTimer.Interval);
+            ECSGameTimer zoneTimer = new ECSGameTimer(banner, CombatZoneTimerCallback, Properties.GUILD_COMBAT_ZONE_DURATION * 1000);
             banner.AddToWorld();
             SpawnCombatZoneBoundaryBanners(banner, zone);
         }
@@ -696,12 +639,7 @@ namespace DOL.GS
         /// </summary>
         public virtual bool IsAM
         {
-            get
-            {
-                if (IsPM)
-                    return false;
-                return true;
-            }
+            get { return !IsPM; }
         }
 
         private bool m_isPM;
@@ -801,7 +739,6 @@ namespace DOL.GS
         /// </summary>
         public void StartRegionMgr()
         {
-            m_timeManager.Start();
             this.Notify(RegionEvent.RegionStart, this);
         }
 
@@ -810,7 +747,6 @@ namespace DOL.GS
         /// </summary>
         public void StopRegionMgr()
         {
-            m_timeManager.Stop();
             this.Notify(RegionEvent.RegionStop, this);
         }
 
@@ -1035,7 +971,7 @@ namespace DOL.GS
             if (myMobCount + myItemCount + myMerchantCount + myBindCount > 0)
             {
                 if (log.IsInfoEnabled)
-                    log.Info(String.Format("Region: {0} ({1}) loaded {2} mobs, {3} merchants, {4} items {5} bindpoints, from DB ({6})", Description, ID, myMobCount, myMerchantCount, myItemCount, myBindCount, TimeManager.Name));
+                    log.Info(String.Format("Region: {0} ({1}) loaded {2} mobs, {3} merchants, {4} items {5} bindpoints, from DB", Description, ID, myMobCount, myMerchantCount, myItemCount, myBindCount));
 
                 log.Debug("Used Memory: " + GC.GetTotalMemory(false) / 1024 / 1024 + "MB");
 
@@ -2123,7 +2059,7 @@ namespace DOL.GS
                 zone.Relocate(null);
             }
 
-            m_lastRelocationTime = DateTime.Now.Ticks / (10 * 1000);
+            m_lastRelocationTime = GameLoop.GameLoopTime;
         }
 
         #endregion

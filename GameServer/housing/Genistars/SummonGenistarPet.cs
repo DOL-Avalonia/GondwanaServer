@@ -144,19 +144,15 @@ namespace DOL.GS.Spells
             }
             if (healthPct <= 0.0) healthPct = 0.01;
 
-            new RegionTimer(m_pet, new RegionTimerCallback(timer =>
+            new ECSGameTimer(m_pet, _ =>
             {
                 if (m_pet != null && m_pet.IsAlive)
                 {
                     m_pet.Health = Math.Max(1, (int)(m_pet.MaxHealth * healthPct));
-
-                    if (healthPct < 1.0)
-                    {
-                        m_pet.BossAblativeShieldCurrent = 0;
-                    }
+                    if (healthPct < 1.0) m_pet.BossAblativeShieldCurrent = 0;
                 }
                 return 0;
-            }), 100);
+            }, 100);
 
             if (m_pet.Brain is IControlledBrain cb)
             {

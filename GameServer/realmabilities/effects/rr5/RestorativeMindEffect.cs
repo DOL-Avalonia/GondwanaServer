@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using DOL.GS.PacketHandler;
-using DOL.GS.RealmAbilities;
-using DOL.GS;
 
 namespace DOL.GS.Effects
 {
@@ -14,7 +11,7 @@ namespace DOL.GS.Effects
     {
 
         private GamePlayer m_playerOwner;
-        private RegionTimer m_tickTimer;
+        private ECSGameTimer m_tickTimer;
 
 
         public RestorativeMindEffect()
@@ -40,12 +37,7 @@ namespace DOL.GS.Effects
             }
         }
 
-        public override void Stop()
-        {
-            if (m_tickTimer.IsAlive)
-                m_tickTimer.Stop();
-            base.Stop();
-        }
+        private void startTimer() => m_tickTimer = new ECSGameTimer(m_playerOwner, onTick, 3000);
 
         private void healTarget()
         {
@@ -71,18 +63,16 @@ namespace DOL.GS.Effects
             }
         }
 
-        private int onTick(RegionTimer timer)
+        private int onTick(ECSGameTimer timer)
         {
             healTarget();
             return 3000;
         }
 
-        private void startTimer()
+        public override void Stop()
         {
-            m_tickTimer = new RegionTimer(m_playerOwner);
-            m_tickTimer.Callback = new RegionTimerCallback(onTick);
-            m_tickTimer.Start(3000);
-
+            m_tickTimer?.Stop();
+            base.Stop();
         }
 
         public override string Name { get { return "Restorative Mind"; } }

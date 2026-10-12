@@ -247,7 +247,7 @@ namespace DOL.GS.Scripts
                         return true;
                     }
 
-                    RegionTimer TimerTL = new RegionTimer(this, Teleportation);
+                    ECSGameTimer TimerTL = new ECSGameTimer(this, Teleportation);
                     TimerTL.Properties.setProperty("TP", jumpPos);
                     TimerTL.Properties.setProperty("player", player);
                     TimerTL.Start(3000);
@@ -307,7 +307,7 @@ namespace DOL.GS.Scripts
             {
                 if (pos.Conditions.Item.Equals(item.Id_nb, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    RegionTimer TimerTL = new RegionTimer(this, Teleportation);
+                    ECSGameTimer TimerTL = new ECSGameTimer(this, Teleportation);
                     TimerTL.Properties.setProperty("TP", pos);
                     TimerTL.Properties.setProperty("player", player);
                     TimerTL.Start(3000);
@@ -411,7 +411,7 @@ namespace DOL.GS.Scripts
             return questDb?.Name ?? $"Quest {questId}";
         }
 
-        protected virtual int Teleportation(RegionTimer timer)
+        protected virtual int Teleportation(ECSGameTimer timer)
         {
             JumpPos pos = timer.Properties.getProperty<JumpPos>("TP", null);
             GamePlayer player = timer.Properties.getProperty<GamePlayer>("player", null);
@@ -473,7 +473,7 @@ namespace DOL.GS.Scripts
 
             if (AreaPulseCastTicks <= 0)
             {
-                RegionTimer blastTimer = new RegionTimer(this, AreaPulseBlastCallback);
+                ECSGameTimer blastTimer = new ECSGameTimer(this, AreaPulseBlastCallback);
                 blastTimer.Start(100);
                 return;
             }
@@ -499,16 +499,16 @@ namespace DOL.GS.Scripts
 
             if (AreaPulseClientEffect <= 0 && AreaPulsePlayerEffect <= 0 && AreaPulseCastEffect <= 0)
             {
-                RegionTimer t = new RegionTimer(this, AreaPulseTeleportCallback);
+                ECSGameTimer t = new ECSGameTimer(this, AreaPulseTeleportCallback);
                 t.Start(castMs);
                 return;
             }
 
-            RegionTimer nextPhaseTimer = new RegionTimer(this, AreaPulseBlastCallback);
+            ECSGameTimer nextPhaseTimer = new ECSGameTimer(this, AreaPulseBlastCallback);
             nextPhaseTimer.Start(castMs);
         }
 
-        private int AreaPulseBlastCallback(RegionTimer timer)
+        private int AreaPulseBlastCallback(ECSGameTimer timer)
         {
             try
             {
@@ -566,7 +566,7 @@ namespace DOL.GS.Scripts
                     }
                 }
 
-                RegionTimer tpTimer = new RegionTimer(this, AreaPulseTeleportCallback);
+                ECSGameTimer tpTimer = new ECSGameTimer(this, AreaPulseTeleportCallback);
                 tpTimer.Start(AREA_PULSE_BLAST_MS);
             }
             catch
@@ -577,7 +577,7 @@ namespace DOL.GS.Scripts
             return 0;
         }
 
-        private int AreaPulseTeleportCallback(RegionTimer timer)
+        private int AreaPulseTeleportCallback(ECSGameTimer timer)
         {
             try
             {

@@ -84,10 +84,14 @@ PvPManager.Rules.ExtraCommands:				=== Extra Commands ===
 PvPManager.Rules.RenameCommand:				Use '/gc rename <name>' if you are the group leader to rename your group/guild.
 PvPManager.Rules.TerritoriesCommand:		Use '/gc territories' or '/gc subterritories' to see map objectives, capture options, owners, and timers.
 
-PvPManager.Journal.CTFName:					[PvP] Kill the flag carrier on the move!
-PvPManager.Journal.CTFDesc:					The enemy flag carrier is currently exposed. Hunt them down!
-PvPManager.Journal.KotHName:				[PvP] Get control of the Hill and defend it!
-PvPManager.Journal.KotHDesc:				Move to the marked location and secure the area for your team!
+PvPManager.Journal.CTF.AtBase.Name:			[PvP] Capture the nearby Flag!
+PvPManager.Journal.CTF.AtBase.Desc:			The flag is waiting nearby! Go grab it!
+PvPManager.Journal.CTF.Carried.Name:		[PvP] Kill the flag carrier on the move!
+PvPManager.Journal.CTF.Carried.Desc:		The enemy flag carrier is currently exposed. Hunt them down!
+PvPManager.Journal.CTF.OnGround.Name:		[PvP] Flag dropped on the ground!
+PvPManager.Journal.CTF.OnGround.Desc:		The flag has been dropped! Secure it before it disappears.
+PvPManager.Journal.CTF.OnTempPad.Name:		[PvP] Flag on an outpost pad!
+PvPManager.Journal.CTF.OnTempPad.Desc:		The flag is secured on an outpost pad. Reclaim it!
 
 PvPManager.Score.Points:					{0} points
 PvPManager.Score.Pts:						{0} pts
@@ -110,6 +114,8 @@ PvPManager.Score.Announce.Guild.3:			[PvP] The guild {0} has won third place in 
 PvPManager.Score.Announce.Player.1:			[PvP] Player {0} has won first place in {1} with {2} points!
 PvPManager.Score.Announce.Player.2:			[PvP] Player {0} has won second place in {1} with {2} points!
 PvPManager.Score.Announce.Player.3:			[PvP] Player {0} has won third place in {1} with {2} points!
+PvPManager.Score.TasksProgression:			------------ PvP Tasks Progression ------------
+PvPManager.Score.PredatorMenu:				----------------- Predator Board -----------------
 
 PvP.Score.PvPSoloKills:						Solo kills
 PvP.Score.PvPGrpKills:						Group kills
@@ -184,3 +190,8 @@ PvP.Score.BioInfections.Short:						Infected
 PvP.Score.BioZombieKills.Short:						ZombieKills
 PvP.Score.BioZombieDeaths.Short:					ZombieDeaths
 PvP.Score.Total.Short:                              Total
+
+PvPManager.Predator.Target:					Target
+PvPManager.Predator.HuntedBy:				Hunted By
+PvPManager.Predator.NoTarget:				No active target
+PvPManager.Predator.Inactive:				Predator system inactive

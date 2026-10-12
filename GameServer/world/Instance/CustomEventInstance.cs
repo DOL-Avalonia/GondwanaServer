@@ -111,8 +111,8 @@ namespace DOL.GS
             }
         }
 
-        public CustomEventInstance(ushort ID, GameTimer.TimeManager time, RegionData dat)
-            : base(ID, time, dat)
+        public CustomEventInstance(ushort ID, RegionData dat)
+            : base(ID, dat)
         {
         }
 

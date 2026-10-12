@@ -39,7 +39,7 @@ namespace DOL.AI.Brain
             m_previousTick = currentTick;
         }
 
-        protected override int BrainTimerCallback(RegionTimer callingTimer)
+        protected override int BrainTimerCallback(ECSGameTimer callingTimer)
         {
             if (!m_body.IsAlive || m_body.ObjectState != GameObject.eObjectState.Active)
             {

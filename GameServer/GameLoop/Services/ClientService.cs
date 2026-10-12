@@ -47,6 +47,9 @@ namespace DOL.GS
                 return;
             }
 
+            for (int i = 0; i < _view.TotalValidCount; i++)
+                _view.Items[i].ProcessPostedActions();
+
             _view.ExecuteForEach(TickInternal);
         }
 

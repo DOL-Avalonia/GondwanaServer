@@ -13,7 +13,7 @@ namespace AmteScripts.Managers
         public TerritoryRelicStatic RelicReference { get; set; }
         public bool IsRemovalExpected { get; set; } = false;
         private bool _isSilencing = false;
-        private RegionTimer _stateCheckTimer;
+        private ECSGameTimer _stateCheckTimer;
         private GameSpellEffect _relicEffect;
 
         public bool IsSilencing
@@ -85,11 +85,11 @@ namespace AmteScripts.Managers
                 player.Out.SendMinotaurRelicWindow(player, RelicReference.DbRecord.Effect, true);
             }
 
-            _stateCheckTimer = new RegionTimer(player, new RegionTimerCallback(StateCheckTimerCallback));
+            _stateCheckTimer = new ECSGameTimer(player, StateCheckTimerCallback, 800);
             _stateCheckTimer.Start(800);
         }
 
-        private int StateCheckTimerCallback(RegionTimer timer)
+        private int StateCheckTimerCallback(ECSGameTimer timer)
         {
             var player = m_owner as GamePlayer;
             if (player == null || !player.IsAlive) return 0;
@@ -105,6 +105,9 @@ namespace AmteScripts.Managers
 
         public override void OnLose(GamePlayer player)
         {
+            _stateCheckTimer?.Stop();
+            _stateCheckTimer = null;
+
             IsSilencing = false;
 
             if (_relicEffect != null)

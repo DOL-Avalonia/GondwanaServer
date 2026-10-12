@@ -203,7 +203,7 @@ namespace DOL.GS.Scripts
         /// </summary>
         private const int CACHE_CHECK_INTERVAL_MILLISECONDS = 30 * 1000;
         private readonly ConcurrentDictionary<string, PlayerCache> _playerCaches = new();
-        private RegionTimer? _cleanupTimer;
+        private ECSGameTimer? _cleanupTimer;
 
         protected AbstractLibrarian() : base()
         {
@@ -219,7 +219,7 @@ namespace DOL.GS.Scripts
             if (!base.AddToWorld())
                 return false;
 
-            _cleanupTimer = new RegionTimer(this, CleanupTimer);
+            _cleanupTimer ??= new ECSGameTimer(this, CleanupTimer);
             _cleanupTimer.Start(CACHE_CHECK_INTERVAL_MILLISECONDS);
             return true;
         }
@@ -230,18 +230,19 @@ namespace DOL.GS.Scripts
             if (!base.RemoveFromWorld())
                 return false;
 
-            _cleanupTimer.Stop();
+            _cleanupTimer?.Stop();
             return true;
         }
 
-        private int CleanupTimer(RegionTimer callingTimer)
+        private int CleanupTimer(ECSGameTimer callingTimer)
         {
-            var now = Environment.TickCount64;
-            var toRemove = _playerCaches.Where(kv => kv.Value.LastAccessed + CACHE_KEEPALIVE_MILLISECONDS < now).Select(kv => kv.Key).ToList();
-            toRemove.ForEach(key => _playerCaches.TryRemove(key, out _));
+            long now = Environment.TickCount64;
+            foreach (var kv in _playerCaches)
+                if (kv.Value.LastAccessed + CACHE_KEEPALIVE_MILLISECONDS < now)
+                    _playerCaches.TryRemove(kv.Key, out _);
             return CACHE_CHECK_INTERVAL_MILLISECONDS;
         }
-        
+
         protected PlayerCache EnsurePlayerCache(GamePlayer player)
         {
             var cache = _playerCaches.GetOrAdd(player.InternalID + ':' + player.Language, _ => new PlayerCache(player));
@@ -340,7 +341,7 @@ namespace DOL.GS.Scripts
                 return;
             }
 
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 var count = await LanguageMgr.Translate(player, "GuildRegistrar.List.Count", registers.Count);
                 SayTo(player, count);

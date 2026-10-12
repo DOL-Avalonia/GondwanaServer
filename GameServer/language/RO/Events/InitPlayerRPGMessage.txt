@@ -1,8 +1,8 @@
 ﻿
 # Server Intro RPG message
-ServerRPGMessage.ShortDescription:		Bun venit în Arcanum, o lume făurită din cenușa Marelui Război Magic! În acest tărâm captivant RP/PvP, regate fracturate luptă pentru supraviețuire, în timp ce Breslele dictează legea. Te rugăm să consulți principiile sacre și regulile serverului pe www.arcanum-server.com. Ascute-ți săbiile, pregătește-ți vrăjile și bucură-te de călătoria ta în Arcanum!
-ServerRPGMessage.Lore1:					Bun venit în Arcanum!
-ServerRPGMessage.Lore2:					Acum două mii de ani, Arcanum era o rețea strălucitoare de citadele plutitoare și forje de mana. Apoi a venit Marele Război Magic. Continentele au fost destrămate, lăsând o lume cicatrizată și slăbită. Din aceste rămășițe, s-au ridicat trei regate: Albion, Midgard și Hibernia. Astăzi, regii domnesc pe hârtie, dar Breslele sunt cele care guvernează cu adevărat ținuturile fracturate, în timp ce nelegiuiții își sculptează propriile imperii în Subteranul întunecat. Alege-ți calea cu înțelepciune.
+ServerRPGMessage.ShortDescription:		Bun venit în {0}, o lume făurită din cenușa Marelui Război Magic! În acest tărâm captivant RP/PvP, regate fracturate luptă pentru supraviețuire, în timp ce Breslele dictează legea. Te rugăm să consulți principiile sacre și regulile serverului pe www.{0}-server.com. Ascute-ți săbiile, pregătește-ți vrăjile și bucură-te de călătoria ta în {0}!
+ServerRPGMessage.Lore1:					Bun venit în {0}!
+ServerRPGMessage.Lore2:					Acum două mii de ani, {0} era o rețea strălucitoare de citadele plutitoare și forje de mana. Apoi a venit Marele Război Magic. Continentele au fost destrămate, lăsând o lume cicatrizată și slăbită. Din aceste rămășițe, s-au ridicat trei regate: Albion, Midgard și Hibernia. Astăzi, regii domnesc pe hârtie, dar Breslele sunt cele care guvernează cu adevărat ținuturile fracturate, în timp ce nelegiuiții își sculptează propriile imperii în Subteranul întunecat. Alege-ți calea cu înțelepciune.
 ServerRPGMessage.FeaturesHeader:		--------- CARACTERISTICI SERVER ---------
 ServerRPGMessage.FeatureEvents1:		[Evenimente Dinamice & Misiuni]
 ServerRPGMessage.FeatureEvents2:		Participă la evenimente care alterează lumea și la vânătoare de boși legendari.
@@ -63,4 +63,4 @@ ServerRPGMessage.GCCombatZone:			/gc combatzone : Creează o zonă de luptă PvP
 ServerRPGMessage.GCJail:				/gc jailrelease <name> : Plătește cauțiunea pentru a elibera un coleg de breaslă din închisoare.
 ServerRPGMessage.GCRent:				/gc houserent <on|off> : Comută plățile automate ale chiriei casei breslei.
 ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Cumpără și desfășoară stindarde tactice pentru a-ți spori membrii sau gărzile teritoriului.
-ServerRPGMessage.Outro:					Mult noroc, și fie ca moștenirea ta în Arcanum să fie legendară!
+ServerRPGMessage.Outro:					Mult noroc, și fie ca moștenirea ta în {0} să fie legendară!

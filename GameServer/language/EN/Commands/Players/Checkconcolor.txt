@@ -1,0 +1,17 @@
+
+Commands.GM.Checkconcolor.Description:      Shows the server-side con level of your target (XP/loot/task rules).
+Commands.GM.Checkconcolor.Usage:            Usage: /checkconcolor
+Commands.GM.Checkconcolor.NeedTarget:       This command requires a target.
+Commands.GM.Checkconcolor.TargetVsYou:      [{0}] level {1} vs you level {2}
+Commands.GM.Checkconcolor.ServerCon:        {2}'s con value: {0:0.00} -> {1} (used by combat / XP / task math)
+Commands.GM.Checkconcolor.LiveCon:          Live-server colour: {0} (for comparison only)
+Commands.GM.Checkconcolor.Grey:             Grey (no XP, no loot, no task credit): {0}
+Commands.GM.Checkconcolor.TaskSolo:         Task tier (solo): {0} {1}
+Commands.GM.Checkconcolor.TaskGroup:        Task tier (group of {0}, highest level {1}): {2} {3}
+Commands.GM.Checkconcolor.Yes:              YES
+Commands.GM.Checkconcolor.No:               no
+Commands.GM.Checkconcolor.Tier.Grey:        (grey - never counts)
+Commands.GM.Checkconcolor.Tier.Green:       (green - counts solo only)
+Commands.GM.Checkconcolor.Tier.Blue:        (blue - counts solo / small group)
+Commands.GM.Checkconcolor.Tier.Yellow:      (yellow or better - always counts)
+Commands.GM.Checkconcolor.ServerName:       Current server

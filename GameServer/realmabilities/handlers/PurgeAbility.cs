@@ -35,9 +35,7 @@ namespace DOL.GS.RealmAbilities
 
                 if (seconds > 0)
                 {
-                    PurgeTimer timer = new PurgeTimer(living, this, seconds);
-                    timer.Interval = 1000;
-                    timer.Start(1);
+                    new PurgeTimer(living, this, seconds).Start(1);
                     DisableSkill(living);
                 }
                 else
@@ -53,9 +51,7 @@ namespace DOL.GS.RealmAbilities
             {
                 if (Level < 2)
                 {
-                    PurgeTimer timer = new PurgeTimer(living, this, 5);
-                    timer.Interval = 1000;
-                    timer.Start(1);
+                    new PurgeTimer(living, this, 5).Start(1);
                     DisableSkill(living);
                 }
                 else
@@ -159,43 +155,33 @@ namespace DOL.GS.RealmAbilities
             return removed;
         }
 
-        protected class PurgeTimer : GameTimer
+        protected sealed class PurgeTimer : ECSGameTimerWrapperBase
         {
-            GameLiving m_caster;
-            PurgeAbility m_purge;
-            int counter;
+            private readonly GameLiving m_caster;
+            private readonly PurgeAbility m_purge;
+            private int m_counter;
 
-            public PurgeTimer(GameLiving caster, PurgeAbility purge, int count)
-                : base(caster.CurrentRegion.TimeManager)
+            public PurgeTimer(GameLiving caster, PurgeAbility purge, int count) : base(caster)
             {
-                m_caster = caster;
-                m_purge = purge;
-                counter = count;
+                m_caster = caster; m_purge = purge; m_counter = count;
             }
-            public override void OnTick()
+
+            protected override int OnTick(ECSGameTimer timer)
             {
                 if (!m_caster.IsAlive)
                 {
-                    Stop();
-                    if (m_caster is GamePlayer)
-                    {
-                        ((GamePlayer)m_caster).DisableSkill(m_purge, 0);
-                    }
-                    return;
+                    (m_caster as GamePlayer)?.DisableSkill(m_purge, 0);
+                    return 0;
                 }
-                if (counter > 0)
+                if (m_counter > 0)
                 {
-                    GamePlayer player = m_caster as GamePlayer;
-                    if (player != null)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PurgeAbility.OnTick.PurgeActivate", counter), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                    counter--;
-                    return;
+                    (m_caster as GamePlayer)?.Out.SendMessage(LanguageMgr.GetTranslation(((GamePlayer)m_caster).Client.Account.Language, "PurgeAbility.OnTick.PurgeActivate", m_counter), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    m_counter--;
+                    return 1000;
                 }
                 m_purge.SendCastMessage(m_caster);
                 RemoveNegativeEffects(m_caster, m_purge);
-                Stop();
+                return 0;
             }
         }
 

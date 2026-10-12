@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.Database;
 using DOL.GS.PacketHandler;
 using DOL.GS.Spells;
@@ -173,7 +155,7 @@ namespace DOL.GS.Effects
         /// </summary>
         protected PulsingEffectTimer m_pulseTimer;
 
-        protected GameTimer m_effectTimer;
+        protected ECSGameTimer m_effectTimer;
 
         public bool CancelledByPurge { get; set; } = false;
 
@@ -247,8 +229,13 @@ namespace DOL.GS.Effects
                 if (Duration == 0)
                     return 0;
 
-                // We send this as an ushort, so make sure it doesn't overflow
-                return (int)Math.Min(ushort.MaxValue * 1000, m_effectTimer?.TimeUntilElapsed ?? 0);
+                if (m_effectTimer != null && m_effectTimer.IsAlive)
+                {
+                    int timeLeft = m_effectTimer.TimeUntilElapsed;
+                    return Math.Min(ushort.MaxValue * 1000, timeLeft);
+                }
+
+                return 0;
             }
         }
 
@@ -507,7 +494,7 @@ namespace DOL.GS.Effects
         /// <param name="target">the target</param>
         public virtual void Start(GameLiving target)
         {
-            m_startedTick = GameTimer.GetTickCount();
+            m_startedTick = GameLoop.GameLoopTime;
             AddEffect(target, true);
         }
 
@@ -561,7 +548,7 @@ namespace DOL.GS.Effects
                 {
                     if (!wasImmunity && m_immunityDuration > 0)
                     {
-                        m_startedTick = GameTimer.GetTickCount();
+                        m_startedTick = GameLoop.GameLoopTime;
                         m_duration = m_immunityDuration;
                         StartDurationTimer();
                         UpdateEffect();
@@ -623,7 +610,7 @@ namespace DOL.GS.Effects
 
                 // Restart Effect
                 IsExpired = false;
-                m_startedTick = GameTimer.GetTickCount();
+                m_startedTick = GameLoop.GameLoopTime;
                 m_duration = effect.Duration;
                 StartDurationTimer();
                 UpdateEffect();
@@ -673,19 +660,12 @@ namespace DOL.GS.Effects
             // Duration => 0 = endless until explicit stop
             if (Duration == 0 || Spell.Concentration > 0)
                 return;
-            
-            if (m_effectTimer != null)
-            {
-                m_effectTimer.Stop();
-                m_effectTimer = null;
-            }
-            
-            var now = GameTimer.GetTickCount();
-            var endTick = m_startedTick + Duration;
-            var timeLeft = endTick - now;
+
+            m_effectTimer?.Stop();
+            long timeLeft = m_startedTick + Duration - GameLoop.GameLoopTime;
             if (m_startedTick != 0 && timeLeft > 0)
             {
-                m_effectTimer = new RegionTimer(m_owner, ExpiredCallback);
+                m_effectTimer ??= new ECSGameTimer(m_owner, ExpiredCallback);
                 m_effectTimer.Start((int)timeLeft);
             }
         }
@@ -706,17 +686,15 @@ namespace DOL.GS.Effects
         /// </summary>
         protected virtual void StopTimers()
         {
-            if (m_pulseTimer != null)
-            {
-                m_pulseTimer.Stop();
-                m_pulseTimer = null;
-            }
+            m_pulseTimer?.Stop();
+            m_pulseTimer = null;
+            m_effectTimer?.Stop();
         }
 
         /// <summary>
         /// The callback method when the effect expires
         /// </summary>
-        protected virtual int ExpiredCallback(RegionTimer timer)
+        protected virtual int ExpiredCallback(ECSGameTimer timer)
         {
             bool removeEffect = false;
             lock (m_LockObject)
@@ -757,7 +735,7 @@ namespace DOL.GS.Effects
             {
                 int maxDuration = ServerProperties.Properties.MAX_DAMNATION_DURATION * 1000;
 
-                long currentTime = GameTimer.GetTickCount();
+                long currentTime = GameLoop.GameLoopTime;
 
                 int elapsedTime = (int)(currentTime - m_startedTick);
                 int remainingTime = Duration - elapsedTime;
@@ -856,7 +834,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Handles effect pulses
         /// </summary>
-        protected sealed class PulsingEffectTimer : GameTimer
+        protected sealed class PulsingEffectTimer : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// The pulsing effect
@@ -876,11 +854,9 @@ namespace DOL.GS.Effects
             /// Constructs a new pulsing timer
             /// </summary>
             /// <param name="effect">The pulsing effect</param>
-            public PulsingEffectTimer(GameSpellEffect effect) : base(effect.m_owner.CurrentRegion.TimeManager)
+            public PulsingEffectTimer(GameSpellEffect effect) : base(effect.m_owner)
             {
-                if (effect == null)
-                    throw new ArgumentNullException("effect");
-                m_effect = effect;
+                m_effect = effect ?? throw new ArgumentNullException(nameof(effect));
             }
 
             public void Change(int newInterval)
@@ -892,24 +868,23 @@ namespace DOL.GS.Effects
             /// Starts the timer with defined initial delay
             /// </summary>
             /// <param name="initialDelay">The initial timer delay. Must be more than 0 and less than MaxInterval</param>
-            public override void Start(int initialDelay)
+            public new void Start(int initialDelay)
             {
                 base.Start(initialDelay);
-                LastStartedTick = GameTimer.GetTickCount();
+                LastStartedTick = GameLoop.GameLoopTime;
             }
 
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                if (!m_effect.IsExpired)
                 {
+                    if (m_effect.IsExpired)
+                        return 0;
+
                     m_effect.PulseCallback();
-                }
-                else
-                {
-                    Stop();
+                    return Interval;
                 }
             }
 

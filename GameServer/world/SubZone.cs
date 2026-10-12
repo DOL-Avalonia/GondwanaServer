@@ -68,6 +68,12 @@ namespace DOL.GS
 
             try
             {
+                if (!GameLoop.IsRunning && !_isTransitionQueued)
+                {
+                    ApplyTransition(destinationZone, destinationSubZone);
+                    return;
+                }
+
                 DestinationZone = destinationZone;
                 DestinationSubZone = destinationSubZone;
 
@@ -86,6 +92,40 @@ namespace DOL.GS
             finally
             {
                 Interlocked.Exchange(ref _isInitiatingTransition, false);
+            }
+        }
+
+        /// <summary>
+        /// Same logic as ZoneService.TickInternal (you can make ZoneService call this too).
+        /// </summary>
+        internal void ApplyTransition(Zone destinationZone, SubZone destinationSubZone)
+        {
+            SubZone currentSubZone = CurrentSubZone;
+            if (currentSubZone == destinationSubZone) return;
+            Zone currentZone = currentSubZone?.ParentZone;
+            bool changingZone = currentZone != destinationZone;
+
+            if (currentSubZone != null)
+            {
+                if (destinationSubZone != null)
+                {
+                    destinationSubZone.AddObjectToThisAndRemoveFromOther(Node, currentSubZone);
+
+                    if (changingZone)
+                    { currentZone!.OnObjectRemovedFromZone(); destinationZone.OnObjectAddedToZone(); }
+                }
+                else
+                {
+                    currentSubZone.RemoveObject(Node);
+
+                    if (changingZone)
+                        currentZone!.OnObjectRemovedFromZone();
+                }
+            }
+            else if (destinationSubZone != null)
+            {
+                destinationSubZone.AddObject(Node);
+                if (changingZone) destinationZone.OnObjectAddedToZone();
             }
         }
 

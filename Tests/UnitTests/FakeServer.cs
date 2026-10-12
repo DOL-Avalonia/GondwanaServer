@@ -54,35 +54,15 @@ namespace DOL.UnitTests.Gameserver
 
     public class FakeRegion : Region
     {
-        public long fakeElapsedTime { get { return fakeTimeManager.fakeTime; } set { fakeTimeManager.fakeTime = value; } }
-        public FakeTimeManager fakeTimeManager = new FakeTimeManager();
+        /// <summary>
+        /// Tests control "now" (Region.Time) with this value. -1 = same default as the old FakeTimeManager.
+        /// </summary>
+        public long fakeElapsedTime { get; set; } = -1;
 
-        public FakeRegion() : base(null, new RegionData()) { }
+        public FakeRegion() : base(new RegionData()) { }
 
-        public override long Time => TimeManager.CurrentTime;
-
+        public override long Time => fakeElapsedTime;
         public override ushort ID => 0;
-
-        public override GameTimer.TimeManager TimeManager => fakeTimeManager;
-    }
-
-    public class FakeTimeManager : GameTimer.TimeManager
-    {
-        public long fakeTime = -1;
-
-        public FakeTimeManager() : base("FakeTimer") { }
-
-        public new long CurrentTime
-        {
-            get => fakeTime;
-            set => fakeTime = value;
-        }
-
-        public new bool Start() => true;
-        //protected override void InsertTimer(GameTimer t, int offsetTick) { }
-        //protected override void RemoveTimer(GameTimer t) { }
-
-        //protected override void Init() { }
     }
 
     public class FakeServer : GameServer
@@ -92,7 +72,10 @@ namespace DOL.UnitTests.Gameserver
         protected override IObjectDatabase DataBaseImpl => database;
         protected override void CheckAndInitDB() { }
         public override byte[] AcquirePacketBuffer() => Array.Empty<byte>();
-        public void SetDatabase(IObjectDatabase database) { this.database = database; }
+        public void SetDatabase(IObjectDatabase database)
+        {
+            this.database = database;
+        }
 
         public static void Load() => LoadTestDouble(new FakeServer());
     }

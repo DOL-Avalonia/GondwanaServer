@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 
 using DOL.Database;
@@ -42,7 +24,7 @@ namespace DOL.GS
     {
         protected DBArea dbArea = null;
         protected readonly List<GameStaticItem> m_boundaryObjects = new List<GameStaticItem>();
-        protected RegionTimer m_effectLoopTimer;
+        protected ECSGameTimer m_effectLoopTimer;
         protected bool m_lastEventState = false;
         protected bool m_canBroadcast = false;
         /// <summary>
@@ -434,29 +416,48 @@ namespace DOL.GS
             if (DbArea.SpellID <= 0 && DbArea.SpellIDEvent <= 0 && string.IsNullOrEmpty(DbArea.EventList))
                 return;
 
-            GameNPC timerOwner = new GameNPC();
-            timerOwner.Name = "AreaEffectController";
-            timerOwner.Flags |= GameNPC.eFlags.CANTTARGET | GameNPC.eFlags.DONTSHOWNAME;
-            timerOwner.Model = 667;
-            timerOwner.Position = Position.Create(Region.ID, DbArea.X, DbArea.Y, DbArea.Z, 0);
-            timerOwner.AddToWorld();
-
-            int freq = DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 2000;
-            m_effectLoopTimer = new RegionTimer(timerOwner, EffectLoopCallback);
-            m_effectLoopTimer.Start(freq);
+            m_effectLoopTimer = new ECSGameTimer(null, EffectLoopCallback);
+            m_effectLoopTimer.Start(DbArea.EffectFrequency > 0 ? DbArea.EffectFrequency : 2000);
         }
 
         public virtual void StopEffectLoop()
         {
-            if (m_effectLoopTimer != null)
+            m_effectLoopTimer?.Stop();
+            m_effectLoopTimer = null;
+        }
+
+        /// Swap the model of the existing boundary markers in place: no Delete/AddToWorld churn.
+        public virtual void SetBoundaryModel(ushort model)
+        {
+            if (Region == null || m_boundaryObjects.Count == 0) return;
+            IList<GameClient> clients = WorldMgr.GetClientsOfRegion(Region.ID);
+            foreach (GameStaticItem marker in m_boundaryObjects)
             {
-                m_effectLoopTimer.Stop();
-                if (m_effectLoopTimer.Owner != null) m_effectLoopTimer.Owner.Delete();
-                m_effectLoopTimer = null;
+                if (marker.Model == model) continue;
+                marker.Model = model;
+                foreach (GameClient c in clients)
+                {
+                    GamePlayer p = c.Player;
+                    if (p == null || !p.IsWithinRadius(marker, WorldMgr.VISIBILITY_DISTANCE)) continue;
+                    p.Out.SendObjectRemove(marker);
+                    p.Out.SendObjectCreate(marker);
+                }
             }
         }
 
-        protected virtual int EffectLoopCallback(RegionTimer timer)
+        /// Pooled storm + lifecycle (cast at +250 ms, released at +3 s). Shared by area loops and CoreRunMode.
+        public static GameNPC SpawnStorm(Region region, Coordinate spot, int spellId, byte level, byte size, int faction = 0, bool npcImmune = false)
+        {
+            GameNPC storm = AreaStormPool.Rent(region, spot, level, size, faction, npcImmune);
+            if (storm != null)
+            {
+                new StormLifecycleTimer(storm, spellId).Start(250);
+            }
+
+            return storm;
+        }
+
+        protected virtual int EffectLoopCallback(ECSGameTimer timer)
         {
             if (DbArea == null || Region == null) return 0;
 
@@ -487,7 +488,16 @@ namespace DOL.GS
             if (currentEventState != m_lastEventState)
             {
                 m_lastEventState = currentEventState;
-                SpawnBoundary();
+                ushort model = (ushort)(currentEventState && DbArea.BoundaryEvent > 0 ? DbArea.BoundaryEvent : DbArea.Boundary);
+
+                if (m_boundaryObjects.Count > 0 && model > 0)
+                {
+                    SetBoundaryModel(model);
+                }
+                else
+                {
+                    SpawnBoundary();
+                }
             }
 
             int activeSpellID = (currentEventState && DbArea.SpellIDEvent > 0) ? DbArea.SpellIDEvent : DbArea.SpellID;
@@ -513,30 +523,11 @@ namespace DOL.GS
             for (int i = 0; i < actualAmount; i++)
             {
                 Coordinate randomPoint = GetRandomPointInside();
-                if (randomPoint.Equals(Coordinate.Nowhere)) continue;
 
-                if (Region.GetZone(randomPoint) == null)
+                if (randomPoint.Equals(Coordinate.Nowhere) || Region.GetZone(randomPoint) == null)
                     continue;
 
-                GameNPC stormPoint = new GameNPC();
-                stormPoint.Model = 667;
-                stormPoint.Name = "Storm";
-                stormPoint.Flags = GameNPC.eFlags.CANTTARGET | GameNPC.eFlags.DONTSHOWNAME;
-                stormPoint.Position = Position.Create(Region.ID, randomPoint.X, randomPoint.Y, randomPoint.Z, 0);
-                stormPoint.Level = (byte)actualLevel;
-                stormPoint.Size = DbArea.StormSize > 0 ? DbArea.StormSize : (byte)50;
-                if (DbArea.StormFaction > 0)
-                {
-                    stormPoint.Faction = FactionMgr.GetFactionByID(DbArea.StormFaction);
-                }
-
-                if (DbArea.NPCImmunToStorm)
-                {
-                    stormPoint.TempProperties.setProperty("NPCImmunToStorm", true);
-                }
-                stormPoint.AddToWorld();
-
-                new StormLifecycleTimer(stormPoint, activeSpellID).Start(250);
+                SpawnStorm(Region, randomPoint, activeSpellID, (byte)actualLevel, DbArea.StormSize > 0 ? DbArea.StormSize : (byte)50, DbArea.StormFaction, DbArea.NPCImmunToStorm);
             }
 
             int baseFreq = DbArea.EffectFrequency;
@@ -623,7 +614,7 @@ namespace DOL.GS
                     return 2750;
                 }
 
-                _storm.Delete();
+                AreaStormPool.Return(_storm);
                 return 0;
             }
         }

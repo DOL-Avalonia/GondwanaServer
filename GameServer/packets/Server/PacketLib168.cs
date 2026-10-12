@@ -641,7 +641,13 @@ namespace DOL.GS.PacketHandler
                 SendTCP(pak);
             }
         }
-        
+
+        public virtual void SendRawMessage(string msg, eChatType type, eChatLoc loc)
+        {
+            // Unsupported.
+            SendMessage(msg, type, loc);
+        }
+
         protected ushort GetXOffsetInZone(GamePlayer player)
             => (ushort)(player.Coordinate.X - player.CurrentZone.Offset.X);
 
@@ -1509,7 +1515,11 @@ namespace DOL.GS.PacketHandler
         // data 3 defines wether it's subscribe or abort
         public virtual async Task SendQuestSubscribeCommand(GameNPC invitingNPC, ushort questid, string inviteMessage)
         {
-            await using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
+            var player = m_gameClient.Player;
+            if (!string.IsNullOrEmpty(inviteMessage) && player != null)
+                inviteMessage = await AutoTranslateManager.Translate(player, inviteMessage);
+
+            using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
             pak.WriteByte(0x00);
             pak.WriteByte(0x64);
             pak.WriteShort(questid); //questid, data1
@@ -1520,9 +1530,6 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte(0x01); // autowrap message
             if (!string.IsNullOrEmpty(inviteMessage))
             {
-                var player = m_gameClient.Player;
-                inviteMessage = await AutoTranslateManager.Translate(player, inviteMessage);
-
                 pak.WriteString(inviteMessage, inviteMessage.Length);
             }
             pak.WriteByte(0x00);
@@ -1533,7 +1540,11 @@ namespace DOL.GS.PacketHandler
         // data 3 defines wether it's subscribe or abort
         public virtual async Task SendQuestAbortCommand(GameNPC abortingNPC, ushort questid, string abortMessage)
         {
-            await using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
+            var player = m_gameClient.Player;
+            if (!string.IsNullOrEmpty(abortMessage) && player != null)
+                abortMessage = await AutoTranslateManager.Translate(player, abortMessage);
+
+            using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
             pak.WriteByte(0x00);
             pak.WriteByte(0x64);
             pak.WriteShort(questid); //questid, data1
@@ -1544,10 +1555,6 @@ namespace DOL.GS.PacketHandler
             pak.WriteByte(0x01); // autowrap message
             if (!string.IsNullOrEmpty(abortMessage))
             {
-                var player = m_gameClient.Player;
-                if (player != null)
-                    abortMessage = await AutoTranslateManager.Translate(player, abortMessage);
-
                 pak.WriteString(abortMessage, abortMessage.Length);
             }
             pak.WriteByte(0x00);
@@ -4083,30 +4090,13 @@ namespace DOL.GS.PacketHandler
 
         protected virtual async Task SendQuestPacket(IQuestPlayerData quest, int index)
         {
-            await using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry));
-            pak.WriteByte((byte)index);
-
-            if (quest.Status != eQuestStatus.InProgress)
+            bool inProgress = quest != null && quest.Status == eQuestStatus.InProgress && quest.Quest != null;
+            string name = string.Empty, desc = string.Empty;
+            if (inProgress)
             {
-                pak.WriteByte(0);
-                pak.WriteByte(0);
-                pak.WriteByte(0);
-            }
-            else
-            {
-                if (quest.Quest == null)
-                {
-                    pak.WriteByte(0);
-                    pak.WriteByte(0);
-                    pak.WriteByte(0);
-                    SendTCP(pak);
-                    return;
-                }
-
                 GamePlayer receiver = m_gameClient.Player;
-
-                string name = quest.Quest.Name ?? string.Empty;
-                string desc = quest.Quest.Description ?? string.Empty;
+                name = quest!.Quest!.Name ?? string.Empty;
+                desc = quest.Quest.Description ?? string.Empty;
 
                 // --- AUTOTRANSLATE HOOK FOR QUEST TEXTS ---
                 // We treat quest texts as "server texts", so sender = null
@@ -4115,25 +4105,23 @@ namespace DOL.GS.PacketHandler
                     name = await AutoTranslateManager.Translate(receiver, name);
                     desc = await AutoTranslateManager.Translate(receiver, desc);
                 }
+                if (name.Length > byte.MaxValue) name = name[..byte.MaxValue];
+                if (desc.Length > byte.MaxValue) desc = desc[..byte.MaxValue];
+            }
 
-                // Make sure we don't exceed packet limits after translation
-                if (name.Length > byte.MaxValue)
-                {
-                    if (log.IsWarnEnabled)
-                        log.Warn($"quest name is too long for 1.68+ clients ({name.Length}) '{name}'");
-                    name = name.Substring(0, byte.MaxValue);
-                }
-
-                if (desc.Length > byte.MaxValue)
-                {
-                    if (log.IsWarnEnabled)
-                        log.Warn($"quest description is too long for 1.68+ clients ({desc.Length}) '{desc}'");
-                    desc = desc.Substring(0, byte.MaxValue);
-                }
-
+            using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry));
+            pak.WriteByte((byte)index);
+            if (!inProgress)
+            {
+                pak.WriteByte(0);
+                pak.WriteByte(0);
+                pak.WriteByte(0);
+            }
+            else
+            {
                 pak.WriteByte((byte)name.Length);
                 pak.WriteByte((byte)desc.Length);
-                pak.WriteByte(0); // unknown / reserved
+                pak.WriteByte(0);
 
                 // Write Quest Name and Description without trailing 0
                 pak.WriteStringBytes(name);

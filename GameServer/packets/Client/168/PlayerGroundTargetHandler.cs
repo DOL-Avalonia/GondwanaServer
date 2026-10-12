@@ -5,23 +5,21 @@ using System.Numerics;
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandlerAttribute(PacketHandlerType.TCP, eClientPackets.PlayerGroundTarget, "Handles Player Ground Target Settings", eClientStatus.PlayerInGame)]
-    public class PlayerGroundTargetHandler : IPacketHandler
+    public class PlayerGroundTargetHandler : PacketHandler
     {
-        public void HandlePacket(GameClient client, GSPacketIn packet)
+        protected override void HandlePacketInternal(GameClient client, GSPacketIn packet)
         {
-            var groundX = (int)packet.ReadInt();
-            var groundY = (int)packet.ReadInt();
-            var groundZ = (int)packet.ReadInt();
+            int groundX = (int)packet.ReadInt();
+            int groundY = (int)packet.ReadInt();
+            int groundZ = (int)packet.ReadInt();
             ushort flag = packet.ReadShort();
             //			ushort unk2 = packet.ReadShort();
 
             GamePlayer player = client.Player;
+            if (player == null)
+                return;
 
-            new ECSGameTimer(player, timer =>
-            {
-                HandleGroundTargetChange((GamePlayer)timer.Owner, groundX, groundY, groundZ, flag);
-                return 0;
-            }, 1);
+            HandleGroundTargetChange(player, groundX, groundY, groundZ, flag);
         }
 
         /// <summary>

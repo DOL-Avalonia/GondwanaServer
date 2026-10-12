@@ -217,7 +217,7 @@ namespace DOL.GS.Commands
 
             GameServer.Database.DeleteObject(db);
 
-            Housing.House house = Housing.HouseMgr.GetHouse(houseNum);
+            House house = HouseMgr.GetHouse(houseNum);
             if (house != null)
             {
                 house.UpdateGenistarVisual(placeholderKey, 1293);
@@ -524,14 +524,13 @@ namespace DOL.GS.Commands
 
             if (delta > 0 && newLevel > oldLevel)
             {
-                new RegionTimer(creature, _ =>
+                new ECSGameTimer(creature, static t =>
                 {
-                    foreach (GamePlayer obs in creature.GetPlayersInRadius((ushort)WorldMgr.VISIBILITY_DISTANCE))
-                    {
-                        obs.Out.SendSpellEffectAnimation(creature, creature, 8007, 0, false, 1);
-                    }
+                    GameNPC npc = (GameNPC)t.Owner;
+                    foreach (GamePlayer obs in npc.GetPlayersInRadius((ushort)WorldMgr.VISIBILITY_DISTANCE))
+                        obs.Out.SendSpellEffectAnimation(npc, npc, 8007, 0, false, 1);
                     return 0;
-                }).Start(150);
+                }, 150);
             }
 
             gmPlayer.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.Command.ExpSuccess", delta, creature.Name, targetXp, creature.Level, creature.Size), eChatType.CT_Staff, eChatLoc.CL_SystemWindow);

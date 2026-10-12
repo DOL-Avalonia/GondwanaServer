@@ -1,12 +1,14 @@
+using DOL.Database;
+using DOL.Events;
+using DOL.GS;
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
+using DOL.Language;
 using System;
 using System.Collections;
+using System.Numerics;
 using System.Reflection;
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
-using DOL.GS.Spells;
-using DOL.Events;
-using DOL.Database;
 namespace DOL.GS.RealmAbilities
 {
     public class VolcanicPillarAbility : TimedRealmAbility
@@ -76,15 +78,13 @@ namespace DOL.GS.RealmAbilities
             {
                 m_caster.RealmAbilityCastTimer.Stop();
                 m_caster.RealmAbilityCastTimer = null;
-                m_caster.Out.SendMessage("You cancel your Spell!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                m_caster.Out.SendMessage(LanguageMgr.GetTranslation(m_caster.Client.Account.Language, "DecimationTrapAbility.CancelCast"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
             }
 
-            m_caster.RealmAbilityCastTimer = new RegionTimer(m_caster);
-            m_caster.RealmAbilityCastTimer.Callback = new RegionTimerCallback(EndCast);
-            m_caster.RealmAbilityCastTimer.Start(2000);
+            m_caster.RealmAbilityCastTimer = new ECSGameTimer(m_caster, EndCast, 2000);
         }
 
-        protected virtual int EndCast(RegionTimer timer)
+        protected virtual int EndCast(ECSGameTimer timer)
         {
             if (m_caster.TargetObject == null)
             {

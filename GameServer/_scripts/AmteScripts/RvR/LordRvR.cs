@@ -16,25 +16,30 @@ namespace Amte
         public static int CLAIM_TIME_SECONDS = 30;
         public static int CLAIM_TIME_BETWEEN_SECONDS = 120;
         public string originalGuildName;
+        public DateTime lastClaim = new(1);
 
-        public DateTime lastClaim = new DateTime(1);
+        private ECSGameTimer _claimTimer;
+        private bool _scoring;
+        private eRealm _holdingRealm;
+        private long _holdingSince;
+        private readonly Dictionary<eRealm, TimeSpan> _scores = new() { { eRealm.Albion, TimeSpan.Zero }, { eRealm.Midgard, TimeSpan.Zero }, { eRealm.Hibernia, TimeSpan.Zero } };
 
-        private RegionTimer _claimTimer;
+        public double timeBeforeClaim => CLAIM_TIME_BETWEEN_SECONDS - (DateTime.Now - lastClaim).TotalSeconds;
 
-        private RegionTimer _scoreTimer;
-        private Dictionary<eRealm, TimeSpan> _scores = new Dictionary<eRealm, TimeSpan>
+        private static eRealm RealmFromName(string n) => n switch { "Albion" => eRealm.Albion, "Midgard" => eRealm.Midgard, "Hibernia" => eRealm.Hibernia, _ => eRealm.None };
+
+        /// Holding time accrues lazily: on guild change, on StopRvR and when someone asks for the scores.
+        private void Accumulate()
         {
-            { eRealm.Albion, new TimeSpan(0) },
-            { eRealm.Midgard, new TimeSpan(0) },
-            { eRealm.Hibernia, new TimeSpan(0) },
-        };
+            long now = GameLoop.GameLoopTime;
+            if (_scoring && _holdingRealm != eRealm.None) _scores[_holdingRealm] += TimeSpan.FromMilliseconds(now - _holdingSince);
+            _holdingSince = now;
+        }
 
-        public double timeBeforeClaim
+        public override string GuildName
         {
-            get
-            {
-                return CLAIM_TIME_BETWEEN_SECONDS - (DateTime.Now - lastClaim).TotalSeconds;
-            }
+            get => base.GuildName;
+            set { Accumulate(); base.GuildName = value; _holdingRealm = RealmFromName(value); }
         }
 
         public override bool Interact(GamePlayer player)
@@ -60,7 +65,7 @@ namespace Amte
         public override void LoadFromDatabase(DataObject obj)
         {
             base.LoadFromDatabase(obj);
-            this.originalGuildName = this.GuildName;
+            originalGuildName = GuildName;
         }
 
         public override bool WhisperReceive(GameLiving source, string text)
@@ -87,7 +92,7 @@ namespace Amte
             }
 
             var startTime = DateTime.Now;
-            _claimTimer = new RegionTimer(
+            _claimTimer = new ECSGameTimer(
                 this,
                 timer =>
                 {
@@ -119,10 +124,8 @@ namespace Amte
 
             player.Out.SendTimerWindow(LanguageMgr.GetTranslation(player.Client.Account.Language, "GameObjects.GamePlayer.RvR.Capture.Timer"), CLAIM_TIME_SECONDS);
 
-            foreach (var obj in GetPlayersInRadius(ushort.MaxValue - 1))
+            foreach (GamePlayer pl in GetPlayersInRadius(ushort.MaxValue - 1))
             {
-                var pl = obj as GamePlayer;
-                if (pl != null)
                     pl.Out.SendMessage(LanguageMgr.GetTranslation(pl.Client.Account.Language, "GameObjects.GamePlayer.RvR.Capture.Start", player.GuildName), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
 
@@ -131,7 +134,7 @@ namespace Amte
 
         public override void RestoreOriginalGuildName()
         {
-            this.GuildName = this.originalGuildName;
+            GuildName = originalGuildName;
         }
 
         public virtual void TakeControl(GamePlayer player)
@@ -156,43 +159,24 @@ namespace Amte
 
         public virtual void StartRvR()
         {
-            var lastTime = DateTime.Now;
-            if (_scoreTimer != null)
-                _scoreTimer.Stop();
-
-            _scoreTimer = new RegionTimer(
-                this,
-                timer =>
-                {
-                    switch (GuildName)
-                    {
-                        case "Albion": _scores[eRealm.Albion] += (DateTime.Now - lastTime); break;
-                        case "Midgard": _scores[eRealm.Midgard] += (DateTime.Now - lastTime); break;
-                        case "Hibernia": _scores[eRealm.Hibernia] += (DateTime.Now - lastTime); break;
-                    }
-                    lastTime = DateTime.Now;
-                    return 1000;
-                },
-                1000
-            );
+            _holdingRealm = RealmFromName(GuildName);
+            _holdingSince = GameLoop.GameLoopTime;
+            _scoring = true;
             lastClaim = new DateTime(1);
         }
 
         public virtual void StopRvR()
         {
-            if (_scoreTimer != null)
-                _scoreTimer.Stop();
-            _scoreTimer = null;
-            _scores[eRealm.Albion] = new TimeSpan(0);
-            _scores[eRealm.Midgard] = new TimeSpan(0);
-            _scores[eRealm.Hibernia] = new TimeSpan(0);
+            _scoring = false;
+            _scores[eRealm.Albion] = TimeSpan.Zero; _scores[eRealm.Midgard] = TimeSpan.Zero; _scores[eRealm.Hibernia] = TimeSpan.Zero;
         }
 
         public virtual string GetScores(string language)
         {
-            var str = LanguageMgr.GetTranslation(language, "RvRManager.HoldingTime") + "\n";
-            foreach (var kvp in _scores)
-                str += GlobalConstants.RealmToName(kvp.Key) + ": " + Math.Round(kvp.Value.TotalSeconds, 1) + " " + LanguageMgr.GetTranslation(language, "RvRManager.Seconds") + "\n";
+            Accumulate();
+            string str = LanguageMgr.GetTranslation(language, "RvRManager.HoldingTime") + "\n";
+            foreach (KeyValuePair<eRealm, TimeSpan> kv in _scores)
+                str += GlobalConstants.RealmToName(kv.Key) + ": " + Math.Round(kv.Value.TotalSeconds, 1) + " " + LanguageMgr.GetTranslation(language, "RvRManager.Seconds") + "\n";
             return str;
         }
     }

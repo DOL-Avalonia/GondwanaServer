@@ -33,7 +33,7 @@ namespace DOL.AI
         /// <summary>
         /// The timer used to check for player proximity
         /// </summary>
-        private RegionTimer m_brainTimer;
+        private ECSGameTimer m_brainTimer;
 
         /// <summary>
         /// Constructs a new brain for a body
@@ -95,10 +95,7 @@ namespace DOL.AI
         /// <summary>
         /// Returns weather this brain is active or not
         /// </summary>
-        public virtual bool IsActive
-        {
-            get { return m_brainTimer != null && m_brainTimer.IsAlive; }
-        }
+        public virtual bool IsActive => m_brainTimer is { IsAlive: true };
 
         /// <summary>
         /// The interval at which the brain will fire, in milliseconds
@@ -127,9 +124,7 @@ namespace DOL.AI
             lock (m_LockObject)
             {
                 if (IsActive) return false;
-
-                m_brainTimer = new RegionTimer(m_body);
-                m_brainTimer.Callback = new RegionTimerCallback(BrainTimerCallback);
+                m_brainTimer ??= new ECSGameTimer(m_body, BrainTimerCallback);
                 m_brainTimer.Start(ThinkInterval);
             }
             return true;
@@ -173,7 +168,7 @@ namespace DOL.AI
         /// </summary>
         /// <param name="callingTimer">the calling timer</param>
         /// <returns>the new tick intervall</returns>
-        protected virtual int BrainTimerCallback(RegionTimer callingTimer)
+        protected virtual int BrainTimerCallback(ECSGameTimer callingTimer)
         {
             if (!m_body.IsAlive || m_body.ObjectState != GameObject.eObjectState.Active)
             {

@@ -1,30 +1,11 @@
-﻿/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System;
-using System.Reflection;
-using System.Linq;
-
+﻿using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
-using DOL.Database;
-
 using log4net;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DOL.GS.Friends
 {
@@ -36,7 +17,7 @@ namespace DOL.GS.Friends
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Players Indexed Friends Lists Cache.
@@ -86,32 +67,33 @@ namespace DOL.GS.Friends
         /// Add Player to Friends Manager Cache
         /// </summary>
         /// <param name="Player">Gameplayer to Add</param>
-        public void AddPlayerFriendsListToCache(GamePlayer Player)
+        public void AddPlayerFriendsListToCache(GamePlayer player)
         {
-            if (Player == null)
-                throw new ArgumentNullException("Player");
+            if (player == null) throw new ArgumentNullException(nameof(player));
+            string[] friends = player.SerializedFriendsList;
 
-            var friends = Player.SerializedFriendsList;
+            // idempotent: WorldEnter is raised on every region change, not only on login
+            PlayersFriendsListsCache.AddOrReplace(player, friends);
+            if (friends.Length == 0) { PlayersFriendsStatusCache.AddOrReplace(player, Array.Empty<FriendStatus>()); return; }
 
-            if (!PlayersFriendsListsCache.AddIfNotExists(Player, friends).added)
+            // DB off the game loop, result posted back
+            Task.Run(() =>
             {
-                if (log.IsWarnEnabled)
-                    log.WarnFormat("Gameplayer ({0}) is already registered in Friends Manager Cache while adding!", Player);
-            }
+                FriendStatus[] offline;
+                try
+                {
+                    offline = Database.SelectObjects<DOLCharacters>(DB.Column(nameof(DOLCharacters.Name)).IsIn(friends))
+                                      .Select(c => new FriendStatus(c.Name, c.Level, c.Class, c.LastPlayed)).ToArray();
+                }
+                catch (Exception e) { log.Error("FriendsManager: loading offline friends", e); return; }
 
-            var offlineFriends = Array.Empty<FriendStatus>();
-            if (friends.Any())
-            {
-                offlineFriends = Database.SelectObjects<DOLCharacters>(DB.Column(nameof(DOLCharacters.Name)).IsIn(friends))
-                    .Select(chr => new FriendStatus(chr.Name, chr.Level, chr.Class, chr.LastPlayed)).ToArray();
-            }
-
-            if (!PlayersFriendsStatusCache.AddIfNotExists(Player, offlineFriends).added)
-            {
-                if (log.IsWarnEnabled)
-                    log.WarnFormat("Gameplayer ({0}) is already registered in Friends Manager Status Cache while adding!", Player);
-            }
-
+                GameLoopPost.Run(static s =>
+                {
+                    if (s.player.ObjectState == GameObject.eObjectState.Deleted) return;
+                    if (!s.self.PlayersFriendsListsCache.ContainsKey(s.player)) return;
+                    s.self.PlayersFriendsStatusCache.AddOrReplace(s.player, s.offline);
+                }, (self: this, player, offline));
+            });
         }
 
         /// <summary>
@@ -356,16 +338,11 @@ namespace DOL.GS.Friends
         /// </summary>
         private void OnClientStateChanged(DOLEvent e, object sender, EventArgs arguments)
         {
-            var client = sender as GameClient;
-            if (client == null)
-                return;
-
-            if (client.ClientState == GameClient.eClientState.WorldEnter && client.Player != null)
-            {
-                // Load Friend List
-                AddPlayerFriendsListToCache(client.Player);
-                SendPlayerFriendsList(client.Player);
-            }
+            if (sender is not GameClient client || client.Player == null) return;
+            if (client.ClientState != GameClient.eClientState.WorldEnter) return;
+            if (PlayersFriendsListsCache.ContainsKey(client.Player)) return;
+            AddPlayerFriendsListToCache(client.Player);
+            SendPlayerFriendsList(client.Player);
         }
 
         /// <summary>

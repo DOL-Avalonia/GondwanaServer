@@ -1,10 +1,6 @@
 ﻿using DOL.Events;
-using DOL.GS.PacketHandler;
-using DOL.Language;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using DOL.GS.Behaviour;
 
 namespace DOL.GS.Quests
 {
@@ -36,14 +32,17 @@ namespace DOL.GS.Quests
         public override PlayerGoalState ForceStartGoal(PlayerQuest questData)
         {
             var state = base.ForceStartGoal(questData);
-            new RegionTimer(questData.Owner, _timer =>
+
+            new ECSGameTimer(questData.Owner, _ =>
             {
-                foreach (var stopId in m_stopGoals)
+                foreach (int stopId in m_stopGoals)
                     if (Quest.Goals.TryGetValue(stopId, out var stopGoal))
                         stopGoal.AbortGoal(questData);
+
                 EndGoal(questData, state, true);
                 return 0;
-            }).Start(1);
+            }, 1);
+
             return state;
         }
     }

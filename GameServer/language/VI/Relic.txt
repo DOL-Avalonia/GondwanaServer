@@ -1,5 +1,18 @@
-# Relics/GameRelicPad (VI)
+# GameRelicPad (VI)
 GameRelicPad.MountRelic.Captured:			{0} đã chiếm: {1}.
 GameRelicPad.MountRelic.Stored:				{0} của {1} đã cất {2} tại {3}.
 GameRelicPad.OnPlayerEnter.EmptyRelicPad:		Bạn phải tìm một bệ thánh tích {0} trống để đặt thánh tích này.
 GameRelicPad.RemoveRelic.Removed:			{0} của {1} đã gỡ {2} khỏi {3}.
+
+# GameRelic
+GameRelic.Interact.Dead:					Bạn không thể nhặt {0}. Bạn đã chết!
+GameRelic.Interact.OwnedByRealm:			Bạn không thể nhặt {0}. Nó thuộc về vương quốc của bạn.
+GameRelic.Interact.CaptureOwnFirst:			Bạn không thể nhặt {0}. Bạn cần phải chiếm lại thánh tích {1} của vương quốc bạn trước.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: Bạn đang mang một thánh tích rồi.
+GameRelic.PlayerTakesRelic.Stealthed:		Bạn không thể mang thánh tích khi đang tàng hình.
+GameRelic.PlayerTakesRelic.Dead:			Bạn đã chết!
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	Bạn phải chiếm pháo đài này trước khi lấy thánh tích.
+GameRelic.PlayerTakesRelic.InventoryFull:		Bạn không có đủ chỗ trong ba lô để mang vật này.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	Thánh tích này thuộc về vương quốc của bạn.
+GameRelic.GetExamineMessages.OwnedByRealm:		Thánh tích này thuộc về {0}.
+GameRelic.GetExamineMessages.NoOwner:			Thánh tích này vô chủ, hãy lấy nó đi!

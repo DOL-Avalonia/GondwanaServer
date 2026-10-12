@@ -1,25 +1,4 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System;
-using System.Collections;
 using DOL.Language;
-
 using DOL.GS.RealmAbilities;
 
 namespace DOL.GS.Effects
@@ -32,7 +11,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// The timer that reduce the endurance every interval
         /// </summary>
-        //RegionTimer m_tickTimer;
+        //ECSGameTimer m_tickTimer;
 
         /// <summary>
         /// The amount of timer ticks player was not moving
@@ -50,7 +29,7 @@ namespace DOL.GS.Effects
 				m_tickTimer.Stop();
 				m_tickTimer = null;
 			}
-			m_tickTimer = new RegionTimer(target);
+			m_tickTimer = new ECSGameTimer(target);
 			m_tickTimer.Callback = new RegionTimerCallback(PulseCallback);
 			m_tickTimer.Start(1);*/
             target.StartEnduranceRegeneration();
@@ -74,7 +53,7 @@ namespace DOL.GS.Effects
         /// </summary>
         /// <param name="callingTimer"></param>
         /// <returns></returns>
-        /*public int PulseCallback(RegionTimer callingTimer)
+        /*public int PulseCallback(ECSGameTimer callingTimer)
 		{
 			int nextInterval;
 

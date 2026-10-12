@@ -3,6 +3,8 @@ ArenaManager.2v2:								2 contre 2
 ArenaManager.3v3:								3 contre 3
 ArenaManager.4v4:								4 contre 4
 ArenaManager.SoloVsSolo:						Solo vs Solo
+ArenaMaster.Interact.NotActive:					The arena is closed for now.
+ArenaMaster.Interact.Cooldown:					The arena is currently preparing for the next match. Gather your strength while the combatants are cleared.
 ArenaMaster.Interact.CurrentMatch:				Tournoi en cours
 ArenaMaster.Interact.CurrentMatch1:				[1] {0}
 ArenaMaster.Interact.CurrentMatch2:				[2] {0}

@@ -130,7 +130,7 @@ namespace DOL.GS.Spells
 
             public BumpSpellHandler SpellHandler { get; init; }
 
-            public RegionTimer Timer { get; init; }
+            public ECSGameTimer Timer { get; init; }
 
             public Victim(BumpSpellHandler spellHandler, GameNPC npc, BumpTrajectory trajectory, GameSpellEffect? effect)
             {
@@ -139,11 +139,11 @@ namespace DOL.GS.Spells
                 Trajectory = trajectory;
                 CurrentPoint = 0;
                 IsBumpNpc = npc is BumpNPC;
-                Timer = new RegionTimer(npc, TimerCallback);
+                Timer = new ECSGameTimer(npc, TimerCallback);
                 Effect = effect;
             }
 
-            private int TimerCallback(RegionTimer callingtimer)
+            private int TimerCallback(ECSGameTimer callingtimer)
             {
                 if (Npc.ObjectState != GameObject.eObjectState.Active)
                 {

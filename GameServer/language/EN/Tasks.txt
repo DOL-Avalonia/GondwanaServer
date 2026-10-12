@@ -48,6 +48,8 @@ Tasks.Level: Level {0}
 
 Tasks.KillEnemyPlayersGroupLog: Kill Enemy Players Grouped: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Kill Enemy Players Alone: {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Kill Creatures in Dungeons: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Kill Outdoors Creatures: {0}/{1}
 Tasks.KillKeepGuardsLog: Kill Keep Guards: {0}/{1}
 Tasks.TakeKeepsLog: Take Keeps: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Kill Territory Guards: {0}/{1}

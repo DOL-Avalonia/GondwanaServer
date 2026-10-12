@@ -1,8 +1,8 @@
 ﻿
 # Server Intro RPG message
-ServerRPGMessage.ShortDescription:		¡Bienvenido a Arcanum, un mundo forjado de las cenizas de la Gran Guerra Mágica! En este reino inmersivo de rol y JcJ, los reinos fracturados luchan por la supervivencia mientras los gremios dictan la ley. Consulta los principios sagrados y las reglas del servidor en www.arcanum-server.com. ¡Afila tus espadas, prepara tus hechizos y disfruta de tu viaje en Arcanum!
-ServerRPGMessage.Lore1:					¡Bienvenido a Arcanum!
-ServerRPGMessage.Lore2:					Hace dos mil años, Arcanum era una brillante red de ciudadelas flotantes y forjas de maná. Luego llegó la Gran Guerra Mágica. Los continentes fueron destrozados, dejando un mundo marcado y debilitado. De estos escombros, surgieron tres reinos: Albion, Midgard y Hibernia. Hoy en día, los reyes gobiernan sobre el papel, pero son los gremios quienes realmente gobiernan las tierras fracturadas, mientras que los forajidos forjan sus propios imperios en el oscuro Subsuelo. Elige tu camino sabiamente.
+ServerRPGMessage.ShortDescription:		¡Bienvenido a {0}, un mundo forjado de las cenizas de la Gran Guerra Mágica! En este reino inmersivo de rol y JcJ, los reinos fracturados luchan por la supervivencia mientras los gremios dictan la ley. Consulta los principios sagrados y las reglas del servidor en www.{0}-server.com. ¡Afila tus espadas, prepara tus hechizos y disfruta de tu viaje en {0}!
+ServerRPGMessage.Lore1:					¡Bienvenido a {0}!
+ServerRPGMessage.Lore2:					Hace dos mil años, {0} era una brillante red de ciudadelas flotantes y forjas de maná. Luego llegó la Gran Guerra Mágica. Los continentes fueron destrozados, dejando un mundo marcado y debilitado. De estos escombros, surgieron tres reinos: Albion, Midgard y Hibernia. Hoy en día, los reyes gobiernan sobre el papel, pero son los gremios quienes realmente gobiernan las tierras fracturadas, mientras que los forajidos forjan sus propios imperios en el oscuro Subsuelo. Elige tu camino sabiamente.
 ServerRPGMessage.FeaturesHeader:		--------- CARACTERÍSTICAS DEL SERVIDOR ---------
 ServerRPGMessage.FeatureEvents1:		[Eventos Dinámicos y Misiones]
 ServerRPGMessage.FeatureEvents2:		Participa en eventos que alteran el mundo y en cacerías de jefes legendarios.
@@ -63,4 +63,4 @@ ServerRPGMessage.GCCombatZone:			/gc combatzone : Crea una zona de combate JcJ t
 ServerRPGMessage.GCJail:				/gc jailrelease <name> : Paga la fianza para liberar a un compañero de gremio de la prisión.
 ServerRPGMessage.GCRent:				/gc houserent <on|off> : Activa/desactiva los pagos automáticos del alquiler de la casa del gremio.
 ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Compra y despliega estandartes tácticos para potenciar a tus miembros o guardias del territorio.
-ServerRPGMessage.Outro:					¡Buena suerte, y que tu legado en Arcanum sea legendario!
+ServerRPGMessage.Outro:					¡Buena suerte, y que tu legado en {0} sea legendario!

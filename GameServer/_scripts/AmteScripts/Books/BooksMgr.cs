@@ -67,7 +67,7 @@ namespace DOL.GS.Scripts
                 taskStamped = LanguageMgr.Translate(player, "GuildRegistrar.Read.StampedBy");
             }
 
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 var sb = new StringBuilder(2048);
                 sb.Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
@@ -159,7 +159,7 @@ namespace DOL.GS.Scripts
                 taskStamped = LanguageMgr.Translate(player, "Librarian.Read.StampedBy");
             }
 
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 var sb = new StringBuilder(2048);
                 sb.Append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")

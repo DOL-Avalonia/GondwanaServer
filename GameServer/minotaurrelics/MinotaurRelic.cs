@@ -1,27 +1,8 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading;
-
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Effects;
@@ -33,7 +14,7 @@ namespace DOL.GS
 {
     public class MinotaurRelic : GameStaticItem
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType);
 
         #region constructor
         public MinotaurRelic() : base() { m_saveInDB = true; }
@@ -48,7 +29,7 @@ namespace DOL.GS
         #region Declarations
         DBMinotaurRelic m_dbRelic;
         Timer timer = null;
-        public RegionTimer respawntimer = null;
+        public ECSGameTimer respawntimer = null;
         protected int m_relicSpellID;
         protected Spell m_relicSpell;
         protected string m_relicTarget;
@@ -141,7 +122,7 @@ namespace DOL.GS
         {
             InternalID = obj.ObjectId;
             m_dbRelic = obj as DBMinotaurRelic;
-            RelicID = m_dbRelic.RelicID;
+            RelicID = m_dbRelic!.RelicID;
 
             SpawnPosition = Position.Create((ushort)m_dbRelic.SpawnRegion, m_dbRelic.SpawnX, m_dbRelic.SpawnY, m_dbRelic.SpawnZ, (ushort)m_dbRelic.SpawnHeading);
             Position = SpawnPosition;
@@ -455,16 +436,14 @@ namespace DOL.GS
                 respawntimer.Stop();
                 respawntimer = null;
             }
-            respawntimer = new RegionTimer(this, new RegionTimerCallback(RespawnTimerCallback),
-                                           Util.Random(MinotaurRelicManager.MIN_RESPAWN_TIMER, MinotaurRelicManager.MAX_RESPAWN_TIMER));
+
+            respawntimer = new ECSGameTimer(this, RespawnTimerCallback, Util.Random(MinotaurRelicManager.MIN_RESPAWN_TIMER, MinotaurRelicManager.MAX_RESPAWN_TIMER));
         }
 
         /// <summary>
         /// Called when the Respawntimer is reached
         /// </summary>
-        /// <param name="respawnTimer"></param>
-        /// <returns></returns>
-        protected override int RespawnTimerCallback(RegionTimer respawnTimer)
+        protected override int RespawnTimerCallback(ECSGameTimer respawnTimer)
         {
             if (respawntimer != null)
             {
@@ -553,7 +532,7 @@ namespace DOL.GS
                 GamePlayer player = sender as GamePlayer;
                 GainedRealmPointsEventArgs arg = args as GainedRealmPointsEventArgs;
 
-                if (player.MinotaurRelic == null || arg == null) return;
+                if (player!.MinotaurRelic == null || arg == null) return;
 
                 if (player.MinotaurRelic.XP < MinotaurRelicManager.MAX_RELIC_EXP)
                     player.MinotaurRelic.XP += (int)arg.RealmPoints / 6;
@@ -567,7 +546,7 @@ namespace DOL.GS
 
             if (e == GamePlayerEvent.AcceptGroup)
             {
-                if (player.Group == null) return;
+                if (player!.Group == null) return;
                 foreach (GamePlayer pl in player.Group.GetPlayersInTheGroup())
                 {
                     if (pl.MinotaurRelic != null)
@@ -592,7 +571,7 @@ namespace DOL.GS
                     if (ProtectorClassType != string.Empty)
                     {
                         GameObject protector = (GameObject)(GetType().Assembly.CreateInstance(ProtectorClassType, false));
-                        if (protector.GetType() != null)
+                        if (protector!.GetType() != null)
                         {
                             //each individual protector will need to have all info needed to add to world
                             //location, name, model, level, etc. hard coded into its class type (script)

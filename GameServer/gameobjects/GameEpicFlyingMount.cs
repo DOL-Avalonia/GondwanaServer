@@ -12,9 +12,9 @@ namespace DOL.GS.Scripts
     {
         public GamePlayer Owner { get; set; }
 
-        private RegionTimer m_checkTimer;
-        private RegionTimer m_zTimer;
-        private RegionTimer m_flightTimer;
+        private ECSGameTimer m_checkTimer;
+        private ECSGameTimer m_zTimer;
+        private ECSGameTimer m_flightTimer;
 
         private int m_zTarget;
         private int m_zStep;
@@ -42,8 +42,8 @@ namespace DOL.GS.Scripts
             if (!base.AddToWorld()) return false;
 
             m_zTarget = this.Position.Z;
-            m_checkTimer = new RegionTimer(this, new RegionTimerCallback(CheckDistanceCallback), 2000);
-            m_flightTimer = new RegionTimer(this, new RegionTimerCallback(MovementTickCallback), 500);
+            m_checkTimer = new ECSGameTimer(this, CheckDistanceCallback, 2000);
+            m_flightTimer = new ECSGameTimer(this, MovementTickCallback, 500);
 
             return true;
         }
@@ -73,7 +73,7 @@ namespace DOL.GS.Scripts
             this.Delete();
         }
 
-        protected virtual int MovementTickCallback(RegionTimer timer)
+        protected virtual int MovementTickCallback(ECSGameTimer timer)
         {
             if (Owner == null || RiderArrayLocation(Owner) == -1)
             {
@@ -211,7 +211,7 @@ namespace DOL.GS.Scripts
             Owner.Out.SendMessage(LanguageMgr.GetTranslation(lang, "EpicMount.Msg.FlyToPlayer"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
-        protected virtual int CheckDistanceCallback(RegionTimer timer)
+        protected virtual int CheckDistanceCallback(ECSGameTimer timer)
         {
             if (Owner == null || !Owner.IsAlive || Owner.ObjectState != eObjectState.Active || Owner.CurrentRegionID != CurrentRegionID)
             {
@@ -307,10 +307,10 @@ namespace DOL.GS.Scripts
 
             m_zStep = m_zTarget > this.Position.Z ? 10 : -10;
 
-            m_zTimer = new RegionTimer(this, new RegionTimerCallback(ZTimerCallback), 50);
+            m_zTimer = new ECSGameTimer(this, ZTimerCallback, 50);
         }
 
-        protected virtual int ZTimerCallback(RegionTimer timer)
+        protected virtual int ZTimerCallback(ECSGameTimer timer)
         {
             bool reached = false;
             int newZ = this.Position.Z + m_zStep;

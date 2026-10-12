@@ -1,0 +1,19 @@
+
+# GameRelicPad
+GameRelicPad.MountRelic.Captured:			{0} kontrolliert nun {1}.
+GameRelicPad.MountRelic.Stored:				{0} aus {1} hat {2} nach {3} gebracht.
+GameRelicPad.OnPlayerEnter.EmptyRelicPad:	Ihr müsst eine leere {0}-Reliktplatte finden, für die Aufbewahrung dieses Relikts.
+GameRelicPad.RemoveRelic.Removed:			{0} aus {1} hat {2} aus {3} entfernt.
+
+# GameRelic
+GameRelic.Interact.Dead:					Du kannst {0} nicht aufheben. Du bist tot!
+GameRelic.Interact.OwnedByRealm:			Du kannst {0} nicht aufheben. Es gehört deinem Reich.
+GameRelic.Interact.CaptureOwnFirst:			Du kannst {0} nicht aufheben. Du musst zuerst das {1}-Relikt deines Reiches erobern.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: Du trägst bereits ein Relikt.
+GameRelic.PlayerTakesRelic.Stealthed:		Du kannst kein Relikt tragen, während du getarnt bist.
+GameRelic.PlayerTakesRelic.Dead:			Du bist tot!
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	Du musst diese Festung erobern, bevor du ein Relikt nimmst.
+GameRelic.PlayerTakesRelic.InventoryFull:		Du hast nicht genug Platz in deinem Rucksack, um dies zu tragen.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	Das Relikt gehört deinem Reich.
+GameRelic.GetExamineMessages.OwnedByRealm:		Das Relikt gehört {0}.
+GameRelic.GetExamineMessages.NoOwner:			Das Relikt hat keinen Besitzer, nimm es!

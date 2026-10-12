@@ -6,7 +6,7 @@ using System.Reflection;
 using DOL.Database;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using DOL.GS.SalvageCalc; // Injects the custom Salvage Calculator
+using DOL.GS.SalvageCalc;
 using DOL.GS.ServerProperties;
 using log4net;
 
@@ -18,12 +18,6 @@ namespace DOL.GS
     public class Salvage
     {
         protected static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
-
-        #region Declaration
-        protected const string SALVAGE_YIELD = "SALVAGE_YIELD";
-        protected const string SALVAGED_ITEM = "SALVAGED_ITEM";
-        protected const string SALVAGE_YIELD_LIST = "SALVAGE_YIELD_LIST";
-        #endregion
 
         #region First call function and callback
 
@@ -76,15 +70,8 @@ namespace DOL.GS
                 };
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Salvage.BeginWork.BeginSalvage", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 player.Out.SendTimerWindow(LanguageMgr.GetTranslation(player.Client.Account.Language, "Salvage.BeginWork.Salvaging", item.Name), mineralYield.Count);
-                player.CraftTimer = new RegionTimer(player)
-                {
-                    Callback = new RegionTimerCallback(Proceed)
-                };
-                player.CraftTimer.Properties.setProperty(AbstractCraftingSkill.PLAYER_CRAFTER, player);
-                player.CraftTimer.Properties.setProperty(SALVAGED_ITEM, item);
-                player.CraftTimer.Properties.setProperty(SALVAGE_YIELD, mineralYield);
-                player.CraftTimer.Properties.setProperty(SALVAGE_YIELD_LIST, mineralYields);
-                player.CraftTimer.Start(mineralYield.Count * 1000);
+                player.CraftTimer = new ECSGameTimer(player, _ => Proceed(player, item, mineralYield, mineralYields), mineralYield.Count * 1000);
+
                 return 1;
             }
 
@@ -214,16 +201,8 @@ namespace DOL.GS
             }
 
             player.Out.SendTimerWindow(LanguageMgr.GetTranslation(player.Client.Account.Language, "Salvage.BeginWork.Salvaging", item.Name), yield.Count);
-            player.CraftTimer = new RegionTimer(player)
-            {
-                Callback = new RegionTimerCallback(Proceed)
-            };
-            player.CraftTimer.Properties.setProperty(AbstractCraftingSkill.PLAYER_CRAFTER, player);
-            player.CraftTimer.Properties.setProperty(SALVAGED_ITEM, item);
-            player.CraftTimer.Properties.setProperty(SALVAGE_YIELD, yield);
-            player.CraftTimer.Properties.setProperty(SALVAGE_YIELD_LIST, yieldList);
+            player.CraftTimer = new ECSGameTimer(player, _ => Proceed(player, item, yield, yieldList), yield.Count * 1000);
 
-            player.CraftTimer.Start(yield.Count * 1000);
             return 1;
         }
 
@@ -320,12 +299,8 @@ namespace DOL.GS
         /// <summary>
         /// Called when craft time is finished
         /// </summary>
-        protected static int Proceed(RegionTimer timer)
+        protected static int Proceed(GamePlayer player, InventoryItem itemToSalvage, SalvageYield yield, List<SalvageYieldEntry> yieldList)
         {
-            GamePlayer player = timer.Properties.getProperty<GamePlayer>(AbstractCraftingSkill.PLAYER_CRAFTER, null);
-            InventoryItem itemToSalvage = timer.Properties.getProperty<InventoryItem>(SALVAGED_ITEM, null);
-            SalvageYield yield = timer.Properties.getProperty<SalvageYield>(SALVAGE_YIELD, null);
-            List<SalvageYieldEntry> yieldList = timer.Properties.getProperty<List<SalvageYieldEntry>>(SALVAGE_YIELD_LIST, null);
             int materialCount = yield?.Count ?? 0;
 
             if (player == null || itemToSalvage == null || yield == null || materialCount == 0)

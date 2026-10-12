@@ -1,0 +1,8 @@
+Commands.Admin.Snoop.Description:		Eavesdrop on a player's messages.
+Commands.Admin.Snoop.Usage:			Usage: /snoop <player> or target a player and type /snoop
+Commands.Admin.Snoop.InvalidTarget:		Invalid target.
+Commands.Admin.Snoop.CannotSnoopSelf:		You cannot snoop yourself.
+Commands.Admin.Snoop.InsufficientPrivileges:	You lack sufficient privileges to snoop this player.
+Commands.Admin.Snoop.Started:			Now snooping {0}.
+Commands.Admin.Snoop.Stopped:			Stopped snooping {0}.
+Commands.Admin.Snoop.MessageFormat:		<Snoop: {0}> {1}

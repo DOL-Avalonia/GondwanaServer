@@ -1,5 +1,18 @@
-# Relics/GameRelicPad (NL)
+# GameRelicPad (NL)
 GameRelicPad.MountRelic.Captured:			{0} heeft veroverd: {1}.
 GameRelicPad.MountRelic.Stored:				{0} van {1} heeft {2} opgeslagen bij {3}.
 GameRelicPad.OnPlayerEnter.EmptyRelicPad:		Je moet een lege {0}‑reliekvoetstuk vinden om deze reliek te plaatsen.
 GameRelicPad.RemoveRelic.Removed:			{0} van {1} heeft {2} verwijderd van {3}.
+
+# GameRelic
+GameRelic.Interact.Dead:					Je kunt {0} niet oppakken. Je bent dood!
+GameRelic.Interact.OwnedByRealm:			Je kunt {0} niet oppakken. Het is eigendom van jouw rijk.
+GameRelic.Interact.CaptureOwnFirst:			Je kunt {0} niet oppakken. Je moet eerst het {1} relikwie van jouw rijk veroveren.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: Je draagt al een relikwie.
+GameRelic.PlayerTakesRelic.Stealthed:		Je kunt geen relikwie dragen terwijl je onzichtbaar bent.
+GameRelic.PlayerTakesRelic.Dead:			Je bent dood!
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	Je moet dit fort veroveren voordat je een relikwie kunt nemen.
+GameRelic.PlayerTakesRelic.InventoryFull:		Je hebt niet genoeg ruimte in je rugzak om dit te dragen.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	Het relikwie is eigendom van jouw rijk.
+GameRelic.GetExamineMessages.OwnedByRealm:		Het relikwie is eigendom van {0}.
+GameRelic.GetExamineMessages.NoOwner:			Het relikwie heeft geen eigenaar, neem het!

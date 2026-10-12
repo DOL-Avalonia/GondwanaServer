@@ -16,10 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Text;
-using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 using DOL.Language;
+using System;
+using System.Text;
 
 namespace DOL.GS.Spells
 {
@@ -83,9 +84,8 @@ namespace DOL.GS.Spells
                 }
             }
 
-            RestoreSpeedTimer timer = new RestoreSpeedTimer(effect);
+            RestoreSpeedTimer timer = new(effect);
             effect.Owner.TempProperties.setProperty(effect, timer);
-            timer.Interval = 650;
             timer.Start(1 + (effect.Duration >> 1));
 
             effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
@@ -95,9 +95,8 @@ namespace DOL.GS.Spells
         {
             base.OnEffectExpires(effect, noMessages);
 
-            GameTimer timer = (GameTimer)effect.Owner.TempProperties.getProperty<object>(effect, null);
+            (effect.Owner.TempProperties.getProperty<object>(effect, null) as ECSGameTimer)?.Stop();
             effect.Owner.TempProperties.removeProperty(effect);
-            if (timer != null) timer.Stop();
 
             effect.Owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, effect);
 
@@ -155,36 +154,19 @@ namespace DOL.GS.Spells
             owner.UpdateMaxSpeed();
         }
 
-        public sealed class RestoreSpeedTimer : GameTimer
+        public sealed class RestoreSpeedTimer : ECSGameTimerWrapperBase
         {
             private readonly GameSpellEffect m_effect;
+            public RestoreSpeedTimer(GameSpellEffect effect) : base(effect.Owner) { m_effect = effect; }
 
-            public RestoreSpeedTimer(GameSpellEffect effect) : base(effect.Owner.CurrentRegion.TimeManager)
-            {
-                m_effect = effect;
-            }
-
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
                 GameSpellEffect effect = m_effect;
-
                 double factor = 2.0 - (effect.Duration - effect.RemainingTime) / (double)(effect.Duration >> 1);
-                if (factor < 0) factor = 0;
-                else if (factor > 1) factor = 1;
-
+                factor = Math.Clamp(factor, 0, 1);
                 effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, effect, 1.0 - effect.Spell.Value * factor * 0.01);
-
                 SendUpdates(effect.Owner);
-
-                if (factor <= 0)
-                    Stop();
-            }
-
-            public override string ToString()
-            {
-                return new StringBuilder(base.ToString())
-                    .Append(" SpeedDecreaseEffect: (").Append(m_effect.ToString()).Append(')')
-                    .ToString();
+                return factor <= 0 ? 0 : 650;
             }
         }
 

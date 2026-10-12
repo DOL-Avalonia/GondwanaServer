@@ -44,7 +44,7 @@ namespace DOL.GS.Scripts
             if (!base.Interact(player))
                 return false;
 
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 var cache = EnsurePlayerCache(player);
                 
@@ -567,7 +567,7 @@ namespace DOL.GS.Scripts
             book.TotalSold += 1;
             book.Save();
 
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 var taskSuccess = LanguageMgr.Translate(buyer, "Librarian.Buy.Success");
                 var taskUpvote = cache.TranslatePrefixKey(INTERACT_KEY_PREFIX_VOTE_UP);

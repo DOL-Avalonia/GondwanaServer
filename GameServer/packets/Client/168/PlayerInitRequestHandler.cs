@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Housing;
@@ -33,448 +14,412 @@ using System.Text;
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandlerAttribute(PacketHandlerType.TCP, eClientPackets.PlayerInitRequest, "Region Entering Init Request", eClientStatus.PlayerInGame)]
-    public class PlayerInitRequestHandler : IPacketHandler
+    public class PlayerInitRequestHandler : PacketHandler
     {
-        /// <summary>
-        /// Defines a logger for this class.
-        /// </summary>
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
-        public void HandlePacket(GameClient client, GSPacketIn packet)
+        protected override void HandlePacketInternal(GameClient client, GSPacketIn packet)
         {
-            new PlayerInitRequestAction(client.Player).Start(1);
-        }
+            GamePlayer player = client.Player;
+            if (player == null) return;
 
-        /// <summary>
-        /// Handles player init requests
-        /// </summary>
-        protected class PlayerInitRequestAction : RegionAction
-        {
-            /// <summary>
-            /// Constructs a new PlayerInitRequestHandler
-            /// </summary>
-            /// <param name="actionSource"></param>
-            public PlayerInitRequestAction(GamePlayer actionSource) : base(actionSource)
+            player.Out.SendUpdatePoints();
+            player.TargetObject = null;
+            player.Out.SendRegionColorScheme();
+
+            if (player.CurrentRegion != null)
+                player.CurrentRegion.Notify(RegionEvent.PlayerEnter, player.CurrentRegion, new RegionPlayerEventArgs(player));
+
+            SendMobsAndMobEquipmentToPlayer(player);   // point 3 candidate: replace by client-driven CreateNPCRequest / streaming
+            player.Out.SendTime();
+
+            bool checkInstanceLogin = false;
+            bool updateTempProperties = false;
+
+            if (!player.EnteredGame)
             {
+                updateTempProperties = true;
+                player.EnteredGame = true;
+                player.Notify(GamePlayerEvent.GameEntered, player);
+                player.EffectList.RestoreAllEffects();
+                checkInstanceLogin = true;
+            }
+            else
+            {
+                player.Notify(GamePlayerEvent.RegionChanged, player);
             }
 
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
+            if (player.TempProperties.getProperty(GamePlayer.RELEASING_PROPERTY, false))
             {
-                var player = (GamePlayer)m_actionSource;
+                player.TempProperties.removeProperty(GamePlayer.RELEASING_PROPERTY);
+                player.Notify(GamePlayerEvent.Revive, player);
+                player.Notify(GamePlayerEvent.Released, player);
+            }
 
-                player.Out.SendUpdatePoints();
-                player.TargetObject = null;
-                // update the region color scheme which may be wrong due to ALLOW_ALL_REALMS support
-                player.Out.SendRegionColorScheme();
-                if (player.CurrentRegion != null)
+            if (player.Group != null)
+            {
+                player.Group.UpdateGroupWindow();
+                player.Group.UpdateAllToMember(player, true, false);
+                player.Group.UpdateMember(player, true, true);
+            }
+
+            player.Out.SendPlayerInitFinished(0);
+            player.TargetObject = null;
+            player.StartHealthRegeneration();
+            player.StartPowerRegeneration();
+            player.StartEnduranceRegeneration();
+            player.StartInvulnerabilityTimer(Properties.TIMER_PLAYER_INIT * 1000, null);
+
+            if (player.Guild != null)
+                SendGuildMessagesToPlayer(player);
+
+            SendHouseRentRemindersToPlayer(player);
+            CheckDebtorStatus(player);   // one FindObjectByKey; acceptable on the loop, but cache DBBanque on the player if it grows
+
+            if (player.Level > 1 && Properties.MOTD != string.Empty)
+            {
+                player.Out.SendMessage(Properties.MOTD, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+            else if (player.Level < 6 && !player.IsRenaissance)
+            {
+                player.Out.SendStarterHelp();
+                if (Properties.USE_RPG_STARTING_MSG)
+                    SendServerRPGMessage(player);
+
+                else if (Properties.STARTING_MSG != string.Empty)
+                    player.Out.SendMessage(Properties.STARTING_MSG, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            }
+
+            if (Properties.ENABLE_DEBUG)
+                player.Out.SendMessage("Server is running in DEBUG mode!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            player.Out.SendPlayerFreeLevelUpdate();
+            if (player.FreeLevelState == 2)
+                player.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true, LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.FreeLevel"));
+
+            player.Out.SendMasterLevelWindow(0);
+
+            AssemblyName an = Assembly.GetExecutingAssembly().GetName();
+            player.Out.SendMessage($"Dawn of Light {an.Name} Version: {an.Version}", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+
+            if (Properties.TELEPORT_LOGIN_NEAR_ENEMY_KEEP)
+                CheckIfPlayerLogsNearEnemyKeepAndMoveIfNecessary(player);
+
+            if (Properties.TELEPORT_LOGIN_BG_LEVEL_EXCEEDED)
+                CheckBGLevelCapForPlayerAndMoveIfNecessary(player);
+
+            if (checkInstanceLogin)
+            {
+                Region region = WorldMgr.GetRegion(player.CurrentRegionID);
+                if (region == null || player.CurrentRegion == null || player.CurrentRegion.IsInstance)
                 {
-                    player.CurrentRegion.Notify(RegionEvent.PlayerEnter, player.CurrentRegion, new RegionPlayerEventArgs(player));
+                    Log.Warn($"{player.Name}:{player.Client.Account.Name} logging into instance or CurrentRegion is null, moving to bind!");
+                    player.MoveToBind();
                 }
+            }
 
-                int mobs = SendMobsAndMobEquipmentToPlayer(player);
-                player.Out.SendTime();
+            if (player.IsUnderwater)
+                player.IsDiving = true;
 
-                bool checkInstanceLogin = false;
-                bool updateTempProperties = false;
-                if (!player.EnteredGame)
+            player.Client.ClientState = GameClient.eClientState.Playing;
+
+            if (updateTempProperties && Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP)
+                RestoreTempProperties(player);
+        }
+
+        private static void RestoreTempProperties(GamePlayer player)
+        {
+            string playerId = player.DBCharacter.ObjectId;
+            // The lookup is I/O-ish (can be large): do it off the loop, then apply on the loop, in order with this client's packets.
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                var containers = TempPropertiesManager.TempPropContainerList.Where(item => item.OwnerID == playerId).ToList();
+                if (containers.Count == 0) return;
+
+                GameLoopPost.RunForClient(player.Client, static state =>
                 {
-                    updateTempProperties = true;
-                    player.EnteredGame = true;
-                    player.Notify(GamePlayerEvent.GameEntered, player);
-                    player.EffectList.RestoreAllEffects();
-                    checkInstanceLogin = true;
+                    var (player, containers) = state;
+                    if (player.ObjectState != GameObject.eObjectState.Active) return;
+                    foreach (var container in containers)
+                    {
+                        if (long.TryParse(container.Value, out long v))
+                        {
+                            player.TempProperties.setProperty(container.TempPropString, v);
+                            if (Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP_DEBUG)
+                                Log.Debug($"Container {container.TempPropString} with value {container.Value} for player {player.Name} was removed from container list, tempproperties added");
+                        }
+                        TempPropertiesManager.TempPropContainerList.TryRemove(container);
+                    }
+                }, (player, containers));
+            });
+        }
+
+        private static void CheckDebtorStatus(GamePlayer player)
+        {
+            DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(player.InternalID);
+            if (bank != null && (bank.Debt > 0 || bank.Money < 0))
+            {
+                bool debug = Properties.BANK_LOAN_DEBUG;
+                TimeSpan elapsed = DateTime.Now - bank.NegativeMoneySince;
+                int timeRemaining;
+                string timeUnit;
+                string lang = player.Client.Account.Language;
+
+                if (debug)
+                {
+                    timeRemaining = Math.Max(0, 90 - (int)elapsed.TotalSeconds);
+                    timeUnit = LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Seconds");
                 }
                 else
                 {
-                    player.Notify(GamePlayerEvent.RegionChanged, player);
-                }
-                if (player.TempProperties.getProperty(GamePlayer.RELEASING_PROPERTY, false))
-                {
-                    player.TempProperties.removeProperty(GamePlayer.RELEASING_PROPERTY);
-                    player.Notify(GamePlayerEvent.Revive, player);
-                    player.Notify(GamePlayerEvent.Released, player);
-                }
-                if (player.Group != null)
-                {
-                    player.Group.UpdateGroupWindow();
-                    player.Group.UpdateAllToMember(player, true, false);
-                    player.Group.UpdateMember(player, true, true);
-                }
-                player.Out.SendPlayerInitFinished(0);
-                player.TargetObject = null;
-                player.StartHealthRegeneration();
-                player.StartPowerRegeneration();
-                player.StartEnduranceRegeneration();
-                player.StartInvulnerabilityTimer(ServerProperties.Properties.TIMER_PLAYER_INIT * 1000, null);
-
-                if (player.Guild != null)
-                {
-                    SendGuildMessagesToPlayer(player);
+                    timeRemaining = Math.Max(0, Properties.DEBTOR_GRACE_PERIOD_HOURS - (int)elapsed.TotalHours);
+                    timeUnit = timeRemaining == 1 ? LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Hour") : LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Hours");
                 }
 
-                SendHouseRentRemindersToPlayer(player);
-                CheckDebtorStatus(player);
-
-                if (player.Level > 1 && Properties.MOTD != "")
-                {
-                    player.Out.SendMessage(Properties.MOTD, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                }
-                else if (player.Level < 6 && !player.IsRenaissance)
-                {
-                    player.Out.SendStarterHelp();
-
-                    if (Properties.USE_RPG_STARTING_MSG)
-                    {
-                        SendServerRPGMessage(player);
-                    }
-                    else if (Properties.STARTING_MSG != "")
-                    {
-                        player.Out.SendMessage(Properties.STARTING_MSG, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    }
-                }
-
-                if (Properties.ENABLE_DEBUG)
-                    player.Out.SendMessage("Server is running in DEBUG mode!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-
-                player.Out.SendPlayerFreeLevelUpdate();
-                if (player.FreeLevelState == 2)
-                {
-                    player.Out.SendDialogBox(eDialogCode.SimpleWarning, 0, 0, 0, 0, eDialogType.Ok, true,
-                                             LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.FreeLevel"));
-                }
-                player.Out.SendMasterLevelWindow(0);
-                AssemblyName an = Assembly.GetExecutingAssembly().GetName();
-                player.Out.SendMessage("Dawn of Light " + an.Name + " Version: " + an.Version, eChatType.CT_System,
-                                       eChatLoc.CL_SystemWindow);
-
-
-                if (Properties.TELEPORT_LOGIN_NEAR_ENEMY_KEEP)
-                {
-                    CheckIfPlayerLogsNearEnemyKeepAndMoveIfNecessary(player);
-                }
-
-                if (Properties.TELEPORT_LOGIN_BG_LEVEL_EXCEEDED)
-                {
-                    CheckBGLevelCapForPlayerAndMoveIfNecessary(player);
-                }
-
-                if (checkInstanceLogin)
-                {
-                    if (WorldMgr.Regions[player.CurrentRegionID] == null || player.CurrentRegion == null || player.CurrentRegion.IsInstance)
-                    {
-                        Log.WarnFormat("{0}:{1} logging into instance or CurrentRegion is null, moving to bind!", player.Name, player.Client.Account.Name);
-                        player.MoveToBind();
-                    }
-                }
-
-                if (player.IsUnderwater)
-                {
-                    player.IsDiving = true;
-                }
-                player.Client.ClientState = GameClient.eClientState.Playing;
-
-                #region TempPropertiesManager LookUp
-
-                if (updateTempProperties && Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP)
-                {
-                    var playerId = player.DBCharacter.ObjectId;
-                    System.Threading.Tasks.Task.Run(() =>
-                    {
-                        var containers = TempPropertiesManager.TempPropContainerList
-                            .Where(item => item.OwnerID == playerId).ToList();
-                        if (containers.Count == 0) return;
-
-                        TimerService.Instance.Post(static state =>
-                        {
-                            var (player, containers) = state;
-                            if (player.ObjectState != GameObject.eObjectState.Active) return;
-                            foreach (var container in containers)
-                            {
-                                if (long.TryParse(container.Value, out long v))
-                                {
-                                    player.TempProperties.setProperty(container.TempPropString, v);
-                                    if (Properties.ACTIVATE_TEMP_PROPERTIES_MANAGER_CHECKUP_DEBUG)
-                                        Log.Debug("Container " + container.TempPropString + " with value " + container.Value
-                                            + " for player " + player.Name + " was removed from container list, tempproperties added");
-                                }
-                                TempPropertiesManager.TempPropContainerList.TryRemove(container);
-                            }
-                        }, (player, containers));
-                    });
-                }
-
-                #endregion TempPropertiesManager LookUp
+                string timeWarning = $"{timeRemaining} {timeUnit}";
+                player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.WarningDebt", timeWarning), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
+        }
 
-            private static void CheckDebtorStatus(GamePlayer player)
+        private void SendServerRPGMessage(GamePlayer player)
+        {
+            string lang = player.Client.Account.Language;
+            string serverName = string.IsNullOrEmpty(Properties.ROG_SERVER_NAME) ? "Dawn of Light" : Properties.ROG_SERVER_NAME;
+
+            string shortdescription = LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ShortDescription", serverName);
+
+            string lore =
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Lore1", serverName) + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Lore2", serverName);
+
+            string features1 =
+                "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturesHeader") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureEvents1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureEvents2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureTasks1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureTasks2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGvG1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGvG2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRvR1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRvR2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureDungeons1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureDungeons2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP2", Properties.PVP_MIN_LEVEL);
+
+            string features2 =
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureArena1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureArena2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureBanker1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureBanker2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAltCraft1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAltCraft2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureReputation1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureReputation2");
+
+            string features3 =
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildCreation1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildCreation2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildLeveling1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildLeveling2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAdrenaline1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAdrenaline2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAutotranslate1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAutotranslate2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureLibrarian1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureLibrarian2") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGenistar1") + "\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGenistar2");
+
+            string servercommands1 =
+                "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ServerCommandsHeader") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdHelp") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdLanguage") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAutotranslate") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdMarket") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCraft") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCombineList") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEvent");
+
+            string servercommands2 =
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEpicMount") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdVol") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdFaceMob") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAskName") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdGenistar") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdPvP") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdRvR") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdBet", Properties.ARENA_MAX_BET_GOLD);
+
+            string guildcommands =
+                "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GuildCommandsHeader") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCMap") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCPortal") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCCombatZone") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCJail") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCRent") + "\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCBanners") + "\n\n\n" +
+                LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Outro", serverName);
+
+            player.Out.SendMessage(shortdescription, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(lore, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(features1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(features2, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(features3, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(servercommands1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(servercommands2, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            player.Out.SendMessage(guildcommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+        }
+
+        private static void CheckBGLevelCapForPlayerAndMoveIfNecessary(GamePlayer player)
+        {
+            if (player.Client.Account.PrivLevel == 1 && player.CurrentRegion.IsRvR && player.CurrentRegionID != 163)
             {
-                DBBanque bank = GameServer.Database.FindObjectByKey<DBBanque>(player.InternalID);
-                if (bank != null && (bank.Debt > 0 || bank.Money < 0))
+                ICollection<AbstractGameKeep> list = GameServer.KeepManager.GetKeepsOfRegion(player.CurrentRegionID);
+
+
+                foreach (AbstractGameKeep k in list)
                 {
-                    bool debug = Properties.BANK_LOAN_DEBUG;
-                    TimeSpan elapsed = DateTime.Now - bank.NegativeMoneySince;
-                    int timeRemaining;
-                    string timeUnit;
-                    string lang = player.Client.Account.Language;
+                    if (k.BaseLevel >= 50)
+                        continue;
 
-                    if (debug)
+                    if (player.Level > k.BaseLevel)
                     {
-                        timeRemaining = Math.Max(0, 90 - (int)elapsed.TotalSeconds);
-                        timeUnit = LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Seconds");
-                    }
-                    else
-                    {
-                        timeRemaining = Math.Max(0, Properties.DEBTOR_GRACE_PERIOD_HOURS - (int)elapsed.TotalHours);
-                        timeUnit = timeRemaining == 1 ? LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Hour") : LanguageMgr.GetTranslation(lang, "BankLoanMgr.TimeUnit.Hours");
-                    }
-
-                    string timeWarning = $"{timeRemaining} {timeUnit}";
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(lang, "BankLoanMgr.WarningDebt", timeWarning), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                }
-            }
-
-            private void SendServerRPGMessage(GamePlayer player)
-            {
-                string lang = player.Client.Account.Language;
-
-                string shortdescription = LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ShortDescription");
-
-                string lore =
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Lore1") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Lore2");
-
-                string features1 =
-                    "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturesHeader") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureEvents1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureEvents2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureTasks1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureTasks2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGvG1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGvG2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRvR1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRvR2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureDungeons1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureDungeons2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeaturePvP2", Properties.PVP_MIN_LEVEL);
-
-                string features2 =
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureArena1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureArena2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureRenaissance2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAFK2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureBanker1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureBanker2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAltCraft1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAltCraft2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureReputation1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureReputation2");
-
-                string features3 =
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildCreation1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildCreation2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildLeveling1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGuildLeveling2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAdrenaline1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAdrenaline2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAutotranslate1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureAutotranslate2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureLibrarian1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureLibrarian2") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGenistar1") + "\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.FeatureGenistar2");
-
-                string servercommands1 =
-                    "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.ServerCommandsHeader") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdHelp") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdLanguage") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAutotranslate") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdMarket") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCraft") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdCombineList") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEvent");
-
-                string servercommands2 =
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdEpicMount") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdVol") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdFaceMob") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdAskName") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdGenistar") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdPvP") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdRvR") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.CmdBet", Properties.ARENA_MAX_BET_GOLD);
-
-                string guildcommands =
-                    "\n" + LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GuildCommandsHeader") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCMap") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCPortal") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCCombatZone") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCJail") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCRent") + "\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.GCBanners") + "\n\n\n" +
-                    LanguageMgr.GetTranslation(lang, "ServerRPGMessage.Outro");
-
-                player.Out.SendMessage(shortdescription, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                player.Out.SendMessage(lore, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(features1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(features2, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(features3, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(servercommands1, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(servercommands2, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                player.Out.SendMessage(guildcommands, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-            }
-
-            private static void CheckBGLevelCapForPlayerAndMoveIfNecessary(GamePlayer player)
-            {
-                if (player.Client.Account.PrivLevel == 1 && player.CurrentRegion.IsRvR && player.CurrentRegionID != 163)
-                {
-                    ICollection<AbstractGameKeep> list = GameServer.KeepManager.GetKeepsOfRegion(player.CurrentRegionID);
-
-
-                    foreach (AbstractGameKeep k in list)
-                    {
-                        if (k.BaseLevel >= 50)
-                            continue;
-
-                        if (player.Level > k.BaseLevel)
-                        {
-                            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.LevelCap"),
-                                                   eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-                            player.MoveTo(player.BindPosition);
-                            break;
-                        }
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.LevelCap"),
+                                               eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                        player.MoveTo(player.BindPosition);
+                        break;
                     }
                 }
             }
+        }
 
-            private static void CheckIfPlayerLogsNearEnemyKeepAndMoveIfNecessary(GamePlayer player)
+        private static void CheckIfPlayerLogsNearEnemyKeepAndMoveIfNecessary(GamePlayer player)
+        {
+            if (player.CurrentRegion.IsInstance)
             {
-                if (player.CurrentRegion.IsInstance)
+                if (WorldMgr.RvRLinkDeadPlayers.ContainsKey(player.InternalID))
                 {
-                    if (WorldMgr.RvRLinkDeadPlayers.ContainsKey(player.InternalID))
-                    {
-                        WorldMgr.RvRLinkDeadPlayers.Remove(player.InternalID);
-                    }
-                    return;
+                    WorldMgr.RvRLinkDeadPlayers.Remove(player.InternalID);
                 }
+                return;
+            }
 
-                int gracePeriodInMinutes = 0;
-                Int32.TryParse(Properties.RVR_LINK_DEATH_RELOG_GRACE_PERIOD, out gracePeriodInMinutes);
-                AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(player.Position, WorldMgr.VISIBILITY_DISTANCE);
-                if (keep != null && player.Client.Account.PrivLevel == 1 && GameServer.KeepManager.IsEnemy(keep, player))
+            int gracePeriodInMinutes = 0;
+            Int32.TryParse(Properties.RVR_LINK_DEATH_RELOG_GRACE_PERIOD, out gracePeriodInMinutes);
+            AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(player.Position, WorldMgr.VISIBILITY_DISTANCE);
+            if (keep != null && player.Client.Account.PrivLevel == 1 && GameServer.KeepManager.IsEnemy(keep, player))
+            {
+                if (WorldMgr.RvRLinkDeadPlayers.ContainsKey(player.InternalID))
                 {
-                    if (WorldMgr.RvRLinkDeadPlayers.ContainsKey(player.InternalID))
-                    {
-                        if (DateTime.Now.Subtract(new TimeSpan(0, gracePeriodInMinutes, 0)) <= WorldMgr.RvRLinkDeadPlayers[player.InternalID])
-                        {
-                            SendMessageAndMoveToSafeLocation(player);
-                        }
-                    }
-                    else
+                    if (DateTime.Now.Subtract(new TimeSpan(0, gracePeriodInMinutes, 0)) <= WorldMgr.RvRLinkDeadPlayers[player.InternalID])
                     {
                         SendMessageAndMoveToSafeLocation(player);
                     }
                 }
-                var linkDeadPlayerIds = new string[WorldMgr.RvRLinkDeadPlayers.Count];
-                WorldMgr.RvRLinkDeadPlayers.Keys.CopyTo(linkDeadPlayerIds, 0);
-                foreach (string playerId in linkDeadPlayerIds)
+                else
                 {
-                    if (playerId != null &&
-                        DateTime.Now.Subtract(new TimeSpan(0, gracePeriodInMinutes, 0)) > WorldMgr.RvRLinkDeadPlayers[playerId])
-                    {
-                        WorldMgr.RvRLinkDeadPlayers.Remove(playerId);
-                    }
+                    SendMessageAndMoveToSafeLocation(player);
                 }
             }
-
-            private static void SendMessageAndMoveToSafeLocation(GamePlayer player)
+            var linkDeadPlayerIds = new string[WorldMgr.RvRLinkDeadPlayers.Count];
+            WorldMgr.RvRLinkDeadPlayers.Keys.CopyTo(linkDeadPlayerIds, 0);
+            foreach (string playerId in linkDeadPlayerIds)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.SaferLocation"),
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                player.MoveTo(player.BindPosition);
+                if (playerId != null &&
+                    DateTime.Now.Subtract(new TimeSpan(0, gracePeriodInMinutes, 0)) > WorldMgr.RvRLinkDeadPlayers[playerId])
+                {
+                    WorldMgr.RvRLinkDeadPlayers.Remove(playerId);
+                }
             }
+        }
 
-            private static void SendHouseRentRemindersToPlayer(GamePlayer player)
+        private static void SendMessageAndMoveToSafeLocation(GamePlayer player)
+        {
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.SaferLocation"),
+                                   eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            player.MoveTo(player.BindPosition);
+        }
+
+        private static void SendHouseRentRemindersToPlayer(GamePlayer player)
+        {
+            House house = HouseMgr.GetHouseByPlayer(player);
+
+            if (house != null)
             {
-                House house = HouseMgr.GetHouseByPlayer(player);
-
-                if (house != null)
-                {
-                    TimeSpan due = (house.LastPaid.AddDays(Properties.RENT_DUE_DAYS).AddHours(1) - DateTime.Now);
-                    if ((due.Days <= 0 || due.Days < Properties.RENT_DUE_DAYS) && house.KeptMoney < HouseMgr.GetRentByModel(house.Model))
-                        player.Out.SendRentReminder(house);
-                }
-
-                if (player.Guild != null)
-                {
-                    House ghouse = HouseMgr.GetGuildHouseByPlayer(player);
-                    if (ghouse != null)
-                    {
-                        TimeSpan due = (ghouse.LastPaid.AddDays(Properties.RENT_DUE_DAYS).AddHours(1) - DateTime.Now);
-                        if ((due.Days <= 0 || due.Days < Properties.RENT_DUE_DAYS) && ghouse.KeptMoney < HouseMgr.GetRentByModel(ghouse.Model))
-                            player.Out.SendRentReminder(ghouse);
-                    }
-                }
+                TimeSpan due = (house.LastPaid.AddDays(Properties.RENT_DUE_DAYS).AddHours(1) - DateTime.Now);
+                if ((due.Days <= 0 || due.Days < Properties.RENT_DUE_DAYS) && house.KeptMoney < HouseMgr.GetRentByModel(house.Model))
+                    player.Out.SendRentReminder(house);
             }
 
-            private static void SendGuildMessagesToPlayer(GamePlayer player)
+            if (player.Guild != null)
             {
-                try
+                House ghouse = HouseMgr.GetGuildHouseByPlayer(player);
+                if (ghouse != null)
                 {
-                    if (player.GuildRank.GcHear && player.Guild.Motd != "")
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.GuildMessage"),
-                                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        player.Out.SendMessage(player.Guild.Motd, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                    if (player.GuildRank.OcHear && player.Guild.Omotd != "")
-                    {
-                        player.Out.SendMessage(
-                            LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.OfficerMessage", player.Guild.Omotd),
-                            eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                    if (player.Guild.alliance != null && player.GuildRank.AcHear && player.Guild.alliance.Dballiance.Motd != "")
-                    {
-                        player.Out.SendMessage(
-                            LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.AllianceMessage",
-                                                       player.Guild.alliance.Dballiance.Motd), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("SendGuildMessageToPlayer exception, missing guild ranks for guild: " + player.Guild.Name + "?", ex);
-                    if (player != null)
-                    {
-                        player.Out.SendMessage(
-                            "There was an error sending motd for your guild. Guild ranks may be missing or corrupted.",
-                            eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                    }
+                    TimeSpan due = (ghouse.LastPaid.AddDays(Properties.RENT_DUE_DAYS).AddHours(1) - DateTime.Now);
+                    if ((due.Days <= 0 || due.Days < Properties.RENT_DUE_DAYS) && ghouse.KeptMoney < HouseMgr.GetRentByModel(ghouse.Model))
+                        player.Out.SendRentReminder(ghouse);
                 }
             }
+        }
 
-            private static int SendMobsAndMobEquipmentToPlayer(GamePlayer player)
+        private static void SendGuildMessagesToPlayer(GamePlayer player)
+        {
+            try
             {
-                int mobs = 0;
-
-                if (player.CurrentRegion != null)
+                if (player.GuildRank.GcHear && player.Guild.Motd != "")
                 {
-                    var npcs = player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().ToArray();
-                    foreach (GameNPC npc in npcs)
-                    {
-                        player.Out.SendNPCCreate(npc);
-                        mobs++;
-                        if (npc.Inventory != null)
-                            player.Out.SendLivingEquipmentUpdate(npc);
-                    }
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.GuildMessage"),
+                                           eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(player.Guild.Motd, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
-
-                return mobs;
+                if (player.GuildRank.OcHear && player.Guild.Omotd != "")
+                {
+                    player.Out.SendMessage(
+                        LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.OfficerMessage", player.Guild.Omotd),
+                        eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+                if (player.Guild.alliance != null && player.GuildRank.AcHear && player.Guild.alliance.Dballiance.Motd != "")
+                {
+                    player.Out.SendMessage(
+                        LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerInitRequestHandler.AllianceMessage",
+                                                   player.Guild.alliance.Dballiance.Motd), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
             }
+            catch (Exception ex)
+            {
+                Log.Error("SendGuildMessageToPlayer exception, missing guild ranks for guild: " + player.Guild.Name + "?", ex);
+                if (player != null)
+                {
+                    player.Out.SendMessage(
+                        "There was an error sending motd for your guild. Guild ranks may be missing or corrupted.",
+                        eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                }
+            }
+        }
+
+        private static int SendMobsAndMobEquipmentToPlayer(GamePlayer player)
+        {
+            int mobs = 0;
+
+            if (player.CurrentRegion != null)
+            {
+                var npcs = player.GetNPCsInRadius(WorldMgr.VISIBILITY_DISTANCE).Cast<GameNPC>().ToArray();
+                foreach (GameNPC npc in npcs)
+                {
+                    player.Out.SendNPCCreate(npc);
+                    mobs++;
+                    if (npc.Inventory != null)
+                        player.Out.SendLivingEquipmentUpdate(npc);
+                }
+            }
+
+            return mobs;
         }
     }
 }

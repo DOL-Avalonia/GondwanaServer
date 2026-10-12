@@ -647,7 +647,7 @@ namespace DOL.MobGroups
 
             if (this.GroupInfos.Effect.HasValue)
             {
-                var spell = GameServer.Database.SelectObjects<Database.DBSpell>(DB.Column("SpellID").IsEqualTo(this.GroupInfos.Effect.Value))?.FirstOrDefault();
+                var spell = GameServer.Database.SelectObjects<DBSpell>(DB.Column("SpellID").IsEqualTo(this.GroupInfos.Effect.Value))?.FirstOrDefault();
                 ushort effect = (ushort)this.GroupInfos.Effect.Value;
 
                 if (spell != null)
@@ -655,18 +655,13 @@ namespace DOL.MobGroups
                     effect = (ushort)spell.ClientEffect;
                 }
 
-                Task.Run(async () =>
+                new ECSGameTimer(npc, _ =>
                 {
-                    await Task.Delay(500);
-
                     if (npc.IsAlive && npc.ObjectState == GameObject.eObjectState.Active)
-                    {
                         foreach (GamePlayer player in npc.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
-                        {
-                            player.Out.SendSpellEffectAnimation(npc, npc, effect, 0, false, (byte)5);
-                        }
-                    }
-                });
+                            player.Out.SendSpellEffectAnimation(npc, npc, effect, 0, false, 5);
+                    return 0;
+                }, 500);
             }
         }
 

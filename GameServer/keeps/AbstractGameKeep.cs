@@ -1,27 +1,8 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Geometry;
@@ -39,7 +20,7 @@ namespace DOL.GS.Keeps
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public bool HasCommander = false;
         public bool HasHastener = false;
@@ -68,12 +49,12 @@ namespace DOL.GS.Keeps
         /// <summary>
         /// Timer to remove bounty point and add realm point to guild which own keep
         /// </summary>
-        protected RegionTimer m_claimTimer;
+        protected ECSGameTimer m_claimTimer;
 
         /// <summary>
         /// Timerto upgrade the keep level
         /// </summary>
-        protected RegionTimer m_changeLevelTimer;
+        protected ECSGameTimer m_changeLevelTimer;
 
         protected long m_lastAttackedByEnemyTick = 0;
         public long LastAttackedByEnemyTick
@@ -722,7 +703,7 @@ namespace DOL.GS.Keeps
         /// </summary>
         public void StartDeductionTimer()
         {
-            m_claimTimer.Start(1);
+            m_claimTimer?.Start(1);
         }
 
         /// <summary>
@@ -730,23 +711,20 @@ namespace DOL.GS.Keeps
         /// </summary>
         public void StopDeductionTimer()
         {
-            m_claimTimer.Stop();
+            m_claimTimer?.Stop();
         }
 
         protected void InitialiseTimers()
         {
-            m_changeLevelTimer = new RegionTimer(CurrentRegion.TimeManager);
-            m_changeLevelTimer.Callback = new RegionTimerCallback(ChangeLevelTimerCallback);
-            m_claimTimer = new RegionTimer(CurrentRegion.TimeManager);
-            m_claimTimer.Callback = new RegionTimerCallback(ClaimCallBack);
-            m_claimTimer.Interval = CLAIM_CALLBACK_INTERVAL;
+            m_changeLevelTimer = new ECSGameTimer(null, ChangeLevelTimerCallback);
+            m_claimTimer = new ECSGameTimer(null, ClaimCallBack);
         }
 
         protected void UnloadTimers()
         {
-            m_changeLevelTimer.Stop();
+            m_changeLevelTimer?.Stop();
             m_changeLevelTimer = null;
-            m_claimTimer.Stop();
+            m_claimTimer?.Stop();
             m_claimTimer = null;
         }
 
@@ -755,15 +733,13 @@ namespace DOL.GS.Keeps
         /// </summary>
         /// <param name="timer"></param>
         /// <returns></returns>
-        public int ClaimCallBack(RegionTimer timer)
+        public int ClaimCallBack(ECSGameTimer timer)
         {
             if (Guild == null)
                 return 0;
 
-            int amount = CalculRP();
-            this.Guild.RealmPoints += amount;
-
-            return timer.Interval;
+            Guild.RealmPoints += CalculRP();
+            return CLAIM_CALLBACK_INTERVAL;
         }
 
         public virtual int CalculRP()
@@ -997,7 +973,7 @@ namespace DOL.GS.Keeps
         /// </summary>
         /// <param name="timer"></param>
         /// <returns></returns>
-        public int ChangeLevelTimerCallback(RegionTimer timer)
+        public int ChangeLevelTimerCallback(ECSGameTimer timer)
         {
             if (this is GameKeepTower)
             {

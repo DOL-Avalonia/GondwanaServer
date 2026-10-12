@@ -1,9 +1,9 @@
+using DOL.AI.Brain;
+using DOL.GS.PacketHandler;
+using Google.Protobuf.WellKnownTypes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using DOL.AI.Brain;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Effects
 {
@@ -13,7 +13,7 @@ namespace DOL.GS.Effects
         protected const String delveString = "Grants unbreakable speed 3 for 15 second duration. Grants immunity to roots, stun, snare and mesmerize spells. Target will still take damage from snare/root spells that do damage.";
         GameLiving m_living;
         protected long m_startTick;
-        protected RegionTimer m_expireTimer;
+        private ECSGameTimer m_expireTimer;
 
         public override void Start(GameLiving living)
         {
@@ -44,7 +44,7 @@ namespace DOL.GS.Effects
                 foreach (IGameEffect effect in living.EffectList)
                 {
                     if (effect is GameSpellEffect == false) continue;
-                    if ((effect as GameSpellEffect).Spell.SpellType == "SpeedEnhancement")
+                    if ((effect as GameSpellEffect)!.Spell.SpellType == "SpeedEnhancement")
                         speedSpells.Add(effect);
                 }
             }
@@ -77,35 +77,26 @@ namespace DOL.GS.Effects
             return true;
         }
 
-        protected virtual void StartTimers()
+        private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_living, new RegionTimerCallback(ExpiredCallback), RealmAbilities.ChargeAbility.DURATION * 1000);
+            m_expireTimer = new ECSGameTimer(m_living, ExpireCallback, RealmAbilities.ChargeAbility.DURATION * 1000);
         }
 
-
-        // Stops the timers for this effect
-        protected virtual void StopTimers()
+        private void StopTimers()
         {
-            if (m_expireTimer != null)
-            {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
-            }
+            m_expireTimer?.Stop();
+            m_expireTimer = null;
         }
 
-
-        // The callback method when the effect expires
-        protected virtual int ExpiredCallback(RegionTimer timer)
+        private int ExpireCallback(ECSGameTimer timer)
         {
             Cancel(false);
             return 0;
         }
 
-
         // Name of the effect
         public override string Name { get { return "Charge"; } }
-
 
         /// <summary>
         /// Remaining time of the effect in milliseconds
@@ -114,13 +105,10 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
-                if (timer == null || !timer.IsAlive)
-                    return 0;
-                return timer.TimeUntilElapsed;
+                ECSGameTimer timer = m_expireTimer;
+                return timer == null || !timer.IsAlive ? 0 : timer.TimeUntilElapsed;
             }
         }
-
 
         // Icon to show on players, can be id
         public override ushort Icon

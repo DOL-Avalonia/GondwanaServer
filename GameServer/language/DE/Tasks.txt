@@ -47,6 +47,8 @@ Tasks.Level: Stufe {0}
 
 Tasks.KillEnemyPlayersGroupLog: Tötet feindliche Spieler in der Gruppe: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Tötet feindliche Spieler alleine: {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Tötet Außenwelt‑Kreaturen: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Zabít bytosti ve volné přírodě: {0}/{1}
 Tasks.KillKeepGuardsLog: Tötet Festungswachen: {0}/{1}
 Tasks.TakeKeepsLog: Erobert Festungen: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Tötet Gebietswachen: {0}/{1}

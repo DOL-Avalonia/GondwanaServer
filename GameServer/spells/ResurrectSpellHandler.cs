@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,7 +17,8 @@ namespace DOL.GS.Spells
     public class ResurrectSpellHandler : SpellHandler
     {
         private const string RESURRECT_CASTER_PROPERTY = "RESURRECT_CASTER";
-        protected readonly ListDictionary m_resTimersByLiving = new ListDictionary();
+        private readonly Dictionary<GameLiving, ECSGameTimer> m_resTimersByLiving = new();
+        private readonly object m_resTimersLock = new();
 
         // constructor
         public ResurrectSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
@@ -99,14 +82,8 @@ namespace DOL.GS.Spells
             else
             {
                 targetPlayer.TempProperties.setProperty(RESURRECT_CASTER_PROPERTY, m_caster);
-                RegionTimer resurrectExpiredTimer = new RegionTimer(targetPlayer);
-                resurrectExpiredTimer.Callback = new RegionTimerCallback(ResurrectExpiredCallback);
-                resurrectExpiredTimer.Properties.setProperty("targetPlayer", targetPlayer);
-                resurrectExpiredTimer.Start(15000);
-                lock (m_resTimersByLiving.SyncRoot)
-                {
-                    m_resTimersByLiving.Add(target, resurrectExpiredTimer);
-                }
+                ECSGameTimer resurrectExpiredTimer = new ECSGameTimer(targetPlayer, ResurrectExpiredCallback, 15000);
+                lock (m_resTimersLock) m_resTimersByLiving[targetPlayer] = resurrectExpiredTimer;
 
                 GamePlayer casterPlayer = m_caster as GamePlayer;
                 if (casterPlayer != null && targetPlayer != null)
@@ -145,12 +122,10 @@ namespace DOL.GS.Spells
         protected virtual void ResurrectResponceHandler(GamePlayer player, byte response)
         {
             //DOLConsole.WriteLine("resurrect responce: " + response);
-            GameTimer resurrectExpiredTimer = null;
-            lock (m_resTimersByLiving.SyncRoot)
-            {
-                resurrectExpiredTimer = (GameTimer)m_resTimersByLiving[player];
-                m_resTimersByLiving.Remove(player);
-            }
+            ECSGameTimer resurrectExpiredTimer = null;
+            lock (m_resTimersLock)
+                if (m_resTimersByLiving.Remove(player, out ECSGameTimer t)) t.Stop();
+
             if (resurrectExpiredTimer != null)
             {
                 resurrectExpiredTimer.Stop();
@@ -218,12 +193,10 @@ namespace DOL.GS.Spells
 
             living.MoveTo(m_caster.Position);
 
-            GameTimer resurrectExpiredTimer = null;
-            lock (m_resTimersByLiving.SyncRoot)
-            {
-                resurrectExpiredTimer = (GameTimer)m_resTimersByLiving[living];
-                m_resTimersByLiving.Remove(living);
-            }
+            ECSGameTimer resurrectExpiredTimer = null;
+            lock (m_resTimersLock)
+                if (m_resTimersByLiving.Remove(living, out ECSGameTimer t)) t.Stop();
+
             if (resurrectExpiredTimer != null)
             {
                 resurrectExpiredTimer.Stop();
@@ -283,10 +256,13 @@ namespace DOL.GS.Spells
         /// </summary>
         /// <param name="callingTimer"></param>
         /// <returns></returns>
-        protected virtual int ResurrectExpiredCallback(RegionTimer callingTimer)
+        protected virtual int ResurrectExpiredCallback(ECSGameTimer callingTimer)
         {
-            GamePlayer player = (GamePlayer)callingTimer.Properties.getProperty<object>("targetPlayer", null);
-            if (player == null) return 0;
+            if (callingTimer.Owner is not GamePlayer player)
+                return 0;
+            lock (m_resTimersLock)
+                m_resTimersByLiving.Remove(player);
+
             player.TempProperties.removeProperty(RESURRECT_CASTER_PROPERTY);
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "SpellHandler.ResurrectSpellHandler.RezExpired"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return 0;

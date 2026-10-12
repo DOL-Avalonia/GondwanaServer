@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.GS.PacketHandler;
 using DOL.Language;
 using System.Linq;
@@ -73,13 +55,8 @@ namespace DOL.GS.Commands
                 if (ply == null)
                     continue;
 
-                Task.Run(async () =>
-                {
-                    string toSend = await translator.Translate(client.Player);
-                    string message = "[Guild] " + client.Player.Name + ": \"" + toSend + "\"";
-
-                    ply.Out.SendMessage(message, eChatType.CT_Guild, eChatLoc.CL_ChatWindow);
-                });
+                GameLoopAsync.Then(translator.Translate(ply), (ply, name: client.Player.Name), static (text, s) =>
+                { if (s.ply.ObjectState == GameObject.eObjectState.Active) s.ply.Out.SendMessage($"[Guild] {s.name}: \"{text}\"", eChatType.CT_Guild, eChatLoc.CL_ChatWindow); });
             }
         }
     }
@@ -136,13 +113,8 @@ namespace DOL.GS.Commands
                 if (!client.Player.Guild.HasRank(ply, Guild.eRank.OcHear))
                     continue;
 
-                Task.Run(async () =>
-                {
-                    string toSend = await translator.Translate(client.Player);
-                    string message = "[Officers] " + client.Player.Name + ": \"" + toSend + "\"";
-                    
-                    ply.Out.SendMessage(message, eChatType.CT_Officer, eChatLoc.CL_ChatWindow);
-                });
+                GameLoopAsync.Then(translator.Translate(ply), (ply, name: client.Player.Name), static (text, s) =>
+                { if (s.ply.ObjectState == GameObject.eObjectState.Active) s.ply.Out.SendMessage($"[Officers] {s.name}: \"{text}\"", eChatType.CT_Guild, eChatLoc.CL_ChatWindow); });
             }
         }
     }
@@ -209,13 +181,8 @@ namespace DOL.GS.Commands
                     if (!gui.HasRank(ply, Guild.eRank.AcHear))
                         continue;
 
-                    Task.Run(async () =>
-                    {
-                        string toSend = await translator.Translate(client.Player);
-                        string message = "[Alliance] " + client.Player.Name + ": \"" + toSend + "\"";
-
-                        ply.Out.SendMessage(message, eChatType.CT_Alliance, eChatLoc.CL_ChatWindow);
-                    });
+                    GameLoopAsync.Then(translator.Translate(ply), (ply, name: client.Player.Name), static (text, s) =>
+                    { if (s.ply.ObjectState == GameObject.eObjectState.Active) s.ply.Out.SendMessage($"[Alliance] {s.name}: \"{text}\"", eChatType.CT_Guild, eChatLoc.CL_ChatWindow); });
                 }
             }
         }

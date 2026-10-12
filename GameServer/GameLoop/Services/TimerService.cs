@@ -131,7 +131,7 @@ namespace DOL.GS
                 IsAlive = true;
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             if (ServiceObjectStore.Remove(this))
                 IsAlive = false;

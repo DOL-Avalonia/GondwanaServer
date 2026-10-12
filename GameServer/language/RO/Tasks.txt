@@ -47,6 +47,8 @@ Tasks.Level: Nivel {0}
 
 Tasks.KillEnemyPlayersGroupLog: Ucideți jucători inamici fiind în grup: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Ucideți jucători inamici singur: {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Ucideți creaturi din temnițe: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Ucideți creaturi din exterior: {0}/{1}
 Tasks.KillKeepGuardsLog: Ucideți gardieni ai forturilor: {0}/{1}
 Tasks.TakeKeepsLog: Cuceriri de forturi: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Ucideți gardieni ai teritoriilor: {0}/{1}

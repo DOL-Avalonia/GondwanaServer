@@ -2240,7 +2240,7 @@ namespace DOL.GS.Spells
         /// <summary>
         /// Casts a spell after the CastTime delay
         /// </summary>
-        protected class DelayedCastTimer : GameTimer
+        protected sealed class DelayedCastTimer : ECSGameTimerWrapperBase
         {
             /// <summary>
             /// The spellhandler instance with callbacks
@@ -2251,10 +2251,10 @@ namespace DOL.GS.Spells
             /// </summary>
             private readonly GameLiving m_target;
             private readonly GameLiving m_caster;
-            private byte m_stage;
             private readonly int m_delay1;
             private readonly int m_delay2;
             private readonly byte m_delay1_substeps;
+            private byte m_stage;
             private byte m_stepcount;
 
             /// <summary>
@@ -2266,95 +2266,62 @@ namespace DOL.GS.Spells
             /// <param name="delay1">Amount of time to wait in stage 1</param>
             /// <param name="delay2">Amount of time to wait in stage 2</param>
             /// <param name="delay1_substeps">Number of times to repeat stage 1</param>
-            public DelayedCastTimer(GameLiving actionSource, SpellHandler handler, GameLiving target, int delay1, int delay2, byte delay1_substeps)
-                : base(actionSource.CurrentRegion.TimeManager)
+            public DelayedCastTimer(GameLiving actionSource, SpellHandler handler, GameLiving target, int delay1, int delay2, byte delay1_substeps) : base(actionSource ?? throw new ArgumentNullException(nameof(actionSource)))
             {
-                if (handler == null)
-                    throw new ArgumentNullException("handler");
-
-                if (actionSource == null)
-                    throw new ArgumentNullException("actionSource");
-
-                m_handler = handler;
+                m_handler = handler ?? throw new ArgumentNullException(nameof(handler));
                 m_target = target;
                 m_caster = actionSource;
-                m_stage = 0;
                 m_delay1 = delay1;
                 m_delay2 = delay2;
                 m_delay1_substeps = delay1_substeps;
-                m_stepcount = 0;
             }
 
             /// <summary>
             /// Called on every timer tick
             /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
                 try
                 {
-                    if (m_stage == 0)
+                    int next;
+                    switch (m_stage)
                     {
-                        if (!m_handler.CheckAfterCast(m_target))
-                        {
-                            Interval = 0;
-                            m_handler.InterruptCasting();
+                        case 0:
+                            if (!m_handler.CheckAfterCast(m_target)) return Abort();
+                            m_stage = 1; m_handler.Stage = 1; next = m_delay1;
+                            break;
+
+                        case 1:
+                            ++m_stepcount;
+                            if (!m_handler.CheckDuringCast(m_target)) return Abort();
+                            if (m_stepcount < m_delay1_substeps) return m_delay1;      // stay in stage 1 (legacy: "return" kept Interval)
+                            m_stage = 2; m_handler.Stage = 2; next = m_delay2;
+                            break;
+
+                        case 2:
+                            m_stage = 3; m_handler.Stage = 3; next = 100;
+                            if (m_handler.CheckEndCast(m_target)) m_handler.FinishSpellCast(m_target);
+                            break;
+
+                        default:
+                            m_stage = 4; m_handler.Stage = 4;
                             m_handler.OnAfterSpellCastSequence();
-                            return;
-                        }
-                        m_stage = 1;
-                        m_handler.Stage = 1;
-                        Interval = m_delay1;
-                    }
-                    else if (m_stage == 1)
-                    {
-                        ++m_stepcount;
-                        if (!m_handler.CheckDuringCast(m_target))
-                        {
-                            Interval = 0;
-                            m_handler.InterruptCasting();
-                            m_handler.OnAfterSpellCastSequence();
-                            return;
-                        }
-                        if (m_stepcount < m_delay1_substeps)
-                            return;
-                        m_stage = 2;
-                        m_handler.Stage = 2;
-                        Interval = m_delay2;
-                    }
-                    else if (m_stage == 2)
-                    {
-                        m_stage = 3;
-                        m_handler.Stage = 3;
-                        Interval = 100;
-
-                        if (m_handler.CheckEndCast(m_target))
-                        {
-                            m_handler.FinishSpellCast(m_target);
-                        }
-                    }
-                    else
-                    {
-                        m_stage = 4;
-                        m_handler.Stage = 4;
-                        Interval = 0;
-                        m_handler.OnAfterSpellCastSequence();
+                            return 0;
                     }
 
-                    if (m_caster is GamePlayer && ServerProperties.Properties.ENABLE_DEBUG && m_stage < 3)
-                    {
-                        (m_caster as GamePlayer)!.Out.SendMessage("[DEBUG] step = " + (m_handler.Stage + 1), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
+                    if (m_caster is GamePlayer p && ServerProperties.Properties.ENABLE_DEBUG && m_stage < 3)
+                        p.Out.SendMessage("[DEBUG] step = " + (m_handler.Stage + 1), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-                    return;
+                    return next;
                 }
                 catch (Exception e)
                 {
-                    if (log.IsErrorEnabled)
-                        log.Error(ToString(), e);
+                    if (log.IsErrorEnabled) log.Error(ToString(), e);
                 }
-
                 m_handler.OnAfterSpellCastSequence();
-                Interval = 0;
+                return 0;
+
+                int Abort() { m_handler.InterruptCasting(); m_handler.OnAfterSpellCastSequence(); return 0; }
             }
 
             /// <summary>
@@ -3149,21 +3116,20 @@ namespace DOL.GS.Spells
             return list.Select(entry => entry.Living).ToList();
         }
 
-        protected class SubSpellTimer : GameTimer
+        protected sealed class SubSpellTimer : ECSGameTimerWrapperBase
         {
-            private ISpellHandler m_subspellhandler;
-            private GameLiving m_target;
-
-            public SubSpellTimer(GameLiving actionSource, ISpellHandler spellhandler, GameLiving target) : base(actionSource.CurrentRegion.TimeManager)
+            private readonly ISpellHandler m_subspellhandler;
+            private readonly GameLiving m_target;
+            public SubSpellTimer(GameLiving actionSource, ISpellHandler spellhandler, GameLiving target) : base(actionSource)
             {
                 m_subspellhandler = spellhandler;
                 m_target = target;
             }
 
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
                 m_subspellhandler.StartSpell(m_target);
-                Stop();
+                return 0;
             }
         }
 

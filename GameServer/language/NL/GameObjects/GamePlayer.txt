@@ -284,6 +284,7 @@ GameObjects.GamePlayer.PickupObject.NoOneWantsThis:        Niemand in de groep w
 GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:      {0} is te ver weg om op te pakken.
 GameObjects.GamePlayer.PickupObject.TooFarFromBoat:        Je bent te ver van de boot om aan boord te gaan.
 GameObjects.GamePlayer.PickupObject.YouGet:                Je raapt {0} op en stopt het in je rugzak.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			U kunt {0} nu ophalen!
 GameObjects.GamePlayer.PickupObject.YouPickUp:             Je raapt {0} op.
 GameObjects.GamePlayer.PickupObject.YourLootShare:         Jouw aandeel van de buit is {0}.
 GameObjects.GamePlayer.PickupObject.GuildDueTax:           Je belasting van {0} gaat naar de gildedeposito.

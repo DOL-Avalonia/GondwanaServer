@@ -1,92 +1,32 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using DOL.Language;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandlerAttribute(PacketHandlerType.TCP, eClientPackets.PlayerAttackRequest, "Handles Player Attack Request", eClientStatus.PlayerInGame)]
-    public class PlayerAttackRequestHandler : IPacketHandler
+    public class PlayerAttackRequestHandler : PacketHandler
     {
-        public void HandlePacket(GameClient client, GSPacketIn packet)
+        protected override void HandlePacketInternal(GameClient client, GSPacketIn packet)
         {
-            var mode = (byte)packet.ReadByte();
+            bool start = packet.ReadByte() != 0;
             bool userAction = packet.ReadByte() == 0;
-            // set to 0 if user pressed the button, set to 1 if client decided to stop attack
-
-            new AttackRequestHandler(client.Player, mode != 0, userAction).Start(1);
+            GamePlayer player = client.Player;
+            if (player == null) return;
+            GameLoopPost.Run(static s => Handle(s.player, s.start, s.userAction), (player, start, userAction));
         }
 
-        /// <summary>
-        /// Handles change attack mode requests
-        /// </summary>
-        protected class AttackRequestHandler : RegionAction
+        private static void Handle(GamePlayer player, bool start, bool userAction)
         {
-            /// <summary>
-            /// True if attack should be started
-            /// </summary>
-            protected readonly bool m_start;
-
-            /// <summary>
-            /// True if user initiated the action else was done by the client
-            /// </summary>
-            protected readonly bool m_userAction;
-
-            /// <summary>
-            /// Constructs a new AttackRequestHandler
-            /// </summary>
-            /// <param name="actionSource">The action source</param>
-            /// <param name="start">True if attack should be started</param>
-            /// <param name="userAction">True if user initiated the action else was done by the client</param>
-            public AttackRequestHandler(GamePlayer actionSource, bool start, bool userAction) : base(actionSource)
+            if (player.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
             {
-                m_start = start;
-                m_userAction = userAction;
+                if (userAction) player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerAttackRequestHandler.CantEnterMelee"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
+                return;
             }
-
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
+            if (start)
             {
-                var player = (GamePlayer)m_actionSource;
-
-                if (player.ActiveWeaponSlot == GameLiving.eActiveWeaponSlot.Distance)
-                {
-                    if (m_userAction)
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PlayerAttackRequestHandler.CantEnterMelee"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-                    return;
-                }
-
-                if (m_start)
-                {
-                    player.StartAttack(player.TargetObject);
-                    // unstealth right after entering combat mode if anything is targeted
-                    if (player.AttackState && player.TargetObject != null)
-                        if (!player.StayStealth)
-                            player.Stealth(false);
-                }
-                else
-                {
-                    player.StopAttack(false);
-                }
+                player.StartAttack(player.TargetObject);
+                if (player.AttackState && player.TargetObject != null && !player.StayStealth) player.Stealth(false);
             }
+            else player.StopAttack(false);
         }
     }
 }

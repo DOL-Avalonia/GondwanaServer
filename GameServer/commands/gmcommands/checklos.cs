@@ -26,6 +26,8 @@ namespace DOL.GS.Commands
             if (player == null)
                 return;
 
+            string lang = client!.Account.Language;
+
             if (args.Length > 1)
             {
                 switch (args[1].ToLowerInvariant())
@@ -36,7 +38,7 @@ namespace DOL.GS.Commands
 
                     case "resetstats":
                         LosCheckHandler.ResetStatistics();
-                        DisplayMessage(client, "LoS statistics have been reset.");
+                        DisplayMessage(client, LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.Reset"));
                         return;
                 }
             }
@@ -54,34 +56,40 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            DisplayMessage(client, LanguageMgr.GetTranslation(client!.Account.Language, "Commands.GM.Checklos.NeedTarget"));
+            DisplayMessage(client, LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.NeedTarget"));
         }
 
         private static void ShowStatistics(GameClient client)
         {
             GamePlayer player = client.Player;
+            string lang = client.Account.Language;
             List<string> text = new List<string>();
 
-            text.AddRange(LosCheckHandler.GetStatisticsReport().Split('\n'));
+            // Get translated statistics from the modified handler
+            text.AddRange(LosCheckHandler.GetStatisticsReport(lang));
             text.Add("");
-            text.Add($"Timeout: {LosCheckHandler.Timeout} ms | Cache lifetime: {LosCheckHandler.CacheLifetime} ms");
-            text.Add($"Server geometry loaded (LOS_MGR_ENABLE): {ServerProperties.Properties.LOS_MGR_ENABLE}"
-                     + $" | used to answer checks (LOS_CHECK_USE_SERVER_GEOMETRY): {ServerProperties.Properties.LOS_CHECK_USE_SERVER_GEOMETRY}");
-            text.Add($"Region {player.CurrentRegionID} has .obj geometry: {(player.CurrentRegion != null && LosCheckMgr.HasDataFor(player.CurrentRegion))}");
-            text.Add($"Pending / cached checks on your client: {player.LosCheckHandler?.ActiveCheckCount ?? 0}");
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.Config", LosCheckHandler.Timeout, LosCheckHandler.CacheLifetime));
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.ServerGeom", ServerProperties.Properties.LOS_MGR_ENABLE, ServerProperties.Properties.LOS_CHECK_USE_SERVER_GEOMETRY));
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.Region", player.CurrentRegionID, (player.CurrentRegion != null && LosCheckMgr.HasDataFor(player.CurrentRegion))));
+            text.Add("");
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.Pending", player.LosCheckHandler?.ActiveCheckCount ?? 0));
 
-            client.Out.SendCustomTextWindow("Check LOS - statistics", text);
+            client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.WindowTitle.Stats"), text);
         }
 
         private static void CheckGroundTarget(GameClient client)
         {
             GamePlayer player = client.Player;
+            string lang = client.Account.Language;
             Position ground = player.GroundTargetPosition;
 
             List<string> text = new List<string>
             {
-                $"Ground target: {ground}",
-                $"Ground target in view (client cache): {player.GroundTargetInView}",
+                LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Header.GroundTarget"),
+                LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Ground.Position", ground),
+                LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Ground.InView", player.GroundTargetInView),
+                "",
+                LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Header.ServerGeom")
             };
 
             Region region = player.CurrentRegion;
@@ -91,35 +99,35 @@ namespace DOL.GS.Commands
                 Stopwatch sw = Stopwatch.StartNew();
                 float collision = LosCheckMgr.GetCollisionDistance(region, player.Coordinate, ground.Coordinate, ref stats);
                 sw.Stop();
-                text.Add(DescribeGeometryResult(collision, stats, sw));
+                DescribeGeometryResult(lang, collision, stats, sw, text);
             }
             else
             {
-                text.Add("Server geometry: no .obj data loaded for this region.");
+                text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Geom.NoData"));
             }
 
-            text.Add("Client check: the client can only test line of sight between two objects, not toward a ground position.");
-            client.Out.SendCustomTextWindow("Check LOS", text);
+            text.Add("");
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Header.ClientCheck"));
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Client.Unsupported"));
+
+            client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.WindowTitle.Main"), text);
         }
 
-        private static string DescribeGeometryResult(float collision, RaycastStats stats, Stopwatch sw)
+        private static void DescribeGeometryResult(string lang, float collision, RaycastStats stats, Stopwatch sw, List<string> text)
         {
             string verdict = float.IsPositiveInfinity(collision)
-                ? "clear line of sight (note: distances < 16 or > visibility range are not tested by the geometry)"
-                : $"BLOCKED at {collision:0} units";
+                ? LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Geom.Clear")
+                : LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Geom.Blocked", collision);
 
-            return $"Server geometry: {verdict} - {stats.nbNodeTests} node tests, {stats.nbFaceTests} face tests, {sw.Elapsed.TotalMilliseconds:0.00} ms";
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Geom.Verdict", verdict));
+            text.Add(LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Geom.Stats", stats.nbNodeTests, stats.nbFaceTests, sw.Elapsed.TotalMilliseconds));
         }
 
-        /// <summary>
-        /// One probe per command. It collects the synchronous information, then waits for the LosCheckHandler answer.
-        /// Cached / geometry-resolved answers arrive synchronously (before SendLosCheckRequest returns), real client
-        /// answers arrive later on the game loop; both paths end in Show().
-        /// </summary>
         private sealed class LosProbe : ILosCheckListener
         {
             private readonly GameClient _client;
             private readonly GameObject _target;
+            private readonly string _lang;
             private readonly List<string> _text = new List<string>();
             private readonly Stopwatch _stopwatch = new Stopwatch();
             private int _checksBefore;
@@ -128,14 +136,18 @@ namespace DOL.GS.Commands
             {
                 _client = client;
                 _target = target;
+                _lang = client.Account.Language;
             }
 
             public void Run()
             {
                 GamePlayer player = _client.Player;
 
-                _text.Add($"Target: {_target.Name} (OID {_target.ObjectID}, distance {(int)_target.Coordinate.DistanceTo(player.Position)})");
-                _text.Add($"Target in view (client cache): {player.TargetInView}");
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Header.TargetInfo"));
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.TargetStr", _target.Name, _target.ObjectID, (int)_target.Coordinate.DistanceTo(player.Position)));
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.InView", player.TargetInView));
+                _text.Add("");
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Header.ServerGeom"));
 
                 Region region = player.CurrentRegion;
                 if (region != null && LosCheckMgr.HasDataFor(region))
@@ -144,20 +156,22 @@ namespace DOL.GS.Commands
                     Stopwatch sw = Stopwatch.StartNew();
                     float collision = LosCheckMgr.GetCollisionDistance(player, _target, ref stats);
                     sw.Stop();
-                    _text.Add(DescribeGeometryResult(collision, stats, sw));
+                    DescribeGeometryResult(_lang, collision, stats, sw, _text);
                 }
                 else
                 {
-                    _text.Add("Server geometry: no .obj data loaded for this region.");
+                    _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Geom.NoData"));
                 }
 
+                _text.Add("");
                 _checksBefore = player.LosCheckHandler?.ActiveCheckCount ?? 0;
 
                 _stopwatch.Start();
                 if (!player.Out.SendLosCheckRequest(player, _target, this))
                 {
                     _stopwatch.Stop();
-                    _text.Add("LosCheckHandler: the check could not be started (target in another region, invalid object id or client not playing).");
+                    _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Header.LosHandler"));
+                    _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.Failed"));
                     Show();
                 }
             }
@@ -166,12 +180,19 @@ namespace DOL.GS.Commands
             {
                 _stopwatch.Stop();
                 long ms = _stopwatch.ElapsedMilliseconds;
-                string origin = ms < 1
-                    ? "instant: answered from the cache, by deduplication or by the server geometry"
-                    : "real client packet round-trip";
 
-                _text.Add($"LosCheckHandler answer: {response} after {ms} ms ({origin}) [source {sourceId} -> target {targetId}]");
-                _text.Add($"Pending / cached checks on your client: {_checksBefore} before, {(_client.Player?.LosCheckHandler?.ActiveCheckCount ?? 0)} now");
+                string origin = ms < 1
+                    ? LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.OriginInst")
+                    : LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.OriginNet");
+
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Header.LosHandler"));
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.Answer", response.ToString()));
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.Time", ms, origin));
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.Route", sourceId, targetId));
+                _text.Add("");
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Header.Cache"));
+                _text.Add(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.Probe.CacheStats", _checksBefore, (_client.Player?.LosCheckHandler?.ActiveCheckCount ?? 0)));
+
                 Show();
             }
 
@@ -180,7 +201,7 @@ namespace DOL.GS.Commands
                 if (_client.Player == null || _client.ClientState != GameClient.eClientState.Playing)
                     return;
 
-                _client.Out.SendCustomTextWindow("Check LOS", _text);
+                _client.Out.SendCustomTextWindow(LanguageMgr.GetTranslation(_lang, "Commands.GM.Checklos.WindowTitle.Main"), _text);
             }
         }
     }

@@ -48,6 +48,8 @@ Tasks.Level: Niveau {0}
 
 Tasks.KillEnemyPlayersGroupLog: Vijandige spelers doden (groep): {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Vijandige spelers doden (solo): {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Wezens in kerkers doden: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Wezens in buitengebieden doden: {0}/{1}
 Tasks.KillKeepGuardsLog: Kasteelwachters doden: {0}/{1}
 Tasks.TakeKeepsLog: Kastelen veroveren: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Territoriumwachters doden: {0}/{1}

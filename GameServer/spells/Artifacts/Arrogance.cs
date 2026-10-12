@@ -1,25 +1,6 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System;
 using DOL.GS;
-using DOL.GS.PacketHandler;
 using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells.Atlantis
 {
@@ -34,7 +15,7 @@ namespace DOL.GS.Spells.Atlantis
         /// <summary>
         /// The timer that will cancel the effect
         /// </summary>
-        protected RegionTimer m_expireTimer;
+        private ECSGameTimer m_expireTimer;
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
@@ -127,20 +108,20 @@ namespace DOL.GS.Spells.Atlantis
             }
             StopTimers();
         }
-        protected virtual void StartTimers()
+
+        private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(playertarget, new RegionTimerCallback(ExpiredCallback), 10000);
+            m_expireTimer = new ECSGameTimer(playertarget, ExpireCallback, 10000);
         }
-        protected virtual void StopTimers()
+
+        private void StopTimers()
         {
-            if (m_expireTimer != null)
-            {
-                m_expireTimer.Stop();
-                m_expireTimer = null;
-            }
+            m_expireTimer?.Stop();
+            m_expireTimer = null;
         }
-        protected virtual int ExpiredCallback(RegionTimer callingTimer)
+
+        private int ExpireCallback(ECSGameTimer timer)
         {
             Stop();
             return 0;

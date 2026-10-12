@@ -222,6 +222,11 @@ namespace DOL.Tests
             string message = await msg;
             SendMessage(message, type, loc);
         }
+        public Action<TestPacketLib, string, eChatType, eChatLoc> SendRawMessageMethod { get; set; }
+        public void SendRawMessage(string msg, eChatType type, eChatLoc loc)
+        {
+            if (SendRawMessageMethod != null) SendRawMessageMethod(this, msg, type, loc);
+        }
         public async Task SendCustomDialog(Task<string> msg, CustomDialogResponse callback)
         {
             string message = await msg;

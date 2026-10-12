@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Globalization;
 using System.Reflection;
@@ -359,6 +341,23 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("system", "new_player_stats", "Enable new player stats. If true, shows new statistics based on Tasks; otherwise, shows old statistics.", true)]
         public static bool SHOW_NEW_PLAYER_STATS;
+
+        [ServerProperty("system", "game_loop_tick_rate", "Game loop ticks per second (20 = 50ms ticks, 50 = 20ms ticks).", 20)]
+        public static int GAME_LOOP_TICK_RATE;
+
+        [ServerProperty("system", "game_loop_parallel_timers", "Run timer callbacks in parallel across all CPU cores. Keep FALSE until your custom timer callbacks are verified thread-safe, then enable for maximum performance.", false)]
+        public static bool GAME_LOOP_PARALLEL_TIMERS;
+
+        [ServerProperty("system", "game_loop_long-tick_threshold_ms", "xxxx", 25)]
+        public static int GAME_LOOP_LONG_TICK_THRESHOLD_MS;
+
+        /// <summary>
+        /// Process the queued client packets (inbound handlers) in parallel, one worker per client, instead of sequentially.
+        /// Keep false (sequential, deterministic, no two handlers ever run at the same time) until the game code is proven thread-safe.
+        /// </summary>
+        [ServerProperty("system", "game_loop_parallel_client_actions", "Process queued client packets in parallel across clients. Default false = sequential (safest).", false)]
+        public static bool GAME_LOOP_PARALLEL_CLIENT_ACTIONS;
+
         #endregion
 
         #region LANGUAGE
@@ -704,17 +703,8 @@ namespace DOL.GS.ServerProperties
         /// <summary>
         /// Prefix for the ROG item description (E.g. Global ROG, Gondwana ROG)
         /// </summary>
-        [ServerProperty("server", "rog_server_name", "Prefix for ROG item descriptions", "Global ROG")]
-        public static string ROG_SERVER_NAME = "Global ROG";
-
-        [ServerProperty("system", "game_loop_tick_rate", "Game loop ticks per second (20 = 50ms ticks, 50 = 20ms ticks).", 20)]
-        public static int GAME_LOOP_TICK_RATE;
-
-        [ServerProperty("system", "game_loop_parallel_timers", "Run timer callbacks in parallel across all CPU cores. Keep FALSE until your custom timer callbacks are verified thread-safe, then enable for maximum performance.", false)]
-        public static bool GAME_LOOP_PARALLEL_TIMERS;
-
-        [ServerProperty("system", "game_loop_long-tick_threshold_ms", "xxxx", 25)]
-        public static int GAME_LOOP_LONG_TICK_THRESHOLD_MS;
+        [ServerProperty("server", "rog_server_name", "Prefix for ROG item descriptions", "")]
+        public static string ROG_SERVER_NAME = "";
 
         #endregion
 
@@ -766,6 +756,21 @@ namespace DOL.GS.ServerProperties
 
         [ServerProperty("world", "weather_log_events", "Should weather events be shown in the Log (and on the console).", true)]
         public static bool WEATHER_LOG_EVENTS;
+
+        [ServerProperty("world", "world_npc_create_per_second", "Max NPC creates streamed to one client per second (nearest first).", 40)]
+        public static int WORLD_NPC_CREATE_PER_SECOND;
+
+        [ServerProperty("world", "world_enter_burst_ms", "After entering a region the create budget is multiplied for this many ms.", 2000)]
+        public static int WORLD_ENTER_BURST_MS;
+
+        [ServerProperty("world", "world_enter_burst_multiplier", "Budget multiplier during the burst window.", 4)]
+        public static int WORLD_ENTER_BURST_MULTIPLIER;
+
+        [ServerProperty("world", "world_npc_always_create_range", "NPCs closer than this are always created immediately, budget or not.", 1200)]
+        public static int WORLD_NPC_ALWAYS_CREATE_RANGE;
+
+        [ServerProperty("world", "world_npc_moving_update_interval", "ObjectUpdate interval (ms) for moving NPCs.", 200)]
+        public static int WORLD_NPC_MOVING_UPDATE_INTERVAL;
 
         /// <summary>
         /// Perform checklos on client with each mob

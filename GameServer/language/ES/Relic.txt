@@ -1,5 +1,18 @@
-# Relics/GameRelicPad (ES)
+# GameRelicPad (ES)
 GameRelicPad.MountRelic.Captured:			{0} ha capturado: {1}.
 GameRelicPad.MountRelic.Stored:				{0} de {1} ha almacenado {2} en {3}.
 GameRelicPad.OnPlayerEnter.EmptyRelicPad:		Debes encontrar un pedestal de reliquia {0} vacío para colocar esta reliquia.
 GameRelicPad.RemoveRelic.Removed:			{0} de {1} ha retirado {2} de {3}.
+
+# GameRelic
+GameRelic.Interact.Dead:					No puedes recoger {0}. ¡Estás muerto!
+GameRelic.Interact.OwnedByRealm:			No puedes recoger {0}. Pertenece a tu reino.
+GameRelic.Interact.CaptureOwnFirst:			No puedes recoger {0}. Primero debes capturar la reliquia {1} de tu reino.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: Ya llevas una reliquia.
+GameRelic.PlayerTakesRelic.Stealthed:		No puedes llevar una reliquia mientras estás en sigilo.
+GameRelic.PlayerTakesRelic.Dead:			¡Estás muerto!
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	Debes capturar esta fortaleza antes de tomar una reliquia.
+GameRelic.PlayerTakesRelic.InventoryFull:		No tienes suficiente espacio en tu mochila para llevar esto.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	La reliquia pertenece a tu reino.
+GameRelic.GetExamineMessages.OwnedByRealm:		La reliquia pertenece a {0}.
+GameRelic.GetExamineMessages.NoOwner:			La reliquia no tiene dueño, ¡tómala!

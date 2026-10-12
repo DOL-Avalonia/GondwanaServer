@@ -1,0 +1,7 @@
+
+TeleportNPC.Douanier.PayString:         payer la somme de: {0} pour les éviter
+TeleportNPC.Douanier.Interact:          Et toi ? Tu choisis quoi ? Tu veux ramasser tout mon clan dans ta face ou [{0}] ?
+TeleportNPC.Douanier.NotEnoughMoney:    Tchakkkk, tu passe pas ! t'es fauché !
+TeleportNPC.Douanier.Busy:              Je suis occupé pour le moment.
+TeleportNPC.Douanier.GiveMoney:         Vous donnez {0} au douanier.
+TeleportNPC.Douanier.Pass:              Bien, tu peux passer toi !

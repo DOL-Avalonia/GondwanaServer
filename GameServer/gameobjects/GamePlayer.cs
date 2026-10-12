@@ -1527,7 +1527,7 @@ namespace DOL.GS
         /// <summary>
         /// tick when player is died
         /// </summary>
-        protected uint m_deathTick;
+        protected long m_deathTick;
 
         /// <summary>
         /// choosed the player to release as soon as possible?
@@ -1642,7 +1642,7 @@ namespace DOL.GS
 
                 m_releaseType = releaseCommand;
                 // we use realtime, because timer window is realtime
-                var diff = m_deathTick - GameTimer.GetTickCount() + RELEASE_MINIMUM_WAIT * 1000;
+                var diff = m_deathTick - GameLoop.GameLoopTime + RELEASE_MINIMUM_WAIT * 1000;
                 if (diff >= 1000)
                 {
                     if (m_automaticRelease)
@@ -1981,7 +1981,7 @@ namespace DOL.GS
         {
             if (IsAlive)
                 return 0;
-            var diffToRelease = GameTimer.GetTickCount() - m_deathTick;
+            var diffToRelease = GameLoop.GameLoopTime - m_deathTick;
             if (m_automaticRelease && diffToRelease > RELEASE_MINIMUM_WAIT * 1000)
             {
                 Release(m_releaseType, true);
@@ -10128,7 +10128,7 @@ namespace DOL.GS
                 }
                 m_automaticRelease = m_releaseType == eReleaseType.Duel;
                 m_releasePhase = 0;
-                m_deathTick = GameTimer.GetTickCount(); // we use realtime, because timer window is realtime
+                m_deathTick = GameLoop.GameLoopTime;
 
                 if (m_releaseType == eReleaseType.Arena)
                 {
@@ -11185,12 +11185,12 @@ namespace DOL.GS
         /// <summary>
         /// This is the timer used to count time when a player casts a RA
         /// </summary>
-        private RegionTimer m_realmAbilityCastTimer;
+        private ECSGameTimer m_realmAbilityCastTimer;
 
         /// <summary>
         /// Get and set the RA cast timer
         /// </summary>
-        public RegionTimer RealmAbilityCastTimer
+        public ECSGameTimer RealmAbilityCastTimer
         {
             get { return m_realmAbilityCastTimer; }
             set { m_realmAbilityCastTimer = value; }
@@ -11199,10 +11199,8 @@ namespace DOL.GS
         /// <summary>
         /// Does the player is casting a realm ability
         /// </summary>
-        public bool IsCastingRealmAbility
-        {
-            get { return (m_realmAbilityCastTimer != null && m_realmAbilityCastTimer.IsAlive); }
-        }
+        public bool IsCastingRealmAbility => m_realmAbilityCastTimer is { IsAlive: true };
+
         #endregion
 
         #region Vault/Money/Items/Trading/UseSlot/ApplyPoison
@@ -12718,43 +12716,24 @@ namespace DOL.GS
             if (IsIgnoring(source))
                 return true;
 
-            eChatType type = eChatType.CT_Send;
-            if (source.Client.Account.PrivLevel > 1)
-                type = eChatType.CT_Staff;
-            
-            System.Threading.Tasks.Task task;
-            string displayed;
+            eChatType type = source.Client.Account.PrivLevel > 1 ? eChatType.CT_Staff : eChatType.CT_Send;
+
             if (!GameServer.ServerRules.IsAllowedToUnderstand(source, this))
             {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source));
-                    Out.SendMessage(displayed, type, eChatLoc.CL_ChatWindow);
-                });
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.FalseLanguage", GetPersonalizedName(source)), type, eChatLoc.CL_ChatWindow);
                 return true;
             }
-            var afkmessage = TempProperties.getProperty<string>(AFK_MESSAGE);
-            System.Threading.Tasks.Task.Run(async () =>
-            {
-                displayed = await LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.Sends", str, (str) => [GetPersonalizedName(source), str]);
-                Out.SendMessage(displayed, type, eChatLoc.CL_ChatWindow);
-                if (afkmessage != null)
-                {
-                    if (afkmessage == "")
-                    {
-                        displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SendReceive.Afk", source.GetPersonalizedName(this));
-                        source!.Out.SendMessage(displayed, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-                    else
-                    {
-                        displayed = await LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.AfkMessage", str, (str) => [source.GetPersonalizedName(this), str]);
-                        source!.Out.SendMessage(
-                            displayed, eChatType.CT_Say,
-                            eChatLoc.CL_ChatWindow);
-                    }
-                }
-            });
 
+            GameLoopAsync.Message(this, LanguageMgr.TranslatePlayerInput(this, source, "GameObjects.GamePlayer.SendReceive.Sends", str, (s) => [GetPersonalizedName(source), s]), type, eChatLoc.CL_ChatWindow);
+
+            var afkmessage = TempProperties.getProperty<string>(AFK_MESSAGE);
+            if (afkmessage != null)
+            {
+                if (afkmessage == "")
+                    GameLoopAsync.Message(source, LanguageMgr.Translate(source, "GameObjects.GamePlayer.SendReceive.Afk", source.GetPersonalizedName(this)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                else
+                    GameLoopAsync.Message(source, LanguageMgr.TranslatePlayerInput(source, this, "GameObjects.GamePlayer.SendReceive.AfkMessage", afkmessage, (s) => [source.GetPersonalizedName(this), s]), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
+            }
             return true;
         }
 
@@ -12775,21 +12754,13 @@ namespace DOL.GS
 
             if (!target.PrivateMessageReceive(this, str))
             {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Send.target.DontUnderstandYou", GetPersonalizedName(target)),
-                                    eChatType.CT_Send, eChatLoc.CL_ChatWindow);
-                });
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.Send.target.DontUnderstandYou", GetPersonalizedName(target)), eChatType.CT_Send, eChatLoc.CL_ChatWindow);
                 return false;
             }
-
             if (Client.Account.PrivLevel == 1 && target.Client.Account.PrivLevel > 1 && target.IsAnonymous)
                 return true;
-            System.Threading.Tasks.Task.Run(async () =>
-            {
-                Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Send.YouSendTo", str, GetPersonalizedName(target)), eChatType.CT_Send,
-                                eChatLoc.CL_ChatWindow);
-            });
+
+            GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.Send.YouSendTo", str, GetPersonalizedName(target)), eChatType.CT_Send, eChatLoc.CL_ChatWindow);
             return true;
         }
 
@@ -12806,23 +12777,11 @@ namespace DOL.GS
 
             if (IsIgnoring(source))
                 return true;
-            
+
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this) || Properties.ENABLE_DEBUG)
-            {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    string displayed = await LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.SayReceive.Says", str, (str) => [GetPersonalizedName(source), str]);
-                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
-            }
+                GameLoopAsync.Message(this, LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.SayReceive.Says", str, (s) => [GetPersonalizedName(source), s]), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             else
-            {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.SayReceive.FalseLanguage", GetPersonalizedName(source));
-                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
-            }
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.SayReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
         }
 
@@ -12837,12 +12796,8 @@ namespace DOL.GS
                 return false;
             if (!base.Say(str))
                 return false;
-            
-            System.Threading.Tasks.Task.Run(async () =>
-            {
-                string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.Say.YouSay", str);
-                Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-            });
+
+            GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.Say.YouSay", str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
         }
 
@@ -12858,23 +12813,11 @@ namespace DOL.GS
                 return false;
             if (IsIgnoring(source))
                 return true;
-            
+
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
-            {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    string displayed = await LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.YellReceive.Yells", str, (str) => [GetPersonalizedName(source), str]);
-                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
-            }
+                GameLoopAsync.Message(this, LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.YellReceive.Yells", str, (s) => [GetPersonalizedName(source), s]), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             else
-            {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.YellReceive.FalseLanguage", GetPersonalizedName(source));
-                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
-            }
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.YellReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
         }
 
@@ -12890,11 +12833,7 @@ namespace DOL.GS
             if (!base.Yell(str))
                 return false;
 
-            System.Threading.Tasks.Task.Run(async () =>
-            {
-                var displayed = await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Yell.YouYell", str);
-                Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-            });
+            GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.Yell.YouYell", str), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
         }
 
@@ -12912,21 +12851,9 @@ namespace DOL.GS
             if (IsIgnoring(source))
                 return true;
             if (GameServer.ServerRules.IsAllowedToUnderstand(source, this))
-            {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    string displayed = await LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.WhisperReceive.Whispers", str, (str) => [GetPersonalizedName(source), str]);
-                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
-            }
+                GameLoopAsync.Message(this, LanguageMgr.TranslatePlayerInput(this, source as GamePlayer, "GameObjects.GamePlayer.WhisperReceive.Whispers", str, (s) => [GetPersonalizedName(source), s]), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             else
-            {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    string displayed = await LanguageMgr.Translate(this, "GameObjects.GamePlayer.WhisperReceive.FalseLanguage", GetPersonalizedName(source));
-                    Out.SendMessage(displayed, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
-            }
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.WhisperReceive.FalseLanguage", GetPersonalizedName(source)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             return true;
         }
 
@@ -12940,11 +12867,7 @@ namespace DOL.GS
         {
             if (target == null)
             {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Whisper.SelectTarget"), eChatType.CT_System,
-                                    eChatLoc.CL_ChatWindow);
-                });
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.Whisper.SelectTarget"), eChatType.CT_System, eChatLoc.CL_ChatWindow);
                 return false;
             }
             if (!GameServer.ServerRules.IsAllowedToSpeak(this, "whisper"))
@@ -12953,10 +12876,7 @@ namespace DOL.GS
                 return false;
             if (target is GamePlayer)
             {
-                System.Threading.Tasks.Task.Run(async () =>
-                {
-                    Out.SendMessage(await LanguageMgr.Translate(Client.Account.Language, "GameObjects.GamePlayer.Whisper.YouWhisper", str, GetPersonalizedName(target)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
-                });
+                GameLoopAsync.Message(this, LanguageMgr.Translate(this, "GameObjects.GamePlayer.Whisper.YouWhisper", str, GetPersonalizedName(target)), eChatType.CT_Say, eChatLoc.CL_ChatWindow);
             }
             return true;
         }
@@ -15333,7 +15253,7 @@ namespace DOL.GS
                             GamePlayer player = this;
                             GameNPC targetNpc = npc;
 
-                            new RegionTimer(targetNpc, t =>
+                            new ECSGameTimer(targetNpc, t =>
                             {
                                 if (player.ObjectState == GameObject.eObjectState.Active && targetNpc.ObjectState == GameObject.eObjectState.Active)
                                 {
@@ -17417,9 +17337,9 @@ namespace DOL.GS
         /// </summary>
         protected readonly List<PlayerQuest> m_questListFinished = new();
 
-        protected RegionTimer m_questActionTimer = null;
+        protected ECSGameTimer m_questActionTimer = null;
 
-        public RegionTimer QuestActionTimer
+        public ECSGameTimer QuestActionTimer
         {
             get { return m_questActionTimer; }
             set { m_questActionTimer = value; }
@@ -17726,7 +17646,7 @@ namespace DOL.GS
         /// <summary>
         /// Gain Merit Points for the guild
         /// </summary>
-        public void GainGuildMeritPoints(int amount, bool quiet = false)
+         public void GainGuildMeritPoints(int amount, bool quiet = false)
         {
             if (!IsEligibleToGiveMeritPoints)
             {
@@ -17844,7 +17764,7 @@ namespace DOL.GS
 
             lock (CraftingLock)
             {
-                // fix error when the player already contains the skill
+               // fix error when the player already contains the skill
                 if (!m_craftingSkills.ContainsKey(skill))
                 {
                     AbstractCraftingSkill craftingSkill = CraftingMgr.getSkillbyEnum(skill);
@@ -17862,12 +17782,12 @@ namespace DOL.GS
         /// <summary>
         /// This is the timer used to count time when a player uses a special crafting skill, for example repairing or salvaging
         /// </summary>
-        private RegionTimer m_specialCraftTimer;
+        private ECSGameTimer m_specialCraftTimer;
 
         /// <summary>
         /// Get and set the craft timer
         /// </summary>
-        public RegionTimer CraftTimer
+        public ECSGameTimer CraftTimer
         {
             get { return m_specialCraftTimer; }
             set { m_specialCraftTimer = value; }

@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -45,7 +27,7 @@ namespace DOL.GS
     /// <author>Aredhel</author>
     public abstract class GameDragon : GameNPC
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Set the dragon difficulty in percent of its max abilities
@@ -53,7 +35,7 @@ namespace DOL.GS
         /// </summary>
         public virtual int DragonDifficulty
         {
-            get { return ServerProperties.Properties.SET_DIFFICULTY_ON_EPIC_ENCOUNTERS; }
+            get { return Properties.SET_DIFFICULTY_ON_EPIC_ENCOUNTERS; }
         }
 
         /// <summary>
@@ -103,7 +85,7 @@ namespace DOL.GS
 
         public override bool HasAbility(string keyName)
         {
-            if (IsResetting && keyName == DOL.GS.Abilities.CCImmunity)
+            if (IsResetting && keyName == GS.Abilities.CCImmunity)
                 return true;
 
             return base.HasAbility(keyName);
@@ -429,35 +411,17 @@ namespace DOL.GS
         /// Provides a timer to remove an NPC from the world after some
         /// time has passed.
         /// </summary>
-        protected class DespawnTimer : GameTimer
+        protected sealed class DespawnTimer : ECSGameTimerWrapperBase
         {
             private GameNPC m_npc;
-
-            /// <summary>
-            /// Constructs a new DespawnTimer.
-            /// </summary>
-            /// <param name="timerOwner">The owner of this timer.</param>
-            /// <param name="npc">The GameNPC to despawn when the time is up.</param>
-            /// <param name="delay">The time after which the add is supposed to despawn.</param>
-            public DespawnTimer(GameObject timerOwner, GameNPC npc, int delay)
-                : base(timerOwner.CurrentRegion.TimeManager)
+            public DespawnTimer(GameObject timerOwner, GameNPC npc, int delay) : base(timerOwner)
             {
-                m_npc = npc;
-                Start(delay);
+                m_npc = npc; Start(delay);
             }
-
-            /// <summary>
-            /// Called on every timer tick.
-            /// </summary>
-            public override void OnTick()
+            protected override int OnTick(ECSGameTimer timer)
             {
-                // Remove the NPC from the world.
-
-                if (m_npc != null)
-                {
-                    m_npc.Delete();
-                    m_npc = null;
-                }
+                m_npc?.Delete(); m_npc = null;
+                return 0;
             }
         }
 
@@ -528,7 +492,7 @@ namespace DOL.GS
             HealthPercentOld = HealthPercent;
             int messageNo = Util.Random(1, m_breathAnnounce.Length) - 1;
             BroadcastMessage(String.Format(m_breathAnnounce[messageNo], Name));
-            new RegionTimer(this, new RegionTimerCallback(CastBreath), 5000);
+            new ECSGameTimer(this, CastBreath, 5000);
         }
 
         /// <summary>
@@ -536,7 +500,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="timer">The timer that started this cast.</param>
         /// <returns></returns>
-        private int CastBreath(RegionTimer timer)
+        private int CastBreath(ECSGameTimer timer)
         {
             CastSpell(Breath, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
             CastSpell(ResistDebuff, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
@@ -601,7 +565,7 @@ namespace DOL.GS
             if (GlareTarget == null) return;
             TurnTo(GlareTarget);
             BroadcastMessage(String.Format(m_glareAnnounce, Name, GlareTarget.Name));
-            new RegionTimer(this, new RegionTimerCallback(CastGlare), 5000);
+            new ECSGameTimer(this, CastGlare, 5000);
         }
 
         /// <summary>
@@ -609,7 +573,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="timer">The timer that started this cast.</param>
         /// <returns></returns>
-        private int CastGlare(RegionTimer timer)
+        private int CastGlare(ECSGameTimer timer)
         {
             // Turn around to the target and cast glare, then go back to the original
             // target, if one exists.
@@ -890,13 +854,13 @@ namespace DOL.GS
         public void PrepareToStun()
         {
             // No announcement for this seemingly.
-            new RegionTimer(this, new RegionTimerCallback(CastStun), 5000);
+            new ECSGameTimer(this, CastStun, 5000);
         }
 
         /// <summary>
         /// Start the 5 second timer for the stun.
         /// </summary>
-        private int CastStun(RegionTimer timer)
+        private int CastStun(ECSGameTimer timer)
         {
             CastSpell(Stun, SkillBase.GetSpellLine(GlobalSpellsLines.Mob_Spells));
             return 0;

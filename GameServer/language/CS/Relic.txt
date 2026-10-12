@@ -1,5 +1,18 @@
-# Relics/GameRelicPad (CS)
+# GameRelicPad (CS)
 GameRelicPad.MountRelic.Captured:			{0} ukořistil(a): {1}.
 GameRelicPad.MountRelic.Stored:				{0} z {1} uložil(a) {2} v {3}.
 GameRelicPad.OnPlayerEnter.EmptyRelicPad:		Musíš najít prázdný relikviář {0}, abys mohl(a) tuto relikvii umístit.
 GameRelicPad.RemoveRelic.Removed:			{0} z {1} odstranil(a) {2} z {3}.
+
+# GameRelic
+GameRelic.Interact.Dead:					Nemůžeš sebrat {0}. Jsi mrtvý!
+GameRelic.Interact.OwnedByRealm:			Nemůžeš sebrat {0}. Patří to tvé říši.
+GameRelic.Interact.CaptureOwnFirst:			Nemůžeš sebrat {0}. Nejprve musíš získat {1} relikvii tvé říše.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: Už u sebe máš relikvii.
+GameRelic.PlayerTakesRelic.Stealthed:		Nemůžeš nést relikvii, když jsi v utajení.
+GameRelic.PlayerTakesRelic.Dead:			Jsi mrtvý!
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	Před sebráním relikvie musíš obsadit tuto pevnost.
+GameRelic.PlayerTakesRelic.InventoryFull:		V batohu nemáš dost místa, abys to mohl nést.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	Relikvie patří tvé říši.
+GameRelic.GetExamineMessages.OwnedByRealm:		Relikvie patří {0}.
+GameRelic.GetExamineMessages.NoOwner:			Relikvie nemá majitele, vezmi si ji!

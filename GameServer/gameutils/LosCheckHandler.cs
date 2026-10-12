@@ -1,11 +1,12 @@
+using DOL.GS.Geometry;
+using DOL.GS.PacketHandler;
+using DOL.GS.ServerProperties;
+using DOL.Language;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using DOL.GS.Geometry;
-using DOL.GS.PacketHandler;
-using DOL.GS.ServerProperties;
-using log4net;
 
 namespace DOL.GS
 {
@@ -384,7 +385,7 @@ namespace DOL.GS
 
         #region Statistics
 
-        public static string GetStatisticsReport()
+        public static List<string> GetStatisticsReport(string lang)
         {
             long sent = Interlocked.Read(ref s_requestsSent);
             long responses = Interlocked.Read(ref s_responses);
@@ -396,8 +397,11 @@ namespace DOL.GS
             long saved = dedup + cache + geometry;
             double savedPercent = sent + saved == 0 ? 0 : 100.0 * saved / (sent + saved);
 
-            return $"LoS packets sent: {sent} | answers: {responses} (late/discarded: {late}) | timeouts: {timeouts}\n"
-                 + $"Round-trips avoided: deduplicated {dedup} | cache {cache} | server geometry {geometry} | total {saved} ({savedPercent:0.#}%)";
+            return new List<string>
+            {
+                LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.Packets", sent, responses, late, timeouts),
+                LanguageMgr.GetTranslation(lang, "Commands.GM.Checklos.Stats.Saved", dedup, cache, geometry, saved, savedPercent)
+            };
         }
 
         public static void ResetStatistics()

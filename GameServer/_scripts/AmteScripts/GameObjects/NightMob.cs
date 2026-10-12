@@ -13,20 +13,20 @@ namespace DOL.GS.Scripts
         public int StartHour = 0;
         public int EndHour = 24;
 
-        private RegionTimer timer;
+        private ECSGameTimer timer;
 
         public override bool AddToWorld()
         {
             if (!base.AddToWorld()) return false;
             if (timer == null)
             {
-                timer = new RegionTimer(this, ScanHour);
+                timer = new ECSGameTimer(this, ScanHour);
                 timer.Start(1000);
             }
             return true;
         }
 
-        private int ScanHour(RegionTimer callingTimer)
+        private int ScanHour(ECSGameTimer callingTimer)
         {
             int hour = (int)(WorldMgr.GetCurrentGameTime() / 1000 / 60 / 60);
             bool add = false;

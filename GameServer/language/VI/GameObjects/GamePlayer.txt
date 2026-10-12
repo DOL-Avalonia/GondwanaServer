@@ -284,6 +284,7 @@ GameObjects.GamePlayer.PickupObject.NoOneWantsThis:        Không ai trong nhóm
 GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:      {0} quá xa để nhặt.
 GameObjects.GamePlayer.PickupObject.TooFarFromBoat:        Bạn quá xa thuyền để lên tàu.
 GameObjects.GamePlayer.PickupObject.YouGet:                Bạn nhặt {0} và cho vào ba lô.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			Bạn có thể đến nhận {0} ngay bây giờ!
 GameObjects.GamePlayer.PickupObject.YouPickUp:             Bạn nhặt {0}.
 GameObjects.GamePlayer.PickupObject.YourLootShare:         Phần chiến lợi phẩm của bạn là {0}.
 GameObjects.GamePlayer.PickupObject.GuildDueTax:           Khoản thu {0} của bạn được chuyển vào ngân khố bang hội.

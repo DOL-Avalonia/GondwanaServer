@@ -356,7 +356,7 @@ namespace DOL.GS
                 }
 
                 var hasStone = GlobalConstants.IsExpansionEnabled((int)eClientExpansion.DarknessRising) ? HasRecallStone(player) : false;
-                Task.Run(async () =>
+                GameLoopAsync.Fire(async () =>
                 {
                     var cache = EnsurePlayerCache(player);
                     
@@ -714,7 +714,7 @@ namespace DOL.GS
 
         private bool ConfirmGuildName(GamePlayer player, DBBook book)
         {
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 var line1Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Confirm.Dialog.Line1");
                 var line2Task = LanguageMgr.Translate(player, "RoyalTreasuryClerk.Confirm.Dialog.Line2");

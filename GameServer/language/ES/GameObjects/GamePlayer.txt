@@ -283,6 +283,7 @@ GameObjects.GamePlayer.PickupObject.NoOneWantsThis:        Nadie en el grupo qui
 GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:      {0} está demasiado lejos para recogerlo.
 GameObjects.GamePlayer.PickupObject.TooFarFromBoat:        Estás demasiado lejos del barco para subir a bordo.
 GameObjects.GamePlayer.PickupObject.YouGet:                Recoges {0} y lo colocas en tu mochila.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			¡Ya puede recoger {0}!
 GameObjects.GamePlayer.PickupObject.YouPickUp:             Recoges {0}.
 GameObjects.GamePlayer.PickupObject.YourLootShare:         Tu parte del botín es {0}.
 GameObjects.GamePlayer.PickupObject.GuildDueTax:           Tu impuesto de {0} va al banco del clan.

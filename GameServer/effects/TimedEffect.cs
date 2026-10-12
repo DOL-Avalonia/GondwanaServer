@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,7 +18,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// The timer that will cancel the effect
         /// </summary>
-        protected RegionTimer m_expireTimer;
+        protected ECSGameTimer m_expireTimer;
 
         /// <summary>
         /// create timed effect that will last the given timespan in milliseconds
@@ -57,7 +39,7 @@ namespace DOL.GS.Effects
             {
                 if (m_expireTimer == null)
                 {
-                    m_expireTimer = new RegionTimer(target, new RegionTimerCallback(ExpiredCallback), m_duration);
+                    m_expireTimer = new ECSGameTimer(target, _ => { Stop(); return 0; }, m_duration);
                 }
                 base.Start(target);
             }
@@ -79,12 +61,6 @@ namespace DOL.GS.Effects
             }
         }
 
-        private int ExpiredCallback(RegionTimer timer)
-        {
-            Stop();
-            return 0;
-        }
-
         /// <summary>
         /// Remaining Time of the effect in milliseconds
         /// </summary>
@@ -92,10 +68,12 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
-                if (timer == null || !timer.IsAlive)
-                    return 0;
-                return timer.TimeUntilElapsed;
+                if (m_expireTimer != null && m_expireTimer.IsAlive)
+                {
+                    return m_expireTimer.TimeUntilElapsed;
+                }
+
+                return 0;
             }
         }
 

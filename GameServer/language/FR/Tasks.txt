@@ -48,6 +48,8 @@ Tasks.Level: Niveau {0}
 
 Tasks.KillEnemyPlayersGroupLog: Tuez des joueurs ennemis en étant groupé : {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Tuez des joueurs ennemis seul : {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Tuez des créatures de donjons : {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Tuez des créatures d'extérieur : {0}/{1}
 Tasks.KillKeepGuardsLog: Tuez des gardes de forts : {0}/{1}
 Tasks.TakeKeepsLog: Prise de forts : {0}/{1}
 Tasks.KillTerritoryGuardsLog: Tuez des gardes de territoires : {0}/{1}

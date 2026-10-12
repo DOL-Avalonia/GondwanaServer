@@ -284,6 +284,7 @@ GameObjects.GamePlayer.PickupObject.NoOneWantsThis:        Nikdo ve skupině nec
 GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:      {0} je příliš daleko na sebrání.
 GameObjects.GamePlayer.PickupObject.TooFarFromBoat:        Jsi příliš daleko od lodi, abys nastoupil/a.
 GameObjects.GamePlayer.PickupObject.YouGet:                Zvedáš {0} a dáváš to do batohu.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			Nyní si můžete vyzvednout {0}!
 GameObjects.GamePlayer.PickupObject.YouPickUp:             Zvedáš {0}.
 GameObjects.GamePlayer.PickupObject.YourLootShare:         Tvůj podíl kořisti je {0}.
 GameObjects.GamePlayer.PickupObject.GuildDueTax:           Tvůj daňový odvod {0} putuje do cechovní banky.

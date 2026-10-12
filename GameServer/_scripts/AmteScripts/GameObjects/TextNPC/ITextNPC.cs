@@ -159,12 +159,7 @@ namespace DOL.GS.Scripts
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
-                    {
-                        var (text, mappings) = await task;
-                        _playerResponseKeyMappings[player.InternalID] = mappings;
-                        player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    });
+                    SendTranslatedPopup(player, text);
                 }
             }
             else if (!string.IsNullOrEmpty(Interact_Text))
@@ -173,12 +168,7 @@ namespace DOL.GS.Scripts
 
                 if (!string.IsNullOrEmpty(text))
                 {
-                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
-                    {
-                        var (text, mappings) = await task;
-                        _playerResponseKeyMappings[player.InternalID] = mappings;
-                        player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    });
+                    SendTranslatedPopup(player, text);
                 }
             }
 
@@ -219,12 +209,7 @@ namespace DOL.GS.Scripts
                 string text = string.Format(response, player.Name, player.LastName, player.GuildName, player.Salutation, player.RaceName);
                 if (!string.IsNullOrEmpty(text))
                 {
-                    AutoTranslateManager.TranslatePlaceholderText(player, text).ContinueWith(async task =>
-                    {
-                        var (text, mappings) = await task;
-                        _playerResponseKeyMappings[player.InternalID] = mappings;
-                        player.Out.SendMessage(text, eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    });
+                    SendTranslatedPopup(player, text);
                 }
             }
 
@@ -544,6 +529,16 @@ namespace DOL.GS.Scripts
             }
         }
 
+        private void SendTranslatedPopup(GamePlayer player, string text)
+        {
+            GameLoopAsync.Then(AutoTranslateManager.TranslatePlaceholderText(player, text), (player, policy: this), static (res, s) =>
+            {
+                var (txt, mappings) = res;
+                s.policy._playerResponseKeyMappings[s.player.InternalID] = mappings;
+                if (s.player.ObjectState == GameObject.eObjectState.Active) s.player.Out.SendMessage(txt, eChatType.CT_System, eChatLoc.CL_PopupWindow);
+            });
+        }
+
         public void HandleClientResponse(GamePlayer player, byte response)
         {
             if (response == 1)
@@ -845,11 +840,7 @@ namespace DOL.GS.Scripts
                 string baseMsg = _body.Name + " " + text.Substring(3);
                 foreach (GamePlayer plr in _body.GetPlayersInRadius(WorldMgr.YELL_DISTANCE))
                 {
-                    Task.Run(async () =>
-                    {
-                        string localized = await AutoTranslateManager.Translate(plr, baseMsg);
-                        plr.Out.SendMessage(localized, eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
-                    });
+                    GameLoopAsync.Message(plr, AutoTranslateManager.Translate(plr, baseMsg), eChatType.CT_Emote, eChatLoc.CL_ChatWindow);
                 }
             }
 

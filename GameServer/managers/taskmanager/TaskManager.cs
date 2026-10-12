@@ -82,8 +82,8 @@ namespace DOL.GS
             A("CapturedRelics", TaskCategory.PvP, [4, 8, 12, 20, 30], true, eChatType.CT_System);
 
             // PvE
-            A("KillCreaturesInDungeons", TaskCategory.PvE, [40, 80, 140, 220, 400], true);
-            A("KillOutdoorsCreatures", TaskCategory.PvE, [50, 100, 200, 350, 700], true);
+            A("KillCreaturesInDungeons", TaskCategory.PvE, [40, 80, 140, 220, 400], true, eChatType.CT_System);
+            A("KillOutdoorsCreatures", TaskCategory.PvE, [50, 100, 200, 350, 700], true, eChatType.CT_System);
             foreach (string t in new[] { "Animal", "Demon", "Dragon", "Elemental", "Giant", "Humanoid", "Insect", "Magical", "Reptile", "Plant", "Undead" })
                 A($"Kill{t}Creatures", TaskCategory.PvE, creature);
 

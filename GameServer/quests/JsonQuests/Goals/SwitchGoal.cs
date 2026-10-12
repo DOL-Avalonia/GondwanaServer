@@ -70,11 +70,7 @@ namespace DOL.GS.Quests
                     {
                         if (AdvanceGoal(quest, goal))
                         {
-                            Task.Run(async () =>
-                            {
-                                string msg = await TranslateGoalText(quest.Owner, switchActivatedMessage);
-                                quest.Owner.Out.SendMessage(msg, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
-                            });
+                            GameLoopAsync.Message(quest.Owner, TranslateGoalText(quest.Owner, switchActivatedMessage), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                         }
                     }
                 }

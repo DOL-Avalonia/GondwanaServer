@@ -1,30 +1,12 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using log4net;
 using DOL.Language;
+using Google.Protobuf.WellKnownTypes;
+using log4net;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace DOL.GS.SkillHandler
 {
@@ -37,7 +19,7 @@ namespace DOL.GS.SkillHandler
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         /// <summary>
         /// The ability reuse time in seconds
         /// </summary>
@@ -101,7 +83,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         public DirtyTricksEffect(int duration)
             : base(duration)
@@ -177,7 +159,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// The ability description
@@ -192,7 +174,7 @@ namespace DOL.GS.Effects
         /// <summary>
         /// The timer that will cancel the effect
         /// </summary>
-        protected RegionTimer m_expireTimer;
+        private ECSGameTimer m_expireTimer;
 
         /// <summary>
         /// Creates a new berserk effect
@@ -237,34 +219,19 @@ namespace DOL.GS.Effects
             return true;
         }
 
-        /// <summary>
-        /// Starts the timers for this effect
-        /// </summary>
-        protected virtual void StartTimers()
+        private void StartTimers()
         {
             StopTimers();
-            m_expireTimer = new RegionTimer(m_player, new RegionTimerCallback(ExpiredCallback), 10000);
+            m_expireTimer = new ECSGameTimer(m_player, ExpireCallback, 10000);
         }
 
-        /// <summary>
-        /// Stops the timers for this effect
-        /// </summary>
-        protected virtual void StopTimers()
+        private void StopTimers()
         {
-            if (m_expireTimer != null)
-            {
-                //DOLConsole.WriteLine("effect stop expire on "+Owner.Name+" "+this.InternalID);
-                m_expireTimer.Stop();
-                m_expireTimer = null;
-            }
+            m_expireTimer?.Stop();
+            m_expireTimer = null;
         }
 
-        /// <summary>
-        /// The callback method when the effect expires
-        /// </summary>
-        /// <param name="callingTimer">the regiontimer of the effect</param>
-        /// <returns>the new intervall (0) </returns>
-        protected virtual int ExpiredCallback(RegionTimer callingTimer)
+        private int ExpireCallback(ECSGameTimer timer)
         {
             Cancel(false);
             return 0;
@@ -277,7 +244,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-                if (Owner != null && Owner is GamePlayer && (Owner as GamePlayer).Client != null)
+                if (Owner != null && Owner is GamePlayer && (Owner as GamePlayer)!.Client != null)
                 {
                     return LanguageMgr.GetTranslation(((GamePlayer)Owner).Client, "Skill.Ability.DirtyTricks.Name");
                 }
@@ -293,10 +260,8 @@ namespace DOL.GS.Effects
         {
             get
             {
-                RegionTimer timer = m_expireTimer;
-                if (timer == null || !timer.IsAlive)
-                    return 0;
-                return timer.TimeUntilElapsed;
+                ECSGameTimer timer = m_expireTimer;
+                return timer == null || !timer.IsAlive ? 0 : timer.TimeUntilElapsed;
             }
         }
 

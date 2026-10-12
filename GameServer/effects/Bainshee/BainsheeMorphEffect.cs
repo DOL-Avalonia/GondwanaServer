@@ -8,7 +8,7 @@ namespace DOL.GS
     public class BainsheeMorphEffect
     {
         protected const int WRAITH_FORM_RESET_DELAY = 30000;
-        protected RegionTimerAction<GamePlayer> m_WraithTimerAction;
+        protected ECSGameTimer m_WraithTimerAction;
         protected DOLEventHandler m_WraithTriggerEvent;
         private GamePlayer player;
 
@@ -22,7 +22,7 @@ namespace DOL.GS
         public void Init()
         {
             // Add Cast Listener.
-            m_WraithTimerAction = new RegionTimerAction<GamePlayer>(player, pl => { if (pl.CharacterClass.Equals(CharacterClass.Bainshee)) TurnOutOfWraith(); });
+            m_WraithTimerAction = new ECSGameTimer(player, _ => { if (player.CharacterClass.Equals(CharacterClass.Bainshee)) TurnOutOfWraith(); return 0; });
             m_WraithTriggerEvent = new DOLEventHandler(TriggerUnWraithForm);
             GameEventMgr.AddHandler(player, GamePlayerEvent.CastFinished, new DOLEventHandler(TriggerWraithForm));
         }

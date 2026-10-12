@@ -22,12 +22,6 @@ namespace DOL.GS
         private readonly InnerTimer _inner;
         private int _interval;
 
-        /// <param name="time">Kept for source compatibility. Ignored: all timers run on the GameLoop.</param>
-        protected GameTimer(TimeManager time)
-        {
-            _inner = new InnerTimer(this);
-        }
-
         /// <summary>
         /// Legacy repeat interval. OnTick implementations may change it;
         /// a value of 0 stops the timer after the current tick.
@@ -86,7 +80,7 @@ namespace DOL.GS
         {
             private readonly GameTimer _owner;
 
-            public InnerTimer(GameTimer owner) : base(null)
+            public InnerTimer(GameTimer owner, GameObject gameObjectOwner) : base(gameObjectOwner)
             {
                 _owner = owner;
                 Callback = Tick;
@@ -103,37 +97,5 @@ namespace DOL.GS
             public override string ToString() => _owner.ToString();
         }
 
-        /// <summary>
-        /// Compile shim for Region.cs / WorldMgr.cs. No thread, no buckets.
-        /// Region.StartRegionMgr()/StopRegionMgr() become no-ops and Region.Time
-        /// returns the game loop clock.
-        /// </summary>
-        public class TimeManager
-        {
-            public TimeManager(string name) { Name = name; }
-
-            public string Name { get; }
-            public bool Running { get; private set; }
-            public long CurrentTime => GameLoop.GameLoopTime;
-            public int ActiveTimers => 0;
-            public long InvokedCount => 0;
-
-            public virtual bool Start()
-            {
-                Running = true;
-                return true;
-            }
-
-            public bool Stop()
-            {
-                Running = false;
-                return true;
-            }
-
-            public string GetFormattedStackTrace()
-            {
-                return "(all timers run on the GameLoop)";
-            }
-        }
     }
 }

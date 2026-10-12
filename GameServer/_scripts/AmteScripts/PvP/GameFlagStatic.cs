@@ -17,46 +17,60 @@ namespace AmteScripts.PvP.CTF
     public class GameFlagStatic : GamePvPStaticItem
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(GameFlagStatic));
+        private const int RETURN_TIMEOUT_MS = 25000;
+
+        private ECSGameTimer _returnTimer;
+
+        /// <summary>
+        /// Stable identity of the flag for the whole session, independent of BasePad.
+        /// </summary>
+        public int FlagID { get; }
         public GameFlagBasePad BasePad { get; private set; }
         public GameCTFTempPad CurrentTempPad { get; set; }
+        public bool IsDroppedOnGround { get; private set; }
 
-        private RegionTimer _returnTimer;
-        private const int RETURN_TIMEOUT_MS = 25000;
-        private bool _isDroppedOnGround = false;
+        public GameFlagStatic(GameFlagBasePad basePad) : this(basePad, basePad?.FlagID ?? 0) { }
 
-        public GameFlagStatic(GameFlagBasePad basePad)
+        public GameFlagStatic(GameFlagBasePad basePad, int flagId)
         {
             BasePad = basePad;
+            FlagID = flagId;
+        }
+
+        public override bool AddToWorld()
+        {
+            if (!base.AddToWorld()) return false;
+            PvpManager.Instance.NotifyFlagObject(this, true);
+            return true;
+        }
+
+        public override bool RemoveFromWorld(int respawnSeconds)
+        {
+            if (!base.RemoveFromWorld(respawnSeconds)) return false;
+            PvpManager.Instance.NotifyFlagObject(this, false);
+            return true;
         }
 
         public override bool Interact(GamePlayer player)
         {
             if (!base.Interact(player)) return false;
 
-
             if (CurrentTempPad == null)
-            {
-                // Presumed neutral, i.e. on base pad or ground
                 return PlayerPickupFlag(player);
-            }
-            
+
             if (OwnerPlayer == player)
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.AlreadyOwnFlag"),
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.AlreadyOwnFlag"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
             if (IsOwner(player))
             {
-                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.GroupOwnsFlag"),
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "PvPGameFlag.GroupOwnsFlag"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return false;
             }
-            else
-            {
-                CaptureByEnemy(player);
-                return true;
-            }
+
+            CaptureByEnemy(player);
+            return true;
         }
 
         public bool PlayerPickupFlag(GamePlayer player)
@@ -138,54 +152,35 @@ namespace AmteScripts.PvP.CTF
                     CurrentTempPad.StopOwnership();
                     CurrentTempPad = null;
                 }
+                IsDroppedOnGround = false;
+
+                _returnTimer?.Stop();
+                _returnTimer = null;
 
                 RemoveFromWorld();
-                if (_returnTimer != null)
-                {
-                    _returnTimer.Stop();
-                    _returnTimer = null;
-                }
-
-                if (BasePad != null)
-                {
-                    BasePad.NotifyFlagLeft();
-                }
-
+                BasePad?.NotifyFlagLeft();
                 SetOwnership(player);
 
                 ushort effectID = (ushort)Util.Random(5811, 5815);
                 foreach (GamePlayer plr in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>())
-                {
                     plr.Out.SendSpellEffectAnimation(player, player, effectID, 0, false, 0x01);
-                }
 
-                var banner = new PvPFlagBanner()
-                {
-                    OwningPlayer = player,
-                    Item = invFlag,
-                };
-                if (player.IsInPvP)
-                    banner.Emblem = PvpManager.Instance.GetEmblemForPlayer(player);
-
+                PvPFlagBanner banner = new() { OwningPlayer = player, Item = invFlag };
+                if (player.IsInPvP) banner.Emblem = PvpManager.Instance.GetEmblemForPlayer(player);
                 player.ActiveBanner = banner;
-                _isDroppedOnGround = false;
 
-                foreach (var area in player.CurrentAreas)
-                {
+                foreach (IArea area in player.CurrentAreas)
                     if (area is TempPadArea padArea)
-                    {
-                        // Flag picked up in our pad, possible if we just killed a thief
                         padArea.Pad.TryDropFlagIfCarried(player);
-                    }
-                }
+
                 return true;
             }
             catch (Exception e)
             {
-                // Something went wrong, abort & reset
-                player.Inventory.RemoveItem(invFlag);
                 log.Error(e);
-                BasePad.SpawnFlag();
+                invFlag.IsRemovalExpected = true;
+                player.Inventory.RemoveItem(invFlag);
+                BasePad?.RespawnFlag();
                 return false;
             }
         }
@@ -197,18 +192,8 @@ namespace AmteScripts.PvP.CTF
                 CurrentTempPad.StopOwnership();
                 CurrentTempPad = null;
             }
-            
             SetOwnership(null);
-
-            bool success = PlayerPickupFlag(captor);
-            if (success)
-            {
-                ushort effectID = (ushort)Util.Random(5811, 5815);
-                foreach (var plr in captor.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE).OfType<GamePlayer>())
-                {
-                    plr.Out.SendSpellEffectAnimation(captor, captor, effectID, 0, false, 0x01);
-                }
-            }
+            PlayerPickupFlag(captor);
         }
 
         /// <summary>
@@ -218,34 +203,37 @@ namespace AmteScripts.PvP.CTF
         /// </summary>
         public bool DropOnGround(int x, int y, int z, ushort heading, Region region)
         {
-            this.Position = Position.Create(region.ID, x, y, z, heading);
-            if (!this.AddToWorld())
-                return false;
-            
-            SetOwnership(null, false);
-            _isDroppedOnGround = true;
-            if (_returnTimer != null)
+            CurrentTempPad = null;
+            IsDroppedOnGround = true;
+            Position = Position.Create(region.ID, x, y, z, heading);
+
+            if (!AddToWorld())
             {
-                _returnTimer.Stop();
+                IsDroppedOnGround = false;
+                return false;
             }
 
-            _returnTimer = new RegionTimer(this, (t) => OnReturnTimerCallback(t));
+            SetOwnership(null, false);
+
+            _returnTimer?.Stop();
+            _returnTimer = new ECSGameTimer(this, OnReturnTimerCallback);
             _returnTimer.Start(RETURN_TIMEOUT_MS);
             return true;
         }
 
         public bool Reset()
         {
+            _returnTimer?.Stop();
+            _returnTimer = null;
+            IsDroppedOnGround = false;
             RemoveFromWorld();
-            if (BasePad != null)
-            {
-                BasePad.RespawnFlag();
-            }
+            BasePad?.RespawnFlag();
             return true;
         }
 
-        private int OnReturnTimerCallback(RegionTimer timer)
+        private int OnReturnTimerCallback(ECSGameTimer timer)
         {
+            _returnTimer = null;
             Reset();
             return 0;
         }

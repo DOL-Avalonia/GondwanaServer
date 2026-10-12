@@ -1,7 +1,19 @@
 
-# Relics/GameRelicPad
+# GameRelicPad
 GameRelicPad.MountRelic.Captured:			{0} has captured the {1}.
 GameRelicPad.MountRelic.Stored:				{0} from {1} has stored the {2} to the {3}.
-GameRelicPad.OnPlayerEnter.EmptyRelicPad:		You need to find an empty {0} relic pad in order to place this relic.
+GameRelicPad.OnPlayerEnter.EmptyRelicPad:	You need to find an empty {0} relic pad in order to place this relic.
 GameRelicPad.RemoveRelic.Removed:			{0} from {1} has removed the {2} from the {3}.
 
+# GameRelic
+GameRelic.Interact.Dead:					You cannot pickup {0}. You are dead!
+GameRelic.Interact.OwnedByRealm:			You cannot pickup {0}. It is owned by your realm.
+GameRelic.Interact.CaptureOwnFirst:			You cannot pickup {0}. You need to capture your realms {1} relic first.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: You are already carrying a relic.
+GameRelic.PlayerTakesRelic.Stealthed:		You cannot carry a relic while stealthed.
+GameRelic.PlayerTakesRelic.Dead:			You are dead!
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	You must capture this keep before taking a relic.
+GameRelic.PlayerTakesRelic.InventoryFull:		You dont have enough space in your backpack to carry this.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	The relic is owned by your realm.
+GameRelic.GetExamineMessages.OwnedByRealm:		The relic is owned by {0}.
+GameRelic.GetExamineMessages.NoOwner:			The relic as no owner, take it!

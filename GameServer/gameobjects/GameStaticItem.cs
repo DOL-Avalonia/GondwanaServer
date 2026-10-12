@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -183,8 +165,6 @@ namespace DOL.GS
             get { return m_loadedFromScript; }
             set { m_loadedFromScript = value; }
         }
-
-
 
         /// <summary>
         /// Returns name with article for nouns
@@ -366,12 +346,12 @@ namespace DOL.GS
         {
             if (!base.AddToWorld()) return false;
 
-            if (m_respawnTimer is { IsAlive: true })
+            lock (m_respawnTimerLock)
             {
-                m_respawnTimer.Stop();
+                m_respawnTimer?.Stop();
                 m_respawnTimer = null;
             }
-            
+
             foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 player.Out.SendObjectCreate(this);
 
@@ -425,11 +405,10 @@ namespace DOL.GS
             return false;
         }
 
-
         /// <summary>
         /// Timer used to respawn this object
         /// </summary>
-        protected RegionTimer m_respawnTimer = null;
+        protected ECSGameTimer m_respawnTimer;
 
         /// <summary>
         /// The sync object for respawn timer modifications
@@ -443,12 +422,8 @@ namespace DOL.GS
         {
             lock (m_respawnTimerLock)
             {
-                if (m_respawnTimer == null)
-                {
-                    m_respawnTimer = new RegionTimer(this);
-                    m_respawnTimer.Callback = new RegionTimerCallback(RespawnTimerCallback);
-                    m_respawnTimer.Start(respawnSeconds * 1000);
-                }
+                if (m_respawnTimer != null) return;
+                m_respawnTimer = new ECSGameTimer(this, RespawnTimerCallback, respawnSeconds * 1000);
             }
         }
 
@@ -457,16 +432,15 @@ namespace DOL.GS
         /// </summary>
         /// <param name="respawnTimer">the timer calling this callback</param>
         /// <returns>the new interval</returns>
-        protected virtual int RespawnTimerCallback(RegionTimer respawnTimer)
+        protected virtual int RespawnTimerCallback(ECSGameTimer respawnTimer)
         {
             lock (m_respawnTimerLock)
             {
-                if (m_respawnTimer != null)
-                {
-                    AddToWorld();
-                }
+                if (m_respawnTimer == null) return 0;
+                m_respawnTimer = null;
             }
 
+            AddToWorld();
             return 0;
         }
 

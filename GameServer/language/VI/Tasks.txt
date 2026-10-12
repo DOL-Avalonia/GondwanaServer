@@ -47,6 +47,8 @@ Tasks.Level: Cấp {0}
 
 Tasks.KillEnemyPlayersGroupLog: Tiêu diệt người chơi địch khi ở trong nhóm: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Tiêu diệt người chơi địch khi đơn độc: {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Tiêu diệt sinh vật trong ngục tối: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Tiêu diệt sinh vật ngoài trời: {0}/{1}
 Tasks.KillKeepGuardsLog: Tiêu diệt lính canh pháo đài: {0}/{1}
 Tasks.TakeKeepsLog: Chiếm pháo đài: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Tiêu diệt lính canh lãnh thổ: {0}/{1}

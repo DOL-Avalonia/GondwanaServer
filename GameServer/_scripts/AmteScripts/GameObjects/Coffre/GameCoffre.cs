@@ -951,7 +951,15 @@ namespace DOL.GS.Scripts
                         }
                         if (tpPoint != null)
                         {
-                            base.MoveTo(tpPoint.Region, (float)tpPoint.Position.X, (float)tpPoint.Position.Y, (float)tpPoint.Position.Z, Coffre.Heading);
+                            Position newPos = Position.Create(
+                                tpPoint.Region,
+                                (int)tpPoint.Position.X,
+                                (int)tpPoint.Position.Y,
+                                (int)tpPoint.Position.Z,
+                                Coffre.Heading
+                            );
+
+                            base.MoveTo(newPos);
                         }
                     }
                 }
@@ -991,31 +999,21 @@ namespace DOL.GS.Scripts
 
         private void HandleTeleporter(GamePlayer player)
         {
-            if (TpX > 0 && TpY > 0 && TpZ > 0 && TpRegion > 0)
+            if (TpX <= 0 || TpY <= 0 || TpZ <= 0 || TpRegion <= 0)
+                return;
+
+            Position targetPos = Position.Create((ushort)TpRegion, TpX, TpY, TpZ, (ushort)TPHeading);
+
+            new ECSGameTimer(this, _ =>
             {
-                RegionTimer TimerTL = new RegionTimer(this, Teleportation);
-                TimerTL.Properties.setProperty("TP", new GameLocation("Coffre Location", (ushort)TpRegion, TpX, TpY, TpZ, (ushort)TPHeading));
-                TimerTL.Properties.setProperty("player", player);
-                TimerTL.Start(3000);
+                player.MoveTo(targetPos);
+                return 0;
+            }, 3000);
 
-                {
-                    if (TpEffect > 0)
-                    {
-                        //handle effect
-                        player.Out.SendSpellCastAnimation(player, (ushort)TpEffect, 20);
-                    }
-                }
+            if (TpEffect > 0)
+            {
+                player.Out.SendSpellCastAnimation(player, (ushort)TpEffect, 20);
             }
-        }
-
-        private int Teleportation(RegionTimer timer)
-        {
-            GameLocation pos = timer.Properties.getProperty<GameLocation>("TP", null);
-            GamePlayer player = timer.Properties.getProperty<GamePlayer>("player", null);
-
-            player.MoveTo(pos.RegionID, pos.Position.X, pos.Position.Y, pos.Position.Z, pos.Heading);
-
-            return 0;
         }
 
         private void HandlePopMob()
@@ -1053,36 +1051,27 @@ namespace DOL.GS.Scripts
                 return;
             }
 
-            RegionTimer timer = new RegionTimer(player, UnlockCallback);
-            timer.Properties.setProperty("X", player.Position.X);
-            timer.Properties.setProperty("Y", player.Position.Y);
-            timer.Properties.setProperty("Z", player.Position.Z);
-            timer.Properties.setProperty("Head", (int)player.Heading);
-            timer.Properties.setProperty("player", player);
-            timer.Start(500);
+            UnlockState state = new UnlockState(player, player.Position, 0);
+            new ECSGameTimer(player, t => UnlockCallback(t, state), 500);
             player.Out.SendTimerWindow("Crochetage", UNLOCK_TIME);
         }
 
-        private int UnlockCallback(RegionTimer timer)
+        private int UnlockCallback(ECSGameTimer timer, UnlockState state)
         {
-            m_interactPlayer = null;
-            GamePlayer player = timer.Properties.getProperty<GamePlayer>("player", null);
-            int Xpos = timer.Properties.getProperty("X", 0);
-            int Ypos = timer.Properties.getProperty("Y", 0);
-            int Zpos = timer.Properties.getProperty("Z", 0);
-            int Head = timer.Properties.getProperty("Head", 0);
-            if (player == null)
-                return 0;
-            if (Xpos != (int)player.Position.X || Ypos != (int)player.Position.Y || Zpos != (int)player.Position.Z || Head != player.Heading || player.InCombat)
+            GamePlayer player = state.Player;
+            if (player == null) { m_interactPlayer = null; return 0; }
+
+            if (player.Position != state.StartPosition || player.InCombat)
             {
+                m_interactPlayer = null;
                 player.Out.SendCloseTimerWindow();
                 return 0;
             }
 
-            int time = timer.Properties.getProperty("time", 0) + 500;
-            timer.Properties.setProperty("time", time);
-            if (time < UNLOCK_TIME * 1000)
-                return 500;
+            state.Time += 500;
+            if (state.Time < UNLOCK_TIME * 1000) return 500;
+
+            m_interactPlayer = null;
             player.Out.SendCloseTimerWindow();
 
             int Chance = 100 - LockDifficult;
@@ -1152,6 +1141,20 @@ namespace DOL.GS.Scripts
                 player.Inventory.RemoveTemplate(CROCHET, 1, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack);
             }
             return 0;
+        }
+
+        private sealed class UnlockState
+        {
+            public readonly GamePlayer Player;
+            public readonly Position StartPosition;
+            public int Time;
+
+            public UnlockState(GamePlayer p, Position pos, int time)
+            {
+                Player = p;
+                StartPosition = pos;
+                Time = time;
+            }
         }
         #endregion
 

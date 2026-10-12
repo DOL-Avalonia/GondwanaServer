@@ -136,11 +136,11 @@ namespace DOL.GS.Spells
             if (owner is GamePlayer player)
             {
                 // TODO: Why is this a timer?
-                new RegionTimerAction<GamePlayer>(player, p =>
+                new ECSGameTimer(player, _ =>
                 {
-                    m_tempParryLevel = CharacterClass.ModTempParry(p, apply, m_tempParryLevel);
+                    m_tempParryLevel = CharacterClass.ModTempParry(player, apply, m_tempParryLevel);
                     return 0;
-                }).Start(1);
+                }, 1);
             }
         }
 

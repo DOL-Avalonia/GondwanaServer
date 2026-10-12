@@ -1,3 +1,35 @@
 Commands.GM.Checklos.Description:		Vérifier la ligne de vue avec la cible
-Commands.GM.Checklos.Usage:				Usage: /checklos
+Commands.GM.Checklos.Usage:			Usage: /checklos
 Commands.GM.Checklos.NeedTarget:		Vous avez besoin d'une cible pour utiliser cette commande.
+Commands.GM.Checklos.Header.TargetInfo:			--- Info Cible ---
+Commands.GM.Checklos.Header.GroundTarget:		--- Cible au Sol ---
+Commands.GM.Checklos.Header.ServerGeom:			--- Géométrie Serveur ---
+Commands.GM.Checklos.Header.ClientCheck:		--- Vérification Client ---
+Commands.GM.Checklos.Header.LosHandler:			--- Gestionnaire LoS ---
+Commands.GM.Checklos.Header.Cache:			--- Cache ---
+Commands.GM.Checklos.WindowTitle.Stats:			Check LOS - Statistiques
+Commands.GM.Checklos.WindowTitle.Main:			Check LOS
+Commands.GM.Checklos.Stats.Reset:			Les statistiques LoS ont été réinitialisées.
+Commands.GM.Checklos.Stats.Packets:			Paquets - Envoyés : {0} | Réponses : {1} (En retard/Ignorés : {2}) | Expirés : {3}
+Commands.GM.Checklos.Stats.Saved:			Économisés - Dédupliqués : {0} | Cache : {1} | Géométrie Serveur : {2} | Total : {3} ({4:0.#}%)
+Commands.GM.Checklos.Stats.Config:			Config - Délai : {0} ms | Durée du cache : {1} ms
+Commands.GM.Checklos.Stats.ServerGeom:			Géométrie Serveur chargée (LOS_MGR_ENABLE) : {0} | Utilisée pour vérif : {1}
+Commands.GM.Checklos.Stats.Region:			La région {0} possède la géométrie .obj : {1}
+Commands.GM.Checklos.Stats.Pending:			Vérifications en attente / en cache sur votre client : {0}
+Commands.GM.Checklos.Ground.Position:			Position : {0}
+Commands.GM.Checklos.Ground.InView:			En vue (cache client) : {0}
+Commands.GM.Checklos.Geom.NoData:			Aucune donnée .obj chargée pour cette région.
+Commands.GM.Checklos.Geom.Clear:			Ligne de vue dégagée (note : dist < 16 ou > portée max non testée)
+Commands.GM.Checklos.Geom.Blocked:			BLOQUÉ à {0:0} unités
+Commands.GM.Checklos.Geom.Verdict:			Verdict : {0}
+Commands.GM.Checklos.Geom.Stats:			Tests : {0} nœuds, {1} faces ({2:0.00} ms)
+Commands.GM.Checklos.Client.Unsupported:		Le client ne peut tester la ligne de vue qu'entre deux objets, pas vers une position au sol.
+Commands.GM.Checklos.Probe.TargetStr:			Nom : {0} | OID : {1} | Distance : {2}
+Commands.GM.Checklos.Probe.InView:			Cible en vue (cache client) : {0}
+Commands.GM.Checklos.Probe.Failed:			Le test n'a pas pu démarrer (région différente, OID invalide ou client inactif).
+Commands.GM.Checklos.Probe.OriginInst:			Instantané (cache, déduplication ou géométrie serveur)
+Commands.GM.Checklos.Probe.OriginNet:			Aller-retour réel du paquet client
+Commands.GM.Checklos.Probe.Answer:			Réponse : {0}
+Commands.GM.Checklos.Probe.Time:			Temps : {0} ms ({1})
+Commands.GM.Checklos.Probe.Route:			Route : Source {0} -> Cible {1}
+Commands.GM.Checklos.Probe.CacheStats:			Tests en attente/cache : {0} avant => {1} maintenant

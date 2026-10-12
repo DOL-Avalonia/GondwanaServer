@@ -22,11 +22,13 @@ namespace DOL.GS.Quests
         {
             var state = base.ForceStartGoal(questData);
             EndGoal(questData, state, true);
-            new RegionTimer(questData.Owner, _timer =>
+
+            new ECSGameTimer(questData.Owner, _ =>
             {
                 EndGoal(questData, state, true);
                 return 0;
-            }).Start(1);
+            }, 1);
+
             return state;
         }
     }

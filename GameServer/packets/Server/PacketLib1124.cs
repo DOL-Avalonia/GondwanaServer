@@ -400,7 +400,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameTimer.GetTickCount();
+            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameLoop.GameLoopTime;
 
             SendObjectGuildID(playerToCreate, playerToCreate.Guild); //used for nearest friendly/enemy object buttons and name colors on PvP server
 
@@ -513,40 +513,26 @@ namespace DOL.GS.PacketHandler
 
         protected override async Task SendQuestWindow(GameNPC questNPC, GamePlayer player, IQuestPlayerData quest, bool offer)
         {
-            await using GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
-            pak.WriteShort((offer) ? (byte)0x22 : (byte)0x21); // Dialog
+            // ---- 1) awaits ----
+            string title = await quest.Quest.GetNameForPlayer(player) ?? string.Empty;
+            string summary = await quest.Quest.GetSummaryForPlayer(player) ?? string.Empty;
+            if (summary.Length > 255) summary = summary[..255];
+            string bodyText = (offer ? await quest.Quest.GetStoryForPlayer(player) : await quest.Quest.GetConclusionForPlayer(player)) ?? string.Empty;
+            string[] goalDescs = await Task.WhenAll(quest.Goals.Select(g => AutoTranslateManager.Translate(m_gameClient.Player, g.Description)));
+
+            // ---- 2) packet ----
+            using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.Dialog));
+            pak.WriteShort(offer ? (byte)0x22 : (byte)0x21); // Dialog
             pak.WriteShort(quest.Quest.Id);
             pak.WriteShort((ushort)questNPC.ObjectID);
             pak.WriteByte(0x00); // unknown
             pak.WriteByte(0x00); // unknown
             pak.WriteByte(0x00); // unknown
             pak.WriteByte(0x00); // unknown
-            pak.WriteByte((offer) ? (byte)0x02 : (byte)0x01); // Accept/Decline or Finish/Not Yet
+            pak.WriteByte(offer ? (byte)0x02 : (byte)0x01); // Accept/Decline or Finish/Not Yet
             pak.WriteByte(0x01); // Wrap
-
-            // ===== TITLE (Name) =====
-            string title = await quest.Quest.GetNameForPlayer(player) ?? string.Empty;
-
             pak.WritePascalString(title);
-
-            // ===== SUMMARY =====
-            string summary = await quest.Quest.GetSummaryForPlayer(player) ?? string.Empty;
-
-            if (summary.Length > 255)
-                pak.WritePascalString(summary.Substring(0, 255)); // Summary is max 255 bytes !
-            else
-                pak.WritePascalString(summary);
-
-            // ===== STORY / CONCLUSION =====
-            string bodyText;
-            if (offer)
-            {
-                bodyText = await quest.Quest.GetStoryForPlayer(player) ?? string.Empty;
-            }
-            else
-            {
-                bodyText = await quest.Quest.GetConclusionForPlayer(player) ?? string.Empty;
-            }
+            pak.WritePascalString(summary);
 
             if (bodyText.Length > Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH)
             {
@@ -595,46 +581,49 @@ namespace DOL.GS.PacketHandler
 
         protected override async Task SendQuestPacket(IQuestPlayerData q, int index)
         {
-            await using GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry));
-            pak.WriteByte((byte)index);
             if (q == null || q.Status == eQuestStatus.NotDoing)
             {
-                pak.WriteByte(0); // name length
-                pak.WriteByte(0); // unknown
-                pak.WriteByte(0); // status
-                pak.WriteByte(0); // goal count
-                pak.WriteByte(0); // level
-                SendTCP(pak);
+                using var empty = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry));
+                empty.WriteByte((byte)index);
+                empty.WriteByte(0); // name length
+                empty.WriteByte(0); // unknown
+                empty.WriteByte(0); // status
+                empty.WriteByte(0); // goal count
+                empty.WriteByte(0); // level
+                SendTCP(empty);
                 return;
             }
 
-            // ===== NAME (with level) =====
-            string questName = await q.Quest.GetNameForPlayer(m_gameClient.Player) ?? string.Empty;
+            // ---- 1) everything that awaits ----
+            GamePlayer player = m_gameClient.Player;
+            string questName = await q.Quest.GetNameForPlayer(player) ?? string.Empty;
+            string name = $"{questName} (Level {q.Quest.MinLevel})";
+            if (name.Length > byte.MaxValue) name = name[..byte.MaxValue];
+            string description = await q.Quest.GetDescriptionForPlayer(player) ?? string.Empty;
 
-            var name = $"{questName} (Level {q.Quest.MinLevel})";
-            if (name.Length > byte.MaxValue)
-                name = name.Substring(0, 256);
+            bool showGoals = q.Status != eQuestStatus.Done;
+            string[] goalTexts = showGoals
+                ? await Task.WhenAll(q.VisibleGoals.Select(g => AutoTranslateManager.Translate(player, g.Description)))
+                : Array.Empty<string>();
 
+            // ---- 2) rent the packet and write synchronously ----
+            using var pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.QuestEntry));
+            pak.WriteByte((byte)index);
             pak.WriteByte((byte)name.Length);
-            pak.WriteShort(0x00); // unknown
-            pak.WriteByte((byte)(q.Status == eQuestStatus.Done ? 0 : q.VisibleGoals.Count));
+            pak.WriteShort(0x00);
+            pak.WriteByte((byte)(showGoals ? q.VisibleGoals.Count : 0));
             pak.WriteByte(q.Quest.MinLevel);
             pak.WriteStringBytes(name);
-
-            // ===== DESCRIPTION =====
-            string description = await q.Quest.GetDescriptionForPlayer(m_gameClient.Player) ?? string.Empty;
-
             pak.WritePascalString(description);
 
-            // ===== GOALS =====
-            if (q.Status != eQuestStatus.Done)
+            if (showGoals)
             {
-                for (var idx = 0; idx < q.VisibleGoals.Count; ++idx)
+                for (int idx = 0; idx < q.VisibleGoals.Count; ++idx)
                 {
                     var goal = q.VisibleGoals[idx];
+                    string baseText = goalTexts[idx];
                     string desc;
 
-                    string baseText = await AutoTranslateManager.Translate(m_gameClient.Player, goal.Description);
                     if (Properties.JSONQUEST_USE_OLDGOAL_LIST)
                     {
                         string prefix = " • ";
@@ -663,13 +652,14 @@ namespace DOL.GS.PacketHandler
                     // pak.WriteShortLowEndian(goal.PointB.X);
                     // pak.WriteShortLowEndian(goal.PointB.Y);
                     pak.Fill(0, 6);
-                    pak.WriteShortLowEndian(0x00); // unknown
+                    pak.WriteShortLowEndian(0x00);
                     pak.WriteShortLowEndian((ushort)goal.Type);
-                    pak.WriteShortLowEndian(0x00); // unknown
+                    pak.WriteShortLowEndian(0x00);
                     pak.WriteShortLowEndian(goal.PointA.ZoneId);
                     pak.WriteShortLowEndian(goal.PointA.X);
                     pak.WriteShortLowEndian(goal.PointA.Y);
-                    pak.WriteByte((byte)((goal.Status == eQuestGoalStatus.FlagActive) ? 0x00 : 0x01));
+                    pak.WriteByte((byte)(goal.Status == eQuestGoalStatus.FlagActive ? 0x00 : 0x01));
+
                     if (goal.QuestItem == null)
                     {
                         pak.WriteByte(0x00);
@@ -681,7 +671,6 @@ namespace DOL.GS.PacketHandler
                     }
                 }
             }
-
             SendTCP(pak);
         }
 
@@ -694,17 +683,21 @@ namespace DOL.GS.PacketHandler
             string desc = " ";
             string lang = m_gameClient.Account.Language;
 
-            switch (AmteScripts.Managers.PvpManager.Instance.CurrentSessionType)
+            var keys = AmteScripts.Managers.PvpManager.Instance.GetMapObjectiveKeys(id);
+
+            if (!string.IsNullOrEmpty(keys.NameKey))
             {
-                case AmteScripts.Managers.PvpManager.eSessionTypes.CaptureTheFlag:
-                    name = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.CTFName");
-                    desc = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.CTFDesc");
-                    break;
-                case AmteScripts.Managers.PvpManager.eSessionTypes.KingOfTheHill:
-                    name = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.KotHName");
-                    desc = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.KotHDesc");
-                    break;
+                name = LanguageMgr.GetTranslation(lang, keys.NameKey);
+                desc = LanguageMgr.GetTranslation(lang, keys.DescKey);
             }
+            else if (AmteScripts.Managers.PvpManager.Instance.CurrentSessionType == AmteScripts.Managers.PvpManager.eSessionTypes.CaptureTheFlag)
+            {
+                name = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.CTF.AtBase.Name");
+                desc = LanguageMgr.GetTranslation(lang, "PvPManager.Journal.CTF.AtBase.Desc");
+            }
+
+            if (string.IsNullOrEmpty(name)) name = " ";
+            if (string.IsNullOrEmpty(desc)) desc = " ";
 
             pak.WriteByte((byte)name.Length);
             pak.WriteShort(0); // unknown

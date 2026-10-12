@@ -174,7 +174,7 @@ public static class DataQuestJsonMgr
         var dq = new PlayerQuest(player, dbQuest);
         if (player.AddQuest(dq))
         {
-            Task.Run(async () =>
+            GameLoopAsync.Fire(async () =>
             {
                 if (!string.IsNullOrWhiteSpace(dq.Quest.AcceptText))
                 {
@@ -201,7 +201,7 @@ public static class DataQuestJsonMgr
 
         foreach (var e in GameEventManager.Instance.GetEventsStartedByQuest(dq.Quest.Id + "-start").Where(e => e.IsReady && e.StartConditionType == StartingConditionType.Quest))
         {
-            Task.Run(() => e.Start(player));
+            GameLoopPost.Run(static s => s.e.Start(s.player), (e, player));
         }
         if (!string.IsNullOrEmpty(dq.Quest.StartEventId))
         {
@@ -218,7 +218,7 @@ public static class DataQuestJsonMgr
                 }
                 if (dq.Quest.StartEvent)
                 {
-                    Task.Run(() => questEvent.Start(player));
+                    GameLoopPost.Run(static s => s.questEvent.Start(s.player), (questEvent, player));
                 }
             }
         }

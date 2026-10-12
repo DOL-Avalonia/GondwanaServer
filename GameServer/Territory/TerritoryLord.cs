@@ -25,7 +25,7 @@ namespace DOL.Territories
 
         public DateTime lastClaim = new DateTime(1);
 
-        private RegionTimer _claimTimer;
+        ECSGameTimer _claimTimer;
 
         private readonly object _lockObject = new object();
 
@@ -418,7 +418,7 @@ namespace DOL.Territories
             }
 
             int ticks = 0;
-            _claimTimer = new RegionTimer(
+            _claimTimer = new ECSGameTimer(
                 this,
                 timer =>
                 {

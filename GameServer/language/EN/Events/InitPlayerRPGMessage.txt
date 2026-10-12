@@ -1,8 +1,8 @@
 
 # Server Intro RPG message
-ServerRPGMessage.ShortDescription:		Welcome to Arcanum, a world forged from the ashes of the Great Magical War! In this immersive RP/PvP realm, fractured kingdoms vie for survival while Guilds dictate the law. Please consult the sacred tenets and server rules at www.arcanum-server.com. Sharpen your blades, ready your spells, and enjoy your journey in Arcanum!
-ServerRPGMessage.Lore1:					Welcome to Arcanum !
-ServerRPGMessage.Lore2:					Two thousand years ago, Arcanum was a shining lattice of floating citadels and mana forges. Then came the Great Magical War. Continents were torn apart, leaving a world scarred and thinned. From this wreckage, three realms rose: Albion, Midgard, and Hibernia. Today, kings rule on paper, but it is the Guilds that truly govern the fractured lands, while outlaws carve their own empires in the dark Underground. Choose your path wisely.
+ServerRPGMessage.ShortDescription:		Welcome to {0}, a world forged from the ashes of the Great Magical War! In this immersive RP/PvP realm, fractured kingdoms vie for survival while Guilds dictate the law. Please consult the sacred tenets and server rules at www.{0}-server.com. Sharpen your blades, ready your spells, and enjoy your journey in {0}!
+ServerRPGMessage.Lore1:					Welcome to {0} !
+ServerRPGMessage.Lore2:					Two thousand years ago, {0} was a shining lattice of floating citadels and mana forges. Then came the Great Magical War. Continents were torn apart, leaving a world scarred and thinned. From this wreckage, three realms rose: Albion, Midgard, and Hibernia. Today, kings rule on paper, but it is the Guilds that truly govern the fractured lands, while outlaws carve their own empires in the dark Underground. Choose your path wisely.
 ServerRPGMessage.FeaturesHeader:		--------- SERVER FEATURES ---------
 ServerRPGMessage.FeatureEvents1:		[Dynamic Events & Quests]
 ServerRPGMessage.FeatureEvents2:		Participate in world-altering events and legendary boss hunts.
@@ -63,4 +63,4 @@ ServerRPGMessage.GCCombatZone:			/gc combatzone : Create a temporary PvP combat 
 ServerRPGMessage.GCJail:				/gc jailrelease <name> : Pay bail to release a guildmate from prison.
 ServerRPGMessage.GCRent:				/gc houserent <on|off> : Toggle automatic guild house rent payments.
 ServerRPGMessage.GCBanners:				/gc territorybanner & /gc buybanner & /gc summon : Buy and deploy tactical banners to buff your members or territory guards.
-ServerRPGMessage.Outro:					Good luck, and may your legacy in Arcanum be legendary!
+ServerRPGMessage.Outro:					Good luck, and may your legacy in {0} be legendary!

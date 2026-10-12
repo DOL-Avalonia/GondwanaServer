@@ -113,9 +113,10 @@ namespace DOL.GS
             AddStep(TimerService.Instance, TimerService.Instance.Tick);
             AddStep(CastingService.Instance, CastingService.Instance.Tick);
             AddStep(ZoneService.Instance, ZoneService.Instance.Tick);
+            AddStep(RelocationService.Instance, RelocationService.Instance.Tick);
+            AddStep(ModuleService.Instance, ModuleService.Instance.Tick);
             AddStep(RolloverSchedulerService.Instance, RolloverSchedulerService.Instance.Tick);
             AddStep(ClientService.Instance, ClientService.Instance.Tick);
-            AddStep(RelocationService.Instance, RelocationService.Instance.Tick);
             // Phase 2+: ClientService, ZoneService...
             // Phase 3+: NpcService, AttackService, CastingService, EffectService, MovementService, ReaperService, RolloverSchedulerService...
             static void AddStep(IGameService service, Action action)

@@ -10,7 +10,7 @@ namespace DOL.GS.Scripts
     public class GenistarEgg : GameNPC
     {
         public DBGenistar DBRecord { get; private set; }
-        private RegionTimer m_careTimer;
+        private ECSGameTimer m_careTimer;
 
         public GenistarEgg() : base()
         {
@@ -33,8 +33,8 @@ namespace DOL.GS.Scripts
             MaxSpeedBase = 0;
             Realm = eRealm.None;
 
-            m_careTimer = new RegionTimer(this, new RegionTimerCallback(CareTimerTick));
-            m_careTimer.Start(5000);
+            m_careTimer?.Stop();
+            m_careTimer = new ECSGameTimer(this, CareTimerTick, 5000);
         }
 
         public override bool Interact(GamePlayer player)
@@ -61,8 +61,11 @@ namespace DOL.GS.Scripts
             return base.Interact(player);
         }
 
-        private int CareTimerTick(RegionTimer timer)
+        private int CareTimerTick(ECSGameTimer timer)
         {
+            if (ObjectState != eObjectState.Active)
+                return 0;
+
             if (DBRecord == null || DBRecord.State != (int)eGenistarState.Incubating) 
                 return 0;
 
@@ -153,11 +156,8 @@ namespace DOL.GS.Scripts
 
         private void Hatch(GamePlayer player)
         {
-            if (m_careTimer != null) 
-            { 
-                m_careTimer.Stop(); 
-                m_careTimer = null; 
-            }
+            m_careTimer?.Stop();
+            m_careTimer = null;
 
             House house = HouseMgr.GetHouse(DBRecord.HouseNumber);
             if (house != null) house.UpdateGenistarVisual(DBRecord.PlaceholderKey, 1682);

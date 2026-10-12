@@ -61,6 +61,8 @@ namespace DOLGameServerConsole
             SendMessage(message, type, loc);
         }
 
+        public void SendRawMessage(string msg, eChatType type, eChatLoc loc) => SendMessage(msg, type, loc);
+
         public void SendCustomDialog(string msg, CustomDialogResponse callback)
         {
             if (msg == null)

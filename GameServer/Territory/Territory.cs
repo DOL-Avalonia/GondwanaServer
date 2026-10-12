@@ -799,7 +799,7 @@ namespace DOL.Territories
                 mob.BroadcastLivingEquipmentUpdate();
         }
 
-        private RegionTimer m_portalTimer;
+        private ECSGameTimer m_portalTimer;
 
         private readonly object m_portalLock = new();
 
@@ -1003,61 +1003,47 @@ namespace DOL.Territories
             return string.IsNullOrEmpty(guild_id);
         }
 
+        private void GatherMobsInTerritory()
+        {
+            Mobs = new List<GameNPC>();
+            if (!WorldMgr.Regions.TryGetValue(RegionId, out GS.Region region))
+            { log.ErrorFormat("Could not find region {0} for territory {1} ({2})", RegionId, Name, ID); return; }
+
+            foreach (GameNPC npc in EnumerateNpcsInAreas(region, Areas).ToList())
+                npc.CurrentTerritory = this;
+
+            if (Boss != null && !Mobs.Contains(Boss))
+            {
+                Mobs.Add(Boss);
+            }
+        }
+
         public void AddArea(AbstractArea area)
         {
             lock (m_lockObject)
             {
                 if (!WorldMgr.Regions.TryGetValue(RegionId, out GS.Region region))
-                {
-                    log.ErrorFormat("Could not find region {0} for territory {1} ({2})", RegionId, Name, ID);
-                    return;
-                }
-                this.Areas.Add(area);
-
-                IEnumerable<GameNPC> mobs;
-                if (area is Circle circle)
-                {
-                   mobs = region.GetNPCsInRadius(circle.Coordinate, (ushort)circle.Radius, false, true).Cast<GameNPC>().Where(n => !n.IsCannotTarget && n is not ShadowNPC);
-                }
-                else
-                {
-                    log.Error($"Impossible to get mobs from territory {this.Name}'s area {area.Description} ({area.ID}) because its type  is not supported");
-                    return;
-                }
-
-                foreach (var mob in mobs)
-                {
-                    Add(mob);
-                }
+                { log.ErrorFormat("Could not find region {0} for territory {1} ({2})", RegionId, Name, ID); return; }
+                Areas.Add(area);
+                foreach (GameNPC mob in EnumerateNpcsInAreas(region, new IArea[] { area }).ToList()) Add(mob);
             }
         }
 
-        private void GatherMobsInTerritory()
+        private static IEnumerable<GameNPC> EnumerateNpcsInAreas(GS.Region region, IEnumerable<IArea> areas)
         {
-            Mobs = new List<GameNPC>();
-
-            var region = WorldMgr.Regions[this.RegionId];
-            foreach (IArea iarea in Areas)
+            List<AbstractArea> abstractAreas = areas.OfType<AbstractArea>().ToList();
+            if (abstractAreas.Count == 0) yield break;
+            GameObject[] objects = region.Objects;
+            for (int i = 0; i < objects.Length; i++)
             {
-                if (!(iarea is AbstractArea area))
-                {
-                    log.Error($"Impossible to get mobs from territory {this.Name}'s area {iarea.ID} because its type is not supported");
+                if (objects[i] is not GameNPC npc || npc.ObjectState != eObjectState.Active)
                     continue;
-                }
 
-                if (area is Circle circle)
-                {
-                    region.GetNPCsInRadius(circle.Coordinate, (ushort)circle.Radius, false, true).Cast<GameNPC>().Where(n => !n.IsCannotTarget && n is not ShadowNPC).Foreach(n => n.CurrentTerritory = this);
-                }
-                else
-                {
-                    log.Error($"Impossible to get mobs from territory {this.Name}'s area {area.Description} ({iarea.ID}) because its type  is not supported");
+                if (npc.IsCannotTarget || npc is ShadowNPC)
                     continue;
-                }
-            }
-            if (Boss != null && !Mobs.Contains(Boss))
-            {
-                Mobs.Add(Boss);
+
+                foreach (AbstractArea area in abstractAreas)
+                    if (area.IsContaining(npc.Coordinate, false)) { yield return npc; break; }
             }
         }
 
@@ -1078,9 +1064,6 @@ namespace DOL.Territories
             Guild guild = spawner.Guild;
             GuildPortalNPC portalNpc = GuildPortalNPC.Create(this, spawner);
             portalNpc.AddToWorld();
-            RegionTimer timer = new RegionTimer(portalNpc);
-            timer.Callback = new RegionTimerCallback(PortalExpireCallback);
-            timer.Interval = Properties.GUILD_PORTAL_DURATION * 1000;
             lock (m_portalLock)
             {
                 if (Portal != null)
@@ -1088,8 +1071,7 @@ namespace DOL.Territories
                     DespawnPortalNpc();
                 }
                 Portal = portalNpc;
-                m_portalTimer = timer;
-                m_portalTimer.Start(m_portalTimer.Interval);
+                m_portalTimer = new ECSGameTimer(portalNpc, PortalExpireCallback, Properties.GUILD_PORTAL_DURATION * 1000);
             }
             foreach (GamePlayer player in guild.GetListOfOnlineMembers())
             {
@@ -1136,7 +1118,7 @@ namespace DOL.Territories
             Portal = null;
         }
 
-        private int PortalExpireCallback(RegionTimer timer)
+        private int PortalExpireCallback(ECSGameTimer timer)
         {
             lock (m_portalLock)
             {

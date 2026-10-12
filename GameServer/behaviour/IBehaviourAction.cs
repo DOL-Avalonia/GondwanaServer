@@ -238,7 +238,7 @@ namespace DOL.GS.Behaviour
         /// </summary>
         Teleport,
         /// <summary>
-        /// TIMR : regiontimer P:RegionTimer starts to count Q:int[string] milliseconds        
+        /// TIMR : ECSGameTimer P:RegionTimer starts to count Q:int[string] milliseconds        
         /// </summary>
         CustomTimer,
         /// <summary>

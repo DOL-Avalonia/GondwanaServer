@@ -554,7 +554,7 @@ namespace DOL.AI.Brain
         /// <summary>
         /// Override in special brains (turrets, bosses…) to change target priority rules.
         /// </summary>
-        protected virtual IThreatStrategy BuildThreatStrategy() => new GondwanaThreatStrategy(this);
+        protected virtual IThreatStrategy BuildThreatStrategy() => new ThreatStrategy(this);
 
         /// <summary
         /// >Gondwana "help" mechanic: everybody on my list gets MaxHealth worth of aggro on the friend.

@@ -1,0 +1,8 @@
+Commands.Admin.Snoop.Description:				Écouter les messages d'un joueur.
+Commands.Admin.Snoop.Usage:						Usage : /snoop <joueur> ou ciblez un joueur et tapez /snoop
+Commands.Admin.Snoop.InvalidTarget:				Cible invalide.
+Commands.Admin.Snoop.CannotSnoopSelf:			Vous ne pouvez pas vous espionner vous-même.
+Commands.Admin.Snoop.InsufficientPrivileges:	Vous n'avez pas les privilèges suffisants pour espionner ce joueur.
+Commands.Admin.Snoop.Started:					Vous écoutez maintenant {0}.
+Commands.Admin.Snoop.Stopped:					Vous n'écoutez plus {0}.
+Commands.Admin.Snoop.MessageFormat:				<Snoop : {0}> {1}

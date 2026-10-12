@@ -1,5 +1,4 @@
-﻿
-using DOL.Database;
+﻿using DOL.Database;
 using DOL.Events;
 using DOL.GS.ServerProperties;
 using DOL.Language;
@@ -7,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using static AmteScripts.Managers.RvrManager;
 
 namespace DOL.GS
 {
@@ -187,7 +185,8 @@ namespace DOL.GS
             this.GenerateBonusConditions();
             this.ApplySmartPricing();
 
-            string rogPrefix = Properties.ROG_SERVER_NAME ?? "Global ROG";
+            string serverName = string.IsNullOrEmpty(Properties.ROG_SERVER_NAME) ? "Global" : Properties.ROG_SERVER_NAME;
+            string rogPrefix = $"{serverName} ROG";
             this.Description = $"{rogPrefix} | {charClass}";
 
             this.AllowAdd = false;

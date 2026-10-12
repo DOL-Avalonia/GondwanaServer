@@ -269,7 +269,7 @@ namespace DOL.GS
             m_doorHealthRegenTimer = new ECSGameTimer(this, HealthRegenerationTimerCallback, REPAIR_INTERVAL);
         }
 
-        // RegionTimer properly handled safely now instead of static memory leak!
+        // ECSGameTimer properly handled safely now instead of static memory leak!
         protected virtual int HealthRegenerationTimerCallback(ECSGameTimer timer)
         {
             if (HealthPercent >= 100)

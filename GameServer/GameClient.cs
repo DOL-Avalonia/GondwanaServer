@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Net;
 using System.Reflection;
@@ -175,6 +157,7 @@ namespace DOL.GS
         /// </summary>
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
         public ServiceObjectId ServiceObjectId { get; } = new(ServiceObjectType.Client);
+        private readonly ConcurrentQueue<IPostedClientAction> _postedActions = new();
 
         /// <summary>
         /// Next GameLoop time at which ClientService refreshes this player's world view.
@@ -279,6 +262,23 @@ namespace DOL.GS
         // Tooltip Request Time Cache, (Object Type => (Object ID => expires))
         private ConcurrentDictionary<int, ConcurrentDictionary<int, long>> m_tooltipRequestTimes = new ConcurrentDictionary<int, ConcurrentDictionary<int, long>>();
 
+        private volatile int _disabledChatTypeMask;
+
+        /// <summary>
+        /// Bit i set = eChatType (CT_Spell + i) is hidden by the player.
+        /// </summary>
+        public int DisabledChatTypeMask
+        {
+            get => _disabledChatTypeMask;
+            set => _disabledChatTypeMask = value;
+        }
+
+        public bool IsChatTypeDisabled(eChatType type)
+        {
+            int index = (int)type - (int)eChatType.CT_Spell;
+            return index >= 0 && index < 16 && (_disabledChatTypeMask & (1 << index)) != 0;
+        }
+
         /// <summary>
         /// Try to Send Tooltip to Client, return false if cache hit.
         /// Return true and register cache before you can send tooltip !
@@ -288,21 +288,13 @@ namespace DOL.GS
         /// <returns></returns>
         public bool CanSendTooltip(int type, int id)
         {
-            m_tooltipRequestTimes.TryAdd(type, new ConcurrentDictionary<int, long>());
+            ConcurrentDictionary<int, long> inner = m_tooltipRequestTimes.GetOrAdd(type, static _ => new());
+            long now = GameLoop.GameLoopTime;
 
-            // Queries cleanup
-            foreach (Tuple<int, int> keys in m_tooltipRequestTimes.SelectMany(e => e.Value.Where(it => it.Value < GameTimer.GetTickCount()).Select(el => new Tuple<int, int>(e.Key, el.Key))))
-            {
-                long dummy;
-                m_tooltipRequestTimes[keys.Item1].TryRemove(keys.Item2, out dummy);
-            }
-
-            // Query hit ?
-            if (m_tooltipRequestTimes[type].ContainsKey(id))
+            if (inner.TryGetValue(id, out long expiry) && expiry > now)
                 return false;
 
-            // Query register
-            m_tooltipRequestTimes[type].TryAdd(id, GameTimer.GetTickCount() + 3600000);
+            inner[id] = now + 3600000;
             return true;
         }
 
@@ -510,6 +502,7 @@ namespace DOL.GS
         public string MinorRev = "";
         public byte MajorBuild = 0;
         public byte MinorBuild = 0;
+        public eEffectFilter EffectFilter { get; set; } = eEffectFilter.All;
 
         /// <summary>
         /// Gets/sets installed client addons (housing/new frontiers)
@@ -709,7 +702,7 @@ namespace DOL.GS
             GamePlayer player = null;
             try
             {
-                player = (GamePlayer)gasm.CreateInstance(playerClass, false, BindingFlags.CreateInstance, null, new object[] { this, dolChar }, null, null);
+                player = (GamePlayer)gasm!.CreateInstance(playerClass, false, BindingFlags.CreateInstance, null, new object[] { this, dolChar }, null, null);
             }
             catch (Exception e)
             {
@@ -918,6 +911,58 @@ namespace DOL.GS
                 .Append(" char:").Append(Player == null ? "null" : Player.Name)
                 .Append(" class:").Append(Player == null ? "null" : Player.CharacterClass.ID.ToString())
                 .ToString();
+        }
+
+        /// <summary>
+        /// Queue work to run on the game loop, after everything previously posted for this client.
+        /// </summary>
+        public void Post<TState>(Action<TState> action, TState state)
+        {
+            if (action == null)
+                return;
+
+            _postedActions.Enqueue(new PostedClientAction<TState>(action, state));
+        }
+
+        /// <summary>
+        /// Called by ClientService only.
+        /// </summary>
+        internal void ProcessPostedActions()
+        {
+            while (_postedActions.TryDequeue(out IPostedClientAction action))
+            {
+                try
+                {
+                    action.Invoke();
+                }
+                catch (Exception e)
+                {
+                    if (log.IsErrorEnabled)
+                        log.Error($"Error while running a posted action for client {this}", e);
+                }
+            }
+        }
+
+        private interface IPostedClientAction
+        {
+            void Invoke();
+        }
+
+        private sealed class PostedClientAction<TState> : IPostedClientAction
+        {
+            private readonly Action<TState> _action;
+            private readonly TState _state;
+
+            public PostedClientAction(Action<TState> action, TState state)
+            {
+                _action = action;
+                _state = state;
+            }
+
+            public void Invoke()
+            {
+                _action(_state);
+            }
         }
     }
 }

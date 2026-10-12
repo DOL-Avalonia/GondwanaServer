@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using System;
 using System.Collections.Generic;
 using DOL.Database;
@@ -25,7 +6,6 @@ using DOL.GS.Spells;
 
 namespace DOL.GS.Effects
 {
-
     public class BoilingCauldronEffect : TimedEffect
     {
         // Parameters
@@ -38,6 +18,7 @@ namespace DOL.GS.Effects
         // Objects
         private GamePlayer EffectOwner;				// Effect owner
         private GameStaticItem Cauldron;					// The cauldron
+        private ECSGameTimer m_cauldronTimer;
 
         public BoilingCauldronEffect()
             : base(RealmAbilities.BoilingCauldronAbility.DURATION)
@@ -63,6 +44,7 @@ namespace DOL.GS.Effects
             if (EffectOwner != null)
                 GameEventMgr.RemoveHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
 
+            m_cauldronTimer?.Stop();
             base.Stop();
         }
 
@@ -77,10 +59,10 @@ namespace DOL.GS.Effects
             Cauldron.Position = EffectOwner.Position.TurnedAround();
             Cauldron.AddToWorld();
 
-            new RegionTimer(EffectOwner, new RegionTimerCallback(CauldronCallBack), RealmAbilities.BoilingCauldronAbility.DURATION - 1000);
+            m_cauldronTimer = new ECSGameTimer(EffectOwner, CauldronCallBack, RealmAbilities.BoilingCauldronAbility.DURATION - 1000);
         }
 
-        private int CauldronCallBack(RegionTimer timer)
+        private int CauldronCallBack(ECSGameTimer timer)
         {
             if (Cauldron != null && EffectOwner != null)
             {
@@ -90,8 +72,6 @@ namespace DOL.GS.Effects
                         target.TakeDamage(EffectOwner, eDamageType.Heat, spellDamage, 0);
                 }
             }
-            timer.Stop();
-            timer = null;
             return 0;
         }
 

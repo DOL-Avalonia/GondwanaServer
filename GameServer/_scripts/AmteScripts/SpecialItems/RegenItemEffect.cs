@@ -9,7 +9,7 @@ namespace DOL.GS.Scripts
 {
     public class RegenItemEffect : StaticEffect
     {
-        private RegionTimer m_tickTimer;
+        private ECSGameTimer m_tickTimer;
 
         public override string Name
         {
@@ -52,15 +52,8 @@ namespace DOL.GS.Scripts
             if (target == null) return;
             m_owner = target;
             target.EffectList.Add(this);
-            if (m_tickTimer != null)
-            {
-                m_tickTimer.Stop();
-                m_tickTimer = null;
-            }
-            m_tickTimer = new RegionTimer(target)
-            {
-                Callback = PulseCallback
-            };
+            m_tickTimer?.Stop();
+            m_tickTimer = new ECSGameTimer(target, PulseCallback, 5000);
             m_tickTimer.Start(5000);
             m_owner.OtherBuffBonus[(int)eProperty.HealthRegenerationRate] += m_owner.Level;
             m_owner.OtherBuffBonus[(int)eProperty.EnduranceRegenerationRate] += 5;
@@ -68,10 +61,13 @@ namespace DOL.GS.Scripts
             m_owner.TempProperties.setProperty("regenItem_level", (int)m_owner.Level);
         }
 
-        private int PulseCallback(RegionTimer callingtimer)
+        private int PulseCallback(ECSGameTimer callingtimer)
         {
             if (!_FireIsHere(m_owner))
+            {
                 Stop();
+                return 0;
+            }
             return 5000;
         }
 

@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Collections;
 using DOL.Database;
@@ -67,20 +49,21 @@ namespace DOL.GS.Housing
                 return false;
 
             House house = HouseMgr.GetHouseByPlayer(player);
+            string lang = player.Client.Account.Language;
 
             if (house != null)
             {
                 //the player might be targeting a lot he already purchased that has no house on it yet
                 if (house.HouseNumber != DatabaseItem.HouseNumber && player.Client.Account.PrivLevel != (int)ePrivLevel.Admin)
                 {
-                    ChatUtil.SendSystemMessage(player, "Housing.LotMarker.YouAlreadyOwnAHouse");
+                    player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.YouAlreadyOwnAHouse"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return false;
                 }
             }
 
             if (string.IsNullOrEmpty(DatabaseItem.OwnerID))
             {
-                player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.DoYouWantToBuyThisLot1") + "\r\n" + LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.DoYouWantToBuyThisLot2", Money.GetString(HouseTemplateMgr.GetLotPrice(DatabaseItem))), BuyLot);
+                player.Out.SendCustomDialog(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.DoYouWantToBuyThisLot1") + "\r\n" + LanguageMgr.GetTranslation(lang, "Housing.LotMarker.DoYouWantToBuyThisLot2", Money.GetString(HouseTemplateMgr.GetLotPrice(DatabaseItem))), BuyLot);
             }
             else
             {
@@ -90,7 +73,7 @@ namespace DOL.GS.Housing
                 }
                 else
                 {
-                    ChatUtil.SendSystemMessage(player, "Housing.LotMarker.YouDoNotOwnThisLot");
+                    player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.YouDoNotOwnThisLot"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 }
             }
 
@@ -102,6 +85,8 @@ namespace DOL.GS.Housing
             if (response != 0x01)
                 return;
 
+            string lang = player.Client.Account.Language;
+
             lock (DatabaseItem) // Mannen 10:56 PM 10/30/2006 - Fixing every lock(this)
             {
                 if (!string.IsNullOrEmpty(DatabaseItem.OwnerID))
@@ -109,7 +94,7 @@ namespace DOL.GS.Housing
 
                 if (HouseMgr.GetHouseNumberByPlayer(player) != 0 && player.Client.Account.PrivLevel != (int)ePrivLevel.Admin)
                 {
-                    ChatUtil.SendMerchantMessage(player, "Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse", HouseMgr.GetHouseNumberByPlayer(player));
+                    player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.YouAlreadyOwnAnotherLotOrHouse", HouseMgr.GetHouseNumberByPlayer(player)), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
                     return;
                 }
 
@@ -122,7 +107,7 @@ namespace DOL.GS.Housing
 
                 if (player.RemoveMoney(totalCost))
                 {
-                    player.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.YouJustBoughtThisLotFor", totalCost.ToText()), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
+                    player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.YouJustBoughtThisLotFor", totalCost.ToText()), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
                     InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, totalCost.Amount);
                     DatabaseItem.LastPaid = DateTime.Now;
                     DatabaseItem.OwnerID = player.ObjectId;
@@ -130,7 +115,7 @@ namespace DOL.GS.Housing
                 }
                 else
                 {
-                    ChatUtil.SendMerchantMessage(player, "Housing.LotMarker.YouDontHaveEnoughMoney");
+                    player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.YouDontHaveEnoughMoney"), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
                 }
             }
         }
@@ -144,6 +129,7 @@ namespace DOL.GS.Housing
                 return false;
 
             var player = (GamePlayer)source;
+            string lang = player.Client.Account.Language;
 
             if (HouseMgr.IsOwner(DatabaseItem, player))
             {
@@ -186,7 +172,7 @@ namespace DOL.GS.Housing
                         CreateHouse(player, 12);
                         break;
                     default:
-                        ChatUtil.SendSystemMessage(player, LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.LotNotItem"));
+                        player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.LotNotItem"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         return false;
                 }
 
@@ -198,8 +184,7 @@ namespace DOL.GS.Housing
                 return true;
             }
 
-            ChatUtil.SendSystemMessage(player, "Housing.LotMarker.YouDoNotOwnThisLot");
-
+            player.SendMessage(LanguageMgr.GetTranslation(lang, "Housing.LotMarker.YouDoNotOwnThisLot"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return false;
         }
 
@@ -239,7 +224,7 @@ namespace DOL.GS.Housing
         {
             if (!item.IsDropable || item.Flags == 1)
             {
-                ChatUtil.SendMerchantMessage(player, "Housing.LotMarker.ThisItemCantBeSold");
+                player.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Housing.LotMarker.ThisItemCantBeSold"), eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
                 return false;
             }
 

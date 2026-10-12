@@ -1,22 +1,34 @@
-﻿/*
+﻿using DOL.GS.PacketHandler;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace DOL.GS
 {
-    /// <summary>
-    /// Marshals work onto the game loop so packets/pooled objects
-    /// are built on a loop thread, in deterministic order.
-    /// </summary>
     public static class GameLoopPost
     {
-        public static void Run(System.Action action)
+        public static bool IsOnGameLoop => SynchronizationContext.Current is GameServiceSynchronizationContext;
+
+        public static void Run(Action action)
         {
-            if (GameLoop.ActiveService != null) { action(); return; }
-            GameLoopService.Instance.Post(static a => a(), action);
+            if (IsOnGameLoop) action();
+            else GameLoopService.Instance.Post(static a => a(), action);
         }
 
-        public static void Run<TState>(System.Action<TState> action, TState state)
+        public static void Run<TState>(Action<TState> action, TState state)
         {
-            if (GameLoop.ActiveService != null) { action(state); return; }
-            GameLoopService.Instance.Post(action, state);
+            if (IsOnGameLoop) action(state);
+            else GameLoopService.Instance.Post(action, state);
+        }
+
+        /// <summary>
+        /// Run on the game loop, ordered after everything already posted for this client.
+        /// </summary>
+        public static void RunForClient<TState>(GameClient client, Action<TState> action, TState state)
+        {
+            if (IsOnGameLoop) { action(state); return; }
+            if (client != null) client.Post(action, state);
+            else GameLoopService.Instance.Post(action, state);
         }
     }
-}*/
+}

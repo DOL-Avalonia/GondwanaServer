@@ -1,3 +1,35 @@
 Commands.GM.Checklos.Description:		Check line of sight with the target
 Commands.GM.Checklos.Usage:				Usage: /checklos
 Commands.GM.Checklos.NeedTarget:		You need a target to use this command.
+Commands.GM.Checklos.Header.TargetInfo:			--- Target Info ---
+Commands.GM.Checklos.Header.GroundTarget:		--- Ground Target ---
+Commands.GM.Checklos.Header.ServerGeom:			--- Server Geometry ---
+Commands.GM.Checklos.Header.ClientCheck:		--- Client Check ---
+Commands.GM.Checklos.Header.LosHandler:			--- LosCheckHandler ---
+Commands.GM.Checklos.Header.Cache:				--- Cache ---
+Commands.GM.Checklos.WindowTitle.Stats:			Check LOS - Statistics
+Commands.GM.Checklos.WindowTitle.Main:			Check LOS
+Commands.GM.Checklos.Stats.Reset:				LoS statistics have been reset.
+Commands.GM.Checklos.Stats.Packets:				Packets - Sent: {0} | Answers: {1} (Late/Discarded: {2}) | Timeouts: {3}
+Commands.GM.Checklos.Stats.Saved:				Saved - Deduplicated: {0} | Cache: {1} | Server Geometry: {2} | Total: {3} ({4:0.#}%)
+Commands.GM.Checklos.Stats.Config:				Config - Timeout: {0} ms | Cache lifetime: {1} ms
+Commands.GM.Checklos.Stats.ServerGeom:			Server Geometry Loaded (LOS_MGR_ENABLE): {0} | Used for checks: {1}
+Commands.GM.Checklos.Stats.Region:				Region {0} has .obj geometry: {1}
+Commands.GM.Checklos.Stats.Pending:				Pending / cached checks on your client: {0}
+Commands.GM.Checklos.Ground.Position:			Position: {0}
+Commands.GM.Checklos.Ground.InView:				In view (client cache): {0}
+Commands.GM.Checklos.Geom.NoData:				No .obj data loaded for this region.
+Commands.GM.Checklos.Geom.Clear:				Clear line of sight (note: dist < 16 or > max range not tested)
+Commands.GM.Checklos.Geom.Blocked:				BLOCKED at {0:0} units
+Commands.GM.Checklos.Geom.Verdict:				Verdict: {0}
+Commands.GM.Checklos.Geom.Stats:				Tests: {0} nodes, {1} faces ({2:0.00} ms)
+Commands.GM.Checklos.Client.Unsupported:		The client can only test line of sight between two objects, not toward a ground position.
+Commands.GM.Checklos.Probe.TargetStr:			Name: {0} | OID: {1} | Distance: {2}
+Commands.GM.Checklos.Probe.InView:				Target in view (client cache): {0}
+Commands.GM.Checklos.Probe.Failed:				The check could not be started (different region, invalid OID or client not playing).
+Commands.GM.Checklos.Probe.OriginInst:			Instant (cache, deduplication or server geometry)
+Commands.GM.Checklos.Probe.OriginNet:			Real client packet round-trip
+Commands.GM.Checklos.Probe.Answer:				Answer: {0}
+Commands.GM.Checklos.Probe.Time:				Time: {0} ms ({1})
+Commands.GM.Checklos.Probe.Route:				Route: Source {0} -> Target {1}
+Commands.GM.Checklos.Probe.CacheStats:			Pending / cached checks: {0} before => {1} now

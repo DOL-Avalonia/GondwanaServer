@@ -1,12 +1,13 @@
+using DOL.Database;
+using DOL.Events;
+using DOL.GS;
+using DOL.GS.Effects;
+using DOL.GS.Geometry;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 using System;
 using System.Collections;
 using System.Reflection;
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
-using DOL.Events;
-using DOL.Database;
-using DOL.GS.Geometry;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -90,15 +91,13 @@ namespace DOL.GS.RealmAbilities
             {
                 caster.RealmAbilityCastTimer.Stop();
                 caster.RealmAbilityCastTimer = null;
-                caster.Out.SendMessage("You cancel your Spell!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                caster.Out.SendMessage(LanguageMgr.GetTranslation(caster.Client.Account.Language, "DecimationTrapAbility.CancelCast"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
             }
 
-            caster.RealmAbilityCastTimer = new RegionTimer(caster);
-            caster.RealmAbilityCastTimer.Callback = new RegionTimerCallback(EndCast);
-            caster.RealmAbilityCastTimer.Start(1);
+            caster.RealmAbilityCastTimer = new ECSGameTimer(caster, EndCast, 1);
         }
 
-        protected virtual int EndCast(RegionTimer timer)
+        protected virtual int EndCast(ECSGameTimer timer)
         {
             if (m_player.IsMezzed || m_player.IsStunned || m_player.IsSitting)
                 return 0;

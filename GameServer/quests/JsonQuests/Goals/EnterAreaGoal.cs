@@ -6,6 +6,7 @@ using DOL.GS.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace DOL.GS.Quests
@@ -42,7 +43,7 @@ namespace DOL.GS.Quests
                     return pq != null && IsActive(pq) && !IsDone(pq);
                 };
                 m_areaIndicator.CurrentRegionID = m_areaRegion;
-                m_areaIndicator.Position = Position.Create(m_areaRegion, m_area.Coordinate.X, m_area.Coordinate.Y, m_area.Coordinate.Z, 0) + Vector.Create(z: 1);
+                m_areaIndicator.Position = Position.Create(m_areaRegion, m_area.Coordinate.X, m_area.Coordinate.Y, m_area.Coordinate.Z, 0) + Geometry.Vector.Create(z: 1);
                 m_areaIndicator.AddToWorld();
             }
         }
@@ -86,11 +87,7 @@ namespace DOL.GS.Quests
                 return;
             if (e == AreaEvent.PlayerEnter)
             {
-                Task.Run(async () =>
-                {
-                    string msg = await TranslateGoalText(quest.Owner, m_text);
-                    quest.Owner.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg);
-                });
+                GameLoopAsync.Then(TranslateGoalText(quest.Owner, m_text), quest.Owner, static (msg, p) => p.Client.Out.SendDialogBox(eDialogCode.CustomDialog, 0, 0, 0, 0, eDialogType.Ok, true, msg));
                 OnPlayerEnterArea(quest, goal);
             }
             if (e == AreaEvent.PlayerLeave)

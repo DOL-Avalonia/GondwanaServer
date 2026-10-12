@@ -284,6 +284,7 @@ GameObjects.GamePlayer.PickupObject.NoOneWantsThis:        Nimeni din grup nu vr
 GameObjects.GamePlayer.PickupObject.ObjectTooFarAway:      {0} este prea departe pentru a fi ridicat.
 GameObjects.GamePlayer.PickupObject.TooFarFromBoat:        Ești prea departe de barcă pentru a te îmbarca.
 GameObjects.GamePlayer.PickupObject.YouGet:                Ridici {0} și îl pui în rucsac.
+GameObjects.GamePlayer.PickupObject.YouMayPickUp:			Acum puteți ridica {0}!
 GameObjects.GamePlayer.PickupObject.YouPickUp:             Ridici {0}.
 GameObjects.GamePlayer.PickupObject.YourLootShare:         Partea ta de pradă este {0}.
 GameObjects.GamePlayer.PickupObject.GuildDueTax:           Taxa ta de {0} merge în banca clanului.

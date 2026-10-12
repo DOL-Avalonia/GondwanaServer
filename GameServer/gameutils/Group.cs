@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -477,31 +459,14 @@ namespace DOL.GS
         /// <param name="loc">message location</param>
         public virtual void SendMessageToGroupMembers(GameLiving from, string msg, eChatType type, eChatLoc loc)
         {
-            AutoTranslator messageTranslator = new AutoTranslator(from as GamePlayer, msg);
-            if (from != null)
-            {
-                foreach (GamePlayer player in GetPlayersInTheGroup())
+            var translator = new AutoTranslator(from as GamePlayer, msg);
+            foreach (GamePlayer player in GetPlayersInTheGroup())
+                GameLoopAsync.Then(translator.Translate(player), (player, from, type, loc), static (text, s) =>
                 {
-                    Task.Run(async () =>
-                    {
-                        string finalMsg = await messageTranslator.Translate(player);
-
-                        player.Out.SendMessage(string.Format("[Party] {0}: \"{1}\"", player.GetPersonalizedName(from), finalMsg), type, loc);
-                    });
-                }
-            }
-            else
-            {
-                foreach (GamePlayer player in GetPlayersInTheGroup())
-                {
-                    Task.Run(async () =>
-                    {
-                        string finalMsg = await messageTranslator.Translate(player);
-
-                        player.Out.SendMessage(string.Format("[Party] {0}", finalMsg), type, loc);
-                    });
-                }
-            }
+                    if (s.player.ObjectState != GameObject.eObjectState.Active) return;
+                    string line = s.from != null ? $"[Party] {s.player.GetPersonalizedName(s.from)}: \"{text}\"" : $"[Party] {text}";
+                    s.player.Out.SendMessage(line, s.type, s.loc);
+                });
         }
 
         /// <summary>

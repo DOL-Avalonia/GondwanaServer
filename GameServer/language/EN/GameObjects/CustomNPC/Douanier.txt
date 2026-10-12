@@ -1,0 +1,7 @@
+
+TeleportNPC.Douanier.PayString:         pay the sum of: {0} to avoid them
+TeleportNPC.Douanier.Interact:          And you? What's your choice? Do you want to take my whole clan to the face or [{0}]?
+TeleportNPC.Douanier.NotEnoughMoney:    Tchakkkk, you shall not pass! You're broke!
+TeleportNPC.Douanier.Busy:              I am busy at the moment.
+TeleportNPC.Douanier.GiveMoney:         You give {0} to the customs officer.
+TeleportNPC.Douanier.Pass:              Good, you can pass!

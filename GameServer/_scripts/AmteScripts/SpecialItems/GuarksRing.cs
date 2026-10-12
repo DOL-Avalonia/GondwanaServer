@@ -69,13 +69,14 @@ namespace DOL.GS.Scripts
             ItemEquippedArgs arg = (ItemEquippedArgs)args;
             if (sender == null || (arg.Item.Id_nb != "guarks_anneau" && arg.Item.Id_nb != "guarks_amulette"))
                 return;
+
             GamePlayer player = ((GamePlayerInventory)sender).Player;
             if (player.Client.ClientState != GameClient.eClientState.Playing)
                 return;
             if (!CheckUse(player))
                 return;
 
-            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkRingUsed"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingUsed"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
 
             player.MaxSpeedBase = 1;
             player.Out.SendUpdateMaxSpeed();
@@ -83,9 +84,9 @@ namespace DOL.GS.Scripts
             if (player.HealthPercent <= 75)
             {
                 if (arg.Item.Id_nb == "anneau_guarks")
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkRingNoPower"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingNoPower"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 else
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkAmuletNoPower"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkAmuletNoPower"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 return;
             }
 
@@ -101,14 +102,12 @@ namespace DOL.GS.Scripts
 
             _playerIDs.Add(player.InternalID);
 
-            RegionTimer timer = new RegionTimer(player, TimerTicks);
-            timer.Properties.setProperty("X", (int)player.Position.X);
-            timer.Properties.setProperty("Y", (int)player.Position.Y);
-            timer.Properties.setProperty("Z", (int)player.Position.Z);
+            // Capture initial position and pass state via lambda
+            RingState state = new RingState(player.Position, 0);
+            ECSGameTimer timer = new ECSGameTimer(player, t => TimerTicks(t, player, state), 1000);
+
             player.TempProperties.setProperty(RING_IS_AMULETTE, (arg.Item.Id_nb == "guarks_amulette"));
             player.TempProperties.setProperty(RING_TIMER, timer);
-            timer.Start(1000);
-
 
             foreach (GamePlayer plr in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 plr.Out.SendSpellEffectAnimation(player, player, 2661, 0, false, 1);
@@ -130,47 +129,42 @@ namespace DOL.GS.Scripts
             }
 
             _playerIDs.Remove(player.InternalID);
-            var timer = player.TempProperties.getProperty<RegionTimer>(RING_TIMER, null);
-            if (timer != null)
-                timer.Stop();
+            player.TempProperties.getProperty<ECSGameTimer>(RING_TIMER, null)?.Stop();
             player.TempProperties.removeProperty(RING_IS_AMULETTE);
             player.TempProperties.removeProperty(RING_TIMER);
             player.TempProperties.removeProperty(RING_TARGET);
         }
 
-        public static int TimerTicks(RegionTimer timer)
+        private static int TimerTicks(ECSGameTimer timer, GamePlayer player, RingState state)
         {
-            var player = timer.Owner as GamePlayer;
             if (player == null)
             {
                 timer.Stop();
                 return 0;
             }
-            //Vérification des mouvement, combats et si on stop le TP
+
+            // Verification of movement, combat, and cancellation
             bool stop = !_playerIDs.Contains(player.InternalID);
             if (!stop)
                 stop = !CheckUse(player);
-            int x = timer.Properties.getProperty("X", 0);
-            int y = timer.Properties.getProperty("Y", 0);
-            int z = timer.Properties.getProperty("Z", 0);
-            if (stop || player.InCombat || (int)player.Position.X != x || (int)player.Position.Y != y || (int)player.Position.Z != z)
+
+            // Check position easily against the state's StartPosition
+            if (stop || player.InCombat || player.Position != state.StartPosition)
             {
-                Console.WriteLine("params overall : " + stop + "  " + player.InCombat + "  " + (player.Position.X != x) + "  " + (player.Position.Y != y) + "  " + (player.Position.Z != z));
                 timer.Stop();
                 player.TempProperties.removeProperty(RING_TARGET);
                 if (stop)
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkRingTPCancelMoved"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingTPCancelMoved"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 else if (!_playerIDs.Contains(player.InternalID) && !player.TempProperties.getProperty(RING_IS_AMULETTE, false))
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkRingTPCancelRemoved"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingTPCancelRemoved"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 else if (!_playerIDs.Contains(player.InternalID))
-                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkAmuletTPCancelRemoved"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkAmuletTPCancelRemoved"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                 _playerIDs.Remove(player.InternalID);
                 return 0;
             }
 
-            int ticks = timer.Properties.getProperty("ticks", 0);
-            ticks += 1000;
-            timer.Properties.setProperty("ticks", ticks);
+            state.Ticks += 1000;
+            int ticks = state.Ticks;
 
             int harm = player.MaxHealth / 10; // 10%
             switch (ticks)
@@ -273,12 +267,12 @@ namespace DOL.GS.Scripts
                     if (Util.Chance(5))
                     {
                         lieu = Lieux[0];
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkRingTPFailed"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingTPFailed"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
                     else if (lieu == null)
                     {
                         lieu = GetRandomLieu(player.TempProperties.getProperty(RING_IS_AMULETTE, false));
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language,"Items.Specialitems.GuarkRingTPNone"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Items.Specialitems.GuarkRingTPNone"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
                     }
 
                     ushort oldRegion = player.CurrentRegionID;
@@ -286,7 +280,7 @@ namespace DOL.GS.Scripts
                     player.MoveTo(dest);
 
                     if (dest.RegionID == oldRegion)
-                        new RegionTimer(player, EffectCallback, 500);
+                        new ECSGameTimer(player, t => EffectCallback(t, player), 500); // Updated to ECSGameTimer
                     else
                         GameEventMgr.AddHandler(player, GamePlayerEvent.RegionChanged, EnterWorld);
 
@@ -297,6 +291,18 @@ namespace DOL.GS.Scripts
             }
 
             return 1000;
+        }
+
+        private sealed class RingState
+        {
+            public readonly Position StartPosition;
+            public int Ticks;
+
+            public RingState(Position startPos, int ticks)
+            {
+                StartPosition = startPos;
+                Ticks = ticks;
+            }
         }
         #endregion
 
@@ -399,15 +405,14 @@ namespace DOL.GS.Scripts
         private static void EnterWorld(DOLEvent e, object sender, EventArgs args)
         {
             GameEventMgr.RemoveHandler(sender, GamePlayerEvent.RegionChanged, EnterWorld);
-            var player = sender as GamePlayer;
-            if (player == null)
-                return;
-            new RegionTimer(player, EffectCallback, 500);
+            if (sender is GamePlayer player)
+            {
+                new ECSGameTimer(player, t => EffectCallback(t, player), 500); // Updated to ECSGameTimer
+            }
         }
 
-        private static int EffectCallback(RegionTimer timer)
+        private static int EffectCallback(ECSGameTimer timer, GamePlayer player)
         {
-            var player = timer.Owner as GamePlayer;
             if (player != null)
                 foreach (GamePlayer plr in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                     plr.Out.SendSpellEffectAnimation(player, player, 276, 0, false, 1);

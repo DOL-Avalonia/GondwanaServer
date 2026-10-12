@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using Discord;
 using System;
 using System.Text;
@@ -62,18 +44,10 @@ namespace DOL.GS.Commands
             var msgTranslator = new AutoTranslator(client.Player, rawText);
             foreach (var player in members)
             {
-                Task.Run(async () =>
+                GameLoopAsync.Then(Task.WhenAll(keyTranslator.Translate(player), msgTranslator.Translate(player)), (player, sender: client.Player), static (r, s) =>
                 {
-                    var key = await keyTranslator.Translate(player);
-                    var msg = await msgTranslator.Translate(player);
-
-                    StringBuilder text = new StringBuilder(7 + 3 + client.Player.Name.Length + key.Length + msg.Length);
-                    text.Append(key);
-                    text.Append(": \"");
-                    text.Append(msg);
-                    text.Append('\"');
-
-                    player.Out.SendMessage(" " + player.GetPersonalizedName(client.Player) + text.ToString(), eChatType.CT_Chat, eChatLoc.CL_ChatWindow);
+                    if (s.player.ObjectState == GameObject.eObjectState.Active)
+                        s.player.Out.SendMessage($" {s.player.GetPersonalizedName(s.sender)}{r[0]}: \"{r[1]}\"", eChatType.CT_Chat, eChatLoc.CL_ChatWindow);
                 });
             }
         }

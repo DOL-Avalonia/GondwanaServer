@@ -140,16 +140,12 @@ namespace DOL.MobGroups
                                 {
                                     ushort effectId = group.EquippedItemClientEffect;
 
-                                    Task.Run(async () =>
+                                    new ECSGameTimer(npc, _ =>
                                     {
-                                        await Task.Delay(120);
-
-                                        if (player != null && player.IsAlive && player.ObjectState == GameObject.eObjectState.Active &&
-                                            npc != null && npc.IsAlive && npc.ObjectState == GameObject.eObjectState.Active)
-                                        {
+                                        if (player.IsAlive && player.ObjectState == GameObject.eObjectState.Active && npc.IsAlive && npc.ObjectState == GameObject.eObjectState.Active)
                                             player.Out.SendSpellEffectAnimation(npc, npc, effectId, 0, false, 5);
-                                        }
-                                    });
+                                        return 0;
+                                    }, 120);
                                 }
 
                                 break;

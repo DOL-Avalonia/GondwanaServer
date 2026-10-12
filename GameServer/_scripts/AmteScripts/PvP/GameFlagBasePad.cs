@@ -2,8 +2,6 @@
 using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.GS.Geometry;
-using DOL.Database;
-using System.Collections.Generic;
 
 namespace AmteScripts.PvP.CTF
 {
@@ -26,6 +24,7 @@ namespace AmteScripts.PvP.CTF
         public void SpawnFlag()
         {
             if (!IsEmpty) return;
+            if (ObjectState != eObjectState.Active) return;
             var flag = new GameFlagStatic(this);
             flag.Model = 3223;
             flag.Name = "Capture Flag #" + FlagID;

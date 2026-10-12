@@ -754,7 +754,7 @@ namespace DOL.GS.Spells
 
         private Position position = Position.Nowhere;
         GameNPC summoned = null;
-        RegionTimer m_growTimer;
+        ECSGameTimer m_growTimer;
         private const int C_GROWTIMER = 2000;
 
         public Convoker10SpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
@@ -814,12 +814,12 @@ namespace DOL.GS.Spells
             summoned.AddToWorld();
             controlledBrain.AggressionState = eAggressionState.Aggressive;
             effect.Start(summoned);
-            m_growTimer = new RegionTimer((GameObject)m_caster, new RegionTimerCallback(TitanGrows), C_GROWTIMER);
+            m_growTimer = new ECSGameTimer(m_caster, TitanGrows, C_GROWTIMER);
             return false;
         }
 
         // Make titan growing, and activate it on completition
-        private int TitanGrows(RegionTimer timer)
+        private int TitanGrows(ECSGameTimer timer)
         {
             if (summoned != null && summoned.Size != 60)
             {

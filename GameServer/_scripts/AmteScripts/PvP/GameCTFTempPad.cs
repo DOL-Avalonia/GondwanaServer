@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using DOL.GS;
+﻿using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.GS.Geometry;
-using DOL.Database;
-using AmteScripts.Areas;
 using AmteScripts.Managers;
 using DOL.Language;
 
@@ -12,16 +8,14 @@ namespace AmteScripts.PvP.CTF
 {
     public class GameCTFTempPad : GamePvPStaticItem
     {
-        private RegionTimer _ownershipTimer;
+        private ECSGameTimer _ownershipTimer;
         private int _pointsInterval = 20_000;
-
-        private RegionTimer _maxPadTimer;
+        private ECSGameTimer _maxPadTimer;
         private const int MAX_TIME_ON_TEMP_PAD = 600_000;
         private AbstractArea _padArea;
 
         public GameFlagStatic OwnedFlag { get; private set; }
 
-        /// <inheritdoc />
         public override int Emblem
         {
             get => base.Emblem;
@@ -73,18 +67,15 @@ namespace AmteScripts.PvP.CTF
             OwnedFlag = flag;
             flag.CurrentTempPad = this;
             // Start awarding points
-            if (_ownershipTimer != null)
-                _ownershipTimer.Stop();
-
-            _ownershipTimer = new RegionTimer(this, TimerCallback, _pointsInterval);
+            _ownershipTimer?.Stop();
+            _ownershipTimer = new ECSGameTimer(this, TimerCallback);
             _ownershipTimer.Start(_pointsInterval);
-
             _maxPadTimer?.Stop();
-            _maxPadTimer = new RegionTimer(this, MaxPadTimeCallback, MAX_TIME_ON_TEMP_PAD);
+            _maxPadTimer = new ECSGameTimer(this, MaxPadTimeCallback);
             _maxPadTimer.Start(MAX_TIME_ON_TEMP_PAD);
         }
 
-        private int TimerCallback(RegionTimer timer)
+        private int TimerCallback(ECSGameTimer timer)
         {
             // Award "Flag_OwnershipPoints" to the pad’s owner each interval
             if (OwnedFlag == null)
@@ -104,7 +95,7 @@ namespace AmteScripts.PvP.CTF
             return _pointsInterval;
         }
 
-        private int MaxPadTimeCallback(RegionTimer t)
+        private int MaxPadTimeCallback(ECSGameTimer t)
         {
             if (OwnedFlag != null)
             {
@@ -112,10 +103,7 @@ namespace AmteScripts.PvP.CTF
                 StopOwnership();
                 oldFlag.RemoveFromWorld();
 
-                if (oldFlag.BasePad != null)
-                {
-                    oldFlag.BasePad.RespawnFlag();
-                }
+                oldFlag.BasePad?.RespawnFlag();
             }
             return 0;
         }
@@ -137,20 +125,15 @@ namespace AmteScripts.PvP.CTF
                     flagInv.ClearFlagReference();
                     player.Inventory.RemoveItem(flagInv);
 
-                    var staticFlag = new GameFlagStatic(originalPad);
+                    GameFlagStatic staticFlag = new(originalPad, flagInv.FlagID)
+                    {
+                        Name = flagInv.Name,
+                        Model = (ushort)flagInv.Model,
+                        Position = Position.Create(CurrentRegionID, Position.X, Position.Y, Position.Z, Heading),
+                        CurrentTempPad = this
+                    };
                     staticFlag.SetOwnership(player);
-                    staticFlag.Name = flagInv.Name;
-                    staticFlag.Model = (ushort)flagInv.Model;
-
-                    staticFlag.Position = Position.Create(
-                        this.CurrentRegionID,
-                        this.Position.X,
-                        this.Position.Y,
-                        this.Position.Z,
-                        this.Heading
-                    );
                     staticFlag.AddToWorld();
-
                     OwnedFlag = staticFlag;
                     StartOwnershipTimer(staticFlag, player);
 

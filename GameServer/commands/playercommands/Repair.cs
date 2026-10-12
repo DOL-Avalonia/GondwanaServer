@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using System;
 using DOL.Database;
 using DOL.GS.Keeps;
@@ -86,7 +68,7 @@ namespace DOL.GS.Commands
             if (obj is GameKeepDoor)
             {
                 GameKeepDoor doorcomponent = obj as GameKeepDoor;
-                if (doorcomponent.Component.Keep.InCombat)
+                if (doorcomponent!.Component.Keep.InCombat)
                 {
                     DisplayMessage(
                         player,
@@ -121,7 +103,7 @@ namespace DOL.GS.Commands
             if (obj is GameKeepComponent)
             {
                 GameKeepComponent component = obj as GameKeepComponent;
-                if (component.IsRaized)
+                if (component!.IsRaized)
                 {
                     DisplayMessage(
                         player,
@@ -229,18 +211,12 @@ namespace DOL.GS.Commands
                     "Commands.Players.Repair.Repairing",
                     obj.Name),
                 workDuration);
-            player.CraftTimer = new RegionTimer(player);
-            player.CraftTimer.Callback = new RegionTimerCallback(Proceed);
-            player.CraftTimer.Properties.setProperty("repair_player", player);
-            player.CraftTimer.Properties.setProperty("repair_target", obj);
-            player.CraftTimer.Start(workDuration * 1000);
+
+            player.CraftTimer = new ECSGameTimer(player, _ => Proceed(player, obj), workDuration * 1000);
         }
 
-        protected int Proceed(RegionTimer timer)
+        protected int Proceed(GamePlayer player, GameLiving obj)
         {
-            GamePlayer player = (GamePlayer)timer.Properties.getProperty<object>("repair_player", null);
-            GameLiving obj = (GameLiving)timer.Properties.getProperty<object>("repair_target", null);
-
             if (player == null || obj == null)
             {
                 if (log.IsWarnEnabled)
@@ -260,17 +236,17 @@ namespace DOL.GS.Commands
                 if (obj is GameKeepDoor)
                 {
                     GameKeepDoor door = obj as GameKeepDoor;
-                    door.Repair((int)(door.MaxHealth * 0.15));
+                    door!.Repair((int)(door.MaxHealth * 0.15));
                 }
                 if (obj is GameKeepComponent)
                 {
                     GameKeepComponent component = obj as GameKeepComponent;
-                    component.Repair((int)(component.MaxHealth * 0.15));
+                    component!.Repair((int)(component.MaxHealth * 0.15));
                 }
                 if (obj is GameSiegeWeapon)
                 {
                     GameSiegeWeapon weapon = obj as GameSiegeWeapon;
-                    weapon.Repair();
+                    weapon!.Repair();
                 }
                 int finish = obj.HealthPercent;
                 CalculatePlayersWood(player, (GetTotalWoodForLevel(obj.Level + 1)));

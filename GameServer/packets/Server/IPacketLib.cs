@@ -159,6 +159,7 @@ namespace DOL.GS.PacketHandler
         PlayerDismountRequest = 0xC8,       // 0x60 ^ 168
         PlayerHeadingUpdate = 0xBA,         // 0x12 ^ 168  also known as Short State
         PlayerPickupHouseItem = 0x0D,       // 0xA5 ^ 168
+        ClientFilterSettings = 0xDC,       // 0xA5 ^ 168
         PlayerMoveItem = 0xDD,              // 0x75 ^ 168
         DetailRequest = 0xD8,               // 0x70 ^ 168
         BuyHookPoint = 0x64,                // 0xCC ^ 168
@@ -642,6 +643,7 @@ namespace DOL.GS.PacketHandler
         void SendTime();
         void SendMessage(string msg, eChatType type, eChatLoc loc);
         Task SendMessage(Task<string> msg, eChatType type, eChatLoc loc);
+        void SendRawMessage(string msg, eChatType type, eChatLoc loc);
         void SendPlayerCreate(GamePlayer playerToCreate);
         void SendObjectGuildID(GameObject obj, Guild guild);
         void SendPlayerQuit(bool totalOut);

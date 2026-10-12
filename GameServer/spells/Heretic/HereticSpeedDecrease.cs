@@ -160,13 +160,25 @@ namespace DOL.GS.Spells
                 }
             }
 
-            RestoreSpeedTimer timer = new RestoreSpeedTimer(effect);
+            ECSGameTimer timer = new ECSGameTimer(effect.Owner, t =>
+            {
+                double factor = 2.0 - (effect.Duration - effect.RemainingTime) / (double)(effect.Duration >> 1);
+                if (factor < 0) factor = 0;
+                else if (factor > 1) factor = 1;
+
+                effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, effect, 1.0 - effect.Spell.Value * factor * 0.01);
+
+                SendUpdates(effect.Owner);
+
+                if (factor <= 0)
+                {
+                    return 0;
+                }
+
+                return 650;
+            }, 1 + (effect.Duration >> 1));
+
             effect.Owner.TempProperties.setProperty(effect, timer);
-
-            //REVOIR
-            timer.Interval = 650;
-            timer.Start(1 + (effect.Duration >> 1));
-
             effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
         }
 
@@ -175,9 +187,9 @@ namespace DOL.GS.Spells
         {
             base.OnEffectExpires(effect, noMessages);
 
-            GameTimer timer = (GameTimer)effect.Owner.TempProperties.getProperty<object>(effect, null);
+            ECSGameTimer timer = (ECSGameTimer)effect.Owner.TempProperties.getProperty<object>(effect, null);
             effect.Owner.TempProperties.removeProperty(effect);
-            timer.Stop();
+            timer?.Stop();
 
             effect.Owner.BuffBonusMultCategory1.Remove((int)eProperty.MaxSpeed, effect);
 
@@ -194,20 +206,6 @@ namespace DOL.GS.Spells
             }
 
             return 60000;
-        }
-
-        /// <inheritdoc />
-        protected override int CalculateEffectDuration(GameLiving target, double effectiveness)
-        {
-            double duration = base.CalculateEffectDuration(target, effectiveness);
-            duration *= target.GetModified(eProperty.SpeedDecreaseDuration) * 0.01;
-
-            if (duration < 1)
-                duration = 1;
-            else if (duration > (Spell.Duration * 4))
-                duration = (Spell.Duration * 4);
-
-            return (int)duration;
         }
 
         protected virtual void OnAttacked(DOLEvent e, object sender, EventArgs arguments)
@@ -247,57 +245,6 @@ namespace DOL.GS.Spells
         public HereticSpeedDecreaseSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line)
         {
             TIMER_PROPERTY = this;
-        }
-
-        /// <summary>
-        /// Slowly restores the livings speed
-        /// </summary>
-        private sealed class RestoreSpeedTimer : GameTimer
-        {
-            /// <summary>
-            /// The speed changing effect
-            /// </summary>
-            private readonly GameSpellEffect m_effect;
-
-            /// <summary>
-            /// Constructs a new RestoreSpeedTimer
-            /// </summary>
-            /// <param name="effect">The speed changing effect</param>
-            public RestoreSpeedTimer(GameSpellEffect effect) : base(effect.Owner.CurrentRegion.TimeManager)
-            {
-                m_effect = effect;
-            }
-
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
-            {
-                GameSpellEffect effect = m_effect;
-
-                double factor = 2.0 - (effect.Duration - effect.RemainingTime) / (double)(effect.Duration >> 1);
-                if (factor < 0) factor = 0;
-                else if (factor > 1) factor = 1;
-
-                effect.Owner.BuffBonusMultCategory1.Set((int)eProperty.MaxSpeed, effect, 1.0 - effect.Spell.Value * factor * 0.01);
-
-                SendUpdates(effect.Owner);
-
-                if (factor <= 0)
-                    Stop();
-            }
-
-
-            /// <summary>
-            /// Returns short information about the timer
-            /// </summary>
-            /// <returns>Short info about the timer</returns>
-            public override string ToString()
-            {
-                return new StringBuilder(base.ToString())
-                    .Append(" SpeedDecreaseEffect: (").Append(m_effect.ToString()).Append(')')
-                    .ToString();
-            }
         }
     }
 }

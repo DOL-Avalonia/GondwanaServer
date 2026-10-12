@@ -15,7 +15,7 @@ namespace DOL.GS.Scripts
     public class GenistarNPC : GameNPC
     {
         public DBGenistar DBRecord { get; private set; }
-        private RegionTimer m_dormantTimer;
+        ECSGameTimer m_dormantTimer;
         private byte _cachedLevel;
         private long _cachedLevelExpiry;
 
@@ -91,7 +91,7 @@ namespace DOL.GS.Scripts
                 SetOwnBrain(new BlankBrain());
 
                 // ClientsEffect visual while in biological coma
-                m_dormantTimer = new RegionTimer(this, new RegionTimerCallback(DormantWakeupTick), 3000);
+                m_dormantTimer = new ECSGameTimer(this, DormantWakeupTick, 3000);
             }
             else
             {
@@ -104,7 +104,7 @@ namespace DOL.GS.Scripts
             this.Flags |= eFlags.PEACE;
         }
 
-        private int DormantWakeupTick(RegionTimer timer)
+        private int DormantWakeupTick(ECSGameTimer timer)
         {
             if (DBRecord == null) return 0;
 
@@ -380,7 +380,7 @@ namespace DOL.GS.Scripts
             {
                 owner.Out.SendMessage(LanguageMgr.GetTranslation(lang, "Genistar.GenistarNPC.RejectSpoiled", Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 this.IsStunned = true;
-                new RegionTimer(this, _ => { this.IsStunned = false; return 0; }).Start(30000);
+                new ECSGameTimer(this, _ => { IsStunned = false; return 0; }, 30000);
                 return;
             }
 
@@ -611,6 +611,8 @@ namespace DOL.GS.Scripts
     {
         private long m_nextRoamTick = 0;
         private bool m_isFollowing = false;
+        private GamePlayer m_cachedOwner;
+        private long m_nextOwnerLookup;
 
         public override void Think()
         {
@@ -619,7 +621,7 @@ namespace DOL.GS.Scripts
             if (Body is not GenistarNPC genistar || genistar.DBRecord == null || genistar.DBRecord.State == (int)eGenistarState.Recovering) return;
             if (Body.IsCasting || Body.AttackState) return;
 
-            GamePlayer owner = WorldMgr.GetClientByPlayerID(genistar.DBRecord.OwnerID, true, false)?.Player;
+            GamePlayer owner = ResolveOwner(genistar);
 
             if (owner == null || owner.CurrentRegionID != Body.CurrentRegionID || !owner.IsAlive)
             {
@@ -676,6 +678,23 @@ namespace DOL.GS.Scripts
                     RoamInGarden();
                 }
             }
+        }
+
+        /// <summary>
+        /// Owner lookup is a scan of all clients: cache it and refresh at most every 5 seconds.
+        /// </summary>
+        private GamePlayer ResolveOwner(GenistarNPC genistar)
+        {
+            GamePlayer cached = m_cachedOwner;
+            if (cached != null && cached.ObjectState == GameObject.eObjectState.Active && cached.Client?.ClientState == GameClient.eClientState.Playing)
+                return cached;
+
+            if (GameLoop.GameLoopTime < m_nextOwnerLookup)
+                return null;
+
+            m_nextOwnerLookup = GameLoop.GameLoopTime + 2000;
+            m_cachedOwner = WorldMgr.GetClientByPlayerID(genistar.DBRecord.OwnerID, true, false)?.Player;
+            return m_cachedOwner;
         }
 
         private void RoamInGarden()

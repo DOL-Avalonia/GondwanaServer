@@ -1,21 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
 using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
@@ -118,19 +100,17 @@ namespace DOL.GS.Commands
 
         private void Announce(GamePlayer sender, string translationId, string message, Action<GamePlayer, string, string> handler)
         {
-            var targets = WorldMgr.GetAllPlayingClients();
             var translator = new KeyTranslator(translationId);
             var msgTranslator = new AutoTranslator(sender, message);
-            foreach (var player in targets.Select(c => c.Player))
+            foreach (var c in WorldMgr.GetAllPlayingClients())
             {
+                var player = c.Player;
                 if (player == null)
-                    return;
+                    continue;
 
-                Task.Run(async () =>
+                GameLoopAsync.Then(Task.WhenAll(translator.Translate(player), msgTranslator.Translate(player)), (player, handler), static (r, s) =>
                 {
-                    var key = await translator.Translate(player);
-                    var msg = await msgTranslator.Translate(player);
-                    handler(player, key, msg);
+                    if (s.player.ObjectState == GameObject.eObjectState.Active) s.handler(s.player, r[0], r[1]);
                 });
             }
         }

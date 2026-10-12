@@ -21,27 +21,18 @@ namespace DOL.AI.Brain
                     areaEffect.ApplySpell();
                 else
                     areaEffect.ApplyEffect();
+
                 AreaEffect nextArea = areaEffect.CheckFamily();
-                if (nextArea != null && areaEffect.IntervalMin > 0)
-                    new NextAreaTimer(nextArea).Start(areaEffect.IntervalMin * 1000);
-                else if (nextArea != null)
-                    new NextAreaTimer(nextArea).Start(1);
-            }
-        }
 
-        private class NextAreaTimer : GameTimer
-        {
-            private AreaEffect nextArea;
-
-            public NextAreaTimer(AreaEffect actionSource) : base(actionSource.CurrentRegion.TimeManager)
-            {
-                nextArea = actionSource;
-            }
-
-            public override void OnTick()
-            {
-                nextArea.CallAreaEffect();
-                Stop();
+                if (nextArea != null)
+                {
+                    int delay = areaEffect.IntervalMin > 0 ? areaEffect.IntervalMin * 1000 : 1;
+                    new ECSGameTimer(nextArea, t =>
+                    {
+                        nextArea.CallAreaEffect();
+                        return 0;
+                    }, delay);
+                }
             }
         }
     }

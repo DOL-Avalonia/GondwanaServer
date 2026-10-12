@@ -302,7 +302,7 @@ namespace DOL.GS.PacketHandler
             }
 
             // Update Cache
-            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameTimer.GetTickCount();
+            m_gameClient.GameObjectUpdateArray[new Tuple<ushort, ushort>(playerToCreate.CurrentRegionID, (ushort)playerToCreate.ObjectID)] = GameLoop.GameLoopTime;
 
             SendObjectGuildID(playerToCreate, playerToCreate.Guild); //used for nearest friendly/enemy object buttons and name colors on PvP server
         }
@@ -391,6 +391,48 @@ namespace DOL.GS.PacketHandler
                 SendTCP(pak);
             }
         }
+        /* TO DO LATER with ECS effects implementation
+        public override void SendSpellEffectAnimation(GameObject spellCaster, GameObject spellTarget, ushort spellid, ushort boltTime, bool noSound, byte success)
+        {
+            GamePlayer viewer = m_gameClient.Player;
+            if (viewer == null || spellCaster == null) return;
+
+            switch (m_gameClient.EffectFilter)
+            {
+                case eEffectFilter.None:
+                    return;
+                case eEffectFilter.Self:
+                    if (viewer != spellCaster && viewer != spellTarget) return;
+                    break;
+                case eEffectFilter.Others:
+                    if (viewer == spellCaster || viewer == spellTarget) return;
+                    break;
+                case eEffectFilter.Group:
+                    {
+                        Group group = viewer.Group;
+                        if (group == null) { if (viewer != spellCaster && viewer != spellTarget) return; }
+                        else if (!group.IsInTheGroup(spellCaster as GameLiving) && !group.IsInTheGroup(spellTarget as GameLiving)) return;
+                        break;
+                    }
+            }
+
+            using (GSTCPPacketOut pak = PooledObjectFactory.GetForTick<GSTCPPacketOut>().Init(GetPacketCode(eServerPackets.SpellEffectAnimation)))
+            {
+                ushort casterObjectId;
+                if (spellTarget == null) casterObjectId = (ushort)spellCaster.ObjectID;
+                else if (!spellTarget.IsWithinRadius(spellCaster, WorldMgr.VISIBILITY_DISTANCE)) casterObjectId = 0;
+                else if (spellTarget is GamePlayer playerTarget && spellCaster is GamePlayer casterPlayer && !playerTarget.CanDetect(casterPlayer)) casterObjectId = 0;
+                else casterObjectId = (ushort)spellCaster.ObjectID;
+
+                pak.WriteShort(casterObjectId);
+                pak.WriteShort(spellid);
+                pak.WriteShort((ushort)(spellTarget == null ? 0 : spellTarget.ObjectID));
+                pak.WriteShort(boltTime);
+                pak.WriteByte((byte)(noSound ? 1 : 0));
+                pak.WriteByte(success);
+                SendTCP(pak);
+            }
+        }*/
 
         public override void SendSpellEffectAnimation(GameObject spellCaster, GameObject spellTarget, ushort spellid, ushort boltTime, bool noSound, byte success)
         {

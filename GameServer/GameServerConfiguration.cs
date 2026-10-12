@@ -1,30 +1,12 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
+using DOL.Config;
+using DOL.Database.Connection;
+using DOL.GS.ServerProperties;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Linq;
-
-using DOL.Config;
-using DOL.Database.Connection;
 
 namespace DOL.GS
 {
@@ -339,13 +321,15 @@ namespace DOL.GS
         /// </summary>
         public GameServerConfiguration() : base()
         {
-            m_ServerName = "Dawn Of Light";
-            m_ServerNameShort = "DOLSERVER";
+            string serverNameProp = Properties.ROG_SERVER_NAME;
+
+            m_ServerName = string.IsNullOrEmpty(serverNameProp) ? "Dawn Of Light" : serverNameProp;
+            m_ServerNameShort = string.IsNullOrEmpty(serverNameProp) ? "DOLSERVER" : serverNameProp;
 
             if (Assembly.GetEntryAssembly() != null)
-                m_rootDirectory = new FileInfo(Assembly.GetEntryAssembly().Location).DirectoryName;
+                m_rootDirectory = new FileInfo(Assembly.GetEntryAssembly()!.Location).DirectoryName;
             else
-                m_rootDirectory = Path.Combine(new FileInfo(Assembly.GetAssembly(typeof(GameServer)).Location).DirectoryName, ".."); // GameServer is in ./lib/
+                m_rootDirectory = Path.Combine(new FileInfo(Assembly.GetAssembly(typeof(GameServer)).Location).DirectoryName!, ".."); // GameServer is in ./lib/
 
             m_logConfigFile = Path.Combine(Path.Combine(".", "config"), "logconfig.xml");
 

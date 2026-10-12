@@ -100,92 +100,76 @@ namespace DOL.Territories
 
             foreach (TerritoryDb territoryDb in values)
             {
-                List<IArea> areas = new List<IArea>();
-
-                if (!WorldMgr.Zones.TryGetValue(territoryDb.ZoneId, out Zone zone) || zone == null)
+                try
                 {
-                    log.Error($"Cannot find Zone {territoryDb.ZoneId} for territory {territoryDb.Name}");
-                    continue;
-                }
+                    if (!WorldMgr.Zones.TryGetValue(territoryDb.ZoneId, out Zone zone) || zone == null)
+                    { log.Error($"Cannot find Zone {territoryDb.ZoneId} for territory {territoryDb.Name}"); continue; }
 
-                if (!string.IsNullOrEmpty(territoryDb.AreaIDs))
-                {
-                    foreach (var areaID in territoryDb.AreaIDs.Split('|'))
+                    List<IArea> areas = new();
+                    if (!string.IsNullOrEmpty(territoryDb.AreaIDs))
                     {
-                        var areaDb = GameServer.Database.SelectObjects<DBArea>(DB.Column("area_id").IsEqualTo(areaID))?.FirstOrDefault();
-
-                        if (areaDb == null)
+                        foreach (string areaID in territoryDb.AreaIDs.Split('|'))
                         {
-                            log.Error($"Cannot find Area in Database with ID {areaID} for territory {territoryDb.Name}");
-                            continue;
+                            AbstractArea area = zone.GetAreas().OfType<AbstractArea>()
+                                .FirstOrDefault(a => a.DbArea != null && string.Equals(areaID, a.DbArea.ObjectId));
+                            if (area == null) { log.Error($"Cannot find Area {areaID} for territory {territoryDb.Name}"); continue; }
+                            areas.Add(area);
                         }
-
-                        var area = zone.GetAreas().OfType<AbstractArea>().FirstOrDefault(a => a.DbArea != null && string.Equals(areaID, a.DbArea.ObjectId));
-                        if (area == null)
-                        {
-                            log.Error($"Cannot find Area {areaID} for territory {territoryDb.Name}");
-                            continue;
-                        }
-
-                        areas.Add(area);
                     }
-                }
 
-                MobInfo mobInfo = new();
-                string[] bossInfo = null;
-                string bossID = null;
-                if (!string.IsNullOrEmpty(territoryDb.BossMobId))
-                {
-                    bossInfo = territoryDb.BossMobId.Split('|');
-                    bossID = bossInfo[0];
-                }
+                    string[] bossInfo = string.IsNullOrEmpty(territoryDb.BossMobId) ? null : territoryDb.BossMobId.Split('|');
+                    string bossID = bossInfo?[0];
+                    GameNPC boss;
 
-                if (!string.IsNullOrEmpty(territoryDb.GroupId))
-                {
-                    mobInfo = Instance.FindBossFromGroupId(territoryDb.GroupId);
-
-                    if (!string.Equals(bossID, mobInfo.Mob.InternalID))
+                    if (!string.IsNullOrEmpty(territoryDb.GroupId))
                     {
-                        log.Error($"Territory {territoryDb.Name} ({territoryDb.ObjectId}) has Boss ID {bossID} which does not match boss {mobInfo.Mob.InternalID} from GroupId {territoryDb.GroupId}");
-                        continue;
+                        MobInfo mobInfo = Instance.FindBossFromGroupId(territoryDb.GroupId);
+                        if (mobInfo.Mob == null)
+                        { log.Error(mobInfo.Error ?? $"No boss found for GroupId {territoryDb.GroupId} (territory {territoryDb.Name})"); continue; }
+                        if (!string.IsNullOrEmpty(bossID) && !string.Equals(bossID, mobInfo.Mob.InternalID))
+                        { log.Error($"Territory {territoryDb.Name} ({territoryDb.ObjectId}) has Boss ID {bossID} which does not match boss {mobInfo.Mob.InternalID} from GroupId {territoryDb.GroupId}"); continue; }
+                        boss = mobInfo.Mob;
                     }
-                }
-                else if (!string.IsNullOrEmpty(bossID))
-                {
-                    mobInfo.Mob = zone.GetNPCsOfZone(eRealm.None).FirstOrDefault(npc => npc.InternalID == bossID);
-                    if (mobInfo.Mob == null)
+                    else if (!string.IsNullOrEmpty(bossID))
                     {
-                        mobInfo.Error = $"Could not find boss with ID {bossID} for territory {territoryDb.Name} ({territoryDb.ObjectId})";
+                        // Region.Objects is filled synchronously by AddToWorld; the sub-zone index is only guaranteed after the first loop tick.
+                        boss = FindNpcInRegion(territoryDb.RegionId, bossID)
+                               ?? zone.GetNPCsOfZone(eRealm.None).FirstOrDefault(npc => npc.InternalID == bossID);
+                        if (boss == null)
+                        { log.Error($"Could not find boss with ID {bossID} for territory {territoryDb.Name} ({territoryDb.ObjectId})"); continue; }
                     }
-                }
+                    else
+                    { log.Error($"Territory {territoryDb.Name} ({territoryDb.ObjectId}) has neither BossMobId nor GroupId, skipping"); continue; }
 
-                if (mobInfo.Error != null)
-                {
-                    log.Error(mobInfo.Error);
-                    return;
-                }
-
-                if (mobInfo.Mob is TerritoryLord lord)
-                {
-                    try
+                    if (boss is TerritoryLord lord)
                     {
-                        lord.ParseParameters(bossInfo!.Skip(1).ToArray());
+                        try { lord.ParseParameters(bossInfo?.Skip(1).ToArray() ?? Array.Empty<string>()); }
+                        catch (Exception ex) { log.Error($"Could not load TerritoryLord parameters {bossID} for territory {territoryDb.Name} ({territoryDb.ObjectId}): {ex.Message}"); }
                     }
-                    catch (Exception ex)
-                    {
-                        log.Error($"Could not load TerritoryLoard parameters ${bossID} for territory {territoryDb.Name} {territoryDb.ObjectId}: {ex.Message}");
-                    }
+
+                    Instance.Territories.Add(new Territory(zone, areas, boss, territoryDb));
+                    count++;
                 }
-
-                Territory territory = new Territory(zone, areas, mobInfo.Mob, territoryDb);
-
-                Instance.Territories.Add(territory);
-
-                count++;
+                catch (Exception ex)
+                {
+                    log.Error($"Failed to load territory {territoryDb.Name} ({territoryDb.ObjectId})", ex);
+                }
             }
 
             GuildMgr.GetAllGuilds().ForEach(g => g.LoadTerritories());
             log.Info(count + " Territoires Chargés");
+        }
+
+        private static GameNPC FindNpcInRegion(ushort regionId, string internalId)
+        {
+            Region region = WorldMgr.GetRegion(regionId);
+            if (region == null) return null;
+            GameObject[] objects = region.Objects;
+
+            for (int i = 0; i < objects.Length; i++)
+                if (objects[i] is GameNPC npc && string.Equals(npc.InternalID, internalId)) return npc;
+
+            return null;
         }
 
         public static Territory GetCurrentTerritory(GameObject obj)

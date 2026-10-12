@@ -23,6 +23,20 @@ namespace DOL.Database
         public Position GetOldBindPosition()
             => Position.Create((ushort)OldBindRegion, OldBindX, OldBindY, OldBindZ, (ushort)OldBindHeading);
 
+        public void CopyTo(RvrPlayer t)
+        {
+            t.PlayerID = PlayerID; t.GuildID = GuildID; t.GuildRank = GuildRank;
+            t.OldX = OldX; t.OldY = OldY; t.OldZ = OldZ; t.OldHeading = OldHeading; t.OldRegion = OldRegion;
+            t.OldBindX = OldBindX; t.OldBindY = OldBindY; t.OldBindZ = OldBindZ; t.OldBindHeading = OldBindHeading; t.OldBindRegion = OldBindRegion;
+            t.PvPSession = PvPSession; t.PvPSpawnNPC = PvPSpawnNPC; t.PvPSpawnX = PvPSpawnX; t.PvPSpawnY = PvPSpawnY; t.PvPSpawnZ = PvPSpawnZ;
+        }
+        public RvrPlayer Clone()
+        {
+            RvrPlayer r = new();
+            CopyTo(r);
+            return r;
+        }
+
         [ScriptLoadedEvent]
         public static void OnScriptsCompiled(DOLEvent e, object sender, EventArgs args)
         {

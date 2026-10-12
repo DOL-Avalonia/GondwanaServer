@@ -1,29 +1,6 @@
-﻿/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
-//Instance devised by Dinberg 
-//     - there will probably be questions, direct them to dinberg_darktouch@hotmail.co.uk ;)
-using System;
-using System.Text;
-using System.Reflection;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 
 using log4net;
@@ -43,13 +20,13 @@ namespace DOL.GS
     ///</summary>
     public class BaseInstance : Region
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod()!.DeclaringType);
 
         /// <summary>
         /// Creates an instance object. This shouldn't be used directly - Please use WorldMgr.CreateInstance
         /// to create an instance.
         /// </summary>
-        public BaseInstance(ushort ID, GameTimer.TimeManager time, RegionData data) : base(time, data)
+        public BaseInstance(ushort ID, RegionData data) : base(data)
         {
             m_regionID = ID;
             m_skinID = data.Id;
@@ -124,17 +101,10 @@ namespace DOL.GS
                 // Instance will be destroyed as soon as all players leave
                 if (m_destroyWhenEmpty)
                 {
-                    if (m_autoCloseRegionTimer != null)
-                    {
-                        m_autoCloseRegionTimer.Stop();
-                        m_autoCloseRegionTimer = null;
-                    }
-
-                    if (m_delayCloseRegionTimer != null)
-                    {
-                        m_delayCloseRegionTimer.Stop();
-                        m_delayCloseRegionTimer = null;
-                    }
+                    m_autoCloseRegionTimer?.Stop();
+                    m_autoCloseRegionTimer = null;
+                    m_delayCloseRegionTimer?.Stop();
+                    m_delayCloseRegionTimer = null;
                 }
 
                 //If no more players remain, remove and clean up the instance...
@@ -161,18 +131,10 @@ namespace DOL.GS
                 if (m_persistent)
                 {
                     DestroyWhenEmpty = false;
-
-                    if (m_autoCloseRegionTimer != null)
-                    {
-                        m_autoCloseRegionTimer.Stop();
-                        m_autoCloseRegionTimer = null;
-                    }
-
-                    if (m_delayCloseRegionTimer != null)
-                    {
-                        m_delayCloseRegionTimer.Stop();
-                        m_delayCloseRegionTimer = null;
-                    }
+                    m_autoCloseRegionTimer?.Stop();
+                    m_autoCloseRegionTimer = null;
+                    m_delayCloseRegionTimer?.Stop();
+                    m_delayCloseRegionTimer = null;
                 }
                 else
                 {
@@ -205,11 +167,8 @@ namespace DOL.GS
             m_playersInInstance++;
 
             //Stop the timer to prevent the region's removal.
-            if (m_autoCloseRegionTimer != null)
-            {
-                m_autoCloseRegionTimer.Stop();
-                m_autoCloseRegionTimer = null;
-            }
+            m_autoCloseRegionTimer?.Stop();
+            m_autoCloseRegionTimer = null;
         }
 
         /// <summary>
@@ -261,22 +220,13 @@ namespace DOL.GS
         {
             base.OnCollapse();
 
-            if (m_autoCloseRegionTimer != null)
-            {
-                m_autoCloseRegionTimer.Stop();
-                m_autoCloseRegionTimer = null;
-            }
+            m_autoCloseRegionTimer?.Stop();
+            m_autoCloseRegionTimer = null;
+            m_delayCloseRegionTimer?.Stop();
+            m_delayCloseRegionTimer = null;
 
-            if (m_delayCloseRegionTimer != null)
-            {
-                m_delayCloseRegionTimer.Stop();
-                m_delayCloseRegionTimer = null;
-            }
-
-            DOL.Events.GameEventMgr.RemoveAllHandlersForObject(this);
-
+            Events.GameEventMgr.RemoveAllHandlersForObject(this);
             m_zoneSkinMap.Clear();
-
             Areas.Clear();
         }
 
@@ -285,8 +235,8 @@ namespace DOL.GS
             log.Debug("BaseInstance destructor called for " + Description);
         }
 
-        private AutoCloseRegionTimer m_autoCloseRegionTimer;
-        private DelayCloseRegionTimer m_delayCloseRegionTimer;
+        private ECSGameTimer m_autoCloseRegionTimer;
+        private ECSGameTimer m_delayCloseRegionTimer;
 
         /// <summary>
         /// Setting this will ensure the instance stays around x minutes.  After that the region will be destroyed when empty
@@ -294,15 +244,22 @@ namespace DOL.GS
         /// <param name="minutes"></param>
         public void BeginAutoClosureCountdown(int minutes)
         {
-            if (m_autoCloseRegionTimer != null)
-            {
-                m_autoCloseRegionTimer.Stop();
-                m_autoCloseRegionTimer = null;
-            }
+            m_autoCloseRegionTimer?.Stop();
 
-            m_autoCloseRegionTimer = new AutoCloseRegionTimer(TimeManager, this);
-            m_autoCloseRegionTimer.Interval = minutes * 60000;
-            m_autoCloseRegionTimer.Start(minutes * 60000);
+            m_autoCloseRegionTimer = new ECSGameTimer(null, t =>
+            {
+                if (WorldMgr.GetClientsOfRegion(ID).Count > 0)
+                {
+                    log.Warn("Players were still in the region on AutoCloseRegionTimer Tick! Please check the overridden voids OnPlayerEnter/Exit to ensure that a 'base.OnPlayerEnter/Exit' is included!");
+                }
+                else
+                {
+                    log.Info(Name + " (ID: " + ID + ") just reached the timeout for the removal timer. The region is empty, and will now be demolished and removed from the world. Entering OnCollapse!");
+                    t.Stop();
+                    WorldMgr.RemoveInstance(this);
+                }
+                return 0;
+            }, minutes * 60000);
         }
 
         /// <summary>
@@ -313,93 +270,17 @@ namespace DOL.GS
         {
             DestroyWhenEmpty = false;
 
-            if (m_autoCloseRegionTimer != null)
+            m_autoCloseRegionTimer?.Stop();
+            m_autoCloseRegionTimer = null;
+
+            m_delayCloseRegionTimer?.Stop();
+
+            m_delayCloseRegionTimer = new ECSGameTimer(null, t =>
             {
-                m_autoCloseRegionTimer.Stop();
-                m_autoCloseRegionTimer = null;
-            }
-
-            if (m_delayCloseRegionTimer != null)
-            {
-                m_delayCloseRegionTimer.Stop();
-                m_delayCloseRegionTimer = null;
-            }
-
-            m_delayCloseRegionTimer = new DelayCloseRegionTimer(TimeManager, this);
-            m_delayCloseRegionTimer.Interval = minutes * 60000;
-            m_delayCloseRegionTimer.Start(minutes * 60000);
-        }
-
-        /// <summary>
-        /// Automated Closing Timer for Instances
-        /// </summary>
-        protected class AutoCloseRegionTimer : GameTimer
-        {
-            public AutoCloseRegionTimer(TimeManager time, BaseInstance i)
-                : base(time)
-            {
-                m_instance = i;
-            }
-
-            //The instance to remove...
-            BaseInstance m_instance;
-
-            //When the timer ticks, it means there are no players in the region.
-            //This, we remove the instance.
-            public override void OnTick()
-            {
-                if (m_instance == null)
-                {
-                    log.Warn("RegionRemovalTimer is not being stopped once the instance is destroyed!");
-                    Stop();
-                    return;
-                }
-                //If there are players, someone has callously forgotten to include
-                //a base in one of their OnPlayerEnter/Exit overrides.
-                //When this is a case, keep the timer ticking - we will eventually have it cleanup the instance,
-                //it just wont be runnign at optimum speed.
-
-                if (WorldMgr.GetClientsOfRegion(m_instance.ID).Count > 0)
-                    log.Warn("Players were still in the region on AutoRemoveregionTimer Tick! Please check the overridden voids OnPlayerEnter/Exit to ensure that a 'base.OnPlayerEnter/Exit' is included!");
-                else
-                {
-                    //Collapse the zone!
-                    //Thats my favourite bit ;)
-                    log.Info(m_instance.Name + " (ID: " + m_instance.ID + ") just reached the timeout for the removal timer. The region is empty, and will now be demolished and removed from the world. Entering OnCollapse!");
-                    Stop();
-                    WorldMgr.RemoveInstance(m_instance);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Delay Closing Timer for Instances
-        /// </summary>
-        protected class DelayCloseRegionTimer : GameTimer
-        {
-            public DelayCloseRegionTimer(TimeManager time, BaseInstance i)
-                : base(time)
-            {
-                m_instance = i;
-            }
-
-            //The instance to remove...
-            BaseInstance m_instance;
-
-            public override void OnTick()
-            {
-                if (m_instance == null)
-                {
-                    log.Warn("DelayCloseRegionTimer is not being stopped once the instance is destroyed!");
-                    Stop();
-                    return;
-                }
-
-                Stop();
-                m_instance.DestroyWhenEmpty = true;
-            }
-
+                t.Stop();
+                DestroyWhenEmpty = true;
+                return 0;
+            }, minutes * 60000);
         }
 
         #endregion

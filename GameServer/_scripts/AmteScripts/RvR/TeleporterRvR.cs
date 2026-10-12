@@ -116,9 +116,7 @@ namespace DOL.GS.Scripts
         private void _Teleport(GamePlayer player)
         {
             _isBusy = true;
-            RegionTimer TimerTL = new RegionTimer(this, _Teleportation);
-            TimerTL.Properties.setProperty("player", player);
-            TimerTL.Start(3000);
+            new ECSGameTimer(this, _ => _Teleportation(player), 3000);
             foreach (GamePlayer players in player.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
             {
                 players.Out.SendSpellCastAnimation(this, 1, 20);
@@ -126,10 +124,9 @@ namespace DOL.GS.Scripts
             }
         }
 
-        private int _Teleportation(RegionTimer timer)
+        private int _Teleportation(GamePlayer player)
         {
             _isBusy = false;
-            GamePlayer player = timer.Properties.getProperty<GamePlayer>("player", null);
             if (player == null) return 0;
             if (player.InCombat)
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "TeleporterRvR.InCombat"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);

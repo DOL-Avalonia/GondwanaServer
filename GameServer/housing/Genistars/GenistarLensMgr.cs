@@ -170,9 +170,7 @@ namespace DOL.GS.Scripts
                 player.SetAFK("AFK Care", showMessage: true);
             }
 
-            RegionTimer emoteTimer = new RegionTimer(player, new RegionTimerCallback(CareEmotePulseCallback));
-            emoteTimer.Properties.setProperty("caringPlayer", player);
-            emoteTimer.Start(2000);
+            ECSGameTimer emoteTimer = new ECSGameTimer(player, CareEmotePulseCallback, 2000);
 
             player.TempProperties.setProperty("GenistarCareEmoteTimer", emoteTimer);
             player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client.Account.Language, "Genistar.LensMgr.Kneel"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -182,7 +180,7 @@ namespace DOL.GS.Scripts
         {
             if (player == null) return;
 
-            RegionTimer emoteTimer = player.TempProperties.getProperty<RegionTimer>("GenistarCareEmoteTimer", null);
+            ECSGameTimer emoteTimer = player.TempProperties.getProperty<ECSGameTimer>("GenistarCareEmoteTimer", null);
             if (emoteTimer != null)
             {
                 emoteTimer.Stop();
@@ -204,15 +202,10 @@ namespace DOL.GS.Scripts
             }
         }
 
-        private static int CareEmotePulseCallback(RegionTimer timer)
+        private static int CareEmotePulseCallback(ECSGameTimer timer)
         {
-            GamePlayer p = timer.Properties.getProperty<GamePlayer>("caringPlayer", null);
-
-            if (p == null || !p.IsAlive || !p.TempProperties.getProperty<bool>("IsAfkCareMode", false))
-            {
-                timer.Stop();
+            if (timer.Owner is not GamePlayer p || !p.IsAlive || !p.TempProperties.getProperty<bool>("IsAfkCareMode", false))
                 return 0;
-            }
 
             p.Out.SendEmoteAnimation(p, eEmote.PlayerPickup);
             return 2000;

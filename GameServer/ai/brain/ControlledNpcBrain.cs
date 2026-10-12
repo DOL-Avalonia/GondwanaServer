@@ -1076,7 +1076,7 @@ namespace DOL.AI.Brain
             }
 
             // Pet-specific pruning: mezzed or hard-rooted (99% snare) targets are dropped.
-            // Dead / far / not-attackable entries are already pruned by GondwanaThreatStrategy inside base.CalculateNextAttackTarget().
+            // Dead / far / not-attackable entries are already pruned by ThreatStrategy inside base.CalculateNextAttackTarget().
             List<GameLiving> removable = null;
             foreach (GameLiving living in m_aggroTable.GetUnordered())
             {

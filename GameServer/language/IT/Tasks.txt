@@ -47,6 +47,8 @@ Tasks.Level: Livello {0}
 
 Tasks.KillEnemyPlayersGroupLog: Uccidi giocatori nemici in gruppo: {0}/{1}
 Tasks.KillEnemyPlayersAloneLog: Uccidi giocatori nemici da solo: {0}/{1}
+Tasks.KillCreaturesInDungeonsLog: Uccidi creature dei dungeon: {0}/{1}
+Tasks.KillOutdoorsCreaturesLog: Uccidi creature all'aperto: {0}/{1}
 Tasks.KillKeepGuardsLog: Uccidi le guardie dei forti: {0}/{1}
 Tasks.TakeKeepsLog: Conquista forti: {0}/{1}
 Tasks.KillTerritoryGuardsLog: Uccidi le guardie di territorio: {0}/{1}

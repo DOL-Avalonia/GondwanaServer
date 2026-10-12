@@ -1,7 +1,19 @@
 
-# Relics/GameRelicPad
+# GameRelicPad
 GameRelicPad.MountRelic.Captured:			{0} a capturé: {1}.
 GameRelicPad.MountRelic.Stored:				{0} de {1} a capturé {2} to the {3}.
-GameRelicPad.OnPlayerEnter.EmptyRelicPad:		Vous devez trouver un socle de relique {0} vide pour placer cette relique.
+GameRelicPad.OnPlayerEnter.EmptyRelicPad:	Vous devez trouver un socle de relique {0} vide pour placer cette relique.
 GameRelicPad.RemoveRelic.Removed:			{0} de {1} a retiré {2} de {3}.
 
+# GameRelic
+GameRelic.Interact.Dead:					Vous ne pouvez pas ramasser {0} car vous êtes mort·e !
+GameRelic.Interact.OwnedByRealm:			Vous ne pouvez pas ramasser {0}. Elle appartient déjà à votre royaume.
+GameRelic.Interact.CaptureOwnFirst:			Vous ne pouvez pas ramasser {0}. Vous devez d'abord capturer la relique {1} de votre royaume.
+GameRelic.PlayerTakesRelic.AlreadyCarrying: Vous portez déjà une relique.
+GameRelic.PlayerTakesRelic.Stealthed:		Vous ne pouvez pas porter de relique en étant furtif.
+GameRelic.PlayerTakesRelic.Dead:			Vous êtes mort·e !
+GameRelic.PlayerTakesRelic.CaptureKeepFirst:	Vous devez capturer ce fort avant de prendre une relique.
+GameRelic.PlayerTakesRelic.InventoryFull:		Vous n'avez pas assez de place dans votre sac à dos pour porter ceci.
+GameRelic.GetExamineMessages.OwnedByYourRealm:	La relique appartient à votre royaume.
+GameRelic.GetExamineMessages.OwnedByRealm:		La relique appartient à : {0}.
+GameRelic.GetExamineMessages.NoOwner:			La relique n'a pas de propriétaire, prenez-la !

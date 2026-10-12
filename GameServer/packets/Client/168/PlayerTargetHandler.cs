@@ -1,22 +1,3 @@
-/*
- * DAWN OF LIGHT - The first free open source DAoC server emulator
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-
 using DOL.Events;
 using DOL.Language;
 
@@ -26,17 +7,11 @@ namespace DOL.GS.PacketHandler.Client.v168
     /// Handles player target changes
     /// </summary>
     [PacketHandlerAttribute(PacketHandlerType.TCP, eClientPackets.PlayerTarget, "Handle Player Target Change.", eClientStatus.PlayerInGame)]
-    public class PlayerTargetHandler : IPacketHandler
+    public class PlayerTargetHandler : PacketHandler
     {
-        /// <summary>
-        /// Handles every received packet
-        /// </summary>
-        /// <param name="client">The client that sent the packet</param>
-        /// <param name="packet">The received packet data</param>
-        /// <returns></returns>
-        public void HandlePacket(GameClient client, GSPacketIn packet)
+        protected override void HandlePacketInternal(GameClient client, GSPacketIn packet)
         {
-            ushort targetID = packet.ReadShort();
+            ushort targetId = packet.ReadShort();
             ushort flags = packet.ReadShort();
 
             /*
@@ -46,93 +21,44 @@ namespace DOL.GS.PacketHandler.Client.v168
 			 * 0x0001 = players attack mode bit (not targets!)
 			 */
 
-            new ChangeTargetAction(client.Player, targetID, (flags & (0x4000 | 0x2000)) != 0, (flags & 0x8000) != 0).Start(1);
-        }
+            GamePlayer player = client.Player;
+            if (player?.CurrentRegion == null) return;
 
-        /// <summary>
-        /// Changes players target
-        /// </summary>
-        protected class ChangeTargetAction : RegionAction
-        {
-            /// <summary>
-            /// The 'examine target' bit
-            /// </summary>
-            protected readonly bool m_examineTarget;
+            bool targetInView = (flags & (0x4000 | 0x2000)) != 0;
+            bool examineTarget = (flags & 0x8000) != 0;
 
-            /// <summary>
-            /// The new target OID
-            /// </summary>
-            protected readonly ushort m_newTargetId;
-
-            /// <summary>
-            /// The 'target in view' flag
-            /// </summary>
-            protected readonly bool m_targetInView;
-
-            /// <summary>
-            /// Constructs a new TargetChangeAction
-            /// </summary>
-            /// <param name="actionSource">The action source</param>
-            /// <param name="newTargetId">The new target OID</param>
-            /// <param name="targetInView">The target LOS bit</param>
-            /// <param name="examineTarget">The 'examine target' bit</param>
-            public ChangeTargetAction(GamePlayer actionSource, ushort newTargetId, bool targetInView, bool examineTarget)
-                : base(actionSource)
+            GameObject target = player.CurrentRegion.GetObject(targetId);
+            if (target != null && !player.IsWithinRadius(target, WorldMgr.OBJ_UPDATE_DISTANCE))
             {
-                m_newTargetId = newTargetId;
-                m_targetInView = targetInView;
-                m_examineTarget = examineTarget;
+                player.Out.SendObjectDelete(targetId);
+                target = null;
             }
 
-            /// <summary>
-            /// Called on every timer tick
-            /// </summary>
-            public override void OnTick()
+            player.TargetObject = target;
+            player.TargetInView = targetInView;
+
+            if (target != null)
             {
-                var player = (GamePlayer)m_actionSource;
+                if (examineTarget)
+                    foreach (string message in target.GetExamineMessages(player))
+                        player.Out.SendMessage(message, eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
 
-                GameObject myTarget = player.CurrentRegion.GetObject((ushort)m_newTargetId);
-                if (myTarget != null && !player.IsWithinRadius(myTarget, WorldMgr.OBJ_UPDATE_DISTANCE))
-                {
-                    player.Out.SendObjectDelete(m_newTargetId);
-                    myTarget = null;
-                }
-                player.TargetObject = myTarget;
-                player.TargetInView = m_targetInView;
+                // Then no LOS message; not sure which bit to use so use both :)
+                // should be sent if targeted is using group panel to change the target
+                if (!targetInView)
+                    player.Out.SendMessage(LanguageMgr.GetTranslation(client, "SpellHandler.TargetNotInView"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-                if (myTarget != null)
-                {
-                    // Send target message text only if 'examine' bit is set.
-                    if (m_examineTarget)
-                    {
-                        foreach (string message in myTarget.GetExamineMessages(player))
-                        {
-                            player.Out.SendMessage(message, eChatType.CT_Missed, eChatLoc.CL_SystemWindow);
-                        }
-                    }
-                    // Then no LOS message; not sure which bit to use so use both :)
-                    // should be sent if targeted is using group panel to change the target
-                    if (!m_targetInView)
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "SpellHandler.TargetNotInView"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                    }
-
-                    if (!(myTarget is GamePlayer))
-                        player.Out.SendObjectUpdate(myTarget);
-                }
-
-                if (player.IsPraying)
-                {
-                    var gravestone = myTarget as GameGravestone;
-                    if (gravestone == null || !gravestone.InternalID.Equals(player.InternalID))
-                    {
-                        player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "PlayerTargetHandler.Gravestone"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                        player.PrayTimerStop();
-                    }
-                }
-
-                GameEventMgr.Notify(GamePlayerEvent.ChangeTarget, player, null);
+                if (target is not GamePlayer)
+                    player.Out.SendObjectUpdate(target);
             }
+
+            if (player.IsPraying && (target is not GameGravestone gravestone || !gravestone.InternalID.Equals(player.InternalID)))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerTargetHandler.Gravestone"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                player.PrayTimerStop();
+            }
+
+            GameEventMgr.Notify(GamePlayerEvent.ChangeTarget, player, null);
         }
     }
 }
